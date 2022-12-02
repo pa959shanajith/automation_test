@@ -27,7 +27,7 @@ const Genius = () => {
   const [appType, setAppType] = useState(null);
   const [appTypeDialog, setAppTypeDialog] = useState(null)
   const [navURL, setNavURL] = useState("")
-  const [selectedBrowser, setSelectedBrowser] = useState(null);
+  const [selectedBrowser, setSelectedBrowser] = useState("chrome");
   const [blockui, setBlockui] = useState({ show: false })
   const [loading, setLoading] = useState(false);
   const [flag, setFlag] = useState(false);
@@ -590,7 +590,7 @@ const Genius = () => {
     setSelectedScenario(null);
     setAppType(null);
     setNavURL("");
-    setSelectedBrowser(null);
+    setSelectedBrowser("chrome");
   }
 
   return (
@@ -605,9 +605,9 @@ const Genius = () => {
           </div>
           <div className='dialog__child'>
             <NormalDropDown
-              label="Select App Type"
+              label="Select Application Type"
               options={plugins_list}
-              placeholder="Select AppType"
+              placeholder="Select Application Type"
               width="300px"
               required
               selectedKey={appTypeDialog ? appTypeDialog.key : null}
@@ -774,7 +774,7 @@ const Genius = () => {
         }}>
           <div>
             <NormalDropDown
-              label="Apptype"
+              label="Application Type"
               options={[
                 selectedProject && allProjects[selectedProject.key] ?
                   {
@@ -783,7 +783,7 @@ const Genius = () => {
                   }
                   : {}
               ]}
-              placeholder="Select an apptype"
+              placeholder="Select Application Type"
               width="300px"
               disabled={!(selectedProject && selectedProject.key)}
               required
@@ -807,7 +807,7 @@ const Genius = () => {
               disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
           </div>
-          <div id="icon-dropdown-container">
+          {/* <div id="icon-dropdown-container">
             <NormalDropDown
               label="Select Browser"
               id="icon-normal-dropdown"
@@ -820,15 +820,15 @@ const Genius = () => {
                   text: 'Google Chrome'
                 }]}
               onChange={(e, item) => {
-                setSelectedBrowser(item.key)
+                setSelectedBrowser(item)
               }}
               placeholder="Select a browser"
-              selectedKey={selectedBrowser ? selectedBrowser.key : null}
+              selectedKey={selectedBrowser}
               width="300px"
               required
               disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
-          </div>
+          </div> */}
         </div>
 
         <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
@@ -859,11 +859,11 @@ const Genius = () => {
         </div>
         <div>
           <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
-            <a href="/plugin" className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem" }}>EXIT</a>
+            <div onClick={()=>{window.localStorage['navigateScreen'] = "plugin";history.replace('/plugin');}} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor:"pointer" }}>EXIT</div>
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
               <button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>
               <button className="reset-action__next"
-                disabled={!(selectedBrowser && selectedProject && selectedModule && selectedScenario && navURL && (appType ? appType.text : ""))}
+                disabled={!(selectedProject && selectedModule && selectedScenario && navURL && (appType ? appType.text : ""))}
                 style={{ border: "2px solid #5F338F", color: "white", borderRadius: "10px", padding: "8px 25px", background: "#5F338F" }} onClick={(e) => {
                   // let eURL = `electron-fiddle://project=${JSON.stringify(selectedProject)}&module=${JSON.stringify(selectedModule)}&scenario=${JSON.stringify(selectedScenario)}&navurl=${navURL}&browser=${selectedBrowser}`
                   // window.location.href = eURL;

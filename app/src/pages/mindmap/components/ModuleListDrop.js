@@ -32,10 +32,13 @@ const ModuleListDrop = (props) =>{
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
-    const filterSc = props.filterSc
+    // const filterSc = props.filterSc
     const [selectedSc,setSelctedSc] = useState([])
     const [isE2EOpen, setIsE2EOpen] = useState(false);
     const [collapse, setCollapse] = useState(false);
+    const SearchScInp = useRef()
+    const [filterSc,setFilterSc] = useState('')
+
     
   
 
@@ -46,6 +49,10 @@ const ModuleListDrop = (props) =>{
         }
         setWarning(false)
      },[])
+     useEffect(()=>{
+        var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
+        setScenarioList(filter)
+    },[filterSc,setScenarioList,initScList])
     
     const displayError = (error) =>{
         setLoading(false)
@@ -66,6 +73,9 @@ const ModuleListDrop = (props) =>{
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+    }
+    const searchScenario = (val) =>{
+        setFilterSc(val)
     }
      const loadModule = async(modID) =>{
         setWarning(false)
@@ -98,6 +108,8 @@ const ModuleListDrop = (props) =>{
                 var type = name
                 var name = type
                 // below code about scenarios fetching
+        SearchScInp.current.value = ""
+
                 setSelctedSc([])
                     if (isE2EOpen){
                         setBlockui({content:'loading scenarios',show:true})
@@ -168,6 +180,7 @@ const ModuleListDrop = (props) =>{
         setBlockui({show:false})
     }
     const addScenario = (e) => {	
+        // console.log('click');
         var sceId = e.currentTarget.getAttribute("value")	
         var sceName = e.currentTarget.getAttribute("title")	
         var scArr = {...selectedSc}	
@@ -175,7 +188,8 @@ const ModuleListDrop = (props) =>{
             delete scArr[sceId] 	
         }else{	
             scArr[sceId] = sceName	
-        }        	
+        }       
+        console.log('scArr', scArr); 	
         setSelctedSc(scArr)	
     }	
     const clickAdd = () =>{	
@@ -229,6 +243,7 @@ const ModuleListDrop = (props) =>{
             <div className='wholeContainer'>
             <div className='fullContainer pxBlack'>
                 <div className='leftContainer pxBlack' style={{ display:"flex"}}>
+                    
                     <div className='modulesBox' >
                         <div style={{ display:"flex", justifyContent:"space-between" }}>
                         <img src="static/imgs/node-modules.png" alt="modules" style={{display:"flex",position:'',width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
@@ -262,7 +277,7 @@ const ModuleListDrop = (props) =>{
                                     <div key={i}>
                                             <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
                                                 <div className='modClick' value={e._id} style={{display:'flex',flexDirection:'row'}} >
-                                                {<input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)}  />}  
+                                                {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)}  />}  
                                                 <span  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} className='modNme' value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</span>
                                                 </div>
                                             </div>
@@ -298,32 +313,45 @@ const ModuleListDrop = (props) =>{
                         <div className='moduleList'>
                         {moduleList.map((e,i)=>{
                             if(e.type==="endtoend")
-                            return(
+                            return(<>
+                                    
                                     <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
-                                       <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left'}}> <span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span></div>
+                                       <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.75rem', display:'flex',flexDirection:'row-reverse',marginLeft:'-6px'}}> <span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span> <div  ><img style={{marginLeft:'-24px'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" /></div></div>
+                                       
                                     </div>
+                                    </>
                             )
                         })}
                         </div>
                     </div>
+                    {/* <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(0deg)' : 'rotate(180deg)',height:'37px',width:'8px', position:'relative'
+    }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' /> </div> */}
                 </div>
+                
                 </div>
-                <div className='scenarioListBox' style={{width:collapse? "13%":"0%"}}>
-                    <div style={{display:"flex", flexDirection:"column", width:"100%"}}>
+                <div className='scenarioListBox' style={{width:collapse? "9rem":"0.5rem", overflowX:'hidden'}}>
+                    <div style={{display:"flex", flexDirection:"column", width:"100%",overflowX:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <div style={{paddingTop:'0.3rem',marginLeft:'1.3rem'}}><h5><b>Scenarios</b></h5></div>
-                    <div style={{marginRight:'-0.5rem',marginTop:'-0.4rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
+                    <div style={{paddingTop:'0.3rem',marginLeft: "30px"}}><h5><b>Scenarios</b></h5></div>
+                    <div style={{marginRight:'-0.4rem',marginTop:'-0.3rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
                     }}><img src="static/imgs/X_button.png" alt="cross button" /></div></div>
+                    {/* scenario Search */}
+                     <span style={{display:'flex', flexDirection:'row-reverse', marginRight:'4px', marginTop:'2px'}}>
+                        <input  style={{width:'137px',height: '23px', borderRadius:'6px'}} placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
+                        <img style={{width: '12px', height: '17px', marginRight:"-8.2rem", marginTop:'2px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                    </span>
                         <div className='scenarioList'>
-                           <div style={{display: scenarioList.length==0? '':'none', textAlign:'center', marginTop:'3rem'}}><h7 >Please select a module to display <br></br> it's scenarios</h7></div> 
+                           <div style={{display: scenarioList.length==0? '':'none', textAlign:'center', marginTop:'3rem', marginRight:!isE2EOpen || !collapse? '5rem':'', overflowX:'hidden'}}><h7 >Please select a module to display <br></br> it's scenarios</h7></div> 
                               
                                 {scenarioList.map((e, i) => {
                                     
                                     return (
-                                        <div className='scenarios'>
-                                            <div key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios' + (selectedSc[e._id] ? ' selected' : '')} title={e.name} value={e._id} >
+                                        <div className='scenarios '>
+
+                                            <div  key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios'} title={e.name} value={e._id} >
+                                                <div><input type="checkbox"  value={e._id} onChange={(e)=>{} } checked={selectedSc[e._id]}  />
                                                 <span style={{textOverflow:"ellipsis"}}>
-                                                {e.name}</span></div>
+                                                {e.name}</span></div></div>
                                         </div>
                                     )
                                 })}
@@ -331,10 +359,12 @@ const ModuleListDrop = (props) =>{
                             <div className='AddBut'>
                                 <div onClick={clickAdd} style={{opacity: scenarioList.length==0? '0.3':'', width:'2.3rem',height:'1.5rem', marginLeft:'.7rem',marginBottom:'0.7rem',textAlign:'center', alignContent:'center',backgroundColor:'$white',cursor:'pointer'}}className={'btn.' + (selectedSc.length < 1 ? ' disabled' : '')}><img src="static/imgs/AddButton.png" alt="AddButton" /></div>
                             </div>
-                    </div>
-                
+                            </div>
+                    <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(0deg)' : 'rotate(180deg)',height:'30px',width:'8px', position:'relative'
+    }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' /> </div>
+                 
                 </div>
-                <div className='collapseButtonDiv' ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(0deg)' : 'rotate(180deg)', }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' /> </div>
+   
                </div>
             
             <div data-test="dropDown" onClick={()=>{
