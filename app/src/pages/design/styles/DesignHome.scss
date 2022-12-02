@@ -22,4 +22,15 @@
     position: static;
 }
 
+.d__mid_section {
+    align-items: flex-end;
+    .ref__wrapper {
+        height: 95%;
+        position: absolute;
+        right: -14px;
+        /* top: 0; */
+        bottom: -29px;
+    }
+}
+
 

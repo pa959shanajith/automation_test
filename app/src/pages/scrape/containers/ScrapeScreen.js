@@ -410,7 +410,7 @@ const ScrapeScreen = (props)=>{
                     { props.appType === "Webservice" 
                         ? <WebserviceScrape /> 
                         : compareFlag ? <CompareObjectList /> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
-                    <RefBarItems mirror={mirror}/>
+                    <RefBarItems mirror={mirror} collapse={true} appType={props.appType}/>
                 </ScrapeContext.Provider>
             </div>
             {/* <div data-test="ssFooter"className='ss__footer'><Footer/></div> */}
