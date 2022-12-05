@@ -303,7 +303,7 @@ const ModuleListDrop = (props) =>{
                                     }
                                 },
                                 ]}
-                                 style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.3rem'}} placeholderIconName = 'plusIconEndtoEnd'
+                                 id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
                             />  
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
