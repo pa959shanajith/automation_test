@@ -10,9 +10,9 @@ import { ReferenceBar, ScrollBar } from '../../global';
         mirror -> base64 screenshot
 */
 
-const ReferenceContent = ({mirror}) => {
+const ReferenceContent = ({mirror,collapse,appType}) => {
 
-    const { appType } = useSelector(state=>state.plugin.CT);
+    // const { appType } = useSelector(state=>state.plugin.CT);
     const [showScreenPop, setShowScreenPop] = useState(false);
     const [screenshotY, setScreenshotY] = useState(null);
 	const [mirrorHeight, setMirrorHeight] = useState("0px");
@@ -64,7 +64,7 @@ const ReferenceContent = ({mirror}) => {
 
     return (
     <>
-    <ReferenceBar popups={<ScreenPopup/>} closeAllPopups={closeAllPopups}>
+    <ReferenceBar popups={<ScreenPopup/>} collapsible={true} collapse={collapse} closeAllPopups={closeAllPopups}>
     { appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={togglePop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
     </ReferenceBar>
     </>

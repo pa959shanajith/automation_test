@@ -72,7 +72,8 @@
     display: flex;
     
     align-items: center;
-    margin: 15% 27px 14% -2px;
+    // margin: 15% 27px 14% -2px;
+    margin: 0 !important;
     font-size: 12.6px;
     font-family: Mulish;
     font-weight: 600;
@@ -293,5 +294,40 @@
     font-size: 15px;
     font-family: 'LatoWebMedium'; 
 }
+.ss__left-btns .ms-Dropdown {
+    height: 2.225rem !important;
+}
 
+.ss__taskBtnd{
 
+    padding: 2px 13px;
+
+    margin-right: 2px;
+
+    height: 20px;
+
+    font-size: 12px;
+
+    background-color: $primaryColor;
+
+    &:disabled{
+
+        background-color: $backgroundThree;
+
+        cursor: not-allowed;
+
+    }
+
+}
+
+.ss__btnd{
+
+    border: none;
+
+    outline: none;
+
+    color: $whiteColor;
+
+    border-radius: 20px;
+
+}

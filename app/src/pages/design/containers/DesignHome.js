@@ -124,12 +124,14 @@ const DesignHome = (props) => {
                                 />
                 {/* <div style={{ display: 'flex',alignItems:'center', }}>
                     <div >
-                <img style={{ height: '1.1rem' }} onClick={closeBar} src={'static/imgs/collapseButton.png'}/></div>
-                {<div style={{width:Collapsed? '5rem':'0rem'}}>
-                    <ReferenceContent data-test="d__refBar" mirror={mirror} appType={props.appType}/> </div>
-                }</div> */}
+                <img style={{ height: '1.1rem' }} onClick={closeBar} src={'static/imgs/collapseButton.png'}/></div> */}
+                {/* {<div style={{width:Collapsed? '5rem':'0rem'}}> */}
+                <div>
+                    <ReferenceContent collapse={true} data-test="d__refBar" mirror={mirror} appType={props.appType}/> </div>
+                    </div>
+                {/* }</div> */}
                 
-            </div>
+            {/* </div> */}
             {/* <div data-test="d__footer" className='d__footer'><Footer/></div> */}
         </div>
         </>}
