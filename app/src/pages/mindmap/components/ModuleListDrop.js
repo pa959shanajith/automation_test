@@ -303,12 +303,12 @@ const ModuleListDrop = (props) =>{
                                     }
                                 },
                                 ]}
-                                 style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.3rem'}} placeholderIconName = 'plusIcon'
+                                 id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
                             />  
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
                             <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
-                            <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                            <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                         </div>
                         <div className='moduleList'>
                         {moduleList.map((e,i)=>{
