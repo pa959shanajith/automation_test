@@ -923,11 +923,11 @@ const DesignContent = props => {
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
                     <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
-                    {props.appType==="Web"?<div style={{ marginLeft: '-1px', marginBottom: '1px', marginRight:'-5px',marginTop:'-29px' }}>
+                    {props.appType==="Web"?<div className='taskButtonWeb'>
                    
                         {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                         <NormalDropDown
-                        style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
+                        // style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
                         
 
                             onChange={(e,item)=>{
@@ -1033,8 +1033,8 @@ const DesignContent = props => {
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
-                    <span className="objname_col d__obj_head" >Object Name</span>
-                    <span className="keyword_col d__key_head" >Keyword</span>
+                    <span className="objname_col d__obj_head" >Element Name</span>
+                    <span className="keyword_col d__key_head" >Operations</span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     {/* <span className="remark_col d__rem_head" >Remarks</span> */}
@@ -1045,9 +1045,9 @@ const DesignContent = props => {
                 <div className="ab">
                     <div className="min">
                         <div className="con" id="d__tcListId">
-                            <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
+                            <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor= "#8a8886" trackColor= "#d2d0ce">
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
+                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
                                 testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row" draggable={draggable}
                                     key={i} idx={i} objList={objNameList} testCase={testCase} edit={edit} 

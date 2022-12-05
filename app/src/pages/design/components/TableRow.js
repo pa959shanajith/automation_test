@@ -48,7 +48,8 @@ const TableRow = (props) => {
     useEffect(()=>{
         if (!focused){
             setObjName(props.testCase.custname);
-            setObjType(null);
+            const caseData = props.getKeywords(props.testCase.custname);
+            setObjType(caseData.obType);
             setKeyword(props.testCase.keywordVal);
             setInput(props.testCase.inputVal[0]);
             setOutput(props.testCase.outputVal);
@@ -197,7 +198,7 @@ const TableRow = (props) => {
                     <div className="d__row_text" title={objName} >{objName}</div>
                     }
                 </span>
-                <span className="keyword_col" >
+                <span className="keyword_col" title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
                     { focused ? 
                     <>
                         <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} disabled={disableStep}>

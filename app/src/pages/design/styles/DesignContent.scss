@@ -203,7 +203,7 @@
     height: 100%;
     padding: 0 5px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    // text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -444,4 +444,8 @@
     border: none !important;
     border-radius:17px;
     font-family:"LatoWeb";
+}
+
+.taskButtonWeb{
+    margin-left: -1px;
 }
