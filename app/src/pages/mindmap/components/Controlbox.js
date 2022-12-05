@@ -71,7 +71,7 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete).html('Delete ').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.record).html('AvoGenius (Smart Recorder)').style('font-family', 'LatoWeb');
+            c.select('p.' + faRef.record).html('Avo Genius (Smart Recorder)').style('font-family', 'LatoWeb');
         } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus).html('Add Testcase').style('font-family', 'LatoWeb');

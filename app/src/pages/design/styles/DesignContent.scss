@@ -98,12 +98,12 @@
         cursor: not-allowed;
     }
 }
-.debug_button{
-    margin-left: 15px;
-    position: sticky;
-    /* top: 47px; */
-    margin-top: 10px;
-}
+// .debug_button{
+//     margin-left: 15px;
+//     position: sticky;
+//     /* top: 47px; */
+//     margin-top: 10px;
+// }
 
 #debug_buttonWeb{
     margin-left: 15px;
@@ -140,7 +140,7 @@
     flex-direction: column;
     flex: 1 1 100%;
     margin: -6px -21px 3px -21px;
-    overflow: auto;
+    // overflow: auto;
     height: 385px;
 }
 
@@ -437,4 +437,11 @@
 
 .d__debugButton .p-button-warning{
     margin: 0;
+}
+
+.debug_button{
+    background: #643693 !important;
+    border: none !important;
+    border-radius:17px;
+    font-family:"LatoWeb";
 }
