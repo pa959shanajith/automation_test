@@ -923,7 +923,7 @@ const DesignContent = props => {
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
                     <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
-                    {props.appType==="Web"?<div style={{ marginLeft: '-1px'}}>
+                    {props.appType==="Web"?<div className='taskButtonWeb'>
                    
                         {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                         <NormalDropDown
