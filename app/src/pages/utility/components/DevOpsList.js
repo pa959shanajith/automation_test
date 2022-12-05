@@ -78,7 +78,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     useEffect(()=>{
         pluginApi.getProjectIDs()
         .then(data => {
-                setProjectData1(data.releases[selectedCycle][0].name);
+                // setProjectData1(data.releases[selectedCycle][0].name);
                 setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
                 setCycleName(data.releases[selectedCycle][0].cycles[0].name);
     })},[selectedCycle])
@@ -565,7 +565,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     return (<>
      {
             executionQueue &&
-            <Dialog header="Manage Execution Queue" visible={displayBasic3}  onDismiss = {() => {displayBasic3(false)}}  style={{width:'50%', height:'auto'}} onHide={() => onHide('displayBasic3')}>
+            <Dialog header="Manage Execution Queue" className='Manage_Execution' visible={displayBasic3}  onDismiss = {() => {displayBasic3(false)}}  onHide={() => onHide('displayBasic3')}>
             {
                         (executionQueue.list.length > 0 ) ? <CheckboxTree
                             showNodeIcon={false} className='devOps_checkbox_tree' nodes={executionQueue.list} expanded={executionQueue.expanded} onExpand={(expanded) => setExecutionQueue({...executionQueue, expanded: expanded}) } /> : 
@@ -579,7 +579,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" style={{width: '44vh'}} onClick={() => setCurrentIntegration({
+            <button data-test="submit-button-test" onClick={() => setCurrentIntegration({
                     name: '',
                     key: uuid(),
                     selectValues: [
@@ -607,8 +607,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
         </div>
         
-                  <div style={{marginTop: '6vh',position: 'absolute', display: 'flex'}}>
-                 <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '1vh', marginRight: '5px'}}>Project Name : </span>
+                <div className = "projectName">
+                 <span className="api-ut__inputLabel projectName1" >Project Name : </span>
         
                     
                 <SearchDropdown
@@ -624,7 +624,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
         { configList.length > 0 ? <>
             { /* Table */ }
-            <div className="d__table" style={{flex: '1 1 7%', paddingLeft:'2vh', paddingRight:'2vh'}}>
+            <div className="d__table">
                 <div className="d__table_header">
                 <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#&nbsp;</span>
                     <span className="d__out_head tkn-table__key tkn-table__head1" >&nbsp;&nbsp;Execution Profile Name</span>
@@ -635,7 +635,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <span className=" details_col tkn-table__key d__det_head" >Action</span>
                 </div>
             </div>
-            <div id="activeUsersToken" className="wrap active-users-token" style={{marginLeft: '-1.5vh',width: '101.5%', paddingBottom:'0%'}}>
+            <div id="activeUsersToken" className="wrap active-users-token active-users-token1 " >
                 <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>
@@ -643,7 +643,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
+                                <td className="tkn-table__key tkn-table__key1" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
@@ -689,15 +689,15 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                     <td className="tkn-table__button" >
-                                        <img style={{marginRight: '8vh',height: '3vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
-                                        <img style={{height: '3vh'}} onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
+                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button" alt="Edit Icon"/> 
+                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons Delete_button" alt="Delete Icon"/>
                                     </td>
                              </tr>)
                          }
                         {
                              searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
+                                <td className="tkn-table__key tkn-table__key1" data-for="name" data-tip={item.configurename} > <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
@@ -743,7 +743,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                     <td className="tkn-table__button" >
-                                        <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
+                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button1" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                    </td>
                              </tr>)
@@ -752,14 +752,14 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </table>
                 
                {/* Dialog for Execute Now */}
-                <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '40vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
+                <Dialog header="Execute Now" visible={displayBasic2}  className="execution" footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
     
-                    <input type="radio" name='myRadios' id='first'  onChange={() => {setAllocateICE(true); setDisplayBasic2(false);}}
-                     style={{width:'2.5vh', height: '2.5vh'}} />&nbsp;&nbsp;
-                    <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label>
+                    <input type="radio" name='myRadios' id='first'  className='radiobutton' onChange={() => {setAllocateICE(true); setDisplayBasic2(false);}}
+                      />&nbsp;&nbsp;
+                    <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Assure Client</label>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="radio" name='myRadios' id='second' onChange={()=>{}} style={{width:'2.5vh', height: '2.5vh'}} checked/>&nbsp;&nbsp;
-                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}} >Avo Agent / Avo Grid</label> 
+                    <input type="radio" name='myRadios' id='second' onChange={()=>{}} className='radiobutton' checked/>&nbsp;&nbsp;
+                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Agent / Avo Grid</label> 
                 
                 </Dialog>
                 {/* Dialog for Execute Now */}
@@ -779,27 +779,27 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 />:null}
 
                 {/* Dialog for Schedule */}
-                <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+                <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}}   onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
                 {/* Dialog for Schedule */} 
 
                 {/* Dialog for CI /CD  */}
 
-                <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
-                    <div style={{display: 'flex', marginBottom:'3vh'}} title={url}>
-                    <span className="devOps_dropdown_label devOps_dropdown_label_url" id='api-url' value={url} style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
-                        <pre className='grid_download_dialog__content__code' style={{ width: '58vh'}}>
+                <Dialog header="Execute via CI/CD" visible={displayBasic} className="cicdName" onHide={() => onHide('displayBasic')}>
+                    <div className="cicdDiv" title={url}>
+                    <span className="devOps_dropdown_label devOps_dropdown_label_url cicdSpan" id='api-url' value={url}>DevOps Integration API url : </span>
+                        <pre className='grid_download_dialog__content__code cicdpre'>
                         <code id='api-url' title={url}>
                         {url}
                         </code>
                     </pre>
                     <label>
                             <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                            <div style={{fontSize:"24px"}}>
-                                    <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '3.5vh'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(url) }} ></i>
+                            <div className="labeldiv">
+                                    <i className="fa fa-files-o icon labeldivi" data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(url) }} ></i>
                             </div>
                         </label>
                 </div>
-                        <div style={{display: 'flex', marginBottom:'3vh'}}>
+                        <div  className="executiontype">
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                                 <label id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
@@ -807,18 +807,18 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <label id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
                         </div>
                     </div>
-                        <div style={{display: 'flex', marginBottom:'3vh'}} title={str}>
-                        <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '8.5vh'}}>DevOps Request Body : </span>
-                        <pre className='grid_download_dialog__content__code'  style={{ width: '58vh', marginLeft: '46px'}}>
-                        <code style={{fontSize: 'smaller'}} id='devops-key' title={str} >
+                        <div className="executiontype" title={str}>
+                        <span className="api-ut__inputLabel executiontypename" >DevOps Request Body : </span>
+                        <pre className='grid_download_dialog__content__code executiontypenamepre' >
+                        <code className="executiontypecode" id='devops-key' title={str} >
                             {str}
                             {/* {abc} */}
                         </code>
                         </pre>
                         <label>
                             <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                                <div style={{fontSize:"24px",marginTop:'5vh'}}>
-                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyConfigKey(str) }} ></i>
+                                <div  className="labeldiv1">
+                                <i className="fa fa-files-o icon labeldivi1"  data-for="copy" data-tip={copyToolTip} onClick={() => {  copyConfigKey(str) }} ></i>
                             </div>
                         </label>
                 </div>
@@ -826,7 +826,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 {/* Dialog for CI /CD  */}
                 </ScrollBar>
             </div>
-        </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' style={{ width: 'auto',height: '60vh',marginRight: '37vh'}}/><h6 style={{position: 'relative',top: '63vh',right: '70vh'}}>No Execution Profile Found<h4 style={ { position: 'absolute', left: '3.5vh', width:'33vh'}}><b>Create Now</b></h4></h6> </div> }
+        </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' className='configImg' /><span className='configImgspan'>No Execution Profile Found<h4 className='configImgh' ><b>Create Now</b></h4></span> </div> }
     </>);
 }
 

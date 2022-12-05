@@ -526,8 +526,8 @@ const DevOpsConfig = props => {
             </span>
         </div>
         <div className="api-ut__btnGroup">
-        <button style={{width: '30vh'}} data-test="submit-button-test" onClick={() => handleConfigSave(props.currentIntegration.name)} >{props.currentIntegration.name == '' ? 'Save Configuration' : 'Update'}</button>
-            <button data-test="submit-button-test" style={{width: '15vh'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
+        <button data-test="submit-button-test submit-button-test_update" onClick={() => handleConfigSave(props.currentIntegration.name)} >{props.currentIntegration.name == '' ? 'Save Configuration' : 'Update'}</button>
+            <button data-test="submit-button-test submit-button-test_back"  onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
             {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
@@ -538,8 +538,8 @@ const DevOpsConfig = props => {
                 </span>
             </div> */}
         </div>
-         <div className="devOps_config_name" style={{position: 'absolute',top: '18vh'}}>
-                <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
+         <div className="devOps_config_name devOps_config_name1"  >
+                <span className="api-ut__inputLabel inputLabel1" >Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
                     <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Profile Name"
@@ -547,10 +547,10 @@ const DevOpsConfig = props => {
                     />
                 </span>
             </div>
-            <div style={{display:'flex'}} > 
-                            <input type='radio' id='Normal' data-for="Normal" data-tip="normalExecution" value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')} style={{width:'2vh', height: '3.5vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><p data-for="Normal" data-tip="Normal Execution"  style={{ fontWeight: '700',marginBottom: '0.5rem' }}>&nbsp;Normal Execution</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Normal" effect="solid" backgroundColor="black" />
-                            <input type='radio' id='Batch' data-for="Batch" data-tip="batchExecution" value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')} style={{width:'2vh', height: '3.5vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><p data-for="Batch" data-tip="Batch Execution" style={{ fontWeight: '700',marginBottom: '0.5rem' }}>&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Batch" effect="solid" backgroundColor="black" />
-                            <input type='radio' id="E2E" data-for="E2E" data-tip="e2eExecution" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')} style={{width:'2vh', height: '3.5vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/><p  data-for="E2E" data-tip="E2E Execution" style={{ fontWeight: '700',marginBottom: '0.5rem' }}>&nbsp;E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</p><ReactTooltip id="E2E" effect="solid" backgroundColor="black" />
+            <div className="radiobutton_config" > 
+                            <input type='radio' id='Normal' data-for="Normal" className='radioinputs' data-tip="normalExecution" value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><p data-for="Normal" data-tip="Normal Execution" className='radioinputsP'  >&nbsp;Normal Execution</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Normal" effect="solid" backgroundColor="black" />
+                            <input type='radio' id='Batch' data-for="Batch" className='radioinputs' data-tip="batchExecution" value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><p data-for="Batch" data-tip="Batch Execution" >&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Batch" effect="solid" backgroundColor="black" />
+                            <input type='radio' id="E2E" data-for="E2E" className='radioinputs' data-tip="e2eExecution" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/><p  data-for="E2E" data-tip="E2E Execution" >&nbsp;E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</p><ReactTooltip id="E2E" effect="solid" backgroundColor="black" />
                         </div>
         {/* <div>
         {
@@ -558,7 +558,7 @@ const DevOpsConfig = props => {
         }
         </div> */}
         {
-            <div style={{ display: 'flex', justifyContent:'space-between' }}>
+            <div className="devOps_module_list_div" >
                 <div className="devOps_module_list">
                     <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} />
                 </div>

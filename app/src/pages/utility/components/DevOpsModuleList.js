@@ -533,21 +533,21 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                     <div className="e__table-head">
                                                         <div className="e__table-head-row">
                                                             <div className='e__contextmenu' id='contextmenu'></div>
-                                                            <div className='e__selectAll' style={{marginRight:'2vh'}} ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
+                                                            <div className='e__selectAll e__selectAll-name ' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
                                                             <input className='e-execute' type='checkbox' checked /></div>	
                                                             <div className='e__scenario'>Scenario Name</div>
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
                                                             <div className='e__apptype' >App Type</div>
-                                                            { showSelectBrowser && <div className='e__accessibilityTesting' style={{width:'30vh'}}>Accessibility Standard</div> }
+                                                            { showSelectBrowser && <div className='e__accessibilityTesting'>Accessibility Standard</div> }
                                                         </div>
                                                     </div>
                                                     <div className={'e__table-bodyContainer'}>
                                                         <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                         {scenarioName.map((e,i)=>
-                                                            <div key={e.name} className={"e__table_row  e__table_row"} style={{marginLeft:'-1vh'}}>   
-                                                            <div className='e__table-col tabeleCellPadding e__contextmenu' style={{marginRight:'1vh'}} >{i+1}</div>
-                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus' style={{marginRight:'2vh'}}>
+                                                            <div key={e.name} className="e__table_row">   
+                                                            <div className='e__table-col tabeleCellPadding e__contextmenu' >{i+1}</div>
+                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus'>
                                                             <input type='checkbox' onChange={e=>{e.target.checked ? doNotExecute[i]=0:doNotExecute[i]=1; setDoNotExecuteArr([...doNotExecute])}} title='Select to execute this scenario' className='doNotExecuteScenario e-execute' checked={!doNotExecute[i]}/>
                                                             </div>
                                                             <div className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" >{scenarioName[i]}</div>
@@ -555,7 +555,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                                 {   dataParameter[i] = e.target.value;
                                                                     setDataParameter([...dataParameter])}} type="text" value = {dataParameter[i]}/></div>
                                                             <div className="e__table-col tabeleCellPadding exe-conditionCheck"><select onChange={(e)=>{condition[i]=e.target.value; setCondition([...condition])}} value={condition[i]} className={"conditionCheck form-control "+((condition[i]=== 0 || condition[i] === '0')?"alertRed":"alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </div>
-                                                            <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'  style={{ marginRight: '1rem'}}>
+                                                            <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'>
                                                                     <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
                                                             { showSelectBrowser &&   

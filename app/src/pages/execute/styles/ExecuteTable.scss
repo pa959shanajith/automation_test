@@ -82,6 +82,7 @@ input[type="checkbox"] {
     white-space:nowrap !important; 
     text-overflow: ellipsis;
     background: inherit !important;
+    margin-right: 2vh !important;
 }
 @media only screen and (height:1080px){
 	.tabeleCellPadding{width: 4%;overflow: hidden;white-space:nowrap !important; text-overflow: ellipsis;}
@@ -176,6 +177,9 @@ input[type="checkbox"] {
 .e__selectAll-exe{
     font-size: 14px
 }
+.e__selectAll-name{
+    margin-right: 2vh;
+}
 .e-execute {
     width: 18px;
     height: 16px;
@@ -228,6 +232,7 @@ input[type="checkbox"] {
 }
 .exe-apptype{
     width: 12%;
+    margin-right: 1rem;
     float:right
 }
 
@@ -264,6 +269,7 @@ input[type="checkbox"] {
     float: left !important;
     padding-top: 5px !important;
     padding-bottom: 5px !important;
+    margin-left: -1vh;
 }
 .e__table-bodyContainer{
     // overflow: auto;

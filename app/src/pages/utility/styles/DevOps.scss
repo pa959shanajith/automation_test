@@ -215,6 +215,9 @@
     justify-content: center;
     flex: 0 0 27%;
 }
+.tkn-table__key1{
+    justify-content: flex-start;
+}
 .tkn-table__icon {
     width: 4%;
 }
@@ -254,14 +257,14 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 59.5vh;
+    height: 61vh;
     &_filter {
         margin-bottom: 2%;
         display: flex;
         justify-content: space-between;
     }
     &_container {
-        height: 44vh;
+        height: 48.5vh;
         max-height: 100%;
     }
 }
@@ -281,6 +284,11 @@
 .active-users-token {
     max-height: 62.6vh;
     height: 100% !important;
+}
+.active-users-token1{
+    margin-left: -1.5vh;
+    width: 101.5%;
+    padding-bottom:0%;
 }
 .searchBoxInput {
     position: relative;
@@ -417,11 +425,149 @@
         margin: 0.1rem 0.5rem 0 0.5rem;
     }
 }
-
 .schedule__dialog .p-dialog-header {
     position: absolute;
     padding: 1rem !important;
     width: 100%;
     background: transparent !important;
     z-index: 10;
+}
+.schedule__dialog{
+    width: 80vw;
+    height:110rem;
+}
+.cicdName{
+    width: 50vw ;
+}
+.cicdDiv{
+    display: flex;
+     margin-bottom: 3vh;
+}
+.cicdSpan{
+    margin-right: 1%;
+    margin-top: 1.5rem;
+}
+.cicdpre{
+    width: 58vh;
+}
+.labeldiv{
+    font-size: 24px;
+}
+.labeldivi{
+    font-size: 24px;
+    margin-top: 3.5vh
+}
+.labeldivi1{
+    font-size: 24px; 
+    margin-top: 1.5rem;
+}
+.executiontype{
+    display: flex;
+    margin-bottom:3vh;
+}
+.executiontypecode{
+    font-size: smaller;
+}
+.labeldiv1{
+    font-size:24px;
+    margin-top:5vh;
+}
+.react-checkbox-tree button{
+     display: none;
+}
+
+.projectName{
+    margin-top: 6vh;
+    position: absolute;
+    display: flex;
+}
+.projectName1{
+    font-weight: 700;
+    margin-top:  1vh;
+    margin-right: 5px;
+}
+.d__table{
+    flex: 1 1 7%;
+    padding-left:2vh;
+    padding-right:2vh;
+}
+.Edit_button{
+    margin-right: 8vh;
+    height: 3vh;
+}
+.Edit_button1{
+   margin-right: 8vh;
+}
+.Delete_button{
+    height: 3vh;
+}
+.execution{
+    width: 40vw;
+}
+.radiobutton{
+    width:2.5vh;
+    height: 2.5vh;
+}
+.radiobutton1{
+    width:25vh;
+    height: 4vh;
+}
+.configImg{
+    width: auto;
+    height: 60vh;
+    margin-right: 37vh;
+}
+.configImgspan{
+    position: relative;
+    top: 60vh;
+    right: 70vh;
+}
+.configImgh{
+    position: absolute; 
+    left: 3.5vh;
+    width:33vh;
+}
+.Manage_Execution{
+    width:50%;
+    height:auto;
+}
+.submit-button-test{
+    width: 44vh;
+}
+.executiontypename{
+    font-weight: 700; 
+    margin-top: 8.5vh;
+}
+.executiontypenamepre{
+    width: 58vh; 
+    margin-left: 46px;
+}
+.submit-button-test_update{
+    width: 11rem;
+    font-size: 15px;
+}
+.submit-button-test_back{
+    width: 5rem;
+}
+.devOps_config_name1{
+    position: absolute;
+    top: 18vh;
+}
+.inputLabel1{
+    font-weight: 700;
+}
+.radiobutton_config{
+    display: flex;
+}
+.radioinputs{
+    width:2vh;
+    height: 3.5vh;
+}
+.radioinputsP{
+    font-weight: 700;
+    margin-bottom: 0.5rem; 
+}
+.devOps_module_list_div{
+    display: flex;
+    justify-content: space-between;
 }

@@ -69,7 +69,7 @@ const ExecuteHome = () => {
     return (
         <div className="e__body">
             <Header />
-                <div className="e__mid_section" style={{paddingBottom: '0%'}}>
+                <div className="e__mid_section">
                     <DevOps/>
                     {/* <ActionBar 
                         upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}
