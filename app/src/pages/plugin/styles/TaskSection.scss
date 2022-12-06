@@ -106,9 +106,10 @@
     border: 2px solid var(--baseColorBorder);
     box-sizing: content-box;
     width: 300px;
-    margin: 10px;
+    margin: -8px;
     height: 10rem;
     margin-top: -0.9rem;
+    border-radius: 9px;
 }
 .display_project_box_list, input[type=checkbox]{
     box-sizing: border-box;
@@ -169,7 +170,35 @@
     color: black;
 }
 
+.user_list{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    margin-left: 5px;
+    height: 100%;
+}
+.ss__search-btn1{
+    outline: none;
+    color: $whiteColor;
+    background-color: $whiteColor;
+    display: flex;
+    border: 1px solid $primaryColor;
+    border-radius: 5px;
+    height: 24px;
+    width: 35px;
+    margin: -28px 14px 12px 49px;
 
+}
+.ss__search_field1{
+    margin-left: 3px;
+    padding: 3px;
+    border: 1px solid $primaryColor;
+    border-radius: 5px;
+    width: 200px;
+    height: 24px;
+    font-family: $avoFont ;
+    font-size: 13px;
+    margin: -37px 13px 13px 86px;}
 // .create-project1{
 //     // font-size: 40px;
 //     font-family: Mulish !important;
@@ -300,6 +329,8 @@
 
     margin-bottom: 0.5rem;
 
+    margin-left: 17px;
+
     label {
 
         margin-right:2rem;
@@ -359,4 +390,5 @@
     }
 
 }
+
 
