@@ -332,7 +332,8 @@ const ModuleListDrop = (props) =>{
                 <div className='scenarioListBox' style={{width:collapse? "9rem":"0.5rem", overflowX:'hidden'}}>
                     <div style={{display:"flex", flexDirection:"column", width:"100%",overflowX:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <div style={{paddingTop:'0.3rem',marginLeft: "30px"}}><h5><b>Scenarios</b></h5></div>
+                            <img style={{width:'1.7rem',height:'1.7rem',marginTop:'5px',  display:!isE2EOpen || !collapse? 'none':'',}}  src='static/imgs/node-scenarios.png'/>
+                    <div style={{paddingTop:'0.3rem',marginLeft: "4px"}}><h5><b>Scenarios</b></h5></div>
                     <div style={{marginRight:'-0.4rem',marginTop:'-0.3rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
                     }}><img src="static/imgs/X_button.png" alt="cross button" /></div></div>
                     {/* scenario Search */}
@@ -349,7 +350,7 @@ const ModuleListDrop = (props) =>{
                                         <div className='scenarios '>
 
                                             <div  key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios'} title={e.name} value={e._id} >
-                                                <div><input type="checkbox"  value={e._id} onChange={(e)=>{} } checked={selectedSc[e._id]}  />
+                                                <div style={{display:'flex',marginTop:'3px'}}><input type="checkbox"  value={e._id} onChange={(e)=>{} } checked={selectedSc[e._id]}  />
                                                 <span style={{textOverflow:"ellipsis"}}>
                                                 {e.name}</span></div></div>
                                         </div>
@@ -360,7 +361,7 @@ const ModuleListDrop = (props) =>{
                                 <div onClick={clickAdd} style={{opacity: scenarioList.length==0? '0.3':'', width:'2.3rem',height:'1.5rem', marginLeft:'.7rem',marginBottom:'0.7rem',textAlign:'center', alignContent:'center',backgroundColor:'$white',cursor:'pointer'}}className={'btn.' + (selectedSc.length < 1 ? ' disabled' : '')}><img src="static/imgs/AddButton.png" alt="AddButton" /></div>
                             </div>
                             </div>
-                    <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(0deg)' : 'rotate(180deg)',height:'30px',width:'8px', position:'relative'
+                    <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(180deg)' : 'rotate(0deg)',height:'30px',width:'8px', position:'relative'
     }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' /> </div>
                  
                 </div>
