@@ -59,13 +59,13 @@ const Genius = () => {
     debugger;
     if (data === "getMindmap") {
       loadModule(selectedModule.key, selectedProject.key);
-      return
     }
     else if (data === "disconnect") {
       setLoading(false);
     }
-    else if (data === "startDebugging") {
+    else if (data.action && data.action === "startDebugging") {
       if (savedRef.current) {
+        finalDataRef.current = data;
         const firstStep = {
           "stepNo": 1,
           "custname": "@Browser",
@@ -117,17 +117,13 @@ const Genius = () => {
         } catch (err) {
           console.log(err)
         }
-        return
-      }
-      else {
-        return
       }
     }
     else if (typeof data === "object") {
       try {
         const res = await PluginApi.getGeniusData(data);
         savedRef.current = true;
-        finalDataRef.current = data;
+        // finalDataRef.current = data;
         if (port) port.postMessage({
           "saved": true
         });
@@ -804,6 +800,7 @@ const Genius = () => {
               value={navURL}
               width="300px"
               required
+              type="url"
               disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
           </div>
@@ -859,7 +856,7 @@ const Genius = () => {
         </div>
         <div>
           <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
-            <div onClick={()=>{window.localStorage['navigateScreen'] = "plugin";history.replace('/plugin');}} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor:"pointer" }}>EXIT</div>
+            <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div>
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
               <button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>
               <button className="reset-action__next"
