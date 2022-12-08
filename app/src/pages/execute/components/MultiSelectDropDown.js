@@ -11,7 +11,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
     const inputRef = useRef()
     const [dropDown,setDropDown] = useState(false)
     useEffect(()=>{
-        inputRef.current.value = (accessibilityParameters.length!==0?accessibilityParameters.length:"") +" Standards Selected";
+        inputRef.current.value = (accessibilityParameters.length!==0?accessibilityParameters.length:"") +" Selected Standards";
     },[accessibilityParameters])
     const selectOption = (value, event) =>{
         let acc_param = [...accessibilityParameters];
@@ -22,7 +22,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
         else {
             acc_param.push(value);
         }
-        inputRef.current.value = ((acc_param.length!==0)?acc_param.length:"") + " Standards Selected"
+        inputRef.current.value = ((acc_param.length!==0)?acc_param.length:"") + " Selected Standards"
         event.currentTarget.getElementsByTagName('input')[0].checked = !event.currentTarget.getElementsByTagName('input')[0].checked
         setAccessibilityParameters(acc_param);
     }

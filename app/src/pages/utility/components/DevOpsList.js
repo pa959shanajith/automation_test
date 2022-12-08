@@ -6,7 +6,7 @@ import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects, 
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { useSelector, useDispatch } from 'react-redux';
-
+import * as actionTypes from '../../plugin/state/action';
 import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
 import {readTestSuite_ICE} from '../../schedule/api';
@@ -23,6 +23,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
+    const dispatch = useDispatch();
     const [executionQueue, setExecutionQueue] = useState(false);
     const [filteredList, setFilteredList] = useState(configList);
     const [displayBasic, setDisplayBasic] = useState(false);
@@ -51,7 +52,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [currentKey,setCurrentKey] = useState('');
     const [projectName, setProjectName] = useState('');
     const [currentName, setCurrentName] = useState('');
-  
+    const current_task = useSelector(state=>state.plugin.PN);
     const [showCICD, setShowCICD] = useState(false);
     const [currentTask, setCurrentTask] = useState({});
     const [eachData, setEachData] = useState([]);
@@ -75,34 +76,34 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     })},[])
 
 
-    useEffect(()=>{
-        pluginApi.getProjectIDs()
-        .then(data => {
-                // setProjectData1(data.releases[selectedCycle][0].name);
-                setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
-                setCycleName(data.releases[selectedCycle][0].cycles[0].name);
-    })},[selectedCycle])
+    // useEffect(()=>{
+    //     pluginApi.getProjectIDs()
+    //     .then(data => {
+    //             // setProjectData1(data.releases[selectedCycle][0].name);
+    //             setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
+    //             setCycleName(data.releases[selectedCycle][0].cycles[0].name);
+    // })},[selectedCycle])
   
     useEffect(()=>{
         (async() => {
             const UserList =  await pluginApi.getUserDetails("user");
-        if(UserList.error){
-            setMsg(MSG.CUSTOM("Error while fetching the user Details"));
-        }else{
-            setUserDetailList(UserList);
-        }
 
+            if(UserList.error){
+                setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+            }else{
+                setUserDetailList(UserList);
+            }
 
             const ProjectList = await pluginApi.getProjectIDs();
-        if(ProjectList.error){
-            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
-        }else{
+            setProjectData1(ProjectList.releases[current_task][0].name);
+            setProjectData(ProjectList.releases[current_task][0].cycles[0]._id);
             
-            const arraynew = ProjectList.projectId.map((element, index) => {
-            
+            if(ProjectList.error){
+                setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+            }else{
+                const arraynew = ProjectList.projectId.map((element, index) => {
                 return (
                     {
-
                         key: element,
                         text: ProjectList.projectName[index],
                         title: ProjectList.projectName[index],
@@ -111,14 +112,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 )
             });
             setProjectList(arraynew);
-            setSelectedProject(arraynew[selectedCycle].key);
-            setProjectName(arraynew[selectedCycle].text);
+            setSelectedProject(arraynew[current_task ? current_task :0].key);
+            setProjectName(arraynew[current_task ? current_task :0].text);
 
-
-
-            if(arraynew.length > selectedCycle) {
+            if(arraynew.length > 0) {
                 const configurationList = await fetchConfigureList({
-                    'projectid': arraynew[selectedCycle].key
+                    'projectid': arraynew[current_task ? current_task :0].key
                 });
                 if(configurationList.error) {
                     if(configurationList.error.CONTENT) {
@@ -132,40 +131,39 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             }
             setLoading(false);
         }
-            var plugins = []; 
+        
+        var plugins = []; 
         const plugins_list= await getAvailablePlugins();
        
-        
         if(plugins_list.error){
             setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
-           
-                    let txt = [];
-                     for (let x in plugins_list) {
-                        if(plugins_list[x] === true) {
-                            txt.push({
-                                key: x,
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
-                                title: x.charAt(0).toUpperCase()+x.slice(1),
-                                disabled: false
-                            })
-                        }
-                        else {
-                            txt.push({
-                                key: x,
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
-                                title: 'License Not Supported',
-                                
-                            })
-                        }
-                       }
-                   
-            setplugins_list(txt);
-        }
         
-        })()
+            let txt = [];
+            for (let x in plugins_list) {
+            if(plugins_list[x] === true) {
+                txt.push({
+                    key: x,
+                    text: x.charAt(0).toUpperCase()+x.slice(1),
+                    title: x.charAt(0).toUpperCase()+x.slice(1),
+                    disabled: false
+                })
+            }
+            else {
+                txt.push({
+                    key: x,
+                    text: x.charAt(0).toUpperCase()+x.slice(1),
+                    title: 'License Not Supported',
+                    
+                })
+            }
+        }    
+        setplugins_list(txt);
+    }
         
-    },[]);
+    })();
+
+},[current_task]);
     useEffect(() => {
         (() => {
             setLoading('Please Wait...');
@@ -199,6 +197,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const onProjectChange = async (option) => {
         setLoading('Please Wait...');
         setSelectedProject(option.key);
+        dispatch({type: actionTypes.SET_PN, payload:option.index});
         setSelectedCycle(option.index);
         setProjectName(option.text);
         projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
@@ -383,7 +382,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             integration: getIntegrationSelected(item.executionRequest.integration),
             executionType: item.executionRequest.executiontype,
             isHeadless: item.executionRequest.isHeadless,
-            executionRequest: item.executionRequest
+            executionRequest: item.executionRequest,
+            disable: true
         });
         return;
     }
@@ -579,7 +579,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" onClick={() => setCurrentIntegration({
+            <button data-test="submit-button-test" className='submit-button-test_profile' onClick={() => setCurrentIntegration({
                     name: '',
                     key: uuid(),
                     selectValues: [
