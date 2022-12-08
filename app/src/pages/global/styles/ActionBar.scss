@@ -4,7 +4,7 @@
   .action__bar {
     background: #fff;
     border-right: 1px solid #0000001a;
-    margin: -23px 0px 7px -37px;
+    // margin: -23px 0px 7px -37px;
   }
 
   .action__wrapper {
@@ -27,6 +27,7 @@
 .action__bar{
     // width: 166px;
     background: $primaryColor;
+    background: $primaryColor;
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -34,6 +35,7 @@
     top: 0;
     bottom: 0;
     left: 0;
+    
 }
 
 .action__content{
@@ -52,7 +54,12 @@
     overflow: auto;
     font-family: $avoSecondaryFont;
     font-size: 12px;
-    margin: 27px 13px 13px 17px;
+    margin: 83px 15px 16px 18px;
+    position:fixed;
+    // top:6rem;
+    // left: 14rem;
+
+   
 }
 
 .action__wrapper{
@@ -64,6 +71,7 @@
     left: 0;
     float: left;
     flex: 0 0 6px;
+
 }
 .action__wrapper__expand{
     flex: 0 0 149px;
@@ -102,19 +110,26 @@
 
 .ab__bottom_contents{
     font-size: 16px;
-    margin-top: -5px;
+    margin-top: -8px;
+    height: 20rem;
     .thumbnail__title{
         font-size: 12px;
         font-weight: 600;
         font-family: Mulish;
     }
     .thumbnail{
-        margin: 8% 0 5%;
+        margin: 8% 0 -10%;
         &:last-child{
             margin: 0;
         }
     }
 }
+
+// .scrollbar-container {
+//     position: relative !important; 
+//     left: 0rem !important;
+
+// }
 
 // // @media screen and (min-width: 1400px) and (min-height: 770px){
 // //     .action__content{

@@ -2,23 +2,22 @@
 .ss__btngroup{
     display: flex;
     max-width: 100%;
-    margin-bottom: 12px;
-    margin-left: -8px;
+    // margin-bottom: 12px;
+    // margin-left: -8px;
     justify-content: space-between;
     font-family: $avoSecondaryFont;
-    height:1px;
-    margin-top: 49px;
+    margin-top: 42px;
    
 }
 
 .ss__left-btns{
-    border-bottom: 1px solid $borderOne;
-    padding-bottom: 22px;
+    border-bottom: 1px solid #656565;
+    padding-bottom: 43px;
     display: flex;
-    align-items:center;
-    margin:-72px -135px -13px -23px;
-    height:8px;
-    padding-left: 36px;
+    align-items: baseline;
+    height: 8px;
+    padding-left: 10px;
+    // margin-top: 1rem;
 }
    
 
@@ -55,7 +54,7 @@
 }
 
 .desktop_btn{
-    margin-Left:-6px;
+    margin-Left:24px;
     margin-Bottom: 0px;
     width:200px;
     font-family: $avoFont;
@@ -63,7 +62,7 @@
     background: white;
     border: none;
     color: black;
-    margin-right: -55px;
+    // margin-right: -55px;
     height: 27px;  
 }
 
@@ -135,7 +134,8 @@
     border-radius: 5px;
     height: 24px;
     width: 35px;
-    margin: -42px 14px 12px -26px;
+    // margin: -42px 14px 12px -26px;
+    margin-top: 2.4rem;
 }
 
 .ss__search-icon{
@@ -151,7 +151,9 @@
     height: 24px;
     font-family: $avoFont ;
     font-size: 13px;
-    margin: -37px 13px 13px 14px;
+    // margin: -37px 13px 13px 14px;
+    margin-left: 2.4rem;
+    margin-top: -1.5rem;
    
     &:focus{
       outline: none;  
@@ -164,11 +166,12 @@
     flex-direction: column;
     margin-left: 5px;
     height: 100%;
+    margin-top: -2%;
 }
 
 .sc__ab{
     position: absolute;
-    top: 0;
+    top: 87px;
     bottom: 0;
     left: 0;
     right: 0;
@@ -190,9 +193,29 @@
     flex: 1 1;
     // overflow: auto;
     // height: 385px;
-    margin: 10px 10px 8px 13px;
+    // margin: 10px 10px 8px 13px;
+    // margin-top: 4rem;
 
 }
+.ss__taskBtnd{
+    padding: 2px 13px;
+    margin-right: 2px;
+    height: 20px;
+    font-size: 12px;
+    background-color: $primaryColor;
+    &:disabled{
+        background-color: $backgroundThree;
+        cursor: not-allowed;
+    }
+}
+.ss__btnd{
+    border: none;
+    outline: none;
+    color: $whiteColor;
+    border-radius: 20px;
+}
+
+
 
 .ss__dup_scroll{
     display: flex;
@@ -211,38 +234,29 @@
     font-weight: normal;
 }
 
-.p-button-warning {
-    width: 85px;
-    height: 30px;
-    font-family: 'latoWeb';
-    margin: 52px 0px 57px 3px;
-    border-radius: 2px;
+// .p-button-warning {
+//     width: 85px;
+//     height: 30px;
+//     font-family: 'latoWeb';
+//     margin: 52px 0px 57px 3px;
+//     border-radius: 2px;
    
-    padding: 10px;
+//     padding: 10px;
      
    
 
-}
-.p-button-warning .p-button {
-    border: 1px solid #643693;
-}
+// }
 
 
-.p-button{
-    margin: 54px -19px 54px -18px;
 
-}
 .p-button-label {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 14px;
    
 }
 
 
-.scrollableContent-158{
 
-    overflow: hidden;
-}
 
 
 
@@ -331,3 +345,4 @@
     border-radius: 20px;
 
 }
+

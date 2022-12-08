@@ -456,7 +456,7 @@ const ScrapeObjectList = (props) => {
                         </button>
                         { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>} */}
                           {/* dropdown button --divya*/}
-                    
+{/*                     
                     <div 
                       data-test="scrapeOnHeading"
                       key="scrapeOn"
@@ -467,6 +467,7 @@ const ScrapeObjectList = (props) => {
                     ></div>
                     { props.appType === "Web" ? <div style={{marginLeft:30}}>
                       {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
+                      { props.appType === "Web" ?<div style={{marginLeft:30}}>
                       <NormalDropDown 
 
                     //   style={{height:'25px',marginLeft:'30px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' , width:'200px'}}
@@ -578,15 +579,12 @@ const ScrapeObjectList = (props) => {
                         {appType === "Webservice" ? "Edit" : "Append"}
                       </span>
                     </div>
-                  
-
                     {props.appType === 'Web' ?
-                    <Button label="Capture" /**disabled={captureButton===""} */  className={"p-button-warning"  } onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '50px', background:'#643693', border:"none",borderRadius:"17px", fontFamily:"LatoWeb"}} />:""}
-
-
-
-
-
+                    (<div className={"c__capturebtn"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}} >
+                    <Button label="Capture" /**disabled={captureButton===""} */ className="debug_button p-button-warning"  onClick={()=>{startScrape(captureButton)}}  disabled={(disableAction || compareFlag)} title="Capture elements" />
+                    </div>)
+                :""} 
+                
 </div>
                     
                     
@@ -605,7 +603,7 @@ const ScrapeObjectList = (props) => {
                        <button data-test="search"className="ss__search-btn" onClick={()=>{}} title="Search for the captured elements">
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
-                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch} placeholder="Search..."/>}
+                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch} placeholder="Search for captured elements"/>}
 
 
                     

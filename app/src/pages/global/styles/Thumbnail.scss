@@ -2,8 +2,9 @@
 
 .ss__body, .s__body, .d__body {
   .thumbnail{
-    height: 92px;
-    justify-content: center;
+    height: 4rem;
+    margin-top: 0rem;
+    justify-content: left;
     color: #000000 !important;
     font-weight: 600 !important;
     font-family: Mulish !important;
@@ -18,12 +19,12 @@
 
 .thumbnail{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     font-family: $avoSecondaryFont;
     font-size: 12px;
     color: $whisper;
-    margin: 4% 0 0%;
+    margin:-8px 0px -15%;
     width: 100%;
     cursor: pointer;
     &:hover .thumbnail__img, &:hover .thumbnail__svg{
