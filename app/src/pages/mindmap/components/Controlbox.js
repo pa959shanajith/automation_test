@@ -12,7 +12,7 @@ import { Redirect } from 'react-router-dom'
 */
 
 
-const ControlBox = (props) => {
+const ControlBox = (props, onClick) => {
     const [redirectTo, setRedirectTo] = useState("");
     var faRef = {
         "plus": "add_icon",
@@ -154,14 +154,14 @@ const ControlBox = (props) => {
                <p data-test="add" className="ct-ctrl add_icon onhover" value={props.nid} onClick={addNode}> </p>
                <p data-test="addMultiple" className="ct-ctrl addmultiple_icon onhover" value={props.nid} onClick={addMultipleNode}></p>
                <hr className='separator'/>
-               <p data-test="captureelements" className="ct-ctrl capture_icon onhover" onClick={() =>props.setShowScrape(true)}  ><> Capture Element </></p>
+               <p data-test="captureelements" className="ct-ctrl capture_icon onhover" onClick={()=>props.openScrapeScreen('displayBasic')}  ><> Capture Element </></p>
                <hr className='separator'/>
                <p data-test="edit" className="ct-ctrl edit_icon onhover" onClick={editNode}></p>
                <p data-test="delete"  className="ct-ctrl delete_icon ct-ctrl-inactive onhover" onClick={deleteNode}></p>
             </div>   : ""}</ClickAwayListener>
             <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}> 
             {t ==='testcases'? <div id="ct-ctrlBox"  className={(isEnE ?'end-to-end':'')}>
-               <p data-test="designteststeps" className="ct-ctrl design_icon onhover"  onClick={() => props.setShowDesignTestSetup(true)}> <> Design Test Steps </></p>
+               <p data-test="designteststeps" className="ct-ctrl design_icon onhover"  onClick={()=>props.openScrapeScreen('displayBasic2') }> <> Design Test Steps </></p>
                <hr className='separator'/>
                <p data-test="edit" className="ct-ctrl edit_icon onhover"  onClick={editNode}></p>
                <p data-test="delete"  className="ct-ctrl delete_icon onhover"  onClick={deleteNode}></p>

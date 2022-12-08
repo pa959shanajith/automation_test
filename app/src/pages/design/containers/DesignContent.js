@@ -989,7 +989,7 @@ const DesignContent = props => {
                             ]}
                             selectedKey={debugButton}
                             placeholder="Select Browser"
-                            width="190px"
+                            width="240px"
                         />
                         </div>
                         :
