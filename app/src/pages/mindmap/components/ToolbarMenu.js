@@ -39,9 +39,13 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const [modlist,setModList] = useState(moduleList)
     const [exportBox,setExportBox] = useState(false);
+    const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
+    
+    
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
-        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
+        // dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
+        setselectedProjectNameForDropdown(proj);
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
@@ -50,7 +54,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-        
+        console.log('screendata', screendata);
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){
         //     SearchInp.current.value = ""
@@ -138,11 +142,11 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             title='Export Modules'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[initProj]["name"]} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[selectedProjectNameForDropdown]["name"]} isAssign={isAssign}/>} 
             />:null} 
         <div className='toolbar__header'>
             <label data-test="projectLabel">Project:</label>
-            <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
+            <select data-test="projectSelect" value={selectedProjectNameForDropdown} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
             </select>
             <span data-test="headerMenu" className='toolbar__header-menus'>
