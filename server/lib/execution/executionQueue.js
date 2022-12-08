@@ -655,7 +655,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             responseFromGetReportApi.push(data);
         }
         if(synchronousFlag) response['status'] = responseFromGetReportApi;
-        response['reportLink'] = "http://" + (req.headers["origin"] || req.hostname) + "/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
+        response['reportLink'] = req.protocol + "://" + (req.headers["origin"] || req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         } catch (error) {
             console.info(error);
             logger.error("Error in execAutomation. Error: %s", error);
@@ -764,6 +764,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
+                                // Store the updated cache data in dataBase.
+                                let storeCacheData =  await utils.fetchData(this.key_list, "devops/cacheData", fnName);
 
                                 executionData = await utils.fetchData({'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
@@ -776,8 +778,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                 }
                                 executionData = [executionRequest];
 
-                                // Store the updated cache data in dataBase.
-                                let storeCacheData =  await utils.fetchData(this.key_list, "devops/cacheData", fnName);
+
                                 //Updating the status to IN_Progress
                                 await cache.set("execution_list", this.key_list);
                                 break;
