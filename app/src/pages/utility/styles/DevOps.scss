@@ -320,7 +320,7 @@
     font-weight: 700;
     margin-bottom: 0;
     &_ice {
-        margin-right: 9%;
+        margin-right: 8%;
     }
     &_browser {
         margin-right: 14%;
@@ -509,7 +509,7 @@
     height: 2.5vh;
 }
 .radiobutton1{
-    width:25vh;
+    width:30vh;
     height: 4vh;
 }
 .configImg{
@@ -569,4 +569,18 @@
 .devOps_module_list_div{
     display: flex;
     justify-content: space-between;
+}
+
+.p-dialog-content {
+    overflow: hidden;
+}
+
+.p-dialog .p-dialog-content {
+    background: #fff;
+    color: #495057;
+    padding: 0px 1rem 1rem;
+}
+
+.legends-margin {
+    margin-right: 1rem;
 }
