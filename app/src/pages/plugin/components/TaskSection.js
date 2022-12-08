@@ -215,15 +215,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         txt.push({
                             key: x,
                             //text: x[0].toUpperCase()+x.slice(1)
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
-                                title: x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            title: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             disabled: false
                         })
                     }
                     else {
                         txt.push({
                             key: x,
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             title: 'License Not Supported',
                             disabled: true
                         })
