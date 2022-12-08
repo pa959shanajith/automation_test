@@ -16,6 +16,8 @@ import CheckboxTree from 'react-checkbox-tree';
 import ScheduleHome from '../../schedule/containers/ScheduleHome';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup';
 import "../styles/DevOps.scss";
+import DropDownList from '../../global/components/DropDownList';
+import { getPools, getICE_list } from '../../execute/api';
 
 
 
@@ -66,6 +68,17 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     });
     const [appType, setAppType] = useState('');
     const [cycleName, setCycleName] = useState('');
+    const [poolType,setPoolType] = useState("unallocated");
+    const [inputErrorBorder,setInputErrorBorder] = useState(false);
+    const [smartMode,setSmartMode] = useState('normal');
+    const [selectedICE,setSelectedICE] = useState("");
+    const [availableICE, setAvailableICE] = useState([]);
+    const [ExeScreen, setExeScreen] = useState(true);
+    const [poolList,setPoolList] = useState({});
+    const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([]);
+    const [iceStatus,setIceStatus] = useState([]);
+    const [iceNameIdMap,setIceNameIdMap] = useState({});
+    const [showIcePopup,setShowIcePopup] = useState(false);
 
 
     useEffect(()=>{
@@ -428,18 +441,29 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         return (
             <div>
                 <Button label="Execute" title="Execute" className="p-button-rounded" onClick={async () => {
-                    const temp = await execAutomation(currentKey);
-                    if(temp.status !== "pass") {
-                        if(temp.error && temp.error.CONTENT) {
-                            setMsg(MSG.CUSTOM(temp.error.CONTENT,VARIANT.ERROR));
-                        } else {
-                            setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
-                        }
-                    }else {
-                        setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                    if (showIcePopup) {
+                        dataExecution.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):"")
+                        dataExecution.poolid = ""
+                        if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
+                        else dataExecution.targetUser = selectedICE
+                        CheckStatusAndExecute(dataExecution, iceNameIdMap);
+                        onHide(name);
                     }
-                    onHide(name);
-                }} autoFocus />
+                    else {
+                        const temp = await execAutomation(currentKey);
+                        if(temp.status !== "pass") {
+                            if(temp.error && temp.error.CONTENT) {
+                                setMsg(MSG.CUSTOM(temp.error.CONTENT,VARIANT.ERROR));
+                            } else {
+                                setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
+                            }
+                        }else {
+                            setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                        }
+                        onHide(name);
+                    }
+                }
+            } autoFocus />
             </div>
         );
     }
@@ -562,6 +586,77 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setLoading(false);
     }
 
+    const fetchData = async (projectId) => {
+        setSmartMode('normal');
+		setSelectedICE("");
+		var projId = projectId;
+		var dataforApi = {poolid:"",projectids: [projId]}
+		setLoading('Fetching ICE ...')
+        const data = await getPools(dataforApi);
+        if(data.error){displayError(data.error);return;}
+        setPoolList(data);
+        var arr = Object.entries(data);
+        arr.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
+        setChooseICEPoolOptions(arr);
+        const data1 = await getICE_list({"projectid":projId});
+        if(data1.error){displayError(data1.error);return;}
+        setIceStatus(data1)
+        populateICElist(arr,true,data1)
+        setLoading(false);
+    }
+
+    const populateICElist = (arr, unallocated, iceStatusdata) => {
+        var ice = [];
+        var iceStatusValue = {};
+        if (iceStatusdata !== undefined) iceStatusValue = iceStatusdata.ice_ids;
+        else if (iceStatusdata === undefined) iceStatusValue = iceStatus.ice_ids;
+        const statusUpdate = (ice) => {
+            var color = '#fdc010';
+            var status = 'Offline';
+            if (ice.connected) {
+                color = '#95c353';
+                status = 'Online';
+            }
+            if (ice.mode) {
+                color = 'red';
+                status = 'DND mode';
+            }
+            return { color, status };
+        };
+        if (unallocated) {
+            setPoolType("unallocated");
+            if (arr === undefined) iceStatusdata = iceStatus;
+            arr = Object.entries(iceStatusdata.unallocatedICE);
+            arr.forEach((e) => {
+                var res = statusUpdate(e[1]);
+                e[1].color = res.color;
+                e[1].statusCode = res.status;
+                ice.push(e[1]);
+            });
+        } else {
+            setPoolType("allocated");
+            var iceNameIdMapData = { ...iceNameIdMap };
+            arr.forEach((e) => {
+                if (e[1].ice_list) {
+                    Object.entries(e[1].ice_list).forEach((k) => {
+                        if (k[0] in iceStatusValue) {
+                            var res = statusUpdate(iceStatusValue[k[0]]);
+                            iceNameIdMapData[k[1].icename] = {};
+                            iceNameIdMapData[k[1].icename].id = k[0];
+                            iceNameIdMapData[k[1].icename].status = iceStatusValue[k[0]].status;
+                            k[1].color = res.color;
+                            k[1].statusCode = res.status;
+                            ice.push(k[1]);
+                        }
+                    });
+                }
+            });
+            setIceNameIdMap(iceNameIdMapData);
+        }
+        ice.sort((a, b) => a.icename.localeCompare(b.icename));
+        setAvailableICE(ice);
+    }
+
     return (<>
      {
             executionQueue &&
@@ -654,7 +749,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setBrowserTypeExe(item.executionRequest.browserType);
-                                    setCurrentName(item.configurename)
+                                    setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({
                                             assignedTime: "",
@@ -675,6 +770,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         testSuiteDetails: testSuiteDetails
                                     });
                                     readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                         //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
@@ -708,7 +805,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setBrowserTypeExe(item.executionRequest.browserType);
-                                    setCurrentName(item.configurename)
+                                    setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({
                                             assignedTime: "",
@@ -729,6 +826,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         testSuiteDetails: testSuiteDetails
                                     });
                                     readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
@@ -752,19 +851,50 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </table>
                 
                {/* Dialog for Execute Now */}
-                <Dialog header="Execute Now" visible={displayBasic2}  className="execution" footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
+                <Dialog header="Execute Now" visible={displayBasic2}  className="execution" footer={renderFooter('displayBasic2')} onHide={() => {onHide('displayBasic2'); setShowIcePopup(false) }}>
     
-                    <input type="radio" name='myRadios' id='first'  className='radiobutton' onChange={() => {setAllocateICE(true); setDisplayBasic2(false);}}
+                    <input type="radio" name='myRadios' id='first'  className='radiobutton' onChange={() => {setShowIcePopup(true)}}
                       />&nbsp;&nbsp;
                     <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Assure Client</label>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="radio" name='myRadios' id='second' onChange={()=>{}} className='radiobutton' checked/>&nbsp;&nbsp;
-                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Agent / Avo Grid</label> 
-                
+                    <input type="radio" name='myRadios' id='second' onChange={()=>{setShowIcePopup(false)}} className='radiobutton' defaultChecked={true}/>&nbsp;&nbsp;
+                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Agent / Avo Grid</label>
+                    { showIcePopup && <div>
+                        <div>
+                            <div className='adminControl-ice popup-content'>
+                                <div className='adminControl-ice popup-content popup-content-status'>
+                                    <ul className="e__IceStatus">
+                                        <li className="popup-li">
+                                            <label title='available' className="legends legends-margin">
+                                                <span id='status' className="status-available"></span>
+                                                Available
+                                            </label>
+                                            <label title='unavailable' className="legends legends-margin">
+                                                <span id='status' className="status-unavailable" ></span>
+                                                Unavailable
+                                            </label>
+                                            <label title='do not disturb' className="legends legends-margin">
+                                                <span id='status' className="status-dnd"></span>
+                                                Do Not Disturb
+                                            </label>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='adminControl-ice popup-content'>
+                            <div>
+                                <span className="leftControl" title="Token Name">{"Execute on"}</span>
+                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Search'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                            </div>
+                        </div>
+                    </div> }
+
                 </Dialog>
                 {/* Dialog for Execute Now */}
 
-                {allocateICE?
+                {/* {allocateICE?
                 <AllocateICEPopup 
                     SubmitButton={CheckStatusAndExecute} 
                     setAllocateICE={setAllocateICE} 
@@ -776,7 +906,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     exeIceLabel={"Execute on ICE"}
                     ExeScreen={true}
                     currentTask={currentTask}
-                />:null}
+                />:null} */}
 
                 {/* Dialog for Schedule */}
                 <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}}   onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
