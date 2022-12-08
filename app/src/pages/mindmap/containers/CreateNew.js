@@ -65,7 +65,6 @@ const CreateNew = ({importRedirect}) => {
     }
   },[selectProj,prjList])
   useEffect(() => {
-      console.log(initEnEProj);
     setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
   },[initEnEProj]);
   useEffect(()=>{
@@ -75,6 +74,7 @@ const CreateNew = ({importRedirect}) => {
         if(res.error){displayError(res.error);return;}
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
+        // dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
             var req={
@@ -99,6 +99,21 @@ const CreateNew = ({importRedirect}) => {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
+// useEffect(()=>{(async()=>{
+//             setBlockui({show:true,content:'Loading modules ...'})
+//             var res = await getProjectList()
+//             if(res.error){displayError(res.error);return;}
+//             var data = parseProjList(res)
+//             dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
+//             dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
+//             var moduledata = await getModules({"tab":"endToend","projectid":res.projectId[0],"moduleid":null})
+//             if(moduledata.error){displayError(moduledata.error);return;}
+//             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+//             dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+//             setBlockui({show:false})
+//             })()
+//             // eslint-disable-next-line react-hooks/exhaustive-deps
+//         },[])
 
   const displayError = (error) =>{
     setBlockui({show:false})

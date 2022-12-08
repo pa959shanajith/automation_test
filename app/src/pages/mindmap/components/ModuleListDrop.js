@@ -275,7 +275,7 @@ const ModuleListDrop = (props) =>{
                                 if(e.type==="basic")
                                 return(
                                     <div key={i}>
-                                            <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
+                                            <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
                                                 <div className='modClick' value={e._id} style={{display:'flex',flexDirection:'row'}} >
                                                 {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)}  />}  
                                                 <span  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} className='modNme' value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</span>
@@ -306,7 +306,7 @@ const ModuleListDrop = (props) =>{
                                  id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
                             />  
                         </div>
-                        <div className='searchBox pxBlack' style={{display:'flex'}}>
+                        <div className='searchBox pxBlack'>
                             <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                         </div>
@@ -333,18 +333,19 @@ const ModuleListDrop = (props) =>{
                     <div style={{display:"flex", flexDirection:"column", width:"100%",overflowX:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
                             <img style={{width:'1.7rem',height:'1.7rem',marginTop:'5px',  display:!isE2EOpen || !collapse? 'none':'',}}  src='static/imgs/node-scenarios.png'/>
-                    <div style={{paddingTop:'0.3rem',marginLeft: "4px"}}><h5><b>Scenarios</b></h5></div>
-                    <div style={{marginRight:'-0.4rem',marginTop:'-0.3rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
+                    <div style={{paddingTop:'0.47rem',marginLeft: "4px",}}><h5 style={{fontSize:'17px'}}><b>Scenarios</b></h5></div>
+                    <div style={{marginRight:'-0.4rem',marginTop:'0rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
                     }}><img src="static/imgs/X_button.png" alt="cross button" /></div></div>
                     {/* scenario Search */}
                      <span style={{display:'flex', flexDirection:'row-reverse', marginRight:'4px', marginTop:'2px'}}>
-                        <input  style={{width:'137px',height: '23px', borderRadius:'6px'}} placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
+                        <input  style={{width:'137px',height: '23px', borderRadius:'6px',fontSize:'15px'}} placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
                         <img style={{width: '12px', height: '17px', marginRight:"-8.2rem", marginTop:'2px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                     </span>
                         <div className='scenarioList'>
                            <div style={{display: scenarioList.length==0? '':'none', textAlign:'center', marginTop:'3rem', marginRight:!isE2EOpen || !collapse? '5rem':'', overflowX:'hidden'}}><h7 >Please select a module to display <br></br> it's scenarios</h7></div> 
                               
                                 {scenarioList.map((e, i) => {
+
                                     
                                     return (
                                         <div className='scenarios '>
