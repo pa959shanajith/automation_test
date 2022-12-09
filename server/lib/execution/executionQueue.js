@@ -606,12 +606,16 @@ module.exports.Execution_Queue = class Execution_Queue {
         //Storing the data in executionlist
         const storeInExecutionList =  await utils.fetchData(gettingTestSuiteIds, "devops/executionList", fnName);
 
-        //Fetch the cache from data base 
-        const cacheData = await utils.fetchData({
-            "query":"fetchData"
-        }, "devops/cacheData", fnName);
-
-        this.key_list = cacheData.length != 0 ? cacheData[0] : {}
+        //To get the data from cache if key list is empty
+        if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+            //check whether cache data is present
+            let cacheData = await cache.get('execution_list')
+            if(cacheData === null) {
+                this.key_list = {};
+            } else {
+                this.key_list = cacheData;
+            }
+        }
         if(!(req.body.key in this.key_list))
             this.key_list[req.body.key] = [];
 
@@ -633,9 +637,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         // Update the execution_list
         await cache.set("execution_list", this.key_list);
 
-        // Store the updated cache data in dataBase.
-        let storeCacheData =  await utils.fetchData(this.key_list, "devops/cacheData", fnName);
-        
         let execution_Queue = await cache.get('execution_list');
 
         if(gettingTestSuiteIds.executionData.executiontype == 'asynchronous'){
@@ -692,12 +693,16 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
             const agentStatus = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
 
-            //Fetch the cache from data base 
-            const cacheData = await utils.fetchData({
-                "query":"fetchData"
-            }, "devops/cacheData", fnName);
-
-            this.key_list = cacheData.length != 0 ? cacheData[0] : {}
+            // To fetch the data from cache if key_list is empty
+            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+                //check whether cache data is present
+                let cacheData = await cache.get('execution_list')
+                if(cacheData === null) {
+                    this.key_list = {};
+                } else {
+                    this.key_list = cacheData;
+                }
+            }
             if(agentStatus['status'] != 'inactive') {
                 let executionList = this.key_list;
                 for(let [key, value] of Object.entries(executionList)){
@@ -744,13 +749,16 @@ module.exports.Execution_Queue = class Execution_Queue {
             const agentName = 'agentName' in req.body ? req.body.agentName : '';
             const executionListId = req.body.executionListId;
 
-            //Fetch the cache from data base 
-            const cacheData = await utils.fetchData({
-                "query":"fetchData"
-            }, "devops/cacheData", fnName);
-
-            this.key_list = cacheData.length != 0 ? cacheData[0] : {}
-
+            // To store the data from cache if key_list is empty
+            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+                //check whether cache data is present
+                let cacheData = await cache.get('execution_list')
+                if(cacheData === null) {
+                    this.key_list = {};
+                } else {
+                    this.key_list = cacheData;
+                }
+            }
             if(configKey in this.key_list) {
 
                 const executionQueue = this.key_list[configKey];
@@ -764,8 +772,6 @@ module.exports.Execution_Queue = class Execution_Queue {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
-                                // Store the updated cache data in dataBase.
-                                let storeCacheData =  await utils.fetchData(this.key_list, "devops/cacheData", fnName);
 
                                 executionData = await utils.fetchData({'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
@@ -822,13 +828,17 @@ module.exports.Execution_Queue = class Execution_Queue {
         try {
             let dataFromIce = req.body,checkInCache = false;
             let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
-            //Fetch the cache from data base 
-            const cacheData = await utils.fetchData({
-                "query":"fetchData"
-            }, "devops/cacheData", fnName);
-
-            this.key_list = cacheData.length != 0 ? cacheData[0] : {}
-
+            
+            // To store the data from cache if key list is empty.
+            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+                //check whether cache data is present
+                let cacheData = await cache.get('execution_list')
+                if(cacheData === null) {
+                    this.key_list = {};
+                } else {
+                    this.key_list = cacheData;
+                }
+            }
             let keyQueue = this.key_list[resultData.configkey];
             if (dataFromIce.status == 'finished')
             {
@@ -862,8 +872,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     let synchronous_report = await cache.get('synchronous_report');
                                     console.log(synchronous_report);
                                 }
-                                // Store the updated cache data in dataBase.
-                                let storeCacheData =  await utils.fetchData(this.key_list, "devops/cacheData", fnName);
+
                                 await cache.set("execution_list", this.key_list);
                             }
                             statusCount+=(testSuite.status == 'COMPLETED');
@@ -878,8 +887,6 @@ module.exports.Execution_Queue = class Execution_Queue {
                 //To delete the execution from the cache
                 if(statusCount == -1){
                     this.key_list[resultData.configkey] = updatedKeyQueue
-                    // Store the updated cache data in dataBase.
-                    let storeCacheData =  await utils.fetchData(this.key_list, "devops/cacheData", fnName);
                     await cache.set("execution_list", this.key_list);
                 }
 
@@ -912,12 +919,24 @@ module.exports.Execution_Queue = class Execution_Queue {
 
     static getQueueState = async (req, res) => {
         let fnName = 'getQueueState'
-        //Fetch the cache from data base 
-        const cacheData = await utils.fetchData({
-            "query":"fetchData"
-        }, "devops/cacheData", fnName);
 
-        this.key_list = cacheData.length != 0 ? cacheData[0] : {}
+        try{
+            //to add the keylist if its empty,, from the cache
+            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+                //check whether cache data is present
+                let cacheData = await cache.get('execution_list')
+                if(cacheData === null) {
+                    this.key_list = {};
+                } else {
+                    this.key_list = cacheData;
+                }
+            }
+        } catch (error) {
+                console.info(error);
+                logger.error("Error in getQueueState. Error: %s", error);
+                return 'fail';
+        }
+
         return this.key_list;
     }
 
@@ -933,13 +952,16 @@ module.exports.Execution_Queue = class Execution_Queue {
             const configurekey = req.body.configurekey;
             const executionListId = req.body.executionListId;
 
-            //Fetch the cache from data base 
-            const cacheData = await utils.fetchData({
-                "query":"fetchData"
-            }, "devops/cacheData", fnName);
-
-            this.key_list = cacheData.length != 0 ? cacheData[0] : {}
-
+            //to add the key list if its empty,, from the cache
+            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+                //check whether cache data is present
+                let cacheData = await cache.get('execution_list')
+                if(cacheData === null) {
+                    this.key_list = {};
+                } else {
+                    this.key_list = cacheData;
+                }
+            }
             const configureKeyExecution = configurekey in this.key_list ? this.key_list[configurekey] : [];
             let newConfigureKeyExecution = [];
             for(let execution of configureKeyExecution) {
@@ -951,8 +973,6 @@ module.exports.Execution_Queue = class Execution_Queue {
             if(newConfigureKeyExecution.length === 0)
                 delete this.key_list[configurekey]
 
-            // Store the updated cache data in dataBase.
-            let storeCacheData =  await utils.fetchData(this.key_list, "devops/cacheData", fnName);
 
             await cache.set("execution_list", this.key_list);
             response['status'] = 'pass';
