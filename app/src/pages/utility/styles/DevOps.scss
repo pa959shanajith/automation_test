@@ -216,7 +216,7 @@
     flex: 0 0 27%;
 }
 .tkn-table__key1{
-    justify-content: flex-start;
+    justify-content: flex-start !important;
 }
 .tkn-table__icon {
     width: 4%;
@@ -287,7 +287,7 @@
 }
 .active-users-token1{
     margin-left: -1.5vh;
-    width: 101.5%;
+    width: 101.5% !important;
     padding-bottom:0%;
 }
 .searchBoxInput {
@@ -484,7 +484,8 @@
 .projectName1{
     font-weight: 700;
     margin-top:  1vh;
-    margin-right: 5px;
+    width: 7.5rem;
+    // margin-right: 5px;
 }
 .d__table{
     flex: 1 1 7% !important;
@@ -544,9 +545,10 @@
 }
 .submit-button-test_update{
     font-size: 15px;
+    width: 6rem;
 }
 .submit-button-test_back{
-    width: 5rem;
+    width: 7rem;
 }
 .devOps_config_name1{
     position: absolute;
@@ -583,4 +585,13 @@
 
 .legends-margin {
     margin-right: 1rem;
+}
+
+.submit-button-test_profile{
+    width: 13rem;
+}
+
+.searchDropdown_avo-search-drop-down__38AXG {
+    min-width: 12rem;
+    margin-right: -8rem;
 }
