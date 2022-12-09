@@ -630,6 +630,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 modulename:ids.testsuiteName,
                 moduleid:ids.testsuiteId,status: 'QUEUED',
                 avoagentList:gettingTestSuiteIds.executionData.avoagents,
+                startTime: new Date().toLocaleString()
             });
 
         keyQueue.push(newExecutionList);
