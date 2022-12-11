@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { NormalDropDown, TextField, Card, IconButton, SearchBox } from '@avo/designcomponents';
+import { NormalDropDown, TextField, Card, SearchBox } from '@avo/designcomponents';
 import { Icon } from "@fluentui/react/lib/Icon";
 import { Header, FooterOne, RedirectPage } from '../../global';
 import "../styles/Genius.scss";
-import { getProjectList, getModules, getScreens, saveMindmap } from '../../mindmap/api';
-import { ScreenOverlay, setMsg, ReferenceBar, ResetSession, Messages as MSG } from '../../global';
+import { getProjectList, getModules, saveMindmap } from '../../mindmap/api';
+import { ScreenOverlay, setMsg, ResetSession, Messages as MSG } from '../../global';
 import { Dialog } from 'primereact/dialog';
 import { parseProjList } from '../../mindmap/containers/MindmapUtils';
 import { useHistory } from 'react-router-dom';
@@ -121,7 +121,8 @@ const Genius = () => {
     }
     else if (typeof data === "object") {
       try {
-        const res = await PluginApi.getGeniusData(data);
+        const scenarioData = getExcludedMindmapInternals(modScenarios, selectedScenario.key);
+        const res = await PluginApi.getGeniusData(data, scenarioData);
         savedRef.current = true;
         // finalDataRef.current = data;
         if (port) port.postMessage({
@@ -138,6 +139,45 @@ const Genius = () => {
     else {
       console.log(data);
     }
+  };
+
+  const templateForMindmapSaving = (scenario) => {
+    return {
+      "testscenarioid": scenario._id,
+      "testscenarioName": scenario.name,
+      "tasks": null,
+      "screenDetails": scenario.children.map((screen, idx) => {
+        return {
+          "screenid": screen._id,
+          "screenName": screen.name,
+          "task": null,
+          "testcaseDetails": screen.children.map((testcase, idx) => {
+            return {
+              "screenid": screen._id,
+              "testcaseid": testcase._id,
+              "testcaseName": testcase.name,
+              "task": null,
+              "state": "saved",
+              "childIndex": testcase.childIndex
+            }
+          }),
+          "state": "saved",
+          "childIndex": screen.childIndex
+        }
+      }),
+      "state": "saved",
+      "childIndex": scenario.childIndex
+    }
+  }
+  const getExcludedMindmapInternals = (scenarios, excluded_scenario) => {
+    let tempArr = [];
+    // let scenarioPID = indexCounter;
+    // let screenPID = indexCounter;
+    scenarios.forEach((scenario, idx) => {
+      if (scenario._id === excluded_scenario) { return };
+      tempArr.push(templateForMindmapSaving(scenario));
+    });
+    return tempArr;
   }
 
   const loadModule = async (modID, projectId) => {
@@ -165,6 +205,8 @@ const Genius = () => {
   }
   useEffect(() => {
     if (port) {
+      port.onMessage.removeListener(backgroundListener);
+      port.onDisconnect.removeListener(reconnectEx)
       port.onMessage.addListener(backgroundListener);
       port.onDisconnect.addListener(reconnectEx)
     }
@@ -282,6 +324,18 @@ const Genius = () => {
         } catch (err) {
           console.log(err);
         }
+      } else {
+        try {
+          port.onMessage.removeListener(backgroundListener);
+          port.onDisconnect.removeListener(reconnectEx);
+          port = undefined;
+          // setLoading("Genius Started...");
+          port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
+          port.onDisconnect.addListener(reconnectEx);
+          port.onMessage.addListener(backgroundListener);
+        } catch (err) {
+          console.log(err);
+        }
       }
     }
     else {
@@ -301,7 +355,7 @@ const Genius = () => {
             "project": selectedProject,
             "module": selectedModule,
             "scenario": selectedScenario,
-            "navurl": navURL,
+            "navurl": (navURL.startsWith("http") || navURL.startsWith("https")) ? navURL : "https://" + navURL,
             "browser": selectedBrowser,
             "siteURL": window.location.origin,
             "keywordData": keywordData,
@@ -460,7 +514,26 @@ const Genius = () => {
         <div>Please enter {type} name</div>
       </>
     )
-  }
+  };
+
+  const templateObjectFunc = (prj_id, id, childIndex, _id, name, type, pid) => {
+    return {
+      "projectID": prj_id,
+      "id": id,
+      "childIndex": childIndex,
+      "_id": _id,
+      "oid": null,
+      "name": name,
+      "type": type,
+      "pid": pid,
+      "task": null,
+      "renamed": false,
+      "orig_name": null,
+      "taskexists": null,
+      "state": "saved",
+      "cidxch": null
+    }
+  };
 
   const handleScenarioCreate = async () => {
     if (!(scenarioName)) {
@@ -481,25 +554,6 @@ const Genius = () => {
       return;
     }
 
-    const templateObjectFunc = (prj_id, id, childIndex, _id, name, type, pid) => {
-      return {
-        "projectID": prj_id,
-        "id": id,
-        "childIndex": childIndex,
-        "_id": _id,
-        "oid": null,
-        "name": name,
-        "type": type,
-        "pid": pid,
-        "task": null,
-        "renamed": false,
-        "orig_name": null,
-        "taskexists": null,
-        "state": "saved",
-        "cidxch": null
-      }
-    }
-
     let indexCounter = 1;
 
     const getMindmapInternals = () => {
@@ -507,11 +561,12 @@ const Genius = () => {
       let scenarioPID = indexCounter;
       let screenPID = indexCounter;
       modScenarios.forEach((scenario, idx) => {
+        scenarioPID = indexCounter;
         tempArr.push(templateObjectFunc(scenario.projectID, indexCounter++, scenario.childIndex, scenario._id, scenario.name, "scenarios", 0));
         if (scenario.children && scenario.children.length > 0) {
           scenario.children.forEach((screen, idx_scr) => {
-            tempArr.push(templateObjectFunc(screen.projectID, indexCounter++, screen.childIndex, screen._id, screen.name, "screens", scenarioPID))
             screenPID = indexCounter;
+            tempArr.push(templateObjectFunc(screen.projectID, indexCounter++, screen.childIndex, screen._id, screen.name, "screens", scenarioPID))
             if (screen.children && screen.children.length > 0) {
               screen.children.forEach((tc, idx_tc) => {
                 tempArr.push(templateObjectFunc(tc.projectID, indexCounter++, tc.childIndex, tc._id, tc.name, "testcases", screenPID))
@@ -519,7 +574,8 @@ const Genius = () => {
             }
           })
         }
-      })
+      });
+
       return tempArr;
     }
 
@@ -557,7 +613,8 @@ const Genius = () => {
           "orig_name": null,
           "taskexists": null,
           "state": "created",
-          "cidxch": "true"
+          "cidxch": "true",
+          "projectID": selectedProject ? selectedProject.key : null,
         }
       ],
       "deletednode": [],
