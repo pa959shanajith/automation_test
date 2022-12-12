@@ -1,12 +1,16 @@
-import React, { useState, useRef, Fragment } from 'react';
+import React, { useState, useRef, Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {getModules,getScreens} from '../api';
 import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
+import * as actionTypesPlugin from '../../plugin/state/action';
+
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
+import { SearchDropdown } from '@avo/designcomponents';
+import * as pluginApi from '../../plugin/api';
 // // primeReact components
 // import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
 // import "primereact/resources/primereact.min.css";                  //core css
@@ -28,6 +32,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const gitBranchRef =  useRef()
     const gitVerRef =  useRef()
     const gitPathRef =  useRef()
+    const current_task = useSelector(state=>state.plugin.PN);
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
@@ -39,30 +44,30 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const [modlist,setModList] = useState(moduleList)
     const [exportBox,setExportBox] = useState(false);
-    const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
-    
-    
+    const [getProjectList,setProjectList]=useState([]);
+    const [selectedData,setSelectedData] = useState('');
+    // const [value, setValue] = useState(current_task);
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
-        // dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
-        setselectedProjectNameForDropdown(proj);
+        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-        console.log('screendata', screendata);
+        
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){
         //     SearchInp.current.value = ""
         // }
         
         setBlockui({show:false})
-        
+
     }
+    // console.log(value)
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
@@ -120,6 +125,78 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             dispatch({type:actionTypes.UPDATE_SELECTNODES,payload:{nodes:[],links:[]}})
         }
     }
+    
+    useEffect(()=>{
+
+        (async() => {
+            const UserList =  await pluginApi.getUserDetails("user");
+
+            if(UserList.error){
+                setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+            }else{
+                // setUserDetailList(UserList);
+            }
+        
+            const ProjectList = await pluginApi.getProjectIDs();
+            
+            if(ProjectList.error){
+                setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+            }else{
+                const arraynew = ProjectList.projectId.map((element, index) => {
+                return (
+                    {
+                        key: element,
+                        text: ProjectList.projectName[index],
+                        index: index
+                    }
+                )
+            });
+            setProjectList(arraynew);
+            setSelectedData(current_task);
+            debugger;
+            selectProj(current_task);
+        }
+        
+        var plugins = []; 
+        const plugins_list= await pluginApi.getAvailablePlugins();
+       
+        if(plugins_list.error){
+            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+        }else{
+        
+            let txt = [];
+            for (let x in plugins_list) {
+            if(plugins_list[x] === true) {
+                txt.push({
+                    key: x,
+                    text: x.charAt(0).toUpperCase()+x.slice(1),
+                    title: x.charAt(0).toUpperCase()+x.slice(1),
+                    disabled: false
+                })
+            }
+            else {
+                txt.push({
+                    key: x,
+                    text: x.charAt(0).toUpperCase()+x.slice(1),
+                    title: 'License Not Supported',
+                    
+                })
+            }
+        }    
+        // setplugins_list(txt);
+    }
+        
+    })();
+
+},[]);
+console.log(selectedData)
+    const onProjectChange = (option) => {
+        setSelectedData(option.key);
+        // setValue(option.key);
+        selectProj(option.key);
+        dispatch({type: actionTypesPlugin.SET_PN, payload:option.key});
+    }
+
     const clickPasteNodes = () =>{
         if(d3.select('#pasteImg').classed('active-map')){
             //close paste
@@ -142,13 +219,21 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             title='Export Modules'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[selectedProjectNameForDropdown]["name"]} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[current_task]["name"]} isAssign={isAssign}/>} 
             />:null} 
         <div className='toolbar__header'>
             <label data-test="projectLabel">Project:</label>
-            <select data-test="projectSelect" value={selectedProjectNameForDropdown} onChange={(e)=>{selectProj(e.target.value)}}>
+            <SearchDropdown
+                    // noItemsText={[ ]}
+                    onChange={onProjectChange}
+                    options={getProjectList}
+                    selectedKey={selectedData}
+                    width='15rem'
+
+                    /> 
+            {/* <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
-            </select>
+            </select> */}
             <span data-test="headerMenu" className='toolbar__header-menus'>
                 <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="Select" onClick={clickSelectBox}></i>
                 <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
@@ -158,7 +243,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
             </span> */}
-            {/* <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button> */}
+            <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button>
             {/* <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button> */}
         </div>
         

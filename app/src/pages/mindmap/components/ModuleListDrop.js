@@ -37,7 +37,8 @@ const ModuleListDrop = (props) =>{
     const [isE2EOpen, setIsE2EOpen] = useState(false);
     const [collapse, setCollapse] = useState(false);
     const SearchScInp = useRef()
-    const [filterSc,setFilterSc] = useState('')
+    const [filterSc,setFilterSc] = useState('');
+    const [firstRender, setFirstRender] = useState(true);
 
     
   
@@ -45,7 +46,7 @@ const ModuleListDrop = (props) =>{
     useEffect(()=> {
         if(moduleList.length > 0) {
             
-            selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false); 
+            selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false,firstRender); 
         }
         setWarning(false)
      },[])
@@ -136,11 +137,11 @@ const ModuleListDrop = (props) =>{
         d3.selectAll('.ct-node').classed('node-selected',false)
         if(Object.keys(moduleSelect).length===0){
             loadModule(modID)
-            return;
+    
         }else{
             setWarning({modID, type: name})
         }
-        
+        return;
     }
     
     //E2E properties
@@ -149,12 +150,15 @@ const ModuleListDrop = (props) =>{
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
-        if(Object.keys(moduleSelect).length===0){
+        if(Object.keys(moduleSelect).length===0 || firstRender){
             loadModuleE2E(modID)
-            return;
+
         }else{
             setWarning({modID, type});
         }
+        setFirstRender(false);
+
+        return; 
     }    
     const loadModuleE2E = async(modID) =>{
         setWarning(false)

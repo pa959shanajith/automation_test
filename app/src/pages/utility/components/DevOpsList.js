@@ -110,6 +110,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             const ProjectList = await pluginApi.getProjectIDs();
             setProjectData1(ProjectList.releases[current_task][0].name);
             setProjectData(ProjectList.releases[current_task][0].cycles[0]._id);
+            setCycleName(ProjectList.releases[current_task][0].cycles[0].name);
             
             if(ProjectList.error){
                 setMsg(MSG.CUSTOM("Error while fetching the project Details"));
@@ -136,7 +137,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     if(configurationList.error.CONTENT) {
                         setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
                     } else {
-                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+                        setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
                     setConfigList(configurationList);
@@ -283,7 +284,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 if(deletedConfig.error.CONTENT) {
                     setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
                 } else {
-                    setMsg(MSG.CUSTOM("Error While Deleting DevOps Configuration",VARIANT.ERROR));
+                    setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
                 }
             }else {
                 const configurationList = await fetchConfigureList({
@@ -293,12 +294,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     if(configurationList.error.CONTENT) {
                         setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
                     } else {
-                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+                        setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
                     setConfigList(configurationList);
                 }
-                setMsg(MSG.CUSTOM("DevOps Configuration deleted successfully",VARIANT.SUCCESS));
+                setMsg(MSG.CUSTOM("Execute configuration deleted successfully.",VARIANT.SUCCESS));
             }
             setLoading(false);
         }, 500);
@@ -458,7 +459,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
                             }
                         }else {
-                            setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                            setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
                         }
                         onHide(name);
                     }
