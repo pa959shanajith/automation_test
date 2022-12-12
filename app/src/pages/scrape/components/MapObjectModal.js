@@ -87,7 +87,12 @@ const MapObjectModal = props => {
             return;
         }
 
-        let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
+        // let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
+        let appType = props.appType;
+        const screenId = props.fetchingDetails["_id"];
+        const projectId = props.fetchingDetails.projectID;
+        const screenName = props.fetchingDetails["name"];
+        const versionNumber = 0
         
         let arg = {
             projectId: projectId,
@@ -97,7 +102,7 @@ const MapObjectModal = props => {
             appType: appType,
             objList: [],
             orderList: orderList,
-            versionnumber: versionnumber
+            versionnumber: 0,
         };
 
         let mapping = {...map};

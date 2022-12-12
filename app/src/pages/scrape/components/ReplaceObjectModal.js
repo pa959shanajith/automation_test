@@ -218,7 +218,8 @@ const ReplaceObjectModal = props => {
             </div>,
             'footer': <button onClick={() => {
                 props.setShowPop("")
-                let { screenId } = props.current_task;
+                // let { screenId } = props.current_task;
+                const screenId = props.fetchingDetails["_id"];
 
                 let arg = {
                     screenId,
