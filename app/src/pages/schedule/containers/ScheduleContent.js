@@ -482,7 +482,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
                                                                     <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(formatDate(data.scheduledatetime)) }}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
-                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
+                                                                        <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
                                                                     :null}
                                                                 </div> 
                                                             </div>
@@ -522,7 +522,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
                                                                     <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(formatDate(data.scheduledatetime)) }}>{data.status}</span>
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
-                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
+                                                                        <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
                                                                     :null}
                                                                 </div> 
                                                             </div>
