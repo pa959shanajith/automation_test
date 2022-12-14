@@ -40,6 +40,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
     const taskJson = useSelector(state=>state.plugin.tasksJson);
     const [showSearch, setShowSearch] = useState(false);
+    const [showCreateSearch, setShowCreateSearch] = useState(false);
     const [activeTab, setActiveTab] = useState("todo");
     const [reviewItems, setReviewItems] = useState([]);
     const [todoItems, setTodoItems] = useState([]);
@@ -92,7 +93,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     // useOnClickOutside(node, () => props.setShowDropdownEdit(!props.showDropdownEdit));
 
     const handleCreateChange = () => {
-        setCreateProjectCheck(true)
+        setCreateProjectCheck(true);
+        setAssignedUsers({});
     };
 
     const handleModifyChange = () => {
@@ -213,15 +215,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         txt.push({
                             key: x,
                             //text: x[0].toUpperCase()+x.slice(1)
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
-                                title: x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            title: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             disabled: false
                         })
                     }
                     else {
                         txt.push({
                             key: x,
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             title: 'License Not Supported',
                             disabled: true
                         })
@@ -458,6 +460,9 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     //         </div>
     //     );
     // }
+    const toggleSearch = () => {
+        setShowCreateSearch(!showCreateSearch);
+    }
 
     const create_project = async()=>{
 
@@ -505,11 +510,9 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 <span data-test="search-icon" className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
                     {/* <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span> */}
                 </div>
-                <div>
-
-            <Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",marginLeft:"380px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Manage Project(s)"  onClick={() =>{setUnassignedUsers([]);setProjectAssignedUsers([]);setAssignedUsers({});setProjectName("");setAppType(null);setSelectedProject(null); setCreateProjectCheck(true); setAssignedUsers({}); onClick('displayBasic')}} />
-            
-            </div>
+                <div style={{ display: "flex", justifyContent: "flex-end"}}>
+                    {userRole==="Test Manager" ?<Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",margin:"0px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Create/Manage Project(s)"  onClick={() =>{setUnassignedUsers([]);setProjectAssignedUsers([]);setAssignedUsers({});setProjectName("");setAppType(null);setSelectedProject(null); setCreateProjectCheck(true); setAssignedUsers({}); onClick('displayBasic')}} />:null}
+                </div>
             <div>
             <div className="task-nav-bar1">
                 {projectNames && projectNames.projectName.map((singleProj,idx)=>{
@@ -525,11 +528,13 @@ return <>
 
 
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
+                                            dispatch({type: actionTypes.SET_PN, payload:projectNames.projectId[idx]});
                                             window.localStorage['navigateScreen'] = "mindmap";
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
 
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"500px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => { 
+                                            dispatch({type: actionTypes.SET_PN, payload:idx});
                                              window.localStorage['navigateScreen'] = "TestSuite";
                                              setRedirectTo(`/execute`);
                                         }}>Execute</button>
@@ -546,7 +551,7 @@ return <>
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
 
 
-                <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px' }}  onHide={() => onHide('displayBasic')}>
+                <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px',height:'700px',position:'fixed',overflow:'hidden' }}  onHide={() => onHide('displayBasic')}>
 
                     {/* <div className="container"> */}
                     {/* <div className="column"> */}
@@ -604,13 +609,15 @@ return <>
                     {/* </div> */}
                     {/* </div> */}
                     <div>
+                        </div>
                         <div className='dialog_dropDown'>
                             {/* {
                     isCreate == true ? <TextField /> : <NormalDropDown /> 
                 } */}
                             {
-                    createProjectCheck ? <TextField label='Enter Project Name'  width='300px' placeholder='Enter Project Name' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='16px'  /> : 
-                                    <NormalDropDown
+                    createProjectCheck ? <TextField required label='Enter Project Name'  width='300px' placeholder='Enter Project Name' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='16px'  /> : 
+                                    <NormalDropDown 
+                                        required
                                         label="Select Project Name"
                                         options={getProjectList}
                         onChange={async(e,item) =>{
@@ -625,7 +632,7 @@ return <>
                                         }}
                                         selectedKey={selectedProject}
                                         placeholder="Select Project"
-                                        standard
+                                        standard                                        
                                         width="300px"
                                         fontSize='16px'
 
@@ -651,24 +658,10 @@ return <>
                                 createProjectCheck ? <NormalDropDown
                                     label="Select App Type"
                                     options={getplugins_list}
-                                    // disabled={true}
-
-                                    // label1="Apptype"
-                                    // options1={[selectedProject && allProjects[selectedProject] ?
-                                    //         {
-                                    //             key: allProjects[selectedProject].apptype,
-                                    //             text: allProjects[selectedProject].apptypeName
-                                    //         }
-                                    //     : {}
-                                    // ]}
-                                    placeholder="Select AppType"
+                                    placeholder="Select App Type"
                                     width="300px"
                                     top="300px"
-
-
-
-                                    // disabled={!selectedProject}
-                                    // required
+                                    required
                                     onChange={(e, item) => {
                                         setAppType(item)
                                     }}
@@ -677,7 +670,15 @@ return <>
                             }
                         </div>
 
-                        <div className='labelStyle1'> <label>Users</label></div>
+                        <div className='labelStyle1'> <label>Users</label>
+                        {/* <div className="user_list">
+                        <button data-test="search"className="ss__search-btn1" onClick={toggleSearch}>
+                            <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
+                        </button>
+                        { showCreateSearch && <input data-test="searchbox" className="ss__search_field1"  onChange={(e)=>{
+                            setSearchUsers(e.target.value?e.target.value.toLowerCase():"")
+                        }} />}
+                        </div> */}
 
 					<div className="wrap" style={{height:'12rem'}} >
                             <div className='display_project_box' style={{ overflow: 'auto' }}>
@@ -695,22 +696,43 @@ return <>
                         :null
                     }
                 </div> */}      
-                <div style={{display:'flex', width:"100%", marginTop:"10px"}}>
-                     <SearchBox
-                        placeholder="Enter Username"
-                        width="20rem"
-                        onClear={() => {setSearchUsers("")}}
-                        onChange={(e,value)=>{
-                            debugger;
-                            setSearchUsers(value)
-                        }}
-                    />
-                </div>
+                                <div style={{display:'flex', width:"100%", marginTop:"10px", position:"sticky", top:10}}>
+                                    <SearchBox
+                                        placeholder="Enter Username"
+                                        width="20rem"
+                                        onClear={() => {setSearchUsers("")}}
+                                        onChange={(e,value)=>{
+                                            debugger;
+                                            setSearchUsers(value)
+                                        }}
+                                    />
+                                </div>
                                 <div >
+                               
                                     {createProjectCheck && userDetailList.map((user, index) => {
-                                        return user[0].includes(searchUsers)? <div key={index} className='display_project_box_list' style={{}} >
-                                            <input type='checkbox' disabled={userInfo.user_id === user[1]} defaultChecked={userInfo.user_id === user[1]}  value={user[0]} onChange={(e) => {
-                                                if (e.target.checked) { setAssignedUsers({ ...assignedUsers, [user[1]]: true }) }
+                                        return (assignedUsers[user[1]] || userInfo.user_id === user[1]) && user[0].includes(searchUsers)? <div key={index} className='display_project_box_list' style={{}} >
+                                            <input type='checkbox' disabled={userInfo.user_id === user[1]} defaultChecked={userInfo.user_id === user[1]} checked={assignedUsers[user[1]] || userInfo.user_id === user[1]} value={user[0]} onChange={(e) => {
+                                                if (!assignedUsers[user[1]]) { 
+                                                    setAssignedUsers({ ...assignedUsers, [user[1]]: true })
+                                                }
+                                                else {
+                                                    setAssignedUsers((prevState) => {
+                                                        let newObj = {...prevState}
+                                                        delete newObj[user[1]]
+                                                        return newObj;
+                                                    })
+                                                }
+                                            }} />
+
+                                            <span title={`${user[4]} ${user[5]} (${user[6]})`} >{user[0]} </span>
+                                        </div>:null
+                                        // </ScrollBar>
+                                    })}
+                                    {!createProjectCheck?null:<hr></hr>}
+                                    {createProjectCheck && userDetailList.map((user, index) => {
+                                        return userInfo.user_id !== user[1] && !assignedUsers[user[1]] && user[0].includes(searchUsers)? <div key={index} className='display_project_box_list' style={{}} >
+                                            <input type='checkbox' disabled={userInfo.user_id === user[1]} defaultChecked={userInfo.user_id === user[1]} checked={assignedUsers[user[1]] || userInfo.user_id === user[1]} value={user[0]} onChange={(e) => {
+                                                if (!assignedUsers[user[1]]) { setAssignedUsers({ ...assignedUsers, [user[1]]: true }) }
                                                 else {
                                                     setAssignedUsers((prevState) => {
                                                         delete prevState[user[1]]
@@ -719,9 +741,9 @@ return <>
                                                 }
                                             }} />
 
-                                            <span >{user[0]} </span>
+                                            <span title={`${user[4]} ${user[5]} (${user[6]})`} >{user[0]} </span>
                                         </div>:null
-                                        // </ScrollBar>
+                                    // </ScrollBar>
                                     })}
                                     {!createProjectCheck && selectedProject && projectAssignedUsers.length > 0 && projectAssignedUsers.map((user_obj, index) => {
                                         return user_obj["name"].includes(searchUsers)?(

@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../../global';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay,ModalContainer, Report } from '../../global';
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, TextField, SearchBox } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
 import "../../execute/styles/ExecuteTable.scss";
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-
+import { useSelector } from 'react-redux';
 import MultiSelectDropDown from '../../execute/components/MultiSelectDropDown';
-
+import Handlebars from "handlebars";
 import { readTestSuite_ICE } from '../../mindmap/api';
-import { updateTestSuite_ICE } from '../../execute/api';
+import { updateTestSuite_ICE,loadLocationDetails,readTestCase_ICE } from '../../execute/api';
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 
@@ -29,6 +29,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const [testSuiteName, setTestSuiteName] = useState();
     const [appTypes, setAppTypes] = useState([]);
     const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
+    const [scenarioDetails,setScenarioDetails] = useState({});
+    const [showModal,setshowModal] = useState(false);
+    const userInfo = useSelector(state=>state.login.userinfo);
     // const [filteredModuleList, setFilteredModuleList] = useState([]);
     const notexe = useRef(
         integrationConfig.executionRequest != undefined ? integrationConfig.executionRequest.donotexe.current : {}
@@ -495,14 +498,27 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
             })
         }
     }
-
+    const loadLocationDetailsScenario = async (scenarioName, scenarioId) => {
+		let data = await loadLocationDetails(scenarioName, scenarioId);
+        if(data.error){displayError(data.error);return;}
+        data["modalHeader"] = scenarioName;
+        setScenarioDetails(data);
+    } 
+    const closeModal = () => {
+        setshowModal(false);
+    }
+    const displayError = (error) =>{
+        setLoading(false)
+        setMsg(error)
+        return
+    }
    
     
     const renderFooter = (name) => {
             return (
                 <div>
-                    <Button label="Cancel"  onClick={() => onHide(name)} className="p-button-text" />
-                    <Button label="Save"  onClick={async () => {const payload =  [{
+                    <Button label="Cancel"  onClick={() => onHide(name)} className="p-button-rounded" />
+                    <Button label="Save"  className='p-button-rounded' onClick={async () => {const payload =  [{
                                 "testsuiteid": moduleIds,
                                 "testsuitename": testSuiteName,
                                 "testscenarioids": scenarioIds,
@@ -520,6 +536,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 </div>
             );
         }
+    const checkAll=()=>{
+        const newdonotexe=scenarioName.map(element=>0)
+        setDoNotExecuteArr(newdonotexe)
+    }
 
     return (
         <>
@@ -533,24 +553,24 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                     <div className="e__table-head">
                                                         <div className="e__table-head-row">
                                                             <div className='e__contextmenu' id='contextmenu'></div>
-                                                            <div className='e__selectAll' style={{marginRight:'2vh'}} ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
-                                                            <input className='e-execute' type='checkbox' checked /></div>	
+                                                            <div className='e__selectAll e__selectAll-name ' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
+                                                            <input className='e-execute' type='checkbox' onChange={checkAll} /></div>	
                                                             <div className='e__scenario'>Scenario Name</div>
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
                                                             <div className='e__apptype' >App Type</div>
-                                                            { showSelectBrowser && <div className='e__accessibilityTesting' style={{width:'30vh'}}>Accesibility Standard</div> }
+                                                            { showSelectBrowser && <div className='e__accessibilityTesting'>Accessibility Standards</div> }
                                                         </div>
                                                     </div>
-                                                    <div className={'e__testScenarioScroll e__table-bodyContainer e__table-bodyContainer'}>
+                                                    <div className={'e__table-bodyContainer'}>
                                                         <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                         {scenarioName.map((e,i)=>
-                                                            <div key={e.name} className={"e__table_row_status e__table_row  e__table_row"} style={{marginLeft:'-1vh'}}>   
-                                                            <div className='e__table-col tabeleCellPadding e__contextmenu' style={{marginRight:'1vh'}} >{i+1}</div>
-                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus' style={{marginRight:'3vh'}}>
+                                                            <div key={e.name} className="e__table_row">   
+                                                            <div className='e__table-col tabeleCellPadding e__contextmenu' >{i+1}</div>
+                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus'>
                                                             <input type='checkbox' onChange={e=>{e.target.checked ? doNotExecute[i]=0:doNotExecute[i]=1; setDoNotExecuteArr([...doNotExecute])}} title='Select to execute this scenario' className='doNotExecuteScenario e-execute' checked={!doNotExecute[i]}/>
                                                             </div>
-                                                            <div className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" >{scenarioName[i]}</div>
+                                                            <div title={scenarioName[i]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(scenarioName[i],scenarioIds[i]);setshowModal(true);}}>{scenarioName[i]}</div>
                                                             <div className="e__table-col tabeleCellPadding exe-dataParam"><input className="e__getParamPath" onChange={(e)=>
                                                                 {   dataParameter[i] = e.target.value;
                                                                     setDataParameter([...dataParameter])}} type="text" value = {dataParameter[i]}/></div>
@@ -569,6 +589,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                             </div>
                                 {/* </ScrollBar> */}
                         </div>
+                        {showModal?
+                            <ModalContainer title={scenarioDetails.modalHeader} footer={submitModalButtons(setshowModal)} close={closeModal} content={scenarioDetailsContent(scenarioDetails, userInfo, displayError)} />
+                        :null} 
                     </Dialog>
             {
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
@@ -596,7 +619,55 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     );
     
 };
-
+const submitModalButtons = (setshowModal) => {
+    return(
+        <button type="button" onClick={()=>{setshowModal(false);}} >Ok</button>
+    )
+}
+const scenarioDetailsContent = (scenarioDetails, userInfo, displayError) => {
+    return(
+        <>
+            <div className="scenarioDetails scenarioDetailsHeading">
+                <div className="sDInnerContents">Test Case Name</div>
+                <div className="sDInnerContents">Screen Name</div>
+                <div className="sDInnerContents">Project Name</div>
+            </div>
+            <div id="scenarioDetailsContent" className="scenarioDetails scenarioDetailsContent scrollbar-inner">
+                <ScrollBar thumbColor="#321e4f" >
+                {scenarioDetails.screennames!==undefined?
+                <>
+                    {scenarioDetails.screennames.map((data,i)=>(
+                        <div key={i} className="sDInnerContentsWrap">
+                            <div className="sDInnerContents viewReadOnlyTC" onClick={()=>{testCaseDetails(scenarioDetails.testcasenames[i], scenarioDetails.testcaseids[i], userInfo, displayError)}} title={scenarioDetails.testcasenames[i]}>{scenarioDetails.testcasenames[i]}</div>
+                            <div className="sDInnerContents" title={scenarioDetails.screennames[i]}>{scenarioDetails.screennames[i]}</div>
+                            <div className="sDInnerContents" title={scenarioDetails.projectnames[i]}>{scenarioDetails.projectnames[i]}</div>
+                        </div>
+                    ))}
+                </>
+                :null}
+                </ScrollBar>
+            </div>
+        </>
+    )
+}
+const testCaseDetails = async (testCaseName, testCaseId, userInfo, displayError) => {
+    try{
+        const response = await readTestCase_ICE(userInfo,testCaseId, testCaseName, 0);
+        if(response.error){displayError(response.error);return;}
+        var template = Handlebars.compile(Report);
+        var dat = template({
+                name: [{
+                        testcasename: response.testcasename
+                    }
+                ],
+                rows: response.testcase
+            });
+        var newWindow = window.open();
+        newWindow.document.write(dat);
+    }catch(error) {
+        console.log(error);
+    }
+}
 const details = {
     "web":{"data":"Web","title":"Web","img":"web"},
     "webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},

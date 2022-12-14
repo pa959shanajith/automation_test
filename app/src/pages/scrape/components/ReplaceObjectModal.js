@@ -218,7 +218,8 @@ const ReplaceObjectModal = props => {
             </div>,
             'footer': <button onClick={() => {
                 props.setShowPop("")
-                let { screenId } = props.current_task;
+                // let { screenId } = props.current_task;
+                const screenId = props.fetchingDetails["_id"];
 
                 let arg = {
                     screenId,
@@ -317,7 +318,9 @@ const ReplaceObjectModal = props => {
         } else {
             props.setOverlay("Fetching Keywords for selected objects...")
 
-            let { screenId,appType } = props.current_task;
+            // let { screenId,appType } = props.current_task;
+            const appType= props.appType;
+            const screenId = props.fetchingDetails["_id"];
             
             let arg = {
                 screenId,    

@@ -34,16 +34,16 @@ const ModuleListDrop = (props) =>{
     const [isE2EOpen, setIsE2EOpen] = useState(false);
     const [collapse, setCollapse] = useState(false);
     const SearchScInp = useRef()
-    const [filterSc,setFilterSc] = useState('')
-
-
+    const [filterSc,setFilterSc] = useState('');
+    const userRole = useSelector(state=>state.login.SR);
+    const [firstRender, setFirstRender] = useState(true);
     
   
 
     useEffect(()=> {
         if(moduleList.length > 0 ) {
             
-            selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false); 
+            selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false,firstRender); 
         }
         setWarning(false)
      },[])
@@ -138,11 +138,11 @@ const ModuleListDrop = (props) =>{
         d3.selectAll('.ct-node').classed('node-selected',false)
         if(Object.keys(moduleSelect).length===0){
             loadModule(modID)
-            return;
+    
         }else{
             setWarning({modID, type: name})
         }
-        
+        return;
     }
     
     //E2E properties
@@ -150,12 +150,15 @@ const ModuleListDrop = (props) =>{
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
-        if(Object.keys(moduleSelect).length===0){
+        if(Object.keys(moduleSelect).length===0 || firstRender){
             loadModuleE2E(modID)
-            return;
+
         }else{
             setWarning({modID, type});
         }
+        setFirstRender(false);
+
+        return; 
     }    
     const loadModuleE2E = async(modID) =>{
         setWarning(false)
@@ -249,7 +252,7 @@ const ModuleListDrop = (props) =>{
                                     Modules
                             </h6>
 
-                            <IconDropdown items={[ 
+                            {userRole!=="Test Engineer"?<IconDropdown items={[ 
                                 {
                                     key: 'csv',
                                     text: 'Create New',
@@ -261,7 +264,7 @@ const ModuleListDrop = (props) =>{
                                     text: 'Import Module',
                                     onClick:()=>{setImportPop(true);}}
                                 ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
-                            />  
+                            />  :null}
                             {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
@@ -291,7 +294,7 @@ const ModuleListDrop = (props) =>{
                             <h6 id='Endto' style={{margin: '5px -82px 3px -17px'}}>
                                     End to End Flows
                             </h6>
-                            <IconDropdown items={[ 
+                           {userRole!=="Test Engineer"? <IconDropdown items={[ 
                                 {
                                     key: 'csv',
                                     text: 'Create New',
@@ -301,12 +304,12 @@ const ModuleListDrop = (props) =>{
                                     }
                                 },
                                 ]}
-                                 style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.3rem'}} placeholderIconName = 'plusIcon'
-                            />  
+                                 id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
+                            />  :null}
                         </div>
                         <div className='searchBox pxBlack'>
                             <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
-                            <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                            <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                         </div>
                         <div className='moduleList'>
                         {moduleList.map((e,i)=>{

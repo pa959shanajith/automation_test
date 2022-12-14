@@ -23,7 +23,7 @@ const ScrapeObjectList = (props) => {
 
     // const [activeEye, setActiveEye] = useState(null);
     const [disableBtns, setDisableBtns] = useState({save: true, delete: true, edit: true, search: false, selAll: false, dnd: false});
-    const [showSearch, setShowSearch] = useState(false);
+    const [showSearch, setShowSearch] = useState(true);
     const [searchVal, setSearchVal] = useState("");
     const [selAllCheck, setSelAllCheck] = useState(false);
     const [deleted, setDeleted] = useState([]);
@@ -35,7 +35,7 @@ const ScrapeObjectList = (props) => {
 
     useEffect(()=> {
         // setActiveEye(null);
-        setShowSearch(false);
+        setShowSearch(true);
         setSearchVal("");
         setSelAllCheck(false);
         setDeleted([]);
@@ -137,7 +137,7 @@ const ScrapeObjectList = (props) => {
             setDeleted([]);
             setDnd(false); 
             setModified({});
-            setShowSearch(false);
+            setShowSearch(true);
             setSearchVal("");
             setSelAllCheck(false);
             setEditableObj({});
@@ -447,16 +447,16 @@ const ScrapeObjectList = (props) => {
                                 Select all
                             </span>
                         </label>
-                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects"  onClick={onSave}><img src="static/imgs/save_ic.png" style={{height:"30px",width:"30px"}}/>  </button>
-                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects"  onClick={onDelete}><img src="static/imgs/delete_ic.png" style={{height:"30px",width:"30px"}}  /></button>
                         <button  data-test="edit"  className="ss__taskBtn ss__btn" title="Edit Objects"  onClick={onEdit}>  <img src={"static/imgs/ic-jq-editstep.png"}/></button>
                         <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange"  onClick={(e)=>onRearrange(e, dnd)}> <img src= {'static/imgs/ic-jq-dragstep.png'}/>  </button>
+                        <button data-test="save" className="ss__taskBtnd ss__btnd" title="Save Objects" disabled={disableBtns.save} onClick={onSave}>Save</button>
+                        <button data-test="delete"className="ss__taskBtnd ss__btnd" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
                         {/* <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
                         { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>} */}
                           {/* dropdown button --divya*/}
-                    
+{/*                     
                     <div 
                       data-test="scrapeOnHeading"
                       key="scrapeOn"
@@ -465,21 +465,22 @@ const ScrapeObjectList = (props) => {
                         (disableAction || compareFlag ? " disable-thumbnail" : "")
                       }
                     ></div>
-                    { props.appType === "Web" ? <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
+                    { props.appType === "Web" ? <div style={{marginLeft:30}}>
                       {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
+                      { props.appType === "Web" ?<div style={{marginLeft:30}}>
                       <NormalDropDown 
 
-                      style={{height:'25px',marginLeft:'30px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' , width:'200px'}}
+                    //   style={{height:'25px',marginLeft:'30px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' , width:'200px'}}
                         
-                        className={
-                          "ss__scrapeOn" +
-                          (disableAction || compareFlag ? " disable-thumbnail" : "")
-                        }
+                        // className={
+                        //   "ss__scrapeOn" +
+                        // }
                         onChange={(e,item)=>{setCaptureButton(item.key)}}
                         defaultSelectedKey={captureButton}
                         // onChange={(e, item) => {
                         //  ;
                         // }}
+                        disabled={(disableAction || compareFlag)}
                         
                         options={[
                             {
@@ -536,8 +537,9 @@ const ScrapeObjectList = (props) => {
                               text: "Edge Chromium",
                             },
                           ]}
+                          selectedKey={captureButton}
                         placeholder="Select Browser"
-                        width="200px"
+                        width="250px"
                         
                       />
                         
@@ -577,15 +579,12 @@ const ScrapeObjectList = (props) => {
                         {appType === "Webservice" ? "Edit" : "Append"}
                       </span>
                     </div>
-                  
-
                     {props.appType === 'Web' ?
-                    <Button label="Capture" /**disabled={captureButton===""} */  className={"p-button-warning"  } onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '50px', background:'#643693', border:"none",borderRadius:"17px", fontFamily:"LatoWeb"}} />:""}
-
-
-
-
-
+                    (<div className={"c__capturebtn"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}} >
+                    <Button label="Capture" /**disabled={captureButton===""} */ className="debug_button p-button-warning"  onClick={()=>{startScrape(captureButton)}}  disabled={(disableAction || compareFlag)} title="Capture elements" />
+                    </div>)
+                :""} 
+                
 </div>
                     
                     
@@ -601,10 +600,10 @@ const ScrapeObjectList = (props) => {
                 <div className="scraped_obj_list">
 
 
-                       <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
+                       <button data-test="search"className="ss__search-btn" onClick={()=>{}} title="Search for the captured elements">
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
-                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>}
+                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch} placeholder="Search for captured elements"/>}
 
 
                     
@@ -612,7 +611,7 @@ const ScrapeObjectList = (props) => {
                 <div className="sc__ab">
                     <div className="sc__min">
                     <div className="sc__con" id="scrapeObjCon">
-                    <ScrollBar scrollId="scrapeObjCon" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                    <ScrollBar scrollId="scrapeObjCon" thumbColor= "#8a8886" trackColor= "#d2d0ce" verticalbarWidth='12px'>
                     <ReactSortable data-test="scrapeObjectContainer" className="scrape_object_container" list={scrapeItems} setList={setScrapeItems} onEnd={onDrop} key={dnd.toString()} disabled={!dnd}>
                     {
                         scrapeItems.map((object, index) =><Fragment key={`${object.val}`}> 

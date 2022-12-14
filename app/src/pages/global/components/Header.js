@@ -261,8 +261,8 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                         </div>
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div title={userInfo.isTrial?"Admin role is available as part of premium":"Switch Role"} className={"switch-role-btn no-border "+ (userInfo.isTrial?"logo-grey":"")} data-toggle="dropdown" onClick={switchRole}  >
-                                <span><img className="switch-role-icon" alt="switch-ic" src={"static/imgs/ic-switch-user"+ (userInfo.isTrial?"_disabled.png":".png")}/></span>
-                                <span>Switch Role</span>
+                                {/* <span><img className="switch-role-icon" alt="switch-ic" src={"static/imgs/ic-switch-user"+ (userInfo.isTrial?"_disabled.png":".png")}/></span>
+                                <span>Switch Role</span> */}
                             </div>
                             <div className={ "switch-role-menu dropdown-menu " + (showSR && "show")}>
                                 {roleList.map(role => 

@@ -9,6 +9,11 @@
     left: 171px;
     max-height: 123px;
     background: $whiteColor;
+    margin-bottom: -20px;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .status-available{
     background-color: $pistachio;
@@ -20,14 +25,14 @@
     background-color:$red
 }
 .popup-content{
-    padding: 0px 40px !important;
+    // padding: 0px 40px !important;
 }
 .popup-wrap{
     height: 250px;
     padding: 40px 15px;
 }
 .popup-li{
-    margin: 0px;
+    margin: 0px 0px 0px 85px;
     padding: 0px;
     list-style-type: none;
     #status {
@@ -70,9 +75,11 @@
 .adminControl-ice {
     margin-bottom: 3%;
     padding: 0px 0px;
-    position: relative;
+    // position: relative;
     float: left;
     width: 100%;
+    margin-top: 20px;
+    margin-left: 10px;
 }
 .adminControl-ice div span {
     display: inline-block;

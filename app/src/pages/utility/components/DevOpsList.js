@@ -6,7 +6,7 @@ import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects, 
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { useSelector, useDispatch } from 'react-redux';
-
+import * as actionTypes from '../../plugin/state/action';
 import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
 import {readTestSuite_ICE} from '../../schedule/api';
@@ -16,6 +16,8 @@ import CheckboxTree from 'react-checkbox-tree';
 import ScheduleHome from '../../schedule/containers/ScheduleHome';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup';
 import "../styles/DevOps.scss";
+import DropDownList from '../../global/components/DropDownList';
+import { getPools, getICE_list } from '../../execute/api';
 
 
 
@@ -23,6 +25,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
+    const dispatch = useDispatch();
     const [executionQueue, setExecutionQueue] = useState(false);
     const [filteredList, setFilteredList] = useState(configList);
     const [displayBasic, setDisplayBasic] = useState(false);
@@ -51,7 +54,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [currentKey,setCurrentKey] = useState('');
     const [projectName, setProjectName] = useState('');
     const [currentName, setCurrentName] = useState('');
-  
+    const current_task = useSelector(state=>state.plugin.PN);
     const [showCICD, setShowCICD] = useState(false);
     const [currentTask, setCurrentTask] = useState({});
     const [eachData, setEachData] = useState([]);
@@ -66,6 +69,17 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     });
     const [appType, setAppType] = useState('');
     const [cycleName, setCycleName] = useState('');
+    const [poolType,setPoolType] = useState("unallocated");
+    const [inputErrorBorder,setInputErrorBorder] = useState(false);
+    const [smartMode,setSmartMode] = useState('normal');
+    const [selectedICE,setSelectedICE] = useState("");
+    const [availableICE, setAvailableICE] = useState([]);
+    const [ExeScreen, setExeScreen] = useState(true);
+    const [poolList,setPoolList] = useState({});
+    const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([]);
+    const [iceStatus,setIceStatus] = useState([]);
+    const [iceNameIdMap,setIceNameIdMap] = useState({});
+    const [showIcePopup,setShowIcePopup] = useState(false);
 
 
     useEffect(()=>{
@@ -75,56 +89,55 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     })},[])
 
 
-    useEffect(()=>{
-        pluginApi.getProjectIDs()
-        .then(data => {
-                setProjectData1(data.releases[selectedCycle][0].name);
-                setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
-                setCycleName(data.releases[selectedCycle][0].cycles[0].name);
-    })},[selectedCycle])
+    // useEffect(()=>{
+    //     pluginApi.getProjectIDs()
+    //     .then(data => {
+    //             // setProjectData1(data.releases[selectedCycle][0].name);
+    //             setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
+    //             setCycleName(data.releases[selectedCycle][0].cycles[0].name);
+    // })},[selectedCycle])
   
     useEffect(()=>{
         (async() => {
             const UserList =  await pluginApi.getUserDetails("user");
-        if(UserList.error){
-            setMsg(MSG.CUSTOM("Error while fetching the user Details"));
-        }else{
-            setUserDetailList(UserList);
-        }
 
+            if(UserList.error){
+                setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+            }else{
+                setUserDetailList(UserList);
+            }
 
-            const ProjectList = await getDetails_ICE(["domaindetails"],["Banking"]);
-        if(ProjectList.error){
-            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
-        }else{
+            const ProjectList = await pluginApi.getProjectIDs();
+            setProjectData1(ProjectList.releases[current_task][0].name);
+            setProjectData(ProjectList.releases[current_task][0].cycles[0]._id);
+            setCycleName(ProjectList.releases[current_task][0].cycles[0].name);
             
-            const arraynew = ProjectList.projectIds.map((element, index) => {
-            
+            if(ProjectList.error){
+                setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+            }else{
+                const arraynew = ProjectList.projectId.map((element, index) => {
                 return (
                     {
-
                         key: element,
-                        text: ProjectList.projectNames[index],
-                        title: ProjectList.projectNames[index],
+                        text: ProjectList.projectName[index],
+                        title: ProjectList.projectName[index],
                         index: index
                     }
                 )
             });
             setProjectList(arraynew);
-            setSelectedProject(arraynew[selectedCycle].key);
-            setProjectName(arraynew[selectedCycle].text);
+            setSelectedProject(arraynew[current_task ? current_task :0].key);
+            setProjectName(arraynew[current_task ? current_task :0].text);
 
-
-
-            if(arraynew.length > selectedCycle) {
+            if(arraynew.length > 0) {
                 const configurationList = await fetchConfigureList({
-                    'projectid': arraynew[selectedCycle].key
+                    'projectid': arraynew[current_task ? current_task :0].key
                 });
                 if(configurationList.error) {
                     if(configurationList.error.CONTENT) {
                         setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
                     } else {
-                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+                        setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
                     setConfigList(configurationList);
@@ -132,40 +145,39 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             }
             setLoading(false);
         }
-            var plugins = []; 
+        
+        var plugins = []; 
         const plugins_list= await getAvailablePlugins();
        
-        
         if(plugins_list.error){
             setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
-           
-                    let txt = [];
-                     for (let x in plugins_list) {
-                        if(plugins_list[x] === true) {
-                            txt.push({
-                                key: x,
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
-                                title: x.charAt(0).toUpperCase()+x.slice(1),
-                                disabled: false
-                            })
-                        }
-                        else {
-                            txt.push({
-                                key: x,
-                                text: x.charAt(0).toUpperCase()+x.slice(1),
-                                title: 'License Not Supported',
-                                
-                            })
-                        }
-                       }
-                   
-            setplugins_list(txt);
-        }
         
-        })()
+            let txt = [];
+            for (let x in plugins_list) {
+            if(plugins_list[x] === true) {
+                txt.push({
+                    key: x,
+                    text: x.charAt(0).toUpperCase()+x.slice(1),
+                    title: x.charAt(0).toUpperCase()+x.slice(1),
+                    disabled: false
+                })
+            }
+            else {
+                txt.push({
+                    key: x,
+                    text: x.charAt(0).toUpperCase()+x.slice(1),
+                    title: 'License Not Supported',
+                    
+                })
+            }
+        }    
+        setplugins_list(txt);
+    }
         
-    },[]);
+    })();
+
+},[current_task]);
     useEffect(() => {
         (() => {
             setLoading('Please Wait...');
@@ -199,6 +211,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const onProjectChange = async (option) => {
         setLoading('Please Wait...');
         setSelectedProject(option.key);
+        dispatch({type: actionTypes.SET_PN, payload:option.index});
         setSelectedCycle(option.index);
         setProjectName(option.text);
         projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
@@ -271,7 +284,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 if(deletedConfig.error.CONTENT) {
                     setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
                 } else {
-                    setMsg(MSG.CUSTOM("Error While Deleting DevOps Configuration",VARIANT.ERROR));
+                    setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
                 }
             }else {
                 const configurationList = await fetchConfigureList({
@@ -281,12 +294,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     if(configurationList.error.CONTENT) {
                         setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
                     } else {
-                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+                        setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
                     setConfigList(configurationList);
                 }
-                setMsg(MSG.CUSTOM("DevOps Configuration deleted successfully",VARIANT.SUCCESS));
+                setMsg(MSG.CUSTOM("Execute configuration deleted successfully.",VARIANT.SUCCESS));
             }
             setLoading(false);
         }, 500);
@@ -383,7 +396,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             integration: getIntegrationSelected(item.executionRequest.integration),
             executionType: item.executionRequest.executiontype,
             isHeadless: item.executionRequest.isHeadless,
-            executionRequest: item.executionRequest
+            executionRequest: item.executionRequest,
+            disable: true
         });
         return;
     }
@@ -427,19 +441,30 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const renderFooter = (name) => {
         return (
             <div>
-                <Button label="Execute" title="Execute" onClick={async () => {
-                    const temp = await execAutomation(currentKey);
-                    if(temp.status !== "pass") {
-                        if(temp.error && temp.error.CONTENT) {
-                            setMsg(MSG.CUSTOM(temp.error.CONTENT,VARIANT.ERROR));
-                        } else {
-                            setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
-                        }
-                    }else {
-                        setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                <Button label="Execute" title="Execute" className="p-button-rounded" onClick={async () => {
+                    if (showIcePopup) {
+                        dataExecution.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):"")
+                        dataExecution.poolid = ""
+                        if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
+                        else dataExecution.targetUser = selectedICE
+                        CheckStatusAndExecute(dataExecution, iceNameIdMap);
+                        onHide(name);
                     }
-                    onHide(name);
-                }} autoFocus />
+                    else {
+                        const temp = await execAutomation(currentKey);
+                        if(temp.status !== "pass") {
+                            if(temp.error && temp.error.CONTENT) {
+                                setMsg(MSG.CUSTOM(temp.error.CONTENT,VARIANT.ERROR));
+                            } else {
+                                setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
+                            }
+                        }else {
+                            setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
+                        }
+                        onHide(name);
+                    }
+                }
+            } autoFocus />
             </div>
         );
     }
@@ -562,10 +587,81 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setLoading(false);
     }
 
+    const fetchData = async (projectId) => {
+        setSmartMode('normal');
+		setSelectedICE("");
+		var projId = projectId;
+		var dataforApi = {poolid:"",projectids: [projId]}
+		setLoading('Fetching ICE ...')
+        const data = await getPools(dataforApi);
+        if(data.error){displayError(data.error);return;}
+        setPoolList(data);
+        var arr = Object.entries(data);
+        arr.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
+        setChooseICEPoolOptions(arr);
+        const data1 = await getICE_list({"projectid":projId});
+        if(data1.error){displayError(data1.error);return;}
+        setIceStatus(data1)
+        populateICElist(arr,true,data1)
+        setLoading(false);
+    }
+
+    const populateICElist = (arr, unallocated, iceStatusdata) => {
+        var ice = [];
+        var iceStatusValue = {};
+        if (iceStatusdata !== undefined) iceStatusValue = iceStatusdata.ice_ids;
+        else if (iceStatusdata === undefined) iceStatusValue = iceStatus.ice_ids;
+        const statusUpdate = (ice) => {
+            var color = '#fdc010';
+            var status = 'Offline';
+            if (ice.connected) {
+                color = '#95c353';
+                status = 'Online';
+            }
+            if (ice.mode) {
+                color = 'red';
+                status = 'DND mode';
+            }
+            return { color, status };
+        };
+        if (unallocated) {
+            setPoolType("unallocated");
+            if (arr === undefined) iceStatusdata = iceStatus;
+            arr = Object.entries(iceStatusdata.unallocatedICE);
+            arr.forEach((e) => {
+                var res = statusUpdate(e[1]);
+                e[1].color = res.color;
+                e[1].statusCode = res.status;
+                ice.push(e[1]);
+            });
+        } else {
+            setPoolType("allocated");
+            var iceNameIdMapData = { ...iceNameIdMap };
+            arr.forEach((e) => {
+                if (e[1].ice_list) {
+                    Object.entries(e[1].ice_list).forEach((k) => {
+                        if (k[0] in iceStatusValue) {
+                            var res = statusUpdate(iceStatusValue[k[0]]);
+                            iceNameIdMapData[k[1].icename] = {};
+                            iceNameIdMapData[k[1].icename].id = k[0];
+                            iceNameIdMapData[k[1].icename].status = iceStatusValue[k[0]].status;
+                            k[1].color = res.color;
+                            k[1].statusCode = res.status;
+                            ice.push(k[1]);
+                        }
+                    });
+                }
+            });
+            setIceNameIdMap(iceNameIdMapData);
+        }
+        ice.sort((a, b) => a.icename.localeCompare(b.icename));
+        setAvailableICE(ice);
+    }
+
     return (<>
      {
             executionQueue &&
-            <Dialog header="Manage Execution Queue" visible={displayBasic3}  onDismiss = {() => {displayBasic3(false)}}  style={{width:'50%', height:'auto'}} onHide={() => onHide('displayBasic3')}>
+            <Dialog header="Manage Execution Queue" className='Manage_Execution' visible={displayBasic3}  onDismiss = {() => {displayBasic3(false)}}  onHide={() => onHide('displayBasic3')}>
             {
                         (executionQueue.list.length > 0 ) ? <CheckboxTree
                             showNodeIcon={false} className='devOps_checkbox_tree' nodes={executionQueue.list} expanded={executionQueue.expanded} onExpand={(expanded) => setExecutionQueue({...executionQueue, expanded: expanded}) } /> : 
@@ -579,7 +675,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" style={{width: '44vh'}} onClick={() => setCurrentIntegration({
+            <button data-test="submit-button-test" className='submit-button-test_profile' onClick={() => setCurrentIntegration({
                     name: '',
                     key: uuid(),
                     selectValues: [
@@ -607,8 +703,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
         </div>
         
-                  <div style={{marginTop: '6vh',position: 'absolute', display: 'flex'}}>
-                 <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '1vh', marginRight: '5px'}}>Project Name : </span>
+                <div className = "projectName">
+                 <span className="api-ut__inputLabel projectName1" >Project Name : </span>
         
                     
                 <SearchDropdown
@@ -624,7 +720,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
         { configList.length > 0 ? <>
             { /* Table */ }
-            <div className="d__table" style={{flex: '1 1 7%', paddingLeft:'2vh', paddingRight:'2vh'}}>
+            <div className="d__table">
                 <div className="d__table_header">
                 <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#&nbsp;</span>
                     <span className="d__out_head tkn-table__key tkn-table__head1" >&nbsp;&nbsp;Execution Profile Name</span>
@@ -635,7 +731,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <span className=" details_col tkn-table__key d__det_head" >Action</span>
                 </div>
             </div>
-            <div id="activeUsersToken" className="wrap active-users-token" style={{marginLeft: '-1.5vh',width: '101%'}}>
+            <div id="activeUsersToken" className="wrap active-users-token active-users-token1 " >
                 <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>
@@ -643,7 +739,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
+                                <td className="tkn-table__key tkn-table__key1" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
@@ -654,7 +750,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setBrowserTypeExe(item.executionRequest.browserType);
-                                    setCurrentName(item.configurename)
+                                    setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({
                                             assignedTime: "",
@@ -675,6 +771,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         testSuiteDetails: testSuiteDetails
                                     });
                                     readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                         //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
@@ -689,15 +787,15 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                     <td className="tkn-table__button" >
-                                        <img style={{marginRight: '8vh',height: '3vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
-                                        <img style={{height: '3vh'}} onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
+                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button" alt="Edit Icon"/> 
+                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons Delete_button" alt="Delete Icon"/>
                                     </td>
                              </tr>)
                          }
                         {
                              searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
+                                <td className="tkn-table__key tkn-table__key1" data-for="name" data-tip={item.configurename} > <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
@@ -708,7 +806,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setBrowserTypeExe(item.executionRequest.browserType);
-                                    setCurrentName(item.configurename)
+                                    setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({
                                             assignedTime: "",
@@ -729,6 +827,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         testSuiteDetails: testSuiteDetails
                                     });
                                     readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
@@ -743,7 +843,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                     <td className="tkn-table__button" >
-                                        <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
+                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button1" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                    </td>
                              </tr>)
@@ -752,19 +852,50 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </table>
                 
                {/* Dialog for Execute Now */}
-                <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '40vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
+                <Dialog header="Execute Now" visible={displayBasic2}  className="execution" style={{ width: "58vw" }} footer={renderFooter('displayBasic2')} onHide={() => {onHide('displayBasic2'); setShowIcePopup(false) }}>
     
-                    <input type="radio" name='myRadios' id='first'  onChange={() => {setAllocateICE(true); setDisplayBasic2(false);}}
-                     style={{width:'2.5vh', height: '2.5vh'}} />&nbsp;&nbsp;
-                    <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="radio" name='myRadios' id='second' onChange={()=>{}} style={{width:'2.5vh', height: '2.5vh'}} checked/>&nbsp;&nbsp;
-                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}} >Avo Agent / Avo Grid</label> 
-                
+                    <input type="radio" name='myRadios' id='first'  className='radiobutton' onChange={() => {setShowIcePopup(true)}}
+                      />&nbsp;&nbsp;
+                    <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Assure Client</label>
+                    <input type="radio" name='myRadios' id='second' onChange={()=>{setShowIcePopup(false)}} className='radiobutton' defaultChecked={true}/>&nbsp;&nbsp;
+                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Agent / Avo Grid</label>
+                    { showIcePopup && <div>
+                        <div>
+                            <div className='adminControl-ice popup-content'>
+                                <div className='adminControl-ice popup-content popup-content-status'>
+                                    <ul className="e__IceStatus">
+                                        <li className="popup-li">
+                                            <label title='available' className="legends legends-margin">
+                                                <span id='status' className="status-available"></span>
+                                                Available
+                                            </label>
+                                            <label title='unavailable' className="legends legends-margin">
+                                                <span id='status' className="status-unavailable" ></span>
+                                                Unavailable
+                                            </label>
+                                            <label title='do not disturb' className="legends legends-margin">
+                                                <span id='status' className="status-dnd"></span>
+                                                Do Not Disturb
+                                            </label>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='adminControl-ice popup-content'>
+                            <div>
+                                <span className="leftControl" title="Token Name">{"Execute on"}</span>
+                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Search'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                            </div>
+                        </div>
+                    </div> }
+
                 </Dialog>
                 {/* Dialog for Execute Now */}
 
-                {allocateICE?
+                {/* {allocateICE?
                 <AllocateICEPopup 
                     SubmitButton={CheckStatusAndExecute} 
                     setAllocateICE={setAllocateICE} 
@@ -776,30 +907,30 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     exeIceLabel={"Execute on ICE"}
                     ExeScreen={true}
                     currentTask={currentTask}
-                />:null}
+                />:null} */}
 
                 {/* Dialog for Schedule */}
-                <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+                <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}}   onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
                 {/* Dialog for Schedule */} 
 
                 {/* Dialog for CI /CD  */}
 
-                <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
-                    <div style={{display: 'flex', marginBottom:'3vh'}} title={url}>
-                    <span className="devOps_dropdown_label devOps_dropdown_label_url" id='api-url' value={url} style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
-                        <pre className='grid_download_dialog__content__code' style={{ width: '58vh'}}>
+                <Dialog header="Execute via CI/CD" visible={displayBasic} className="cicdName" onHide={() => onHide('displayBasic')}>
+                    <div className="cicdDiv" title={url}>
+                    <span className="devOps_dropdown_label devOps_dropdown_label_url cicdSpan" id='api-url' value={url}>DevOps Integration API url : </span>
+                        <pre className='grid_download_dialog__content__code cicdpre'>
                         <code id='api-url' title={url}>
                         {url}
                         </code>
                     </pre>
                     <label>
                             <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                            <div style={{fontSize:"24px"}}>
-                                    <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '3.5vh'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(url) }} ></i>
+                            <div className="labeldiv">
+                                    <i className="fa fa-files-o icon labeldivi" data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(url) }} ></i>
                             </div>
                         </label>
                 </div>
-                        <div style={{display: 'flex', marginBottom:'3vh'}}>
+                        <div  className="executiontype">
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                                 <label id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
@@ -807,18 +938,18 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <label id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
                         </div>
                     </div>
-                        <div style={{display: 'flex', marginBottom:'3vh'}} title={str}>
-                        <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '8.5vh'}}>DevOps Request Body : </span>
-                        <pre className='grid_download_dialog__content__code'  style={{ width: '58vh', marginLeft: '46px'}}>
-                        <code style={{fontSize: 'smaller'}} id='devops-key' title={str} >
+                        <div className="executiontype" title={str}>
+                        <span className="api-ut__inputLabel executiontypename" >DevOps Request Body : </span>
+                        <pre className='grid_download_dialog__content__code executiontypenamepre' >
+                        <code className="executiontypecode" id='devops-key' title={str} >
                             {str}
                             {/* {abc} */}
                         </code>
                         </pre>
                         <label>
                             <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                                <div style={{fontSize:"24px",marginTop:'5vh'}}>
-                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyConfigKey(str) }} ></i>
+                                <div  className="labeldiv1">
+                                <i className="fa fa-files-o icon labeldivi1"  data-for="copy" data-tip={copyToolTip} onClick={() => {  copyConfigKey(str) }} ></i>
                             </div>
                         </label>
                 </div>
@@ -826,7 +957,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 {/* Dialog for CI /CD  */}
                 </ScrollBar>
             </div>
-        </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' style={{ width: 'auto',height: '60vh',marginRight: '37vh'}}/><h6 style={{position: 'relative',top: '63vh',right: '70vh'}}>No Execution Profile Found<h4 style={ { position: 'absolute', left: '3.5vh', width:'33vh'}}><b>Create Now</b></h4></h6> </div> }
+        </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' className='configImg' /><span className='configImgspan'>No Execution Profile Found<h4 className='configImgh' ><b>Create Now</b></h4></span> </div> }
     </>);
 }
 

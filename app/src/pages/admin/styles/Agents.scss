@@ -259,14 +259,14 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 59.5vh;
+    height: 61vh;
     &_filter {
         margin-bottom: 2%;
         display: flex;
         justify-content: space-between;
     }
     &_container {
-        height: 44vh;
+        height: 48.5vh;
         max-height: 100%;
     }
 }
@@ -284,7 +284,7 @@
     padding-left: 2%;
 }
 .active-users-token {
-    max-height: 61vh;
+    max-height: 62.6vh;
     height: 100% !important;
 }
 .searchBoxInput {
@@ -318,7 +318,7 @@
     font-weight: 700;
     margin-bottom: 0;
     &_ice {
-        margin-right: 9%;
+        margin-right: 8%;
     }
     &_browser {
         margin-right: 15%;

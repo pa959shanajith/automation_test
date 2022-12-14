@@ -16,7 +16,7 @@ const RefBarItems = props => {
 	const dispatch = useDispatch();
 	const highlightRef = useRef();
 	const history = useHistory();
-	const { appType, uid } = useSelector(state=>state.plugin.CT);
+	const {uid } = useSelector(state=>state.plugin.CT);
 	const compareFlag = useSelector(state=>state.scrape.compareFlag);
 	const objValue = useSelector(state=>state.scrape.objValue);
     const [toFilter, setToFilter] = useState([]);
@@ -32,6 +32,7 @@ const RefBarItems = props => {
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
 	const [imageHeight,setImageHeight]=useState(0)
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);
+	const appType= props.appType;
 
 	useEffect(()=>{
 		return ()=>{
@@ -264,7 +265,7 @@ const RefBarItems = props => {
 					</div>
 					<div className="scrape__filterTagBtns">
 					{ tagList.map((tag, index)=>(
-						<button key={index} data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
+						<button key={index} data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
 					))}
 					</div>
                 </div>
@@ -277,7 +278,7 @@ const RefBarItems = props => {
     
     return (
     
-        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
+        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} collapse={props.collapse} collapsible={true} scrapeScreenURL={scrapedURL} >
 			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title" title="Screenshot">Screenshot</span></div>}
             { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter" title="Filter"/></span><span className="rb_box_title" title="Filter">Filter</span></span>}
         </ReferenceBar>

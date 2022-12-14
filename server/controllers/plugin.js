@@ -157,7 +157,9 @@ exports.getGeniusData = async (req, res) => {
   const fnName = "getGeniusData";
   logger.info("Inside UI service: " + fnName);
   try {
-    const content = req.body.data;
+    const body = req.body;
+    const content = body.data.data;
+    const existing_data = body.snr_data;
     const inputs = {
       "data": {
         "projectid": content.project.key,
@@ -168,6 +170,7 @@ exports.getGeniusData = async (req, res) => {
             "testsuiteName": content.module.text,
             "task": null,
             "testscenarioDetails": [
+              ...existing_data,
               {
                 "testscenarioid": content.scenario.key,
                 "testscenarioName": content.scenario.text,
@@ -193,8 +196,9 @@ exports.getGeniusData = async (req, res) => {
                 }),
                 "state": "created",
                 "childIndex": 1
-              }],
-            "state": "created"
+              }
+            ],
+            "state": "saved"
           }
         ],
         "versionnumber": 0,

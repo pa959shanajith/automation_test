@@ -56,3 +56,12 @@
 .node-error{
     outline: 2px dashed $red;
 }
+.p-dialog-header{
+z-index: 1;
+}
+.p-dialog{
+    .action__contents{
+        position: fixed;
+        margin: 83px 15px 16px 18px;
+    }
+}
