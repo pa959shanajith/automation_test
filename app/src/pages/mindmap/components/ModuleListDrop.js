@@ -8,7 +8,6 @@ import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents';
 import ImportMindmap from'../components/ImportMindmap.js';
-import { style } from 'd3';
 
 
 
@@ -16,7 +15,6 @@ const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
-    console.log('proj',proj)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
     const [moddrop,setModdrop]=useState(true)
@@ -32,13 +30,11 @@ const ModuleListDrop = (props) =>{
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
-    // const filterSc = props.filterSc
     const [selectedSc,setSelctedSc] = useState([])
     const [isE2EOpen, setIsE2EOpen] = useState(false);
     const [collapse, setCollapse] = useState(false);
     const SearchScInp = useRef()
     const [filterSc,setFilterSc] = useState('')
-    const [projChange, setProjChange] = useState(false);
 
 
     
@@ -51,7 +47,7 @@ const ModuleListDrop = (props) =>{
         }
         setWarning(false)
      },[])
-     
+
      useEffect(()=>{
         setIsE2EOpen(true)
      }, [proj])
@@ -87,7 +83,6 @@ const ModuleListDrop = (props) =>{
      const loadModule = async(modID) =>{
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
        
         if(moduleSelect._id === modID){
@@ -152,7 +147,6 @@ const ModuleListDrop = (props) =>{
     
     //E2E properties
     const selectModules= async(e) => {
-        // setSelctedSc([])
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
@@ -169,7 +163,6 @@ const ModuleListDrop = (props) =>{
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         if(moduleSelect._id === modID){
             dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         }
@@ -187,7 +180,6 @@ const ModuleListDrop = (props) =>{
         setBlockui({show:false})
     }
     const addScenario = (e) => {	
-        // console.log('click');
         var sceId = e.currentTarget.getAttribute("value")	
         var sceName = e.currentTarget.getAttribute("title")	
         var scArr = {...selectedSc}	
@@ -196,7 +188,6 @@ const ModuleListDrop = (props) =>{
         }else{	
             scArr[sceId] = sceName	
         }       
-        console.log('scArr', scArr); 	
         setSelctedSc(scArr)	
     }	
     const clickAdd = () =>{	
@@ -331,8 +322,6 @@ const ModuleListDrop = (props) =>{
                         })}
                         </div>
                     </div>
-                    {/* <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(0deg)' : 'rotate(180deg)',height:'37px',width:'8px', position:'relative'
-    }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' /> </div> */}
                 </div>
                 
                 </div>

@@ -7,13 +7,6 @@ import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
-// // primeReact components
-// import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
-// import "primereact/resources/primereact.min.css";                  //core css
-// import "primeicons/primeicons.css";                                //icons
- 
-
-
 
 /*Component ToolbarMenu
   use: renders tool bar menus of create new page
@@ -54,7 +47,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-        // console.log('screendata', screendata);
         // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata});
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){
@@ -84,7 +76,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         }
         
         if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
-        // if(ftype === 'custom') toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
         if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
     }
     const validate = (arr) =>{
@@ -155,12 +146,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
             </span>
-            {/* <span data-test="searchBox" className='toolbar__header-searchbox'>
-                <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
-                <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
-            </span> */}
-            {/* <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button> */}
-            {/* <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button> */}
         </div>
         
 
