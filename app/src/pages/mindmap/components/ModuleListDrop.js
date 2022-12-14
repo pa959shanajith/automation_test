@@ -38,8 +38,8 @@ const ModuleListDrop = (props) =>{
     const [collapse, setCollapse] = useState(false);
     const SearchScInp = useRef()
     const [filterSc,setFilterSc] = useState('');
+    const userRole = useSelector(state=>state.login.SR);
     const [firstRender, setFirstRender] = useState(true);
-
     
   
 
@@ -255,7 +255,7 @@ const ModuleListDrop = (props) =>{
                                     Modules
                             </h6>
 
-                            <IconDropdown items={[ 
+                            {userRole!=="Test Engineer"?<IconDropdown items={[ 
                                 {
                                     key: 'csv',
                                     text: 'Create New',
@@ -267,7 +267,7 @@ const ModuleListDrop = (props) =>{
                                     text: 'Import Module',
                                     onClick:()=>{setImportPop(true);}}
                                 ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
-                            />  
+                            />  :null}
                             {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
@@ -297,7 +297,7 @@ const ModuleListDrop = (props) =>{
                             <h6 id='Endto' style={{margin: '5px -82px 3px -17px'}}>
                                     End to End Flows
                             </h6>
-                            <IconDropdown items={[ 
+                           {userRole!=="Test Engineer"? <IconDropdown items={[ 
                                 {
                                     key: 'csv',
                                     text: 'Create New',
@@ -308,7 +308,7 @@ const ModuleListDrop = (props) =>{
                                 },
                                 ]}
                                  id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
-                            />  
+                            />  :null}
                         </div>
                         <div className='searchBox pxBlack'>
                             <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>

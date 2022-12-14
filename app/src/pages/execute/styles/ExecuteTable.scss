@@ -172,7 +172,8 @@ input[type="checkbox"] {
 }
 .e__selectAll{
     width: 3%;
-    padding: 5px 0px !important
+    padding: 5px 0px !important;
+    margin-left: 0.2rem;
 }
 .e__selectAll-exe{
     font-size: 14px
@@ -204,7 +205,7 @@ input[type="checkbox"] {
     border-right: 1px solid rgb(255, 255, 255)
 }
 .e__apptype{
-    width: 12%;
+    width: 11%;
     text-align:center;
     float: right
 }
