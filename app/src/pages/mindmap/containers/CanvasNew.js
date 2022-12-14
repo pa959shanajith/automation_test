@@ -86,7 +86,7 @@ const CanvasNew = (props) => {
                 console.log(error)
             })
         return ()=>{
-            // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
     },[])
     useEffect(() => {

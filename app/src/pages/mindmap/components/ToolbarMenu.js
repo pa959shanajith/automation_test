@@ -44,17 +44,18 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
-        // dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
+        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         setselectedProjectNameForDropdown(proj);
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-        console.log('screendata', screendata);
+        // console.log('screendata', screendata);
+        // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata});
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){
         //     SearchInp.current.value = ""

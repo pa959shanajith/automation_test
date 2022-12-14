@@ -155,7 +155,7 @@ const CanvasAssign =(props)=>{
                         onMouseUp={(e)=>moveNode(e,'KeyUp')}
                         onMouseDown={(e)=>moveNode(e,'KeyDown')}
                         cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
-                        className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
+                        className={"ct-"+node[1].type+"ct-nodeBubble"} r="4"></circle>
                         :null}
                     </g>)}
                 </g>

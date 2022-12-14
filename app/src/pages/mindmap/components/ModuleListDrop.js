@@ -16,12 +16,12 @@ const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
+    console.log('proj',proj)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
-    const [selectedModuleList,setSelectedModuleList] = useState([]);
     const isAssign = props.isAssign
     const [options,setOptions] = useState(undefined)
     const [modlist,setModList] = useState(moduleList)
@@ -38,17 +38,24 @@ const ModuleListDrop = (props) =>{
     const [collapse, setCollapse] = useState(false);
     const SearchScInp = useRef()
     const [filterSc,setFilterSc] = useState('')
+    const [projChange, setProjChange] = useState(false);
+
 
     
   
 
     useEffect(()=> {
-        if(moduleList.length > 0) {
+        if(moduleList.length > 0 ) {
             
             selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false); 
         }
         setWarning(false)
      },[])
+     
+     useEffect(()=>{
+        setIsE2EOpen(true)
+     }, [proj])
+    
      useEffect(()=>{
         var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
         setScenarioList(filter)
@@ -333,22 +340,22 @@ const ModuleListDrop = (props) =>{
                     <div style={{display:"flex", flexDirection:"column", width:"100%",overflowX:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
                             <img style={{width:'1.7rem',height:'1.7rem',marginTop:'5px',  display:!isE2EOpen || !collapse? 'none':'',}}  src='static/imgs/node-scenarios.png'/>
-                    <div style={{paddingTop:'0.47rem',marginLeft: "4px",}}><h5 style={{fontSize:'17px'}}><b>Scenarios</b></h5></div>
+                    <div style={{paddingTop:'0.47rem',marginLeft: "4px",}}><h5 style={{fontSize:'17px',opacity:!isE2EOpen || !collapse? '0':''}}><b>Scenarios</b></h5></div>
                     <div style={{marginRight:'-0.4rem',marginTop:'0rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
                     }}><img src="static/imgs/X_button.png" alt="cross button" /></div></div>
                     {/* scenario Search */}
-                     <span style={{display:'flex', flexDirection:'row-reverse', marginRight:'4px', marginTop:'2px'}}>
+                     <span style={{display:'flex', flexDirection:'row-reverse', marginRight:'4px', marginTop:'2px',marginRight:!isE2EOpen || !collapse? '15rem':''}}>
                         <input  style={{width:'137px',height: '23px', borderRadius:'6px',fontSize:'15px'}} placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
                         <img style={{width: '12px', height: '17px', marginRight:"-8.2rem", marginTop:'2px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                     </span>
                         <div className='scenarioList'>
-                           <div style={{display: scenarioList.length==0? '':'none', textAlign:'center', marginTop:'3rem', marginRight:!isE2EOpen || !collapse? '5rem':'', overflowX:'hidden'}}><h7 >Please select a module to display <br></br> it's scenarios</h7></div> 
+                           <div style={{display: scenarioList.length==0? '':'none', textAlign:'center', marginTop:'3rem', marginRight:!isE2EOpen || !collapse? '15rem':'', overflowX:'hidden',opacity:''}}><h7 >Please select a module to display <br></br> it's scenarios</h7></div> 
                               
                                 {scenarioList.map((e, i) => {
 
                                     
                                     return (
-                                        <div className='scenarios '>
+                                        <div className='scenarios ' style={{marginRight:!isE2EOpen || !collapse? '15rem':''}}>
 
                                             <div  key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios'} title={e.name} value={e._id} >
                                                 <div style={{display:'flex',marginTop:'3px'}}><input type="checkbox"  value={e._id} onChange={(e)=>{} } checked={selectedSc[e._id]}  />

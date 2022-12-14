@@ -27,7 +27,9 @@ const CreateNew = ({importRedirect}) => {
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
   const selectProj = useSelector(state=>state.mindmap.selectedProj)
+  console.log('selectProj',selectProj)
   const prjList = useSelector(state=>state.mindmap.projectList)
+  console.log('prjList',prjList)
   const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [showScrape, setShowScrape] = useState(false)
@@ -57,6 +59,7 @@ const CreateNew = ({importRedirect}) => {
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
         // dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
+        
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
             var req={
@@ -81,21 +84,7 @@ const CreateNew = ({importRedirect}) => {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
-// useEffect(()=>{(async()=>{
-//             setBlockui({show:true,content:'Loading modules ...'})
-//             var res = await getProjectList()
-//             if(res.error){displayError(res.error);return;}
-//             var data = parseProjList(res)
-//             dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
-//             dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
-//             var moduledata = await getModules({"tab":"endToend","projectid":res.projectId[0],"moduleid":null})
-//             if(moduledata.error){displayError(moduledata.error);return;}
-//             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-//             dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-//             setBlockui({show:false})
-//             })()
-//             // eslint-disable-next-line react-hooks/exhaustive-deps
-//         },[])
+
 
   const displayError = (error) =>{
     setBlockui({show:false})
