@@ -3,7 +3,6 @@
 // import { useDispatch, useSelector} from 'react-redux';
 // import { ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 // import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils';
-// import  ToolbarMenuEnE from '../components/ToolbarMenuEnE';
 // import CanvasEnE from './CanvasEnE';
 // import SaveMapButton from '../components/SaveMapButton';
 // import Legends from '../components/Legends';
@@ -58,7 +57,6 @@
 //     <Fragment>
 //         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
 //         <div id='ene' className='mp__canvas_container'>
-//             <ToolbarMenuEnE setBlockui={setBlockui} />
 //             <div id='mp__canvas' className='mp__canvas'>
 //                 {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
 //                 :<Fragment>

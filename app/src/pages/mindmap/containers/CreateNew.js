@@ -32,7 +32,6 @@ const CreateNew = ({importRedirect}) => {
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [showScrape, setShowScrape] = useState(false)
   const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
-//   const [isCreateE2E, setIsCreateE2E] = useState(true)
   const[ShowDesignTestSetup, setShowDesignTestSetup]=useState(false)
   const [displayBasic, setDisplayBasic] = useState(false);
   const [displayBasic2, setDisplayBasic2] = useState(false);
@@ -75,6 +74,7 @@ const CreateNew = ({importRedirect}) => {
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
         // dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
+        
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
             var req={
@@ -85,7 +85,6 @@ const CreateNew = ({importRedirect}) => {
                 modName:"",
                 moduleid:null
             }
-            // var moduledata = await getModules({"tab":"tabCreate","projectid":selectProj?selectProj:res.projectId[0],"moduleid":null})
             var moduledata = await getModules(req);
 
             if(moduledata.error){displayError(moduledata.error);return;}
@@ -99,21 +98,7 @@ const CreateNew = ({importRedirect}) => {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
-// useEffect(()=>{(async()=>{
-//             setBlockui({show:true,content:'Loading modules ...'})
-//             var res = await getProjectList()
-//             if(res.error){displayError(res.error);return;}
-//             var data = parseProjList(res)
-//             dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
-//             dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
-//             var moduledata = await getModules({"tab":"endToend","projectid":res.projectId[0],"moduleid":null})
-//             if(moduledata.error){displayError(moduledata.error);return;}
-//             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-//             dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-//             setBlockui({show:false})
-//             })()
-//             // eslint-disable-next-line react-hooks/exhaustive-deps
-//         },[])
+
 
   const displayError = (error) =>{
     setBlockui({show:false})
@@ -123,16 +108,6 @@ const CreateNew = ({importRedirect}) => {
   
   return (
     <Fragment>
-        {/* {showScrape?<Dialog
-            // hidden = {showScrape === false}
-            onDismiss = {() => {setShowScrape(false)}}
-            
-            title={props.taskname + " : Capture Elements"} 
-            minWidth = '60rem' 
-            // onDecline={() => console.log(false)}
-            onConfirm = {() => { }} >
-                <div style={{ height: '120rem' }}><ScrapeScreen /></div>
-            </Dialog>:null} */}
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
         {(!loading)?
@@ -148,7 +123,6 @@ const CreateNew = ({importRedirect}) => {
                 <p><b>Note </b>- Read the Mindmap from left to right</p>
                 </div>
                 <div id='mp__canvas' className='mp__canvas'>
-                {/* //isCreateE2E = true/false -- new hook */}
                      {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?
                     <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap} displayBasic={displayBasic} displayBasic2= {displayBasic2} setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
@@ -163,32 +137,12 @@ const CreateNew = ({importRedirect}) => {
                     <SaveMapButton disabled={true}/>
                     <Legends isEnE={true}/>
                 </Fragment>}
-                    {console.log('initEnEProj', initEnEProj)}
-                    {console.log('isCreateE2E', isCreateE2E)}
-                    {/* {isCreateE2E ? ( (Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
-                :<Fragment>
-                    <SaveMapButton disabled={true}/>
-                    <Legends isEnE={true}/>
-                </Fragment>) : null}  */}
-                {/* {console.log('initEnEProj', initEnEProj)}
-                {console.log('isCreateE2E', isCreateE2E)} */}
-                {/* {(Object.keys(moduleSelect).length>0)?
-                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
-                :<Fragment>
-                    <SaveMapButton disabled={true}/>
-                    <Legends isEnE={true}/>
-                </Fragment>} */}
                     
                     
                 </div>
                 <div>
-                {/* {(Object.keys(moduleSelect).length>0)?
-                    {/* <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/> */}
                     :<Fragment>
                    
-                        {/* <ExportMapButton/>
-                        <SaveMapButton disabled={true}/>
-                        <Legends/> */}
                     </Fragment>
                     </div>
                 

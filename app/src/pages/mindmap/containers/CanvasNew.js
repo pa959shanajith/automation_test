@@ -88,7 +88,7 @@ const CanvasNew = (props) => {
                 console.log(error)
             })
         return ()=>{
-            // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
     },[])
     useEffect(() => {
@@ -153,10 +153,6 @@ const CanvasNew = (props) => {
             if(verticalLayout !== props.verticalLayout && dNodes.length > 0){
                 tree = dNodes[0]
             }
-            //load mindmap from data
-            // if(!(tree && tree.createnew && tree.createnew === true)) {
-            //     tree = generateTree(tree,types,{...count},props.verticalLayout)
-            // }
             tree = generateTree(tree,types,{...count},props.verticalLayout)
             count= {...count,...tree.count}
         }
@@ -375,7 +371,6 @@ const CanvasNew = (props) => {
     const clickDeleteNodeHere=(id)=>{
         var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
         if(res){
-            // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
             setReuseDelConfirm(false)
             setNodes(res.nodeDisplay)
             setLinks(res.linkDisplay)

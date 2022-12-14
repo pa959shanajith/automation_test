@@ -8,7 +8,6 @@ import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents';
 import ImportMindmap from'../components/ImportMindmap.js';
-import { style } from 'd3';
 
 
 
@@ -21,7 +20,6 @@ const ModuleListDrop = (props) =>{
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
-    const [selectedModuleList,setSelectedModuleList] = useState([]);
     const isAssign = props.isAssign
     const [options,setOptions] = useState(undefined)
     const [modlist,setModList] = useState(moduleList)
@@ -32,7 +30,6 @@ const ModuleListDrop = (props) =>{
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
-    // const filterSc = props.filterSc
     const [selectedSc,setSelctedSc] = useState([])
     const [isE2EOpen, setIsE2EOpen] = useState(false);
     const [collapse, setCollapse] = useState(false);
@@ -44,12 +41,17 @@ const ModuleListDrop = (props) =>{
   
 
     useEffect(()=> {
-        if(moduleList.length > 0) {
+        if(moduleList.length > 0 ) {
             
             selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false,firstRender); 
         }
         setWarning(false)
      },[])
+
+     useEffect(()=>{
+        setIsE2EOpen(true)
+     }, [proj])
+    
      useEffect(()=>{
         var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
         setScenarioList(filter)
@@ -81,7 +83,6 @@ const ModuleListDrop = (props) =>{
      const loadModule = async(modID) =>{
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
        
         if(moduleSelect._id === modID){
@@ -146,7 +147,6 @@ const ModuleListDrop = (props) =>{
     
     //E2E properties
     const selectModules= async(e) => {
-        // setSelctedSc([])
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
@@ -166,7 +166,6 @@ const ModuleListDrop = (props) =>{
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         if(moduleSelect._id === modID){
             dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         }
@@ -184,7 +183,6 @@ const ModuleListDrop = (props) =>{
         setBlockui({show:false})
     }
     const addScenario = (e) => {	
-        // console.log('click');
         var sceId = e.currentTarget.getAttribute("value")	
         var sceName = e.currentTarget.getAttribute("title")	
         var scArr = {...selectedSc}	
@@ -193,7 +191,6 @@ const ModuleListDrop = (props) =>{
         }else{	
             scArr[sceId] = sceName	
         }       
-        console.log('scArr', scArr); 	
         setSelctedSc(scArr)	
     }	
     const clickAdd = () =>{	
@@ -328,8 +325,6 @@ const ModuleListDrop = (props) =>{
                         })}
                         </div>
                     </div>
-                    {/* <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(0deg)' : 'rotate(180deg)',height:'37px',width:'8px', position:'relative'
-    }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' /> </div> */}
                 </div>
                 
                 </div>
@@ -337,22 +332,22 @@ const ModuleListDrop = (props) =>{
                     <div style={{display:"flex", flexDirection:"column", width:"100%",overflowX:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
                             <img style={{width:'1.7rem',height:'1.7rem',marginTop:'5px',  display:!isE2EOpen || !collapse? 'none':'',}}  src='static/imgs/node-scenarios.png'/>
-                    <div style={{paddingTop:'0.47rem',marginLeft: "4px",}}><h5 style={{fontSize:'17px'}}><b>Scenarios</b></h5></div>
+                    <div style={{paddingTop:'0.47rem',marginLeft: "4px",}}><h5 style={{fontSize:'17px',opacity:!isE2EOpen || !collapse? '0':''}}><b>Scenarios</b></h5></div>
                     <div style={{marginRight:'-0.4rem',marginTop:'0rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
                     }}><img src="static/imgs/X_button.png" alt="cross button" /></div></div>
                     {/* scenario Search */}
-                     <span style={{display:'flex', flexDirection:'row-reverse', marginRight:'4px', marginTop:'2px'}}>
+                     <span style={{display:'flex', flexDirection:'row-reverse', marginRight:'4px', marginTop:'2px',marginRight:!isE2EOpen || !collapse? '15rem':''}}>
                         <input  style={{width:'137px',height: '23px', borderRadius:'6px',fontSize:'15px'}} placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
                         <img style={{width: '12px', height: '17px', marginRight:"-8.2rem", marginTop:'2px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                     </span>
                         <div className='scenarioList'>
-                           <div style={{display: scenarioList.length==0? '':'none', textAlign:'center', marginTop:'3rem', marginRight:!isE2EOpen || !collapse? '5rem':'', overflowX:'hidden'}}><h7 >Please select a module to display <br></br> it's scenarios</h7></div> 
+                           <div style={{display: scenarioList.length==0? '':'none', textAlign:'center', marginTop:'3rem', marginRight:!isE2EOpen || !collapse? '15rem':'', overflowX:'hidden',opacity:''}}><h7 >Please select a module to display <br></br> it's scenarios</h7></div> 
                               
                                 {scenarioList.map((e, i) => {
 
                                     
                                     return (
-                                        <div className='scenarios '>
+                                        <div className='scenarios ' style={{marginRight:!isE2EOpen || !collapse? '15rem':''}}>
 
                                             <div  key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios'} title={e.name} value={e._id} >
                                                 <div style={{display:'flex',marginTop:'3px'}}><input type="checkbox"  value={e._id} onChange={(e)=>{} } checked={selectedSc[e._id]}  />
