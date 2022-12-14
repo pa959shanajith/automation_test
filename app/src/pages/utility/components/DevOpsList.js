@@ -852,7 +852,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </table>
                 
                {/* Dialog for Execute Now */}
-                <Dialog header="Execute Now" visible={displayBasic2}  className="execution" footer={renderFooter('displayBasic2')} onHide={() => {onHide('displayBasic2'); setShowIcePopup(false) }}>
+                <Dialog header="Execute Now" visible={displayBasic2}  className="execution" style={{ width: "58vw" }} footer={renderFooter('displayBasic2')} onHide={() => {onHide('displayBasic2'); setShowIcePopup(false) }}>
     
                     <input type="radio" name='myRadios' id='first'  className='radiobutton' onChange={() => {setShowIcePopup(true)}}
                       />&nbsp;&nbsp;

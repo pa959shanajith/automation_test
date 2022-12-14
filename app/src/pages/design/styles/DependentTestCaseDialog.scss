@@ -47,6 +47,11 @@
     }
     .tcView{
         flex: 0 0 10%;
+        color: #0000ee;
+        cursor: pointer;
+        &:hover {
+            text-decoration: underline;
+        }
     }
 
 }
