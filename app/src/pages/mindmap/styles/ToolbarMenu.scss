@@ -2,19 +2,18 @@
 @import "../../global/styles/ColorVariables.scss";
 .toolbar__header{
     background-color: $borderThree;
-    height: 45px;
+    height: 30px;
     padding: 0 10px;
     font-size: 14px;
     font-family: $avoFont;
     padding-top: 5px;
-    display: flex;
 }
 .toolbar__header label{
     display: inline-block;
     max-width: 100%;
     font-weight: 700;
     position: relative;
-    margin: 8px 8px 0 0;
+    margin: 2px 8px 0 0;
 }
 .toolbar__header select{
     width: 160px;
@@ -28,7 +27,7 @@
 .toolbar__header-menus{
     display: inline-block;
     white-space: nowrap;
-    padding: 9px 7px 0 7px;
+    padding: 4px 7px 0 7px;
 }
 .toolbar__header-menus i{
     margin-left: 11%;

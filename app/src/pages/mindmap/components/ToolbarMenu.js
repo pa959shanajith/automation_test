@@ -50,6 +50,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
+        dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
@@ -67,7 +68,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         setBlockui({show:false})
 
     }
-    // console.log(value)
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
@@ -189,13 +189,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     })();
 
 },[]);
-console.log(selectedData)
-    const onProjectChange = (option) => {
-        setSelectedData(option.key);
-        // setValue(option.key);
-        selectProj(option.key);
-        dispatch({type: actionTypesPlugin.SET_PN, payload:option.key});
-    }
 
     const clickPasteNodes = () =>{
         if(d3.select('#pasteImg').classed('active-map')){
@@ -223,17 +216,9 @@ console.log(selectedData)
             />:null} 
         <div className='toolbar__header'>
             <label data-test="projectLabel">Project:</label>
-            <SearchDropdown
-                    // noItemsText={[ ]}
-                    onChange={onProjectChange}
-                    options={getProjectList}
-                    selectedKey={selectedData}
-                    width='15rem'
-
-                    /> 
-            {/* <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
+            <select data-test="projectSelect" value={current_task} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
-            </select> */}
+            </select>
             <span data-test="headerMenu" className='toolbar__header-menus'>
                 <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="Select" onClick={clickSelectBox}></i>
                 <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
