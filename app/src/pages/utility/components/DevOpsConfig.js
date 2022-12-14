@@ -473,7 +473,7 @@ const DevOpsConfig = props => {
                 setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
             }
         }else {
-            props.showMessageBar( `Execution profile ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS');
+            props.showMessageBar( `Execution profile ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d successfully.` , 'SUCCESS');
             props.setCurrentIntegration(false);
         }
         props.setLoading(false);

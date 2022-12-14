@@ -1,3 +1,4 @@
+
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar } from '../../global';
@@ -10,8 +11,9 @@ import '../styles/MultiSelectDropDown.scss'
 const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters}) => {
     const inputRef = useRef()
     const [dropDown,setDropDown] = useState(false)
+    const [chatBox , setChatBox] = useState(false);
     useEffect(()=>{
-        inputRef.current.value = (accessibilityParameters.length!==0?accessibilityParameters.length:"") +" Selected Standards";
+        inputRef.current.value = (accessibilityParameters.length!==0?accessibilityParameters.length:"") +"Select Standards";
     },[accessibilityParameters])
     const selectOption = (value, event) =>{
         let acc_param = [...accessibilityParameters];
@@ -22,7 +24,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
         else {
             acc_param.push(value);
         }
-        inputRef.current.value = ((acc_param.length!==0)?acc_param.length:"") + " Selected Standards"
+        inputRef.current.value = ((acc_param.length!==0)?acc_param.length:"") + "  Select Standards "
         event.currentTarget.getElementsByTagName('input')[0].checked = !event.currentTarget.getElementsByTagName('input')[0].checked
         setAccessibilityParameters(acc_param);
     }
@@ -31,8 +33,9 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
 			
     return(
         <Fragment>
-            <ClickAwayListener className="exe__table-multiDropDown-pad" onClickAway={()=>setDropDown(false)}>
-            <input ref={inputRef} readOnly={true} className="ms__input" onClick={()=>{setDropDown(true)}} id="userIdName" />
+            <ClickAwayListener className="exe__table-multiDropDown-pad Pad" onClickAway={()=>setDropDown(false)}>
+            <input ref={inputRef} readOnly={true} className="ms__input"  onClick={()=>{setDropDown(true);setChatBox(!chatBox)}} id="userIdName" />
+            <img className="down-arrow-img" alt="message_arrow" onClick={()=>{setDropDown(!dropDown);setChatBox(!chatBox)}} src={chatBox? "static/imgs/ChevronUp.svg": "static/imgs/ChevronDown.svg" }/>
                 <div className="ms__dropDown" role="menu" id="multiSelectDropDown" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#321e4f" scrollId="multiSelectDropDown" >
                     {paradigmDropdown.map((data,index) => (  

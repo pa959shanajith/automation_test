@@ -536,6 +536,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 </div>
             );
         }
+    const checkAll=()=>{
+        const newdonotexe=scenarioName.map(element=>0)
+        setDoNotExecuteArr(newdonotexe)
+    }
 
     return (
         <>
@@ -550,7 +554,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                         <div className="e__table-head-row">
                                                             <div className='e__contextmenu' id='contextmenu'></div>
                                                             <div className='e__selectAll e__selectAll-name ' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
-                                                            <input className='e-execute' type='checkbox' /></div>	
+                                                            <input className='e-execute' type='checkbox' onChange={checkAll} /></div>	
                                                             <div className='e__scenario'>Scenario Name</div>
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
