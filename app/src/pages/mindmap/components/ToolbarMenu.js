@@ -6,10 +6,8 @@ import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import * as actionTypesPlugin from '../../plugin/state/action';
-
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
-import { SearchDropdown } from '@avo/designcomponents';
 import * as pluginApi from '../../plugin/api';
 // // primeReact components
 // import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
@@ -46,27 +44,30 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const [exportBox,setExportBox] = useState(false);
     const [getProjectList,setProjectList]=useState([]);
     const [selectedData,setSelectedData] = useState('');
-    // const [value, setValue] = useState(current_task);
+    const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(current_task);
+    
+    
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
+        setselectedProjectNameForDropdown(proj);
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-        
+        console.log('screendata', screendata);
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){
         //     SearchInp.current.value = ""
         // }
         
         setBlockui({show:false})
-
+        
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
@@ -125,7 +126,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             dispatch({type:actionTypes.UPDATE_SELECTNODES,payload:{nodes:[],links:[]}})
         }
     }
-    
     useEffect(()=>{
 
         (async() => {
@@ -212,11 +212,11 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             title='Export Modules'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[current_task]["name"]} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[selectedProjectNameForDropdown]["name"]} isAssign={isAssign}/>} 
             />:null} 
         <div className='toolbar__header'>
             <label data-test="projectLabel">Project:</label>
-            <select data-test="projectSelect" value={current_task} onChange={(e)=>{selectProj(e.target.value)}}>
+            <select data-test="projectSelect" value={selectedProjectNameForDropdown} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
             </select>
             <span data-test="headerMenu" className='toolbar__header-menus'>
@@ -228,7 +228,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
             </span> */}
-            <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button>
+            {/* <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button> */}
             {/* <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button> */}
         </div>
         
