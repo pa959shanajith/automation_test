@@ -23,7 +23,7 @@ const ExecuteContent = (integrationConfig) => {
 	const [execEnv,setExecEnv] = useState("default");
     const [taskName, setTaskName] = useState(null);
     const [status, setStatus] = useState(null);
-    const [appType, setAppType] = useState(null);
+    const appType = useSelector(state=>state.mindmap.appType);
     const [syncScenario, setSyncScenario] = useState(false);
     const [readTestSuite,setreadTestSuite] = useState("");
     const [loading,setLoading] = useState(false)
@@ -60,7 +60,7 @@ const ExecuteContent = (integrationConfig) => {
             if(current_task.taskName.indexOf("Execute Batch") < 0) setTaskName("Suite Execution");
             else setTaskName("Batch Execution");
             setStatus(current_task.status);
-            setAppType(current_task.appType);
+            // setAppType(current_task.appType);
             // eslint-disable-next-line
             versionnumber = current_task.versionnumber;
             let readTestSuiteData = current_task.testSuiteDetails;
