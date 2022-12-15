@@ -550,7 +550,7 @@ const ScrapeObjectList = (props) => {
                         <p onClick={() => {setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
                     </div>: 
                     props.appType==="OEBS"? <div className='desktop_btn'>
-                    <p onClick={() => {setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Oebs Apps</span></p>
+                    <p onClick={() => {setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
                     </div>:
                     props.appType==="SAP"?<div className='desktop_btn'>
                     <p onClick={() => {setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
@@ -559,7 +559,7 @@ const ScrapeObjectList = (props) => {
                     <p className='mobileApp_btn'  onClick={() => {setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img style={{height:'25px', width:'20px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
                     </div>:
                     props.appType==="MobileWeb"?<div className='mobileApp_btn'>
-                    <p onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>MobileWeb Apps</span></p>
+                    <p onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
                     </div>:""}
                   
                     <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")} >
@@ -606,7 +606,7 @@ const ScrapeObjectList = (props) => {
                         { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch} placeholder="Search for captured elements"/>}
 
 
-                    
+
 
                 <div className="sc__ab">
                     <div className="sc__min">
