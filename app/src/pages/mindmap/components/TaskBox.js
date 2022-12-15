@@ -25,7 +25,7 @@ const TaskBox = (props) => {
     const projectList = useSelector(state=>state.mindmap.projectList)
     const unassignList = useSelector(state=>state.mindmap.unassignTask)
     const userInfo = useSelector(state=>state.login.userinfo)
-    const selectedProj = useSelector(state=>state.mindmap.selectedProj)
+    const selectedProj = useSelector(state=>state.plugin.PN)
     const [closeCal,setCloseCal] = useState(false)
     const [warning,setWarning]=useState(false)
     const [task,setTask] = useState({arr:[],initVal:undefined})
@@ -38,7 +38,7 @@ const TaskBox = (props) => {
     const [complexity,setComplexity] = useState({show:false,clist:undefined,val:undefined})
     const [assignbtn,SetAssignbtn] = useState({disable:true,reassign:false})
     const [showcomplexity,setShowcomplexity] = useState(false)
-    const appType = projectList[selectedProj].apptypeName
+    const appType = useSelector(state=>state.mindmap.appType);
     const cycleid = props.cycleid;
     const releaseid = props.releaseid;
     const setTaskBox = props.setTaskBox;

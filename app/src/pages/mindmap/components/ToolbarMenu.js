@@ -8,7 +8,7 @@ import * as actionTypes from '../state/action';
 import * as actionTypesPlugin from '../../plugin/state/action';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
-import * as pluginApi from '../../plugin/api';
+
 
 
 /*Component ToolbarMenu
@@ -24,27 +24,24 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const gitBranchRef =  useRef()
     const gitVerRef =  useRef()
     const gitPathRef =  useRef()
-    const current_task = useSelector(state=>state.plugin.PN);
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const prjList = useSelector(state=>state.mindmap.projectList)
-    const initProj = useSelector(state=>state.mindmap.selectedProj)
-    const selectedProj = useSelector(state=>state.mindmap.selectedProj)
+    const initProj = useSelector(state=>state.plugin.PN)
+    const selectedProj = useSelector(state=>state.plugin.PN)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const selectedModule = useSelector(state=>state.mindmap.selectedModule)    
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const [modlist,setModList] = useState(moduleList)
     const [exportBox,setExportBox] = useState(false);
-    const [getProjectList,setProjectList]=useState([]);
-    const [selectedData,setSelectedData] = useState('');
-    const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
+    // const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
     
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
-        setselectedProjectNameForDropdown(proj);
+        // setselectedProjectNameForDropdown(proj);
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
@@ -120,69 +117,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             dispatch({type:actionTypes.UPDATE_SELECTNODES,payload:{nodes:[],links:[]}})
         }
     }
-    useEffect(()=>{
-
-        (async() => {
-            const UserList =  await pluginApi.getUserDetails("user");
-
-            if(UserList.error){
-                setMsg(MSG.CUSTOM("Error while fetching the user Details"));
-            }else{
-                // setUserDetailList(UserList);
-            }
-        
-            const ProjectList = await pluginApi.getProjectIDs();
-            
-            if(ProjectList.error){
-                setMsg(MSG.CUSTOM("Error while fetching the project Details"));
-            }else{
-                const arraynew = ProjectList.projectId.map((element, index) => {
-                return (
-                    {
-                        key: element,
-                        text: ProjectList.projectName[index],
-                        index: index
-                    }
-                )
-            });
-            setProjectList(arraynew);
-            setSelectedData(current_task);
-            debugger;
-            selectProj(current_task);
-        }
-        
-        var plugins = []; 
-        const plugins_list= await pluginApi.getAvailablePlugins();
-       
-        if(plugins_list.error){
-            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
-        }else{
-        
-            let txt = [];
-            for (let x in plugins_list) {
-            if(plugins_list[x] === true) {
-                txt.push({
-                    key: x,
-                    text: x.charAt(0).toUpperCase()+x.slice(1),
-                    title: x.charAt(0).toUpperCase()+x.slice(1),
-                    disabled: false
-                })
-            }
-            else {
-                txt.push({
-                    key: x,
-                    text: x.charAt(0).toUpperCase()+x.slice(1),
-                    title: 'License Not Supported',
-                    
-                })
-            }
-        }    
-        // setplugins_list(txt);
-    }
-        
-    })();
-
-},[]);
 
     const clickPasteNodes = () =>{
         if(d3.select('#pasteImg').classed('active-map')){
@@ -206,11 +140,11 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             title='Export Modules'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[selectedProjectNameForDropdown]["name"]} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[initProj]["name"]} isAssign={isAssign}/>} 
             />:null} 
         <div className='toolbar__header'>
             <label data-test="projectLabel">Project:</label>
-            <select data-test="projectSelect" value={selectedProjectNameForDropdown} onChange={(e)=>{selectProj(e.target.value)}}>
+            <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
             </select>
             <span data-test="headerMenu" className='toolbar__header-menus'>

@@ -19,7 +19,7 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
-  const selectProj = useSelector(state=>state.mindmap.selectedProj)
+  const selectProj = useSelector(state=>state.plugin.PN)
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
     'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))

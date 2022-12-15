@@ -26,7 +26,7 @@ const CreateNew = ({importRedirect}) => {
   const [loading,setLoading] = useState(true)
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
-  const selectProj = useSelector(state=>state.mindmap.selectedProj)
+  const selectProj = useSelector(state=>state.plugin.PN)
   const prjList = useSelector(state=>state.mindmap.projectList)
   const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
@@ -43,12 +43,11 @@ const CreateNew = ({importRedirect}) => {
 
   const onClick = (name, position) => {
       dialogFuncMap[`${name}`](true);
-
       if (position) {
-          setPosition(position);
+          setPosition(position);        
       }
   }
-
+ 
   const onHide = (name) => {
       dialogFuncMap[`${name}`](false);
   }
@@ -60,7 +59,8 @@ const CreateNew = ({importRedirect}) => {
             "Domain": prjList[selectProj].domains,
             "Project":prjList[selectProj].name
         }
-        setInfo(dict)
+        setInfo(dict);
+        dispatch({type:actionTypes.APP_TYPE_FOR_PROJECT,payload:prjList[selectProj].apptypeName})
     }
   },[selectProj,prjList])
   useEffect(() => {
