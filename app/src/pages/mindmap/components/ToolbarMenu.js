@@ -206,11 +206,11 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             title='Export Modules'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[selectedProjectNameForDropdown]["name"]} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[current_task]["name"]} isAssign={isAssign}/>} 
             />:null} 
         <div className='toolbar__header'>
             <label data-test="projectLabel">Project:</label>
-            <select data-test="projectSelect" value={selectedProjectNameForDropdown} onChange={(e)=>{selectProj(e.target.value)}}>
+            <select data-test="projectSelect" value={current_task} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
             </select>
             <span data-test="headerMenu" className='toolbar__header-menus'>
