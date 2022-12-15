@@ -26,7 +26,7 @@ const CreateNew = ({importRedirect}) => {
   const [loading,setLoading] = useState(true)
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
-  const selectProj = useSelector(state=>state.mindmap.selectedProj)
+  const selectProj = useSelector(state=>state.plugin.PN)
   const prjList = useSelector(state=>state.mindmap.projectList)
   const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)

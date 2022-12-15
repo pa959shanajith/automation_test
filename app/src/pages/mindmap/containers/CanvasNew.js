@@ -67,7 +67,7 @@ const CanvasNew = (props) => {
     const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true)
     const appType = useSelector(state=>state.mindmap.appType);
-    const proj = useSelector(state=>state.mindmap.selectedProj)
+    const proj = useSelector(state=>state.plugin.PN)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
