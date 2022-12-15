@@ -41,7 +41,7 @@ const SaveMapButton = (props) => {
 
 //mindmap save funtion
 const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop)=>{
-    var tab = "tabCreate"
+    var tab = "endToend"
     var selectedProject;
     var error = !1
     var mapData = []
@@ -155,15 +155,26 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
     if(moduleselected.error){displayError(moduleselected.error);return}
     var screendata = await getScreens(projId)
     if(screendata.error){displayError(screendata.error);return}
-    // dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
-    // dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
+    dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
+    dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
     setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
     if(result.scenarioInfo){
         dispatch({type:actionTypes.DELETE_SCENARIO,payload:result.scenarioInfo})
         setDelSnrWarnPop(true);
     }
+    var req={
+        tab:"endToend" && "createTab",
+        projectid:projId?projId:"",
+        version:0,
+        cycId: null,
+        modName:"",
+        moduleid:null
+    }
+    var moduledata = await getModules(req);
+    dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
     return;
+
 }
 
 const treeIterator = (c, d, e) =>{
