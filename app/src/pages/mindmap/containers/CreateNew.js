@@ -43,12 +43,11 @@ const CreateNew = ({importRedirect}) => {
 
   const onClick = (name, position) => {
       dialogFuncMap[`${name}`](true);
-
       if (position) {
-          setPosition(position);
+          setPosition(position);        
       }
   }
-
+ 
   const onHide = (name) => {
       dialogFuncMap[`${name}`](false);
   }
@@ -60,7 +59,8 @@ const CreateNew = ({importRedirect}) => {
             "Domain": prjList[selectProj].domains,
             "Project":prjList[selectProj].name
         }
-        setInfo(dict)
+        setInfo(dict);
+        dispatch({type:actionTypes.APP_TYPE_FOR_PROJECT,payload:prjList[selectProj].apptypeName})
     }
   },[selectProj,prjList])
   useEffect(() => {

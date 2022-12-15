@@ -41,15 +41,21 @@ const ModuleListDrop = (props) =>{
   
 
     useEffect(()=> {
-        if(moduleList.length > 0 ) {
+        if(moduleList.length > 0) {
+            const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
+            selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,firstRender); 
             
-            selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false,firstRender); 
         }
+       
         setWarning(false)
      },[])
 
      useEffect(()=>{
-        setIsE2EOpen(true)
+        console.log('moduleSelect', moduleSelect);
+        if(moduleSelect.type === 'endtoend') {
+            setIsE2EOpen(true)
+            setCollapse(true)
+        }
      }, [proj])
     
      useEffect(()=>{
@@ -111,7 +117,6 @@ const ModuleListDrop = (props) =>{
                 var name = type
                 // below code about scenarios fetching
         SearchScInp.current.value = ""
-
                 setSelctedSc([])
                     if (isE2EOpen){
                         setBlockui({content:'loading scenarios',show:true})

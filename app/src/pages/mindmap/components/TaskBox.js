@@ -38,7 +38,7 @@ const TaskBox = (props) => {
     const [complexity,setComplexity] = useState({show:false,clist:undefined,val:undefined})
     const [assignbtn,SetAssignbtn] = useState({disable:true,reassign:false})
     const [showcomplexity,setShowcomplexity] = useState(false)
-    const appType = projectList[selectedProj].apptypeName
+    const appType = useSelector(state=>state.mindmap.appType);
     const cycleid = props.cycleid;
     const releaseid = props.releaseid;
     const setTaskBox = props.setTaskBox;

@@ -11,18 +11,18 @@ const ScheduleHome = ({item}) => {
     const filter_data = useSelector(state=>state.plugin.FD)
     const [browserTypeExe,setBrowserTypeExe] = useState([]);
     const [execAction,setExecAction] = useState("serial");
-    const [appType, setAppType] = useState(null);
+    const appType = useSelector(state=>state.mindmap.appType);
     const [syncScenario, setSyncScenario] = useState(false);
     const [execEnv,setExecEnv] = useState("default");
     const [smartMode,setSmartMode] = useState('normal')
     const isMac = navigator.appVersion.toLowerCase().indexOf("mac") !== -1;
 	
     
-    useEffect(()=>{
-        if (Object.keys(current_task).length!==0 && Object.keys(filter_data).length!==0){
-            setAppType(current_task.appType);
-        }
-    }, [current_task, filter_data]);
+    // useEffect(()=>{
+    //     if (Object.keys(current_task).length!==0 && Object.keys(filter_data).length!==0){
+    //         // setAppType(current_task.appType);
+    //     }
+    // }, [current_task, filter_data]);
 
     const UpdateBrowserTypeExe = (browserId) => {
         let browserTypeExecute = [...browserTypeExe];

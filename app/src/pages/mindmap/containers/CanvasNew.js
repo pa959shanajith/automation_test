@@ -66,7 +66,7 @@ const CanvasNew = (props) => {
     const [reuseDelContent,setReuseDelContent] = useState()
     const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true)
-    const [appType, setAppType] = useState("");
+    const appType = useSelector(state=>state.mindmap.appType);
     const proj = useSelector(state=>state.plugin.PN)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
@@ -83,7 +83,7 @@ const CanvasNew = (props) => {
         pluginApi.getProjectIDs()
             .then(data => {
                 let projectIndex = data.projectId.findIndex((project_id)=> project_id===proj)
-                setAppType(data.appTypeName[projectIndex])
+                // setAppType(data.appTypeName[projectIndex])
             }).catch(error=>{
                 console.log(error)
             })
@@ -440,10 +440,10 @@ const CanvasNew = (props) => {
 
     return (
         <Fragment>
-             <Dialog header={taskname + " : Capture Elements"}  visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => props.onHide('displayBasic')}>
+             <Dialog header={taskname + " : Capture Elements"}  visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
              <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} /></div>
              </Dialog>
-             <Dialog header={taskname  +  " : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => props.onHide('displayBasic2')}>
+             <Dialog header={taskname  +  " : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
              <div style={{ height: '50vh'}}><DesignHome fetchingDetails={fetchingDetails} appType={appType}  /></div>
              </Dialog>
             {/* <Dialog
