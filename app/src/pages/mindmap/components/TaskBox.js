@@ -25,7 +25,7 @@ const TaskBox = (props) => {
     const projectList = useSelector(state=>state.mindmap.projectList)
     const unassignList = useSelector(state=>state.mindmap.unassignTask)
     const userInfo = useSelector(state=>state.login.userinfo)
-    const selectedProj = useSelector(state=>state.mindmap.selectedProj)
+    const selectedProj = useSelector(state=>state.plugin.PN)
     const [closeCal,setCloseCal] = useState(false)
     const [warning,setWarning]=useState(false)
     const [task,setTask] = useState({arr:[],initVal:undefined})

@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 const ModuleListDropEnE = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
-    const proj = useSelector(state=>state.mindmap.selectedProj)
+    const proj = useSelector(state=>state.plugin.PN)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const [initScList,setInitScList] = useState([]) 
     const [scenarioList,setScenarioList] = useState([])

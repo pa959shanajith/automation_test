@@ -35,7 +35,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
         <Fragment>
             <ClickAwayListener className="exe__table-multiDropDown-pad Pad" onClickAway={()=>setDropDown(false)}>
             <input ref={inputRef} readOnly={true} className="ms__input"  onClick={()=>{setDropDown(true);setChatBox(!chatBox)}} id="userIdName" />
-            <img className="down-arrow-img" alt="message_arrow" onClick={()=>{setDropDown(!dropDown);setChatBox(!chatBox)}} src={chatBox? "static/imgs/ChevronUp.svg": "static/imgs/ChevronDown.svg" }/>
+            <img className="down-arrow-img1" alt="message_arrow" onClick={()=>{setDropDown(!dropDown);setChatBox(!chatBox)}} src={chatBox? "static/imgs/ChevronUp.svg": "static/imgs/ChevronDown.svg" }/>
                 <div className="ms__dropDown" role="menu" id="multiSelectDropDown" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#321e4f" scrollId="multiSelectDropDown" >
                     {paradigmDropdown.map((data,index) => (  

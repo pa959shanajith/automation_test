@@ -17,7 +17,7 @@ const SaveMapButton = (props) => {
     const dispatch = useDispatch()
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
     const unassignTask = useSelector(state=>state.mindmap.unassignTask)
-    const projId = useSelector(state=>state.mindmap.selectedProj)
+    const projId = useSelector(state=>state.plugin.PN)
     const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     const moduledata = useSelector(state=>state.mindmap.moduleList)

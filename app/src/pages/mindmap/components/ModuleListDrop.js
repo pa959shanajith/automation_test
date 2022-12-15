@@ -14,7 +14,7 @@ import ImportMindmap from'../components/ImportMindmap.js';
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
-    const proj = useSelector(state=>state.mindmap.selectedProj)
+    const proj = useSelector(state=>state.plugin.PN)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
     const [moddrop,setModdrop]=useState(true)
