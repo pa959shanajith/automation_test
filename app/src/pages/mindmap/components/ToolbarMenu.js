@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from 'react';
+import React, { useState, useRef, Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {getModules,getScreens} from '../api';
 import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit} from '../api';
@@ -8,8 +8,6 @@ import * as actionTypes from '../state/action';
 import * as actionTypesPlugin from '../../plugin/state/action';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
-
- 
 
 
 
@@ -37,19 +35,24 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const [modlist,setModList] = useState(moduleList)
     const [exportBox,setExportBox] = useState(false);
+    // const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
+    
+    
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
-        // dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
+        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
+        // setselectedProjectNameForDropdown(proj);
+        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-        console.log('screendata', screendata);
+        // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata});
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){
         //     SearchInp.current.value = ""
@@ -78,7 +81,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         }
         
         if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
-        // if(ftype === 'custom') toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
         if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
     }
     const validate = (arr) =>{
@@ -115,6 +117,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             dispatch({type:actionTypes.UPDATE_SELECTNODES,payload:{nodes:[],links:[]}})
         }
     }
+
     const clickPasteNodes = () =>{
         if(d3.select('#pasteImg').classed('active-map')){
             //close paste
@@ -149,12 +152,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
             </span>
-            {/* <span data-test="searchBox" className='toolbar__header-searchbox'>
-                <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
-                <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
-            </span> */}
-            {/* <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button> */}
-            {/* <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button> */}
         </div>
         
 

@@ -51,7 +51,6 @@ const ModuleListDrop = (props) =>{
      },[])
 
      useEffect(()=>{
-        console.log('moduleSelect', moduleSelect);
         if(moduleSelect.type === 'endtoend') {
             setIsE2EOpen(true)
             setCollapse(true)
