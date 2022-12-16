@@ -397,7 +397,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             executionType: item.executionRequest.executiontype,
             isHeadless: item.executionRequest.isHeadless,
             executionRequest: item.executionRequest,
-            disable: true
+            disable: true,
+            selectedBrowserType: showCICD
         });
         return;
     }

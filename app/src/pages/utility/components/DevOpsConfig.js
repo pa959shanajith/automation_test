@@ -560,7 +560,7 @@ const DevOpsConfig = props => {
         {
             <div className="devOps_module_list_div" >
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} selectedBrowserType={props.currentIntegration.selectedBrowserType} />
                 </div>
                 <div className="devOps_pool_list">
                     <div>
@@ -575,7 +575,7 @@ const DevOpsConfig = props => {
                             width='54%'
                         />
                     </div>
-                    { showSelectBrowser && <div>
+                    { (props.currentIntegration.selectedBrowserType || showSelectBrowser) && <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browsers : </label>
                         <MultiSelectDropdown
                             hideSelectAll
