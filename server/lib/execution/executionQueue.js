@@ -926,7 +926,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
     static getQueueState = async (req, res) => {
         let fnName = 'getQueueState'
-
+        let response = {}
         try{
             //to add the keylist if its empty,, from the cache
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
@@ -938,13 +938,19 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.key_list = cacheData;
                 }
             }
+
+            for(let configKeys in this.key_list) {
+                if(this.key_list[configKeys].length){
+                    response[configKeys] = this.key_list[configKeys]
+                }
+            }
         } catch (error) {
                 console.info(error);
                 logger.error("Error in getQueueState. Error: %s", error);
                 return 'fail';
         }
 
-        return this.key_list;
+        return response;
     }
 
     static deleteExecutionListId = async (req, res) => {
