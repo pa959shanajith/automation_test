@@ -86,6 +86,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [unassignedUsers, setUnassignedUsers] = useState([]);
     const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
     const [redirectTo, setRedirectTo] = useState("");
+    const [searchText, setSearchText] = useState("");
 
     // const userConf = useSelector(state=>state.admin.userConf)
     // const node = useRef();
@@ -95,11 +96,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const handleCreateChange = () => {
         setCreateProjectCheck(true);
         setAssignedUsers({});
+        setSearchUsers("");
+        setSearchText("");
     };
 
     const handleModifyChange = () => {
         setCreateProjectCheck(false);
         setAssignedUsers({});
+        setSearchUsers("");
+        setSearchText("");
     };
 
 
@@ -699,11 +704,13 @@ return <>
                                 <div style={{display:'flex', width:"100%", marginTop:"10px", position:"sticky", top:10}}>
                                     <SearchBox
                                         placeholder="Enter Username"
+                                        value={searchText}
                                         width="20rem"
                                         onClear={() => {setSearchUsers("")}}
                                         onChange={(e,value)=>{
                                             debugger;
-                                            setSearchUsers(value)
+                                            setSearchUsers(value);
+                                            setSearchText(value);
                                         }}
                                     />
                                 </div>
