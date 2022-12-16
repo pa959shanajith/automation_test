@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import '../styles/TaskBox.scss';
 import { Redirect } from 'react-router-dom'
 import { useSelector } from 'react-redux';
-import { disable } from 'agenda/dist/job/disable';
 
 /*Component ControlBox
   use: returns node control options 
