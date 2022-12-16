@@ -771,7 +771,7 @@ return <>
                                     {!createProjectCheck && selectedProject && unassignedUsers.length > 0 && unassignedUsers.map((user_obj, index) => {
                                         return user_obj["name"].includes(searchUsers)? (
                                             <div key={index} className='display_project_box_list' style={{}} >
-                                        <input type='checkbox' disabled={userInfo.user_id === user_obj["_id"] } defaultChecked={false} value={user_obj["name"]} onChange={(e)=>{
+                                        <input type='checkbox' defaultChecked={false} value={user_obj["name"]} onChange={(e)=>{
                                             if(e.target.checked) {setAssignedUsers({...assignedUsers, [user_obj["_id"]]:true}) }
                                             else{
                                                 setAssignedUsers((prevState)=>{
