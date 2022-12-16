@@ -13,12 +13,16 @@ import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 import CanvasEnE from './CanvasEnE';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { Redirect } from 'react-router-dom'
+
 
 /*Component CreateNew
   use: renders create New Mindmap page
 */
     
 const CreateNew = ({importRedirect}) => {
+   const [redirectTo, setRedirectTo] = useState("");
   const dispatch = useDispatch()
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
@@ -51,6 +55,29 @@ const CreateNew = ({importRedirect}) => {
   const onHide = (name) => {
       dialogFuncMap[`${name}`](false);
   }
+  const accept = () => {
+    // toast.current.show({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
+    window.localStorage['navigateScreen'] = "genius";
+    setRedirectTo(`/genius`)
+}
+
+const reject = () => {
+    window.localStorage['navigateScreen'] = "mindmap";
+    setRedirectTo(`/mindmap`)
+    // toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+}
+const confirm1 = () => {
+    confirmDialog({
+        message: 'Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        accept,
+        reject,
+        acceptClassName:"p-button-rounded",
+        rejectClassName:"p-button-rounded"
+    });
+};
+
 
   useEffect(()=>{
     if(selectProj && prjList[selectProj]){
@@ -107,6 +134,8 @@ const CreateNew = ({importRedirect}) => {
   }
   
   return (
+    <>
+    { redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
@@ -124,7 +153,7 @@ const CreateNew = ({importRedirect}) => {
                 </div>
                 <div id='mp__canvas' className='mp__canvas'>
                      {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?
-                    <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap} displayBasic={displayBasic} displayBasic2= {displayBasic2} setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
+                    <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap}  displayBasic={displayBasic} displayBasic2= {displayBasic2}  setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} accept={accept} reject={reject} confirm1={confirm1} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
                    
@@ -161,6 +190,7 @@ const CreateNew = ({importRedirect}) => {
             </div>
         </ReferenceBar>
     </Fragment>
+    </>
   );
 }
 
