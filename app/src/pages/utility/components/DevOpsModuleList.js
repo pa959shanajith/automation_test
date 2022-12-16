@@ -14,7 +14,7 @@ import { updateTestSuite_ICE,loadLocationDetails,readTestCase_ICE } from '../../
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser }) => {
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser, selectedBrowserType }) => {
     const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [moduleIds, setModuleIds] = useState();
@@ -559,15 +559,15 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
                                                             <div className='e__apptype' >App Type</div>
-                                                            { showSelectBrowser && <div className='e__accessibilityTesting'>Accessibility Standards</div> }
+                                                            {(selectedBrowserType || showSelectBrowser) && <div className='e__accessibilityTesting'>Accessibility Standards</div> }
                                                         </div>
                                                     </div>
                                                     <div className={'e__table-bodyContainer'}>
                                                         <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                         {scenarioName.map((e,i)=>
                                                             <div key={e.name} className="e__table_row">   
-                                                            <div className='e__table-col tabeleCellPadding e__contextmenu' >{i+1}</div>
-                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus'>
+                                                            <div className='e__table-col tabeleCellPadding e__contextmenu e__table-col1 '  >{i+1}</div>
+                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus e__table-col2'>
                                                             <input type='checkbox' onChange={e=>{e.target.checked ? doNotExecute[i]=0:doNotExecute[i]=1; setDoNotExecuteArr([...doNotExecute])}} title='Select to execute this scenario' className='doNotExecuteScenario e-execute' checked={!doNotExecute[i]}/>
                                                             </div>
                                                             <div title={scenarioName[i]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(scenarioName[i],scenarioIds[i]);setshowModal(true);}}>{scenarioName[i]}</div>
@@ -578,7 +578,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'>
                                                                     <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
-                                                            { showSelectBrowser &&   
+                                                            {(selectedBrowserType || showSelectBrowser) &&   
                                                             <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div> }
                                                         </div>)
                                                         }
