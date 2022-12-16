@@ -20,6 +20,8 @@ import '../styles/MindmapCanvas.scss';
 // import {Dialog} from '@avo/designcomponents';
 import * as pluginApi from '../../plugin/api';
 import { Dialog } from 'primereact/dialog';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+
 
 
 /*Component Canvas
@@ -440,6 +442,7 @@ const CanvasNew = (props) => {
 
     return (
         <Fragment>
+            <ConfirmDialog />
              <Dialog header={taskname + " : Capture Elements"}  visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
              <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} /></div>
              </Dialog>
@@ -478,7 +481,7 @@ const CanvasNew = (props) => {
 
             {/* {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null} */}
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
-            {(ctrlBox !== false)?<ControlBox openScrapeScreen={props.onClick}  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {(ctrlBox !== false)?<ControlBox openScrapeScreen={props.onClick}  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} Avodialog={props.confirm1} ctScale={ctScale}/>:null}
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
