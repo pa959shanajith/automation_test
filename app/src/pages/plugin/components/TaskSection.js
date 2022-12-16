@@ -86,6 +86,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [unassignedUsers, setUnassignedUsers] = useState([]);
     const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
     const [redirectTo, setRedirectTo] = useState("");
+    const [searchText, setSearchText] = useState("");
 
     // const userConf = useSelector(state=>state.admin.userConf)
     // const node = useRef();
@@ -95,11 +96,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const handleCreateChange = () => {
         setCreateProjectCheck(true);
         setAssignedUsers({});
+        setSearchUsers("");
+        setSearchText("");
     };
 
     const handleModifyChange = () => {
         setCreateProjectCheck(false);
         setAssignedUsers({});
+        setSearchUsers("");
+        setSearchText("");
     };
 
 
@@ -699,11 +704,13 @@ return <>
                                 <div style={{display:'flex', width:"100%", marginTop:"10px", position:"sticky", top:10}}>
                                     <SearchBox
                                         placeholder="Enter Username"
+                                        value={searchText}
                                         width="20rem"
                                         onClear={() => {setSearchUsers("")}}
                                         onChange={(e,value)=>{
                                             debugger;
-                                            setSearchUsers(value)
+                                            setSearchUsers(value);
+                                            setSearchText(value);
                                         }}
                                     />
                                 </div>
@@ -771,7 +778,7 @@ return <>
                                     {!createProjectCheck && selectedProject && unassignedUsers.length > 0 && unassignedUsers.map((user_obj, index) => {
                                         return user_obj["name"].includes(searchUsers)? (
                                             <div key={index} className='display_project_box_list' style={{}} >
-                                        <input type='checkbox' disabled={userInfo.user_id === user_obj["_id"] } defaultChecked={false} value={user_obj["name"]} onChange={(e)=>{
+                                        <input type='checkbox' defaultChecked={false} value={user_obj["name"]} onChange={(e)=>{
                                             if(e.target.checked) {setAssignedUsers({...assignedUsers, [user_obj["_id"]]:true}) }
                                             else{
                                                 setAssignedUsers((prevState)=>{
