@@ -9,7 +9,8 @@ exports.getProjectIDs = async (req, res) => {
   try {
     var obj = req.body;
     obj.userid = req.session.userid;
-    const data = await create_ice.getProjectIDs(obj)
+    obj.userrole = req.session.defaultRole;
+    const data = await create_ice.getProjectIDs(obj)  
     res.send(data)
   } catch (exception) {
     logger.error("Error occurred in mindmap/" + fnName + ":", exception);

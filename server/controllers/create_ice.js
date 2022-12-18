@@ -70,11 +70,13 @@ exports.saveMindmapE2E = function(req,res) {
 exports.getProjectIDs =  async(req) => {
 	logger.info("Inside UI service: getProjectIDs");
 	var user_id = req.userid;
+	var user_role = req.userrole;
 	var allflag = req.allflag;
 	if (allflag) allflag = "allflag";
 	else allflag = "emptyflag";
 	var inputs = {
 		"userid": user_id,
+		"userrole": user_role,
 		"query": allflag
 	};
 	return await utils.fetchData(inputs, "create_ice/getProjectIDs", "getProjectIDs");
