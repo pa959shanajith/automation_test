@@ -550,15 +550,15 @@ module.exports.Execution_Queue = class Execution_Queue {
         const timestamp = Date.parse(new Date);
         return new Promise((rsv,rej) => {
             const configureTime = 1000,response = false;
-            let executionCompleted = true;
             try{
                 const startChecking = setInterval(()=> {
-                if(this.key_list[configureKey].length == 0){
-                    executionCompleted = true;
-                } 
-                for(let executionQueues of this.key_list[configureKey]){
-                    if(executionQueues[0]['executionListId'] == executionListId){
-                        executionCompleted = false;
+                let executionCompleted = true;
+
+                if(configureKey in this.key_list) {
+                    for(let executionQueues of this.key_list[configureKey]){
+                        if(executionQueues[0]['executionListId'] == executionListId){
+                            executionCompleted = false;
+                        }
                     }
                 }
                 if(executionCompleted) {
@@ -640,6 +640,9 @@ module.exports.Execution_Queue = class Execution_Queue {
 
         let execution_Queue = await cache.get('execution_list');
 
+        //Adding the reportLink in the response
+        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
+        
         if(gettingTestSuiteIds.executionData.executiontype == 'asynchronous'){
             response['status'] = "pass";
             return response;
@@ -656,8 +659,11 @@ module.exports.Execution_Queue = class Execution_Queue {
             });
             responseFromGetReportApi.push(data);
         }
+        // Deleting the cacheData once that execution is completed 
+        delete synchronous_report[newExecutionListId]
+        await cache.set('synchronous_report',synchronous_report)
+
         if(synchronousFlag) response['status'] = responseFromGetReportApi;
-        response['reportLink'] = req.protocol + "://" + (req.headers["origin"] || req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         } catch (error) {
             console.info(error);
             logger.error("Error in execAutomation. Error: %s", error);
@@ -920,7 +926,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
     static getQueueState = async (req, res) => {
         let fnName = 'getQueueState'
-
+        let response = {}
         try{
             //to add the keylist if its empty,, from the cache
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
@@ -932,13 +938,19 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.key_list = cacheData;
                 }
             }
+
+            for(let configKeys in this.key_list) {
+                if(this.key_list[configKeys].length){
+                    response[configKeys] = this.key_list[configKeys]
+                }
+            }
         } catch (error) {
                 console.info(error);
                 logger.error("Error in getQueueState. Error: %s", error);
                 return 'fail';
         }
 
-        return this.key_list;
+        return response;
     }
 
     static deleteExecutionListId = async (req, res) => {
