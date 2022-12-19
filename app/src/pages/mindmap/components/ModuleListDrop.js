@@ -8,7 +8,7 @@ import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents';
 import ImportMindmap from'../components/ImportMindmap.js';
-
+import { Button } from "primereact/button";
 
 
 const ModuleListDrop = (props) =>{
@@ -362,7 +362,7 @@ const ModuleListDrop = (props) =>{
                                 })}
                             </div>
                             <div className='AddBut'>
-                                <div onClick={clickAdd} style={{opacity: scenarioList.length==0? '0.3':'', width:'2.3rem',height:'1.5rem', marginLeft:'.7rem',marginBottom:'0.7rem',textAlign:'center', alignContent:'center',backgroundColor:'$white',cursor:'pointer'}}className={'btn.' + (selectedSc.length < 1 ? ' disabled' : '')}><img src="static/imgs/AddButton.png" alt="AddButton" /></div>
+                                <Button onClick={clickAdd} style={{ 'true':'false', marginLeft:'.7rem',marginBottom:'0.7rem',textAlign:'center',width:'60px',height:'33px', alignContent:'center',cursor:'pointer',alignItems:'center'}} disabled={ selectedSc.length < 1? true : false} label="Add"  />
                             </div>
                             </div>
                     <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(180deg)' : 'rotate(0deg)',height:'30px',width:'8px', position:'relative'

@@ -175,11 +175,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     width: 7rem;
+    height: 1rem;
 }
 .modNmeE2E{
     font-size: 0.75rem;
     text-overflow:ellipsis ;
     width: 7rem;
+    height: 1rem;
     // text-align: left;
     padding-left: 0px;
     margin-left: -4px;
@@ -279,10 +281,10 @@ margin-right: 12px;}
         // height: 2.6rem;
        
     }
-    .AddBut :hover{
-        background: $iceColor;
+    // .AddBut :hover{
+    //     background: $iceColor;
 
-    }
+    // }
 
 .collapseButtonDiv {
     position: relative;
