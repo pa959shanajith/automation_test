@@ -839,7 +839,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     // setShowIcePopup(false);
-                                    }} src="static/imgs/Execute.png"  className="action_icons" title="Execute"alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+                                    }} src="static/imgs/Execute.png"  className="action_icons" title="Execute Now"alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute </button>&nbsp;&nbsp;&nbsp; */}
