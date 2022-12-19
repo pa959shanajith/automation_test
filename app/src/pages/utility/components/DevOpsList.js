@@ -80,6 +80,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [iceStatus,setIceStatus] = useState([]);
     const [iceNameIdMap,setIceNameIdMap] = useState({});
     const [showIcePopup,setShowIcePopup] = useState(false);
+    const [accessibilityParameters, setAccessibilityParameters] = useState([]);
 
 
     useEffect(()=>{
@@ -500,7 +501,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
        
         if(executionData === undefined) executionData = dataExecution;
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, '', '');
+        const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, accessibilityParameters, '');
         if(modul_Info === false) return;
         setLoading("Sending Execution Request");
         executionData["source"]="task";
@@ -769,6 +770,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentTask({
                                         testSuiteDetails: testSuiteDetails
                                     });
+                                    let accessibilityParametersValue = item.executionRequest.batchInfo.map((element) => {
+                                        return (element.suiteDetails[0].accessibilityParameters)
+                                    });
+                                    setAccessibilityParameters(accessibilityParametersValue);
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     setShowIcePopup(false);
@@ -825,6 +830,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentTask({
                                         testSuiteDetails: testSuiteDetails
                                     });
+                                    let accessibilityParametersValue = item.executionRequest.batchInfo.map((element) => {
+                                        return (element.suiteDetails[0].accessibilityParameters)
+                                    });
+                                    setAccessibilityParameters(accessibilityParametersValue);
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     setShowIcePopup(false);

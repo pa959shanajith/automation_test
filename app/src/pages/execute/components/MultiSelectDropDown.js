@@ -8,7 +8,7 @@ import '../styles/MultiSelectDropDown.scss'
   use: select multiple options 
 */
 
-const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters}) => {
+const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters, getAccessibilityParameters}) => {
     const inputRef = useRef()
     const [dropDown,setDropDown] = useState(false)
     const [chatBox , setChatBox] = useState(false);
@@ -27,6 +27,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
         inputRef.current.value = ((acc_param.length!==0)?acc_param.length:"") + "  Select Standards "
         event.currentTarget.getElementsByTagName('input')[0].checked = !event.currentTarget.getElementsByTagName('input')[0].checked
         setAccessibilityParameters(acc_param);
+        getAccessibilityParameters(acc_param);
     }
 
     const selectOptionCheckBox = (value) => document.getElementById(value).checked = !document.getElementById(value).checked

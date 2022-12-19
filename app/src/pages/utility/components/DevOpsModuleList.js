@@ -33,6 +33,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const [showModal,setshowModal] = useState(false);
     const userInfo = useSelector(state=>state.login.userinfo);
     // const [filteredModuleList, setFilteredModuleList] = useState([]);
+    const [accessibilityParametersValue, setAccessibilityParametersValue] = useState([]);
     const notexe = useRef(
         integrationConfig.executionRequest != undefined ? integrationConfig.executionRequest.donotexe.current : {}
         );
@@ -524,7 +525,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 "testscenarioids": scenarioIds,
                                 "getparampaths": dataParameter,
                                 "conditioncheck": condition,
-                                "donotexecute": doNotExecute
+                                "donotexecute": doNotExecute,
+                                "accessibilityParameters": accessibilityParametersValue
                             }]
                         await updateTestSuite_ICE(payload);
             
@@ -539,6 +541,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const checkAll=()=>{
         const newdonotexe=scenarioName.map(element=>0)
         setDoNotExecuteArr(newdonotexe)
+    }
+
+    const getAccessibilityParameters = (accessibilityParametersValue) => {	
+        setAccessibilityParametersValue(accessibilityParametersValue);	
     }
 
     return (
@@ -578,8 +584,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'>
                                                                     <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
-                                                            {(selectedBrowserType || showSelectBrowser) &&   
-                                                            <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div> }
+                                                            { showSelectBrowser &&   
+                                                            <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} getAccessibilityParameters={getAccessibilityParameters} /></div> }
                                                         </div>)
                                                         }
                             
