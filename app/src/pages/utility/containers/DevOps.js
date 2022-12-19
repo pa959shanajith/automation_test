@@ -25,7 +25,7 @@ const DevOps = props => {
         pluginApi.getProjectIDs()
             .then(data => {
                 setProjectTypes(data.appTypeName);
-                setProjectIds(data.projectId);  
+                setProjectIds(data.projectId);   
             }
         )
     },[])
