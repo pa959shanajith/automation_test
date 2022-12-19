@@ -362,7 +362,7 @@ const ModuleListDrop = (props) =>{
                                 })}
                             </div>
                             <div className='AddBut'>
-                                <Button onClick={clickAdd} style={{ 'true':'false', marginLeft:'.7rem',marginBottom:'0.7rem',textAlign:'center',width:'60px',height:'33px', alignContent:'center',cursor:'pointer',alignItems:'center'}} disabled={ selectedSc.length < 1? true : false} label="Add"  />
+                                <Button onClick={clickAdd} style={{  marginLeft:'.7rem',marginBottom:'0.7rem',textAlign:'center',width:'60px',height:'33px', alignContent:'center',cursor:'pointer',alignItems:'center'}} disabled={ selectedSc.length < 1? true : false} label="Add"  />
                             </div>
                             </div>
                     <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(180deg)' : 'rotate(0deg)',height:'30px',width:'8px', position:'relative'
