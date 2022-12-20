@@ -19,7 +19,7 @@ const DevOpsConfig = props => {
 
     useEffect(() => {
         props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web" ? setShowSelectBrowser(true) : setShowSelectBrowser(false)
-    }, [])
+    }, [props.currentIntegration.selectValues[0].selected])
 
     if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
         if(props.currentIntegration.selectedModuleType === 'normalExecution')
