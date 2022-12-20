@@ -298,7 +298,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 }else {
                     setConfigList(configurationList);
                 }
-                setMsg(MSG.CUSTOM("Execute configuration deleted successfully.",VARIANT.SUCCESS));
+                setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
             }
             setLoading(false);
         }, 500);
@@ -360,7 +360,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setLoading(false);
     }
     const onClickDeleteDevOpsConfig = (name, key) => {
-        setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>{name}</b> Configuration?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
+        setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{name}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
     }
     const handleSearchChange = (value) => {
         let filteredItems = configList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1));
@@ -778,7 +778,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     // setShowIcePopup(false);
-                                    }} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+                                    }} src="static/imgs/Execute.png" className="action_icons" title="Execute Now" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                         //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute </button>&nbsp;&nbsp;&nbsp; */}
