@@ -188,17 +188,18 @@
     margin-top: 4px;
 }
 .scenarioList{
-    height: 80%;
+    height: 21.7rem;
     // padding: 0.25rem;
     scroll-behavior: smooth;
     overflow-y:auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
+    width: 94%;
     scroll-behavior: smooth;
     // padding-top: 2rem;
     margin-top: 0.5rem;
+    overflow-x: hidden;
 
 }
 
@@ -211,7 +212,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 94%;
+    // height: 94%;
     overflow: hidden; 
     transition-duration: 0.4s;
     // opacity:0.5;
@@ -227,13 +228,14 @@
      cursor:pointer;
      border-radius: 0.5rem;
      width: 7rem;
-     overflow: hidden;
+     overflow: ellipsis;
+
 }
 .dropdown_scenarios:hover{
     background: $iceColor;
     color: inherit;
     border-radius: 0.5rem;
-    width: 7rem;
+    width: 7.5rem;
 }
 .dropdown_scenarios.selected{
     background-color: $summerSky;
@@ -272,7 +274,8 @@
     text-align: center;
     overflow: hidden;
 display: flex;
-margin-right: 12px;}
+margin-right: 12px;
+padding-bottom: 1.5rem;}
 
     .AddBut{
         // padding: 0.5rem;
@@ -290,7 +293,7 @@ margin-right: 12px;}
     position: relative;
     display: flex;
     align-items: center;
-    height: 99%;
+    height: 98.5%;
     padding-left: 2px;
     padding-bottom: 2px;
     margin-top: 0rem;
