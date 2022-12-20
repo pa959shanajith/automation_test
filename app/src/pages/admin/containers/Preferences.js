@@ -64,11 +64,11 @@ const Preferences = (props) => {
                         <td><input type='checkbox' value='' className='module_admin' disabled/></td>
                     </tr>
                     <tr id="rows">
-                        <td>ICE</td>
+                        <td>Manage Project</td>
                         <td><input type='checkbox' value='' className='module_admin' disabled/></td>
                         <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
                         <td><input type='checkbox' value='' className='module_admin' disabled/></td>
-                        <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                        <td><input type='checkbox' value='' className='module_admin' disabled/></td>
                         {/* {Object.keys(resultList).forEach((data,index)=>(
                             <td key={index}><input disabled key={index} type='checkbox' value='' checked={(['Test Lead', 'Test Engineer'].indexOf(resultList[data]) > -1)? true:false} className='module_admin'/></td>
                         ))} */}
@@ -77,7 +77,7 @@ const Preferences = (props) => {
                         if(resultList[data] && (data === "alm" || data === "mindmap")){
                         return(
                         <tr key={index} >
-                            <td>{(data === "alm") ? 'Integration' : 'Mindmap'}</td>
+                            <td>{(data === "alm") ? 'Integration' : 'Create Mindmap'}</td>
                             <td><input type='checkbox' value='' className='module_admin' disabled/></td>
                             <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
                             <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
@@ -93,7 +93,7 @@ const Preferences = (props) => {
                                 <td><input type='checkbox' value='' className='module_admin' disabled/></td>
                                 <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
                                 <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
-                                <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                                <td><input type='checkbox' value='' checked={["utility","reports","seleniumtoavo"].includes(data)?true:false} className='module_admin' disabled/></td>
                             </tr>
                         )}
                     })}
