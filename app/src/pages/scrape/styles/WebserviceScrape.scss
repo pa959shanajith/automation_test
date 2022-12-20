@@ -7,6 +7,7 @@
 .ws__url_method{
     flex: 1 0;
     margin-top: -5px;
+    z-index: 10;
 
     label{
         font-family: $avoSecondaryFont;
@@ -18,7 +19,7 @@
     }
 
     .ws__input{
-        width: 360px;
+        width: 230px;
         border-radius: 4px 0 0 4px!important;
     }
 
@@ -27,7 +28,7 @@
     }
 
     .ws__addBtn{
-        margin-left: 40px;
+        margin-left: 29px;
     }
     
     .ws__goBtn{
@@ -54,17 +55,17 @@
     border-bottom: 1px solid $pluginGray;
 
     .ws__input{
-        width: 345px;
+        width: 107px;
         margin: 0 10px 0 5px;
     }
 
     .ws__select{
-        width: 120px;
+        width: 114px;
         margin: 0 10px 0 0;
     }
     
     .ws__op_input{
-        width: 110px!important;
+        width: 74px!important;
         margin: 0 10px 0 0;
     }
 }
@@ -78,7 +79,7 @@
 
     img{
         height: 24px;
-        width: 24px;
+        width: 22px;
     }
 }
 
@@ -139,15 +140,18 @@
     width: fit-content;
     align-items: center;
     border-radius: 4px;
-    padding: 10px 40px 10px 15px;
+    padding: 11px 3px 7px 1px;;
     background-color: $borderThree;
 }
 
 .ws__mainContainer{
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 84%;
     width: 100%;
+}
+.mainContainerAd{
+    margin: 4rem 12rem -1rem 0rem
 }
 
 .ws__rqst_resp_header, .ws__rqst_resp_body{
@@ -175,7 +179,7 @@
 
 .ws__action_btn{
     position: relative;
-    padding: 1px 13px;
+    padding: 1px 8px;
     margin-right: 7px;
     height: 21px;
     font-size: 13px;
@@ -197,4 +201,7 @@
 
 .ws_eb{
     border: 2px solid  $redError !important;
+}
+.space{
+    margin: 0rem 1.15rem 0rem -0.85rem;
 }
