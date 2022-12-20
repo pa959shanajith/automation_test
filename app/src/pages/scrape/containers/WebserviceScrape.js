@@ -301,7 +301,7 @@ const WebserviceScrape = () => {
     return (
         <ScreenWrapper
             fullHeight = {true}
-            webserviceContent = {<div className="ws__mainContainer">
+            webserviceContent = {<div className="ws__mainContainer mainContainerAd">
                 <div className="ws__row">
                     <div className="ws__url_method">
                         <div className="ws__url_m_wrapper">
@@ -344,8 +344,8 @@ const WebserviceScrape = () => {
                     <button className="ws__cert_btn" onClick={()=>setShowObjModal("addCert")}>
                         <img alt="cert-icon" src="static/imgs/certificate_ws.png"/>
                     </button>
-                    <button className="ws__action_btn ws__bigBtn" disabled={saved.flag && disableAction } onClick={onSave}>Save</button>
-                    <button className="ws__action_btn ws__bigBtn" disabled={
+                    <button className="ws__action_btn ws__bigBtn space" disabled={saved.flag && disableAction } onClick={onSave}>Save</button>
+                    <button className="ws__action_btn ws__bigBtn space" disabled={
                         !wsdlURL && opDropdown === "0" && !endPointURL && method === "0" && !opInput && !reqHeader && !reqBody && !respHeader && !respBody && !paramHeader
                     } onClick={clearFields}>Clear</button>
                 </div>
