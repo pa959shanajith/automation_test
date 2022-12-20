@@ -321,7 +321,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 if(queueList && queueList[item] && queueList[item] && queueList[item][0] && queueList[item][0][0]){
                     let nodeItem = {
                         value: item,
-                        label: item+'   :   '+queueList[item][0][0].configurename,
+                        label: queueList[item][0][0].configurename,
+                        // label: item+'   :   '+queueList[item][0][0].configurename,
                         showCheckbox: false
                     }
                     let nodeItemChildren = [];
