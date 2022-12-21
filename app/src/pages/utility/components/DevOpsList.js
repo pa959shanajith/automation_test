@@ -869,7 +869,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                       />&nbsp;&nbsp;
                     <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Assure Client</label>
                     <input disabled={appType!=="Web"} title={appType!=="Web"?"Apptype not supported":""} type="radio" name='myRadios' id='second' onChange={()=>{setShowIcePopup(false)}} className='radiobutton'  defaultChecked={appType==="Web"}/>&nbsp;&nbsp;
-                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Agent / Avo Grid</label>
+                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" title={appType!=="Web"?"Apptype not supported":""}>Avo Agent / Avo Grid</label>
                     { showIcePopup && <div>
                         <div>
                             <div className='adminControl-ice popup-content'>
