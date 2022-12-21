@@ -393,7 +393,7 @@ const ScrapeScreen = (props)=>{
         { showObjModal === "importObject" && <ImportObjectModal  fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType={props.appType}  fetchingDetails={props.fetchingDetails} />}
         { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} fetchingDetails={props.fetchingDetails}  /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
-        { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
+        { showObjModal === "compareObject" && <CompareObjectModal fetchingDetails={props.fetchingDetails} setShow={setShowObjModal} startScrape={startScrape} /> }
         { showObjModal === "replaceObjectSelBr" && <ReplaceObjectSelBrModal setShow={setShowObjModal} startScrape={startScrape} /> }
         { showObjModal === "replaceObject" && <ReplaceObjectModal appType={props.appType}  fetchingDetails={props.fetchingDetails} setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} setOverlay={setOverlay} /> }
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setOrderList={setOrderList} />}
@@ -409,7 +409,7 @@ const ScrapeScreen = (props)=>{
                 <ActionBarItems appType={props.appType}  fetchingDetails={props.fetchingDetails} />
                     { props.appType === "Webservice" 
                         ? <WebserviceScrape /> 
-                        : compareFlag ? <CompareObjectList /> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
+                        : compareFlag ? <CompareObjectList fetchingDetails={props.fetchingDetails}/> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
                     <RefBarItems mirror={mirror} collapse={true} appType={props.appType}/>
                 </ScrapeContext.Provider>
             </div>
