@@ -9,10 +9,10 @@ import * as actions from '../state/action';
 import { updateScreen_ICE } from '../api';
 import "../styles/CompareObjectList.scss";
 
-const CompareObjectList = () => {
+const CompareObjectList = (props) => {
 
     const { changedObj, notChangedObj, notFoundObj } = useSelector(state=>state.scrape.compareObj);
-    const { screenId } = useSelector(state=>state.plugin.CT);
+    // const { screenId } = props.fetchingDetails["_id"];
     const { user_id, role } = useSelector(state=>state.login.userinfo);
     const compareData = useSelector(state=>state.scrape.compareData);
     const { setShowPop, fetchScrapeData, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);  
@@ -50,7 +50,7 @@ const CompareObjectList = () => {
 		
 		let arg = {
             'modifiedObj': updatedObjects,
-            'screenId': screenId,
+            'screenId': props.fetchingDetails["_id"],
             'userId': user_id,
             'roleId': role,
             'param': 'saveScrapeData',
