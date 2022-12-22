@@ -316,6 +316,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                         label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                             event.preventDefault();
                                             onClick('displayMaximizable');
+                                            setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
                                             onDataParamsIconClick1(batch+module.moduleid, module.name)}}/></div>
                                     };
                                     if(module.scenarios && module.scenarios.length > 0) {
@@ -356,6 +357,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                     event.preventDefault();
                                     onClick('displayMaximizable');
+                                    setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
                                     onDataParamsIconClick1(module.batchname+module.moduleid, module.name)}}/></div>
                             };
                             if(module.scenarios && module.scenarios.length > 0) {
