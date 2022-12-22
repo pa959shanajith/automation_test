@@ -542,7 +542,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 "testscenarioids": scenarioIds,
                                 "getparampaths": dataParameter,
                                 "conditioncheck": condition,
-                                "donotexecute": doNotExecute,
+                                "donotexecute": notExeInternalState,
                                 "accessibilityParameters": accessibilityParametersValue
                             }]
                         await updateTestSuite_ICE(payload);
@@ -614,7 +614,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                                     <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
                                                             {(showSelectedBrowserType || showSelectBrowser) &&   
-                                                            <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div> }
+                                                            <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} getAccessibilityParameters={getAccessibilityParameters} /></div> }
                                                         </div>)
                                                         }
                             
