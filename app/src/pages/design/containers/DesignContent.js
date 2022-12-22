@@ -893,7 +893,7 @@ const DesignContent = props => {
             });
     };
     
-
+    
     return (
         <>
         { showPopup && ConfirmPopup()}
@@ -998,7 +998,7 @@ const DesignContent = props => {
                             <p onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
                         </div>: 
                         props.appType==="Desktop"? <div className='desktopAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Destop Apps</span></p>
+                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
                         </div>:
                         props.appType==="SAP"?<div className='desktopAppDesign_btn'>
                         <p  onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
