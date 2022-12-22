@@ -699,6 +699,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                 currentIceCount: 'icecount' in req.body ? req.body.icecount : 0
             }
             const agentStatus = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
+            //Update the maxicecount for the agent
+            response['maxicecount'] = agentStatus['icecount']
 
             // To fetch the data from cache if key_list is empty
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
