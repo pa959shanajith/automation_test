@@ -92,6 +92,7 @@ const confirm1 = () => {
   },[selectProj,prjList])
   useEffect(() => {
     setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
+    
   },[initEnEProj]);
   useEffect(()=>{
     (async()=>{
@@ -105,7 +106,7 @@ const confirm1 = () => {
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
             var req={
-                tab:"endToend",
+                tab:"endToend" || "tabCreate",
                 projectid:selectProj?selectProj:res.projectId[0],
                 version:0,
                 cycId: null,
@@ -132,6 +133,8 @@ const confirm1 = () => {
     setLoading(false)
     setMsg(error)
   }
+  console.log(' isCreateE2E',isCreateE2E)
+//    console.log(' initEnEProj.isE2Ecreate',initEnEProj.isE2ECreate)
   
   return (
     <>
@@ -152,20 +155,23 @@ const confirm1 = () => {
                 <p><b>Note </b>- Read the Mindmap from left to right</p>
                 </div>
                 <div id='mp__canvas' className='mp__canvas'>
-                     {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?
+                     {isCreateE2E ?   
+                     
+                     (Object.keys(moduleSelect).length>0)?
+                <>
+                {console.log('moduleSelect1', moduleSelect)}
+                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/></>
+                :<Fragment>
+                    {console.log('moduleSelect2', moduleSelect)}
+                    <SaveMapButton disabled={true}/>
+                    <Legends isEnE={true}/>
+                </Fragment>:((Object.keys(moduleSelect).length>0)?
                     <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap}  displayBasic={displayBasic} displayBasic2= {displayBasic2}  setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} accept={accept} reject={reject} confirm1={confirm1} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
-                    // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
-                   
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
                         <Legends/>
-                    </Fragment>) : (Object.keys(moduleSelect).length>0)?
-                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
-                :<Fragment>
-                    <SaveMapButton disabled={true}/>
-                    <Legends isEnE={true}/>
-                </Fragment>}
+                    </Fragment>)}
                     
                     
                 </div>
