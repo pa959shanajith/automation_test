@@ -14,7 +14,7 @@ import { updateTestSuite_ICE,loadLocationDetails,readTestCase_ICE } from '../../
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser, selectedBrowserType }) => {
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser, showSelectedBrowserType }) => {
     const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [moduleIds, setModuleIds] = useState();
@@ -37,7 +37,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const notexe = useRef(
         integrationConfig.executionRequest != undefined ? integrationConfig.executionRequest.donotexe.current : {}
         );
-
+    const [notExeState, setNotExeState] = useState({...notexe.current});
+    const [notExeInternalState, setNotExeInternalState] = useState([]);
     const indeterminateStyle = {
         root: {
             '&[class ~= is-enabled]': {
@@ -204,17 +205,21 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     }
     const HandleTreeChange = (checked,targetnode) => {
 
-        //clicked on scenario
+        //clicked on module
         if(targetnode.isLeaf){
-            if(notexe.current[targetnode.parent.value] == undefined) {
-                notexe.current[targetnode.parent.value] = []
+            if(notexe.current[targetnode.value] == undefined) {
+                notexe.current[targetnode.value] = []
+                setNotExeState({...notexe.current})
             }
-            if(targetnode.checked)
-                notexe.current[targetnode.parent.value].push(targetnode.index)
+            if(targetnode.checked){
+                notexe.current[targetnode.value].push(targetnode.index)
+                setNotExeState({...notexe.current})
+            }
             else{
-                const index = notexe.current[targetnode.parent.value].indexOf(targetnode.index);
+                const index = notexe.current[targetnode.value].indexOf(targetnode.index);
                 if (index > -1) { 
-                    notexe.current[targetnode.parent.value].splice(index, 1);
+                    notexe.current[targetnode.value].splice(index, 1);
+                    setNotExeState({...notexe.current})
                 }
             }
         }
@@ -225,13 +230,21 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     notexe.current[module.value] = []
                     for(let i = 0;i<module.children.length;i++){
                         notexe.current[module.value].push(i);
+                        setNotExeState({...notexe.current})
                     }
                 }
             }
             else{
-                notexe.current[targetnode.value] = []
-                for(let i = 0;i<targetnode.children.length;i++){
-                    notexe.current[targetnode.value].push(i);
+                if(targetnode.checked){
+                    notexe.current[targetnode.value] = []
+                    for(let i = 0;i<targetnode.children.length;i++){
+                        notexe.current[targetnode.value].push(i);
+                        setNotExeState({...notexe.current})
+                    }
+                }
+                else {
+                    notexe.current[targetnode.value] = []
+                    setNotExeState({...notexe.current})
                 }
             }
         }
@@ -270,6 +283,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                     event.preventDefault();
                                     onClick('displayMaximizable');
+                                    setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
                                     onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                             }
                             if(module.scenarios && module.scenarios.length > 0) {
@@ -302,6 +316,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                         label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                             event.preventDefault();
                                             onClick('displayMaximizable');
+                                            setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
                                             onDataParamsIconClick1(batch+module.moduleid, module.name)}}/></div>
                                     };
                                     if(module.scenarios && module.scenarios.length > 0) {
@@ -342,6 +357,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                     event.preventDefault();
                                     onClick('displayMaximizable');
+                                    setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
                                     onDataParamsIconClick1(module.batchname+module.moduleid, module.name)}}/></div>
                             };
                             if(module.scenarios && module.scenarios.length > 0) {
@@ -396,11 +412,11 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 setAppTypes(appTypeArr)
             } 
         })()
-    },[integrationConfig.selectValues[2].selected, modalContent]);
+    },[integrationConfig.selectValues[2].selected, modalContent, notExeState]);
 
 
    const handleSearchChange = (value) => {
-       let filteredItems = filteredModuleList.filter(element=>element.label.props.children[0].includes(value))
+       let filteredItems = filteredModuleList.filter(element=>element.label.props.children[0].toLowerCase().includes(value.toLowerCase()))
        setFilteredModuleList(filteredItems)
        setSearchText(value);
 
@@ -519,13 +535,16 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
             return (
                 <div>
                     <Button label="Cancel"  onClick={() => onHide(name)} className="p-button-rounded" />
-                    <Button label="Save"  className='p-button-rounded' onClick={async () => {const payload =  [{
+                    <Button label="Save"  className='p-button-rounded' onClick={async () => {
+                        notExeState[modalContent.moduleId] = notExeInternalState
+                        setNotExeState({...notExeState});
+                        const payload =  [{
                                 "testsuiteid": moduleIds,
                                 "testsuitename": testSuiteName,
                                 "testscenarioids": scenarioIds,
                                 "getparampaths": dataParameter,
                                 "conditioncheck": condition,
-                                "donotexecute": doNotExecute,
+                                "donotexecute": notExeInternalState,
                                 "accessibilityParameters": accessibilityParametersValue
                             }]
                         await updateTestSuite_ICE(payload);
@@ -538,15 +557,23 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 </div>
             );
         }
-    const checkAll=()=>{
-        const newdonotexe=scenarioName.map(element=>0)
-        setDoNotExecuteArr(newdonotexe)
-    }
+    const checkAll=(e)=>{
+        if(notExeInternalState.length>0){
+            setNotExeInternalState([])
+        }else {
+            setNotExeInternalState(scenarioName.map((sceName,idx)=>idx))
+        }     
+    }     
 
     const getAccessibilityParameters = (accessibilityParametersValue) => {	
         setAccessibilityParametersValue(accessibilityParametersValue);	
     }
-
+    const handleKeyDown = (event)=>{
+        if(event.key === 'Backspace'){
+            handleSearchChange('');
+            setFilteredModuleList(initialFilteredModuleList)
+        }
+       }
     return (
         <>
 
@@ -560,12 +587,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                         <div className="e__table-head-row">
                                                             <div className='e__contextmenu' id='contextmenu'></div>
                                                             <div className='e__selectAll e__selectAll-name ' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
-                                                            <input className='e-execute' type='checkbox' onChange={checkAll} /></div>	
+                                                            <input className='e-execute' type='checkbox' onChange={checkAll} checked={notExeInternalState.length>0 ? notExeInternalState.length===scenarioName.length:false} /></div>	
                                                             <div className='e__scenario'>Scenario Name</div>
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
                                                             <div className='e__apptype' >App Type</div>
-                                                            {(selectedBrowserType || showSelectBrowser) && <div className='e__accessibilityTesting'>Accessibility Standards</div> }
+                                                            {(showSelectedBrowserType || showSelectBrowser) && <div className='e__accessibilityTesting'>Accessibility Standards</div> }
                                                         </div>
                                                     </div>
                                                     <div className={'e__table-bodyContainer'}>
@@ -574,7 +601,16 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div key={e.name} className="e__table_row">   
                                                             <div className='e__table-col tabeleCellPadding e__contextmenu e__table-col1 '  >{i+1}</div>
                                                             <div className='e__table-col tabeleCellPadding exe-ExecuteStatus e__table-col2'>
-                                                            <input type='checkbox' onChange={e=>{e.target.checked ? doNotExecute[i]=0:doNotExecute[i]=1; setDoNotExecuteArr([...doNotExecute])}} title='Select to execute this scenario' className='doNotExecuteScenario e-execute' checked={!doNotExecute[i]}/>
+                                                            <input type='checkbox' onChange={e=>{
+                                                                if(e.target.checked){
+                                                                        notExeInternalState.push(i);
+                                                                        setNotExeInternalState([...notExeInternalState])
+                                                                    
+                                                                }
+                                                                else{
+                                                                        setNotExeInternalState([...notExeInternalState.filter((scenarioNo)=>scenarioNo!==i)])
+                                                                    
+                                                                }} } title='Select to execute this scenario' className='doNotExecuteScenario e-execute' defaultChecked={notExeInternalState.includes(i)?true:false}/>
                                                             </div>
                                                             <div title={scenarioName[i]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(scenarioName[i],scenarioIds[i]);setshowModal(true);}}>{scenarioName[i]}</div>
                                                             <div className="e__table-col tabeleCellPadding exe-dataParam"><input className="e__getParamPath" onChange={(e)=>
@@ -584,7 +620,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'>
                                                                     <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
-                                                            { showSelectBrowser &&   
+                                                            {(showSelectedBrowserType || showSelectBrowser) &&   
                                                             <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} getAccessibilityParameters={getAccessibilityParameters} /></div> }
                                                         </div>)
                                                         }
@@ -603,7 +639,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                         <div className='devOps_module_list_filter'>
                             <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
-                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => {setSearchText('');setFilteredModuleList(initialFilteredModuleList)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={handleKeyDown} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                             {/* <SearchDropdown
                                 calloutMaxHeight="30vh"
                                 noItemsText={'Loading...'}
