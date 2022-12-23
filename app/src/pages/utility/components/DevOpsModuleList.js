@@ -207,18 +207,18 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
 
         //clicked on module
         if(targetnode.isLeaf){
-            if(notexe.current[targetnode.value] == undefined) {
-                notexe.current[targetnode.value] = []
+            if(notexe.current[targetnode.parent.value] == undefined) {
+                notexe.current[targetnode.parent.value] = []
                 setNotExeState({...notexe.current})
             }
             if(targetnode.checked){
-                notexe.current[targetnode.value].push(targetnode.index)
+                notexe.current[targetnode.parent.value].push(targetnode.index)
                 setNotExeState({...notexe.current})
             }
             else{
-                const index = notexe.current[targetnode.value].indexOf(targetnode.index);
+                const index = notexe.current[targetnode.parent.value].indexOf(targetnode.index);
                 if (index > -1) { 
-                    notexe.current[targetnode.value].splice(index, 1);
+                    notexe.current[targetnode.parent.value].splice(index, 1);
                     setNotExeState({...notexe.current})
                 }
             }
