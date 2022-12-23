@@ -379,7 +379,6 @@ const CanvasNew = (props) => {
             setdLinks(res.dLinks)
             setdNodes(res.dNodes)
         }
-        
     }
     const processDeleteNode = (sel_node) => {        
         var res = deleteNode(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
@@ -392,6 +391,7 @@ const CanvasNew = (props) => {
             
         }
         setDelConfirm(false);
+        setReuseDelConfirm(false);
     }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;

@@ -3,12 +3,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import XMLParser from 'react-xml-parser';
 import { useHistory } from 'react-router-dom';
 import ScreenWrapper from './ScreenWrapper';
+import ScrapeObject from '../components/ScrapeObject';
 import { ScrapeContext } from '../components/ScrapeContext';
 import { RedirectPage, ResetSession, Messages as MSG, setMsg } from '../../global';
 import SubmitTask from '../components/SubmitTask';
 import * as api from '../api';
+import * as scrapeApi from '../api';
 import * as actions from '../state/action';
 import "../styles/WebserviceScrape.scss";
+import * as actionTypes from '../state/action';
 
 let allXpaths = [];
 let allCustnames = [];
@@ -18,9 +21,12 @@ let xpath = "";
 const WebserviceScrape = () => {
 
     const dispatch = useDispatch();
-
-    const { setShowObjModal, setOverlay, saved, setSaved, fetchScrapeData } = useContext(ScrapeContext);
+    const appType = useSelector((state)=>state.mindmap.appType)
+    const { setShowObjModal, setOverlay, saved, setSaved, fetchScrapeData,setShowAppPop,startScrape } = useContext(ScrapeContext);
     const disableAction = useSelector(state=>state.scrape.disableAction);
+    const disableAppend = useSelector(state => state.scrape.disableAppend);
+    const [appendCheck, setAppendCheck] = useState(false);
+    const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const current_task = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
     const certificateInfo = useSelector(state=>state.scrape.cert);
@@ -297,9 +303,19 @@ const WebserviceScrape = () => {
             });
 		}
     }
+    const onAppend = event => {
+        dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
+        if (event.target.checked) {
+            setAppendCheck(true);
+            if (appType==="Webservice") setSaved({ flag: false });
+        }
+        else setAppendCheck(false);
+    }
+    
 
     return (
         <ScreenWrapper
+
             fullHeight = {true}
             webserviceContent = {<div className="ws__mainContainer mainContainerAd">
                 <div className="ws__row">
@@ -313,10 +329,17 @@ const WebserviceScrape = () => {
                                 { opList.map((op, i) => <option key={i} value={op}>{op}</option>)}
                             </select>
                             <button className="ws__action_btn ws__bigBtn ws__addBtn" onClick={onAdd}>Add</button>
-                        </div>
+                            </div>
                     </div>
+                    <p className='webservice_btn' onClick={() => {setShowAppPop({'appType': 'Webservice', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img className='webservice_img' src='static/imgs/ic-webservice.png'/><span id='Websevice_name'>WebService</span></p>
+                    <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
+                        <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
+                        <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
+                     </div>
+        
                     <SubmitTask />
                 </div>
+
                 
                 <div className="ws__row ws__action_wrapper">
                 <button className={"ws__action_btn" + (activeView==="req" ? " ws__active": "")} onClick={()=>setActiveView("req")}>
