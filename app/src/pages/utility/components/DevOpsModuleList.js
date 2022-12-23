@@ -577,7 +577,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     return (
         <>
 
-            <Dialog header={modalContent.name + ` : Execution Parameters`} visible={displayMaximizable} maximizable modal style={{ width: '70vw', height:'30vw' }} footer={renderFooter('displayMaximizable')} onHide={() => onHide('displayMaximizable')}>
+            <Dialog header={modalContent.name + ` : Execution Parameters`} className="devopsModList__Dialog" visible={displayMaximizable} maximizable modal style={{ width: '70vw', height:'30vw' }} footer={renderFooter('displayMaximizable')} onHide={() => onHide('displayMaximizable')}>
                         <div className="e__batchSuites e__batchSuites_Max">
                                 {/* <ScrollBar  thumbColor="rgb(51,51,51)" trackColor="rgb(211, 211, 211)" > */}
                                             {/* <div className='suiteNameTxt' ><span  className='taskname'> </span></div> */}
