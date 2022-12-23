@@ -17,7 +17,7 @@ import Design from './pages/design';
 import Utility from './pages/utility';
 import Integration from './pages/integration';
 import Settings from './pages/settings';
-import Genius from "./pages/plugin/components/Genius";
+import GeniusDialog from './pages/global/components/GeniusDialog';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';
@@ -71,6 +71,7 @@ const RouteApp = () => {
   return(
     <Router>
     <PopupMsg/>
+    <GeniusDialog/>
     { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to`} close={()=>setRole("")} /> }
     <SocketFactory/>
     <Switch>
@@ -86,7 +87,6 @@ const RouteApp = () => {
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
       <Route path ='/settings' component={Settings}/>
-      <Route path ='/genius' component={Genius}/>
       <Route component={ErrorPage} />
     </Switch>
   </Router>
