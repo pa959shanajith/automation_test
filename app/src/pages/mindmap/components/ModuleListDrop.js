@@ -70,14 +70,12 @@ const ModuleListDrop = (props) =>{
     const CreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
-        console.log('moduleSelectNormal',moduleSelect)
 
     }
     const clickCreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
         setIsE2EOpen(isE2EOpen)
-        console.log('moduleSelectE2E',moduleSelect)
 
     }
     const searchModule = (val) =>{
@@ -93,10 +91,9 @@ const ModuleListDrop = (props) =>{
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
         
     
-        if(moduleSelect._id === modID){
+        // if(moduleSelect._id === modID){
            
-            console.log('moduleSelect')
-        }
+        // }
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var req={
             tab:"createTab",
@@ -176,9 +173,6 @@ const ModuleListDrop = (props) =>{
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        console.log('loadedENE')
-        console.log('moduleSelect',moduleSelect)
-        console.log('modID',modID)
         // if(moduleSelect._id === modID){
             
             

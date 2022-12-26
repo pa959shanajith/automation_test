@@ -133,8 +133,6 @@ const confirm1 = () => {
     setLoading(false)
     setMsg(error)
   }
-  console.log(' isCreateE2E',isCreateE2E)
-//    console.log(' initEnEProj.isE2Ecreate',initEnEProj.isE2ECreate)
   
   return (
     <>
@@ -159,10 +157,8 @@ const confirm1 = () => {
                      
                      (Object.keys(moduleSelect).length>0)?
                 <>
-                {console.log('moduleSelect1', moduleSelect)}
                 <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/></>
                 :<Fragment>
-                    {console.log('moduleSelect2', moduleSelect)}
                     <SaveMapButton disabled={true}/>
                     <Legends isEnE={true}/>
                 </Fragment>:((Object.keys(moduleSelect).length>0)?
