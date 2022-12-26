@@ -388,7 +388,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
         filteredItems = projectNames.projectName.filter(projectName => projectName.toLowerCase().indexOf(value.toLowerCase()) > -1);
 
-        debugger;
         setSearchItems(filteredItems);
     }
 

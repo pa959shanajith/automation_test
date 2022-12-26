@@ -9,6 +9,7 @@ import ClickAwayListener from 'react-click-away-listener';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
 import { RedirectPage, ModalContainer, ScreenOverlay, WelcomePopover, Messages as MSG, setMsg } from '../../global';
+import ServiceBell from "@servicebell/widget";
 import "../styles/Header.scss";
 
 /*
@@ -44,6 +45,27 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
 
     useEffect(()=>{
         //on Click back button on browser
+        (async()=>{
+            const response = await fetch("/getServiceBell")
+            let { enableServiceBell } = await response.json();
+           const key = await fetch("/getServiceBellSecretKey")
+           let { SERVICEBELL_IDENTITY_SECRET_KEY } = await key.json();
+           const data = { id: userInfo.email_id,
+            email:userInfo.email_id
+           };
+          if(enableServiceBell){
+            ServiceBell("identify",
+            userInfo.email_id,
+            { 
+            displayName: userInfo.firstname + ' ' + userInfo.lastname,
+            email: userInfo.email_id
+            },
+            crypto
+          .createHmac('sha256', SERVICEBELL_IDENTITY_SECRET_KEY)
+          .update(JSON.stringify(data))
+          .digest('hex'),
+        );
+        }})();
         window.addEventListener('popstate', (e)=> {
             logout(e)
         })
