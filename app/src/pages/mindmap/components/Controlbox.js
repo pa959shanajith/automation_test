@@ -74,7 +74,7 @@ const ControlBox = (props, onClick) => {
             c.select('p.' + faRef.edit ).html('Rename').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete).html('Delete ').style('font-family', 'LatoWeb');
-            c.select('p.' + faRef.debug).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.debug).classed('ct-ctrl-disabled', !0);
             c.select('p.' + faRef.debug).html('Debug').style('font-family', 'LatoWeb');
             if(appType === "Web"){
             c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
@@ -93,8 +93,14 @@ const ControlBox = (props, onClick) => {
             c.select('p.' + faRef.edit ).html('Rename').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete).html('Delete ').style('font-family', 'LatoWeb');
-            c.select('p.' + faRef.captureelements).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.captureelements).html('Capture Elements').style('font-family','LatoWeb');
+            if(appType !== "Mainframe"){
+                c.select('p.' + faRef.captureelements).classed('ct-ctrl-inactive', !1);
+                c.select('p.' + faRef.captureelements).html('Capture Elements').style('font-family','LatoWeb');
+            }
+            else{
+                c.select('p.' + faRef.captureelements).classed('ct-ctrl-disabled', !0);
+                c.select('p.' + faRef.captureelements).html('Capture Elements').style('font-family','LatoWeb');
+            }
         } else if (t === 'testcases') {
             c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.edit ).html('Rename').style('font-family','LatoWeb');
@@ -158,7 +164,7 @@ const ControlBox = (props, onClick) => {
                 <hr className='separator'/>
                 {/* <p data-test="record"  className="ct-ctrl record_icon ct-ctrl-inactive onhover" onClick={()=>{window.localStorage['navigateScreen'] = "genius";setRedirectTo(`/genius`)}}  ></p > */}
                 <div className='CursorPoint'><p data-test="record" className={"ct-ctrl record_icon onhover "+(appType!=="Web"?"ct-ctrl-disabled":"ct-ctrl-inactive")} onClick={props.Avodialog}></p ></div>
-                <p data-test="debug"  className="ct-ctrl debug_icon onhover"></p >
+                <div className='CursorPoint'><p data-test="debug"  className="ct-ctrl debug_icon onhover ct-ctrl-disabled"></p></div>
                 <hr className='separator'/>
                 <p data-test="edit" className="ct-ctrl edit_icon onhover" onClick={editNode}></p>
                 <p data-test="delete"  className="ct-ctrl delete_icon ct-ctrl-inactive onhover"  onClick={deleteNode}></p>
@@ -168,7 +174,7 @@ const ControlBox = (props, onClick) => {
                <p data-test="add" className="ct-ctrl add_icon onhover" value={props.nid} onClick={addNode}> </p>
                <p data-test="addMultiple" className="ct-ctrl addmultiple_icon onhover" value={props.nid} onClick={addMultipleNode}></p>
                <hr className='separator'/>
-               <p data-test="captureelements" className="ct-ctrl capture_icon onhover" onClick={()=>props.openScrapeScreen('displayBasic')}  ><> Capture Element </></p>
+               <div className='CursorPoint'> <p data-test="captureelements" className={"ct-ctrl capture_icon onhover"+(appType === "Mainframe"?"ct-ctrl-disabled":"ct-ctrl-inactive")} onClick={()=>props.openScrapeScreen('displayBasic')}  ><> Capture Element </></p></div>
                <hr className='separator'/>
                <p data-test="edit" className="ct-ctrl edit_icon onhover" onClick={editNode}></p>
                <p data-test="delete"  className="ct-ctrl delete_icon ct-ctrl-inactive onhover" onClick={deleteNode}></p>

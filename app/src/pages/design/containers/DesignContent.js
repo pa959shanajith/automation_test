@@ -1014,15 +1014,17 @@ const DesignContent = props => {
                         </div>:
                         props.appType==="Mainframe"?<div className='mainframeDesign_btn'>
                             <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
-                        </div>:""}
+                        </div>:
+                         props.appType==="Webservice"?<div className='webservices_btn'>
+                         <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px'}}>WebServices</span></p>
+                     </div>:""}
 
                 </div>
                        
-               {props.appType==="Web"?
-               (<div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
+               {(props.appType==="Web") ?
+               <div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
                     <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
-                </div>)
-                :""} 
+                </div>:""} 
             </div>
            
 
