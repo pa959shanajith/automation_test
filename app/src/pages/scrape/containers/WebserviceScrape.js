@@ -331,7 +331,7 @@ const WebserviceScrape = () => {
                             <button className="ws__action_btn ws__bigBtn ws__addBtn" onClick={onAdd}>Add</button>
                             </div>
                     </div>
-                    <p className='webservice_btn' onClick={() => {setShowAppPop({'appType': 'Webservice', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img className='webservice_img' src='static/imgs/ic-webservice.png'/><span id='Websevice_name'>WebService</span></p>
+                    <p className={'webservice_btn' + (disableAction ? "disable-thumbnail" : "")} onClick={() => startScrape()} ><img className='webservice_img' src='static/imgs/ic-webservice.png'/><span id='Websevice_name'>WebService</span></p>
                     <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
                         <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
                         <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>

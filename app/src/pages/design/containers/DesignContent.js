@@ -1021,15 +1021,10 @@ const DesignContent = props => {
 
                 </div>
                        
-               {(props.appType==="Web" || "Webservice") ?
+               {(props.appType==="Web") ?
                <div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
                     <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
-                </div>:         
-                // props.appType==="Webservice"?
-                // <div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
-                //      <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
-                //  </div>
-                 ""} 
+                </div>:""} 
             </div>
            
 

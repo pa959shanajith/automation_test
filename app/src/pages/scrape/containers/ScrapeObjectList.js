@@ -559,10 +559,12 @@ const ScrapeObjectList = (props) => {
                     </div>:
                     props.appType==="MobileWeb"?<div className={'mobileApp_btn' +(disableAction || compareFlag ? "disable-thumbnail" : "")}>
                     <p onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
-                    </div>:
-                    props.appType==="Webservice"?<div>
-                    <p onClick={() => {setShowAppPop({'appType': 'Webservice', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px'}}>Web Services</span></p>
                     </div>:""}
+
+                    <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
+                        <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
+                        <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
+                     </div>
                     
                     {props.appType === 'Web'  ?
                     (<div className={"c__capturebtn"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}} >
