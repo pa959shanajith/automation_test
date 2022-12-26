@@ -345,6 +345,7 @@ const Genius = (props) => {
     else {
       setLoading(false);
       // add popup message to show that extension is not present.
+      setMsg(MSG.CUSTOM("No Extension Present.Please download it from the above link and re-open the Genius popup","error"))
       console.log("Extension not present");
     }
   }
@@ -749,7 +750,6 @@ const Genius = (props) => {
             {/* <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> */}
             <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span>
           </h4>
-          <span style={{ margin: "1.5rem 1rem 1rem 1rem", fontFamily:"Mulish", fontWeight:"600" }}>Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Chrome Extension</span>
         </div>
         <div style={{
           display: "flex",
@@ -924,6 +924,8 @@ const Genius = (props) => {
         </div>
         */}
         <div className="genius__footer">
+        <div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Chrome Extension</span></div>
+
           <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
             {/* <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div> */}
             <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>&nbsp;Mandatory Fields</div>
