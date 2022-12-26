@@ -170,7 +170,7 @@ const CanvasEnE =(props)=>{
     }
     return (
         <Fragment>
-            <Legends isEnE={true}/>
+            {/* <Legends isEnE={true}/> */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
             <SaveMapButton isEnE={true} verticalLayout={setVerticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>

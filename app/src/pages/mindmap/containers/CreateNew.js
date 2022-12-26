@@ -130,18 +130,20 @@ const CreateNew = ({importRedirect}) => {
                 <p><b>Note </b>- Read the Mindmap from left to right</p>
                 </div>
                 <div id='mp__canvas' className='mp__canvas'>
-                     {isCreateE2E ? 
-                     (Object.keys(moduleSelect).length>0)? <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
-                :<Fragment>
-                    <SaveMapButton disabled={true}/>
-                    <Legends isEnE={true}/>
-                </Fragment>:((Object.keys(moduleSelect).length>0)?
+                     {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?
                     <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap}  displayBasic={displayBasic} displayBasic2= {displayBasic2}  setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
+                    // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
+                   
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
-                        <Legends/>
-                    </Fragment>)}
+                        {/* <Legends/> */}
+                    </Fragment>) : (Object.keys(moduleSelect).length>0)?
+                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
+                :<Fragment>
+                    <SaveMapButton disabled={true}/>
+                    {/* <Legends isEnE={true}/> */}
+                </Fragment>}
                     
                     
                 </div>

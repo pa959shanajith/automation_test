@@ -60,13 +60,16 @@
 .searchBox input{
     width:90%;
     border-radius: 0.3125rem;
-    height: 3%;
+    height: 1.5rem;
     margin: 2%;
     border:1px solid rgba(0, 0, 0, 0.295);
 }
 
 .pxBlack{
     border:0px solid black;
+}
+.pFont{
+    font-size: 0.75rem;
 }
 
 .leftContainer{

@@ -8,6 +8,7 @@ import * as actionTypes from '../state/action';
 import * as actionTypesPlugin from '../../plugin/state/action';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
+import Legends from '../components/Legends'
 
 
 
@@ -141,6 +142,9 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             footer={<Footer clickExport={clickExport}/>}
             content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[initProj]["name"]} isAssign={isAssign}/>} 
             />:null} 
+
+            <Legends/>
+            <Legends isEnE={true}/> 
         <div className='toolbar__header'>
             <label data-test="projectLabel">Project:</label>
             <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
