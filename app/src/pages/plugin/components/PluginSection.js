@@ -19,40 +19,24 @@ const PluginSection = ({userInfo}) => {
     });
 
     useEffect(()=>{
-
         if (Object.keys(userInfo).length!==0){
-
             let tempList = { ...pluginList };
-
             let availablePlugins = userInfo.pluginsInfo;
-
-            let pluginsLength = availablePlugins && availablePlugins.length;
-
+            let pluginsLength = availablePlugins.length;
             for(let i=0 ; i < pluginsLength ; i++){
-
-                if(availablePlugins[i].pluginValue !== false){
-
+                // if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
-
-                   
-
+                    
                     if (tempList[pluginName]) tempList[pluginName].show = availablePlugins[i].pluginValue;
-
-                    else tempList[pluginName] = { title: pluginName, show: true};
-
-                }
-
+                    // else tempList[pluginName] = { title: pluginName, show: true};
+                // }
             }
-
             tempList["Avo Discover"].show = false;
             tempList["Mindmap"].show = false;
             tempList["Selenium To Avo"].show = false;
             tempList.showList = true;
-
             setPluginList(tempList);
-
         }
-
     }, [userInfo]);
 
     return(

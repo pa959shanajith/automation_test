@@ -2,16 +2,17 @@
 #navigate-widget {
     position: relative;
     z-index: 1;
-    padding: 27px;
-    left: -94px;
+    padding: 0rem;
+    left: -4.8rem;
+    top:-0.7rem;
 }
 .arrow-box {
     float: left;
     opacity: 0.4;
     border: 1px solid $borderFive;
-    border-radius: 50px;
-    width: 100px;
-    height: 100px;
+    border-radius: 2.5rem;
+    width: 5rem;
+    height: 5rem;
     text-align: center;
     background: $whiteColor;
 }
@@ -20,11 +21,11 @@
     border-color: $primaryColor;
 }
 .arrow-box p {
-    margin: 7px 5px;
+    margin: 2px 0px;
 }
 .zoom-box {
     float: left;
-    padding: 21px 0px 0px 10px;
+    padding: 8px 0px 0px 9px;
 }
 .arrow-box-ic {
     border: solid $borderFive;
@@ -49,7 +50,7 @@
 }
 .right {
     cursor: pointer;
-    margin-left: 50px;
+    margin-left: 42px;
     transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
 }
