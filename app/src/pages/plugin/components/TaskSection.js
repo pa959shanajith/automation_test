@@ -376,7 +376,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
 
     const onSearchHandler = event => {
-        searchProjects(event.target.value)
+        searchProjects(event.target.value);
         setSearchValue(event.target.value);
     };
 
@@ -521,8 +521,11 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             <div>
             <div className="task-nav-bar1">
                 {projectNames && projectNames.projectName.map((singleProj,idx)=>{
+                    if(searchValue.length>0 && !searchItems.includes(singleProj)){
+                        return <></>
+                    }
                    
-return <>
+            return <>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
 
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>

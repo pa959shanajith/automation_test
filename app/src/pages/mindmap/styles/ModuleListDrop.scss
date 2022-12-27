@@ -19,7 +19,7 @@
 .toolbar__module-box{
     position: relative;
     display: flex;
-    text-overflow: ellipsis;
+    // text-overflow: ellipsis;
     padding: 0rem;
     margin: 0rem 0rem 0.2rem;
     text-align: center;
@@ -179,6 +179,7 @@
 }
 .modNmeE2E{
     font-size: 0.75rem;
+    overflow: hidden;
     text-overflow:ellipsis ;
     width: 7rem;
     height: 1rem;
@@ -235,13 +236,13 @@
     background: $iceColor;
     color: inherit;
     border-radius: 0.5rem;
-    width: 7.5rem;
+    width: 7rem;
 }
 .dropdown_scenarios.selected{
     background-color: $summerSky;
     color: $whiteColor;
     border-radius: 0.5rem;
-    width: 9rem;}
+    width: 7rem;}
 .wholeContainer{
     // border: 1px solid black;
     display: flex;

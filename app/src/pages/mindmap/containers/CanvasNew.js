@@ -21,6 +21,7 @@ import '../styles/MindmapCanvas.scss';
 import * as pluginApi from '../../plugin/api';
 import { Dialog } from 'primereact/dialog';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import * as actionTypesGlobal from  "../../global/state/action"
 
 
 
@@ -379,7 +380,6 @@ const CanvasNew = (props) => {
             setdLinks(res.dLinks)
             setdNodes(res.dNodes)
         }
-        
     }
     const processDeleteNode = (sel_node) => {        
         var res = deleteNode(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
@@ -392,6 +392,7 @@ const CanvasNew = (props) => {
             
         }
         setDelConfirm(false);
+        setReuseDelConfirm(false);
     }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
@@ -440,6 +441,31 @@ const CanvasNew = (props) => {
     //     setTaskBox(false)
     // }
 
+  const confirm1 = () => {
+    confirmDialog({
+        message: 'Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        accept,
+        reject,
+        acceptClassName:"p-button-rounded",
+        rejectClassName:"p-button-rounded"
+    });
+  };
+
+  const accept = () => {
+    dispatch({type:actionTypesGlobal.OPEN_GENIUS,payload:{
+      showGenuisWindow:true,
+      geniusWindowProps:{
+        selectedProject:{key: proj,text: ""},
+        selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
+        selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]}
+      }
+    }}) 
+  }
+
+  const reject = () => {}
+
     return (
         <Fragment>
             <ConfirmDialog />
@@ -481,7 +507,7 @@ const CanvasNew = (props) => {
 
             {/* {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null} */}
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
-            {(ctrlBox !== false)?<ControlBox openScrapeScreen={props.onClick}  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} Avodialog={props.confirm1} ctScale={ctScale}/>:null}
+            {(ctrlBox !== false)?<ControlBox openScrapeScreen={props.onClick}  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} Avodialog={confirm1} ctScale={ctScale}/>:null}
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}

@@ -42,7 +42,6 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         // setselectedProjectNameForDropdown(proj);
-        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})

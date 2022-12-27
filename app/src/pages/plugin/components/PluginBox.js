@@ -3,8 +3,9 @@ import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import { getMappedDiscoverUser } from '../api';
 import { setMsg } from '../../global' ;
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import uiConfig from "../../../assets/ui_config.json";
+import * as actionTypesGlobal from "../../global/state/action"
 
 const displayError = (error) =>{
 	setMsg(error)
@@ -22,13 +23,15 @@ const PluginBox = ({pluginName, pluginTitle}) => {
   const userInfo = useSelector(state=>state.login.userinfo);
   const pluginData = uiConfig.pluginData;
   const disabled = userInfo.isTrial && !pluginData[pluginName.split(' ').join('').toLowerCase()]["availableForTrial"]
+  const dispatch = useDispatch()
 
 	const pluginRedirect = async() => {
     if (disabled) {
       return
     }
 		pluginName = pluginName.split(' ').join('').toLowerCase();
-		window.localStorage['navigateScreen'] = pluginName;
+    if (pluginName !== "genius")
+		    window.localStorage['navigateScreen'] = pluginName;
 		if(['dashboard', 'neurongraphs', 'seleniumtoavo', "reports"].includes(pluginName)){
 			window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
 			window.location.href = "/"+ pluginName;
@@ -43,8 +46,12 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 			setRedirectTo(`/${pluginName}`) 
 		}
 		//All the plugins that require direct Redirect
-		else if(['mindmap','utility','genius'].includes(pluginName)){
+		else if(['mindmap','utility'].includes(pluginName)){
 			setRedirectTo(`/${pluginName}`) 
+		}
+    else if (pluginName === "genius") {
+			dispatch({type:actionTypesGlobal.OPEN_GENIUS,payload:{showGenuisWindow:true,geniusWindowProps:{}}}) 
+      return
 		}
 		else {
 			//redirects to the external plugin's URL in a new tab

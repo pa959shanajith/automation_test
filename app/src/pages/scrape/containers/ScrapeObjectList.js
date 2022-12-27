@@ -54,23 +54,22 @@ const ScrapeObjectList = (props) => {
   const [disable, setDisable] = useState(false);
   const disableAppend = useSelector((state) => state.scrape.disableAppend);
   const { appType, subTaskId } = useSelector((state) => state.plugin.CT);
-  console.log(disableAppend, compareFlag);
+
 
   useEffect(() => {
     setIsMac(navigator.appVersion.toLowerCase().indexOf("mac") !== -1);
     if (saved.flag || disableAction) setAppendCheck(false);
     //eslint-disable-next-line
   }, [appType, saved, subTaskId]);
-  const onAppend = (event) => {
-    dispatch({
-      type: actionTypes.SET_DISABLEACTION,
-      payload: !event.target.checked,
-    });
+  
+  const onAppend = (event)=> {
+    dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
     if (event.target.checked) {
-      setAppendCheck(true);
-      if (appType === "Webservice") setSaved({ flag: false });
-    } else setAppendCheck(false);
-  };
+        setAppendCheck(true);
+        if (appType==="Webservice") setSaved({ flag: false });
+    }
+    else setAppendCheck(false);
+};
   
 
   // let renderComp = [
@@ -546,44 +545,32 @@ const ScrapeObjectList = (props) => {
                       
                     </div> :
                     props.appType==="Desktop" ? 
-                    <div className={'desktop_btn'+(disableAction || compareFlag ? " disable-thumbnail" : "")}>
+                    <div className={'desktop_btn'+(disableAction ? " disable-thumbnail" : "")}>
                         <p onClick={() => {setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
                     </div>: 
-                    props.appType==="OEBS"? <div className='desktop_btn'>
+                    props.appType==="OEBS"? <div className={'desktop_btn' + (disableAction ? " disable-thumbnail" : "")}>
                     <p onClick={() => {setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
                     </div>:
-                    props.appType==="SAP"?<div className='desktop_btn'>
+                    props.appType==="SAP"?<div className={'desktop_btn' + (disableAction ? " disable-thumbnail" : "")} >
                     <p onClick={() => {setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
                     </div>:
                     props.appType==="MobileApp"?<div >
-                    <p className='mobileApp_btn'  onClick={() => {setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img style={{height:'25px', width:'20px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
+                    <p className={'mobileApp_btn' +(disableAction ? "disable-thumbnail" : "")} onClick={() => {setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img style={{height:'25px', width:'20px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
                     </div>:
-                    props.appType==="MobileWeb"?<div className='mobileApp_btn'>
+                    props.appType==="MobileWeb"?<div className={'mobileApp_btn' +(disableAction || compareFlag ? "disable-thumbnail" : "")}>
                     <p onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
                     </div>:""}
-                  
-                    <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")} >
-                      <input
-                        data-test="appendInput"
-                        id="enable_append"
-                        type="checkbox"
-                        title="Enable Add"
-                        onChange={onAppend}
-                        checked={appendCheck}
-                      />
-                      <span
-                        data-test="append"
-                        className="ss__thumbnail_title"
-                        title="Enable Append"
-                      >
-                        {appType === "Webservice" ? "Edit" : "Append"}
-                      </span>
-                    </div>
-                    {props.appType === 'Web' ?
+
+                    <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
+                        <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
+                        <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
+                     </div>
+                    
+                    {props.appType === 'Web'  ?
                     (<div className={"c__capturebtn"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}} >
                     <Button label="Capture" /**disabled={captureButton===""} */ className="debug_button p-button-warning"  onClick={()=>{startScrape(captureButton)}}  disabled={(disableAction || compareFlag)} title="Capture elements" />
                     </div>)
-                :""} 
+                    :""}                    
                 
 </div>
                     

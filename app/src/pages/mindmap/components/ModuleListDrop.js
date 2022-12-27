@@ -89,12 +89,14 @@ const ModuleListDrop = (props) =>{
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
-       
-        if(moduleSelect._id === modID){
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
+        
+    
+        // if(moduleSelect._id === modID){
+           
+        // }
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var req={
-            tab:"endToend",
+            tab:"createTab",
             projectid:proj,
             version:0,
             cycId: null,
@@ -171,9 +173,11 @@ const ModuleListDrop = (props) =>{
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        if(moduleSelect._id === modID){
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
-        }
+        // if(moduleSelect._id === modID){
+            
+            
+        // }
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var req={
             tab:"endToend",
             projectid:proj,
@@ -357,7 +361,7 @@ const ModuleListDrop = (props) =>{
 
                                             <div  key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios'} title={e.name} value={e._id} >
                                                 <div style={{display:'flex',marginTop:'3px',textOverflow:"ellipsis"}}><input type="checkbox"  value={e._id} onChange={(e)=>{} } checked={selectedSc[e._id]}  />
-                                                <span style={{textOverflow:"ellipsis"}}>
+                                                <span style={{textOverflow:"ellipsis", height:'1rem'}}>
                                                 {e.name}</span></div></div>
                                         </div>
                                     )

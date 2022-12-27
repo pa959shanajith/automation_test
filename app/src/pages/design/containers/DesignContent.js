@@ -893,7 +893,7 @@ const DesignContent = props => {
             });
     };
     
-
+    
     return (
         <>
         { showPopup && ConfirmPopup()}
@@ -998,7 +998,7 @@ const DesignContent = props => {
                             <p onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
                         </div>: 
                         props.appType==="Desktop"? <div className='desktopAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Destop Apps</span></p>
+                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
                         </div>:
                         props.appType==="SAP"?<div className='desktopAppDesign_btn'>
                         <p  onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
@@ -1013,16 +1013,18 @@ const DesignContent = props => {
                         <p onClick={()=>debugTestCases('1')}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>System App</span></p>
                         </div>:
                         props.appType==="Mainframe"?<div className='mainframeDesign_btn'>
-                            <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/mainframe.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
-                        </div>:""}
+                            <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
+                        </div>:
+                         props.appType==="Webservice"?<div className='webservices_btn'>
+                         <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px'}}>WebServices</span></p>
+                     </div>:""}
 
                 </div>
                        
-               {props.appType==="Web"?
-               (<div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
+               {(props.appType==="Web") ?
+               <div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
                     <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
-                </div>)
-                :""} 
+                </div>:""} 
             </div>
            
 

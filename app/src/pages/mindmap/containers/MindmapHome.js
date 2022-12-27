@@ -57,6 +57,7 @@ const MindmapHome = () => {
   return (
     <div className='mp__container'>
       <Header/> 
+      {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       <div className='mp__body'>
         <ActionBar collapsible={false} collapse={"newmindmap"}>
           <div className="mp__ic_box">
