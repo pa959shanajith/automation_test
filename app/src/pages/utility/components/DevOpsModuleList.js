@@ -568,10 +568,16 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     }
     const handleKeyDown = (event)=>{
         if(event.key === 'Backspace'){
-            handleSearchChange('');
-            setFilteredModuleList(initialFilteredModuleList)
+            if(searchText.length>0){
+                let val=searchText.substring(0,searchText.length-1);
+                debugger;
+                let filteredItems = initialFilteredModuleList.filter(element=>element.label.props.children[0].toLowerCase().includes(val.toLowerCase()))
+                setFilteredModuleList(filteredItems)
+                setSearchText(val);
+            }
+            event.preventDefault();  
         }
-       }
+   }
     return (
         <>
 
@@ -637,7 +643,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                         <div className='devOps_module_list_filter'>
                             <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
-                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={handleKeyDown} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={(event)=>{handleKeyDown(event)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                             {/* <SearchDropdown
                                 calloutMaxHeight="30vh"
                                 noItemsText={'Loading...'}
