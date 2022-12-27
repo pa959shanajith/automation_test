@@ -1013,7 +1013,7 @@ const DesignContent = props => {
                         <p onClick={()=>debugTestCases('1')}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>System App</span></p>
                         </div>:
                         props.appType==="Mainframe"?<div className='mainframeDesign_btn'>
-                            <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
+                            <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/mainframe.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
                         </div>:""}
 
                 </div>
