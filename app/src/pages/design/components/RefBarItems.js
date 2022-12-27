@@ -64,7 +64,7 @@ const ReferenceContent = ({mirror,collapse,appType}) => {
 
     return (
     <>
-    <ReferenceBar popups={<ScreenPopup/>} collapsible={true} collapse={collapse} closeAllPopups={closeAllPopups}>
+    <ReferenceBar hideInfo={true} popups={<ScreenPopup/>} collapsible={true} collapse={collapse} closeAllPopups={closeAllPopups}>
     { appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={togglePop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
     </ReferenceBar>
     </>
