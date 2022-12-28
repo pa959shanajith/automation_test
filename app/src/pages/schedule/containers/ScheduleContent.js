@@ -123,6 +123,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     newScheduledScenario["_id"] = result[i]._id;
                     newScheduledScenario["status"] = result[i].status;
                     newScheduledScenario["poolname"] =  result[i].poolname ? result[i].poolname : 'Unallocated ICE';
+                    newScheduledScenario["getscheduleondate"] = result[i].scheduledon;
                     scheduledDataParsed.push(newScheduledScenario);
                 } 
                 setScheduledData(scheduledDataParsed);
@@ -480,7 +481,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(formatDate(data.scheduledatetime)) }}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(data.getscheduleondate) }}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
                                                                     :null}
@@ -520,7 +521,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(formatDate(data.scheduledatetime)) }}>{data.status}</span>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(data.getscheduleondate) }}>{data.status}</span>
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
                                                                     :null}
