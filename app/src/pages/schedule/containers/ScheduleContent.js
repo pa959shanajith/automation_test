@@ -773,6 +773,8 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
                 suiteInfo.recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
                 suiteInfo.recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid][	"recurringStringOnHover"];
                 suiteInfo.endAfter = moduleScheduledate[eachData[i].testsuiteid]["endAfter"];
+                suiteInfo.clientTime = moduleScheduledate[eachData[i].testsuiteid]["clientTime"];
+                suiteInfo.clientTimeZone = moduleScheduledate[eachData[i].testsuiteid]["clientTimeZone"];
             } 
         }
         if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);
