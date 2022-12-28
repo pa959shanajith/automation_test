@@ -42,7 +42,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             tableData.map((rowData)=>{
                 if(moduleScheduledateTime[rowData.testsuiteid] === undefined) {
                     moduleScheduledateTime[rowData.testsuiteid] = {
-                        date:"",time:"",recurringValue: "",recurringString: "",recurringStringOnHover: "",endAfter: "",
+                        date:"",time:"",recurringValue: "",recurringString: "",recurringStringOnHover: "",endAfter: "",clientTime: "",clientTimeZone: "",
                         inputPropstime: {readOnly:"readonly" ,
                             disabled : true,
                             className:"fc-timePicker",
@@ -166,7 +166,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
     const updateDateTime = (date_time, value , testsuiteid) => {
         let moduleScheduledateTime = {...moduleScheduledate}
         if(moduleScheduledateTime[testsuiteid] === undefined) {
-            moduleScheduledateTime[testsuiteid] = {date:"",time:"",recurringValue: "", recurringString: "", recurringStringOnHover: "", endAfter: ""};
+            moduleScheduledateTime[testsuiteid] = {date:"",time:"",recurringValue: "", recurringString: "", recurringStringOnHover: "", endAfter: "", clientTime: "", clientTimeZone: "",};
         }
         if(date_time==="date"){
             moduleScheduledateTime[testsuiteid]["date"] = value;
@@ -181,6 +181,14 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         }
         else if(date_time==="time"){
             moduleScheduledateTime[testsuiteid]["time"] = value;
+            var hr = new Date().getHours();
+            var min = parseInt(new Date().getMinutes());
+            if (new Date().getHours().toString().length === 1)
+                hr = "0" + hr;
+            if (parseInt(new Date().getMinutes()).toString().length === 1)
+                min = "0" + min;
+            moduleScheduledateTime[testsuiteid]["clientTime"] = new Date().getFullYear()+ '/' + (new Date().getMonth() + 1) + '/' + new Date().getDate() + ' ' + hr + ":" + min;
+            moduleScheduledateTime[testsuiteid]["clientTimeZone"] = new Date().toString().split("GMT")[1].slice(0,5);
         }
         else if (date_time === "recurringValue") {
             moduleScheduledateTime[testsuiteid]["date"] = "";
