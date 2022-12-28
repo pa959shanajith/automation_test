@@ -277,7 +277,7 @@ const ModuleListDrop = (props) =>{
                             {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
-                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
+                            <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                         </div>
                         <div className='moduleList'>
@@ -300,7 +300,7 @@ const ModuleListDrop = (props) =>{
                     <div className='endToEnd'>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:'center', }}>
                         <img src="static/imgs/node-endtoend.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
-                            <h6 id='Endto' style={{margin: '5px -82px 3px -17px'}}>
+                            <h6 id='Endto' style={{margin: '6px -230px 3px -13px'}}>
                                     End to End Flows
                             </h6>
                            {userRole!=="Test Engineer"? <IconDropdown items={[ 
@@ -317,7 +317,7 @@ const ModuleListDrop = (props) =>{
                             />  :null}
                         </div>
                         <div className='searchBox pxBlack'>
-                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                            <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                         </div>
                         <div className='moduleList'>

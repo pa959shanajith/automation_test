@@ -8,7 +8,6 @@ import "../styles/GeniusDialog.scss";
 const GeniusDialog = () => {
   const showGeniusDialog = useSelector((state) => state.progressbar.showGenuisWindow)
   const geniusWindowProps = useSelector((state) => state.progressbar.geniusWindowProps)
-  debugger;
   const dispatch = useDispatch();
   return <>
     <Dialog header={"Welcome to Avo Genius"} visible={showGeniusDialog} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } }) }}>
