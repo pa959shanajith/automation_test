@@ -48,7 +48,7 @@ const Genius = (props) => {
   const finalDataRef = useRef([])
   const dispatch = useDispatch();
   const history = useHistory();
-
+  const userRole = useSelector(state=>state.login.SR);
   const displayError = (error) => {
     console.log(error)
     setBlockui({ show: false })
@@ -253,6 +253,7 @@ const Genius = (props) => {
   }, [selectedModule])
 
   useEffect(() => {
+  
     // The ID of the extension we want to talk to.
     // Make a simple request:
     // setTimeout(() => {
@@ -310,6 +311,8 @@ const Genius = (props) => {
         }
         setplugins_list(txt);
       }
+     
+      
     })()
   }, [])
 
@@ -759,9 +762,9 @@ const Genius = (props) => {
           gap: 50
         }}>
           <div style={{ position: "relative" }}>
-            <div style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={async () => {
+           {userRole==="Test Manager" && <div style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={async () => {
               setDisplayCreateProject(true)
-            }}>+ New Project</div>
+            }}>+ New Project</div>}
             <NormalDropDown
               label="Select Project"
               options={
