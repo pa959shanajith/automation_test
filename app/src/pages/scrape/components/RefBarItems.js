@@ -278,7 +278,7 @@ const RefBarItems = props => {
     
     return (
     
-        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} collapse={props.collapse} collapsible={true} scrapeScreenURL={scrapedURL} >
+        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} hideInfo={props.hideInfo} collapse={props.collapse} collapsible={true} scrapeScreenURL={scrapedURL} >
 			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title" title="Screenshot">Screenshot</span></div>}
             { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter" title="Filter"/></span><span className="rb_box_title" title="Filter">Filter</span></span>}
         </ReferenceBar>
