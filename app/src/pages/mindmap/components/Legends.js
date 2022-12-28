@@ -8,7 +8,7 @@ import '../styles/Legends.scss'
 
 const Legends = ({isEnE}) => {
     return(
-        <svg className="ct-legendBox">
+        <svg className="ct-legendBox legendBoxAlignment">
             <g  transform="translate(10,10)">
                 {!isEnE?
                 <Fragment>
