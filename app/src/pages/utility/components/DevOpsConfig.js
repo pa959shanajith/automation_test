@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef} from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
@@ -79,12 +79,10 @@ const DevOpsConfig = props => {
                         onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
+                    const moduleChildren = module.scenarios.map((scenario) => {
                         return ({
                             value: scenario._id,
-                            // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                            //     event.preventDefault();
-                            //     onDataParamsIconClick1(scenario._id, scenario.name)}}/></div>
+                            label: scenario.name
                         })
                     });
                     filterModule['children'] = moduleChildren;
@@ -104,10 +102,7 @@ const DevOpsConfig = props => {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
                         return ({
                             value: module.batchname+module.moduleid+index+scenario._id,
-                            // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                            //     event.preventDefault();
-                                
-                            //    onDataParamsIconClick1(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+                            label: scenario.name
                         })
                     });
                     filterModule['children'] = moduleChildren;
@@ -135,10 +130,7 @@ const DevOpsConfig = props => {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
                                 return ({
                                     value: batch+module.moduleid+index+scenario._id,
-                                    // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                    //     event.preventDefault();
-                                    
-                                    //     onDataParamsIconClick1(batch+module.moduleid+index+scenario._id, scenario.name) }}/></div>
+                                    label: scenario.name
                                 })
                             });
                             filterModule['children'] = moduleChildren;
