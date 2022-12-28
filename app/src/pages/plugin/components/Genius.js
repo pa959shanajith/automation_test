@@ -345,7 +345,7 @@ const Genius = (props) => {
     else {
       setLoading(false);
       // add popup message to show that extension is not present.
-      setMsg(MSG.CUSTOM("No Extension Present.Please download it from the above link and re-open the Genius popup","error"))
+      setMsg(MSG.CUSTOM("Extension not found!!! Download it and re-open the Genius popup","error"))
       console.log("Extension not present");
     }
   }
@@ -654,7 +654,7 @@ const Genius = (props) => {
 
   return (
     <div className="plugin-bg-container">
-      <Header />
+      <Header geniusPopup={true}/>
       {loading ? <ScreenOverlay content={loading} /> : null}
       {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && mindmapShow ? <GeniusMindmap displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
       <Dialog header={'Create Project'} visible={displayCreateProject} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setSearchUsers(""); setProjectName(""); setAppTypeDialog(null); setAssignedUsers({}); setDisplayCreateProject(false) }}>
@@ -924,13 +924,17 @@ const Genius = (props) => {
         </div>
         */}
         <div className="genius__footer">
-        <div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Chrome Extension</span></div>
+        <div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
+        
+          <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Genius Extension.</h5>
+          </span>
+        </div>
 
           <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
             {/* <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div> */}
             <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>&nbsp;Mandatory Fields</div>
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
-              <button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>
+              {props.selectedProject?null:<button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>}
               <button className="reset-action__next"
                 disabled={!(selectedProject && selectedModule && selectedScenario && navURL && (appType ? appType.text : ""))}
                 style={{ border: "2px solid #5F338F", color: "white", borderRadius: "10px", padding: "8px 25px", background: "#5F338F" }} onClick={(e) => {

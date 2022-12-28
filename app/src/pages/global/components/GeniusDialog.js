@@ -11,7 +11,7 @@ const GeniusDialog = () => {
   debugger;
   const dispatch = useDispatch();
   return <>
-    <Dialog header={"Welcome to Avo Genius"} visible={showGeniusDialog} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } }) }}>
+    <Dialog style={{height:"95vh"}} header={"Welcome to Avo Genius"} visible={showGeniusDialog} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } }) }}>
       <Genius {...geniusWindowProps}></Genius>
     </Dialog>  
   </>
