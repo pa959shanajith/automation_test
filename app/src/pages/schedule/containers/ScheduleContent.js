@@ -221,7 +221,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["source"]="schedule";
         executionData["exectionMode"]=execAction;
         executionData["executionEnv"]=execEnv;
-        executionData["browserType"]=browserTypeExe || item.executionRequest.browserType;
+        executionData["browserType"]=browserTypeExe || (item.executionRequest.browserType.length !== 0 ? item.executionRequest.browserType : ["1"]);
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
@@ -608,7 +608,7 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
 
 const SelectBrowserCheck = (appType,browserTypeExe,execAction,displayError,item)=>{ 
     // console.log(item)
-    browserTypeExe = browserTypeExe || item.executionRequest.browserType
+    browserTypeExe = browserTypeExe || (item.executionRequest.browserType.length !==0 ? item.executionRequest.browserType : ['1'])
     if ((appType === "Web") && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_BROWSER);
     else if (appType === "Webservice" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_WEBSERVICE);
     else if (appType === "MobileApp" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE_APP);

@@ -751,7 +751,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(item.executionRequest.batchInfo[0].appType !== "Web")
-                                    setBrowserTypeExe(item.executionRequest.browserType);
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                                     setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({
@@ -812,7 +812,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(item.executionRequest.batchInfo[0].appType !=="Web")
-                                    setBrowserTypeExe(item.executionRequest.browserType);
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                                     setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({
