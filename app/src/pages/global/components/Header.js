@@ -19,7 +19,7 @@ import "../styles/Header.scss";
 
 */
 
-const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
+const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -45,6 +45,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
 
     useEffect(()=>{
         //on Click back button on browser
+       
         (async()=>{
             const response = await fetch("/getServiceBell")
             let { enableServiceBell } = await response.json();
@@ -70,6 +71,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
             logout(e)
         })
         getOS();
+       
         (async()=>{
             const response = await fetch("/getClientConfig")
             let {avoClientConfig,trainingLinks} = await response.json();
@@ -251,7 +253,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/AssureLogo_horizonal.svg" onClick={ !adminDisable ? naviPg : null } /></span>
                     <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(!showHelp)} style={{padding:5}}>
-                            <span className="help">Need Help ?</span>
+                            {geniusPopup?null:<span className="help">Need Help ?</span>}
                         </div>
                         <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
                             <div onClick={()=>{window.open(trainLinks.videos,'_blank')
