@@ -376,7 +376,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
 
     const onSearchHandler = event => {
-        searchProjects(event.target.value)
+        searchProjects(event.target.value);
         setSearchValue(event.target.value);
     };
 
@@ -521,8 +521,11 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             <div>
             <div className="task-nav-bar1">
                 {projectNames && projectNames.projectName.map((singleProj,idx)=>{
+                    if(searchValue.length>0 && !searchItems.includes(singleProj)){
+                        return <></>
+                    }
                    
-return <>
+            return <>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
 
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
@@ -556,7 +559,7 @@ return <>
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
 
 
-                <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px',height:'700px',position:'fixed',overflow:'hidden' }}  onHide={() => onHide('displayBasic')}>
+                <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px',height:'700px',position:'fixed',overflow:'hidden' }} className="dialog__projectDialog" onHide={() => onHide('displayBasic')}>
 
                     {/* <div className="container"> */}
                     {/* <div className="column"> */}
@@ -620,15 +623,14 @@ return <>
                     isCreate == true ? <TextField /> : <NormalDropDown /> 
                 } */}
                             {
-                    createProjectCheck ? <TextField required label='Enter Project Name'  width='300px' placeholder='Enter Project Name' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='16px'  /> : 
+                    createProjectCheck ? <TextField required label='Project Name'  placeholder='Enter Project Name'  width='300px' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='15px'  /> : 
                                     <NormalDropDown 
                                         required
-                                        label="Select Project Name"
+                                        label="Project Name"
                                         options={getProjectList}
                         onChange={async(e,item) =>{
                                             setSelectedProject(item.key)
                                             const users_obj = await pluginApi.getUsers_ICE(item.key);
-                                            debugger
                                             // const assigned = {};
                                             // users_obj["assignedUsers"].forEach((user_obj)=> {assigned[user_obj._id]=true})
                                             // setAssignedUsers(assigned);
@@ -636,10 +638,11 @@ return <>
                                             setProjectAssignedUsers(users_obj["assignedUsers"]);
                                         }}
                                         selectedKey={selectedProject}
-                                        placeholder="Select Project"
+                                        placeholder="Select"
                                         standard                                        
                                         width="300px"
                                         fontSize='16px'
+                                        id="project__dropdown"
 
                                     //   fontSize='40px'
                                     //   marginLeft="200px"
@@ -661,17 +664,19 @@ return <>
                 } */}
                             {
                                 createProjectCheck ? <NormalDropDown
-                                    label="Select App Type"
+                                    label="App Type"
                                     options={getplugins_list}
-                                    placeholder="Select App Type"
+                                    placeholder="Select"
                                     width="300px"
                                     top="300px"
+                                    // color= '#8E8E8E'
                                     required
+                                    id="apptype__dropdown"
                                     onChange={(e, item) => {
                                         setAppType(item)
                                     }}
 
-                    /> : <TextField label='Selected App Type' disabled value={selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:""} width='19rem' />
+                    /> : <TextField label='App Type' disabled value={selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:""} width='19rem' />
                             }
                         </div>
 
