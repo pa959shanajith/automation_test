@@ -76,7 +76,6 @@ const ModuleListDrop = (props) =>{
     const clickCreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        setIsE2EOpen(isE2EOpen)
         console.log('moduleSelectE2E',moduleSelect)
 
     }
