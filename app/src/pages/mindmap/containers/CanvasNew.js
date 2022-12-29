@@ -22,6 +22,10 @@ import { deleteScenario} from '../api';
 import * as pluginApi from '../../plugin/api';
 import { Dialog } from 'primereact/dialog';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import * as actionTypesGlobal from  "../../global/state/action"
+
+
+
 /*Component Canvas
   use: return mindmap on a canvas
 */
@@ -461,6 +465,44 @@ const CanvasNew = (props) => {
             {message}
         </p>
     )
+
+    // const clickUnassign = (res) =>{
+    //     setNodes(res.nodeDisplay)
+    //     dispatch({type:actionTypes.UPDATE_UNASSIGNTASK,payload:res.unassignTask})
+    //     setTaskBox(false)
+    // }
+
+    // const clickAddTask = (res) =>{
+    //     setNodes(res.nodeDisplay)
+    //     setdNodes(res.dNodes)
+    //     setTaskBox(false)
+    // }
+
+  const confirm1 = () => {
+    confirmDialog({
+        message: 'Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        accept,
+        reject,
+        acceptClassName:"p-button-rounded",
+        rejectClassName:"p-button-rounded"
+    });
+  };
+
+  const accept = () => {
+    dispatch({type:actionTypesGlobal.OPEN_GENIUS,payload:{
+      showGenuisWindow:true,
+      geniusWindowProps:{
+        selectedProject:{key: proj,text: ""},
+        selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
+        selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]}
+      }
+    }}) 
+  }
+
+  const reject = () => {}
+
     return (
         <Fragment>
              <ConfirmDialog />
@@ -502,13 +544,13 @@ const CanvasNew = (props) => {
 
             {/* {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null} */}
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
-            {(ctrlBox !== false)?<ControlBox openScrapeScreen={props.onClick}  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} Avodialog={props.confirm1} ctScale={ctScale}/>:null}
+            {(ctrlBox !== false)?<ControlBox openScrapeScreen={props.onClick}  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} Avodialog={confirm1} ctScale={ctScale}/>:null}
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
-            <Legends/>
+            {/* <Legends/> */}
             {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
             {props.GeniusDialog ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>

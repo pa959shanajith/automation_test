@@ -123,6 +123,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     newScheduledScenario["_id"] = result[i]._id;
                     newScheduledScenario["status"] = result[i].status;
                     newScheduledScenario["poolname"] =  result[i].poolname ? result[i].poolname : 'Unallocated ICE';
+                    newScheduledScenario["getscheduleondate"] = result[i].scheduledon;
                     scheduledDataParsed.push(newScheduledScenario);
                 } 
                 setScheduledData(scheduledDataParsed);
@@ -220,7 +221,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["source"]="schedule";
         executionData["exectionMode"]=execAction;
         executionData["executionEnv"]=execEnv;
-        executionData["browserType"]=browserTypeExe || item.executionRequest.browserType;
+        executionData["browserType"]=browserTypeExe || (item.executionRequest.browserType.length !== 0 ? item.executionRequest.browserType : ["1"]);
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
@@ -480,7 +481,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(formatDate(data.scheduledatetime)) }}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(data.getscheduleondate) }}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
                                                                     :null}
@@ -520,7 +521,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(formatDate(data.scheduledatetime)) }}>{data.status}</span>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(data.getscheduleondate) }}>{data.status}</span>
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
                                                                     :null}
@@ -607,7 +608,7 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
 
 const SelectBrowserCheck = (appType,browserTypeExe,execAction,displayError,item)=>{ 
     // console.log(item)
-    browserTypeExe = browserTypeExe || item.executionRequest.browserType
+    browserTypeExe = browserTypeExe || (item.executionRequest.browserType.length !==0 ? item.executionRequest.browserType : ['1'])
     if ((appType === "Web") && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_BROWSER);
     else if (appType === "Webservice" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_WEBSERVICE);
     else if (appType === "MobileApp" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE_APP);
@@ -773,6 +774,8 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
                 suiteInfo.recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
                 suiteInfo.recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid][	"recurringStringOnHover"];
                 suiteInfo.endAfter = moduleScheduledate[eachData[i].testsuiteid]["endAfter"];
+                suiteInfo.clientTime = moduleScheduledate[eachData[i].testsuiteid]["clientTime"];
+                suiteInfo.clientTimeZone = moduleScheduledate[eachData[i].testsuiteid]["clientTimeZone"];
             } 
         }
         if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);

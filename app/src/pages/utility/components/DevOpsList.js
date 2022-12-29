@@ -330,7 +330,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     for (let executionNode of queueList[item]) {
                         let executionItem = {
                             value: item+nodeItemChildrenIndex,
-                            label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" onClick={async () => {
+                            label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" className='Terminate_Execution' onClick={async () => {
                                     const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
                                     if(deleteExecutionFromQueue.status !== 'pass') {
                                         setMsg(MSG.CUSTOM("Error While Removing Execution from Execution Queue",VARIANT.ERROR));
@@ -751,7 +751,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(item.executionRequest.batchInfo[0].appType !== "Web")
-                                    setBrowserTypeExe(item.executionRequest.browserType);
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                                     setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({
@@ -812,7 +812,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(item.executionRequest.batchInfo[0].appType !=="Web")
-                                    setBrowserTypeExe(item.executionRequest.browserType);
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                                     setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
                                         return ({

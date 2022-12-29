@@ -70,13 +70,11 @@ const ModuleListDrop = (props) =>{
     const CreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
-        console.log('moduleSelectNormal',moduleSelect)
 
     }
     const clickCreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        console.log('moduleSelectE2E',moduleSelect)
 
     }
     const searchModule = (val) =>{
@@ -92,10 +90,9 @@ const ModuleListDrop = (props) =>{
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
         
     
-        if(moduleSelect._id === modID){
+        // if(moduleSelect._id === modID){
            
-            console.log('moduleSelect')
-        }
+        // }
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var req={
             tab:"createTab",
@@ -175,9 +172,6 @@ const ModuleListDrop = (props) =>{
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        console.log('loadedENE')
-        console.log('moduleSelect',moduleSelect)
-        console.log('modID',modID)
         // if(moduleSelect._id === modID){
             
             
@@ -282,7 +276,7 @@ const ModuleListDrop = (props) =>{
                             {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
-                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
+                            <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                         </div>
                         <div className='moduleList'>
@@ -305,7 +299,7 @@ const ModuleListDrop = (props) =>{
                     <div className='endToEnd'>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:'center', }}>
                         <img src="static/imgs/node-endtoend.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
-                            <h6 id='Endto' style={{margin: '5px -82px 3px -17px'}}>
+                            <h6 id='Endto' style={{margin: '6px -230px 3px -13px'}}>
                                     End to End Flows
                             </h6>
                            {userRole!=="Test Engineer"? <IconDropdown items={[ 
@@ -322,7 +316,7 @@ const ModuleListDrop = (props) =>{
                             />  :null}
                         </div>
                         <div className='searchBox pxBlack'>
-                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                            <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                         </div>
                         <div className='moduleList'>

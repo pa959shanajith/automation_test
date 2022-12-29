@@ -5,9 +5,10 @@
     height: 4rem;
     margin-top: 0rem;
     justify-content: left;
-    color: #000000 !important;
-    font-weight: 600 !important;
-    font-family: Mulish !important;
+    color: #615277 !important;
+    // font-weight: 600 !important;
+    font-family: LatoWeb !important;
+    font-size: 14px;
     &:hover {
       background-color: #1817170a;
     }
@@ -42,7 +43,13 @@
     margin-bottom: 2px;
     border-radius: 5px;
     // margin-left: -93px;
+    color: #615277 !important;
 }
+
+.thumbnail .thumbnail__img {
+  color: #1817170a !important;
+}
+
 
 .svg_ic{
     padding: 6px 8px;

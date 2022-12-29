@@ -8,6 +8,8 @@ import * as actionTypes from '../state/action';
 import * as actionTypesPlugin from '../../plugin/state/action';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
+import Legends from '../components/Legends'
+
 
 
 
@@ -24,6 +26,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const gitBranchRef =  useRef()
     const gitVerRef =  useRef()
     const gitPathRef =  useRef()
+    const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
@@ -35,14 +38,20 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const [modlist,setModList] = useState(moduleList)
     const [exportBox,setExportBox] = useState(false);
-    // const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
+    const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
+    const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
     
+
+    // const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
+    useEffect(() => {
+        setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
+        
+      },[initEnEProj]);
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         // setselectedProjectNameForDropdown(proj);
-        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
@@ -61,6 +70,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         setBlockui({show:false})
         
     }
+   
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
@@ -142,7 +152,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             footer={<Footer clickExport={clickExport}/>}
             content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={prjList[initProj]["name"]} isAssign={isAssign}/>} 
             />:null} 
-        <div className='toolbar__header'>
+                    
+        <div className='toolbar__header'>    
             <label data-test="projectLabel">Project:</label>
             <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
@@ -152,6 +163,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
             </span>
+            {!isCreateE2E ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
         </div>
         
 

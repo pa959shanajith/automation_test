@@ -421,9 +421,10 @@ exports.deleteExecutionListId = async(req,res) => {
 exports.getScheduledDetailsOnDate_ICE = async (req, res) => {
 	logger.info("Inside UI service getScheduledDetailsOnDate_ICE");
 	let scheduledDate = req.body.scheduledDate;
-	let dateValue = scheduledDate.split(' ')[0]
-	let timeValue = scheduledDate.split(' ')[1]
-	let timestamp = + new Date(parseInt(dateValue.split('-')[0]), parseInt(dateValue.split('-')[1])-1, parseInt(dateValue.split('-')[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+	let dateString = scheduledDate.split(' ');
+    let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[2]) / 3;
+	let timeValue = dateString[4];
+    let timestamp = + new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[1]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 	const inputs = { "query": "getallscheduledataondate", "scheduledDate": timestamp, "configKey": req.body.configKey, "configName": req.body.configName };
 	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
 	return res.send(result);

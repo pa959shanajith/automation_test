@@ -42,8 +42,8 @@ const Preferences = (props) => {
 						<tr id="head">
 							<th>Plugins/Modules</th>
 							<th>Admin</th>
-							<th>Test Lead</th>
 							<th>Test Manager</th>
+							<th>Test Lead</th>
 							<th>Test Engineer</th>
                             {/* {
                                 Object.keys(resultList).forEach((data, index) => (

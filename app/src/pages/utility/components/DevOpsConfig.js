@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef} from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
@@ -16,7 +16,9 @@ const DevOpsConfig = props => {
     const dataParametersCollection = [];
     const [error, setError] = useState({});
     const [showSelectBrowser, setShowSelectBrowser] = useState(false);
-
+    const notexe = useRef(
+        props.currentIntegration.executionRequest != undefined ? props.currentIntegration.executionRequest.donotexe.current : {}
+        );
     useEffect(() => {
         props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web" ? setShowSelectBrowser(true) : setShowSelectBrowser(false)
     }, [props.currentIntegration.selectValues[0].selected])
@@ -64,10 +66,11 @@ const DevOpsConfig = props => {
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
     const handleExecutionTypeChange = (selectedType) => {
+        notexe['current'] = {}
         const selectedKey = selectedType;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].map((module) => {
+            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
                 let filterModule = {
                     value: module.moduleid,
                     label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -76,12 +79,10 @@ const DevOpsConfig = props => {
                         onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
+                    const moduleChildren = module.scenarios.map((scenario) => {
                         return ({
                             value: scenario._id,
-                            // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                            //     event.preventDefault();
-                            //     onDataParamsIconClick1(scenario._id, scenario.name)}}/></div>
+                            label: scenario.name
                         })
                     });
                     filterModule['children'] = moduleChildren;
@@ -101,10 +102,7 @@ const DevOpsConfig = props => {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
                         return ({
                             value: module.batchname+module.moduleid+index+scenario._id,
-                            // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                            //     event.preventDefault();
-                                
-                            //    onDataParamsIconClick1(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+                            label: scenario.name
                         })
                     });
                     filterModule['children'] = moduleChildren;
@@ -132,10 +130,7 @@ const DevOpsConfig = props => {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
                                 return ({
                                     value: batch+module.moduleid+index+scenario._id,
-                                    // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                    //     event.preventDefault();
-                                    
-                                    //     onDataParamsIconClick1(batch+module.moduleid+index+scenario._id, scenario.name) }}/></div>
+                                    label: scenario.name
                                 })
                             });
                             filterModule['children'] = moduleChildren;
@@ -560,7 +555,7 @@ const DevOpsConfig = props => {
         {
             <div className="devOps_module_list_div" >
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} selectedBrowserType={props.currentIntegration.selectedBrowserType} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} />
                 </div>
                 <div className="devOps_pool_list">
                     <div>

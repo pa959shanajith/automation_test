@@ -91,10 +91,10 @@
     left: 0;
     height: 50%;
     width: 100%;
-    background: white;
+    background: transparent;
     border-left: 2px solid #5F338F;
     border-right: 2px solid #5F338F;
-    z-index: -2;
+    z-index: 0;
     bottom: 0px;
     transform: skew(-30deg);
     border-bottom: 2px solid #5F338F;
@@ -109,10 +109,10 @@
     left: 0;
     height: 50%;
     width: 100%;
-    background: white;
+    background: transparent;
     border-left: 2px solid #5F338F;
     border-right: 2px solid #5F338F;
-    z-index: -2;
+    z-index: 0;
   }
 }
 
@@ -158,4 +158,20 @@
 
 .ms-SearchBox-iconContainer {
   width: unset !important;
+}
+
+.genius__footer {
+  display: flex;
+  flex: 1 1;
+  width: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.reminder__container {
+  display: flex;
+  margin: 0px 1rem;
+  flex: 1;
+  align-items: flex-end;
+  height: 100%;
 }

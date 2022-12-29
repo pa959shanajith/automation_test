@@ -88,7 +88,7 @@ input[type="checkbox"] {
 	.tabeleCellPadding{width: 4%;overflow: hidden;white-space:nowrap !important; text-overflow: ellipsis;}
 }
 .e__table_scenaio-name{
-    width: 16%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left !important
+    width: 19%; margin-right: 0%; cursor:pointer; word-break: break-all; text-align:left !important; margin-left: 0.7rem;
 }
 .e__getParamPath{
     display: inline-block;
@@ -197,7 +197,7 @@ input[type="checkbox"] {
     border-right: 1px solid $whiteColor;
 }
 .e__condition{
-    width: 18%;
+    width: 20%;
     border-right: 1px solid $whiteColor;
 }
 .e__projectName{
@@ -205,7 +205,7 @@ input[type="checkbox"] {
     border-right: 1px solid rgb(255, 255, 255)
 }
 .e__apptype{
-    width: 11%;
+    width: 17%;
     text-align:center;
     float: right;
     margin-right: 0vh !important;
@@ -219,10 +219,11 @@ input[type="checkbox"] {
     padding-top: 7px !important;
 }
 .exe-dataParam{
-    width: 27%
+    width: 32%;
+    margin-right: 1rem;
 }
 .exe__table-multiDropDown{
-    width: 20%;
+    width: 22%;
     height: 2rem;
 }
 .exe__table-multiDropDown-pad:nth-child(even){
@@ -233,11 +234,11 @@ input[type="checkbox"] {
 }
 .exe-conditionCheck{
     width: 18%;
-    margin-right: 0vh !important;
+    // margin-right: 0vh !important;
 }
 .exe-apptype{
-    width: 14%;
-    margin-right: 1rem;
+    width: 16%;
+    margin-right: 0.5rem;
     float:right
 }
 
@@ -329,7 +330,7 @@ input[type="checkbox"] {
     background: inherit !important;
 }
 
-.p-dialog-maximized {
+.devopsModList__Dialog.p-dialog-maximized {
     transition: none;
     transform: none;
     width: 73vw !important;
@@ -386,4 +387,5 @@ input[type="checkbox"] {
 }
 .e__table-col2{
     margin-right: 1vh;
+    // margin-left: -0.4rem;
 }

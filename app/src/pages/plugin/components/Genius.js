@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { NormalDropDown, TextField, Card, SearchBox } from '@avo/designcomponents';
+import { NormalDropDown, TextField, SearchBox } from '@avo/designcomponents';
 import { Icon } from "@fluentui/react/lib/Icon";
-import { Header, FooterOne, RedirectPage } from '../../global';
+import { RedirectPage, Header } from '../../global';
 import "../styles/Genius.scss";
 import { getProjectList, getModules, saveMindmap } from '../../mindmap/api';
 import { ScreenOverlay, setMsg, ResetSession, Messages as MSG } from '../../global';
@@ -15,9 +15,9 @@ import GeniusMindmap from "../../mindmap/containers/GeniusMindmap";
 import { useSelector, useDispatch } from 'react-redux';
 
 let port = null;
-var editorExtensionId = "mnigbjhmoafjckljdgkocmghllegjefk";
+let editorExtensionId = "bcdklcknooclndglabfjppeeomefcjof";
 
-const Genius = () => {
+const Genius = (props) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedScenario, setSelectedScenario] = useState(null);
@@ -42,12 +42,13 @@ const Genius = () => {
   const [userDetailList, setUserDetailList] = useState([]);
   const [plugins_list, setplugins_list] = useState([]);
   const moduleSelect = useSelector(state => state.mindmap.selectedModule);
+  const [mindmapShow, setMindmapShow] = useState(false);  
   const userInfo = useSelector(state => state.login.userinfo);
   const savedRef = useRef(false);
   const finalDataRef = useRef([])
   const dispatch = useDispatch();
   const history = useHistory();
-
+  const userRole = useSelector(state=>state.login.SR);
   const displayError = (error) => {
     console.log(error)
     setBlockui({ show: false })
@@ -181,7 +182,7 @@ const Genius = () => {
   }
 
   const loadModule = async (modID, projectId) => {
-    dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
+    // dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
     var req = {
       tab: "tabCreate",
       projectid: projectId,
@@ -193,10 +194,12 @@ const Genius = () => {
     var res = await getModules(req)
     if (res.error) { displayError(res.error); return }
     dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: res });
+    setMindmapShow(true);
   }
 
   const hideMindmap = () => {
-    dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
+    setMindmapShow(false);
+    // dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
   }
 
   const reconnectEx = () => {
@@ -223,11 +226,15 @@ const Genius = () => {
       if (selectedProject && selectedProject.key) {
         setSelectedModule(null);
         setSelectedScenario(null);
-        setAppType(null);
+        setAppType({
+          key: allProjects[selectedProject.key].apptype,
+          text: allProjects[selectedProject.key].apptypeName
+        })
         var modulesdata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": null });
         if (modulesdata === "Invalid Session") return RedirectPage(history);
         if (modulesdata.error) { displayError(modulesdata.error); return; }
         setProjModules(modulesdata);
+        setSelectedModule(props.selectedModule?props.selectedModule:null)
       }
     })()
   }, [selectedProject])
@@ -240,12 +247,13 @@ const Genius = () => {
         if (moduledata === "Invalid Session") return RedirectPage(history);
         if (moduledata.error) { displayError(moduledata.error); return; }
         setModScenarios(moduledata.children);
+        setSelectedScenario(props.selectedScenario?props.selectedScenario:null)
       }
     })()
   }, [selectedModule])
 
   useEffect(() => {
-    console.log(window.chrome);
+  
     // The ID of the extension we want to talk to.
     // Make a simple request:
     // setTimeout(() => {
@@ -258,7 +266,7 @@ const Genius = () => {
     //       }
     //     });
     // }, 2000);
-    dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
+    // dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
     connect();
     (async () => {
       setBlockui({ show: true, content: 'Loading...' })
@@ -266,7 +274,8 @@ const Genius = () => {
       if (res === "Invalid Session") return RedirectPage(history);
       if (res.error) { displayError(res.error); return; }
       var data = parseProjList(res)
-      setAllProjects(data)
+      setAllProjects(data);
+      setSelectedProject(props.selectedProject?props.selectedProject:null)
       res = await PluginApi.getUserDetails("user");
       if (res === "Invalid Session") return RedirectPage(history);
       if (res.error) {
@@ -302,11 +311,9 @@ const Genius = () => {
         }
         setplugins_list(txt);
       }
+     
+      
     })()
-
-    return () => {
-      dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
-    }
   }, [])
 
   const sendMessageToPort = (msg) => {
@@ -340,6 +347,8 @@ const Genius = () => {
     }
     else {
       setLoading(false);
+      // add popup message to show that extension is not present.
+      setMsg(MSG.CUSTOM("Extension not found!!! Download it and re-open the Genius popup","error"))
       console.log("Extension not present");
     }
   }
@@ -648,9 +657,9 @@ const Genius = () => {
 
   return (
     <div className="plugin-bg-container">
-      <Header />
+      <Header geniusPopup={true}/>
       {loading ? <ScreenOverlay content={loading} /> : null}
-      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 ? <GeniusMindmap displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
+      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && mindmapShow ? <GeniusMindmap displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
       <Dialog header={'Create Project'} visible={displayCreateProject} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setSearchUsers(""); setProjectName(""); setAppTypeDialog(null); setAssignedUsers({}); setDisplayCreateProject(false) }}>
         <div>
           <div className='dialog__child'>
@@ -725,7 +734,7 @@ const Genius = () => {
         </div>
       </Dialog>
       <div className='plugin-elements'>
-        <h3 style={{ margin: "1rem 0 1rem 1rem" }}>Welcome To Avo Genius</h3>
+        {/* <h3 style={{ margin: "1rem 0 1rem 1rem" }}>Welcome To Avo Genius</h3> */}
         <div className="breadcrumbs__container">
           <ol className="breadcrumbs__elements" style={{ listStyle: "none", display: "flex", gap: "2rem", flex: 1 }}>
             <li className="breadcrumbs__element__inner" data-value="">
@@ -739,10 +748,12 @@ const Genius = () => {
             </li>
           </ol>
         </div>
-        <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
-          {/* <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> */}
-          <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span>
-        </h4>
+        <div style={{ display:"flex", justifyContent:"space-between"}}>
+          <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
+            {/* <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> */}
+            <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span>
+          </h4>
+        </div>
         <div style={{
           display: "flex",
           flexDirection: 'row',
@@ -751,9 +762,9 @@ const Genius = () => {
           gap: 50
         }}>
           <div style={{ position: "relative" }}>
-            <div style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={async () => {
+           {userRole==="Test Manager" && <div style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={async () => {
               setDisplayCreateProject(true)
-            }}>+ New Project</div>
+            }}>+ New Project</div>}
             <NormalDropDown
               label="Select Project"
               options={
@@ -770,6 +781,7 @@ const Genius = () => {
               placeholder="Select a project"
               width="300px"
               required
+              disabled={props.selectedProject}
               selectedKey={selectedProject ? selectedProject.key : null}
             />
           </div>
@@ -790,7 +802,7 @@ const Genius = () => {
               selectedKey={selectedModule ? selectedModule.key : null}
               placeholder="Select a module"
               width="300px"
-              disabled={!(selectedProject && selectedProject.key)}
+              disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
               required
             />
           </div>
@@ -811,7 +823,7 @@ const Genius = () => {
               selectedKey={selectedScenario ? selectedScenario.key : null}
               placeholder="Select a scenario"
               width="300px"
-              disabled={!(selectedModule && selectedModule.key)}
+              disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
               required
             />
           </div>
@@ -838,7 +850,7 @@ const Genius = () => {
               ]}
               placeholder="Select Application Type"
               width="300px"
-              disabled={!(selectedProject && selectedProject.key)}
+              disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
               required
               selectedKey={appType ? appType.key : null}
               onChange={(e, item) => {
@@ -885,8 +897,10 @@ const Genius = () => {
           </div> */}
         </div>
 
+
+        { /** 
         <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
-          {/* <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> */}
+          // <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> 
           <span style={{ marginLeft: "0.5rem" }}>Recent Scenarios</span></h4>
         <div id="recentScenario__cards__container" style={{ display: "flex", flexDirection: 'row', margin: "0 10px", marginLeft: "1.5rem" }}>
           <Card
@@ -911,11 +925,19 @@ const Genius = () => {
             </div>
           </Card>
         </div>
-        <div>
+        */}
+        <div className="genius__footer">
+        <div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
+        
+          <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Genius Extension.</h5>
+          </span>
+        </div>
+
           <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
-            <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div>
+            {/* <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div> */}
+            <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>&nbsp;Mandatory Fields</div>
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
-              <button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>
+              {props.selectedProject?null:<button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>}
               <button className="reset-action__next"
                 disabled={!(selectedProject && selectedModule && selectedScenario && navURL && (appType ? appType.text : ""))}
                 style={{ border: "2px solid #5F338F", color: "white", borderRadius: "10px", padding: "8px 25px", background: "#5F338F" }} onClick={(e) => {
@@ -952,11 +974,9 @@ const Genius = () => {
               </button>
             </div>
           </div>
-
-          <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>&nbsp;Mandatory Fields</div>
         </div>
       </div>
-      <FooterOne />
+      {/* <FooterOne /> */}
     </div>
   );
 };
