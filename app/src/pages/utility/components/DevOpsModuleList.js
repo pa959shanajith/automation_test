@@ -288,9 +288,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 const moduleChildren = module.scenarios.map((scenario) => {
                                     return ({
                                         value: scenario._id,
-                                        // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                        //     event.preventDefault();
-                                        //     onDataParamsIconClick(scenario._id, scenario.name)}}/></div>
+                                        label: scenario.name
                                     })
                                 });
                                 filterModule['children'] = moduleChildren;
@@ -333,9 +331,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                             }
                                             return ({
                                                 value: batch+module.moduleid+index+scenario._id,
-                                                // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                                //     event.preventDefault();
-                                                //     onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+                                                label: scenario.name
                                             })
                                         });
                                         filterModule['children'] = moduleChildren;
@@ -362,9 +358,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 const moduleChildren = module.scenarios.map((scenario, index) => {
                                     return ({
                                         value: module.batchname+module.moduleid+index+scenario._id,
-                                        // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                        //     event.preventDefault();
-                                        //     onDataParamsIconClick(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+                                        label: scenario.name
                                     })
                                 });
                                 filterModule['children'] = moduleChildren;
@@ -419,100 +413,100 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
        setSearchText(value);
 
    }
-    const [scenario, setScenario] = useState(false);
-    const handleExecutionTypeChange = (selectedType) => {
-        notexe['current'] = {}
-        const selectedKey = selectedType.key;
-        let filteredNodes = [];
-        if(selectedKey === 'normalExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
-                let filterModule = {
-                    value: module.moduleid,
-                    label: module.name,
-                };
-                if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.map((scenario) => {
-                        return ({
-                            value: scenario._id,
-                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                event.preventDefault();
-                                onDataParamsIconClick(scenario._id, scenario.name)}}/></div>
-                        })
-                    });
-                    filterModule['children'] = moduleChildren;
-                }
-                return filterModule;
-            });
-        } else if(selectedKey === 'e2eExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
-                let filterModule = {
-                    value: module.moduleid,
-                    label: module.name,
-                };
-                if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.map((scenario, index) => {
-                        return ({
-                            value: module.batchname+module.moduleid+index+scenario._id,
-                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                event.preventDefault();
-                                onDataParamsIconClick(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
-                        })
-                    });
-                    filterModule['children'] = moduleChildren;
-                }
-                return filterModule;
-            });
-        }
-        else if(selectedKey === 'batchExecution') {
-            const batchData = moduleScenarioList['batchExecution'];
-            filteredNodes = Object.keys(batchData).map((batch) => {
-                let filterBatch = {
-                    value: batch,
-                    label: batch,
-                };
-                if(batchData[batch].length > 0) {
-                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
-                        let filterModule = {
-                            value: module.moduleid,
-                            label: module.name,
-                        };
-                        if(module.scenarios && module.scenarios.length > 0) {
-                            const moduleChildren = module.scenarios.map((scenario, index) => {
-                                return ({
-                                    value: batch+module.moduleid+index+scenario._id,
-                                    label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                        event.preventDefault();
-                                        onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)}}/></div>
-                                })
-                            });
-                            filterModule['children'] = moduleChildren;
-                        }
-                        return filterModule;
-                    });
-                }
-                return filterBatch;
-            });
-        }
-        setSelectedExecutionType(selectedKey);
-        setModuleList(filteredNodes);
-        setFilteredModuleList(filteredNodes);
-        setModuleState({expanded: [], checked: []});
-        setIntegrationConfig({ ...integrationConfig, scenarioList: [], dataParameters: [] });
-    }
-    // const [modalContent, setModalContent] = useState(false);
-    const onDataParamsIconClick = (scenarioId, name) => {
-        if(integrationConfig.dataParameters.some((data) => data.scenarioId === scenarioId)) {
-            let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.scenarioId === scenarioId);
-            setModalContent(integrationConfig.dataParameters[paramIndex]);
-        } else {
-            setScenario({
-                scenarioId: scenarioId,
-                name: name,
-                dataparam: '',
-                condition: 0
-            })
-        }
-    }
+    // const [scenario, setScenario] = useState(false);
+    // // const handleExecutionTypeChange = (selectedType) => {
+    // //     notexe['current'] = {}
+    // //     const selectedKey = selectedType.key;
+    // //     let filteredNodes = [];
+    // //     if(selectedKey === 'normalExecution') {
+    // //         filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+    // //             let filterModule = {
+    // //                 value: module.moduleid,
+    // //                 label: module.name,
+    // //             };
+    // //             if(module.scenarios && module.scenarios.length > 0) {
+    // //                 const moduleChildren = module.scenarios.map((scenario) => {
+    // //                     return ({
+    // //                         value: scenario._id,
+    // //                         label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+    // //                             event.preventDefault();
+    // //                             onDataParamsIconClick(scenario._id, scenario.name)}}/></div>
+    // //                     })
+    // //                 });
+    // //                 filterModule['children'] = moduleChildren;
+    // //             }
+    // //             return filterModule;
+    // //         });
+    // //     } else if(selectedKey === 'e2eExecution') {
+    // //         filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+    // //             let filterModule = {
+    // //                 value: module.moduleid,
+    // //                 label: module.name,
+    // //             };
+    // //             if(module.scenarios && module.scenarios.length > 0) {
+    // //                 const moduleChildren = module.scenarios.map((scenario, index) => {
+    // //                     return ({
+    // //                         value: module.batchname+module.moduleid+index+scenario._id,
+    // //                         label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+    // //                             event.preventDefault();
+    // //                             onDataParamsIconClick(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+    // //                     })
+    // //                 });
+    // //                 filterModule['children'] = moduleChildren;
+    // //             }
+    // //             return filterModule;
+    // //         });
+    // //     }
+    // //     else if(selectedKey === 'batchExecution') {
+    // //         const batchData = moduleScenarioList['batchExecution'];
+    // //         filteredNodes = Object.keys(batchData).map((batch) => {
+    // //             let filterBatch = {
+    // //                 value: batch,
+    // //                 label: batch,
+    // //             };
+    // //             if(batchData[batch].length > 0) {
+    // //                 filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+    // //                     let filterModule = {
+    // //                         value: module.moduleid,
+    // //                         label: module.name,
+    // //                     };
+    // //                     if(module.scenarios && module.scenarios.length > 0) {
+    // //                         const moduleChildren = module.scenarios.map((scenario, index) => {
+    // //                             return ({
+    // //                                 value: batch+module.moduleid+index+scenario._id,
+    // //                                 label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+    // //                                     event.preventDefault();
+    // //                                     onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+    // //                             })
+    // //                         });
+    // //                         filterModule['children'] = moduleChildren;
+    // //                     }
+    // //                     return filterModule;
+    // //                 });
+    // //             }
+    // //             return filterBatch;
+    // //         });
+    // //     }
+    // //     setSelectedExecutionType(selectedKey);
+    // //     setModuleList(filteredNodes);
+    // //     setFilteredModuleList(filteredNodes);
+    // //     setModuleState({expanded: [], checked: []});
+    // //     setIntegrationConfig({ ...integrationConfig, scenarioList: [], dataParameters: [] });
+    // // }
+    // // const [modalContent, setModalContent] = useState(false);
+    // const onDataParamsIconClick = (scenarioId, name) => {
+    //     if(integrationConfig.dataParameters.some((data) => data.scenarioId === scenarioId)) {
+    //         let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.scenarioId === scenarioId);
+    //         setModalContent(integrationConfig.dataParameters[paramIndex]);
+    //     } else {
+    //         setScenario({
+    //             scenarioId: scenarioId,
+    //             name: name,
+    //             dataparam: '',
+    //             condition: 0
+    //         })
+    //     }
+    // }
     const loadLocationDetailsScenario = async (scenarioName, scenarioId) => {
 		let data = await loadLocationDetails(scenarioName, scenarioId);
         if(data.error){displayError(data.error);return;}
@@ -542,14 +536,14 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 "testscenarioids": scenarioIds,
                                 "getparampaths": dataParameter,
                                 "conditioncheck": condition,
-                                "donotexecute": notExeInternalState,
+                                // "donotexecute": notExeInternalState,
                                 "accessibilityParameters": accessibilityParametersValue
                             }]
                         await updateTestSuite_ICE(payload);
             
                         integrationConfig.dataParameters = dataParameter;
                         integrationConfig.condition = condition;
-                        integrationConfig.scenarioList = scenarioIds;
+                        // integrationConfig.scenarioList = scenarioIds;
                         setIntegrationConfig({...integrationConfig})
                         onHide(name)}} autoFocus />
                 </div>
@@ -570,7 +564,6 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
         if(event.key === 'Backspace'){
             if(searchText.length>0){
                 let val=searchText.substring(0,searchText.length-1);
-                debugger;
                 let filteredItems = initialFilteredModuleList.filter(element=>element.label.props.children[0].toLowerCase().includes(val.toLowerCase()))
                 setFilteredModuleList(filteredItems)
                 setSearchText(val);
@@ -656,7 +649,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         </div>
                         <div id="moduleScenarioList" className="devOps_module_list_container">
                             <ScrollBar scrollId='moduleScenarioList' thumbColor="#929397" >
-                            <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked}) } />
+                            <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
                             </ScrollBar>
                         </div>
                 </>
