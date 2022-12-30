@@ -23,8 +23,8 @@ const SaveMapButton = (props) => {
     const moduledata = useSelector(state=>state.mindmap.moduleList)
     const verticalLayout= props.verticalLayout
     useEffect(()=>{
-        if(props.createnew==='save')clickSave()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        if(props.createnew==='save'||props.createnew==='autosave')clickSave()      
+          // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
         saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop)
@@ -158,7 +158,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
     dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
     dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
-    setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
+    if(createnew!=='autosave') setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
     if(result.scenarioInfo){
         dispatch({type:actionTypes.DELETE_SCENARIO,payload:result.scenarioInfo})
         setDelSnrWarnPop(true);
