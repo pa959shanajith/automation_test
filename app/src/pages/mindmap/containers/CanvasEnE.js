@@ -85,12 +85,12 @@ const CanvasEnE =(props)=>{
         }
     },[deletedNodes]
     )
-    useEffect(()=>{
-        //useEffect to clear redux data selected module on unmount
-        return ()=>{
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
-    },[dispatch])
+    // useEffect(()=>{
+    //     //useEffect to clear redux data selected module on unmount
+    //     return ()=>{
+    //         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+    //     }
+    // },[dispatch])
     useEffect(()=>{
         var tree;
         count = {
