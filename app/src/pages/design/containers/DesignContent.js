@@ -854,12 +854,12 @@ const DesignContent = props => {
         if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
         
         // globalSelectedBrowserType = selectedBrowserType;5
-    
+        
         if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
         else testcaseID.push(props.fetchingDetails['_id']);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, [props.fetchingDetails['_id']], userInfo, props.appType)
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
             .then(data => {
                 setOverlay("");
                 ResetSession.end();

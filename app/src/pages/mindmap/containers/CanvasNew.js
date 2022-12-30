@@ -88,9 +88,9 @@ const CanvasNew = (props) => {
             }).catch(error=>{
                 console.log(error)
             })
-        return ()=>{
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
+        // return ()=>{
+        //     dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        // }
     },[])
     useEffect(()=>{
         if(deletedNodes && deletedNodes.length>0){
