@@ -1004,7 +1004,7 @@ const DesignContent = props => {
                         <p  onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
                         </div>:
                         props.appType==="MobileApp"?<div className='mobileAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
+                        <p  onClick={()=>debugTestCases('1')} ><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
                         </div>:
                         props.appType==="MobileWeb"?<div className='mobileAppDesign_btn'>
                         <p onClick={()=>debugTestCases()}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
