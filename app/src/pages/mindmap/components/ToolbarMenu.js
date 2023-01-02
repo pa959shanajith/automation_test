@@ -52,7 +52,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         // setselectedProjectNameForDropdown(proj);
-        dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
+        if(!isCreateE2E){
+        dispatch({type: actionTypesPlugin.SET_PN, payload:proj})}
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
