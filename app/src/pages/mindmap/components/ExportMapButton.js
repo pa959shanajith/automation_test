@@ -22,7 +22,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const selectedProj = useSelector(state=>state.plugin.PN)
     const projectList = useSelector(state=>state.mindmap.projectList)
     const openExport = ()=>{
-        if(!selectedProj || !selectedModule || !selectedModule._id || selectedModulelist.length==0){
+        if(selectedModulelist.length==0){
             return;
         }
         setExportBox(true)
@@ -51,7 +51,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             footer={<Footer clickExport={clickExport}/>}
             content={<Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
             />:null}
-            <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox(true)}>
+            <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModulelist.length!=0?"":" disableButton")} id="ct-export" onClick={()=>openExport(true)}>
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                     <text x="16" y="18">Export</text>
