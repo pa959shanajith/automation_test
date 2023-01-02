@@ -61,6 +61,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+        dispatch({ type: actionTypes.SELECT_MODULELIST, payload: [] })
         // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata});
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){
