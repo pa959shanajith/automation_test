@@ -96,7 +96,7 @@ const DevOpsConfig = props => {
                     label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                         event.preventDefault();
                         onClick('displayMaximizable');
-                        onDataParamsIconClick1(module.batchname+module.moduleid, module.name)}}/></div>
+                        onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -124,7 +124,7 @@ const DevOpsConfig = props => {
                             label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                 event.preventDefault();
                                 onClick('displayMaximizable');
-                                onDataParamsIconClick1(batch+module.moduleid, module.name)}}/></div>
+                                onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                         };
                         if(module.scenarios && module.scenarios.length > 0) {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -388,7 +388,7 @@ const DevOpsConfig = props => {
                         scenarioTaskType: "disable",
                         testsuiteName: module.name,
                         testsuiteId: module.moduleid,
-                        batchname: "",
+                        batchname: module.batchname,
                         versionNumber: 0,
                         appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
