@@ -139,6 +139,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
+                   const integrationData = configurationList.map((item,idx)=>{
+                        setIntegration(item.executionRequest.integration)
+                    })
                     setConfigList(configurationList);
                 }
             }
@@ -224,6 +227,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
             }
         }else {
+            const integrationData = configurationList.map((item,idx)=>{
+                setIntegration(item.executionRequest.integration)
+            })
             setConfigList(configurationList);
         }
         setLoading(false);
@@ -296,6 +302,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
+                    const integrationData = configurationList.map((item,idx)=>{
+                        setIntegration(item.executionRequest.integration)
+                    })
                     setConfigList(configurationList);
                 }
                 setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
