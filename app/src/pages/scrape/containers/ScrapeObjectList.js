@@ -544,21 +544,20 @@ const ScrapeObjectList = (props) => {
                         
                       
                     </div> :
-                    props.appType==="Desktop" ? 
-                    <div className={'desktop_btn'+(disableAction ? " disable-thumbnail" : "")}>
+                    props.appType==="Desktop" ?<div className={'desktop_btn'+(disableAction ? " disable-thumbnail" : "")}>
                         <p onClick={() => {setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
                     </div>: 
-                    props.appType==="OEBS"? <div className={'desktop_btn' + (disableAction ? " disable-thumbnail" : "")}>
+                    props.appType==="OEBS"?<div className={'desktop_btn' + (disableAction ? " disable-thumbnail" : "")}>
                     <p onClick={() => {setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
                     </div>:
                     props.appType==="SAP"?<div className={'desktop_btn' + (disableAction ? " disable-thumbnail" : "")} >
                     <p onClick={() => {setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
                     </div>:
-                    props.appType==="MobileApp"?<div >
-                    <p className={'mobileApp_btn' +(disableAction ? "disable-thumbnail" : "")} onClick={() => {setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img style={{height:'25px', width:'20px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
+                    props.appType==="MobileApp"?<div className={'mobileApp_btn' +(disableAction ? "disable-thumbnail" : "")}>
+                    <div onClick={() => {setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></div>
                     </div>:
                     props.appType==="MobileWeb"?<div className={'mobileApp_btn' +(disableAction || compareFlag ? "disable-thumbnail" : "")}>
-                    <p onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
+                    <div onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></div>
                     </div>:""}
 
                     <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
