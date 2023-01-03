@@ -28,12 +28,13 @@ import { Selection } from "@fluentui/react";
 // import "../styles/DevOps.scss";
 const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
   const [searchText, setSearchText] = useState("");
-  const [dataUpdated, setDataUpdated] = useState(true);
+  const [isDataUpdated, setIsDataUpdated] = useState(false);
 
   const [agentData, setAgentData] = useState([]);
   const [originalAgentData, setOriginalAgentData] = useState([]);
 
   const onClientIceCountChange = (operation, name, newVal = "") => {
+    setIsDataUpdated(true);
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
     if (
@@ -54,6 +55,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
     }
   };
   const onAgentToggle = (name) => {
+    setIsDataUpdated(true);
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
     updatedData[index] = {
@@ -63,6 +65,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
     setAgentData([...updatedData]);
   };
   const onConfirmDeleteAgent = (name) => {
+    setIsDataUpdated(true);
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
     updatedData.splice(index, 1);
@@ -75,6 +78,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
     );
   };
   const deleteAgent = (name) => {
+    setIsDataUpdated(true);
     setShowConfirmPop({
       title: "Delete Avo Agent",
       content: (
@@ -202,6 +206,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         }
       }
       if (requestData.length > 0) {
+        setIsDataUpdated(true);
         const storeConfig = await saveAvoAgent(requestData);
         if (storeConfig !== "success") {
           if (storeConfig.error && storeConfig.error.CONTENT) {
@@ -211,32 +216,15 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           }
         } else {
           showMessageBar("Agents List updated successfully", "SUCCESS");
+          setIsDataUpdated(false);
         }
       } else {
-        console.log("requestData : " + requestData);
-        console.log(requestData);
+        setIsDataUpdated(false);
       }
       setLoading(false);
     })();
   };
-  // useEffect(()=> {
-  //     let isUpdated = false;
-  //     console.log(integrationConfig);
-  //     Object.keys(integrationConfig).some(element => {
-  //         if(typeof(integrationConfig[element]) === 'string' && integrationConfig[element] !== props.currentIntegration[element]) {
-  //             isUpdated = true;
-  //             return true;
-  //         } else if(typeof(integrationConfig[element]) === 'object' && element === 'scenarioList' && (integrationConfig[element].length !== props.currentIntegration[element].length || integrationConfig[element].some((scenario) => { return !props.currentIntegration[element].includes(scenario) }) )) {
-  //             isUpdated = true;
-  //             return true;
-  //         }
-  //     });
-  //     if (dataUpdated !== isUpdated) setDataUpdated(isUpdated);
-  // }, [integrationConfig]);
-  // const displayError = (error) =>{
-  //     setLoading(false)
-  //     setMsg(error)
-  // }
+
   const [filteredList, setFilteredList] = useState(agentData);
   const handleSearchChange = (value) => {
     let filteredItems = agentData.filter(
@@ -292,7 +280,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         <button
           data-test="submit-button-test"
           onClick={handleAgentsSave}
-          disabled={!dataUpdated}
+          disabled={!isDataUpdated}
         >
           Save
         </button>

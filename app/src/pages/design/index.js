@@ -4,7 +4,6 @@ import { RedirectPage } from '../global';
 import DesignHome from './containers/DesignHome';
 
 const Design = () => {
-    
     const history = useHistory();
 
     useEffect(()=>{

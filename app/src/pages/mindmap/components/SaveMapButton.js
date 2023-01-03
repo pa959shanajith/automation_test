@@ -17,17 +17,17 @@ const SaveMapButton = (props) => {
     const dispatch = useDispatch()
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
     const unassignTask = useSelector(state=>state.mindmap.unassignTask)
-    const projId = useSelector(state=>state.mindmap.selectedProj)
+    const projId = useSelector(state=>state.plugin.PN)
     const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     const moduledata = useSelector(state=>state.mindmap.moduleList)
     const verticalLayout= props.verticalLayout
     useEffect(()=>{
-        if(props.createnew==='save')clickSave()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        if(props.createnew==='save'||props.createnew==='autosave')clickSave()      
+          // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -40,8 +40,8 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop)=>{
-    var tab = "tabCreate"
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew)=>{
+    var tab = "endToend"
     var selectedProject;
     var error = !1
     var mapData = []
@@ -158,12 +158,23 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
     dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
     dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
-    setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
+    if(createnew!=='autosave') setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
     if(result.scenarioInfo){
         dispatch({type:actionTypes.DELETE_SCENARIO,payload:result.scenarioInfo})
         setDelSnrWarnPop(true);
     }
+    var req={
+        tab:"endToend" && "createTab",
+        projectid:projId?projId:"",
+        version:0,
+        cycId: null,
+        modName:"",
+        moduleid:null
+    }
+    var moduledata = await getModules(req);
+    dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
     return;
+
 }
 
 const treeIterator = (c, d, e) =>{

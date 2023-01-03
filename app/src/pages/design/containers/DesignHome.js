@@ -13,7 +13,7 @@ import "../styles/DesignHome.scss";
     Props: None
 */
 
-const DesignHome = () => {
+const DesignHome = (props) => {
     
     const current_task = useSelector(state=>state.plugin.CT)
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -28,6 +28,7 @@ const DesignHome = () => {
     const [showDpndntTcDlg, setShowDpndntTcDlg] = useState(false);
     const [dTcFlag, setDTcFlag] = useState(false);
     const [checkedTc, setCheckedTc] = useState({});
+    const [Collapsed, setCollapsed] = useState(false);
     
     useEffect(()=>{
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
@@ -35,6 +36,8 @@ const DesignHome = () => {
         setImported(false);
     }, [current_task, filter_data]);
 
+    const closeBar =()=> setCollapsed(!Collapsed);
+    
     const ConfirmPopup = () => (
         <ModalContainer 
             title={showConfirmPop.title}
@@ -57,17 +60,17 @@ const DesignHome = () => {
         { overlay && <ScreenOverlay content={overlay} />}
         { showConfirmPop && <ConfirmPopup /> }
         { showDpndntTcDlg && <DependentTestCaseDialog 
-                                scenarioId = {current_task.scenarioId}
+                                scenarioId = {props.fetchingDetails.parent.parent["_id"]}
                                 setShowDlg={setShowDpndntTcDlg} 
                                 checkedTc={checkedTc}
                                 setCheckedTc={setCheckedTc} 
                                 setDTcFlag={setDTcFlag}
-                                taskName={current_task.testCaseName}
-                                taskId={current_task.testCaseId}
+                                taskName={props.fetchingDetails.name}
+                                taskId={props.fetchingDetails["_id"]}
                                 />
         }
         <div className="d__body">
-            <Header data-test="d__header" />
+            {/* <Header data-test="d__header" /> */}
             <div className="d__mid_section">
                 
                 <ActionBar data-test="d__actionBar" 
@@ -82,6 +85,8 @@ const DesignHome = () => {
                                     isMac={isMac}
                                     disable={disableActionBar} 
                                     setOverlay={setOverlay}
+                                    appType = {props.appType}
+                                    fetchingDetails={props.fetchingDetails}
                                 />
                             } 
                             bottomContent={
@@ -90,22 +95,44 @@ const DesignHome = () => {
                                     setImported={setImported} 
                                     setOverlay={setOverlay}
                                     setShowConfirmPop={setShowConfirmPop}
+                                    appType = {props.appType}
+                                    fetchingDetails={props.fetchingDetails}
                                 />
                             }
                 />
                 <DesignContent data-test="d__contents" 
+                                key={777} 
+                                showDlg={showDpndntTcDlg} 
+                                setShowDlg={setShowDpndntTcDlg}
+                                dTcFlag={dTcFlag} 
+                                setDTcFlag={setDTcFlag} 
+                                setCheckedTc={setCheckedTc}
+                                checkedTc={checkedTc} 
+                                isMac={isMac}
+                                disable={disableActionBar} 
+                                setOverlay={setOverlay}
+
                                 current_task={current_task} 
                                 imported={imported} 
                                 setImported={setImported} 
                                 setMirror={setMirror}
                                 setShowConfirmPop={setShowConfirmPop}
                                 setDisableActionBar={setDisableActionBar}
+                                appType = {props.appType}
+                                fetchingDetails={props.fetchingDetails}
+                                
                                 />
+                {/* <div style={{ display: 'flex',alignItems:'center', }}>
+                    <div >
+                <img style={{ height: '1.1rem' }} onClick={closeBar} src={'static/imgs/collapseButton.png'}/></div> */}
+                {/* {<div style={{width:Collapsed? '5rem':'0rem'}}> */}
+                <div>
+                    <ReferenceContent  hideInfo={props.hideInfo} collapse={true} data-test="d__refBar" mirror={mirror} appType={props.appType}/> </div>
+                    </div>
+                {/* }</div> */}
                 
-                <ReferenceContent data-test="d__refBar" mirror={mirror}/>
-                
-            </div>
-            <div data-test="d__footer" className='d__footer'><Footer/></div>
+            {/* </div> */}
+            {/* <div data-test="d__footer" className='d__footer'><Footer/></div> */}
         </div>
         </>}
         </>

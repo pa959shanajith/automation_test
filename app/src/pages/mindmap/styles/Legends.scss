@@ -1,35 +1,46 @@
 @import "../../global/styles/ColorVariables.scss";
 .ct-scenarios {
-    background-color: $summerSky;
-    stroke:$summerSky;
-    fill: $summerSky;
+    background-color: #FF6700;
+    stroke:#FF6700;
+    fill: #FF6700;
     stroke-width: 0;
 }
-.ct-modules, .ct-endtoend {
-    background-color: $blueColor;
-    stroke:$blueColor;
-    fill: $blueColor;
+.ct-modules{
+    background-color: #5C5CE4;
+    stroke:#5C5CE4;
+    fill: #5C5CE4;
+    stroke-width: 0;
+}
+.ct-endtoend {
+    background-color: #90E45C;
+    stroke:#90E45C;
+    fill: #90E45C;
     stroke-width: 0;
 }
 .ct-screens {
-    background-color: $cyanColor;
-    stroke:$cyanColor;
-    fill: $cyanColor;
+    background-color: #3EA39B;
+    stroke:#3EA39B;
+    fill: #3EA39B;
     stroke-width: 0;
 }
 .ct-testcases {
-    background-color: $yellowColor;
-    stroke:$yellowColor;
-    fill: $yellowColor;
+    background-color: #E1AD01;
+    stroke:#E1AD01;
+    fill:#E1AD01 ;
     stroke-width: 0;
 }
 .ct-legendBox{
-    position: absolute;
-    height: 20px;
-    width: 351px;
-    top: calc(100% - 62px);
-    left: 161px;
+    // position: absolute;
+    height: 26px;
+    width: 65rem;
+    // top: calc(100% - 620px);
+    // left: 1610px;
+    // margin-left:72% ;
 }
+.legendBoxAlignment  {
+    margin: 0rem -70rem 0.2rem 5rem;
+   }
+
 .ct-nodeLabel{
     font-size: 12px;
 }

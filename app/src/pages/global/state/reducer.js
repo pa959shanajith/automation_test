@@ -3,7 +3,9 @@ import * as actionTypes from './action.js';
 const initialState = {
     progress: 0,
     roleSwitched: false,
-    popup: false
+    popup: false,
+    showGenuisWindow: false,
+    geniusWindowProps: {}
 };
 
 const reducer = (state = initialState , action) => {
@@ -19,7 +21,14 @@ const reducer = (state = initialState , action) => {
         case actionTypes.SET_POPUP:
             return{
                 ...state, popup: action.payload,
-            }    
+            }
+        case actionTypes.OPEN_GENIUS:
+        case actionTypes.CLOSE_GENIUS:
+          return {
+            ...state,
+            showGenuisWindow: action.payload.showGenuisWindow,
+            geniusWindowProps:action.payload.geniusWindowProps
+          }
         default:
             return state;
     }

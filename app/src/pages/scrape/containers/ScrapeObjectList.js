@@ -10,8 +10,11 @@ import * as scrapeApi from '../api';
 import "../styles/ScrapeObjectList.scss";
 import ScreenWrapper from './ScreenWrapper';
 import SubmitTask from '../components/SubmitTask';
+import { NormalDropDown } from "@avo/designcomponents";
 
-const ScrapeObjectList = () => {
+import { Button } from "primereact/button";
+
+const ScrapeObjectList = (props) => {
     const dispatch = useDispatch();
     const current_task = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
@@ -20,18 +23,19 @@ const ScrapeObjectList = () => {
 
     // const [activeEye, setActiveEye] = useState(null);
     const [disableBtns, setDisableBtns] = useState({save: true, delete: true, edit: true, search: false, selAll: false, dnd: false});
-    const [showSearch, setShowSearch] = useState(false);
+    const [showSearch, setShowSearch] = useState(true);
     const [searchVal, setSearchVal] = useState("");
     const [selAllCheck, setSelAllCheck] = useState(false);
     const [deleted, setDeleted] = useState([]);
     const [modified, setModified] = useState({});
     const [editableObj, setEditableObj] = useState({});
     const [dnd, setDnd] = useState(false);
-    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList } = useContext(ScrapeContext);
+    const[captureButton, setCaptureButton]=useState("chrome");
+    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList, startScrape, setShowAppPop} = useContext(ScrapeContext);
 
     useEffect(()=> {
         // setActiveEye(null);
-        setShowSearch(false);
+        setShowSearch(true);
         setSearchVal("");
         setSelAllCheck(false);
         setDeleted([]);
@@ -41,6 +45,42 @@ const ScrapeObjectList = () => {
         setDnd(false);
         //eslint-disable-next-line
     }, [current_task])
+    
+  const disableAction = useSelector((state) => state.scrape.disableAction);
+  const compareFlag = useSelector((state) => state.scrape.compareFlag);
+
+  const [appendCheck, setAppendCheck] = useState(false);
+  const [isMac, setIsMac] = useState(false);
+  const [disable, setDisable] = useState(false);
+  const disableAppend = useSelector((state) => state.scrape.disableAppend);
+  const { appType, subTaskId } = useSelector((state) => state.plugin.CT);
+
+
+  useEffect(() => {
+    setIsMac(navigator.appVersion.toLowerCase().indexOf("mac") !== -1);
+    if (saved.flag || disableAction) setAppendCheck(false);
+    //eslint-disable-next-line
+  }, [appType, saved, subTaskId]);
+  
+  const onAppend = (event)=> {
+    dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
+    if (event.target.checked) {
+        setAppendCheck(true);
+        if (appType==="Webservice") setSaved({ flag: false });
+    }
+    else setAppendCheck(false);
+};
+  
+
+  // let renderComp = [
+  //     <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Capture</div>,
+  // ];
+  // switch (appType) {
+  //     case "Web": renderComp.splice(1, 0, <Fragment key="scrape-upper-section"> {WebList.map((icon, i) => icon.title !== "Safari" || isMac ? <Thumbnail key={i} title={icon.title} tooltip={"Launch "+icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable} /> : null)}</Fragment>);
+  //         break;
+  // };
+  // return renderComp;
+
 
     useEffect(()=>{
         let disable = {};
@@ -96,7 +136,7 @@ const ScrapeObjectList = () => {
             setDeleted([]);
             setDnd(false); 
             setModified({});
-            setShowSearch(false);
+            setShowSearch(true);
             setSearchVal("");
             setSelAllCheck(false);
             setEditableObj({});
@@ -235,6 +275,7 @@ const ScrapeObjectList = () => {
     }
 
     const onSave = (e, confirmed) => {
+       
         let continueSave = true;
         
         if (mainScrapedData.reuse && !confirmed) {
@@ -267,7 +308,7 @@ const ScrapeObjectList = () => {
                     if (scrapeItem.xpath === "" || scrapeItem.xpath === undefined) continue;
                     let xpath = scrapeItem.xpath;
     
-                    if (current_task.appType === 'MobileWeb') xpath = xpath.split(";")[2];
+                    if (props.appType === 'MobileWeb') xpath = xpath.split(";")[2];
     
                     if (uniqueXPaths.includes(xpath)) {
                         dXpath = true;
@@ -342,7 +383,7 @@ const ScrapeObjectList = () => {
             'deletedObj': deleted,
             'modifiedObj': modifiedObjects,
             'addedObj': {...added, view: views},
-            'screenId': current_task.screenId,
+            'screenId': props.fetchingDetails["_id"],
             'userId': user_id,
             'roleId': role,
             'param': 'saveScrapeData',
@@ -405,26 +446,158 @@ const ScrapeObjectList = () => {
                                 Select all
                             </span>
                         </label>
-                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects" disabled={disableBtns.save} onClick={onSave}>Save</button>
-                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
-                        <button data-test="edit"className="ss__taskBtn ss__btn" title="Edit Objects" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
-                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}>{dnd?"Stop":"Rearrange"}</button>
-                        <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
+                        <button  data-test="edit"  className="ss__taskBtn ss__btn" title="Edit Objects"  onClick={onEdit}>  <img src={"static/imgs/ic-jq-editstep.png"}/></button>
+                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange"  onClick={(e)=>onRearrange(e, dnd)}> <img src= {'static/imgs/ic-jq-dragstep.png'}/>  </button>
+                        <button data-test="save" className="ss__taskBtnd ss__btnd" title="Save Objects" disabled={disableBtns.save} onClick={onSave}>Save</button>
+                        <button data-test="delete"className="ss__taskBtnd ss__btnd" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
+                        {/* <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
-                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>}
-                    </div>
+                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>} */}
+                          {/* dropdown button --divya*/}
+{/*                     
+                    <div 
+                      data-test="scrapeOnHeading"
+                      key="scrapeOn"
+                      className={
+                        "ss__scrapeOn" +
+                        (disableAction || compareFlag ? " disable-thumbnail" : "")
+                      }
+                    ></div>
+                    { props.appType === "Web" ? <div style={{marginLeft:30}}>
+                      {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
+                      { props.appType === "Web" ?<div style={{marginLeft:30}}>
+                      <NormalDropDown 
 
-                    <SubmitTask />
+                    //   style={{height:'25px',marginLeft:'30px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' , width:'200px'}}
+                        
+                        // className={
+                        //   "ss__scrapeOn" +
+                        // }
+                        onChange={(e,item)=>{setCaptureButton(item.key)}}
+                        defaultSelectedKey={captureButton}
+                        // onChange={(e, item) => {
+                        //  ;
+                        // }}
+                        disabled={(disableAction || compareFlag)}
+                        
+                        options={[
+                            {
+                              data: {
+                                icon: 'internet',
+                              },
+  
+                              key: "ie",
+                              text: "Internet Explorer",
+                              
+                            },
+  
+                            {
+                              data: {
+                                icon: "chrome",
+                              },
+                              key: "chrome",
+                              text: "Google Chrome",
+                            },
+                            {
+                              data: {
+                                icon: "safari",
+                                
+                              },
+  
+                              key: "safari",
+                              text: "Safari",
+                              disabled:true,
+                            },
+  
+                            {
+                              data: {
+                                icon: "firefox",
+                              },
+  
+                              key: "mozilla",
+                              text: "Mozilla Firefox",
+                            },
+  
+                            {
+                              data: {
+                                icon: "edge",
+                              },
+  
+                              key: "edge",
+                              text: "Microsoft Edge",
+                            },
+                            {
+                              data: {
+                                icon: "edge",
+                              },
+  
+                              key: "chromium",
+                              text: "Edge Chromium",
+                            },
+                          ]}
+                          selectedKey={captureButton}
+                        placeholder="Select Browser"
+                        width="250px"
+                        
+                      />
+                        
+                      
+                    </div> :
+                    props.appType==="Desktop" ?<div className={'desktop_btn'+(disableAction ? " disable-thumbnail" : "")}>
+                        <p onClick={() => {setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
+                    </div>: 
+                    props.appType==="OEBS"?<div className={'desktop_btn' + (disableAction ? " disable-thumbnail" : "")}>
+                    <p onClick={() => {setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
+                    </div>:
+                    props.appType==="SAP"?<div className={'desktop_btn' + (disableAction ? " disable-thumbnail" : "")} >
+                    <p onClick={() => {setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
+                    </div>:
+                    props.appType==="MobileApp"?<div className={'mobileApp_btn' +(disableAction ? "disable-thumbnail" : "")}>
+                    <div onClick={() => {setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></div>
+                    </div>:
+                    props.appType==="MobileWeb"?<div className={'mobileApp_btn' +(disableAction || compareFlag ? "disable-thumbnail" : "")}>
+                    <div onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></div>
+                    </div>:""}
+
+                    <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
+                        <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
+                        <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
+                     </div>
+                    
+                    {props.appType === 'Web'  ?
+                    (<div className={"c__capturebtn"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}} >
+                    <Button label="Capture" /**disabled={captureButton===""} */ className="debug_button p-button-warning"  onClick={()=>{startScrape(captureButton)}}  disabled={(disableAction || compareFlag)} title="Capture elements" />
+                    </div>)
+                    :""}                    
+                
+</div>
+                    
+                    
+                    {/* <SubmitTask /> */}
 
                 </div>
             }
+
+           
+
+           
             scrapeObjectList={
                 <div className="scraped_obj_list">
+
+
+                       <button data-test="search"className="ss__search-btn" onClick={()=>{}} title="Search for the captured elements">
+                            <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
+                        </button>
+                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch} placeholder="Search for captured elements"/>}
+
+
+
+
                 <div className="sc__ab">
                     <div className="sc__min">
                     <div className="sc__con" id="scrapeObjCon">
-                    <ScrollBar scrollId="scrapeObjCon" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                    <ScrollBar scrollId="scrapeObjCon" thumbColor= "#8a8886" trackColor= "#d2d0ce" verticalbarWidth='12px'>
                     <ReactSortable data-test="scrapeObjectContainer" className="scrape_object_container" list={scrapeItems} setList={setScrapeItems} onEnd={onDrop} key={dnd.toString()} disabled={!dnd}>
                     {
                         scrapeItems.map((object, index) =><Fragment key={`${object.val}`}> 
@@ -439,8 +612,10 @@ const ScrapeObjectList = () => {
                     </div>
                 </div>
                 </div>
+            
             }
         />
+            
     );
 }
 

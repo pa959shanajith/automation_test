@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollBar, CalendarComp, TimeComp, RecurrenceComp} from '../../global'
+import { ScrollBar, CalendarComp, TimeComp, RecurrenceComp, EndDateComp} from '../../global'
 import {readTestSuite_ICE} from '../api';
 import "../styles/ScheduleSuitesTopSection.scss";
 
-const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData, closePopups, setClosePopups, clearScheduleData}) => {
+const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData, closePopups, setClosePopups, clearScheduleData, item}) => {
 
     const [closeCal, setCloseCal] = useState(false);
     
@@ -12,7 +12,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         let readTestSuite = current_task.testSuiteDetails;
             if(typeof readTestSuite === "string") readTestSuite = JSON.parse(current_task.testSuiteDetails);
             for (var rti = 0; rti < readTestSuite.length; rti++) {
-                readTestSuite[rti].versionnumber = parseFloat(current_task.versionnumber);
+                readTestSuite[rti].versionnumber = current_task.versionnumber ? parseFloat(current_task.versionnumber) : parseFloat(readTestSuite[rti].versionnumber);
             }
             readTestSuiteFunct(readTestSuite);
         }
@@ -42,7 +42,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             tableData.map((rowData)=>{
                 if(moduleScheduledateTime[rowData.testsuiteid] === undefined) {
                     moduleScheduledateTime[rowData.testsuiteid] = {
-                        date:"",time:"",recurringValue: "",recurringString: "",recurringStringOnHover: "",
+                        date:"",time:"",recurringValue: "",recurringString: "",recurringStringOnHover: "",endAfter: "",clientTime: "",clientTimeZone: "",
                         inputPropstime: {readOnly:"readonly" ,
                             disabled : true,
                             className:"fc-timePicker",
@@ -63,6 +63,12 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                           className: "fc-timePicker textbox-container",
                           title: "Select Frequency",
                       },
+                        inputPropsEndDate: {readOnly:"readonly" ,
+                            disabled : true,
+                            className:"fc-timePicker textbox-container",
+                            placeholder: "Select End After",
+                            title: "Select End After"
+                        }
                     };
                 }
             })
@@ -77,6 +83,22 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                     }
                 }
             }
+
+            // Change executestatus of scenarios which should not be scheduled according to devops config
+            for (var m = 0; m < keys.length; m++) {
+                tableData[m].scenarioids.map((scenarioid, index) => {
+                    tableData[m].executestatus[index] = 0;
+                    if (m < item.executionRequest.batchInfo.length) {
+                        for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
+                            if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
+                                tableData[m].executestatus[index] = 1;
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+
             setModuleScheduledate(moduleScheduledateTime);
             setScheduleTableData(tableData);
             updateScenarioStatus(tableData);
@@ -144,7 +166,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
     const updateDateTime = (date_time, value , testsuiteid) => {
         let moduleScheduledateTime = {...moduleScheduledate}
         if(moduleScheduledateTime[testsuiteid] === undefined) {
-            moduleScheduledateTime[testsuiteid] = {date:"",time:"",recurringValue: "", recurringString: "", recurringStringOnHover: ""};
+            moduleScheduledateTime[testsuiteid] = {date:"",time:"",recurringValue: "", recurringString: "", recurringStringOnHover: "", endAfter: "", clientTime: "", clientTimeZone: "",};
         }
         if(date_time==="date"){
             moduleScheduledateTime[testsuiteid]["date"] = value;
@@ -159,6 +181,14 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         }
         else if(date_time==="time"){
             moduleScheduledateTime[testsuiteid]["time"] = value;
+            var hr = new Date().getHours();
+            var min = parseInt(new Date().getMinutes());
+            if (new Date().getHours().toString().length === 1)
+                hr = "0" + hr;
+            if (parseInt(new Date().getMinutes()).toString().length === 1)
+                min = "0" + min;
+            moduleScheduledateTime[testsuiteid]["clientTime"] = new Date().getFullYear()+ '/' + (new Date().getMonth() + 1) + '/' + new Date().getDate() + ' ' + hr + ":" + min;
+            moduleScheduledateTime[testsuiteid]["clientTimeZone"] = new Date().toString().split("GMT")[1].slice(0,5);
         }
         else if (date_time === "recurringValue") {
             moduleScheduledateTime[testsuiteid]["date"] = "";
@@ -207,6 +237,9 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                     moduleScheduledateTime[testsuiteid]["inputPropstime"][
                         "disabled"
                     ] = false;
+                    moduleScheduledateTime[testsuiteid]["inputPropsEndDate"][
+                        "disabled"
+                    ] = false;
                 }
                 else {
                     moduleScheduledateTime[testsuiteid]["date"] = "";
@@ -215,6 +248,9 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                         "disabled"
                     ] = true;
                     moduleScheduledateTime[testsuiteid]["inputPropstime"][
+                        "disabled"
+                    ] = true;
+                    moduleScheduledateTime[testsuiteid]["inputPropsEndDate"][
                         "disabled"
                     ] = true;
                 }
@@ -235,6 +271,17 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         else if (date_time === "recurringStringOnHover") {	
             moduleScheduledateTime[testsuiteid]["recurringStringOnHover"] =	value;	
         }
+        else if (date_time === "endAfter") {	
+            moduleScheduledateTime[testsuiteid]["endAfter"] = value;	
+        }
+
+
+        // update same schedule time to every module
+        Object.entries(moduleScheduledateTime).forEach(([key, value]) => {
+            if (key !== testsuiteid) {
+                moduleScheduledateTime[key] = moduleScheduledateTime[testsuiteid];
+            }
+        });
         setModuleScheduledate(moduleScheduledateTime);
     }
 
@@ -244,38 +291,39 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             <div className="s__ab">
                 <div className="s__min">
                     <div className="s__con" id="schSuiteTable">
-                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollY={()=>setCloseCal(true)}>
-                        {scheduleTableData.map((rowData,i)=>(
+                        {/* <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollY={()=>setCloseCal(true)}> */}
+                        {scheduleTableData.length > 0 && [scheduleTableData[0]].map((rowData,i)=>(
                             <div key={i} className="batchSuite">
                                 <div className="scheduleSuite" id={`ss-id${i}`} >
-                                    <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
-                                    <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
+                                    {/* <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" /> */}
+                                    {/* <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span> */}
                                     <TimeComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" time={moduleScheduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropstime"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropstime"].disabled} classTimer="schedule_timer"/>
+                                    <EndDateComp placeholder={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].placeholder} classname={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].className} readonly={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].readOnly } title={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].disabled } endAfterValue={moduleScheduledate[rowData.testsuiteid]["endAfter"]} setEndAfterValue={(val) => {updateDateTime("endAfter", val, rowData.testsuiteid)}}  classTimer="schedule_timer" />
                                     <CalendarComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"].disabled} date={moduleScheduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
                                     <RecurrenceComp closeCal={closeCal} setCloseCal={setCloseCal} placeholder={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].placeholder} classname={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].className} readonly={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].readOnly } title={moduleScheduledate[rowData.testsuiteid]["recurringStringOnHover"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].disabled } recur={moduleScheduledate[rowData.testsuiteid]["recurringString"]} setRecurringString={(val) => {updateDateTime("recurringString", val, rowData.testsuiteid)}} setRecurringStringOnHover={(val) => {updateDateTime("recurringStringOnHover", val, rowData.testsuiteid)}} setRecurringValue={(val) => {updateDateTime("recurringValue", val, rowData.testsuiteid)}} clearScheduleData={clearScheduleData} classTimer="schedule_timer" />
                                 </div>
                                 <table className="scenarioSchdCon scenarioSch_' + i + '">
                                     <thead className="scenarioHeaders">
-                                        <tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td><td>App type</td></tr>
+                                        {/* <tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td><td>App type</td></tr> */}
                                     </thead>
                                     <tbody className="scenarioBody scenarioTbCon_' + i + '">
                                     {rowData.scenarioids.map((sid,j)=>(
                                         <tr key={j}>
-                                            <td><span>{j+1}</span><input type="checkbox" checked={rowData.executestatus[j]?true:false}  onChange={()=>{changeExecutestatus(i,j)}} id={"executestatus_"+i+"_"+j} className="selectToSched"/></td>
-                                            <td data-scenarioid={sid}>{rowData.scenarionames[j]}</td>
-                                            <td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td>
-                                            <td><select disabled defaultValue={(rowData.condition[j] === 0) ? "0" : "1"} ><option value="1" >True</option><option value="0" >False</option></select></td>
-                                            <td>{rowData.projectnames[j]}</td> 
-                                            <td title={details[rowData.apptypes[j].toLowerCase()]['data']}>
+                                            {/* <td><span>{j+1}</span><input type="checkbox" checked={rowData.executestatus[j]?true:false}  onChange={()=>{changeExecutestatus(i,j)}} id={"executestatus_"+i+"_"+j} className="selectToSched"/></td> */}
+                                            {/* <td data-scenarioid={sid}>{rowData.scenarionames[j]}</td> */}
+                                            {/* <td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td> */}
+                                            {/* <td><select disabled defaultValue={(rowData.condition[j] === 0) ? "0" : "1"} ><option value="1" >True</option><option value="0" >False</option></select></td> */}
+                                            {/* <td>{rowData.projectnames[j]}</td>  */}
+                                            {/* <td title={details[rowData.apptypes[j].toLowerCase()]['data']}>
                                                 <img src={"static/imgs/"+details[rowData.apptypes[j].toLowerCase()]['img']+".png"} alt="apptype"/>
-                                            </td>
+                                            </td> */}
                                         </tr>
                                     ))}
                                     </tbody>
                                 </table>
                             </div>
                         ))}
-                        </ScrollBar>
+                        {/* </ScrollBar> */}
                     </div>
                 </div>
             </div>

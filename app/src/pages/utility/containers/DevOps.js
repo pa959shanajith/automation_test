@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactTooltip from 'react-tooltip';
 import ReportApi from '../components/ReportApi'
 import ExecMetricsApi from '../components/ExecMetricsApi'
@@ -9,12 +9,38 @@ import { Messages as MSG, VARIANT, setMsg, ModalContainer, ScreenOverlay } from 
 import "../styles/DevOps.scss";
 import DevOpsList from '../components/DevOpsList';
 import DevOpsConfig from '../components/DevOpsConfig';
+import * as pluginApi from "../../plugin/api";
 
 const DevOps = props => {
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const api = window.location.href.slice(0, -7)+'execAutomation';
     const [currentIntegration, setCurrentIntegration] = useState(false);
     const [loading,setLoading] = useState(false);
+    const [projectTypes, setProjectTypes] = useState([]);
+    const [projectIds, setProjectIds] = useState([]);
+    const [projectIdTypesDicts, setProjectIdTypesDicts] = useState({});
+    
+
+    useEffect(()=>{
+        pluginApi.getProjectIDs()
+            .then(data => {
+                setProjectTypes(data.appTypeName);
+                setProjectIds(data.projectId);   
+            }
+        )
+    },[])
+
+    useEffect(()=> {
+        let projectIdTypesDict = {}
+        for (let key in projectIds){
+            for (let value in projectTypes){
+                projectIdTypesDict[projectIds[key].toString()] = projectTypes[value]
+                projectTypes.shift()
+                break
+            }
+        }
+        setProjectIdTypesDicts(projectIdTypesDict);  
+    }, [projectTypes, projectIds]);
 
     const ConfirmPopup = () => (
         <ModalContainer 
@@ -37,7 +63,7 @@ const DevOps = props => {
     return (<>
         { showConfirmPop && <ConfirmPopup /> }
         {loading?<ScreenOverlay content={loading}/>:null}
-        {currentIntegration ? <DevOpsConfig url={api} setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} /> : <DevOpsList url={api} setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} /> }
+        {currentIntegration ? <DevOpsConfig url={api} setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} projectIdTypesDicts={projectIdTypesDicts} /> : <DevOpsList url={api} setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} projectIdTypesDicts={projectIdTypesDicts} /> }
 {/*         
         <div className={classes["api-ut_contents"]}>
         <div className={classes["api-ut__ab"]}>

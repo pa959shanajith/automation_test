@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 
+
 import { registerIcons } from 'office-ui-fabric-react';
 import React from 'react';
 import { ReactComponent as Search } from '@avo/designcomponents/lib/assets/icons/search.svg';
@@ -72,18 +73,37 @@ import { ReactComponent as BarChart } from '@avo/designcomponents/lib/assets/ico
 import { ReactComponent as PieChart } from '@avo/designcomponents/lib/assets/icons/pie-chart.svg';
 import { ReactComponent as DonutChart } from '@avo/designcomponents/lib/assets/icons/donut-chart.svg';
 import { ReactComponent as Input } from '@avo/designcomponents/lib/assets/icons/input.svg';
+import { ReactComponent as ChromeIcon } from "../../../assets/imgs/chrome_logo_new.svg";
+import { ReactComponent as EdgeIcon } from "../../../assets/imgs/edge_logo_new.svg";
+import { ReactComponent as WebIcon } from "../../../assets/imgs/web-icon.svg"
+import { ReactComponent as PinIcon } from "../../../assets/imgs/pin-icon.svg"
+import { ReactComponent as DeleteIcon } from "../../../assets/imgs/delete-icon.svg"
 
 registerIcons({
   icons: {
+    'pin-icon':<PinIcon/>,
+    'delete-icon':<DeleteIcon/>,
+    'web-icon':<WebIcon/>,
+    'chrome-icon':<ChromeIcon/>,
+    'edge-icon':<EdgeIcon/>,
     search: <Search />,
     bar: <BarChart />,
     pie: <PieChart />,
     donut: <DonutChart />,
     cancel: <Cancel />,
     warning: <Warning />,
+    'plusIcon' : <img style={{width:'1.86rem', marginRight:'0.7rem',marginTop:'0.02rem'}} title="Click here to import/create a new module" src='static/imgs/plusNew.png' />,
+    'plusIconEndtoEnd' : <img style={{width:'1.86rem', marginRight:'0.7rem',marginTop:'0.02rem'}} title="Click here to create an end to end flow" src='static/imgs/plusNew.png' />,
+    'E2Eicon' : <img src='static/imgs/E2Eicon.png'/>,
     'add-user': <AddUser />,
     computer: <Computer />,
     undeploy: <Undeploy />,
+    'chrome':<img  style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/chrome_logo_new.svg"} />,
+    'internet':<img style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/internet_explorer_logo_new.svg"} />,
+    'edge':<img style={{width:'1.41rem', padding: '3px' }}src={"static/imgs/edge_logo_new.svg"} />,
+    'safari':<img style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/safari_logo_new.svg"} />,
+    'firefox':<img style={{width:'1.41rem',padding: '3px'}}src={"static/imgs/firefox_logo_new.svg"} />,
+    
     play: <Play />,
     link: <Link />,
     export: <Export />,

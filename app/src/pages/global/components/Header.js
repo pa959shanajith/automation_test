@@ -9,6 +9,7 @@ import ClickAwayListener from 'react-click-away-listener';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
 import { RedirectPage, ModalContainer, ScreenOverlay, WelcomePopover, Messages as MSG, setMsg } from '../../global';
+import ServiceBell from "@servicebell/widget";
 import "../styles/Header.scss";
 
 /*
@@ -18,7 +19,7 @@ import "../styles/Header.scss";
 
 */
 
-const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
+const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -44,10 +45,33 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
 
     useEffect(()=>{
         //on Click back button on browser
+       
+        (async()=>{
+            const response = await fetch("/getServiceBell")
+            let { enableServiceBell } = await response.json();
+           const key = await fetch("/getServiceBellSecretKey")
+           let { SERVICEBELL_IDENTITY_SECRET_KEY } = await key.json();
+           const data = { id: userInfo.email_id,
+            email:userInfo.email_id
+           };
+          if(enableServiceBell){
+            ServiceBell("identify",
+            userInfo.email_id,
+            { 
+            displayName: userInfo.firstname + ' ' + userInfo.lastname,
+            email: userInfo.email_id
+            },
+            crypto
+          .createHmac('sha256', SERVICEBELL_IDENTITY_SECRET_KEY)
+          .update(JSON.stringify(data))
+          .digest('hex'),
+        );
+        }})();
         window.addEventListener('popstate', (e)=> {
             logout(e)
         })
         getOS();
+       
         (async()=>{
             const response = await fetch("/getClientConfig")
             let {avoClientConfig,trainingLinks} = await response.json();
@@ -229,7 +253,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/AssureLogo_horizonal.svg" onClick={ !adminDisable ? naviPg : null } /></span>
                     <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(!showHelp)} style={{padding:5}}>
-                            <span className="help">Need Help ?</span>
+                            {geniusPopup?null:<span className="help">Need Help ?</span>}
                         </div>
                         <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
                             <div onClick={()=>{window.open(trainLinks.videos,'_blank')
@@ -261,8 +285,8 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                         </div>
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div title={userInfo.isTrial?"Admin role is available as part of premium":"Switch Role"} className={"switch-role-btn no-border "+ (userInfo.isTrial?"logo-grey":"")} data-toggle="dropdown" onClick={switchRole}  >
-                                <span><img className="switch-role-icon" alt="switch-ic" src={"static/imgs/ic-switch-user"+ (userInfo.isTrial?"_disabled.png":".png")}/></span>
-                                <span>Switch Role</span>
+                                {/* <span><img className="switch-role-icon" alt="switch-ic" src={"static/imgs/ic-switch-user"+ (userInfo.isTrial?"_disabled.png":".png")}/></span>
+                                <span>Switch Role</span> */}
                             </div>
                             <div className={ "switch-role-menu dropdown-menu " + (showSR && "show")}>
                                 {roleList.map(role => 

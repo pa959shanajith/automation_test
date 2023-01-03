@@ -558,7 +558,7 @@ const CreateUser = (props) => {
                         ))}
                     </select>
 				</div> 
-
+{/* 
                 {( userConf.rolename!=='Admin' && props.showEditUser === true  && userConf.userIdName!=='')?
                     <div  className="col-xs-6 selectRole" >
                         <label className="leftControl primaryRole" id="additionalRoleTxt">Additional Role: </label>
@@ -576,7 +576,7 @@ const CreateUser = (props) => {
                             </ul>
                         :null}
                     </div>
-                :null}
+                :null} */}
                 
 			</div>	
             </div>

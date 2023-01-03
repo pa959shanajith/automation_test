@@ -4,7 +4,7 @@ import {mount}from 'enzyme';
 import Controlbox from '../components/Controlbox';
 document.body.innerHTML =
 '<g id="node_8" class="ct-node" data-nodetype="scenarios" transform="translate(171.19,270)">'+
-'<image class="ct-nodeIcon" xlink:href="static/imgs/node-scenarios.png" style="height: 40px; width: 40px; opacity: 1;"></image>'+
+'<image class="ct-nodeIcon" xlink:href="static/imgs/node-scenarios.png" style="height: 45px; width: 45px; opacity: 1;"></image>'+
 '<text class="ct-nodeLabel" text-anchor="middle" x="20" title="Slk_bank_Reg_Scenario_Customer_Service" y="50">Slk_bank_Reg_Sc...</text>'+
 '<title val="8" class="ct-node-title">Slk_bank_Reg_Scenario_Customer_Service</title>'+
 '<circle class="ct-scenarios ct-cRight ct-nodeBubble" cx="44" cy="20" r="4"></circle>'+
@@ -56,3 +56,6 @@ describe('<Controlbox/> Positive scenarios',()=>{
         }
     });
 })
+
+
+
