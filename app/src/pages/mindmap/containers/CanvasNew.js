@@ -22,6 +22,7 @@ import * as pluginApi from '../../plugin/api';
 import { Dialog } from 'primereact/dialog';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import * as actionTypesGlobal from  "../../global/state/action"
+import { style } from 'd3';
 
 
 
@@ -469,10 +470,10 @@ const CanvasNew = (props) => {
     return (
         <Fragment>
             <ConfirmDialog />
-             <Dialog header={taskname + " : Capture Elements"}  visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
+             <Dialog header={(taskname.length >=55 ? taskname.substr(0, 54)+"..." :taskname)+  " : Capture Elements"}  visible={props.displayBasic} maximizable modal style={{width: '69vw',height: '50vw'}} onHide={() => {props.onHide('displayBasic')}}>
              <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} /></div>
              </Dialog>
-             <Dialog header={taskname  +  " : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
+             <Dialog header={(taskname.length >=55 ? taskname.substr(0, 54)+"..." :taskname) +  " : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
              <div style={{ height: '50vh'}}><DesignHome fetchingDetails={fetchingDetails} appType={appType}  /></div>
              </Dialog>
             {/* <Dialog

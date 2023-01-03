@@ -11,7 +11,6 @@ import { ReferenceBar, ScrollBar } from '../../global';
 */
 
 const ReferenceContent = ({mirror,collapse,appType}) => {
-    debugger
     // const { appType } = useSelector(state=>state.plugin.CT);
     const [showScreenPop, setShowScreenPop] = useState(false);
     const [screenshotY, setScreenshotY] = useState(null);
