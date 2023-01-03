@@ -31,9 +31,8 @@ const ReferenceContent = ({mirror,collapse,appType}) => {
 		mirrorImg.src = `data:image/PNG;base64,${mirror}`;
 	}, [mirror])
 
-    const closeAllPopups = () => {
-        setShowScreenPop(false);
-    };
+    const closeAllPopups = () =>  setShowScreenPop(false);
+    
 
     const ScreenPopup = () => (
         <>
