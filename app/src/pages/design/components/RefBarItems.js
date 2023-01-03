@@ -11,7 +11,6 @@ import { ReferenceBar, ScrollBar } from '../../global';
 */
 
 const ReferenceContent = ({mirror,collapse,appType}) => {
-
     // const { appType } = useSelector(state=>state.plugin.CT);
     const [showScreenPop, setShowScreenPop] = useState(false);
     const [screenshotY, setScreenshotY] = useState(null);
@@ -32,15 +31,16 @@ const ReferenceContent = ({mirror,collapse,appType}) => {
 		mirrorImg.src = `data:image/PNG;base64,${mirror}`;
 	}, [mirror])
 
-    const closeAllPopups = () => setShowScreenPop(false);
+    const closeAllPopups = () =>  setShowScreenPop(false);
+    
 
     const ScreenPopup = () => (
         <>
         {
             showScreenPop && 
-            <ClickAwayListener onClickAway={closeAllPopups}>
+            // <ClickAwayListener onClickAway={()=>{debugger; closeAllPopups();}}>
             <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`, height: `${mirrorHeight}px`}}>
-                <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
+                <h4 className="pop__header" onClick={()=>{setShowScreenPop(false)}}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div className="screenshot_pop__content" >
 				<div className="scrsht_outerContainer" id="ss_ssId">
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
@@ -51,7 +51,7 @@ const ReferenceContent = ({mirror,collapse,appType}) => {
 				</div>
 				</div>
             </div>
-            </ClickAwayListener>
+            // </ClickAwayListener>
         }
         </>
     );

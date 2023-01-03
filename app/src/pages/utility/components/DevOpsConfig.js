@@ -16,6 +16,7 @@ const DevOpsConfig = props => {
     const dataParametersCollection = [];
     const [error, setError] = useState({});
     const [showSelectBrowser, setShowSelectBrowser] = useState(false);
+    const [text, setText] = useState(props.currentIntegration.name);
     const notexe = useRef(
         props.currentIntegration.executionRequest != undefined ? props.currentIntegration.executionRequest.donotexe.current : {}
         );
@@ -96,7 +97,7 @@ const DevOpsConfig = props => {
                     label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                         event.preventDefault();
                         onClick('displayMaximizable');
-                        onDataParamsIconClick1(module.batchname+module.moduleid, module.name)}}/></div>
+                        onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -124,7 +125,7 @@ const DevOpsConfig = props => {
                             label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                 event.preventDefault();
                                 onClick('displayMaximizable');
-                                onDataParamsIconClick1(batch+module.moduleid, module.name)}}/></div>
+                                onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                         };
                         if(module.scenarios && module.scenarios.length > 0) {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -334,7 +335,7 @@ const DevOpsConfig = props => {
         return data;
     }
     const handleConfigSave = async (checkForButton) => {
-        if(integrationConfig.name === ''){
+        if(text === ''){
             setError({
                 ...error,
                 name: 'Please Enter Configuration Name'
@@ -388,7 +389,7 @@ const DevOpsConfig = props => {
                         scenarioTaskType: "disable",
                         testsuiteName: module.name,
                         testsuiteId: module.moduleid,
-                        batchname: "",
+                        batchname: module.batchname,
                         versionNumber: 0,
                         appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
@@ -449,7 +450,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: integrationConfig.name,
+            configurename: text,
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
@@ -501,7 +502,10 @@ const DevOpsConfig = props => {
         const onHide = (name) => {
             dialogFuncMap[`${name}`](false);
         }
-    
+    const HandleTextValue =(value)=>{
+    setIntegrationConfig({...integrationConfig, name:value})
+    setText(value)
+    }
     return (<>
         { showIntegrationModal ? 
             <IntegrationDropDown
@@ -537,8 +541,8 @@ const DevOpsConfig = props => {
                 <span className="api-ut__inputLabel inputLabel1" >Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
-                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Profile Name"
-                        errorMessage={(integrationConfig.name === '' && error.name && error.name !== '') ?  error.name : null}
+                    <TextField value={text} width='150%' label="" standard={true} onChange={(event) => HandleTextValue(event.target.value)} autoComplete="off" placeholder="Enter Profile Name"
+                        errorMessage={(text === '' && error.name && error.name !== '') ?  error.name : null}
                     />
                 </span>
             </div>

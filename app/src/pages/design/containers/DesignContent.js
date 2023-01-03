@@ -86,6 +86,7 @@ const DesignContent = props => {
     const [allUsers,setAllUsers] = useState([])
     const [groupList,setGroupList] = useState([])
     const [showPopup, setShow] = useState(false);
+    const [debugEnable, setDebugEnable] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -123,6 +124,12 @@ const DesignContent = props => {
     useEffect(()=>{
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
         //eslint-disable-next-line
+        Object.values(testCaseData).forEach(value => {
+            if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+              setDebugEnable(true);          
+             }
+            });
+          
     }, [testCaseData]);
 
     useEffect(()=>{
@@ -924,7 +931,7 @@ const DesignContent = props => {
                     <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
                     <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
                     {props.appType==="Web"?<div className='taskButtonWeb'>
-                   
+
                         {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                         <NormalDropDown
                         // style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
@@ -932,8 +939,8 @@ const DesignContent = props => {
 
                             onChange={(e,item)=>{
                                 setDebugButton(item.key)}}
-                            
-                            
+
+
                             options={[
                             {
                                 data: {
@@ -1020,11 +1027,11 @@ const DesignContent = props => {
                      </div>:""}
 
                 </div>
-                       
-               {(props.appType==="Web") ?
+                    
+               {(props.appType==="Web")?
                <div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
-                    <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
-                </div>:""} 
+                {<Button label="Debug"  disabled={debugEnable} className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>}
+            </div>:""}
             </div>
            
 
