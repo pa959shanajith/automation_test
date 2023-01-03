@@ -124,7 +124,7 @@ const DesignContent = props => {
     useEffect(()=>{
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
         //eslint-disable-next-line
-        Object.values(testCaseData).every(value => {
+        Object.values(testCaseData).forEach(value => {
             if (value.custname === "" || value.custname==="OBJECT_DELETED") {
               setDebugEnable(true);          
              }
