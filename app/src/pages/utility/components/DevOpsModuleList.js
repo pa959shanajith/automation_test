@@ -385,7 +385,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 const testSuiteData = Object.values(testSuiteData1)[0];
                 setModuleIds(testSuiteData.testsuiteid)
                 setTestSuiteName(testSuiteData.testsuitename)
-                let scenarioNameArr = [], dataParameterArr = [], conditionArr = [], testSuiteIdArr = [], doNotExecuteArr = [], scenarioIdArr = [], appTypeArr = []
+                let scenarioNameArr = [], dataParameterArr = [], conditionArr = [], testSuiteIdArr = [], doNotExecuteArr = [], scenarioIdArr = [], appTypeArr = [], accessibilityParametersArr = []
                 for (let i=0;i<testSuiteData.scenarioids.length;i++)
                 {
                     scenarioNameArr.push(testSuiteData.scenarionames[i])
@@ -394,6 +394,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     doNotExecuteArr.push(testSuiteData.executestatus[i])
                     scenarioIdArr.push(testSuiteData.scenarioids[i])
                     appTypeArr.push(testSuiteData.apptypes[i])
+                    accessibilityParametersArr.push(testSuiteData.accessibilityParameters[i])
                 }
                 setScenarioName(scenarioNameArr)
                 setDataParameter(dataParameterArr)
@@ -402,6 +403,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 setDoNotExecuteArr(doNotExecuteArr)
                 setScenarioIds(scenarioIdArr)
                 setAppTypes(appTypeArr)
+                setAccessibilityParameters(accessibilityParametersArr)
             } 
         })()
     },[integrationConfig.selectValues[2].selected, modalContent, notExeState]);

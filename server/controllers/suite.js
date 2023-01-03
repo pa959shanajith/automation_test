@@ -47,7 +47,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"moduleid": moduleId,
 			"batchname": testsuite.batchname,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber
+			"versionnumber": suite.versionnumber,
+			"accessibilityParameters": testsuite.accessibilityParameters
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -160,6 +161,7 @@ exports.updateTestSuite_ICE = async (req, res) => {
 			"modifiedbyrole": userInfo.role,
 			"testsuiteid": testsuite.testsuiteid,
 			"name": testsuite.testsuitename,
+			"accessibilityParameters": testsuite.accessibilityParameters
 		};
 		const result = await utils.fetchData(inputs, "suite/updateTestSuite_ICE", "updateTestSuite_ICE")
 		if (result == "fail") overallstatusflag = "fail";
