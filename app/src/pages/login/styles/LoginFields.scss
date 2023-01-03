@@ -10,6 +10,13 @@
   animation: $animation $duration $method $times;
 }
 
+.base__redirect, .base__redirect:hover{
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
 .arrow-circle {
     color:$medLightGray;
     font-size:25px!important;

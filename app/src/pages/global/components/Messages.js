@@ -379,7 +379,7 @@ const Messages={
         SUCC_WS_TEMP_SAVE: {"CONTENT":"WebService Template saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SCREEN_JSON_IMPORT: {"CONTENT":"Screen Json imported successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SCREEN_EXCEL_IMPORT: {"CONTENT":"Screen Excel imported successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_OBJ_ADD: {"CONTENT":"Objects has been added successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_OBJ_ADD: {"CONTENT":"Element(s) added sucessfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_CERT_SAVE: {"CONTENT":"Certificate Saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_OBJ_CREATE: {"CONTENT":"Objects has been created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
