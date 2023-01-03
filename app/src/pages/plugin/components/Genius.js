@@ -60,6 +60,20 @@ const Genius = (props) => {
     debugger;
     if (data === "getMindmap") {
       loadModule(selectedModule.key, selectedProject.key);
+      setSelectedProject(null);
+      setSelectedModule(null);
+      setSelectedScenario(null);
+      setAppType(null);
+      setNavURL("");
+      setSelectedBrowser("chrome");
+    }
+    else if(data === "resetProjs"){
+      setSelectedProject(null);
+      setSelectedModule(null);
+      setSelectedScenario(null);
+      setAppType(null);
+      setNavURL("");
+      setSelectedBrowser("chrome");
     }
     else if (data === "disconnect") {
       setLoading(false);
