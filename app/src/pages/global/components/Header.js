@@ -300,9 +300,12 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
                         }
 
                         <ClickAwayListener onClickAway={onClickAwayUD}>
-                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowUD(true)}>
-                            <span className="user-name">{username || "Demo User"}</span>
-                            <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
+                        <div className="nav_bar">
+                            <span className="">Welcome</span>
+                            <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowUD(true)}>
+                                <span className="user-name">{username || "Demo User"}</span>
+                                <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
+                            </div>
                         </div>
                         <div className={"user-name-menu dropdown-menu dropdown-menu-right " + (showUD && "show")} onMouseLeave={(e)=>{setShowICEMenu(false)}}>
                             <div><Link className="user-role-item" to="#">{selectedRole || "Test Manager"}</Link></div>

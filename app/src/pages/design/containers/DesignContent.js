@@ -128,6 +128,9 @@ const DesignContent = props => {
             if (value.custname === "" || value.custname==="OBJECT_DELETED") {
               setDebugEnable(true);          
              }
+             else {
+                setDebugEnable(false);
+             }
             });
           
     }, [testCaseData]);

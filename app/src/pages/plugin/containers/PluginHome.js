@@ -39,9 +39,9 @@ const PluginHome = () => {
             <Header show_WP_POPOVER={show_WP_POPOVER} setPopover={setPopover}/>
             <div className="plugin-elements" id="plugin__mainScreen">
                 <ScrollBar scrollId="plugin__mainScreen" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                <div className="greeting-text">
+                {/* <div className="greeting-text">
                     Welcome {name}!
-                </div>
+                </div> */}
                 <div className="page-contents">
                     <PluginSection userInfo={userInfo}/>
                     <div className='min_gap'>
