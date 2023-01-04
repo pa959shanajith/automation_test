@@ -264,7 +264,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                     </div>
                     { gridList.length > 0 && <>
                         <div className='searchBoxInput'>
-                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                            <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                         </div>
                     </> }
                 </div>
