@@ -264,7 +264,7 @@ const LoginFields = (props) => {
         setLockedOut(false);
         setUserError(false);
         if (email==="" || !regEx_email.test(email)) {
-          setEmailError("Please Enter a valid email address")
+          setEmailError("Please enter a valid email address")
           // retriggerAnimation("rc_email_validation","shakeX")
         }
         else if (duplicateEmails.length>0 && !resetUsername){
