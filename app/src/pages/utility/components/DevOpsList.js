@@ -935,7 +935,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
 
                 {/* Dialog for CI /CD  */}
 
-                <Dialog header="Execute via CI/CD" visible={displayBasic} className="cicdName" onHide={() => onHide('displayBasic')}>
+                <Dialog header="Execute via CI/CD" visible={displayBasic} className="cicdName" onHide={() => {
+                    onHide('displayBasic');
+                    setExecutionTypeInRequest('asynchronous')
+                    }}>
                     <div className="cicdDiv" title={url}>
                     <span className="devOps_dropdown_label devOps_dropdown_label_url cicdSpan" id='api-url' value={url}>DevOps Integration API url : </span>
                         <pre className='grid_download_dialog__content__code cicdpre'>
@@ -954,7 +957,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                                 <label id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
-                                <Toggle label="" inlineLabel={true} onChange = {() => executionTypeInRequest == 'asynchronous' ? setExecutionTypeInRequest('synchronous') : setExecutionTypeInRequest('asynchronous')}/>
+                                <Toggle label="" inlineLabel={true} onChange = {() => executionTypeInRequest == 'asynchronous' ? setExecutionTypeInRequest('synchronous') : setExecutionTypeInRequest('asynchronous')}
+                                    checked = {executionTypeInRequest === 'synchronous'}/>
                                 <label id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
                         </div>
                     </div>
