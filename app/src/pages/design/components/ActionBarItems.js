@@ -34,7 +34,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     const mainTestCases = useSelector(state=>state.design.testCases);
     const saveEnable = useSelector(state=>state.design.saveEnable);
 
-    let appType = useSelector(state=>state.mindmap.appType);;
+    let appType = useSelector(state=>state.mindmap.appType);
     const history = useHistory();
     const dispatch = useDispatch();
 

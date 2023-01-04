@@ -128,9 +128,6 @@ const DesignContent = props => {
             if (value.custname === "" || value.custname==="OBJECT_DELETED") {
               setDebugEnable(true);          
              }
-             else {
-                setDebugEnable(false);
-             }
             });
           
     }, [testCaseData]);
@@ -422,6 +419,7 @@ const DesignContent = props => {
         setStepSelect({edit: false, check: [], highlight: []});
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
+        setDebugEnable(false);
     }
 
     const setRowData = data => {
@@ -1005,28 +1003,28 @@ const DesignContent = props => {
                         :
                         props.appType==="OEBS" ? 
                         <div className='desktopAppDesign_btn'>
-                            <p onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
+                            <p onClick={()=> debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>OEBS Apps</span></p>
                         </div>: 
                         props.appType==="Desktop"? <div className='desktopAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
+                        <p  onClick={()=>debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Desktop Apps</span></p>
                         </div>:
                         props.appType==="SAP"?<div className='desktopAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
+                        <p  onClick={()=> debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>SAP Apps</span></p>
                         </div>:
                         props.appType==="MobileApp"?<div className='mobileAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
+                        <p  onClick={()=> debugEnable || debugTestCases('1')} ><img src="static/imgs/ic-mobility.png" style={{opacity:!debugEnable?1:0.5}}/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Mobile App</span></p>
                         </div>:
                         props.appType==="MobileWeb"?<div className='mobileAppDesign_btn'>
-                        <p onClick={()=>debugTestCases()}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
+                        <p onClick={()=> debugEnable || debugTestCases()}><img src="static/imgs/ic-mobility.png" style={{opacity:!debugEnable?1:0.5}} /><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Mobile Web</span></p>
                         </div>:
                         props.appType==="System"? <div className='desktopAppDesign_btn'>
-                        <p onClick={()=>debugTestCases('1')}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>System App</span></p>
+                        <p onClick={()=> debugEnable || debugTestCases('1')}><img  style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>System App</span></p>
                         </div>:
                         props.appType==="Mainframe"?<div className='mainframeDesign_btn'>
-                            <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
+                            <p onClick={()=>debugEnable || debugTestCases()}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px',opacity:!debugEnable?1:0.5}}>Maniframe</span></p>
                         </div>:
                          props.appType==="Webservice"?<div className='webservices_btn'>
-                         <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px'}}>WebServices</span></p>
+                         <p onClick={()=>debugEnable || debugTestCases()}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>WebServices</span></p>
                      </div>:""}
 
                 </div>
