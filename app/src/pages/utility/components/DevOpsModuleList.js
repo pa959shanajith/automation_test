@@ -15,7 +15,7 @@ import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser, showSelectedBrowserType,notexe }) => {
-    const [moduleList, setModuleList] = useState([]);
+    // const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [moduleIds, setModuleIds] = useState();
     const [accessibilityParameters, setAccessibilityParameters] = useState([]);
@@ -410,9 +410,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
 
 
    const handleSearchChange = (value) => {
-       let filteredItems = filteredModuleList.filter(element=>element.label.props.children[0].toLowerCase().includes(value.toLowerCase()))
-       setFilteredModuleList(filteredItems)
-       setSearchText(value);
+        let filteredItems = filteredModuleList.filter(element=>element.label.props.children[0].toLowerCase().includes(value.toLowerCase()))
+        setFilteredModuleList(filteredItems)
+        setSearchText(value);
 
    }
     // const [scenario, setScenario] = useState(false);

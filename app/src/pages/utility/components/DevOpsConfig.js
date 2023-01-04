@@ -338,7 +338,7 @@ const DevOpsConfig = props => {
         if(text === ''){
             setError({
                 ...error,
-                name: 'Please Enter Configuration Name'
+                name: 'Please Enter Profile Name'
             });
             return;
         }
@@ -559,7 +559,7 @@ const DevOpsConfig = props => {
         {
             <div className="devOps_module_list_div" >
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} moduleList={moduleList} setModuleList={setModuleList} />
                 </div>
                 <div className="devOps_pool_list">
                     <div>
