@@ -135,6 +135,12 @@ setSelectedProject(null);
             "ICE_AVAILABILITY":true
           })
         }
+        if(res==="success"){
+          port.postMessage({
+            "success":true
+        })
+        }
+        console.log(res)
         } catch (err) {
           console.log(err)
         }
