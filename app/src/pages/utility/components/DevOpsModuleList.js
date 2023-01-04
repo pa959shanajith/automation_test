@@ -394,7 +394,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         doNotExecuteArr.push(testSuiteData.executestatus[i])
                         scenarioIdArr.push(testSuiteData.scenarioids[i])
                         appTypeArr.push(testSuiteData.apptypes[i])
-                        accessibilityParametersArr.push(testSuiteData.accessibilityParameters[i])
+                        if ("accessibilityParameters" in testSuiteData && testSuiteData.accessibilityParameters.length > 0) {
+                            accessibilityParametersArr.push(testSuiteData.accessibilityParameters)
+                        }
                     }
                     setScenarioName(scenarioNameArr)
                     setDataParameter(dataParameterArr)
@@ -403,7 +405,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     setDoNotExecuteArr(doNotExecuteArr)
                     setScenarioIds(scenarioIdArr)
                     setAppTypes(appTypeArr)
-                    setAccessibilityParameters(accessibilityParametersArr)
+                    setAccessibilityParameters(accessibilityParametersArr.length > 0 ? accessibilityParametersArr[0] : [])
                 }
         })()
     },[integrationConfig.selectValues[2].selected, modalContent, notExeState]);
