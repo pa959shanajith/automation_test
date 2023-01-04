@@ -60,7 +60,10 @@ const Genius = (props) => {
     debugger;
     if (data === "getMindmap") {
       loadModule(selectedModule.key, selectedProject.key);
-      setSelectedProject(null);
+      
+    }
+    else if(data==="resetProjs"){
+setSelectedProject(null);
       setSelectedModule(null);
       setSelectedScenario(null);
       setAppType(null);
@@ -121,6 +124,17 @@ const Genius = (props) => {
 
             return acc.concat(...testcasesArr)
           }, [])], userInfo, appType && appType.key ? appType.text : "", true)
+          console.log(res)
+          if(res==="unavailableLocalServer" && port){
+            port.postMessage({
+            "ICE_UNAVAILABILITY":true
+          })
+        }
+        else{
+          port.postMessage({
+            "ICE_AVAILABILITY":true
+          })
+        }
         } catch (err) {
           console.log(err)
         }
