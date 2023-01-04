@@ -124,7 +124,7 @@ setSelectedProject(null);
 
             return acc.concat(...testcasesArr)
           }, [])], userInfo, appType && appType.key ? appType.text : "", true)
-          console.log(res)
+          
           if(res==="unavailableLocalServer" && port){
             port.postMessage({
             "ICE_UNAVAILABILITY":true
