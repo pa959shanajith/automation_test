@@ -700,10 +700,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false
-                })} >Add Profile</button>
+                })} >Create Profile</button>
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
-                    <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                    <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
                 { showCICD && <div className="api-ut__btnGroup">
                    <button onClick={() => {onClick('displayBasic3');getCurrentQueueState()} }>Manage Execution Queue</button>
@@ -732,7 +732,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             { /* Table */ }
             <div className="d__table">
                 <div className="d__table_header">
-                <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#&nbsp;</span>
+                <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >Sl.no&nbsp;</span>
                     <span className="d__out_head tkn-table__key tkn-table__head1" >&nbsp;&nbsp;Execution Profile Name</span>
                     {/* <span className="details_col tkn-table__key d__det_head" >Configuration Key</span> */}
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
@@ -802,8 +802,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                     <td className="tkn-table__button" >
-                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button" alt="Edit Icon" title='Edit'/> 
-                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons Delete_button" alt="Delete Icon" title='Delete'/>
+                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button" alt="Edit Icon" title='Edit Profile'/> 
+                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons Delete_button" alt="Delete Icon" title='Delete Profile'/>
                                     </td>
                              </tr>)
                          }

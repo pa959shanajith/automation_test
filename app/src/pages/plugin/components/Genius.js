@@ -60,7 +60,10 @@ const Genius = (props) => {
     debugger;
     if (data === "getMindmap") {
       loadModule(selectedModule.key, selectedProject.key);
-      setSelectedProject(null);
+      
+    }
+    else if(data==="resetProjs"){
+setSelectedProject(null);
       setSelectedModule(null);
       setSelectedScenario(null);
       setAppType(null);
@@ -121,6 +124,17 @@ const Genius = (props) => {
 
             return acc.concat(...testcasesArr)
           }, [])], userInfo, appType && appType.key ? appType.text : "", true)
+          
+          if(res==="unavailableLocalServer" && port){
+            port.postMessage({
+            "ICE_UNAVAILABILITY":true
+          })
+        }
+        else{
+          port.postMessage({
+            "ICE_AVAILABILITY":true
+          })
+        }
         } catch (err) {
           console.log(err)
         }
@@ -330,7 +344,7 @@ const Genius = (props) => {
     if (window.chrome.runtime) {
       if (!port) {
         try {
-          // setLoading("Genius Started...");
+          // setLoading("Genius Initiated...");
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);
@@ -342,7 +356,7 @@ const Genius = (props) => {
           port.onMessage.removeListener(backgroundListener);
           port.onDisconnect.removeListener(reconnectEx);
           port = undefined;
-          // setLoading("Genius Started...");
+          // setLoading("Genius Initiated...");
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);
@@ -364,7 +378,7 @@ const Genius = (props) => {
         try {
           // port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassue" });
           ResetSession.start();
-          setLoading("Genius Started...");
+          setLoading("Genius Initiated...");
           sendMessageToPort({
             "open": true,
             "project": selectedProject,
@@ -744,22 +758,22 @@ const Genius = (props) => {
         <div className="breadcrumbs__container">
           <ol className="breadcrumbs__elements" style={{ listStyle: "none", display: "flex", gap: "2rem", flex: 1 }}>
             <li className="breadcrumbs__element__inner" data-value="">
-              <span className="containerSpan"><span className="styledSpan">Select Project Details</span></span>
+              <span className="containerSpan"><span className="styledSpan">Project Details</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Record Test Cases</span></span>
+              <span className="containerSpan"><span className="styledSpan">Record Scenario</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Execute with Avo Assure</span></span>
+              <span className="containerSpan"><span className="styledSpan">Preview scenario</span></span>
             </li>
           </ol>
         </div>
-        <div style={{ display:"flex", justifyContent:"space-between"}}>
+        {/* <div style={{ display:"flex", justifyContent:"space-between"}}>
           <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
             {/* <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> */}
-            <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span>
-          </h4>
-        </div>
+            {/* <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span> */}
+          {/* </h4> */}
+        {/* </div>  */}
         <div style={{
           display: "flex",
           flexDirection: 'row',
@@ -770,9 +784,9 @@ const Genius = (props) => {
           <div style={{ position: "relative" }}>
            {userRole==="Test Manager" && <div style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={async () => {
               setDisplayCreateProject(true)
-            }}>+ New Project</div>}
+            }}>Create Project</div>}
             <NormalDropDown
-              label="Select Project"
+              label="Project"
               options={
                 Object.values(allProjects).map((proj) => {
                   return {
@@ -784,7 +798,7 @@ const Genius = (props) => {
               onChange={(e, item) => {
                 setSelectedProject(item)
               }}
-              placeholder="Select a project"
+              placeholder="Select"
               width="300px"
               required
               disabled={props.selectedProject}
@@ -793,9 +807,9 @@ const Genius = (props) => {
           </div>
 
           <div style={{ position: "relative" }}>
-            <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>+ New Module</div>
+            <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Module</div>
             <NormalDropDown
-              label="Select Module"
+              label="Module"
               options={projModules.map((mod) => {
                 return {
                   key: mod._id,
@@ -806,7 +820,7 @@ const Genius = (props) => {
                 setSelectedModule(item)
               }}
               selectedKey={selectedModule ? selectedModule.key : null}
-              placeholder="Select a module"
+              placeholder="Select"
               width="300px"
               disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
               required
@@ -814,9 +828,9 @@ const Genius = (props) => {
           </div>
 
           <div style={{ position: "relative" }}>
-            <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>+ New Scenario</div>
+            <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Scenario</div>
             <NormalDropDown
-              label="Select Scenario"
+              label="Scenario"
               options={modScenarios.map((scenario) => {
                 return {
                   key: scenario._id,
@@ -827,7 +841,7 @@ const Genius = (props) => {
                 setSelectedScenario(item)
               }}
               selectedKey={selectedScenario ? selectedScenario.key : null}
-              placeholder="Select a scenario"
+              placeholder="Select"
               width="300px"
               disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
               required
@@ -868,7 +882,7 @@ const Genius = (props) => {
           </div>
           <div>
             <TextField
-              label="Enter Navigation URL"
+              label="Application URL"
               onChange={(e) => { setNavURL(e.target.value) }}
               placeholder="https://www.google.com"
               standard

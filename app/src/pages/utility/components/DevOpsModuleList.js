@@ -394,7 +394,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         doNotExecuteArr.push(testSuiteData.executestatus[i])
                         scenarioIdArr.push(testSuiteData.scenarioids[i])
                         appTypeArr.push(testSuiteData.apptypes[i])
-                        accessibilityParametersArr.push(testSuiteData.accessibilityParameters[i])
+                        if ("accessibilityParameters" in testSuiteData && testSuiteData.accessibilityParameters.length > 0) {
+                            accessibilityParametersArr.push(testSuiteData.accessibilityParameters)
+                        }
                     }
                     setScenarioName(scenarioNameArr)
                     setDataParameter(dataParameterArr)
@@ -403,7 +405,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     setDoNotExecuteArr(doNotExecuteArr)
                     setScenarioIds(scenarioIdArr)
                     setAppTypes(appTypeArr)
-                    setAccessibilityParameters(accessibilityParametersArr)
+                    setAccessibilityParameters(accessibilityParametersArr.length > 0 ? accessibilityParametersArr[0] : [])
                 }
         })()
     },[integrationConfig.selectValues[2].selected, modalContent, notExeState]);
@@ -638,7 +640,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                         <div className='devOps_module_list_filter'>
                             <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
-                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={(event)=>{handleKeyDown(event)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                            <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={(event)=>{handleKeyDown(event)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                             {/* <SearchDropdown
                                 calloutMaxHeight="30vh"
                                 noItemsText={'Loading...'}

@@ -343,7 +343,7 @@ const DevOpsConfig = props => {
             return;
         }
         if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
-            setMsg(MSG.CUSTOM("Please Select atleast one Browser",VARIANT.ERROR));
+            setMsg(MSG.CUSTOM("Please select atleast one Browser",VARIANT.ERROR));
             return;
         }
         if(props.currentIntegration.selectValues[2].selected === '') {
@@ -438,7 +438,7 @@ const DevOpsConfig = props => {
                 }));
         
         if(batchInfo.length < 1) {
-            setMsg(MSG.CUSTOM("Please Select atleast one Scenario",VARIANT.ERROR));
+            setMsg(MSG.CUSTOM("Please select atleast one Scenario",VARIANT.ERROR));
             return;
         }
         props.setLoading('Please Wait...');
@@ -547,9 +547,9 @@ const DevOpsConfig = props => {
                 </span>
             </div>
             <div className="radiobutton_config" > 
-                        <input type='radio' id='Normal' className='radioinputs' data-for="Normal" data-tip="Click here to execute Normal modules"  value='normalExecution' disabled={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('normalExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><p data-for="Normal" data-tip="Click here to execute Normal modules"   className='radioinputsP'>&nbsp;Normal Execution</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Normal" effect="solid" backgroundColor="black" />
-                        <input type='radio' id='Batch' className='radioinputs' data-for="Batch" data-tip="Click here to execute Batch of modules" value='batchExecution' disabled ={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('batchExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><p data-for="Batch" data-tip="Click here to execute Batch of modules"  className='radioinputsP'>&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Batch" effect="solid" backgroundColor="black" />
-                        <input type='radio' id="E2E" className='radioinputs' data-for="E2E" data-tip="Click here to execute end to end flows" value='e2eExecution' disabled ={props.currentIntegration.disable} onChange={() => handleExecutionTypeChange('e2eExecution')} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/><p  data-for="E2E" data-tip="Click here to execute end to end flows"  className='radioinputsP'>&nbsp;E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</p><ReactTooltip id="E2E" effect="solid" backgroundColor="black" />
+                        <input type='radio' id='Normal' className='radioinputs' data-for="Normal" data-tip="Click here to execute Normal modules"  value='normalExecution' disabled={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('normalExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><p data-for="Normal" data-tip=" Click here to select Normal module(s)"   className='radioinputsP'>&nbsp;Normal module(s)</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Normal" effect="solid" backgroundColor="black" />
+                        <input type='radio' id='Batch' className='radioinputs' data-for="Batch" data-tip="Click here to execute Batch of modules" value='batchExecution' disabled ={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('batchExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><p data-for="Batch" data-tip="Click here to select batch module(s)"  className='radioinputsP'>&nbsp;Batch module(s)&nbsp;&nbsp;&nbsp;</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Batch" effect="solid" backgroundColor="black" />
+                        <input type='radio' id="E2E" className='radioinputs' data-for="E2E" data-tip="Click here to execute end to end flows" value='e2eExecution' disabled ={props.currentIntegration.disable} onChange={() => handleExecutionTypeChange('e2eExecution')} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/><p  data-for="E2E" data-tip=" Click here to select E2E flows"  className='radioinputsP'>&nbsp;E2E Flow&nbsp;&nbsp;&nbsp;&nbsp;</p><ReactTooltip id="E2E" effect="solid" backgroundColor="black" />
                     </div> 
         {/* <div>
         {
@@ -575,16 +575,16 @@ const DevOpsConfig = props => {
                         />
                     </div>
                     { (props.currentIntegration.selectedBrowserType || showSelectBrowser) && <div>
-                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browsers : </label>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Browsers : </label>
                         <MultiSelectDropdown
                             hideSelectAll
                             noItemsText={'No Browser available'}
                             onSelectKeysChange={(selectedBrowsers) => setIntegrationConfig({...integrationConfig, browsers: selectedBrowsers})}
                             options={browserlist}
-                            placeholder="Select Browsers"
-                            searchPlaceholder="Search Browser Name"
+                            placeholder="Select"
+                            searchPlaceholder="Search"
                             selectedKeys={integrationConfig.browsers}
-                            width='54%'
+                            width='53.5%'
                             />
                     </div> }
                     <div>
