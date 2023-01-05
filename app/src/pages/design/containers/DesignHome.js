@@ -127,7 +127,7 @@ const DesignHome = (props) => {
                 <img style={{ height: '1.1rem' }} onClick={closeBar} src={'static/imgs/collapseButton.png'}/></div> */}
                 {/* {<div style={{width:Collapsed? '5rem':'0rem'}}> */}
                 <div>
-                    <ReferenceContent  hideInfo={props.hideInfo} collapse={true} data-test="d__refBar" mirror={mirror} appType={props.appType} openScrapeScreen1={props.openScrapeScreen}/> </div>
+                    <ReferenceContent  hideInfo={props.hideInfo} collapse={true} data-test="d__refBar" mirror={mirror} appType={props.appType} openScrapeScreenCap={props.openScrapeScreen}/> </div>
                     </div>
                 {/* }</div> */}
                 

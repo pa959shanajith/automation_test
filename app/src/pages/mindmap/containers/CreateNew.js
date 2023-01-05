@@ -30,7 +30,6 @@ const CreateNew = ({importRedirect}) => {
   const [loading,setLoading] = useState(true)
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule);
-  console.log(moduleSelect,">>>>>> create new")
   const selectProj = useSelector(state=>state.plugin.PN)
   const prjList = useSelector(state=>state.mindmap.projectList)
   const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
