@@ -406,6 +406,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     setScenarioIds(scenarioIdArr)
                     setAppTypes(appTypeArr)
                     setAccessibilityParameters(accessibilityParametersArr.length > 0 ? accessibilityParametersArr[0] : [])
+                    setAccessibilityParametersValue(accessibilityParametersArr.length > 0 ? accessibilityParametersArr[0] : [])
                 }
         })()
     },[integrationConfig.selectValues[2].selected, modalContent, notExeState]);
