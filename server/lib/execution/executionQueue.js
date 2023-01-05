@@ -592,8 +592,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         const executionData = await utils.fetchData(inputs, "devops/configurekey", fnName);
 
         //Checking for "executiontype" in the request
-        if("executiontype" in req.body) {
-            executionData.executionData.executiontype == req.body.executiontype;
+        if("executionType" in req.body) {
+            executionData.executionData.executiontype = req.body.executionType;
         }
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
