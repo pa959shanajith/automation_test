@@ -579,19 +579,19 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             // }
 
             // Change executestatus of scenarios which should not be scheduled according to devops config
-            for (var m = 0; m < keys.length; m++) {
-                tableData[m].scenarioids.map((scenarioid, index) => {
-                    tableData[m].executestatus[index] = 0;
-                    if (m < item.executionRequest.batchInfo.length) {
-                        for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
-                            if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
-                                tableData[m].executestatus[index] = 1;
-                                break;
-                            }
-                        }
-                    }
-                });
-            }
+            // for (var m = 0; m < keys.length; m++) {
+            //     tableData[m].scenarioids.map((scenarioid, index) => {
+            //         tableData[m].executestatus[index] = 0;
+            //         if (m < item.executionRequest.batchInfo.length) {
+            //             for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
+            //                 if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
+            //                     tableData[m].executestatus[index] = 1;
+            //                     break;
+            //                 }
+            //             }
+            //         }
+            //     });
+            // }
             setEachData(tableData);
         }
         setLoading(false);
