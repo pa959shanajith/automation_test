@@ -233,6 +233,8 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                         if (parseInt(new Date().getMinutes()).toString().length === 1)
                             min = "0" + min;
                         moduleScheduledateTime[testsuiteid]["time"] = hr + ":" + min;
+                        moduleScheduledateTime[testsuiteid]["clientTime"] = new Date().getFullYear()+ '/' + (new Date().getMonth() + 1) + '/' + new Date().getDate() + ' ' + hr + ":" + min;
+                        moduleScheduledateTime[testsuiteid]["clientTimeZone"] = new Date().toString().split("GMT")[1].slice(0,5);
                     }
                     moduleScheduledateTime[testsuiteid]["inputPropstime"][
                         "disabled"
