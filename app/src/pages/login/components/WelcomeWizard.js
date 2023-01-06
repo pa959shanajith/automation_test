@@ -19,6 +19,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
   const [showMacOSSelection, setShowMacOSSelection] = useState(false);
+  const [showLinuxOSSelection, setShowLinuxOSSelection] = useState(false);
   const [selectedMacOS, setSelectedMacOS] = useState("");
   const [downloadPopover, setDownloadPop] = useState("");
   const userInfo = useSelector(state=>state.login.userinfo);
@@ -174,7 +175,11 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         setShowMacOSSelection(true)
         setOS("MacOS");
     }
-
+    else if (navigator.userAgent.indexOf("Linux") != -1) 
+    {
+        setShowLinuxOSSelection(true)
+        setOS("Linux");
+    }
     else 
         setOS("Not Supported");
   }
@@ -231,6 +236,10 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         setSelectedMacOS(pkgName)
         getIce("avoclientpath_"+pkgName)
         // }
+    }
+    else if(showLinuxOSSelection)
+    {
+        getIce("avoclientpath_Linux")
     }
     else if (OS==="Windows")
         getIce("avoclientpath_Windows")
@@ -568,7 +577,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     </>)
                     :null)}
 
-                {showIndicator && !showMacOSSelection ? 
+                {showIndicator && !showMacOSSelection && !showLinuxOSSelection? 
                     <>
                         <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading the Avo Assure Client"}</div>
                         <div className="downloadProgress">
@@ -583,7 +592,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         </div>
                     </>
                 :
-                (OS==="Windows"?<button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>:null)}
+                (OS==="Windows" || OS==="Linux"?<button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>:null)}
                 {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
             </div>
   };
