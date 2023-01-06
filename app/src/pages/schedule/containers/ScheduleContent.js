@@ -365,7 +365,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     SubmitButton={ScheduleTestSuite} 
                     setAllocateICE={setAllocateICE} 
                     allocateICE={allocateICE} 
-                    modalTitle={"Allocate ICE to Schedule"} 
+                    modalTitle={"Allocate Avo Client to Schedule"} 
                     modalButton={"Schedule"}
                     icePlaceholder={'Search ICE to allocate'}
                     exeTypeLabel={"Select Schedule type"}
@@ -657,6 +657,7 @@ const checkSelectedModules = (scheduleTableData, displayError) => {
 } 
 
 const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate, displayError) => {
+    let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     for(var i =0 ;i<eachData.length;i++){
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
@@ -670,6 +671,8 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 var dateValue = moduleScheduledate[eachData[i].testsuiteid]["date"];
                 var timeValue = moduleScheduledate[eachData[i].testsuiteid]["time"];
                 var recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
+                var recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
+                var recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid]["recurringStringOnHover"];
                 var endAfterValue = moduleScheduledate[eachData[i].testsuiteid]["endAfter"];
 
                 if (recurringValue === "") {
@@ -701,8 +704,8 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 const sltime_2 = timeValue.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 const diff = (timestamp - new Date()) / 60000;
-                if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
-                    if (recurringValue != "One Time") {
+                if (diff < 5 && (recurringString === "One Time" || recurringString === "Every Day" || (recurringString === "Every Week" && (recurringStringOnHover.includes(days[new Date().getDay()]) || recurringStringOnHover === "Occurs every day")) || (recurringString === "Every Month" && (recurringValue.split(' ')[2] == new Date().getDate() || recurringStringOnHover.includes(days[new Date().getDay()]))))) { // Check if schedule time is not ahead of 5 minutes from current time
+                    if (recurringValue !== "One Time") {
                         moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
                     } else {
                         if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";

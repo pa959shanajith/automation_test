@@ -14,8 +14,8 @@ import { updateTestSuite_ICE,loadLocationDetails,readTestCase_ICE } from '../../
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser, showSelectedBrowserType,notexe }) => {
-    const [moduleList, setModuleList] = useState([]);
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser, showSelectedBrowserType,notexe, moduleList, setModuleList }) => {
+    // const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [moduleIds, setModuleIds] = useState();
     const [accessibilityParameters, setAccessibilityParameters] = useState([]);
@@ -207,17 +207,17 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
         if(targetnode.isLeaf){
             if(notexe.current[targetnode.parent.value] == undefined) {
                 notexe.current[targetnode.parent.value] = []
-                setNotExeState({...notexe.current})
+                // setNotExeState({...notexe.current})
             }
             if(targetnode.checked){
                 notexe.current[targetnode.parent.value].push(targetnode.index)
-                setNotExeState({...notexe.current})
+                // setNotExeState({...notexe.current})
             }
             else{
                 const index = notexe.current[targetnode.parent.value].indexOf(targetnode.index);
                 if (index > -1) { 
                     notexe.current[targetnode.parent.value].splice(index, 1);
-                    setNotExeState({...notexe.current})
+                    // setNotExeState({...notexe.current})
                 }
             }
         }
@@ -228,7 +228,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     notexe.current[module.value] = []
                     for(let i = 0;i<module.children.length;i++){
                         notexe.current[module.value].push(i);
-                        setNotExeState({...notexe.current})
+                        // setNotExeState({...notexe.current})
                     }
                 }
             }
@@ -237,12 +237,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     notexe.current[targetnode.value] = []
                     for(let i = 0;i<targetnode.children.length;i++){
                         notexe.current[targetnode.value].push(i);
-                        setNotExeState({...notexe.current})
+                        // setNotExeState({...notexe.current})
                     }
                 }
                 else {
                     notexe.current[targetnode.value] = []
-                    setNotExeState({...notexe.current})
+                    // setNotExeState({...notexe.current})
                 }
             }
         }
@@ -313,7 +313,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                             event.preventDefault();
                                             onClick('displayMaximizable');
                                             setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
-                                            onDataParamsIconClick1(batch+module.moduleid, module.name)}}/></div>
+                                            onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                                     };
                                     if(module.scenarios && module.scenarios.length > 0) {
                                         const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -352,7 +352,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                     event.preventDefault();
                                     onClick('displayMaximizable');
                                     setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
-                                    onDataParamsIconClick1(module.batchname+module.moduleid, module.name)}}/></div>
+                                    onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                             };
                             if(module.scenarios && module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -374,43 +374,48 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 setLoading(false);
             }
             if(modalContent){
-            var payload = [{
-                "releaseid": integrationConfig.selectValues[1].selected,
-                "cycleid": integrationConfig.selectValues[2].selected,
-                "testsuiteid": modalContent.moduleId,
-                "testsuitename": modalContent.name,
-                "projectidts": integrationConfig.selectValues[0].selected
-                }]
-                const testSuiteData1 = await readTestSuite_ICE(payload)
-                const testSuiteData = Object.values(testSuiteData1)[0];
-                setModuleIds(testSuiteData.testsuiteid)
-                setTestSuiteName(testSuiteData.testsuitename)
-                let scenarioNameArr = [], dataParameterArr = [], conditionArr = [], testSuiteIdArr = [], doNotExecuteArr = [], scenarioIdArr = [], appTypeArr = []
-                for (let i=0;i<testSuiteData.scenarioids.length;i++)
-                {
-                    scenarioNameArr.push(testSuiteData.scenarionames[i])
-                    dataParameterArr.push(testSuiteData.dataparam[i])
-                    conditionArr.push(testSuiteData.condition[i])
-                    doNotExecuteArr.push(testSuiteData.executestatus[i])
-                    scenarioIdArr.push(testSuiteData.scenarioids[i])
-                    appTypeArr.push(testSuiteData.apptypes[i])
+                var payload = [{
+                    "releaseid": integrationConfig.selectValues[1].selected,
+                    "cycleid": integrationConfig.selectValues[2].selected,
+                    "testsuiteid": modalContent.moduleId,
+                    "testsuitename": modalContent.name,
+                    "projectidts": integrationConfig.selectValues[0].selected
+                    }]
+                    const testSuiteData1 = await readTestSuite_ICE(payload)
+                    const testSuiteData = Object.values(testSuiteData1)[0];
+                    setModuleIds(testSuiteData.testsuiteid)
+                    setTestSuiteName(testSuiteData.testsuitename)
+                    let scenarioNameArr = [], dataParameterArr = [], conditionArr = [], testSuiteIdArr = [], doNotExecuteArr = [], scenarioIdArr = [], appTypeArr = [], accessibilityParametersArr = []
+                    for (let i=0;i<testSuiteData.scenarioids.length;i++)
+                    {
+                        scenarioNameArr.push(testSuiteData.scenarionames[i])
+                        dataParameterArr.push(testSuiteData.dataparam[i])
+                        conditionArr.push(testSuiteData.condition[i])
+                        doNotExecuteArr.push(testSuiteData.executestatus[i])
+                        scenarioIdArr.push(testSuiteData.scenarioids[i])
+                        appTypeArr.push(testSuiteData.apptypes[i])
+                        if ("accessibilityParameters" in testSuiteData && testSuiteData.accessibilityParameters.length > 0) {
+                            accessibilityParametersArr.push(testSuiteData.accessibilityParameters)
+                        }
+                    }
+                    setScenarioName(scenarioNameArr)
+                    setDataParameter(dataParameterArr)
+                    setCondition(conditionArr)
+                    setTestSuiteId(testSuiteIdArr)
+                    setDoNotExecuteArr(doNotExecuteArr)
+                    setScenarioIds(scenarioIdArr)
+                    setAppTypes(appTypeArr)
+                    setAccessibilityParameters(accessibilityParametersArr.length > 0 ? accessibilityParametersArr[0] : [])
+                    setAccessibilityParametersValue(accessibilityParametersArr.length > 0 ? accessibilityParametersArr[0] : [])
                 }
-                setScenarioName(scenarioNameArr)
-                setDataParameter(dataParameterArr)
-                setCondition(conditionArr)
-                setTestSuiteId(testSuiteIdArr)
-                setDoNotExecuteArr(doNotExecuteArr)
-                setScenarioIds(scenarioIdArr)
-                setAppTypes(appTypeArr)
-            } 
         })()
     },[integrationConfig.selectValues[2].selected, modalContent, notExeState]);
 
 
    const handleSearchChange = (value) => {
-       let filteredItems = filteredModuleList.filter(element=>element.label.props.children[0].toLowerCase().includes(value.toLowerCase()))
-       setFilteredModuleList(filteredItems)
-       setSearchText(value);
+        let filteredItems = filteredModuleList.filter(element=>element.label.props.children[0].toLowerCase().includes(value.toLowerCase()))
+        setFilteredModuleList(filteredItems)
+        setSearchText(value);
 
    }
     // const [scenario, setScenario] = useState(false);
@@ -636,7 +641,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                         <div className='devOps_module_list_filter'>
                             <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
-                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={(event)=>{handleKeyDown(event)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                            <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={(event)=>{handleKeyDown(event)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                             {/* <SearchDropdown
                                 calloutMaxHeight="30vh"
                                 noItemsText={'Loading...'}

@@ -34,7 +34,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     const mainTestCases = useSelector(state=>state.design.testCases);
     const saveEnable = useSelector(state=>state.design.saveEnable);
 
-    let appType = useSelector(state=>state.mindmap.appType);;
+    let appType = useSelector(state=>state.mindmap.appType);
     const history = useHistory();
     const dispatch = useDispatch();
 
@@ -86,9 +86,9 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
 
     let renderComp = [
                     // <div key={1} className={'d__debugOn' + (disable ? " disable-thumbnail" : "")}>Debug On</div>, 
-                    <div key={3} title="Add Dependent Test Cases"  className={"d__thumbnail" + (disable ? " disable-thumbnail" : "")}>
+                    <div key={3} title="Add Dependent Test Steps"  className={"d__thumbnail" + (disable ? " disable-thumbnail" : "")}>
                         <input id="add_depend" type="checkbox" onChange={addDependentTestCase} checked={dependCheck}/>
-                        <span className="d__thumbnail_title">Add Dependent Test Cases</span>
+                        <span className="d__thumbnail_title">Add Dependent Test Steps</span>
                     </div>
                     ];
 

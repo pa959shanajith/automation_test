@@ -30,6 +30,7 @@ const ScrapeScreen = (props)=>{
     const current_task = useSelector(state=>state.plugin.CT);
     const certificateInfo = useSelector(state=>state.scrape.cert);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
+    const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
     const [overlay, setOverlay] = useState(null);
     const [showPop, setShowPop] = useState("");
@@ -383,6 +384,31 @@ const ScrapeScreen = (props)=>{
         setScrapeItems([...scrapeItems, ...newList])
     }
 
+    const openScreenTestCase =() =>{
+        let screenTestcases = [];
+        selectedModule.children.some((scenario)=>{
+            if(scenario["_id"]===props.fetchingDetails.parent["_id"]) {
+                scenario.children.some((scr)=>{
+                    if (scr["_id"]===props.fetchingDetails["_id"]){
+                        screenTestcases=scr.children
+                    }
+                    return scr["_id"]===props.fetchingDetails["_id"]
+                })
+            }
+            return scenario["_id"]===props.fetchingDetails.parent["_id"]
+        })
+
+        let populateTestcaseDetails = {
+            "parent":{"_id":props.fetchingDetails["_id"],name:props.fetchingDetails["name"],projectId:props.fetchingDetails["projectId"],"testCaseId":screenTestcases?screenTestcases[0]["_id"]:"","parent":{"_id":props.fetchingDetails.parent["_id"]}},
+            "_id":screenTestcases?screenTestcases[0]["_id"]:"",
+            "name":screenTestcases?screenTestcases[0]["name"]:""
+        }
+
+        
+
+        props.openScrapeScreen("displayBasic2","","displayBasic",{populateTestcaseDetails})
+    }
+
     return (
         
         <>
@@ -410,7 +436,7 @@ const ScrapeScreen = (props)=>{
                     { props.appType === "Webservice" 
                         ? <WebserviceScrape /> 
                         : compareFlag ? <CompareObjectList fetchingDetails={props.fetchingDetails}/> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
-                    <RefBarItems hideInfo={true} mirror={mirror} collapse={true} appType={props.appType}/>
+                    <RefBarItems hideInfo={true} mirror={mirror} collapse={true} appType={props.appType} openScreenTestCase={openScreenTestCase}/>
                 </ScrapeContext.Provider>
             </div>
             {/* <div data-test="ssFooter"className='ss__footer'><Footer/></div> */}
