@@ -31,8 +31,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const prjList = useSelector(state=>state.mindmap.projectList)
-    const initProj = useSelector(state=>state.plugin.PN)
-    const selectedProj = useSelector(state=>state.plugin.PN)
+    const initProj = useSelector(state=>state.mindmap.selectedProj)
+    const selectedProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const selectedModule = useSelector(state=>state.mindmap.selectedModule)    
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
@@ -53,7 +53,9 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         // setselectedProjectNameForDropdown(proj);
         if(!isCreateE2E){
-        dispatch({type: actionTypesPlugin.SET_PN, payload:proj})}
+            // dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})

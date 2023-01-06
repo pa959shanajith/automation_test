@@ -14,7 +14,7 @@ import { Button } from "primereact/button";
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
-    const proj = useSelector(state=>state.plugin.PN)
+    const proj = useSelector(state=>state.mindmap.selectedProj)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
     const [moddrop,setModdrop]=useState(true)
@@ -54,7 +54,14 @@ const ModuleListDrop = (props) =>{
         if(moduleSelect.type === 'endtoend') {
             setIsE2EOpen(true)
             setCollapse(true)
+            if(moduleList.length > 0) {
+                const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
+                selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,firstRender); 
+                
+            }
+            setWarning(false)
         }
+        setScenarioList([]);
      }, [proj])
     
      useEffect(()=>{

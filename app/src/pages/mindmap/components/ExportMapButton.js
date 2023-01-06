@@ -19,7 +19,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const [exportBox,setExportBox] = useState(false)    
     const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
-    const selectedProj = useSelector(state=>state.plugin.PN)
+    const selectedProj = useSelector(state=>state.mindmap.selectedProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     const openExport = ()=>{
         if(!selectedProj || !selectedModule || !selectedModule._id || selectedModulelist.length==0){
