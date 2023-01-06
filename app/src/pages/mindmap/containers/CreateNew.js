@@ -15,6 +15,7 @@ import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 import CanvasEnE from './CanvasEnE';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Redirect } from 'react-router-dom'
+import * as actionTypesPlugin from '../../plugin/state/action';
 
 
 /*Component CreateNew
@@ -30,7 +31,7 @@ const CreateNew = ({importRedirect}) => {
   const [loading,setLoading] = useState(true)
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
-  const selectProj = useSelector(state=>state.plugin.PN)
+  const selectProj = useSelector(state=>state.mindmap.selectedProj);  
   const prjList = useSelector(state=>state.mindmap.projectList)
   const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
@@ -78,7 +79,7 @@ const CreateNew = ({importRedirect}) => {
         if(res.error){displayError(res.error);return;}
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
-        // dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
+        dispatch({type:actionTypesPlugin.SET_PN,payload:res.projectId[0]})
         
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 

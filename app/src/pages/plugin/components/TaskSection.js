@@ -6,6 +6,7 @@ import {v4 as uuid} from 'uuid';
 import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents,ValidationExpression, GenerateTaskList, Messages as MSG, setMsg,Messages ,VARIANT} from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
+import * as actionTypesMindmap from '../../mindmap/state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
 // import '../styles/ProjectAssign.scss';
@@ -536,7 +537,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
 
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
-                                            dispatch({type: actionTypes.SET_PN, payload:projectNames.projectId[idx]});
+                                            dispatch({type: actionTypesMindmap.SELECT_PROJECT, payload:projectNames.projectId[idx]});
                                             window.localStorage['navigateScreen'] = "mindmap";
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
