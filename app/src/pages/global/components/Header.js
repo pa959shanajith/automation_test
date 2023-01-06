@@ -58,7 +58,7 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
             ServiceBell("identify",
             userInfo.email_id,
             { 
-            displayName: userInfo.email_id,
+            displayName: userInfo.firstname + ' ' + userInfo.lastname,
             email: userInfo.email_id
             },
             crypto
