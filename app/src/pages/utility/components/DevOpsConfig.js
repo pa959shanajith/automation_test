@@ -15,6 +15,7 @@ const DevOpsConfig = props => {
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
     const [error, setError] = useState({});
+    const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
     const [showSelectBrowser, setShowSelectBrowser] = useState(false);
     const [text, setText] = useState(props.currentIntegration.name);
     const notexe = useRef(
@@ -145,6 +146,7 @@ const DevOpsConfig = props => {
         setSelectedExecutionType(selectedKey);
         setModuleList(filteredNodes);
         setFilteredModuleList(filteredNodes);
+        setinitialFilteredModuleList(filteredNodes);
         setModuleState({expanded: [], checked: []});
         setIntegrationConfig({ ...props.currentIntegration, scenarioList: [], dataParameters: [] });
     }
@@ -559,7 +561,7 @@ const DevOpsConfig = props => {
         {
             <div className="devOps_module_list_div" >
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} moduleList={moduleList} setModuleList={setModuleList} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} moduleList={moduleList} setModuleList={setModuleList} initialFilteredModuleList={initialFilteredModuleList} setinitialFilteredModuleList={setinitialFilteredModuleList} />
                 </div>
                 <div className="devOps_pool_list">
                     <div>
