@@ -38,7 +38,6 @@ const ModuleListDrop = (props) =>{
     const userRole = useSelector(state=>state.login.SR);
     const [firstRender, setFirstRender] = useState(true);
     const [showNote, setShowNote] = useState(false);
-    const initProj = useSelector(state=>state.mindmap.selectedProj)
   
 
     useEffect(()=> {
