@@ -715,7 +715,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                         width="20rem"
                                         onClear={() => {setSearchUsers("")}}
                                         onChange={(e,value)=>{
-                                            debugger;
                                             setSearchUsers(value);
                                             setSearchText(value);
                                         }}
@@ -806,7 +805,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                             <div>
                             <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px",marginTop:'-0.9rem' }} 
                             onClick={async()=>{
-                                debugger;
                                if(createProjectCheck){
                                     try{
                                                 if (!(appType && appType.key && projectName)) {

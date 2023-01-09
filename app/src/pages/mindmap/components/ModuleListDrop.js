@@ -46,7 +46,6 @@ const ModuleListDrop = (props) =>{
         if(moduleList.length > 0) {
             const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
             selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
-            debugger;
         }
        
         setWarning(false);
@@ -61,7 +60,6 @@ const ModuleListDrop = (props) =>{
         //     const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
         //     selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,firstRender);
         // }
-        debugger;
         setWarning(false);
         setScenarioList([]);
      }, [proj])
@@ -121,7 +119,6 @@ const ModuleListDrop = (props) =>{
 
     // normal module selection
             const selectModule = async (id,name,type,checked, firstRender) => {
-        debugger;
 
                 var modID = id
                 var type = name
