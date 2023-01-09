@@ -431,11 +431,6 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
     let createdDate = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))
     const targetUser = multiExecutionData.batchInfo[0].targetUser;
     let recurringPattern = multiExecutionData['batchInfo'][0]['recurringValue'];
-    recurringPattern = recurringPattern.split(" ");
-    recurringPattern[0] = timeSelected.split(":")[1];
-    recurringPattern[1] = timeSelected.split(":")[0];
-    recurringPattern = recurringPattern.join(" ");
-    body.executionData.batchInfo[0].recurringValue = recurringPattern;
     body.executionData.batchInfo[0].poolid = poolid;
     body.executionData.batchInfo[0].startDate = createdDate;
     let recurringString = multiExecutionData['batchInfo'][0]['recurringString'];
@@ -445,6 +440,11 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
     let clientTimeZoneValue = multiExecutionData.batchInfo[0].clientTimeZone;
     let timeValue = multiExecutionData['batchInfo'][0]['time'];
     timeValue = getScheduleTime(clientTime, timeValue, clientTimeZoneValue);
+    recurringPattern = recurringPattern.split(" ");
+    recurringPattern[0] = timeValue.split(":")[1];
+    recurringPattern[1] = timeValue.split(":")[0];
+    recurringPattern = recurringPattern.join(" ");
+    body.executionData.batchInfo[0].recurringValue = recurringPattern;
 
     if (recurringString == "Every Day") {
         if (!recurringPattern.includes("1-5") && recurringStringOnHover != "Occurs every day") {
