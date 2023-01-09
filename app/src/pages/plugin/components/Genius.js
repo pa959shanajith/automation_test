@@ -12,10 +12,10 @@ import * as DesignApi from "../../design/api";
 import * as PluginApi from "../../plugin/api";
 import * as mindmapActionTypes from "../../mindmap/state/action";
 import GeniusMindmap from "../../mindmap/containers/GeniusMindmap";
-import { confirmDialog,ConfirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { setWarningCallback } from '@fluentui/react';
+
 
 let port = null;
 let editorExtensionId = "bcdklcknooclndglabfjppeeomefcjof";
@@ -150,7 +150,7 @@ const Genius = (props) => {
         const scenarioData = getExcludedMindmapInternals(modScenarios, selectedScenario.key);
         const res = await PluginApi.getGeniusData(data, scenarioData);
         savedRef.current = true;
-        // finalDataRef.current = data;
+        
         if (port) port.postMessage({
           "saved": true
         });
@@ -213,7 +213,7 @@ const Genius = (props) => {
       projectid: projectId,
       version: 0,
       cycId: null,
-      // modName:"",
+    
       moduleid: [modID]
     }
     var res = await getModules(req)
@@ -754,7 +754,7 @@ const Genius = (props) => {
         </div>
       </Dialog>
       <div className='plugin-elements'>
-        {/* <h3 style={{ margin: "1rem 0 1rem 1rem" }}>Welcome To Avo Genius</h3> */}
+       
         <div className="breadcrumbs__container">
           <ol className="breadcrumbs__elements" style={{ listStyle: "none", display: "flex", gap: "2rem", flex: 1 }}>
             <li className="breadcrumbs__element__inner" data-value="">
@@ -879,7 +879,7 @@ const Genius = (props) => {
                 setAppType(item)
               }}
             />
-            {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={() => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
+          
 
           </div>
           <div>
@@ -899,34 +899,7 @@ const Genius = (props) => {
         </div>
 
 
-        { /** 
-        <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
-          // <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> 
-          <span style={{ marginLeft: "0.5rem" }}>Recent Scenarios</span></h4>
-        <div id="recentScenario__cards__container" style={{ display: "flex", flexDirection: 'row', margin: "0 10px", marginLeft: "1.5rem" }}>
-          <Card
-            style={{
-              width: "100%",
-              height: 170,
-              maxWidth: "25%",
-              backgroundColor: "white",
-              padding: 10,
-            }}
-          >
-            <div style={{ fontSize: "1.2rem", fontWeight: 600 }}>Test_Scenario_1</div>
-            <div style={{ fontSize: "0.8rem" }}>{`Project_1 >> Module_1 >> Scenario_1`}</div>
-            <div style={{ fontSize: "0.7rem", color: "#777" }}>{`Last modified on 21st Jan 2021 by s.kaman`}</div>
-            <div style={{ fontSize: "0.7rem", color: "#777" }}>{`Last executed on 21st Jan 2021 by s.kaman`}</div>
-            <div style={{ display: "flex", flex: 1, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <Icon styles={{ root: { display: "flex" } }} iconName='web-icon'></Icon>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <Icon styles={{ root: { display: "flex", cursor: "pointer" } }} iconName='pin-icon'></Icon>
-                <Icon styles={{ root: { display: "flex", cursor: "pointer" } }} iconName='delete-icon'></Icon>
-              </div>
-            </div>
-          </Card>
-        </div>
-        */}
+       
         <div className="genius__footer">
        
         {warning && <h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"red",fontSize:'18px' }} >Extension not found!!! Download it and re-open the Genius popup.</h5>} 
