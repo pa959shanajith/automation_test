@@ -24,8 +24,6 @@ import { DataTable } from 'primereact/datatable';
 // import { FontSizes } from '@fluentui/react';
 // import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
 import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
-import { text } from 'body-parser';
-import { RadioButton } from 'primereact/radiobutton';
 import {getProjectList} from '../../mindmap/api';
 // import useOnClickOutside from './UseOnClickOutside'
 // import * as actionTypes from '../state/action';
