@@ -83,21 +83,7 @@ const Genius = (props) => {
     else if (data.action && data.action === "startDebugging") {
       if (savedRef.current) {
         finalDataRef.current = data;
-        // const firstStep = {
-        //   "stepNo": 1,
-        //   "custname": "@Browser",
-        //   "keywordVal": "openBrowser",
-        //   "objectName": "",
-        //   "inputVal": [
-        //     ""
-        //   ],
-        //   "outputVal": "",
-        //   "appType": "Web",
-        //   "remarks": "",
-        //   "addDetails": "",
-        //   "cord": "",
-        //   "url": ""
-        // };
+       
         try {
 
           let index = 1;
@@ -212,8 +198,7 @@ const Genius = (props) => {
   }
   const getExcludedMindmapInternals = (scenarios, excluded_scenario) => {
     let tempArr = [];
-    // let scenarioPID = indexCounter;
-    // let screenPID = indexCounter;
+    
     scenarios.forEach((scenario, idx) => {
       if (scenario._id === excluded_scenario) { return };
       tempArr.push(templateForMindmapSaving(scenario));
@@ -222,7 +207,7 @@ const Genius = (props) => {
   }
 
   const loadModule = async (modID, projectId) => {
-    // dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
+   
     var req = {
       tab: "tabCreate",
       projectid: projectId,
@@ -239,11 +224,11 @@ const Genius = (props) => {
 
   const hideMindmap = () => {
     setMindmapShow(false);
-    // dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
+   
   }
 
   const reconnectEx = () => {
-    // port.onMessage.removeListener(backgroundListener); 
+   
     port = undefined; connect()
   }
   useEffect(() => {
@@ -295,19 +280,7 @@ const Genius = (props) => {
 
   useEffect(() => {
   
-    // The ID of the extension we want to talk to.
-    // Make a simple request:
-    // setTimeout(() => {
-    //   window.chrome.runtime.sendMessage(editorExtensionId, { siteURL: window.location.origin },
-    //     function (response) {
-    //       if (!response.success)
-    //         console.log(response);
-    //       else {
-    //         console.log("succcess")
-    //       }
-    //     });
-    // }, 2000);
-    // dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
+  
     connect();
     (async () => {
       setBlockui({ show: true, content: 'Loading...' })
@@ -365,7 +338,7 @@ const Genius = (props) => {
     if (window.chrome.runtime) {
       if (!port) {
         try {
-          // setLoading("Genius Initiated...");
+         
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);
@@ -377,7 +350,7 @@ const Genius = (props) => {
           port.onMessage.removeListener(backgroundListener);
           port.onDisconnect.removeListener(reconnectEx);
           port = undefined;
-          // setLoading("Genius Initiated...");
+         
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);
@@ -398,7 +371,7 @@ const Genius = (props) => {
     if (window.chrome.runtime) {
       if (port) {
         try {
-          // port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassue" });
+          
           ResetSession.start();
           setLoading("Genius Initiated...");
           sendMessageToPort({
@@ -412,35 +385,13 @@ const Genius = (props) => {
             "keywordData": keywordData,
             "appType": appType ? appType.text : ""
           });
-          // port.onDisconnect.addListener(() => {
-          //   port = undefined;
-          //   ResetSession.end();
-          //   setLoading(false);
-          // })
-          // port.onMessage.addListener(backgroundListener);
+         
         }
         catch (err) {
-          // ResetSession.end();
-          // if (idx < 3)
-          //   createPort(keywordData, idx++);
-          // else {
-          //   port = undefined;
-          //   setLoading(false);
-          // }
-          // console.log(err);
+       
         }
       } else {
-        // sendMessageToPort({
-        //   "open": true,
-        //   "project": selectedProject,
-        //   "module": selectedModule,
-        //   "scenario": selectedScenario,
-        //   "navurl": navURL,
-        //   "browser": selectedBrowser,
-        //   "siteURL": window.location.origin,
-        //   "keywordData": keywordData,
-        //   "appType": appType
-        // });
+      
       }
 
     }
@@ -713,18 +664,7 @@ const Genius = (props) => {
     setNavURL("");
     setSelectedBrowser("chrome");
   }
-  // const confirm1 = (item) => {
-  //   confirmDialog({
-  //       message: 'Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?',
-  //       header: 'Confirmation',
-  //       icon: 'pi pi-exclamation-triangle',
-  //       accept:()=> setSelectedScenario(item),
-  //       reject:()=>{},
-  //       acceptClassName:"p-button-rounded",
-  //       rejectClassName:"p-button-rounded"
-  //   });
-  // };
-
+  
   return (
     <div className="plugin-bg-container">
       <Header geniusPopup={true}/>
@@ -828,12 +768,7 @@ const Genius = (props) => {
             </li>
           </ol>
         </div>
-        {/* <div style={{ display:"flex", justifyContent:"space-between"}}>
-          <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
-            {/* <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> */}
-            {/* <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span> */}
-          {/* </h4> */}
-        {/* </div>  */}
+       
         <div style={{
           display: "flex",
           flexDirection: 'row',
@@ -903,16 +838,7 @@ const Genius = (props) => {
                 setScenarioChosen(item)
                 setVisibleScenario(true)
                 setVisibleReset(false)
-               
-              //   confirmDialog({
-              //     message: 'Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?',
-              //     header: 'Confirmation',
-              //     icon: 'pi pi-exclamation-triangle',
-              //     accept:()=> setSelectedScenario(item),
-              //     reject:()=>{},
-              //     acceptClassName:"p-button-rounded",
-              //     rejectClassName:"p-button-rounded"
-              // });
+           
                
               }}
               selectedKey={selectedScenario ? selectedScenario.key : null}
@@ -969,28 +895,7 @@ const Genius = (props) => {
               disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
           </div>
-          {/* <div id="icon-dropdown-container">
-            <NormalDropDown
-              label="Select Browser"
-              id="icon-normal-dropdown"
-              options={
-                [{
-                  data: {
-                    icon: "chrome-icon"
-                  },
-                  key: 'chrome',
-                  text: 'Google Chrome'
-                }]}
-              onChange={(e, item) => {
-                setSelectedBrowser(item)
-              }}
-              placeholder="Select a browser"
-              selectedKey={selectedBrowser}
-              width="300px"
-              required
-              disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
-            />
-          </div> */}
+         
         </div>
 
 
@@ -1046,26 +951,9 @@ const Genius = (props) => {
                     .then(keywordData => {
                       if (keywordData === "Invalid Session") return RedirectPage(history);
                       createPort(keywordData);
-                      // port.postMessage({ joke: "Knock knock" });
+                    
                     })
-                    //   window.chrome.runtime.sendMessage(editorExtensionId, {
-                    //     "open": true,
-                    //     "project": selectedProject,
-                    //     "module": selectedModule,
-                    //     "scenario": selectedScenario,
-                    //     "navurl": navURL,
-                    //     "browser": selectedBrowser,
-                    //     "siteURL": window.location.origin,
-                    //     "keywordData": keywordData
-                    //   },
-                    //     function (response) {
-                    //       if (!response.success)
-                    //         console.log(response);
-                    //       else {
-                    //         console.log("success")
-                    //       }
-                    //     });
-                    // })
+                  
                     .catch((err) => { console.log("error"); setLoading(false); })
                 }
                 }>
