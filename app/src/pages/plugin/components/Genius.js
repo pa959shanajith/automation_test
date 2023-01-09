@@ -12,7 +12,10 @@ import * as DesignApi from "../../design/api";
 import * as PluginApi from "../../plugin/api";
 import * as mindmapActionTypes from "../../mindmap/state/action";
 import GeniusMindmap from "../../mindmap/containers/GeniusMindmap";
+import { confirmDialog,ConfirmDialog } from 'primereact/confirmdialog';
+
 import { useSelector, useDispatch } from 'react-redux';
+import { setWarningCallback } from '@fluentui/react';
 
 let port = null;
 let editorExtensionId = "bcdklcknooclndglabfjppeeomefcjof";
@@ -41,8 +44,12 @@ const Genius = (props) => {
   const [assignedUsers, setAssignedUsers] = useState({});
   const [userDetailList, setUserDetailList] = useState([]);
   const [plugins_list, setplugins_list] = useState([]);
+  const[warning,setWarning]=useState(false)
   const moduleSelect = useSelector(state => state.mindmap.selectedModule);
   const [mindmapShow, setMindmapShow] = useState(false);  
+  const[visibleScenario,setVisibleScenario]=useState(false)
+  const[visibleReset,setVisibleReset]=useState(false)
+  const[scenarioChosen,setScenarioChosen]=useState(null)
   const userInfo = useSelector(state => state.login.userinfo);
   const savedRef = useRef(false);
   const finalDataRef = useRef([])
@@ -63,7 +70,7 @@ const Genius = (props) => {
       
     }
     else if(data==="resetProjs"){
-setSelectedProject(null);
+      setSelectedProject(null);
       setSelectedModule(null);
       setSelectedScenario(null);
       setAppType(null);
@@ -76,25 +83,25 @@ setSelectedProject(null);
     else if (data.action && data.action === "startDebugging") {
       if (savedRef.current) {
         finalDataRef.current = data;
-        const firstStep = {
-          "stepNo": 1,
-          "custname": "@Browser",
-          "keywordVal": "openBrowser",
-          "objectName": "",
-          "inputVal": [
-            ""
-          ],
-          "outputVal": "",
-          "appType": "Web",
-          "remarks": "",
-          "addDetails": "",
-          "cord": "",
-          "url": ""
-        };
+        // const firstStep = {
+        //   "stepNo": 1,
+        //   "custname": "@Browser",
+        //   "keywordVal": "openBrowser",
+        //   "objectName": "",
+        //   "inputVal": [
+        //     ""
+        //   ],
+        //   "outputVal": "",
+        //   "appType": "Web",
+        //   "remarks": "",
+        //   "addDetails": "",
+        //   "cord": "",
+        //   "url": ""
+        // };
         try {
 
-          let index = 2;
-          const res = await DesignApi.debugTestCase_ICE(["1"], [firstStep, ...finalDataRef.current.data.screens.reduce((acc, curr) => {
+          let index = 1;
+          const res = await DesignApi.debugTestCase_ICE(["1"], [...finalDataRef.current.data.screens.reduce((acc, curr) => {
             let dataObjectsArr = curr.data_objects;
             let dataObjectsObj = {}
             dataObjectsArr.forEach((d_obj) => {
@@ -140,6 +147,12 @@ setSelectedProject(null);
             "success":true
         })
         }
+        if(res==="Terminate"){
+          
+          port.postMessage({
+            "Terminate":true
+        })
+        } 
        
         } catch (err) {
           console.log(err)
@@ -163,6 +176,7 @@ setSelectedProject(null);
     else if (data === "pleaseBeConnected") {
       console.log("got the message for being connected")
     }
+
     else {
       console.log(data);
     }
@@ -260,6 +274,7 @@ setSelectedProject(null);
         if (modulesdata === "Invalid Session") return RedirectPage(history);
         if (modulesdata.error) { displayError(modulesdata.error); return; }
         setProjModules(modulesdata);
+        console.log(props.selectedModule)
         setSelectedModule(props.selectedModule?props.selectedModule:null)
       }
     })()
@@ -350,7 +365,7 @@ setSelectedProject(null);
     if (window.chrome.runtime) {
       if (!port) {
         try {
-          // setLoading("Genius Started...");
+          // setLoading("Genius Initiated...");
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);
@@ -362,7 +377,7 @@ setSelectedProject(null);
           port.onMessage.removeListener(backgroundListener);
           port.onDisconnect.removeListener(reconnectEx);
           port = undefined;
-          // setLoading("Genius Started...");
+          // setLoading("Genius Initiated...");
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);
@@ -374,8 +389,9 @@ setSelectedProject(null);
     else {
       setLoading(false);
       // add popup message to show that extension is not present.
+      setWarning(true)
       setMsg(MSG.CUSTOM("Extension not found!!! Download it and re-open the Genius popup","error"))
-      console.log("Extension not present");
+     
     }
   }
   const createPort = (keywordData, idx = 0) => {
@@ -384,7 +400,7 @@ setSelectedProject(null);
         try {
           // port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassue" });
           ResetSession.start();
-          setLoading("Genius Started...");
+          setLoading("Genius Initiated...");
           sendMessageToPort({
             "open": true,
             "project": selectedProject,
@@ -535,8 +551,15 @@ setSelectedProject(null);
       let modulesdata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": null });
       if (modulesdata === "Invalid Session") return RedirectPage(history);
       if (modulesdata.error) { displayError(modulesdata.error); return; }
+      
       setProjModules(modulesdata);
       setDisplayCreateModule(false);
+      console.log(modulesdata[modulesdata.length-1])
+      const newModule={
+        key:modulesdata[modulesdata.length-1]._id,
+        text:modulesdata[modulesdata.length-1].name
+      }
+      setSelectedModule(newModule)
     } catch (err) {
       console.log(err);
     }
@@ -666,6 +689,12 @@ setSelectedProject(null);
       if (moduledata === "Invalid Session") return RedirectPage(history);
       if (moduledata.error) { displayError(moduledata.error); return; }
       setModScenarios(moduledata.children);
+      console.log(moduledata.children)
+      const newSce={
+        key: moduledata.children[moduledata.children.length-1]._id,
+        text: moduledata.children[moduledata.children.length-1].name
+      }
+      setSelectedScenario(newSce)
       setDisplayCreateScenario(false);
     } catch (err) {
       console.log(err);
@@ -673,6 +702,10 @@ setSelectedProject(null);
   }
 
   const resetGeniusFields = () => {
+   setVisibleReset(true)
+   setVisibleScenario(false)
+  }
+  const resetFields=()=>{
     setSelectedProject(null);
     setSelectedModule(null);
     setSelectedScenario(null);
@@ -680,10 +713,31 @@ setSelectedProject(null);
     setNavURL("");
     setSelectedBrowser("chrome");
   }
+  // const confirm1 = (item) => {
+  //   confirmDialog({
+  //       message: 'Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?',
+  //       header: 'Confirmation',
+  //       icon: 'pi pi-exclamation-triangle',
+  //       accept:()=> setSelectedScenario(item),
+  //       reject:()=>{},
+  //       acceptClassName:"p-button-rounded",
+  //       rejectClassName:"p-button-rounded"
+  //   });
+  // };
 
   return (
     <div className="plugin-bg-container">
       <Header geniusPopup={true}/>
+      <ConfirmDialog 
+      visible={visibleScenario ||visibleReset} 
+      onHide={() =>{visibleScenario? setVisibleScenario(false):setVisibleReset(false)}} message={visibleScenario?"Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?":"All the entered data will be cleared."}
+      header={visibleScenario?"Override Scenario":"Reset Confirmation"} 
+      icon="pi pi-exclamation-triangle"  
+      acceptClassName="p-button-rounded"
+      rejectClassName="p-button-rounded"
+      accept={()=>{visibleScenario?setSelectedScenario(scenarioChosen): resetFields()}} 
+      reject={()=>{}} 
+      />
       {loading ? <ScreenOverlay content={loading} /> : null}
       {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && mindmapShow ? <GeniusMindmap displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
       <Dialog header={'Create Project'} visible={displayCreateProject} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setSearchUsers(""); setProjectName(""); setAppTypeDialog(null); setAssignedUsers({}); setDisplayCreateProject(false) }}>
@@ -742,7 +796,7 @@ setSelectedProject(null);
       <Dialog header={'Create Module'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setModuleName(""); setDisplayCreateModule(false); }}>
         <div>
           <div className='dialog__child'>
-            <TextField required label='Enter Module Name' onGetErrorMessage={(value) => { return validateNames(value, "module") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Module Name' value={moduleName} onChange={(e) => { setModuleName(e.target.value.trim()) }} />
+            <TextField required label='Module Name' onGetErrorMessage={(value) => { return validateNames(value, "module") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Module Name' value={moduleName} onChange={(e) => { setModuleName(e.target.value.trim()) }} />
           </div>
           <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
             <button className="dialog__footer__action" onClick={handleModuleCreate}>{'Create'}</button>
@@ -752,7 +806,7 @@ setSelectedProject(null);
       <Dialog header={'Create Scenario'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}>
         <div>
           <div className='dialog__child'>
-            <TextField required label='Enter Scenario Name' onGetErrorMessage={(value) => { return validateNames(value, "scenario") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Scenario Name' value={scenarioName} onChange={(e) => { setScenarioName(e.target.value.trim()) }} />
+            <TextField required label='Scenario Name' onGetErrorMessage={(value) => { return validateNames(value, "scenario") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Scenario Name' value={scenarioName} onChange={(e) => { setScenarioName(e.target.value.trim()) }} />
           </div>
           <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
             <button className="dialog__footer__action" onClick={handleScenarioCreate}>{'Create'}</button>
@@ -764,22 +818,22 @@ setSelectedProject(null);
         <div className="breadcrumbs__container">
           <ol className="breadcrumbs__elements" style={{ listStyle: "none", display: "flex", gap: "2rem", flex: 1 }}>
             <li className="breadcrumbs__element__inner" data-value="">
-              <span className="containerSpan"><span className="styledSpan">Select Project Details</span></span>
+              <span className="containerSpan"><span className="styledSpan">Project Details</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Record Test Cases</span></span>
+              <span className="containerSpan"><span className="styledSpan">Record Scenario</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Execute with Avo Assure</span></span>
+              <span className="containerSpan"><span className="styledSpan">Preview scenario</span></span>
             </li>
           </ol>
         </div>
-        <div style={{ display:"flex", justifyContent:"space-between"}}>
+        {/* <div style={{ display:"flex", justifyContent:"space-between"}}>
           <h4 style={{ margin: "1rem 0 1rem 1rem" }}>
             {/* <IconButton icon="chevron-up" onClick={() => { }} variant="borderless" /> */}
-            <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span>
-          </h4>
-        </div>
+            {/* <span style={{ marginLeft: "0.5rem" }}>Select/Create Project Details</span> */}
+          {/* </h4> */}
+        {/* </div>  */}
         <div style={{
           display: "flex",
           flexDirection: 'row',
@@ -790,9 +844,9 @@ setSelectedProject(null);
           <div style={{ position: "relative" }}>
            {userRole==="Test Manager" && <div style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={async () => {
               setDisplayCreateProject(true)
-            }}>+ New Project</div>}
+            }}>Create Project</div>}
             <NormalDropDown
-              label="Select Project"
+              label="Project"
               options={
                 Object.values(allProjects).map((proj) => {
                   return {
@@ -804,7 +858,7 @@ setSelectedProject(null);
               onChange={(e, item) => {
                 setSelectedProject(item)
               }}
-              placeholder="Select a project"
+              placeholder="Select"
               width="300px"
               required
               disabled={props.selectedProject}
@@ -813,9 +867,9 @@ setSelectedProject(null);
           </div>
 
           <div style={{ position: "relative" }}>
-            <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>+ New Module</div>
+            <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Module</div>
             <NormalDropDown
-              label="Select Module"
+              label="Module"
               options={projModules.map((mod) => {
                 return {
                   key: mod._id,
@@ -823,10 +877,12 @@ setSelectedProject(null);
                 }
               })}
               onChange={(e, item) => {
+                console.log(item)
                 setSelectedModule(item)
+                
               }}
               selectedKey={selectedModule ? selectedModule.key : null}
-              placeholder="Select a module"
+              placeholder="Select"
               width="300px"
               disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
               required
@@ -834,9 +890,9 @@ setSelectedProject(null);
           </div>
 
           <div style={{ position: "relative" }}>
-            <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>+ New Scenario</div>
+            <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Scenario</div>
             <NormalDropDown
-              label="Select Scenario"
+              label="Scenario"
               options={modScenarios.map((scenario) => {
                 return {
                   key: scenario._id,
@@ -844,10 +900,23 @@ setSelectedProject(null);
                 }
               })}
               onChange={(e, item) => {
-                setSelectedScenario(item)
+                setScenarioChosen(item)
+                setVisibleScenario(true)
+                setVisibleReset(false)
+               
+              //   confirmDialog({
+              //     message: 'Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?',
+              //     header: 'Confirmation',
+              //     icon: 'pi pi-exclamation-triangle',
+              //     accept:()=> setSelectedScenario(item),
+              //     reject:()=>{},
+              //     acceptClassName:"p-button-rounded",
+              //     rejectClassName:"p-button-rounded"
+              // });
+               
               }}
               selectedKey={selectedScenario ? selectedScenario.key : null}
-              placeholder="Select a scenario"
+              placeholder="Select"
               width="300px"
               disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
               required
@@ -878,6 +947,7 @@ setSelectedProject(null);
               width="300px"
               disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
               required
+ 
               selectedKey={appType ? appType.key : null}
               onChange={(e, item) => {
                 setAppType(item)
@@ -888,7 +958,7 @@ setSelectedProject(null);
           </div>
           <div>
             <TextField
-              label="Enter Navigation URL"
+              label="Application URL"
               onChange={(e) => { setNavURL(e.target.value) }}
               placeholder="https://www.google.com"
               standard
@@ -953,13 +1023,16 @@ setSelectedProject(null);
         </div>
         */}
         <div className="genius__footer">
-        <div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
+       
+        {warning && <h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"red",fontSize:'18px' }} >Extension not found!!! Download it and re-open the Genius popup.</h5>} 
+          <div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
         
-          <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Genius Extension.</h5>
-          </span>
-        </div>
-
-          <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
+        <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Genius Extension.</h5>
+        
+      
+        </span>
+          </div>
+            <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
             {/* <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div> */}
             <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>&nbsp;Mandatory Fields</div>
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
