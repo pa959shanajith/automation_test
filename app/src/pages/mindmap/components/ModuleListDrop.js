@@ -38,29 +38,31 @@ const ModuleListDrop = (props) =>{
     const userRole = useSelector(state=>state.login.SR);
     const [firstRender, setFirstRender] = useState(true);
     const [showNote, setShowNote] = useState(false);
+    const initProj = useSelector(state=>state.mindmap.selectedProj)
   
 
     useEffect(()=> {
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         if(moduleList.length > 0) {
             const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
-            selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,firstRender); 
-            
+            selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
+            debugger;
         }
        
-        setWarning(false)
-     },[])
+        setWarning(false);
+     }, [moduleList])
 
      useEffect(()=>{
         if(moduleSelect.type === 'endtoend') {
             setIsE2EOpen(true)
-            setCollapse(true)
-            if(moduleList.length > 0) {
-                const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
-                selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,firstRender); 
-                
-            }
-            setWarning(false)
+            setCollapse(true);
         }
+        // if(moduleList.length > 0) {
+        //     const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
+        //     selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,firstRender);
+        // }
+        debugger;
+        setWarning(false);
         setScenarioList([]);
      }, [proj])
     
@@ -118,7 +120,9 @@ const ModuleListDrop = (props) =>{
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
 
     // normal module selection
-            const selectModule = async (id,name,type,checked) => {
+            const selectModule = async (id,name,type,checked, firstRender) => {
+        debugger;
+
                 var modID = id
                 var type = name
                 var name = type
@@ -137,7 +141,7 @@ const ModuleListDrop = (props) =>{
                         setBlockui({show:false})
                         setShowNote(true)
                         return;}
-                        if(Object.keys(moduleSelect).length===0){
+                        if(Object.keys(moduleSelect).length===0 || firstRender){
                             loadModule(modID)
                             return;
                         }else{
@@ -363,7 +367,7 @@ const ModuleListDrop = (props) =>{
 
                                     
                                     return (
-                                        <div className='scenarios ' style={{marginRight:!isE2EOpen || !collapse? '15rem':''}}>
+                                        <div key={i} className='scenarios ' style={{marginRight:!isE2EOpen || !collapse? '15rem':''}}>
 
                                             <div  key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios'} title={e.name} value={e._id} >
                                                 <div style={{display:'flex',marginTop:'3px',textOverflow:"ellipsis"}}><input type="checkbox"  value={e._id} onChange={(e)=>{} } checked={selectedSc[e._id]}  />
