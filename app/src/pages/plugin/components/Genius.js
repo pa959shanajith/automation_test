@@ -57,7 +57,7 @@ const Genius = (props) => {
   const history = useHistory();
   const userRole = useSelector(state=>state.login.SR);
   const displayError = (error) => {
-    console.log(error)
+    
     setBlockui({ show: false })
     setLoading(false)
     setMsg(typeof error === "object" ? error : MSG.CUSTOM(error, "error"))
@@ -274,7 +274,7 @@ const Genius = (props) => {
         if (modulesdata === "Invalid Session") return RedirectPage(history);
         if (modulesdata.error) { displayError(modulesdata.error); return; }
         setProjModules(modulesdata);
-        console.log(props.selectedModule)
+        
         setSelectedModule(props.selectedModule?props.selectedModule:null)
       }
     })()
@@ -554,7 +554,7 @@ const Genius = (props) => {
       
       setProjModules(modulesdata);
       setDisplayCreateModule(false);
-      console.log(modulesdata[modulesdata.length-1])
+     
       const newModule={
         key:modulesdata[modulesdata.length-1]._id,
         text:modulesdata[modulesdata.length-1].name
@@ -689,7 +689,7 @@ const Genius = (props) => {
       if (moduledata === "Invalid Session") return RedirectPage(history);
       if (moduledata.error) { displayError(moduledata.error); return; }
       setModScenarios(moduledata.children);
-      console.log(moduledata.children)
+     
       const newSce={
         key: moduledata.children[moduledata.children.length-1]._id,
         text: moduledata.children[moduledata.children.length-1].name
@@ -877,7 +877,7 @@ const Genius = (props) => {
                 }
               })}
               onChange={(e, item) => {
-                console.log(item)
+               
                 setSelectedModule(item)
                 
               }}
