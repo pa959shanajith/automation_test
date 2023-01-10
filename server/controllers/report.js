@@ -281,7 +281,7 @@ exports.connectJira_ICE = function(req, res) {
             }
         } else if (req.body.action == 'createIssueInJira') { //Create issues in the Jira
             var createObj = req.body.issue_dict;
-            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty")  && !validateData(createObj.description, "empty") && !validateData(createObj.priority, "empty")) {
+            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty")  && !validateData(createObj.description, "empty")) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
