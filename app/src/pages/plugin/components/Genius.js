@@ -338,7 +338,8 @@ const Genius = (props) => {
     if (window.chrome.runtime) {
       if (!port) {
         try {
-         
+
+          // setLoading("Genius Initiated...");
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);
@@ -350,7 +351,8 @@ const Genius = (props) => {
           port.onMessage.removeListener(backgroundListener);
           port.onDisconnect.removeListener(reconnectEx);
           port = undefined;
-         
+
+          // setLoading("Genius Initiated...");
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
           port.onDisconnect.addListener(reconnectEx);
           port.onMessage.addListener(backgroundListener);

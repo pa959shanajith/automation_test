@@ -15,7 +15,9 @@ const DevOpsConfig = props => {
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
     const [error, setError] = useState({});
+    const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
     const [showSelectBrowser, setShowSelectBrowser] = useState(false);
+    const [text, setText] = useState(props.currentIntegration.name);
     const notexe = useRef(
         props.currentIntegration.executionRequest != undefined ? props.currentIntegration.executionRequest.donotexe.current : {}
         );
@@ -96,7 +98,7 @@ const DevOpsConfig = props => {
                     label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                         event.preventDefault();
                         onClick('displayMaximizable');
-                        onDataParamsIconClick1(module.batchname+module.moduleid, module.name)}}/></div>
+                        onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -124,7 +126,7 @@ const DevOpsConfig = props => {
                             label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                 event.preventDefault();
                                 onClick('displayMaximizable');
-                                onDataParamsIconClick1(batch+module.moduleid, module.name)}}/></div>
+                                onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                         };
                         if(module.scenarios && module.scenarios.length > 0) {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -144,6 +146,7 @@ const DevOpsConfig = props => {
         setSelectedExecutionType(selectedKey);
         setModuleList(filteredNodes);
         setFilteredModuleList(filteredNodes);
+        setinitialFilteredModuleList(filteredNodes);
         setModuleState({expanded: [], checked: []});
         setIntegrationConfig({ ...props.currentIntegration, scenarioList: [], dataParameters: [] });
     }
@@ -334,15 +337,15 @@ const DevOpsConfig = props => {
         return data;
     }
     const handleConfigSave = async (checkForButton) => {
-        if(integrationConfig.name === ''){
+        if(text === ''){
             setError({
                 ...error,
-                name: 'Please Enter Configuration Name'
+                name: 'Please Enter Profile Name'
             });
             return;
         }
         if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
-            setMsg(MSG.CUSTOM("Please Select atleast one Browser",VARIANT.ERROR));
+            setMsg(MSG.CUSTOM("Please select atleast one Browser",VARIANT.ERROR));
             return;
         }
         if(props.currentIntegration.selectValues[2].selected === '') {
@@ -388,7 +391,7 @@ const DevOpsConfig = props => {
                         scenarioTaskType: "disable",
                         testsuiteName: module.name,
                         testsuiteId: module.moduleid,
-                        batchname: "",
+                        batchname: module.batchname,
                         versionNumber: 0,
                         appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
@@ -437,7 +440,7 @@ const DevOpsConfig = props => {
                 }));
         
         if(batchInfo.length < 1) {
-            setMsg(MSG.CUSTOM("Please Select atleast one Scenario",VARIANT.ERROR));
+            setMsg(MSG.CUSTOM("Please select atleast one Scenario",VARIANT.ERROR));
             return;
         }
         props.setLoading('Please Wait...');
@@ -449,7 +452,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: integrationConfig.name,
+            configurename: text,
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
@@ -501,7 +504,10 @@ const DevOpsConfig = props => {
         const onHide = (name) => {
             dialogFuncMap[`${name}`](false);
         }
-    
+    const HandleTextValue =(value)=>{
+    setIntegrationConfig({...integrationConfig, name:value})
+    setText(value)
+    }
     return (<>
         { showIntegrationModal ? 
             <IntegrationDropDown
@@ -537,15 +543,15 @@ const DevOpsConfig = props => {
                 <span className="api-ut__inputLabel inputLabel1" >Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
-                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Profile Name"
-                        errorMessage={(integrationConfig.name === '' && error.name && error.name !== '') ?  error.name : null}
+                    <TextField value={text} width='150%' label="" standard={true} onChange={(event) => HandleTextValue(event.target.value)} autoComplete="off" placeholder="Enter Profile Name"
+                        errorMessage={(text === '' && error.name && error.name !== '') ?  error.name : null}
                     />
                 </span>
             </div>
             <div className="radiobutton_config" > 
-                        <input type='radio' id='Normal' className='radioinputs' data-for="Normal" data-tip="Click here to execute Normal modules"  value='normalExecution' disabled={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('normalExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><p data-for="Normal" data-tip="Click here to execute Normal modules"   className='radioinputsP'>&nbsp;Normal Execution</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Normal" effect="solid" backgroundColor="black" />
-                        <input type='radio' id='Batch' className='radioinputs' data-for="Batch" data-tip="Click here to execute Batch of modules" value='batchExecution' disabled ={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('batchExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><p data-for="Batch" data-tip="Click here to execute Batch of modules"  className='radioinputsP'>&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Batch" effect="solid" backgroundColor="black" />
-                        <input type='radio' id="E2E" className='radioinputs' data-for="E2E" data-tip="Click here to execute end to end flows" value='e2eExecution' disabled ={props.currentIntegration.disable} onChange={() => handleExecutionTypeChange('e2eExecution')} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/><p  data-for="E2E" data-tip="Click here to execute end to end flows"  className='radioinputsP'>&nbsp;E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</p><ReactTooltip id="E2E" effect="solid" backgroundColor="black" />
+                        <input type='radio' id='Normal' className='radioinputs' data-for="Normal" data-tip="Click here to execute Normal modules"  value='normalExecution' disabled={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('normalExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><p data-for="Normal" data-tip=" Click here to select Normal module(s)"   className='radioinputsP'>&nbsp;Normal module(s)</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Normal" effect="solid" backgroundColor="black" />
+                        <input type='radio' id='Batch' className='radioinputs' data-for="Batch" data-tip="Click here to execute Batch of modules" value='batchExecution' disabled ={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('batchExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><p data-for="Batch" data-tip="Click here to select batch module(s)"  className='radioinputsP'>&nbsp;Batch module(s)&nbsp;&nbsp;&nbsp;</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Batch" effect="solid" backgroundColor="black" />
+                        <input type='radio' id="E2E" className='radioinputs' data-for="E2E" data-tip="Click here to execute end to end flows" value='e2eExecution' disabled ={props.currentIntegration.disable} onChange={() => handleExecutionTypeChange('e2eExecution')} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/><p  data-for="E2E" data-tip=" Click here to select E2E flows"  className='radioinputsP'>&nbsp;E2E Flow&nbsp;&nbsp;&nbsp;&nbsp;</p><ReactTooltip id="E2E" effect="solid" backgroundColor="black" />
                     </div> 
         {/* <div>
         {
@@ -555,7 +561,7 @@ const DevOpsConfig = props => {
         {
             <div className="devOps_module_list_div" >
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} moduleList={moduleList} setModuleList={setModuleList} initialFilteredModuleList={initialFilteredModuleList} setinitialFilteredModuleList={setinitialFilteredModuleList} />
                 </div>
                 <div className="devOps_pool_list">
                     <div>
@@ -571,16 +577,16 @@ const DevOpsConfig = props => {
                         />
                     </div>
                     { (props.currentIntegration.selectedBrowserType || showSelectBrowser) && <div>
-                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browsers : </label>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Browsers : </label>
                         <MultiSelectDropdown
                             hideSelectAll
                             noItemsText={'No Browser available'}
                             onSelectKeysChange={(selectedBrowsers) => setIntegrationConfig({...integrationConfig, browsers: selectedBrowsers})}
                             options={browserlist}
-                            placeholder="Select Browsers"
-                            searchPlaceholder="Search Browser Name"
+                            placeholder="Select"
+                            searchPlaceholder="Search"
                             selectedKeys={integrationConfig.browsers}
-                            width='54%'
+                            width='53.5%'
                             />
                     </div> }
                     <div>

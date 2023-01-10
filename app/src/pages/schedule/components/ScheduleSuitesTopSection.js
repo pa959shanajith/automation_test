@@ -46,28 +46,28 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                         inputPropstime: {readOnly:"readonly" ,
                             disabled : true,
                             className:"fc-timePicker",
-                            placeholder: "Select Time",
-                            title: "Select Time"
+                            placeholder: "Time",
+                            title: "Time"
                         },
                         inputPropsdate : {
-                            placeholder: "Select Date",
+                            placeholder: "Start Date",
                             readOnly:"readonly" ,
                             disabled: true,
                             className:"fc-datePicker",
-                            title:"Select Date"
+                            title:"Start Date"
                         },
                         inputPropsrecurring: {
-                          placeholder: "Select Frequency",
+                          placeholder: "Frequency",
                           readOnly: "readonly",
                           disabled: false,
                           className: "fc-timePicker textbox-container",
-                          title: "Select Frequency",
+                          title: "Frequency",
                       },
                         inputPropsEndDate: {readOnly:"readonly" ,
                             disabled : true,
                             className:"fc-timePicker textbox-container",
-                            placeholder: "Select End After",
-                            title: "Select End After"
+                            placeholder: "End Date",
+                            title: "End Date"
                         }
                     };
                 }
@@ -233,6 +233,8 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                         if (parseInt(new Date().getMinutes()).toString().length === 1)
                             min = "0" + min;
                         moduleScheduledateTime[testsuiteid]["time"] = hr + ":" + min;
+                        moduleScheduledateTime[testsuiteid]["clientTime"] = new Date().getFullYear()+ '/' + (new Date().getMonth() + 1) + '/' + new Date().getDate() + ' ' + hr + ":" + min;
+                        moduleScheduledateTime[testsuiteid]["clientTimeZone"] = new Date().toString().split("GMT")[1].slice(0,5);
                     }
                     moduleScheduledateTime[testsuiteid]["inputPropstime"][
                         "disabled"

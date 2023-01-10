@@ -18,6 +18,8 @@ import AllocateICEPopup from '../../global/components/AllocateICEPopup';
 import "../styles/DevOps.scss";
 import DropDownList from '../../global/components/DropDownList';
 import { getPools, getICE_list } from '../../execute/api';
+import {getProjectList} from '../../mindmap/api';
+
 
 
 
@@ -26,6 +28,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
     const dispatch = useDispatch();
+    const userInfo = useSelector(state=>state.login.userinfo);
     const [executionQueue, setExecutionQueue] = useState(false);
     const [filteredList, setFilteredList] = useState(configList);
     const [displayBasic, setDisplayBasic] = useState(false);
@@ -34,7 +37,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [displayBasic3, setDisplayBasic3] = useState(false);
     const [position, setPosition] = useState('center');
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-    const [getProjectList,setProjectList]=useState([]);
+    const [getProjectLists,setProjectList]=useState([]);
     const [projectId, setPojectId] = useState('')
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectData, setProjectData] = useState([]);
@@ -106,7 +109,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setUserDetailList(UserList);
             }
 
-            const ProjectList = await pluginApi.getProjectIDs();
+            const ProjectList = await getProjectList();
             setProjectData1(ProjectList.releases[current_task][0].name);
             setProjectData(ProjectList.releases[current_task][0].cycles[0]._id);
             setCycleName(ProjectList.releases[current_task][0].cycles[0].name);
@@ -139,6 +142,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
+                   const integrationData = configurationList.map((item,idx)=>{
+                        setIntegration(item.executionRequest.integration)
+                    })
                     setConfigList(configurationList);
                 }
             }
@@ -224,6 +230,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
             }
         }else {
+            const integrationData = configurationList.map((item,idx)=>{
+                setIntegration(item.executionRequest.integration)
+            })
             setConfigList(configurationList);
         }
         setLoading(false);
@@ -296,6 +305,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
+                    const integrationData = configurationList.map((item,idx)=>{
+                        setIntegration(item.executionRequest.integration)
+                    })
                     setConfigList(configurationList);
                 }
                 setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
@@ -570,19 +582,19 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             // }
 
             // Change executestatus of scenarios which should not be scheduled according to devops config
-            for (var m = 0; m < keys.length; m++) {
-                tableData[m].scenarioids.map((scenarioid, index) => {
-                    tableData[m].executestatus[index] = 0;
-                    if (m < item.executionRequest.batchInfo.length) {
-                        for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
-                            if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
-                                tableData[m].executestatus[index] = 1;
-                                break;
-                            }
-                        }
-                    }
-                });
-            }
+            // for (var m = 0; m < keys.length; m++) {
+            //     tableData[m].scenarioids.map((scenarioid, index) => {
+            //         tableData[m].executestatus[index] = 0;
+            //         if (m < item.executionRequest.batchInfo.length) {
+            //             for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
+            //                 if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
+            //                     tableData[m].executestatus[index] = 1;
+            //                     break;
+            //                 }
+            //             }
+            //         }
+            //     });
+            // }
             setEachData(tableData);
         }
         setLoading(false);
@@ -691,10 +703,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false
-                })} >Add Profile</button>
+                })} >Create Profile</button>
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
-                    <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                    <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
                 { showCICD && <div className="api-ut__btnGroup">
                    <button onClick={() => {onClick('displayBasic3');getCurrentQueueState()} }>Manage Execution Queue</button>
@@ -711,7 +723,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <SearchDropdown
                     noItemsText={[ ]}
                     onChange={onProjectChange}
-                    options={getProjectList}
+                    options={getProjectLists}
                     selectedKey={selectedProject}
                     width='15rem'
 
@@ -723,7 +735,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             { /* Table */ }
             <div className="d__table">
                 <div className="d__table_header">
-                <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#&nbsp;</span>
+                <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >Sl.no&nbsp;</span>
                     <span className="d__out_head tkn-table__key tkn-table__head1" >&nbsp;&nbsp;Execution Profile Name</span>
                     {/* <span className="details_col tkn-table__key d__det_head" >Configuration Key</span> */}
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
@@ -793,8 +805,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                     <td className="tkn-table__button" >
-                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button" alt="Edit Icon" title='Edit'/> 
-                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons Delete_button" alt="Delete Icon" title='Delete'/>
+                                        <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button" alt="Edit Icon" title='Edit Profile'/> 
+                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons Delete_button" alt="Delete Icon" title='Delete Profile'/>
                                     </td>
                              </tr>)
                          }
@@ -868,7 +880,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <input type="radio" defaultChecked={appType!=="Web"} name='myRadios' id='first'  className='radiobutton' onChange={() => {setShowIcePopup(true)}}
                       />&nbsp;&nbsp;
                     <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Assure Client</label>
-                    <input disabled={appType!=="Web"} title={appType!=="Web"?"Apptype not supported":""} type="radio" name='myRadios' id='second' onChange={()=>{setShowIcePopup(false)}} className='radiobutton'  defaultChecked={appType==="Web"}/>&nbsp;&nbsp;
+                    <input disabled={appType!=="Web" || userInfo.isTrial } title={appType!=="Web"?"Apptype not supported":""} type="radio" name='myRadios' id='second' onChange={()=>{setShowIcePopup(false)}} className='radiobutton'  defaultChecked={appType==="Web"}/>&nbsp;&nbsp;
                     <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" title={appType!=="Web"?"Apptype not supported":""}>Avo Agent / Avo Grid</label>
                     { showIcePopup && <div>
                         <div>
@@ -926,7 +938,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
 
                 {/* Dialog for CI /CD  */}
 
-                <Dialog header="Execute via CI/CD" visible={displayBasic} className="cicdName" onHide={() => onHide('displayBasic')}>
+                <Dialog header="Execute via CI/CD" visible={displayBasic} className="cicdName" onHide={() => {
+                    onHide('displayBasic');
+                    setExecutionTypeInRequest('asynchronous')
+                    }}>
                     <div className="cicdDiv" title={url}>
                     <span className="devOps_dropdown_label devOps_dropdown_label_url cicdSpan" id='api-url' value={url}>DevOps Integration API url : </span>
                         <pre className='grid_download_dialog__content__code cicdpre'>
@@ -945,7 +960,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                                 <label id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
-                                <Toggle label="" inlineLabel={true} onChange = {() => executionTypeInRequest == 'asynchronous' ? setExecutionTypeInRequest('synchronous') : setExecutionTypeInRequest('asynchronous')}/>
+                                <Toggle label="" inlineLabel={true} onChange = {() => executionTypeInRequest == 'asynchronous' ? setExecutionTypeInRequest('synchronous') : setExecutionTypeInRequest('asynchronous')}
+                                    checked = {executionTypeInRequest === 'synchronous'}/>
                                 <label id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
                         </div>
                     </div>

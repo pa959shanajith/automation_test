@@ -16,6 +16,7 @@ import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
+import { deleteScenario} from '../api';
 // import TaskBox from '../components/TaskBox';
 // import {Dialog} from '@avo/designcomponents';
 import * as pluginApi from '../../plugin/api';
@@ -54,6 +55,7 @@ const CanvasNew = (props) => {
     const [fetchingDetails,setFetchingDetails] = useState(null); // this can be used for fetching testcase/screen/scenario/module details
     const [ctrlBox,setCtrlBox] = useState(false);
     const [taskname, setTaskName] = useState("") 
+
     const [inpBox,setInpBox] = useState(false);
     const [multipleNode,setMultipleNode] = useState(false)
     const [ctScale,setCtScale] = useState({})
@@ -70,16 +72,12 @@ const CanvasNew = (props) => {
     const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true)
     const appType = useSelector(state=>state.mindmap.appType);
-    const proj = useSelector(state=>state.plugin.PN)
+    const proj = useSelector(state=>state.mindmap.selectedProj)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
     const CanvasRef = useRef();
     readCtScale = () => ctScale
-
-
-    
-    
 
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
@@ -90,10 +88,43 @@ const CanvasNew = (props) => {
             }).catch(error=>{
                 console.log(error)
             })
-        return ()=>{
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
+        // return ()=>{
+        //     dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        // }
     },[])
+    useEffect(()=>{
+        if(deletedNodes && deletedNodes.length>0){
+            var scenarioIds=[]
+            var screenIds=[]
+            var testcaseIds=[]
+            for(let i = 0 ;i<deletedNodes.length; i++){
+                if(deletedNodes[i].length>1){
+                    if(deletedNodes[i][1]=="scenarios"){
+                        scenarioIds.push(deletedNodes[i][0]);                    
+                    }
+                    if(deletedNodes[i][1]=="screens"){
+                        screenIds.push(deletedNodes[i][0]);                    
+                    }
+                    if(deletedNodes[i][1]=="testcases"){
+                        testcaseIds.push(deletedNodes[i][0]);                    
+                    }
+                }
+                
+            } 
+            (async()=>{
+                setBlockui({show:true,content:'Loading ...'})
+                var res = await deleteScenario({scenarioIds:scenarioIds,screenIds:screenIds,testcaseIds:testcaseIds})
+                if(res.error){displayError(res.error);return;}                
+                setDelSnrWarnPop(false)                
+                dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
+                setBlockui({show:false})
+                setMsg(MSG.MINDMAP.SUCC_DELETE_SCENARIO)
+                setCreateNew('autosave')                             
+            })()
+
+        }
+    },[deletedNodes]
+    )
     useEffect(() => {
         var tree;
         count = {
@@ -156,6 +187,7 @@ const CanvasNew = (props) => {
             if(verticalLayout !== props.verticalLayout && dNodes.length > 0){
                 tree = dNodes[0]
             }
+            //load mindmap from data
             tree = generateTree(tree,types,{...count},props.verticalLayout)
             count= {...count,...tree.count}
         }
@@ -173,6 +205,9 @@ const CanvasNew = (props) => {
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect(()=>{
         if(createnew === 'save'){
+            setCreateNew(false)
+        }
+        else if(createnew === 'autosave'){
             setCreateNew(false)
         }
         else if(createnew !== false){
@@ -198,6 +233,7 @@ const CanvasNew = (props) => {
             setInpBox(false)
             setCtrlBox(e.target.parentElement.id)
             setTaskName(e.target.parentElement.children[2].innerHTML)
+
         }
     }
     const createMultipleNode = (e,mnode)=>{
@@ -374,6 +410,7 @@ const CanvasNew = (props) => {
     const clickDeleteNodeHere=(id)=>{
         var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
         if(res){
+            // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
             setReuseDelConfirm(false)
             setNodes(res.nodeDisplay)
             setLinks(res.linkDisplay)
@@ -389,10 +426,10 @@ const CanvasNew = (props) => {
             setLinks(res.linkDisplay)
             setdLinks(res.dLinks)
             setdNodes(res.dNodes)
-            
         }
-        setDelConfirm(false);
         setReuseDelConfirm(false);
+        setDelConfirm(false);
+        setEndToEndDelConfirm(false);
     }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
@@ -468,12 +505,12 @@ const CanvasNew = (props) => {
 
     return (
         <Fragment>
-            <ConfirmDialog />
+             <ConfirmDialog />
              <Dialog header={taskname + " : Capture Elements"}  visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
-             <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} /></div>
+             <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} openScrapeScreen={props.onClick}/></div>
              </Dialog>
              <Dialog header={taskname  +  " : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
-             <div style={{ height: '50vh'}}><DesignHome fetchingDetails={fetchingDetails} appType={appType}  /></div>
+             <div style={{ height: '50vh'}}><DesignHome fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} appType={appType} openScrapeScreen={props.onClick} /></div>
              </Dialog>
             {/* <Dialog
             hidden = {props.showScrape === false}
@@ -523,7 +560,7 @@ const CanvasNew = (props) => {
                 })}
                 {Object.entries(nodes).map((node)=>
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                        <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                       <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='testcases')?
@@ -553,7 +590,7 @@ const CanvasNew = (props) => {
             />:null}
             {DelConfirm?<ModalContainer 
                 title='Confirmation'
-                content={"Are you sure, you want to Delete it permenantly?"}         
+                content={"Are you sure, you want to Delete it Permanently?"}         
                 close={()=>setDelConfirm(false)}
                 footer={
                     <>

@@ -313,6 +313,10 @@ export const addNode = (n) =>{
     }
     var img_src = 'static/imgs/node-' + n.type + '.png';
     if (n.reuse && (n.type === 'testcases' || n.type === 'screens')) img_src = 'static/imgs/' + n.type + '-reuse.png';
+    if (n.type === 'screens' && n.objLen===0) img_src = 'static/imgs/' + n.type + '-capture.png';
+    if (n.type === 'screens' && n.objLen===0 && n.reuse) img_src = 'static/imgs/' + n.type + '-reusecapture.png';
+    if (n.type === 'testcases' && n.stepsLen===0) img_src = 'static/imgs/' + n.type + '-teststep.png';
+    if (n.type === 'testcases' && n.stepsLen===0 && n.reuse) img_src = 'static/imgs/' + n.type + '-reuseteststep.png';
     var accessibility = 'Disable'
     if(n.task && n.task.tasktype == 'Execute Scenario Accessibility Only') accessibility = 'Exclusive'
     else if(n.task && n.task.tasktype == 'Execute Scenario with Accessibility') accessibility = 'Enable'

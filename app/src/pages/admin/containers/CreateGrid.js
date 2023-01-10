@@ -303,7 +303,7 @@ const CreateGrid = ({
           <>
             <div className="searchBoxInput">
               <SearchBox
-                placeholder="Enter Text to Search"
+                placeholder="Search"
                 width="20rem"
                 value={searchText}
                 onClear={() => handleSearchChange("")}

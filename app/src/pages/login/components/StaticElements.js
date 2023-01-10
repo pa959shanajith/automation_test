@@ -18,7 +18,7 @@ const StaticElements = ({children}) => {
             <div className="element-holder">
                 <div className="greet-text">
                     <h1>Hello</h1>
-                    <h2>Welcome to Avo Assure!</h2>
+                    <h2>Welcome to Avo Assure</h2>
                     <h3>Login to Experience Intelligence.</h3>
                 </div>
                 <div className="login-block">

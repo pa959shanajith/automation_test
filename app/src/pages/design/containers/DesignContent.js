@@ -86,6 +86,7 @@ const DesignContent = props => {
     const [allUsers,setAllUsers] = useState([])
     const [groupList,setGroupList] = useState([])
     const [showPopup, setShow] = useState(false);
+    const [debugEnable, setDebugEnable] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -123,6 +124,12 @@ const DesignContent = props => {
     useEffect(()=>{
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
         //eslint-disable-next-line
+        Object.values(testCaseData).forEach(value => {
+            if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+              setDebugEnable(true);          
+             }
+            });
+          
     }, [testCaseData]);
 
     useEffect(()=>{
@@ -412,6 +419,7 @@ const DesignContent = props => {
         setStepSelect({edit: false, check: [], highlight: []});
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
+        setDebugEnable(false);
     }
 
     const setRowData = data => {
@@ -854,12 +862,12 @@ const DesignContent = props => {
         if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
         
         // globalSelectedBrowserType = selectedBrowserType;5
-    
+        
         if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
         else testcaseID.push(props.fetchingDetails['_id']);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, [props.fetchingDetails['_id']], userInfo, props.appType)
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
             .then(data => {
                 setOverlay("");
                 ResetSession.end();
@@ -924,7 +932,7 @@ const DesignContent = props => {
                     <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
                     <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
                     {props.appType==="Web"?<div className='taskButtonWeb'>
-                   
+
                         {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                         <NormalDropDown
                         // style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
@@ -932,8 +940,8 @@ const DesignContent = props => {
 
                             onChange={(e,item)=>{
                                 setDebugButton(item.key)}}
-                            
-                            
+
+
                             options={[
                             {
                                 data: {
@@ -995,36 +1003,36 @@ const DesignContent = props => {
                         :
                         props.appType==="OEBS" ? 
                         <div className='desktopAppDesign_btn'>
-                            <p onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
+                            <p onClick={()=> debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>OEBS Apps</span></p>
                         </div>: 
                         props.appType==="Desktop"? <div className='desktopAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
+                        <p  onClick={()=>debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Desktop Apps</span></p>
                         </div>:
                         props.appType==="SAP"?<div className='desktopAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
+                        <p  onClick={()=> debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>SAP Apps</span></p>
                         </div>:
                         props.appType==="MobileApp"?<div className='mobileAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
+                        <p  onClick={()=> debugEnable || debugTestCases('1')} ><img src="static/imgs/ic-mobility.png" style={{opacity:!debugEnable?1:0.5}}/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Mobile App</span></p>
                         </div>:
                         props.appType==="MobileWeb"?<div className='mobileAppDesign_btn'>
-                        <p onClick={()=>debugTestCases()}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
+                        <p onClick={()=> debugEnable || debugTestCases()}><img src="static/imgs/ic-mobility.png" style={{opacity:!debugEnable?1:0.5}} /><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Mobile Web</span></p>
                         </div>:
                         props.appType==="System"? <div className='desktopAppDesign_btn'>
-                        <p onClick={()=>debugTestCases('1')}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>System App</span></p>
+                        <p onClick={()=> debugEnable || debugTestCases('1')}><img  style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>System App</span></p>
                         </div>:
                         props.appType==="Mainframe"?<div className='mainframeDesign_btn'>
-                            <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
+                            <p onClick={()=>debugEnable || debugTestCases()}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px',opacity:!debugEnable?1:0.5}}>Maniframe</span></p>
                         </div>:
                          props.appType==="Webservice"?<div className='webservices_btn'>
-                         <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px'}}>WebServices</span></p>
+                         <p onClick={()=>debugEnable || debugTestCases()}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>WebServices</span></p>
                      </div>:""}
 
                 </div>
-                       
-               {(props.appType==="Web") ?
+                    
+               {(props.appType==="Web")?
                <div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
-                    <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
-                </div>:""} 
+                {<Button label="Debug"  disabled={debugEnable} className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>}
+            </div>:""}
             </div>
            
 

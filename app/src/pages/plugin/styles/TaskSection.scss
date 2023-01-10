@@ -391,4 +391,16 @@
 
 }
 
+.dialog__projectDialog {
+    .ms-Label, .ms-TextField-field, .ms-Dropdown-title, .ms-SearchBox-field, .labelStyle1>label, .display_project_box_list>span {
+        font-size: 15px !important;
+    }
+    input:disabled, .ms-TextField.is-disabled .ms-TextField-fieldGroup {
+        background-color: #C7C7C7 !important;
+        color: #8E8E8E !important;
+    }
+}
 
+#apptype__dropdown-list>.ms-Button, #project__dropdown-list>.ms-Button {
+    font-size: 15px !important;
+}

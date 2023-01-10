@@ -31,8 +31,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectNodes = useSelector(state=>state.mindmap.selectNodes)
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const prjList = useSelector(state=>state.mindmap.projectList)
-    const initProj = useSelector(state=>state.plugin.PN)
-    const selectedProj = useSelector(state=>state.plugin.PN)
+    const initProj = useSelector(state=>state.mindmap.selectedProj)
+    const selectedProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const selectedModule = useSelector(state=>state.mindmap.selectedModule)    
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
@@ -52,7 +52,10 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         // setselectedProjectNameForDropdown(proj);
-        dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
+        if(!isCreateE2E){
+            // dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
@@ -61,6 +64,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         if(screendata.error){displayError(screendata.error);return;}
         setModList(moduledata)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+        dispatch({ type: actionTypes.SELECT_MODULELIST, payload: [] })
         // dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata});
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
         // if(SearchInp){

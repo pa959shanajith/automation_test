@@ -69,8 +69,8 @@ const RectangleBox = (props) =>{
     }}
     onResize={()=>resize()}
     default={{
-      x: 150,
-      y: 150,
+      x: 500,
+      y: 22,
       width: 150,
       height: 150
     }}>

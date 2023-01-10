@@ -15,6 +15,7 @@ import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 import CanvasEnE from './CanvasEnE';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { Redirect } from 'react-router-dom'
+import * as actionTypesPlugin from '../../plugin/state/action';
 
 
 /*Component CreateNew
@@ -30,7 +31,7 @@ const CreateNew = ({importRedirect}) => {
   const [loading,setLoading] = useState(true)
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
-  const selectProj = useSelector(state=>state.plugin.PN)
+  const selectProj = useSelector(state=>state.mindmap.selectedProj);  
   const prjList = useSelector(state=>state.mindmap.projectList)
   const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
@@ -40,13 +41,22 @@ const CreateNew = ({importRedirect}) => {
   const [displayBasic, setDisplayBasic] = useState(false);
   const [displayBasic2, setDisplayBasic2] = useState(false);
   const [position, setPosition] = useState('center');
+  const [populateTestcaseDetails, setPopulateTestcaseDetails] = useState(undefined)
   const dialogFuncMap = {
       'displayBasic': setDisplayBasic,
       'displayBasic2': setDisplayBasic2
   }
 
-  const onClick = (name, position) => {
+  const onClick = (name, position, toBeClosed=undefined, extraProps=undefined) => {
       dialogFuncMap[`${name}`](true);
+      if(toBeClosed){
+        dialogFuncMap[`${toBeClosed}`](false);
+      }
+      if (extraProps && extraProps.populateTestcaseDetails) {
+        setPopulateTestcaseDetails(extraProps.populateTestcaseDetails);
+      }else {
+        setPopulateTestcaseDetails(undefined);
+      }
       if (position) {
           setPosition(position);        
       }
@@ -78,7 +88,7 @@ const CreateNew = ({importRedirect}) => {
         if(res.error){displayError(res.error);return;}
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
-        // dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
+        dispatch({type:actionTypesPlugin.SET_PN,payload:res.projectId[0]})
         
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
@@ -131,7 +141,7 @@ const CreateNew = ({importRedirect}) => {
                 </div>
                 <div id='mp__canvas' className='mp__canvas'>
                      {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?
-                    <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap}  displayBasic={displayBasic} displayBasic2= {displayBasic2}  setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
+                    <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap}  displayBasic={displayBasic} displayBasic2= {displayBasic2}  setShowScrape={setShowScrape} populateTestcaseDetails={populateTestcaseDetails} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
                    
