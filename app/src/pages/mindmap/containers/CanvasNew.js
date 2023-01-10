@@ -590,7 +590,7 @@ const CanvasNew = (props) => {
             />:null}
             {DelConfirm?<ModalContainer 
                 title='Confirmation'
-                content={"Are you sure, you want to Delete it permenantly?"}         
+                content={"Are you sure, you want to Delete it Permanently?"}         
                 close={()=>setDelConfirm(false)}
                 footer={
                     <>

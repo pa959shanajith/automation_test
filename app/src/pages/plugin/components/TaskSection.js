@@ -24,8 +24,7 @@ import { DataTable } from 'primereact/datatable';
 // import { FontSizes } from '@fluentui/react';
 // import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
 import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
-import { text } from 'body-parser';
-import { RadioButton } from 'primereact/radiobutton'
+import {getProjectList} from '../../mindmap/api';
 // import useOnClickOutside from './UseOnClickOutside'
 // import * as actionTypes from '../state/action';
 // import {userCreateProject_ICE} from '../api';
@@ -68,7 +67,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
     // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
-    const [getProjectList,setProjectList]=useState([]);
+    const [getProjectLists,setProjectList]=useState([]);
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectName, setProjectName] = useState("");
     // const [selDomainOptions,setSelDomainOptions] = useState([])
@@ -262,7 +261,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             resetStates();
 
             setOverlay("Loading Tasks..Please wait...");
-            pluginApi.getProjectIDs()
+            getProjectList()
                 .then(data => {
                     console.log(data)
                     setProjectNames(data);
@@ -628,7 +627,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                     <NormalDropDown 
                                         required
                                         label="Project Name"
-                                        options={getProjectList}
+                                        options={getProjectLists}
                         onChange={async(e,item) =>{
                                             setSelectedProject(item.key)
                                             const users_obj = await pluginApi.getUsers_ICE(item.key);
@@ -714,7 +713,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                         width="20rem"
                                         onClear={() => {setSearchUsers("")}}
                                         onChange={(e,value)=>{
-                                            debugger;
                                             setSearchUsers(value);
                                             setSearchText(value);
                                         }}
@@ -805,7 +803,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                             <div>
                             <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px",marginTop:'-0.9rem' }} 
                             onClick={async()=>{
-                                debugger;
                                if(createProjectCheck){
                                     try{
                                                 if (!(appType && appType.key && projectName)) {
