@@ -54,11 +54,9 @@ const ModuleListDrop = (props) =>{
         if(moduleSelect.type === 'endtoend') {
             setIsE2EOpen(true)
             setCollapse(true);
+            
         }
-        // if(moduleList.length > 0) {
-        //     const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
-        //     selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,firstRender);
-        // }
+        
         setWarning(false);
         setScenarioList([]);
      }, [proj])
