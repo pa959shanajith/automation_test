@@ -6,6 +6,7 @@ import {v4 as uuid} from 'uuid';
 import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents,ValidationExpression, GenerateTaskList, Messages as MSG, setMsg,Messages ,VARIANT} from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
+import * as actionTypesMindmap from '../../mindmap/state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
 // import '../styles/ProjectAssign.scss';
@@ -23,8 +24,7 @@ import { DataTable } from 'primereact/datatable';
 // import { FontSizes } from '@fluentui/react';
 // import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
 import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
-import { text } from 'body-parser';
-import { RadioButton } from 'primereact/radiobutton'
+import {getProjectList} from '../../mindmap/api';
 // import useOnClickOutside from './UseOnClickOutside'
 // import * as actionTypes from '../state/action';
 // import {userCreateProject_ICE} from '../api';
@@ -67,7 +67,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
     // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
-    const [getProjectList,setProjectList]=useState([]);
+    const [getProjectLists,setProjectList]=useState([]);
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectName, setProjectName] = useState("");
     // const [selDomainOptions,setSelDomainOptions] = useState([])
@@ -261,7 +261,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             resetStates();
 
             setOverlay("Loading Tasks..Please wait...");
-            pluginApi.getProjectIDs()
+            getProjectList()
                 .then(data => {
                     console.log(data)
                     setProjectNames(data);
@@ -536,7 +536,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
 
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
-                                            dispatch({type: actionTypes.SET_PN, payload:projectNames.projectId[idx]});
+                                            dispatch({type: actionTypesMindmap.SELECT_PROJECT, payload:projectNames.projectId[idx]});
                                             window.localStorage['navigateScreen'] = "mindmap";
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
@@ -627,7 +627,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                     <NormalDropDown 
                                         required
                                         label="Project Name"
-                                        options={getProjectList}
+                                        options={getProjectLists}
                         onChange={async(e,item) =>{
                                             setSelectedProject(item.key)
                                             const users_obj = await pluginApi.getUsers_ICE(item.key);
@@ -713,7 +713,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                         width="20rem"
                                         onClear={() => {setSearchUsers("")}}
                                         onChange={(e,value)=>{
-                                            debugger;
                                             setSearchUsers(value);
                                             setSearchText(value);
                                         }}
@@ -804,7 +803,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                             <div>
                             <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px",marginTop:'-0.9rem' }} 
                             onClick={async()=>{
-                                debugger;
                                if(createProjectCheck){
                                     try{
                                                 if (!(appType && appType.key && projectName)) {

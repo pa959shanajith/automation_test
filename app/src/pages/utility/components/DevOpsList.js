@@ -18,6 +18,8 @@ import AllocateICEPopup from '../../global/components/AllocateICEPopup';
 import "../styles/DevOps.scss";
 import DropDownList from '../../global/components/DropDownList';
 import { getPools, getICE_list } from '../../execute/api';
+import {getProjectList} from '../../mindmap/api';
+
 
 
 
@@ -35,7 +37,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [displayBasic3, setDisplayBasic3] = useState(false);
     const [position, setPosition] = useState('center');
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-    const [getProjectList,setProjectList]=useState([]);
+    const [getProjectLists,setProjectList]=useState([]);
     const [projectId, setPojectId] = useState('')
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectData, setProjectData] = useState([]);
@@ -107,7 +109,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setUserDetailList(UserList);
             }
 
-            const ProjectList = await pluginApi.getProjectIDs();
+            const ProjectList = await getProjectList();
             setProjectData1(ProjectList.releases[current_task][0].name);
             setProjectData(ProjectList.releases[current_task][0].cycles[0]._id);
             setCycleName(ProjectList.releases[current_task][0].cycles[0].name);
@@ -721,7 +723,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <SearchDropdown
                     noItemsText={[ ]}
                     onChange={onProjectChange}
-                    options={getProjectList}
+                    options={getProjectLists}
                     selectedKey={selectedProject}
                     width='15rem'
 
