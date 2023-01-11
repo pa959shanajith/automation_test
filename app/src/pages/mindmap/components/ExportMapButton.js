@@ -96,7 +96,6 @@ const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,selectedModulelist,isAs
         resetImportModule(e.target.value);
     }
     const resetImportModule = async(selProj) => {
-        // if(uploadFileRef.current)uploadFileRef.current.value = ''
           if(selProj) {
               var moduledata = await getModules({"tab":"tabCreate","projectid":selProj,"moduleid":null,"query":"modLength"})
               if (moduledata.length>0){
@@ -237,7 +236,6 @@ const exportToProj = async(module,currProjId,displayError,setBlockui) => {
         }
         var result =  await exportToProject(data)
         if(result.error){displayError(result.error);return;}
-        // jsonDownload(fname+'.mm', JSON.stringify(result));
         setBlockui({show:false,content:''})
         setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
     }catch(err){
