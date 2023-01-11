@@ -820,8 +820,7 @@ const Genius = (props) => {
               }
               onChange={(e, item) => {
                 setSelectedProject(item)
-                getScreens(item.key).then(data=>console.log(data)).catch(err=>console.log(err))
-              }}
+                              }}
               placeholder="Select"
               width="300px"
               required
@@ -853,30 +852,6 @@ const Genius = (props) => {
               required
             />
           </div>
-
-          {/* <div style={{ position: "relative" }}>
-            <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Module</div>
-            <SearchDropdown
-              label="Module"
-              options={projModules.map((mod) => {
-                return {
-                  key: mod._id,
-                  text: mod.name
-                }
-              })}
-              onChange={(e, item) => {
-               
-                setSelectedModule(item)
-                
-              }}
-              noItemsText={"NO modules found"}
-              selectedKey={selectedModule ? selectedModule.key : null}
-              placeholder="Select"
-              width="300px"
-              disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
-              required
-            />
-          </div> */}
 
           <div style={{ position: "relative" }}>
             <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Scenario</div>
