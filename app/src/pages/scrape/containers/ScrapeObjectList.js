@@ -557,7 +557,7 @@ const ScrapeObjectList = (props) => {
                     <div  onClick={() => {!disableAction && setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img style={{opacity:!disableAction?1:0.5}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px',opacity:!disableAction?1:0.5}}>Mobile Apps</span></div>
                     </div>:
                     props.appType==="MobileWeb"?<div className={'mobileApp_btn' +(disableAction || compareFlag ? " disable-thumbnail" : "")}>
-                    <div onClick={() =>{!disableAction && !compareFlag && setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{opacity:!disableAction?1:0.5}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px',opacity:!disableAction?1:0.5}}>Mobile Web</span></div>
+                    <div onClick={() =>{!disableAction && !compareFlag && setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{opacity:!disableAction?1:0.5}}src="static/imgs/mobileWeb.png"/><span style={{paddingLeft:'7px',opacity:!disableAction?1:0.5}}>Mobile Web</span></div>
                     </div>:""}
 
                     <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
