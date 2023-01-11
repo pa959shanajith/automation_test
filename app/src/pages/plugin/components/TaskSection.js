@@ -537,6 +537,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
                                             dispatch({type: actionTypesMindmap.SELECT_PROJECT, payload:projectNames.projectId[idx]});
+                                            dispatch({type:actionTypesMindmap.SELECT_MODULE,payload:{}})
                                             window.localStorage['navigateScreen'] = "mindmap";
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
