@@ -25,6 +25,7 @@ import { DataTable } from 'primereact/datatable';
 // import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
 import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
 import {getProjectList} from '../../mindmap/api';
+// import ValidationExpression from '../../global/components/ValidationExpression'
 // import useOnClickOutside from './UseOnClickOutside'
 // import * as actionTypes from '../state/action';
 // import {userCreateProject_ICE} from '../api';
@@ -87,6 +88,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
     const [redirectTo, setRedirectTo] = useState("");
     const [searchText, setSearchText] = useState("");
+    const [projectNameError,setProjectNameError] = useState("");
 
     // const userConf = useSelector(state=>state.admin.userConf)
     // const node = useRef();
@@ -623,7 +625,18 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     isCreate == true ? <TextField /> : <NormalDropDown /> 
                 } */}
                             {
-                    createProjectCheck ? <TextField required label='Project Name'  placeholder='Enter Project Name'  width='300px' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='15px'  /> : 
+                    createProjectCheck ? <TextField  label='Project Name'  placeholder='Enter Project Name'  width='300px' fontStyle='LatoWeb'  onChange={(e)=>{
+            
+                                    // if( ValidationExpression(e.target.value,"projectName") ) {
+                                    //     setProjectNameError('Special Characters are not allowed')
+                                    // }else {
+                                    //     setProjectNameError("")
+                                    //     setProjectName(e.target.value)
+                                    // }
+                                    let value = ValidationExpression(e.target.value,"projectName");
+                                    setProjectName(value);
+                                }} FontSize='15px'
+                                errorMessage = {projectNameError}  required/> : 
                                     <NormalDropDown 
                                         required
                                         label="Project Name"
