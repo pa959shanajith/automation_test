@@ -1,8 +1,8 @@
 import * as actionTypes from './action';
 
 const initialState = {
-    SR: "Test Lead",
-    userinfo: {"user_id":"62e37f4f7f8c5bb0300feff8","username":"ritik_sharma","email_id":"ritik.sharma@avoautomation.com","additionalrole":[],"firstname":"Ritik","lastname":"Sharma","role":"5db0022cf87fdec084ae49aa","taskwflow":false,"token":"720","dateformat":"YYYY-MM-DD","dbuser":true,"ldapuser":false,"samluser":false,"openiduser":false,"welcomeStepNo":3,"firstTimeLogin":true,"rolename":"Test Lead","pluginsInfo":[{"pluginName":"Integration","pluginValue":true},{"pluginName":"APG","pluginValue":false},{"pluginName":"Dashboard","pluginValue":true},{"pluginName":"Mindmap","pluginValue":true},{"pluginName":"Neuron Graphs","pluginValue":false},{"pluginName":"Performance Testing","pluginValue":false},{"pluginName":"Reports","pluginValue":true},{"pluginName":"Utility","pluginValue":true},{"pluginName":"Webocular","pluginValue":false},{"pluginName":"Selenium To Avo","pluginValue":true},{"pluginName":"Avo Discover","pluginValue":false},{"pluginName":"iTDM","pluginValue":true}],"page":"plugin","tandc":false,"isTrial":false},
+    SR: "",
+    userinfo: {},
     socket:undefined,
     notify:{data:[],unread:0},
     dateformat:"DD-MM-YYYY"
