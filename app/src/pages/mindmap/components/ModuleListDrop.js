@@ -38,13 +38,12 @@ const ModuleListDrop = (props) =>{
     const userRole = useSelector(state=>state.login.SR);
     const [firstRender, setFirstRender] = useState(true);
     const [showNote, setShowNote] = useState(false);
-  
 
     useEffect(()=> {
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        if(moduleList.length > 0) {
-            const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
-            selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
+        
+            if(moduleList.length > 0) {
+                const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
+                selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
         }
        
         setWarning(false);
@@ -200,7 +199,7 @@ const ModuleListDrop = (props) =>{
         var sceName = e.currentTarget.getAttribute("title")	
         var scArr = {...selectedSc}	
         if(scArr[sceId]){	
-            delete scArr[sceId] 	
+            delete scArr[sceId] 
         }else{	
             scArr[sceId] = sceName	
         }       
