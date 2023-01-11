@@ -1,5 +1,4 @@
 import React, { useState, useEffect ,useRef} from 'react';
-// import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
 import { useHistory, Redirect } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
@@ -9,7 +8,6 @@ import * as actionTypes from '../state/action';
 import * as actionTypesMindmap from '../../mindmap/state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
-// import '../styles/ProjectAssign.scss';
 import PropTypes from 'prop-types';
 import { NormalDropDown, SearchBox, TextField } from '@avo/designcomponents';
 import 'primeicons/primeicons.css';
@@ -21,13 +19,9 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
-// import { FontSizes } from '@fluentui/react';
-// import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
 import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
 import {getProjectList} from '../../mindmap/api';
-// import useOnClickOutside from './UseOnClickOutside'
-// import * as actionTypes from '../state/action';
-// import {userCreateProject_ICE} from '../api';
+
 
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -66,11 +60,11 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [statechange,setStateChange] = useState(true);
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
-    // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
+ 
     const [getProjectLists,setProjectList]=useState([]);
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectName, setProjectName] = useState("");
-    // const [selDomainOptions,setSelDomainOptions] = useState([])
+  
     const [searchUsers, setSearchUsers] = useState("")
 
     const [projectNames, setProjectNames] = useState(null);
@@ -88,10 +82,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [redirectTo, setRedirectTo] = useState("");
     const [searchText, setSearchText] = useState("");
 
-    // const userConf = useSelector(state=>state.admin.userConf)
-    // const node = useRef();
-
-    // useOnClickOutside(node, () => props.setShowDropdownEdit(!props.showDropdownEdit));
 
     const handleCreateChange = () => {
         setCreateProjectCheck(true);
@@ -135,28 +125,13 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         }
         props.setSelDomainOptions(data);
     }
-    // const displayError = (error) =>{
-    //     setLoading(false)
-    //     setMsg(error)
-    // }
+    
 
     let dataDict;
 
 
 
-    // useEffect( async () => {
-
-    // },[]);
-
-    // useEffect(async()=>{
-
-    // },[]);
-
-    // useEffect(()=>{
-    //     (async () => {
-    //         const res= await pluginApi.userCreateProject_ICE();
-    //     })()
-    // },[])
+    
 
     useEffect(()=>{
         (async() => {
@@ -168,14 +143,10 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
             }
 
-            console.log("UserDetailsList");
-            console.log(userListFromApi);
+           
             const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
             setProjectsDetails(ProjectList)
-            // ProjectList = {
-            //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
-            //     "projectNames":["avangers", "avangers2"]
-            // }
+            
         if(ProjectList.error){
                 setMsg(MSG.CUSTOM("Error while fetching the project Details"));
         }else{
@@ -185,26 +156,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         {
                             key: element,
                             text: ProjectList.projectName[index],
-                            // disabled: true,
-                            // title: 'License Not Supported' 
+                            
                         }
                     )
                 });
                 setProjectList(arraynew);
-                // key: "62e27e5887904e413dad10ff",
-                // text: "avangers2"
+                
             }
-            // [
-            //     {
-            //         key: "62e27e5887904e413dad10fe",
-            //         text: "avangers"
-            //     },
-            //     {
-            //     ]
-            // }
+            
 
-        console.log("domaindetails","Banking");
-            console.log(ProjectList);
             var plugins = [];
         const plugins_list= await getAvailablePlugins();
 
@@ -212,12 +172,13 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         if(plugins_list.error){
                 setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
-                console.log(plugins_list);
-
                 let txt = [];
                 for (let x in plugins_list) {
                         if(plugins_list[x] === true) {
                         txt.push({
+                            data: {
+                                icon:x,
+                            },
                             key: x,
                             //text: x[0].toUpperCase()+x.slice(1)
                             text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
@@ -234,20 +195,10 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         })
                     }
                 }
-                //   setProjectList(arraynew1);
-                // const arraynew2 = arraynew1.map((txt) => {
-                //       return (
-                //     {
-                //         key: txt,
-                //         text:txt
-                //     }
-                // )
-                // }
-                // ); 
+               
                 setplugins_list(txt);
             }
-            // console.log({"desktop":true, "mainframe": true, "mobileapp": true, "mobileweb": true, "oebs":true, "sap": true, "system":true,"web":true,"webservice":true});
-            // console.log(plugins_list);
+            
         })()
 
     },[])
@@ -263,7 +214,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             setOverlay("Loading Tasks..Please wait...");
             getProjectList()
                 .then(data => {
-                    console.log(data)
+                    
                     setProjectNames(data);
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
                     else {
@@ -308,19 +259,19 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                                 setDataDictState(dataDict);
                         dispatch({type: actionTypes.SET_FD, payload: dataDict})
-                                console.log(data)
+                                
                             })
                             .catch(error => {
                                 setOverlay("");
                                 setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
-                                console.error("Error::::", error);
+                                
                             });
                     }
                 })
                 .catch(error => {
                     setOverlay("");
                     setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
-                    console.error("Error::::", error);
+                    
                 });
         }
     }, [userInfo, userRole]);
@@ -417,27 +368,13 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         else return false;
     }
 
-    // const onSelectTodo = event =>{
-    //     setActiveTab("todo");
-    //     if (showSearch) searchTask("todo", searchValue);
-    // }
-
-    // const onSelectReview = event => {
-    //     setActiveTab("review");
-    //     if (showSearch) searchTask("review", searchValue);
-    // }
+    
 
     const hideSearchBar = event => {
         setSearchValue("");
         setShowSearch(!showSearch)
     }
-    // const confirm = () => {
-    //     confirmDialog({
-    //         message: 'Are you sure you want to proceed?',
-    //         header: 'Confirmation',
-    //         icon: 'pi pi-exclamation-triangle',
-    //     });
-    // }
+   
     const [displayBasic, setDisplayBasic] = useState(false);
     const [position, setPosition] = useState('center');
 
@@ -457,14 +394,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         dialogFuncMap[`${name}`](false);
     }
 
-    // const renderFooter = (name) => {
-    //     return (
-    //         <div>
-    //             <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} className="p-button-text" />
-    //             <Button label="Yes" icon="pi pi-check" onClick={() => onHide(name)} autoFocus />
-    //         </div>
-    //     );
-    // }
+  
     const toggleSearch = () => {
         setShowCreateSearch(!showCreateSearch);
     }
@@ -486,19 +416,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 ]
             }
         ];
-        console.log(createprojectObj);
-        console.log("Controller: " + createprojectObj);
-        // const createProjectRes = await createProject_ICE(createprojectObj)
-        // if(createProjectRes.error){displayError(createProjectRes.error);return;}
-        // else if (createProjectRes === 'success') {
-        //     displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
-        //     props.resetForm();
-        //     props.setProjectDetails([]);
-        //     refreshDomainList();
-        // } else {
-        //     displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
-        //     props.resetForm();
-        // }
+        
+       
         setLoading(false);
     }
 
@@ -513,8 +432,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     <span data-test="my-task" className="my-task"> Projects </span>
                 { showSearch && <input data-test="search-input" className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
                 <span data-test="search-icon" className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
-                    {/* <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span> */}
-                </div>
+                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-end"}}>
                     {userRole==="Test Manager" ?<Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",margin:"0px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Create/Manage Project(s)"  onClick={() =>{setUnassignedUsers([]);setProjectAssignedUsers([]);setAssignedUsers({});setProjectName("");setAppType(null);setSelectedProject(null); setCreateProjectCheck(true); setAssignedUsers({}); onClick('displayBasic')}} />:null}
                 </div>
@@ -530,8 +448,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
-            <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
-                                    {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
+            <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh',textOverflow: 'ellipsis', textAlign: 'left',overflow: 'hidden',width: '18rem'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
                                     <div className='button-design'>
 
 
@@ -555,15 +472,10 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                     </div>
                 </div>
-                {/* <div>
-            {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
-
-
+               
                 <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px',height:'700px',position:'fixed',overflow:'hidden' }} className="dialog__projectDialog" onHide={() => onHide('displayBasic')}>
 
-                    {/* <div className="container"> */}
-                    {/* <div className="column"> */}
-                    {/* <div className="col-sm-12"> */}
+                    
                     <div>
 
                         <form>
@@ -832,12 +744,12 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                                     const ProjectList = await getProjectIDs();
                                                     setProjectNames(ProjectList);
                                         }catch(err) {
-                                                    console.log(err)
+                                                    
                                                 }
                                             }
                                     catch(err){
                                         setMsg(MSG.CUSTOM("Failed to create Project","error"));
-                                                console.log(err);
+                                                
                                             }
                                         }
                                         else {

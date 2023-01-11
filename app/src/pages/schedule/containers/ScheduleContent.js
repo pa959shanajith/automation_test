@@ -365,11 +365,11 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     SubmitButton={ScheduleTestSuite} 
                     setAllocateICE={setAllocateICE} 
                     allocateICE={allocateICE} 
-                    modalTitle={"Allocate Avo Client to Schedule"} 
+                    modalTitle={"Allocate Avo Assure Client to Schedule"} 
                     modalButton={"Schedule"}
-                    icePlaceholder={'Search ICE to allocate'}
+                    icePlaceholder={'Search'}
                     exeTypeLabel={"Select Schedule type"}
-                    exeIceLabel={"Allocate ICE"}
+                    exeIceLabel={"Allocate Avo Assure Client"}
                     scheSmartMode={smartMode}
                     currentTask={currentTask}
                 />
