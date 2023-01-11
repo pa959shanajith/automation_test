@@ -21,8 +21,8 @@ const DevOps = props => {
     const [projectIdTypesDicts, setProjectIdTypesDicts] = useState({});
     
 
-    useEffect(async ()=>{
-        await getProjectList()
+    useEffect(()=>{
+        getProjectList()
             .then(data => {
                 setProjectTypes(data.appTypeName);
                 setProjectIds(data.projectId);   
