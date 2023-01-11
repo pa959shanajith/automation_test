@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { NormalDropDown, TextField, SearchBox } from '@avo/designcomponents';
+import { NormalDropDown, TextField, SearchBox, SearchDropdown } from '@avo/designcomponents';
 import { Icon } from "@fluentui/react/lib/Icon";
 import { RedirectPage, Header } from '../../global';
 import "../styles/Genius.scss";
-import { getProjectList, getModules, saveMindmap } from '../../mindmap/api';
+import { getProjectList, getModules, saveMindmap, getScreens } from '../../mindmap/api';
 import { ScreenOverlay, setMsg, ResetSession, Messages as MSG } from '../../global';
 import { Dialog } from 'primereact/dialog';
 import { parseProjList } from '../../mindmap/containers/MindmapUtils';
@@ -70,6 +70,7 @@ const Genius = (props) => {
       
     }
     else if(data==="resetProjs"){
+      if(!props.selectedModule){
       setSelectedProject(null);
       setSelectedModule(null);
       setSelectedScenario(null);
@@ -77,6 +78,7 @@ const Genius = (props) => {
       setNavURL("");
       setSelectedBrowser("chrome");
     }
+  }
     else if (data === "disconnect") {
       setLoading(false);
     }
@@ -450,7 +452,23 @@ const Genius = (props) => {
     }
   }
 
+  const validNodeDetails = (value) =>{
 
+    var nName, flag = !0;
+
+    nName = value;
+
+    var regex = /^[a-zA-Z0-9_]*$/;;
+
+    if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName== 'Screen_0' || nName == 'Scenario_0' || nName == 'Testcase_0') {
+
+        flag = !1;
+
+    }
+
+    return flag;
+
+};
   const handleModuleCreate = async (e) => {
     if (!(moduleName)) {
       setMsg(MSG.CUSTOM("Please fill the mandatory fields", "error"));
@@ -467,6 +485,10 @@ const Genius = (props) => {
     }
     else if (projModules.filter((mod) => mod.name === moduleName).length > 0) {
       setMsg(MSG.CUSTOM("Module already exists", "error"));
+      return;
+    }
+    else if(!validNodeDetails(moduleName)){
+       setMsg(MSG.CUSTOM("Not a valid Module", "error"));
       return;
     }
     const module_data = {
@@ -562,6 +584,10 @@ const Genius = (props) => {
     }
     else if (modScenarios.filter((scenario) => scenario.name === scenarioName).length > 0) {
       setMsg(MSG.CUSTOM("Scenario already exists", "error"));
+      return;
+    }
+    else if (!validNodeDetails(scenarioName)){
+      setMsg(MSG.CUSTOM("Scenario name invalid", "error"));
       return;
     }
 
@@ -690,7 +716,7 @@ const Genius = (props) => {
           <div className='dialog__child'>
             <NormalDropDown
               label="Select Application Type"
-              options={plugins_list}
+              options={ [{key:'web',text: 'Web',title: 'Web',disabled: false}]}
               placeholder="Select Application Type"
               width="300px"
               required
@@ -785,7 +811,7 @@ const Genius = (props) => {
             <NormalDropDown
               label="Project"
               options={
-                Object.values(allProjects).map((proj) => {
+                Object.values(allProjects).filter(proj=>proj.apptypeName==="Web").map((proj) => {
                   return {
                     key: proj.id,
                     text: proj.name
@@ -794,7 +820,7 @@ const Genius = (props) => {
               }
               onChange={(e, item) => {
                 setSelectedProject(item)
-              }}
+                              }}
               placeholder="Select"
               width="300px"
               required
@@ -802,6 +828,7 @@ const Genius = (props) => {
               selectedKey={selectedProject ? selectedProject.key : null}
             />
           </div>
+          
 
           <div style={{ position: "relative" }}>
             <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Module</div>
