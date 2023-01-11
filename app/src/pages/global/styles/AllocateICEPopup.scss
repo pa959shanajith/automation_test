@@ -4,6 +4,9 @@
     height: 35px;
 }
 .e__IceStatus{
+    margin-left: 6rem;
+}
+.e__IceStatusExecute{
     padding-top: 7px;
     width: 100%;
     left: 171px;
@@ -15,6 +18,19 @@
     justify-content: center;
     align-items: center;
 }
+.e__IceStatusSchedule{
+    // padding-top: 7px;
+    width: 63%;
+    left: 171px;
+    max-height: 123px;
+    background: $whiteColor;
+    // margin-bottom: -20px;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .status-available{
     background-color: $pistachio;
 }
@@ -24,9 +40,9 @@
 .status-dnd{
     background-color:$red
 }
-.popup-content{
-    // padding: 0px 40px !important;
-}
+// .popup-content{
+//     // padding: 0px 40px !important;
+// }
 .popup-wrap{
     height: 250px;
     padding: 40px 15px;
@@ -84,7 +100,7 @@
 .adminControl-ice div span {
     display: inline-block;
     font-size: small;
-    width: 28%;
+    width: 30%;
     font-weight: 700;
     margin-top: 5px;
 }

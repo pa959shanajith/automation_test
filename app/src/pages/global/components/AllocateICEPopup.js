@@ -181,9 +181,9 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
 
             <div className='adminControl-ice popup-content popup-content-status'>
 				<div>
-					<span className="leftControl" title="Token Name">ICE Status:</span>
+					<span className="leftControl" title="Token Name">Status:</span>
 					<div>
-						<ul className="e__IceStatus">
+						<ul className="e__IceStatus" >
 							<li className="popup-li">
 								<label title='available' className="legends">
 									<span id='status' className="status-available"></span>
