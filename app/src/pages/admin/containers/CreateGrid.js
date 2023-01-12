@@ -290,7 +290,7 @@ const CreateGrid = ({
       </div>
       <div className="api-ut__btnGroup">
         {/* <button data-test="submit-button-test" onClick={() => console.log()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button> */}
-        <button data-test="submit-button-test" onClick={handleConfigSave}>
+        <button data-test="submit-button-test" disabled={!gridName} onClick={handleConfigSave}>
           Save
         </button>
         <button
@@ -317,10 +317,7 @@ const CreateGrid = ({
           </>
         )}
         <div className="devOps_config_name">
-          <span className="api-ut__inputLabel" style={{ fontWeight: "700" }}>
-            Avo Grid Name :{" "}
-          </span>
-          &nbsp;&nbsp;
+          <span className="api-ut__inputLabel_text" >Avo Grid Name :</span>
           <span className="api-ut__inputLabel">
             <TextField
               value={gridName}
@@ -335,7 +332,7 @@ const CreateGrid = ({
         </div>
       </div>
       <div>
-        <div className="agent_state__legends">
+        <div className="agent_state__legends_grid">
           {showLegend("inactive", "Inactive")}
           {showLegend("idle", "Active - Idle")}
           {showLegend("in-progress", "Active - In Progress")}

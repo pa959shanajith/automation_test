@@ -11,6 +11,60 @@
     width: 100%;
     margin-bottom: 1.5%;
     height: 6vh;
+    // display: flex;
+    // flex-direction: row-reverse;
+    &>button{
+        position: relative;
+        float: right;
+        padding: 2px 25px;
+        margin-right: 7px;
+        height: 2.5rem;
+        font-size: 17px;
+        font-family: "LatoWebLight";
+        background-color: #633693;
+        border: none;
+        outline: none;
+        color: #fff;
+        border-radius: 20px;
+        &:disabled{
+            background-color: #997cb8;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.api-ut__btnGroup__grid {
+    width: 100%;
+    margin-bottom: 1.5%;
+    height: 6vh;
+    display: flex;
+    flex-direction: row-reverse;
+    &>button{
+        position: relative;
+        float: right;
+        padding: 2px 25px;
+        margin-right: 7px;
+        height: 2.5rem;
+        font-size: 17px;
+        font-family: "LatoWebLight";
+        background-color: #633693;
+        border: none;
+        outline: none;
+        color: #fff;
+        border-radius: 20px;
+        &:disabled{
+            background-color: #997cb8;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.api-ut__btnGroup__agent {
+    width: 100%;
+    margin-bottom: 1.5%;
+    height: 6vh;
+    display: flex;
+    flex-direction: row;
     &>button{
         position: relative;
         float: right;
@@ -290,7 +344,7 @@
 .searchBoxInput {
     position: relative;
     float: right;
-    margin-right: 1%;
+    margin-right: 4%;
 }
 .agents{
     &__action_icons {
@@ -311,8 +365,12 @@
     margin: 0 10% !important;
 }
 .devOps_config_name {
+    margin: 0% 16% 0% 0% !important;
     display: flex;
     align-items: center;
+    .api-ut__inputLabel_text{
+        font-weight: 700;
+    }
 }
 .devOps_dropdown_label {
     font-weight: 700;
@@ -409,6 +467,11 @@
     &__legends {
         display: flex;
         width: inherit;
+    }
+    &__legends_grid{
+        display: flex;
+        width: inherit;
+        margin-top: 3rem;
     }
 }
 .grid_download_dialog{
