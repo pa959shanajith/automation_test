@@ -166,6 +166,9 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     }
                     else {
                         txt.push({
+                            data:{
+                                icon: x,
+                            },
                             key: x,
                             text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             title: 'License Not Supported',
