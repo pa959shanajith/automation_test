@@ -13,7 +13,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
     const [currentGrid, setCurrentGrid] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [gridList, setGridList] = useState([]);
-    const deleteGridConfig = async (grid) => {
+    const deleteGridConfig = (grid) => {
         setShowConfirmPop({
             title: 'Delete Avo Grid Configuration', 
             content: <p>Are you sure, you want to delete <b>{grid.name}</b> Configuration?</p>, 
@@ -33,7 +33,6 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                 const gridList = await fetchAvoAgentAndAvoGridList({
                     query: 'avoGridList'
                 });
-                console.log(gridList);
                 if(gridList.error) {
                     if(gridList.error.CONTENT) {
                         setMsg(MSG.CUSTOM(gridList.error.CONTENT,VARIANT.ERROR));
