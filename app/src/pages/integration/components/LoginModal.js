@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
 import { ModalContainer, ScreenOverlay, Messages as MSG, setMsg } from "../../global";
 import "../styles/LoginModal.scss";
-import { getDetails_ZEPHYR } from '../api';
+import { getDetails_ZEPHYR,getDetails_Jira} from '../api';
 
 /* 
     props:
@@ -89,6 +89,43 @@ const LoginModal = props => {
             setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
         }
     }
+    const getJiraDetails = async () =>{
+        try {
+            setLoading("Loading...")
+            const data = await getDetails_Jira()
+            if (data.error) { setMsg(data.error); return; }
+            if(data !=="empty"){
+                setIsEmpty(false);
+                let tempDefaultValues = {};
+                if(data.jiraURL && props.urlRef && props.urlRef.current ) {
+                    props.urlRef.current.value = data.jiraURL;
+                    tempDefaultValues['url'] = data.jiraURL;
+                }
+                // if(data.jiraAuthType) {
+                //     await props.setAuthType(authtype);
+                // }
+                if(data.jiraUsername) {
+                    if(props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.jiraUsername;
+                    tempDefaultValues['username'] = data.jiraUsername;
+                }
+                if(data.jirapwrd) {
+                    if(props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.jirapwd;
+                    tempDefaultValues['password'] = data.jirapwd;
+                }
+                setDefaultValues(tempDefaultValues);
+                onSubmit(data.jirapwd);
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+        }
+    }
+
+    useEffect(() => {
+        props.screenType=="Jira" && getJiraDetails();
+    }, [])
+    
     useEffect(() => {
         props.screenType=="Zephyr" && getZephyrDetails();
     }, [])
@@ -101,7 +138,8 @@ const LoginModal = props => {
                 content={
                     <>
                     <div className="ilm__inputs">
-                        {props.screenType=="Zephyr" ? 
+                    {/* (props.screenType=="Zephyr") */}
+                        {(props.screenType=="Zephyr")? 
                         <div className='ilm__authtype_cont'>
                             <span className="ilm__auth" title="Authentication Type">Authentication Type</span>
                             <label className="authTypeRadio ilm__leftauth">
@@ -134,7 +172,7 @@ const LoginModal = props => {
                             placeholder={inpPlaceHolder[props.screenType].password}
                             data-test="intg_password_inp"
                         /></>:null}
-                        {props.screenType=="Zephyr" && props.authType=="token" ? <input
+                        {(props.screenType=="Zephyr" && props.authType=="token") ? <input
                             className={"ilm__input"+(error.authtoken ? " ilm_input_error" : "")}
                             ref={props.authtokenRef}
                             placeholder={inpPlaceHolder[props.screenType].authtoken}
@@ -153,7 +191,7 @@ const LoginModal = props => {
                     }
                     <div data-test="intg_log_error_span" className="ilm__error_msg" style={{ marginTop: (error.msg || props.error) ? '0' : '-22px'}}>
                         {
-                            props.screenType=="Zephyr" && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '4%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
+                            (props.screenType=="Zephyr" || props.screenType ==="Jira")  && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '4%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
                         }
                         {error.msg || props.error}
                     </div>
@@ -176,6 +214,12 @@ const inpPlaceHolder = {
         username : "Enter Zephyr Username",
         password : "Enter Zephyr Password",
         authtoken: "Enter API Token"
+    },
+    Jira : {
+        url : "Enter Jira URL (Ex. http(s)://SERVER[:PORT])",
+        username : "Enter Jira Username",
+        password : "Enter Jira API Key",
+        // authtoken: "Enter API Token"
     },
     qTest : {
         url : "Enter qTest URL",

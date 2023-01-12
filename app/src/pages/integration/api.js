@@ -412,6 +412,8 @@ export const zephyrProjectDetails_ICE = async(projectId, user_id) => {
 }
 
 
+
+
 export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
     try{
         const res = await axios(url+'/zephyrCyclePhase_ICE', {
@@ -667,5 +669,190 @@ export const getDetails_ZEPHYR = async() => {
     }catch(err){
         console.error(err)
         return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
+
+
+/*Component connectJira_ICE
+  use: logins to qTets Environment  
+  api returns [{id:"",name:""}]
+*/
+
+// export const connectJIRA_ICE = async(url, username, key) => {
+//     try{
+//         const res = await axios(url+'/connectJira_ICE', {
+//             method: 'POST',
+//             headers: {
+//             'Content-type': 'application/json',
+//             },
+//             // responseType: 'arraybuffer',
+//             credentials: 'include',
+//             data: {
+//                 "url": url,
+//                 "username": username,
+//                 "password": key,
+//                 "action": "loginToJira"
+//             },
+//         });
+//         if(res.status === 401 || res.data === "Invalid Session" ){
+//             RedirectPage(history)
+//             return {error:MSG.GENERIC.INVALID_SESSION};
+//         }else if(res.status===200 && res.data !== "fail"){            
+//             return res.data;
+//         }
+//         console.error(res.data)
+//         return {error:MSG.JIRA.ERR_JIRA_LOGIN}
+//     }catch(err){
+//         console.error(err)
+//         return {error:MSG.JIRA.ERR_JIRA_LOGIN}
+//     }
+// }
+
+
+export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
+    try{
+
+        const res = await axios(url+'/connectJira_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {   
+           "action" : 'jiraLogin',
+            "url": jiraurl,
+            "username": jirausername,
+            "password": jirapwd,
+            // action : 'zephyrProjectDetails_ICE',
+//           "action": "loginToJira"
+
+
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+// input_payload = {
+    // project: '',
+    // 'issuetype: '',
+    //project_data: {
+    //     'project': '',
+    //     'key':'',
+    // }
+// }
+
+export const getJiraTestcases_ICE = async(input_payload) => {
+    try{
+        const res = await axios(url+'/connectJira_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {   
+        'project': input_payload['project'],
+        'issuetype': input_payload['issuetype'],
+        'url': input_payload['url'],
+        'username': input_payload['username'],
+        'password': input_payload['password'],
+        'projects': input_payload['projects_data'],
+        'key':input_payload['key'],
+        "action": "getJiraTestcases"
+
+            // action : 'zephyrProjectDetails_ICE',
+//           "action": "loginToJira"
+
+
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+
+
+
+
+
+/* getDetails_Jira
+  api returns {zephyrUrl: ,zephyrUsername: ,zephyrPassword: ,zephyrToken:} or "empty"
+*/
+export const getDetails_Jira = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_JIRA', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
+
+
+
+
+
+export const getConfigurFieldJIRA_ICE = async(input_payload) => {
+    try{
+        const res = await axios(url+'/connectJira_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: {
+                'project': input_payload['project'],
+                'issuetype': input_payload['issuetype'],
+                'url': input_payload['url'],
+                'username': input_payload['username'],
+                'password': input_payload['password'],
+                'projects': input_payload['projects_data'],
+                "action": "getJiraConfigureFields"
+            },
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.JIRA.ERR_JIRA_CONFIG_FIELDS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.JIRA.ERR_JIRA_CONFIG_FIELDS}
     }
 }

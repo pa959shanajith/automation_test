@@ -68,10 +68,14 @@ const MappingPage = props =>{
                                     {!updateFlag ?
                                     <>
                                     {props.testList}
+                                    {/* {props.selectTestCase} */}
                                     </>
+
                                      : 
                                      <>
                                      {props.testList}
+                                     {/* {props.selectTestCase} */}
+
                                      </>}
                                     </>
                                 </ScrollBar>
