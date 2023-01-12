@@ -73,6 +73,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
     const [redirectTo, setRedirectTo] = useState("");
     const [searchText, setSearchText] = useState("");
+    const [projectNameError,setProjectNameError] = useState("");
 
     const handleCreateChange = () => {
         setCreateProjectCheck(true);
@@ -461,7 +462,11 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         </div>
                         <div className='dialog_dropDown'>
                             {
-                    createProjectCheck ? <TextField required label='Project Name'  placeholder='Enter Project Name'  width='300px' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='15px'  /> : 
+                    createProjectCheck ? <TextField  label='Project Name'  placeholder='Enter Project Name'  width='300px' fontStyle='LatoWeb'  onChange={(e)=>{
+
+                                    setProjectName(e.target.value);
+                                }} FontSize='15px'
+                                errorMessage = {projectNameError}  required/> : 
                                     <NormalDropDown 
                                         required
                                         label="Project Name"
@@ -618,9 +623,18 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                                             return;
                                                         } else proceed = true;
                                                     }
-                                                } 
+                                                }
+                                                if (config.projectName.trim() === "" || !ValidationExpression(config.projectName, "validName")) {
+                                                    setMsg(MSG.CUSTOM("project name is not valid","error"));
+                                                    return;
+                                                }
+
                                                 const res = await pluginApi.userCreateProject_ICE(config)
-                                                setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
+                                                if(res === "invalid_name_spl") {
+                                                    setMsg(MSG.CUSTOM("Special characters are not allowed in project name","error"));
+                                                }else{
+                                                    setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
+                                                }
                                                 // onHide('displayBasic');
                                                 try {
                                                     const ProjectList = await getProjectIDs();
