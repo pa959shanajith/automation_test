@@ -38,7 +38,7 @@ const ModuleListDrop = (props) =>{
     const userRole = useSelector(state=>state.login.SR);
     const [firstRender, setFirstRender] = useState(true);
     const [showNote, setShowNote] = useState(false);
-
+    const [allModSelected, setAllModSelected] = useState(false);
     useEffect(()=> {
         
             if(moduleList.length > 0) {
@@ -64,6 +64,15 @@ const ModuleListDrop = (props) =>{
         var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
         setScenarioList(filter)
     },[filterSc,setScenarioList,initScList])
+    // about select all check box
+    useEffect(()=>{
+        if(moduleSelectlist.length===moduleList.length && moduleSelectlist.length>0){
+          setAllModSelected(true);
+        }
+        else{
+          setAllModSelected(false);
+        }
+      },[moduleSelectlist, moduleList])
     
     const displayError = (error) =>{
         setLoading(false)
@@ -280,6 +289,14 @@ const ModuleListDrop = (props) =>{
                             {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
+                        <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
+                  if (!allModSelected) {
+                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: moduleList.map((modd) => modd._id) })
+                  } else {
+                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: [] })
+                  }
+                  setAllModSelected(!allModSelected)
+                }} ></input>
                             <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                         </div>
@@ -320,6 +337,7 @@ const ModuleListDrop = (props) =>{
                             />  :null}
                         </div>
                         <div className='searchBox pxBlack'>
+                        <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
                             <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                         </div>
