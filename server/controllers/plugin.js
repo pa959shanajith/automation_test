@@ -35,7 +35,7 @@ exports.userCreateProject_ICE = async (req, res) =>{
     logger.info("Inside UI service: userCreateProject_ICE ");
 
     var status = "fail";
-    const regEx= /[~*+=?^%<>()|\\|\/]/;
+    const regEx= /[;~*+=?^%<>()|\\|\/]/;
     const createProjectObj=req.body;
 		if (regEx.test(createProjectObj.projectName)) {
 			logger.error("Error occurred in admin/"+fnName+": Special characters found in project name");

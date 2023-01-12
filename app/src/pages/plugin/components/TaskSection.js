@@ -1,5 +1,4 @@
 import React, { useState, useEffect ,useRef} from 'react';
-// import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
 import { useHistory, Redirect } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
@@ -9,7 +8,6 @@ import * as actionTypes from '../state/action';
 import * as actionTypesMindmap from '../../mindmap/state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
-// import '../styles/ProjectAssign.scss';
 import PropTypes from 'prop-types';
 import { NormalDropDown, SearchBox, TextField } from '@avo/designcomponents';
 import 'primeicons/primeicons.css';
@@ -21,17 +19,8 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
-// import { FontSizes } from '@fluentui/react';
-// import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
 import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
 import {getProjectList} from '../../mindmap/api';
-// import ValidationExpression from '../../global/components/ValidationExpression'
-// import useOnClickOutside from './UseOnClickOutside'
-// import * as actionTypes from '../state/action';
-// import {userCreateProject_ICE} from '../api';
-
-
-// import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 
 const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
@@ -67,19 +56,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [statechange,setStateChange] = useState(true);
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
-    // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
     const [getProjectLists,setProjectList]=useState([]);
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectName, setProjectName] = useState("");
-    // const [selDomainOptions,setSelDomainOptions] = useState([])
     const [searchUsers, setSearchUsers] = useState("")
-
     const [projectNames, setProjectNames] = useState(null);
     const [projectId,setprojectId]=useState(null);
     const [loading,setLoading] = useState(false)
     const [createProjectCheck,setCreateProjectCheck]=useState(true);
     const [isCreate, setisCreate]=useState(false);
-
     const [createProj, setCreateProj] = React.useState(true);
     const [ModifyProj, setModifyProj] = React.useState(true);
     const [createprojectObj,setcreateprojectObj]=useState([]);
@@ -89,11 +74,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [redirectTo, setRedirectTo] = useState("");
     const [searchText, setSearchText] = useState("");
     const [projectNameError,setProjectNameError] = useState("");
-
-    // const userConf = useSelector(state=>state.admin.userConf)
-    // const node = useRef();
-
-    // useOnClickOutside(node, () => props.setShowDropdownEdit(!props.showDropdownEdit));
 
     const handleCreateChange = () => {
         setCreateProjectCheck(true);
@@ -137,28 +117,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         }
         props.setSelDomainOptions(data);
     }
-    // const displayError = (error) =>{
-    //     setLoading(false)
-    //     setMsg(error)
-    // }
 
     let dataDict;
-
-
-
-    // useEffect( async () => {
-
-    // },[]);
-
-    // useEffect(async()=>{
-
-    // },[]);
-
-    // useEffect(()=>{
-    //     (async () => {
-    //         const res= await pluginApi.userCreateProject_ICE();
-    //     })()
-    // },[])
 
     useEffect(()=>{
         (async() => {
@@ -167,17 +127,9 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 setMsg(MSG.CUSTOM("Error while fetching the user Details"));
         }else{
                 setUserDetailList(userListFromApi);
-
             }
-
-            console.log("UserDetailsList");
-            console.log(userListFromApi);
             const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
             setProjectsDetails(ProjectList)
-            // ProjectList = {
-            //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
-            //     "projectNames":["avangers", "avangers2"]
-            // }
         if(ProjectList.error){
                 setMsg(MSG.CUSTOM("Error while fetching the project Details"));
         }else{
@@ -186,27 +138,12 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     return (
                         {
                             key: element,
-                            text: ProjectList.projectName[index],
-                            // disabled: true,
-                            // title: 'License Not Supported' 
+                            text: ProjectList.projectName[index], 
                         }
                     )
                 });
                 setProjectList(arraynew);
-                // key: "62e27e5887904e413dad10ff",
-                // text: "avangers2"
             }
-            // [
-            //     {
-            //         key: "62e27e5887904e413dad10fe",
-            //         text: "avangers"
-            //     },
-            //     {
-            //     ]
-            // }
-
-        console.log("domaindetails","Banking");
-            console.log(ProjectList);
             var plugins = [];
         const plugins_list= await getAvailablePlugins();
 
@@ -214,14 +151,11 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         if(plugins_list.error){
                 setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
-                console.log(plugins_list);
-
                 let txt = [];
                 for (let x in plugins_list) {
                         if(plugins_list[x] === true) {
                         txt.push({
                             key: x,
-                            //text: x[0].toUpperCase()+x.slice(1)
                             text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             title: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             disabled: false
@@ -236,20 +170,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         })
                     }
                 }
-                //   setProjectList(arraynew1);
-                // const arraynew2 = arraynew1.map((txt) => {
-                //       return (
-                //     {
-                //         key: txt,
-                //         text:txt
-                //     }
-                // )
-                // }
-                // ); 
                 setplugins_list(txt);
             }
-            // console.log({"desktop":true, "mainframe": true, "mobileapp": true, "mobileweb": true, "oebs":true, "sap": true, "system":true,"web":true,"webservice":true});
-            // console.log(plugins_list);
         })()
 
     },[])
@@ -265,7 +187,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             setOverlay("Loading Tasks..Please wait...");
             getProjectList()
                 .then(data => {
-                    console.log(data)
                     setProjectNames(data);
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
                     else {
@@ -283,7 +204,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                                     let { dataObjList, reviewList, todoList } = GenerateTaskList(tasksJson, "pluginList");
 
-                                    // setTaskJson(tasksJson);
                             dispatch({type: actionTypes.SET_TASKSJSON, payload: tasksJson});
                                     setReviewItems(reviewList);
                                     setTodoItems(todoList);
@@ -310,7 +230,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                                 setDataDictState(dataDict);
                         dispatch({type: actionTypes.SET_FD, payload: dataDict})
-                                console.log(data)
                             })
                             .catch(error => {
                                 setOverlay("");
@@ -383,9 +302,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     };
 
     const searchProjects = (value) => {
-        // let items = activeTab === "todo" ? todoItems : 
-
-        // reviewItems;
         let filteredItems = [];
 
         filteredItems = projectNames.projectName.filter(projectName => projectName.toLowerCase().indexOf(value.toLowerCase()) > -1);
@@ -419,27 +335,10 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         else return false;
     }
 
-    // const onSelectTodo = event =>{
-    //     setActiveTab("todo");
-    //     if (showSearch) searchTask("todo", searchValue);
-    // }
-
-    // const onSelectReview = event => {
-    //     setActiveTab("review");
-    //     if (showSearch) searchTask("review", searchValue);
-    // }
-
     const hideSearchBar = event => {
         setSearchValue("");
         setShowSearch(!showSearch)
     }
-    // const confirm = () => {
-    //     confirmDialog({
-    //         message: 'Are you sure you want to proceed?',
-    //         header: 'Confirmation',
-    //         icon: 'pi pi-exclamation-triangle',
-    //     });
-    // }
     const [displayBasic, setDisplayBasic] = useState(false);
     const [position, setPosition] = useState('center');
 
@@ -458,15 +357,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
     }
-
-    // const renderFooter = (name) => {
-    //     return (
-    //         <div>
-    //             <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} className="p-button-text" />
-    //             <Button label="Yes" icon="pi pi-check" onClick={() => onHide(name)} autoFocus />
-    //         </div>
-    //     );
-    // }
     const toggleSearch = () => {
         setShowCreateSearch(!showCreateSearch);
     }
@@ -488,19 +378,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 ]
             }
         ];
-        console.log(createprojectObj);
-        console.log("Controller: " + createprojectObj);
-        // const createProjectRes = await createProject_ICE(createprojectObj)
-        // if(createProjectRes.error){displayError(createProjectRes.error);return;}
-        // else if (createProjectRes === 'success') {
-        //     displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
-        //     props.resetForm();
-        //     props.setProjectDetails([]);
-        //     refreshDomainList();
-        // } else {
-        //     displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
-        //     props.resetForm();
-        // }
         setLoading(false);
     }
 
@@ -515,7 +392,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     <span data-test="my-task" className="my-task"> Projects </span>
                 { showSearch && <input data-test="search-input" className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
                 <span data-test="search-icon" className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
-                    {/* <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span> */}
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-end"}}>
                     {userRole==="Test Manager" ?<Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",margin:"0px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Create/Manage Project(s)"  onClick={() =>{setUnassignedUsers([]);setProjectAssignedUsers([]);setAssignedUsers({});setProjectName("");setAppType(null);setSelectedProject(null); setCreateProjectCheck(true); setAssignedUsers({}); onClick('displayBasic')}} />:null}
@@ -532,13 +408,14 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
-            <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
-                                    {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
+            <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh',textOverflow: 'ellipsis', textAlign: 'left',overflow: 'hidden',width: '18rem'}}> {projectNames && `${idx+1}.${singleProj}`}</span></span>
                                     <div className='button-design'>
 
 
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
                                             dispatch({type: actionTypesMindmap.SELECT_PROJECT, payload:projectNames.projectId[idx]});
+                                            dispatch({type:actionTypesMindmap.SELECT_MODULE,payload:{}})
+                                            dispatch({type:actionTypesMindmap.SELECT_MODULELIST,payload:[]})
                                             window.localStorage['navigateScreen'] = "mindmap";
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
@@ -557,15 +434,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                     </div>
                 </div>
-                {/* <div>
-            {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
-
-
                 <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px',height:'700px',position:'fixed',overflow:'hidden' }} className="dialog__projectDialog" onHide={() => onHide('displayBasic')}>
-
-                    {/* <div className="container"> */}
-                    {/* <div className="column"> */}
-                    {/* <div className="col-sm-12"> */}
                     <div>
 
                         <form>
@@ -587,54 +456,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                                 </label>
                             </div>
-                            {/* <div className='Radiobutton_des'>
-        
-        <div className="radio"  >
-            
-          <label style={{ marginRight: '2rem' }} >
-            
-            <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb' }}
-             label="Create"
-             value={createProj}
-             onChange={handleCreateChange}
-             />
-             Create Project
-          </label>
-          <label >
-             <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb'}}
-              label="Modify"
-             value={ModifyProj}
-             onChange={handleModifyChange} />
- 
-             Modify Project
-            </label>
-        </div> */}
-                            {/* </div> */}
-
-
                         </form>
                     </div>
-
-                    {/* </div> */}
-                    {/* </div> */}
-                    {/* </div> */}
                     <div>
                         </div>
                         <div className='dialog_dropDown'>
-                            {/* {
-                    isCreate == true ? <TextField /> : <NormalDropDown /> 
-                } */}
                             {
                     createProjectCheck ? <TextField  label='Project Name'  placeholder='Enter Project Name'  width='300px' fontStyle='LatoWeb'  onChange={(e)=>{
-            
-                                    // if( ValidationExpression(e.target.value,"projectName") ) {
-                                    //     setProjectNameError('Special Characters are not allowed')
-                                    // }else {
-                                    //     setProjectNameError("")
-                                    //     setProjectName(e.target.value)
-                                    // }
-                                    let value = ValidationExpression(e.target.value,"projectName");
-                                    setProjectName(value);
+
+                                    setProjectName(e.target.value);
                                 }} FontSize='15px'
                                 errorMessage = {projectNameError}  required/> : 
                                     <NormalDropDown 
@@ -644,9 +474,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         onChange={async(e,item) =>{
                                             setSelectedProject(item.key)
                                             const users_obj = await pluginApi.getUsers_ICE(item.key);
-                                            // const assigned = {};
-                                            // users_obj["assignedUsers"].forEach((user_obj)=> {assigned[user_obj._id]=true})
-                                            // setAssignedUsers(assigned);
                                             setUnassignedUsers(users_obj["unassignedUsers"]);
                                             setProjectAssignedUsers(users_obj["assignedUsers"]);
                                         }}
@@ -656,25 +483,10 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                         width="300px"
                                         fontSize='16px'
                                         id="project__dropdown"
-
-                                    //   fontSize='40px'
-                                    //   marginLeft="200px"
                                     />
                             }
-                            {/* /create_project() */}
-                            {/* <p><a style={{ color: 'green' }} onClick={()=>{setCreateProjectCheck(!createProjectCheck)}} target="_blank">{createProjectCheck ? 'Select Project' : 'Create New Project'}</a></p> */}
-
-                            {/* <a  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="Select Project"  onClick={() => onClick('displayBasic')} a/> */}
-
-                            {/* <p onClick = {() => setisCreate(!isCreate)}>{
-                    isCreate == true ? 'Select Project' : '+ Create New'                     
-                }</p> */}
-
                         </div>
                         <div className='dialog_dropDown'>
-                            {/* {
-                    isCreate == false ? <TextField /> : <NormalDropDown /> 
-                } */}
                             {
                                 createProjectCheck ? <NormalDropDown
                                     label="App Type"
@@ -682,43 +494,17 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                     placeholder="Select"
                                     width="300px"
                                     top="300px"
-                                    // color= '#8E8E8E'
                                     required
                                     id="apptype__dropdown"
                                     onChange={(e, item) => {
                                         setAppType(item)
                                     }}
-
                     /> : <TextField label='App Type' disabled value={selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:""} width='19rem' />
                             }
                         </div>
-
                         <div className='labelStyle1'> <label>Users</label>
-                        {/* <div className="user_list">
-                        <button data-test="search"className="ss__search-btn1" onClick={toggleSearch}>
-                            <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
-                        </button>
-                        { showCreateSearch && <input data-test="searchbox" className="ss__search_field1"  onChange={(e)=>{
-                            setSearchUsers(e.target.value?e.target.value.toLowerCase():"")
-                        }} />}
-                        </div> */}
-
 					<div className="wrap" style={{height:'12rem'}} >
-                            <div className='display_project_box' style={{ overflow: 'auto' }}>
-                                {/* <div className='userForm-edit adminControl-edit'>
-                    <button title={userConf.fType} className="userTypeBtn_conv-edit " style={{margin:"4px 0",right:"0",cursor:"default"}}>{userConf.fType}</button>
-                    <input data-test="userListInputEdit" list="allUsersListauto" className=" btn-users edit-user-dropdown-edit" onClick = {()=>{props.click();props.setShowDropdownEdit(!props.showDropdownEdit);props.setAllUserFilList(userConf.allUsersList);}} type="text"  id="userIdName"  onChange={(event)=>{dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:event.target.value});props.searchFunctionUser(event.target.value);}} value={userConf.allUserFilter}  placeholder="Search User.." autoComplete="none"/>
-                    {(props.showDropdownEdit && userConf.allUsersList!==[])?
-                        <div ref={node} className=" dropdown-menu-edit dropdown-menu-users-edit create-user__dropdown c__usersList" role="menu" style={{}}>
-                            <ScrollBar scrollId='allUsersListauto' thumbColor="#929397" >
-                            {props.allUserFilList.map((uid,index) => (  
-                                <option key={index} role="presentation" onClick = {()=>{props.setShowDropdownEdit(!props.showDropdownEdit);dispatch({type:actionTypes.UPDATE_USERIDNAME,payload:uid[1]+';'+uid[0]});dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:uid[0]});props.getUserData({user_idName:uid[1]+';'+uid[0]});}} value={uid[1] +";"+uid[0]} className="user-select__option"> {uid[0]}</option> 
-                            ))}
-                            </ScrollBar>
-                        </div>
-                        :null
-                    }
-                </div> */}      
+                            <div className='display_project_box' style={{ overflow: 'auto' }}>    
                                 <div style={{display:'flex', width:"100%", marginTop:"10px", position:"sticky", top:10}}>
                                     <SearchBox
                                         placeholder="Enter Username"
@@ -837,9 +623,18 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                                             return;
                                                         } else proceed = true;
                                                     }
-                                                } 
+                                                }
+                                                if (config.projectName.trim() === "" || !ValidationExpression(config.projectName, "validName")) {
+                                                    setMsg(MSG.CUSTOM("project name is not valid","error"));
+                                                    return;
+                                                }
+
                                                 const res = await pluginApi.userCreateProject_ICE(config)
-                                                setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
+                                                if(res === "invalid_name_spl") {
+                                                    setMsg(MSG.CUSTOM("Special characters are not allowed in project name","error"));
+                                                }else{
+                                                    setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
+                                                }
                                                 // onHide('displayBasic');
                                                 try {
                                                     const ProjectList = await getProjectIDs();

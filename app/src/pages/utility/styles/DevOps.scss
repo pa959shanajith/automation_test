@@ -1,8 +1,6 @@
 .api-ut__btnGroup {
     width: 100%;
     margin-bottom: 1%;
-    display: flex;
-    flex-direction: row-reverse;
 
     &>button{
         position: relative;
@@ -509,7 +507,7 @@
 }
 .radiobutton{
     width:2.5vh;
-    height: 2.5vh;
+    height: 2.2vh;
     margin-left: auto !important;
 }
 .radiobutton1{
@@ -577,13 +575,14 @@
 }
 
 .p-dialog-content {
-    overflow: overlay;
+    overflow-x: overlay;
+    overflow-y: unset;
 }
 
 .p-dialog .p-dialog-content {
     background: #fff;
     color: #495057;
-    padding: 0px 1rem 1rem;
+    padding: 0px -1rem 1rem 1rem;
 }
 
 .legends-margin {
@@ -616,8 +615,21 @@
 .dropdownItems-208 > div:first-child{
     display: none;
 }
+.dropdownItems-203 > div:first-child{
+    display: none;
+}
 
 .dropdownItems-208{
     overflow: unset !important; 
     margin-top: 0rem;
+}
+.dropdownItems-203{
+    overflow: unset !important; 
+    margin-top: 0rem;
+}
+.dropdownItem-228 label{
+    margin-bottom: 0 !important;
+}
+.dropdownItem-233 label{
+    margin-bottom: 0 !important;
 }

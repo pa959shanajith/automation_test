@@ -84,6 +84,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [iceNameIdMap,setIceNameIdMap] = useState({});
     const [showIcePopup,setShowIcePopup] = useState(false);
     const [accessibilityParameters, setAccessibilityParameters] = useState([]);
+    const [changeLable, setChangeLable] = useState(false);
 
 
     useEffect(()=>{
@@ -790,6 +791,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setAccessibilityParameters(accessibilityParametersValue);
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setChangeLable(true);
                                     // setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png" className="action_icons" title="Execute Now" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
@@ -851,6 +853,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setAccessibilityParameters(accessibilityParametersValue);
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setChangeLable(true);
                                     // setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png"  className="action_icons" title="Execute Now"alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
@@ -886,7 +889,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <div>
                             <div className='adminControl-ice popup-content'>
                                 <div className='adminControl-ice popup-content popup-content-status'>
-                                    <ul className="e__IceStatus">
+                                    <ul className={changeLable?"e__IceStatusExecute":"e__IceStatusSchedule"}>
                                         <li className="popup-li">
                                             <label title='available' className="legends legends-margin">
                                                 <span id='status' className="status-available"></span>

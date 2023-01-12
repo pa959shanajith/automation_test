@@ -250,9 +250,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         </span>
       </div>
       <div
-        className="api-ut__btnGroup"
-        style={{ display: "flex", justifyContent: "end" }}
-      >
+        className="api-ut__btnGroup__agent">
         <div className="agent_state__legends">
           {showLegend("inactive", "Inactive")}
           {showLegend("idle", "Active - Idle")}

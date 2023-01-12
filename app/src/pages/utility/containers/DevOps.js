@@ -9,7 +9,7 @@ import { Messages as MSG, VARIANT, setMsg, ModalContainer, ScreenOverlay } from 
 import "../styles/DevOps.scss";
 import DevOpsList from '../components/DevOpsList';
 import DevOpsConfig from '../components/DevOpsConfig';
-import * as pluginApi from "../../plugin/api";
+import {getProjectList} from '../../mindmap/api';
 
 const DevOps = props => {
     const [showConfirmPop, setShowConfirmPop] = useState(false);
@@ -22,7 +22,7 @@ const DevOps = props => {
     
 
     useEffect(()=>{
-        pluginApi.getProjectIDs()
+        getProjectList()
             .then(data => {
                 setProjectTypes(data.appTypeName);
                 setProjectIds(data.projectId);   
