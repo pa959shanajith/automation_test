@@ -73,7 +73,6 @@ const ModuleListDrop = (props) =>{
           setAllModSelected(false);
         }
       },[moduleSelectlist, moduleList])
-    
     const displayError = (error) =>{
         setLoading(false)
         setMsg(error)
@@ -389,7 +388,7 @@ const ModuleListDrop = (props) =>{
                                 })}
                             </div>
                             <div className='AddBut'>
-                                <Button onClick={clickAdd} style={{  marginLeft:'.7rem',marginTop:'0.4rem',textAlign:'center',width:'66px',height:'31px', alignContent:'center',cursor:'pointer',alignItems:'center'}} disabled={ selectedSc.length < 1? true : false} label="ADD"  />
+                                <Button onClick={clickAdd} style={{  marginLeft:'.7rem',marginTop:'0.4rem',textAlign:'center',width:'66px',height:'31px', alignContent:'center',cursor:'pointer',alignItems:'center'}} disabled={ Object.keys(selectedSc).length<1? true : false} label="ADD"  />
                             </div>
                             </div>
                     <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(180deg)' : 'rotate(0deg)',height:'30px',width:'8px', position:'relative'
