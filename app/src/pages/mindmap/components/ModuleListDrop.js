@@ -8,8 +8,6 @@ import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents';
 import ImportMindmap from'../components/ImportMindmap.js';
-import { Button } from "primereact/button";
-import { objectTypes } from '../../scrape/components/ListVariables';
 
 
 const ModuleListDrop = (props) =>{
