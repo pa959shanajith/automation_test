@@ -171,7 +171,7 @@ registerIcons({
     sap:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/sapApps.png"}/>,
     system:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/desktop.png"}/>,
     web:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/ic-web.png"}/>,
-    webservice:<img style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/ic-web.png"}/>,
+    webservice:<img style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/ic-webservice.png"}/>,
     desktop:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/desktop.png"}/>,
     mainframe:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/mainframe.png"}/>
   }
