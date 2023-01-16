@@ -312,13 +312,13 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
                                 !adminDisable &&
                                 <>
                                 {OS==="Windows"?
-                                <div onClick={()=>{getIce("avoclientpath_Windows")}} ><Link to="#">Download ICE</Link></div>:null}
+                                <div onClick={()=>{getIce("avoclientpath_Windows")}} ><Link to="#">Download Client</Link></div>:null}
                                 {OS==="MacOS"?
                                 <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
-                                    <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download ICE<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
+                                    <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download Client<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
                                 </div>:null}
                                 {OS === "Linux" ?
-                                <div onClick={()=>{getIce("avoclientpath_Linux")}}><Link to="#">Download ICE</Link></div>:null}
+                                <div onClick={()=>{getIce("avoclientpath_Linux")}}><Link to="#">Download Client</Link></div>:null}
                                 
                                 {showICEMenu?
                                 (<div id="downloadICEContainer">
