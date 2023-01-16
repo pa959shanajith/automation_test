@@ -109,7 +109,7 @@ const JiraContent = props => {
 
     const callSaveButton =async()=>{ 
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
-        const response = await api.connectJira_ICE(mappedPair);
+        const response = await api.saveJiraDetails_ICE(mappedPair);
         if (response.error){
             setMsg(response.error);
         } 

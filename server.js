@@ -512,6 +512,8 @@ if (cluster.isMaster) {
 		//Report Screen Routes
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
+		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
+		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);

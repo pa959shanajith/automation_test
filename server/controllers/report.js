@@ -713,6 +713,68 @@ exports.getReport_API = async (req, res) => {
     }
 };
 
+
+exports.saveJiraDetails_ICE = async (req, res) => {
+	const fnName = "saveJiraDetails_ICE";
+	logger.info("Inside UI service: " + fnName);
+    // console.log(req.body);
+	try {
+		var mappedDetails = req.body.mappedDetails;
+		var flag = mappedDetails.length > 0;
+		if (!flag) return res.send('fail');
+		for (let i=0; i<mappedDetails.length; i++) {
+			let itr = mappedDetails[i];
+			const inputs = {
+				"testscenarioid": itr.scenarioId[0],
+				'projectid': itr.projectId,			
+				'projectName': itr.projectName,
+				'projectCode': itr.projectCode,
+				'testId': itr.testId,
+				'testCode': itr.testCode,
+				"query": "saveJiraDetails_ICE"
+			};
+			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
+			if (result == "fail") flag = false;
+		}
+		if (!flag) return res.send('fail');
+		res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in jira/"+fnName+":", exception);
+		res.send("fail");
+	}
+};
+
+
+// exports.viewJiraMappedList_ICE = function (req, res) {
+// 	logger.info("Inside UI service: viewJiraMappedList_ICE");
+// 	var userid = req.session.userid;
+//     console.log(userid)
+// 	// getQcDetailsForUser(userid, function (responsedata) {
+// 	// 	res.send(responsedata);
+// 	// });
+// };
+
+
+exports.viewJiraMappedList_ICE = async (req, res) => {
+    // console.log(args);
+	const fnName = "viewJiraMappedList_ICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+		var inputs = {
+			"userid": userid,
+			"query": "jiradetails"
+		};
+		const result = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+		if (result == "fail") res.send('fail');
+		else res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		res.send("fail");
+	}
+};
+
+
 exports.getAccessibilityReports_API = async(req, res)=>{
     const executionId = req.body.execution_data.executionId;
     var userInfo = req.body.userInfo;

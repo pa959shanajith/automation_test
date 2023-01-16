@@ -137,7 +137,7 @@ const Jira = () => {
         try{
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: saveFlag?'Updating...':'Fetching...'});
         
-            const response = await api.connectJira_ICE(user_id);
+            const response = await api.viewJiraMappedList_ICE(user_id);
             
             if (response.error){
                 setMsg(response.error);
@@ -184,7 +184,7 @@ console.log(user)
                 leftBoxTitle="Jira Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
-                fetchMappedFiles={null}
+                fetchMappedFiles={callViewMappedFiles}
             /> 
         }
         { viewMappedFlies ===null && !loginSuccess && 
@@ -204,8 +204,8 @@ console.log(user)
             <JiraContent
                 domainDetails={domainDetails}
                 user={user}
-                callViewMappedFiles={()=>{}}
-                callUpdateMappedFiles={()=>{}}
+                callViewMappedFiles={callViewMappedFiles}
+                // callUpdateMappedFiles={()=>{}}
 
             /> }
         </> 

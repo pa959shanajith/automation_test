@@ -113,7 +113,7 @@ const LoginModal = props => {
                     tempDefaultValues['password'] = data.jirakey;
                 }
                 setDefaultValues(tempDefaultValues);
-                onSubmit(data.jirapwd);
+                onSubmit(data.jirakey);
             }
             setLoading(false);
         } catch (error) {
