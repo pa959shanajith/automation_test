@@ -80,7 +80,15 @@ const Genius = (props) => {
     }
   }
     else if (data === "disconnect") {
+      if(!props.selectedModule){
       setLoading(false);
+      setSelectedProject(null);
+      setSelectedModule(null);
+      setSelectedScenario(null);
+      setAppType(null);
+      setNavURL("");
+      setSelectedBrowser("chrome");
+      }
     }
     else if (data.action && data.action === "startDebugging") {
       if (savedRef.current) {
@@ -119,7 +127,6 @@ const Genius = (props) => {
 
             return acc.concat(...testcasesArr)
           }, [])], userInfo, appType && appType.key ? appType.text : "", true)
-          
           if(res==="unavailableLocalServer" && port){
             port.postMessage({
             "ICE_UNAVAILABILITY":true
@@ -488,7 +495,7 @@ const Genius = (props) => {
       return;
     }
     else if(!validNodeDetails(moduleName)){
-       setMsg(MSG.CUSTOM("Not a valid Module", "error"));
+       setMsg(MSG.CUSTOM("Module name must include _ ", "error"));
       return;
     }
     const module_data = {
@@ -587,7 +594,7 @@ const Genius = (props) => {
       return;
     }
     else if (!validNodeDetails(scenarioName)){
-      setMsg(MSG.CUSTOM("Scenario name invalid", "error"));
+      setMsg(MSG.CUSTOM("Scenario name must include _", "error"));
       return;
     }
 
@@ -764,7 +771,7 @@ const Genius = (props) => {
       <Dialog header={'Create Module'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setModuleName(""); setDisplayCreateModule(false); }}>
         <div>
           <div className='dialog__child'>
-            <TextField required label='Module Name' onGetErrorMessage={(value) => { return validateNames(value, "module") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Module Name' value={moduleName} onChange={(e) => { setModuleName(e.target.value.trim()) }} />
+            <TextField required label='Module Name' onGetErrorMessage={(value) => { return validateNames(value, "module") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder={`Ex-: Module_0`} value={moduleName} onChange={(e) => { setModuleName(e.target.value.trim()) }} />
           </div>
           <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
             <button className="dialog__footer__action" onClick={handleModuleCreate}>{'Create'}</button>
@@ -774,7 +781,7 @@ const Genius = (props) => {
       <Dialog header={'Create Scenario'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}>
         <div>
           <div className='dialog__child'>
-            <TextField required label='Scenario Name' onGetErrorMessage={(value) => { return validateNames(value, "scenario") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Scenario Name' value={scenarioName} onChange={(e) => { setScenarioName(e.target.value.trim()) }} />
+            <TextField required label='Scenario Name' onGetErrorMessage={(value) => { return validateNames(value, "scenario") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder={`Ex-:Scenario_0`} value={scenarioName} onChange={(e) => { setScenarioName(e.target.value.trim()) }} />
           </div>
           <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
             <button className="dialog__footer__action" onClick={handleScenarioCreate}>{'Create'}</button>
@@ -831,7 +838,7 @@ const Genius = (props) => {
           
 
           <div style={{ position: "relative" }}>
-            <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Module</div>
+            {!props.selectedModule && <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Module</div>}
             <NormalDropDown
               label="Module"
               options={projModules.map((mod) => {
@@ -854,7 +861,7 @@ const Genius = (props) => {
           </div>
 
           <div style={{ position: "relative" }}>
-            <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Scenario</div>
+            {!props.selectedModule && <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Scenario</div>}
             <NormalDropDown
               label="Scenario"
               options={modScenarios.map((scenario) => {
