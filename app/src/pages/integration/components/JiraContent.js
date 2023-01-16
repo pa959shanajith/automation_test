@@ -30,9 +30,12 @@ const JiraContent = props => {
     const [releaseArr, setReleaseArr] = useState([]);
     const [selectedRel, setSelectedRel] = useState("Select Release");
     const [testCaseData, setTestCaseData] = useState([]);
-    const[selected,setSelected]=useState(false)
+    const[selected,setSelected]=useState(false);
+    const [proj, setProj] = useState('');
+    const [projCode, setProjCode] = useState('');
+    const [projName, setProjName] = useState('');
     
- console.log(user_id)
+ 
 //     useEffect(() =>{
 
 //         console.log(props.domainDetails);
@@ -150,11 +153,16 @@ const JiraContent = props => {
     const jiraTest = async(e) => {
         if(e.target.tilte != "Select Project"){
             let projectName = ""
+            let projectID = ''
             for(let projectDetails of props.domainDetails.projects) {
                 if( e.target.value == projectDetails.code) {
                     projectName = projectDetails.name;
+                    projectID = projectDetails.id;
+                    setProj(projectID)
+                    setProjCode(e.target.value)
+                    setProjName(projectName)
                     break;
-                }
+                };
             }
             let jira_info ={
                 project: projectName,
@@ -168,14 +176,9 @@ const JiraContent = props => {
             }
             const testData = await api.getJiraTestcases_ICE(jira_info)
             setTestCaseData(testData.testcases)
-            // console.log(data)
-            console.log(testData.testcases)
-            console.log(testCaseData.testcases)
 
         }
     }
-
-    console.log(testCaseData)
     // console.log(testData.testcases)
 
     // const calltestcase_Jira = async()=>{
@@ -295,8 +298,20 @@ const JiraContent = props => {
     //     }
     
 
-    const handleClick=(value)=>{
+    const handleClick=(value, id)=>{
        setSelected(value)
+       const mappedPair=[
+            {
+                projectId: proj, 
+                projectCode: projCode,
+                projectName: projName,        
+                testId: id,
+                testCode: value, 
+                scenarioId: selectedScIds
+            }
+        ];
+        dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
+        dispatch({type: actionTypes.SYNCED_TC, payload: value});
     }
 
     // const handleSync = () => {
@@ -337,7 +352,6 @@ const JiraContent = props => {
     //     dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
     // }
 
-console.log(props);
     return(
          !screenexit?
         <Fragment>
@@ -424,14 +438,14 @@ console.log(props);
                             //     {e.code}
                             // </div>
                             <div className={"test_tree_leaves"+ ( selected===e.code ? " test__selectedTC" : "")}>
-                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code)}>
+                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id)}>
                                 <span className="leafId">{e.code}</span>    
                                 <span className="test__tcName">{e.code}</span>
                             </label>
                             {selected===e.code 
                                     && <><div className="test__syncBtns"> 
-                                    { selected && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={()=>{handleClick(e.code)}} src="static/imgs/ic-qcSyncronise.png" />}
-                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={()=>{handleClick(e.code)}} src="static/imgs/ic-qcUndoSyncronise.png" />
+                                    { selected && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={()=>{handleClick(e.code,e.id)}} src="static/imgs/ic-qcSyncronise.png" />}
+                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={()=>{handleClick(e.code,e.id)}} src="static/imgs/ic-qcUndoSyncronise.png" />
                                     </div></> 
                             }
                         </div>
