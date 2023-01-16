@@ -8,6 +8,7 @@ import { Messages as MSG, setMsg, RedirectPage } from '../../global';
 // import CycleNode from './ZephyrTree';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
+import CycleNode from './JiraTree.js';
 
 
 const JiraContent = props => {
@@ -29,6 +30,7 @@ const JiraContent = props => {
     const [releaseArr, setReleaseArr] = useState([]);
     const [selectedRel, setSelectedRel] = useState("Select Release");
     const [testCaseData, setTestCaseData] = useState([]);
+    const[selected,setSelected]=useState(false)
     
  console.log(user_id)
 //     useEffect(() =>{
@@ -199,6 +201,142 @@ const JiraContent = props => {
         }
         dispatch({type: actionTypes.SEL_SCN_IDS, payload: newScenarioIds});	
     }
+    // const TestCaseNode = props => {
+
+    //     const dispatch = useDispatch();
+    //     const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
+    //     const selectedTC = useSelector(state=>state.integration.selectedTestCase);
+    //     const syncedTestCases = useSelector(state=>state.integration.syncedTestCases);
+    //     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
+    
+    //     let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}\\${props.testCase.name}\\${props.testCase.parentId}|`;
+    
+    //     const handleClick = (value) => {
+    //         // let newSelectedTCDetails = { ...selectedZTCDetails };
+    //         let newSelectedTC = [value.e.code];
+
+    //         let setSelected = {value};
+    
+    //         if (!value.ctrlKey) {
+    //             // setSelected.selectedTCPhaseId = [props.phaseId];
+    //             setSelected.selectedTcId = [String(props.testCaseData.id)];
+    //             setSelected.selectedTCNames = [props.testCaseData.name];
+    //             // setSelected.selectedTCReqDetails = [props.testCase.reqdetails];
+    //             // setSelected.selectedTreeId = [String(props.testCase.cyclePhaseId)];
+    //             // setSelected.selectedParentID = [props.testCase.parentId];
+    //             // setSelected.selectedProjectID = [parseInt(props.projectId)];
+    //             // setSelected.selectedReleaseID = [parseInt(props.releaseId)];
+    //             newSelectedTC = [uniqueTCpath];
+    //         } else if (value.ctrlKey) { 
+    //             const index = newSelectedTC.indexOf(uniqueTCpath);
+    //             if (index !== -1) {
+    //                 // newSelectedTCDetails.selectedTCPhaseId.splice(index, 1);
+    //                 setSelected.selectedTcId.splice(index, 1);
+    //                 setSelected.selectedTCNames.splice(index, 1);
+    //                 // newSelectedTCDetails.selectedTCReqDetails.splice(index, 1);
+    //                 // newSelectedTCDetails.selectedTreeId.splice(index, 1);
+    //                 // newSelectedTCDetails.selectedParentID.splice(index, 1);
+    //                 // newSelectedTCDetails.selectedProjectID.splice(index, 1);
+    //                 // newSelectedTCDetails.selectedReleaseID.splice(index, 1);
+    //                 newSelectedTC.splice(index, 1);
+    //             } else {
+    //                 // newSelectedTCDetails.selectedTCPhaseId.push(props.phaseId);
+    //                 setSelected.selectedTcId.push(String(props.testCaseData.id));
+    //                 setSelected.selectedTCNames.push(props.testCaseData.name);
+    //                 // newSelectedTCDetails.selectedTCReqDetails.push(props.testCase.reqdetails);
+    //                 // newSelectedTCDetails.selectedTreeId.push(String(props.testCase.cyclePhaseId));
+    //                 // newSelectedTCDetails.selectedParentID.push(props.testCase.parentId);
+    //                 // newSelectedTCDetails.selectedProjectID.push(parseInt(props.projectId));
+    //                 // newSelectedTCDetails.selectedReleaseID.push(parseInt(props.releaseId));
+    //                 newSelectedTC.push(uniqueTCpath)
+    //             } 
+    //         }
+    //         dispatch({type: actionTypes.SEL_TC_DETAILS, payload: setSelected});
+    //         dispatch({type: actionTypes.SYNCED_TC, payload: []});
+    //         dispatch({type: actionTypes.SEL_TC, payload: newSelectedTC});
+    //     }
+    
+    //     const handleSync = () => {
+    //         let popupMsg = false;
+    //         if(selectedScIds.length===0){
+    //             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+    //         }
+    //         else if(selectedZTCDetails.selectedTcId.length===0){
+    //             popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+    //         }
+    //         else if(selectedZTCDetails.selectedTcId.length>1 && selectedScIds.length>1) {
+    //             popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+    //         }
+    
+    //         if (popupMsg) setMsg(popupMsg);
+    //         else{
+    //             const mappedPair=[
+    //                 {
+    //                     projectid: selectedZTCDetails.selectedProjectID,			
+    //                     releaseid: selectedZTCDetails.selectedReleaseID,
+    //                     treeid: selectedZTCDetails.selectedTreeId,
+    //                     parentid: selectedZTCDetails.selectedParentID,
+    //                     testid: selectedZTCDetails.selectedTcId,
+    //                     testname: selectedZTCDetails.selectedTCNames,
+    //                     reqdetails: selectedZTCDetails.selectedTCReqDetails, 
+    //                     scenarioId: selectedScIds
+    //                 }
+    //             ]
+    //             dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
+    //             dispatch({type: actionTypes.SYNCED_TC, payload: selectedZTCDetails.selectedTCNames});
+    //         }
+    //     }
+    
+    //     const handleUnSync = () => {
+    //         dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+    //         dispatch({type: actionTypes.SYNCED_TC, payload: []});
+    //         dispatch({type: actionTypes.SEL_TC, payload: []});
+    //         dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+    //     }
+    
+
+    const handleClick=(value)=>{
+       setSelected(value)
+    }
+
+    // const handleSync = () => {
+    //     let popupMsg = false;
+    //     if(selectedScIds.length===0){
+    //         popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+    //     }
+    //     else if(testCaseData.length===0){
+    //         popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+    //     }
+    //     else if(testCaseData.length>1 && selectedScIds.length>1) {
+	// 		popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+    //     }
+
+    //     if (popupMsg) setMsg(popupMsg);
+    //     else{
+    //         const mappedPair=[
+    //             {
+    //                 projectid:testCaseData.code,			
+    //                 // releaseid: selectedZTCDetails.selectedReleaseID,
+    //                 // treeid: selectedZTCDetails.selectedTreeId,
+    //                 // parentid: selectedZTCDetails.selectedParentID,
+    //                 testid: testCaseData.code,
+    //                 testname: testCaseData.code,
+    //                 // reqdetails: selectedZTCDetails.selectedTCReqDetails, 
+    //                 scenarioId: selectedScIds
+    //             }
+    //         ]
+    //         dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
+    //         dispatch({type: actionTypes.SYNCED_TC, payload: testCaseData.code});
+    //     }
+    // }
+
+    // const handleUnSync = () => {
+    //     dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+    //     dispatch({type: actionTypes.SYNCED_TC, payload: []});
+    //     dispatch({type: actionTypes.SEL_TC, payload: []});
+    //     dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+    // }
+
 console.log(props);
     return(
          !screenexit?
@@ -273,8 +411,34 @@ console.log(props);
                     {
                         testCaseData ?
                         testCaseData.map((e,i)=>(
-                            <option id={e.code} value={e.code} key={e.code}>{e.code}</option>))
-                            : null 
+                            // <option id={e.code} value={e.code} key={e.code}>{e.code}</option>
+                            
+                            //  <div 
+                            //     key={e.code}
+                            //     className={"scenario__listItem" + (selectedScIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")}
+                            //     title={e.name}
+                            //     // onClick={(event)=>{alert(e.code);}}
+                            //     onClick={()=>{}}
+                            // ><div><img className="test__syncBtn" alt="s-ic" title="Synchronize"  src="static/imgs/ic-qcSyncronise.png" />
+                            // <img className="test__syncBtn" alt="s-ic" title="Undo" src="static/imgs/ic-qcUndoSyncronise.png" /></div>
+                            //     {e.code}
+                            // </div>
+                            <div className={"test_tree_leaves"+ ( selected===e.code ? " test__selectedTC" : "")}>
+                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code)}>
+                                <span className="leafId">{e.code}</span>    
+                                <span className="test__tcName">{e.code}</span>
+                            </label>
+                            {selected===e.code 
+                                    && <><div className="test__syncBtns"> 
+                                    { selected && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={()=>{handleClick(e.code)}} src="static/imgs/ic-qcSyncronise.png" />}
+                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={()=>{handleClick(e.code)}} src="static/imgs/ic-qcUndoSyncronise.png" />
+                                    </div></> 
+                            }
+                        </div>
+                            ))
+                            : null
+                            
+                        // onClick={(e.code)}
                     }
                 </div>
                 }
@@ -322,5 +486,6 @@ console.log(props);
     </Fragment>
     :null)
 }
+
     
 export default JiraContent;

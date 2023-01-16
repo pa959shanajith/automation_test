@@ -108,9 +108,9 @@ const LoginModal = props => {
                     if(props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.jiraUsername;
                     tempDefaultValues['username'] = data.jiraUsername;
                 }
-                if(data.jirapwrd) {
-                    if(props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.jirapwd;
-                    tempDefaultValues['password'] = data.jirapwd;
+                if(data.jirakey) {
+                    if(props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.jirakey;
+                    tempDefaultValues['password'] = data.jirakey;
                 }
                 setDefaultValues(tempDefaultValues);
                 onSubmit(data.jirapwd);
