@@ -80,6 +80,7 @@ const Genius = (props) => {
     }
   }
     else if (data === "disconnect") {
+      if(!props.selectedModule){
       setLoading(false);
       setSelectedProject(null);
       setSelectedModule(null);
@@ -87,6 +88,7 @@ const Genius = (props) => {
       setAppType(null);
       setNavURL("");
       setSelectedBrowser("chrome");
+      }
     }
     else if (data.action && data.action === "startDebugging") {
       if (savedRef.current) {
