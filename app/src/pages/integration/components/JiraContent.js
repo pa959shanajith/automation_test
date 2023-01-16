@@ -9,6 +9,7 @@ import { Messages as MSG, setMsg, RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
 import CycleNode from './JiraTree.js';
+import { SET_DISABLEAPPEND } from '../../scrape/state/action.js';
 
 
 const JiraContent = props => {
@@ -17,6 +18,8 @@ const JiraContent = props => {
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const mappedPair = useSelector(state=>state.integration.mappedPair);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
+    const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
+    const selectedTC = useSelector(state=>state.integration.selectedTestCase);
     const [projectId, setProjectId] = useState('');
     const [projectDetails , setProjectDetails]=useState({});
     const [avoProjects , setAvoProjects]= useState(null);
@@ -30,10 +33,12 @@ const JiraContent = props => {
     const [releaseArr, setReleaseArr] = useState([]);
     const [selectedRel, setSelectedRel] = useState("Select Release");
     const [testCaseData, setTestCaseData] = useState([]);
-    const[selected,setSelected]=useState(false);
+    const [selected,setSelected]=useState(false);
+    const [selectedId, setSelectedId] = useState('');
     const [proj, setProj] = useState('');
     const [projCode, setProjCode] = useState('');
     const [projName, setProjName] = useState('');
+    const [disabled, setDisabled] = useState(true);
     
  
 //     useEffect(() =>{
@@ -299,19 +304,44 @@ const JiraContent = props => {
     
 
     const handleClick=(value, id)=>{
+        let newSelectedTCDetails = { ...selectedZTCDetails };
+        let newSelectedTC = [...value];
        setSelected(value)
-       const mappedPair=[
-            {
-                projectId: proj, 
-                projectCode: projCode,
-                projectName: projName,        
-                testId: id,
-                testCode: value, 
-                scenarioId: selectedScIds
+       setSelectedId(id)
+       setDisabled(true)
+       dispatch({type: actionTypes.SEL_TC_DETAILS, payload: newSelectedTCDetails});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: newSelectedTC});
+    }
+    const handleSync = () => {
+       let popupMsg = false;
+            if(selectedScIds.length===0){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
             }
-        ];
-        dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
-        dispatch({type: actionTypes.SYNCED_TC, payload: value});
+            else if(selectedId===''){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+            }
+            else if(selectedId===selectedId && selectedScIds.length>1) {
+                popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+            }
+    
+            if (popupMsg) setMsg(popupMsg);
+            else{
+                    const mappedPair=[
+                            {
+                                projectId: proj, 
+                                projectCode: projCode,
+                                projectName: projName,        
+                                testId: selectedId,
+                                testCode: selected, 
+                                scenarioId: selectedScIds
+                            }
+                        ];
+                        console.log("vallue,,,,,,,,",mappedPair)
+                        dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
+                        dispatch({type: actionTypes.SYNCED_TC, payload: selected});
+            }
+        setDisabled(false);
     }
 
     // const handleSync = () => {
@@ -345,12 +375,15 @@ const JiraContent = props => {
     //     }
     // }
 
-    // const handleUnSync = () => {
-    //     dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
-    //     dispatch({type: actionTypes.SYNCED_TC, payload: []});
-    //     dispatch({type: actionTypes.SEL_TC, payload: []});
-    //     dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
-    // }
+    const handleUnSync = () => {
+        dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: []});
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        clearSelections();
+        setDisabled(true)
+        setSelected(false)
+    }
 
     return(
          !screenexit?
@@ -444,8 +477,8 @@ const JiraContent = props => {
                             </label>
                             {selected===e.code 
                                     && <><div className="test__syncBtns"> 
-                                    { selected && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={()=>{handleClick(e.code,e.id)}} src="static/imgs/ic-qcSyncronise.png" />}
-                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={()=>{handleClick(e.code,e.id)}} src="static/imgs/ic-qcUndoSyncronise.png" />
+                                    { selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled?"static/imgs/ic-qcSyncronise.png":null} />}
+                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                                     </div></> 
                             }
                         </div>
