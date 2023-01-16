@@ -154,7 +154,6 @@
    }
 .button-design{
     float: "left";
-    margin-left: 1rem;
     font-family:"LatoWeb";
     font-size: 16px;
     padding: 0rem -9rem 0rem 1rem;
@@ -403,4 +402,7 @@
 
 #apptype__dropdown-list>.ms-Button, #project__dropdown-list>.ms-Button {
     font-size: 15px !important;
+}
+.ms-TooltipHost{
+    margin-left: 0.5rem;
 }

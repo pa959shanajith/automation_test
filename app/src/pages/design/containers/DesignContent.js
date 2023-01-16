@@ -122,14 +122,20 @@ const DesignContent = props => {
     }, [draggedFlag])
 
     useEffect(()=>{
+        let shouldDisable = false;
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
         //eslint-disable-next-line
-        Object.values(testCaseData).forEach(value => {
+        for(let value of testCaseData){
             if (value.custname === "" || value.custname==="OBJECT_DELETED") {
-              setDebugEnable(true);          
-             }
-            });
-          
+                shouldDisable = true;         
+            }
+        }
+        // Object.values(testCaseData).forEach(value => {
+        //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+        //         shouldDisable = true;         
+        //      }
+        //     });
+        setDebugEnable(shouldDisable);
     }, [testCaseData]);
 
     useEffect(()=>{

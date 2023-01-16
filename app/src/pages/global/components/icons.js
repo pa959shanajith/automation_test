@@ -164,6 +164,15 @@ registerIcons({
     'studio-white': <StudioWhite />,
     studio: <Studio />,
     'taskboard-white': <TaskboardWhite />,
-    input: <Input />
+    input: <Input />,
+    mobileapp: <img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/mobileApps.png"}/>,
+    mobileweb:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/mobileWeb.png"}/>,
+    oebs:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/oracleApps.png"}/>,
+    sap:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/sapApps.png"}/>,
+    system:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/desktop.png"}/>,
+    web:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/ic-web.png"}/>,
+    webservice:<img style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/ic-webservice.png"}/>,
+    desktop:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/desktop.png"}/>,
+    mainframe:<img style={{width:'1.41rem', padding: '3px'}} src={"static/imgs/mainframe.png"}/>
   }
 });

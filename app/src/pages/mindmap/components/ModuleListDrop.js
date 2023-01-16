@@ -38,13 +38,12 @@ const ModuleListDrop = (props) =>{
     const userRole = useSelector(state=>state.login.SR);
     const [firstRender, setFirstRender] = useState(true);
     const [showNote, setShowNote] = useState(false);
-  
-
+    const [allModSelected, setAllModSelected] = useState(false);
     useEffect(()=> {
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        if(moduleList.length > 0) {
-            const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
-            selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
+        
+            if(moduleList.length > 0) {
+                const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
+                selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
         }
        
         setWarning(false);
@@ -65,7 +64,15 @@ const ModuleListDrop = (props) =>{
         var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
         setScenarioList(filter)
     },[filterSc,setScenarioList,initScList])
-    
+    // about select all check box
+    useEffect(()=>{
+        if(moduleSelectlist.length===moduleList.length && moduleSelectlist.length>0){
+          setAllModSelected(true);
+        }
+        else{
+          setAllModSelected(false);
+        }
+      },[moduleSelectlist, moduleList])
     const displayError = (error) =>{
         setLoading(false)
         setMsg(error)
@@ -200,7 +207,7 @@ const ModuleListDrop = (props) =>{
         var sceName = e.currentTarget.getAttribute("title")	
         var scArr = {...selectedSc}	
         if(scArr[sceId]){	
-            delete scArr[sceId] 	
+            delete scArr[sceId] 
         }else{	
             scArr[sceId] = sceName	
         }       
@@ -281,6 +288,14 @@ const ModuleListDrop = (props) =>{
                             {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
+                        <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
+                  if (!allModSelected) {
+                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: moduleList.map((modd) => modd._id) })
+                  } else {
+                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: [] })
+                  }
+                  setAllModSelected(!allModSelected)
+                }} ></input>
                             <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                         </div>
@@ -321,6 +336,7 @@ const ModuleListDrop = (props) =>{
                             />  :null}
                         </div>
                         <div className='searchBox pxBlack'>
+                        <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
                             <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                         </div>
@@ -372,7 +388,7 @@ const ModuleListDrop = (props) =>{
                                 })}
                             </div>
                             <div className='AddBut'>
-                                <Button onClick={clickAdd} style={{  marginLeft:'.7rem',marginTop:'0.4rem',textAlign:'center',width:'66px',height:'31px', alignContent:'center',cursor:'pointer',alignItems:'center'}} disabled={ selectedSc.length < 1? true : false} label="ADD"  />
+                                <Button onClick={clickAdd} style={{  marginLeft:'.7rem',marginTop:'0.4rem',textAlign:'center',width:'66px',height:'31px', alignContent:'center',cursor:'pointer',alignItems:'center'}} disabled={ Object.keys(selectedSc).length<1? true : false} label="ADD"  />
                             </div>
                             </div>
                     <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(180deg)' : 'rotate(0deg)',height:'30px',width:'8px', position:'relative'

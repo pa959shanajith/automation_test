@@ -12,11 +12,43 @@ import { deleteAvoGrid, fetchAvoAgentAndAvoGridList } from '../api';
 const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
     const [currentGrid, setCurrentGrid] = useState(false);
     const [searchText, setSearchText] = useState("");
-    const deleteGridConfig = async (id) => {
-    
-        setShowConfirmPop({'title': 'Delete Avo Grid Configuration', 'content': <p>Are you sure, you want to delete <b>Name 1</b> Configuration?</p>, 'onClick': ()=>{ setShowConfirmPop(false); showMessageBar('Name 1 Configuration Deleted', 'SUCCESS'); }});
-    }
     const [gridList, setGridList] = useState([]);
+    const deleteGridConfig = (grid) => {
+        setShowConfirmPop({
+            title: 'Delete Avo Grid Configuration', 
+            content: <p>Are you sure, you want to delete <b>{grid.name}</b> Configuration?</p>, 
+        onClick: ()=>{ deleteDevopsAvoGrid(grid); }});
+    }
+    const deleteDevopsAvoGrid = (grid) => {
+        setLoading('Please Wait...');
+        setTimeout(async () => {
+            const deletedAvoGrid = await deleteAvoGrid({'_id':grid._id});
+            if(deletedAvoGrid.error) {
+                if(deletedAvoGrid.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(deletedAvoGrid.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
+                }
+            }else {
+                const gridList = await fetchAvoAgentAndAvoGridList({
+                    query: 'avoGridList'
+                });
+                if(gridList.error) {
+                    if(gridList.error.CONTENT) {
+                        setMsg(MSG.CUSTOM(gridList.error.CONTENT,VARIANT.ERROR));
+                    } else {
+                        setMsg(MSG.CUSTOM("Error While Fetching Grid List",VARIANT.ERROR));
+                    }
+                }else {
+                    setGridList(gridList.avogrids);
+                }
+                setMsg(MSG.CUSTOM( grid.name+" Deleted Successfully.",VARIANT.SUCCESS));
+            }
+            setLoading(false);
+        }, 500);
+        setShowConfirmPop(false);
+    }
+   
     
 
     const listHeaders = [
@@ -254,7 +286,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                         Avo Grid Configuration
                     </span>
                 </div>
-                <div className="api-ut__btnGroup">
+                <div className="api-ut__btnGroup__grid">
                     <button data-test="submit-button-test" onClick={() => setCurrentGrid({
                         name: '',
                         agents: []
@@ -272,7 +304,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                     <DetailsList columns={listHeaders} items={((searchText.length > 0) ? filteredList : gridList).map((grid) => ({
                         name: grid.name,
                         editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid(grid)} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
-                        deleteIcon: <img onClick={() => deleteGridConfig(grid._id)} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
+                        deleteIcon: <img onClick={() => deleteGridConfig(grid)} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
                     }))} layoutMode={1} selectionMode={0} variant="variant-two" />
                 </div> : <div className="no_config_img"> <img src="static/imgs/empty-config-list.svg" alt="Empty List Image"/>  </div> }
             </>

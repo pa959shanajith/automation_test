@@ -172,7 +172,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
         moduleid:null
     }
     var moduledata = await getModules(req);
-    dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+    // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
     return;
 
 }

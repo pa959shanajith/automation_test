@@ -674,3 +674,29 @@ export const deleteScenarioETE = async(data) => {
         return {error:MSG.MINDMAP.ERR_DELETE_SCENARIO}
     }
 }
+export const exportToProject = async(moduleId) => {
+    try{
+        const res = await axios(url+'/exportToProject', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+                mindmapId:moduleId
+            },
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }
+}
