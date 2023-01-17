@@ -97,7 +97,7 @@ const MappedPage = props =>{
                 props.mappedfilesRes.forEach(object => {
                     totalCounts = totalCounts + 1;
                     mappedScenarios = mappedScenarios + object.testscenarioname.length;
-                    mappedTests = '1';
+                    mappedTests = mappedTests + 1;
                     tempRow.push({
                         'testCaseNames': object.testCode, 
                         'scenarioNames': object.testscenarioname,

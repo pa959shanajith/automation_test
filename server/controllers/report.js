@@ -761,10 +761,18 @@ exports.viewJiraMappedList_ICE = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var userid = req.session.userid;
-		var inputs = {
-			"userid": userid,
-			"query": "jiradetails"
-		};
+        if (!req.body.scenarioName) {
+            var inputs = {
+                "userid": userid,
+                "query": "jiradetails"
+            };
+        } else {
+            var inputs = {
+                "userid": userid,
+                'scenarioName':req.body.scenarioName,
+                "query": "jiradetails"
+            };
+        }
 		const result = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
 		if (result == "fail") res.send('fail');
 		else res.send(result);
