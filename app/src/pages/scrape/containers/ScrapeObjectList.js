@@ -482,15 +482,15 @@ const ScrapeObjectList = (props) => {
                         disabled={(disableAction || compareFlag)}
                         
                         options={[
-                            {
-                              data: {
-                                icon: 'internet',
-                              },
+                            // {
+                            //   data: {
+                            //     icon: 'internet',
+                            //   },
   
-                              key: "ie",
-                              text: "Internet Explorer",
+                            //   key: "ie",
+                            //   text: "Internet Explorer",
                               
-                            },
+                            // },
   
                             {
                               data: {
@@ -527,14 +527,14 @@ const ScrapeObjectList = (props) => {
                               key: "edge",
                               text: "Microsoft Edge",
                             },
-                            {
-                              data: {
-                                icon: "edge",
-                              },
+                            // {
+                            //   data: {
+                            //     icon: "edge",
+                            //   },
   
-                              key: "chromium",
-                              text: "Edge Chromium",
-                            },
+                            //   key: "chromium",
+                            //   text: "Edge Chromium",
+                            // },
                           ]}
                           selectedKey={captureButton}
                         placeholder="Select Browser"
