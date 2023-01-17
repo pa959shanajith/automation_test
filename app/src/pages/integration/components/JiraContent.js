@@ -123,6 +123,16 @@ const JiraContent = props => {
             clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        setDisabled(true)
+        setSelected(false)
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        let popupMsg = false;
+            if(selectedScIds.length===0){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+            }
+            else if(selectedId===''){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+            }
     }
     const callExit=()=>{
         setScreenExit(true);

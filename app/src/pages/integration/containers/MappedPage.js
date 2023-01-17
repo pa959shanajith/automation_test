@@ -226,25 +226,25 @@ const MappedPage = props =>{
 
                 if (type === "scenario") {
                     if (tempUnSyncMaps.maps[rowIdx]) {
-                        tempUnSyncMaps.maps[rowIdx].testscenarioid.push(rows[rowIdx].scenarioId[labelIdx]);
+                        tempUnSyncMaps.maps[rowIdx].testscenarioid.push(rows[rowIdx].scenarioId);
                     }
                     else {
                         tempUnSyncMaps.maps[rowIdx] = {
                             'mapid': rows[rowIdx].mapId,
-                            'testscenarioid': [rows[rowIdx].scenarioId[labelIdx]]
+                            'testscenarioid': [rows[rowIdx].scenarioId]
                         }
                     }
                 }
                 else if (type === "testcase") {
                     if (tempUnSyncMaps.maps[rowIdx]) {
-                        tempUnSyncMaps.maps[rowIdx].testCaseNames.push(rows[rowIdx].testCaseNames[labelIdx]);
-                        tempUnSyncMaps.maps[rowIdx].testid.push(rows[rowIdx].testid[labelIdx]);
+                        tempUnSyncMaps.maps[rowIdx].testCaseNames.push(rows[rowIdx].testCaseNames);
+                        tempUnSyncMaps.maps[rowIdx].testid.push(rows[rowIdx].testid);
                     }
                     else {
                         tempUnSyncMaps.maps[rowIdx] = {
                             'mapid': rows[rowIdx].mapId,
-                            'testCaseNames': [rows[rowIdx].testCaseNames[labelIdx]],
-                            'testid': [rows[rowIdx].testid[labelIdx]]
+                            'testCaseNames': [rows[rowIdx].testCaseNames],
+                            'testid': [rows[rowIdx].testid]
                         }
                     }
                 }
