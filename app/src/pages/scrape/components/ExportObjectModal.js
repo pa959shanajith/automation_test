@@ -151,7 +151,7 @@ const ExportObjectModal = props => {
     
     return(
         <ModalContainer 
-        title={'Export Object'}
+        title={'Export'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
         content={<Content/>}

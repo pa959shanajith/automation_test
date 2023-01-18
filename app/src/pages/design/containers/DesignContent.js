@@ -998,7 +998,7 @@ const DesignContent = props => {
                                 },
 
                                 key: "8",
-                                text: "Edge",
+                                text: "Microsoft Edge",
                             },
                             ]}
                             selectedKey={debugButton}

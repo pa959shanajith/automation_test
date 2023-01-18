@@ -185,7 +185,7 @@ const DevOpsConfig = props => {
         // },
         {
             key: '8',
-            text: 'Edge'
+            text: 'Microsoft Edge'
         }
     ]);
     const [integration,setIntegration] = useState(props.currentIntegration.executionRequest ? props.currentIntegration.executionRequest.integration : {

@@ -533,7 +533,7 @@ const ScrapeObjectList = (props) => {
                               },
   
                               key: "chromium",
-                              text: "Edge",
+                              text: "Microsoft Edge",
                             },
                           ]}
                           selectedKey={captureButton}
