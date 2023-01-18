@@ -26,7 +26,7 @@ const ReplaceObjectSelBrModal = props => {
             <ModalContainer 
                 title="Replace Element"
                 content={<div data-test="sbReplaceObjectContent" className="sb__SelBrObj_content">
-                    <span>Select one of the browsers below to capture new Element to replace old Element</span>
+                    <span>Select one of the browsers below to capture new element to replace old element</span>
                     <div data-test="sbReplaceObjectButtons" className="sb__replaceObj_btns">
                         { webIcons.map((icon, i) => !icon.hide && <button data-test="sbReplaceObjectButton" key={i} className="sb__replaceObj_btn" title={icon.title} onClick={icon.action}>
                                 <img data-test="webIcons" className="sb__web_icons" src={icon.src} alt={icon.title}/>

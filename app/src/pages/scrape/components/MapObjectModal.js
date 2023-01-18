@@ -155,7 +155,7 @@ const MapObjectModal = props => {
                         <div   data-test="mapObjectHeading" className="ss__mo_lbl headerMargin">Please select the elements to drag and drop</div>
                         <div className="ss__mo_lists">
                             <div data-test="mapObjectScrapeObjectList" className="ss__mo_scrapeObjectList">
-                                <div  data-test="mapObjectLabel" className="ss__mo_lbl lblMargin">captured Elements</div>
+                                <div  data-test="mapObjectLabel" className="ss__mo_lbl lblMargin">Captured Elements</div>
                                 <div className="mo_scrapeListContainer">
                                     <div className="mo_listCanvas">
                                         <div className="mo_listMinHeight">
