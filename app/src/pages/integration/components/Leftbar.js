@@ -12,7 +12,7 @@ const Leftbar = (props) => {
     const callIconClick = iconType => {
         let clickedScreen = null;
 
-        if(["qTest","ALM","Zephyr","Jira"].includes(iconType)) clickedScreen = iconType;
+        if(["qTest","ALM","Zephyr"].includes(iconType)) clickedScreen = iconType;
         else if(iconType === "Import") 
         {   clickedScreen = "Zephyr";
             props.setImportPop(true)
@@ -63,19 +63,6 @@ const Leftbar = (props) => {
                         <div>Zephyr</div>
                     </span> 
                 </Fragment> ) 
-            case "Jira":
-            case "JiraUpdate":
-                return(
-                <Fragment>
-                    <h4>Integration</h4>
-                   <span onClick={()=>callIconClick("Jira")} title="Jira">
-                        <img alt="JiraIcon"  
-                            id={(screenType === "Jira")? "selectedIcon" : null} 
-                            src='static/imgs/JiraSoftware.png'
-                        />
-                        <div>Jira</div>
-                    </span> 
-                </Fragment> )     
             default :
             return(
             <Fragment>
@@ -100,13 +87,6 @@ const Leftbar = (props) => {
                             src='static/imgs/Zephyr.png'
                         />
                         <div>Zephyr</div>
-                    </span>
-                    <span onClick={()=>callIconClick("Jira")} title="Jira">
-                        <img alt="JiraIcon" 
-                            id={(screenType === "Jira")? "selectedIcon" : null} 
-                            src='static/imgs/JiraSoftware.png'
-                        />
-                        <div>Jira</div>
                     </span>
             </Fragment>    )
         }

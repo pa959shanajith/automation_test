@@ -41,7 +41,7 @@ const MappedLabel = props => {
                             >
                                 {item}
                             </div>
-                            {(type==='testcase' && (screenType==='Zephyr' || screenType==='Jira'))?
+                            {(type==='testcase' && screenType==='Zephyr')?
                                 <i onClick={()=>{setInfo(true); settestId(idx+1);}} className="fa fa-info" title="Requirement mapping info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
                             }
                             { props.selected.includes(`${props.mapIdx}-${idx+1}`) && !props.unSynced &&

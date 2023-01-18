@@ -7,7 +7,6 @@ import ImportMappings from '../components/ImportMappings';
 import ALM from './ALM';
 import QTest from './QTest';
 import Zephyr from './Zephyr';
-import Jira from './Jira';
 import * as actionTypes from '../state/action';
 import '../styles/IntegrationHome.scss'
 
@@ -46,7 +45,6 @@ const Integrations = () => {
                     { screenType === 'ALM' && <ALM /> }
                     { screenType === "Zephyr" && <Zephyr /> }
                     { screenType === "qTest" && <QTest /> }
-                    { screenType === "Jira" && <Jira /> }
                 </div>
 
                 <Rightbar />
