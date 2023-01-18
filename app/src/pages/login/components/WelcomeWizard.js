@@ -669,7 +669,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 </div>
                 :null
             }
-          {<div className="WelcomeContactUs">For help <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">Click here</a> OR <a href="mailto:support@avoautomation.com">Contact us</a></div>}
+          {<div className="WelcomeContactUs">For help <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">click here</a> OR <a href="mailto:support@avoautomation.com">contact us</a></div>}
         </div>
         </div>
     </div>
