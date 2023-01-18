@@ -134,7 +134,7 @@ const ImportObjectModal = props => {
     }
     return(
         <ModalContainer 
-        title={'Import Object'}
+        title={'Import'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
         content={<Content sheetRef={sheetRef} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay}/>}
