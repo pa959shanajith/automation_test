@@ -482,7 +482,7 @@ const JiraContent = props => {
                             // </div>
                             <div className={"test_tree_leaves"+ ( selected===e.code ? " test__selectedTC" : "")}>
                             <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id)}>
-                                <span className="leafId">{e.code}</span>    
+                                <span className="leafId">{e.id}</span>    
                                 <span className="test__tcName">{e.code}</span>
                             </label>
                             {selected===e.code 
