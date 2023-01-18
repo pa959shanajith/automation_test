@@ -23,7 +23,7 @@ const MappedLabel = props => {
                     >
                         {typeof(props.list) === "object" ? props.list[0] : props.list}
                     </div>
-                    {(type==='testcase' && screenType==='Zephyr')||(type==='testcase' && screenType==='Jira')?
+                    {(type==='testcase' && screenType==='Zephyr')?
                         <i onClick={()=>setInfo(true)} className="fa fa-info" title="Requirement mapping info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
                     }
                     { props.selected.includes(`${props.mapIdx}-0`) && !props.unSynced &&

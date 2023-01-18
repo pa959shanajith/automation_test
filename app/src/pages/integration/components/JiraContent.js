@@ -215,7 +215,7 @@ const JiraContent = props => {
             if (index !== -1) {
                 newScenarioIds.splice(index, 1);
             }
-            else newScenarioIds.push(id);
+            // else newScenarioIds.push(id);
         }
         dispatch({type: actionTypes.SEL_SCN_IDS, payload: newScenarioIds});	
     }
