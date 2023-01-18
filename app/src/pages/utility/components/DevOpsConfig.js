@@ -178,14 +178,15 @@ const DevOpsConfig = props => {
         },{
             key: '2',
             text: 'Mozilla Firefox'
-        },{
-            key: '7',
-            text: 'Microsoft Edge'
-        }
+        },
         // {
-        //     key: '8',
-        //     text: 'Edge Chromium'
-        // }
+        //     key: '7',
+        //     text: 'Microsoft Edge'
+        // },
+        {
+            key: '8',
+            text: 'Edge'
+        }
     ]);
     const [integration,setIntegration] = useState(props.currentIntegration.executionRequest ? props.currentIntegration.executionRequest.integration : {
         alm: {url:"",username:"",password:""}, 

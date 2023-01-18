@@ -519,22 +519,22 @@ const ScrapeObjectList = (props) => {
                               text: "Mozilla Firefox",
                             },
   
-                            {
-                              data: {
-                                icon: "edge",
-                              },
-  
-                              key: "edge",
-                              text: "Microsoft Edge",
-                            },
                             // {
                             //   data: {
                             //     icon: "edge",
                             //   },
   
-                            //   key: "chromium",
-                            //   text: "Edge Chromium",
+                            //   key: "edge",
+                            //   text: "Microsoft Edge",
                             // },
+                            {
+                              data: {
+                                icon: "edge",
+                              },
+  
+                              key: "chromium",
+                              text: "Edge",
+                            },
                           ]}
                           selectedKey={captureButton}
                         placeholder="Select Browser"

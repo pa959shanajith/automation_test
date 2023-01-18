@@ -984,22 +984,22 @@ const DesignContent = props => {
                                 text: "Mozilla Firefox",
                             },
 
-                            {
-                                data: {
-                                icon: "edge",
-                                },
-
-                                key: "7",
-                                text: "Microsoft Edge",
-                            },
                             // {
                             //     data: {
                             //     icon: "edge",
                             //     },
 
-                            //     key: "8",
-                            //     text: "Edge Chromium",
+                            //     key: "7",
+                            //     text: "Microsoft Edge",
                             // },
+                            {
+                                data: {
+                                icon: "edge",
+                                },
+
+                                key: "8",
+                                text: "Edge",
+                            },
                             ]}
                             selectedKey={debugButton}
                             placeholder="Select Browser"
