@@ -548,7 +548,7 @@ module.exports.validateUserState = async (req, res) => {
 				const sessid = await utils.findSessID(username);
 				if (sessid.length !== 0) {
 					logger.info(`User ${username} is already logged in`);
-					const d2s = {"action":'logout', "key":sessid, "user":user.username, "cmdBy":'admin', "reason": 'session'};
+					const d2s = {"action":'logout', "key":sessid, "user":user.username, "cmdBy":'admin', "reason": 'duplicatesession'};
 					try {
 						const status = await utils.delSession(d2s);
 						emsg = "reload";
