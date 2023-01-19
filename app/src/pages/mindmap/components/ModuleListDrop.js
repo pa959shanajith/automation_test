@@ -15,6 +15,7 @@ const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
+    const initProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
     const [moddrop,setModdrop]=useState(true)
@@ -26,6 +27,7 @@ const ModuleListDrop = (props) =>{
     const SearchInp = useRef()
     const SearchMdInp = useRef()
     const [modE2Elist, setModE2EList] = useState(moduleList)
+    const [searchForNormal, setSearchForNormal] = useState(false)
     const [importPop,setImportPop] = useState(false)
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
@@ -40,14 +42,17 @@ const ModuleListDrop = (props) =>{
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
     useEffect(()=> {
-        
+        if(!searchForNormal) {
             if(moduleList.length > 0) {
                 const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
                 selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
-        }
+        }}
        
         setWarning(false);
-     }, [moduleList])
+     }, [ moduleList])
+     useEffect(()=>{
+         setSearchForNormal(false);
+     },[initProj])
 
      useEffect(()=>{
         if(moduleSelect.type === 'endtoend') {
@@ -89,8 +94,10 @@ const ModuleListDrop = (props) =>{
 
     }
     const searchModule = (val) =>{
+        setSearchForNormal(true);
         var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+        
     }
     const searchScenario = (val) =>{
         setFilterSc(val)
@@ -296,7 +303,7 @@ const ModuleListDrop = (props) =>{
                   }
                   setAllModSelected(!allModSelected)
                 }} ></input>
-                            <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
+                            <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value);setSearchForNormal(true)}}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                         </div>
                         <div className='moduleList'>
