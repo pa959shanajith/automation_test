@@ -75,8 +75,8 @@ const JiraContent = props => {
 
     const onReleaseSelect = async(event) => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
-        const releaseId = event.target.value;
-        const testAndScenarioData =await api.zephyrCyclePhase_ICE(projectId, user_id);
+        const releaseId = "Jira_123";
+        const testAndScenarioData =await api.zephyrCyclePhase_ICE(releaseId, user_id);
         if (testAndScenarioData.error)
             setMsg(testAndScenarioData.error);
         else if (testAndScenarioData === "unavailableLocalServer")
@@ -408,7 +408,7 @@ const JiraContent = props => {
                 leftBoxTitle="Jira Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestDomain={
-                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{callProjectDetails_ICE(e);jiraTest(e);onReleaseSelect(e)}} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                    <select data-test="intg_Zephyr_project_drpdwn" value={projectDropdn1} onChange={(e)=>{callProjectDetails_ICE(e);jiraTest(e);onReleaseSelect(e)}} className="qcSelectDomain" style={{marginRight : "5px"}}>
                         <option value="Select Project" disabled >Select Project</option>
                         {  props.domainDetails ? 
                             
