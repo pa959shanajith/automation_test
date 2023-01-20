@@ -34,6 +34,7 @@ const CreateGrid = ({
   const [searchText, setSearchText] = useState("");
   const [dataUpdated, setDataUpdated] = useState(false);
   const [agentData, setAgentData] = useState([]);
+  const [filteredList, setFilteredList] = useState(agentData);
   let selectedAgents = undefined;
 
   let firstRenderCheck = true;
@@ -79,13 +80,20 @@ const CreateGrid = ({
             : agentData[index].icecount - 1,
       };
       setAgentData([...updatedData]);
+      let filteredItems = updatedData.filter(
+        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      );
+      setFilteredList(filteredItems);
     } else if (operation === "update" && newVal > 0) {
       updatedData[index] = { ...agentData[index], icecount: parseInt(newVal) };
       setAgentData([...updatedData]);
+      let filteredItems = updatedData.filter(
+        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      );
+      setFilteredList(filteredItems);
     }
   };
 
-  const [filteredList, setFilteredList] = useState(agentData);
   const handleSearchChange = (value) => {
     let filteredItems = agentData.filter(
       (item) => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1
@@ -278,6 +286,11 @@ const CreateGrid = ({
       isSelected: !agentData[index].isSelected,
     };
     setAgentData([...updatedData]);
+
+    let filteredItems = updatedData.filter(
+      (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+    );
+    setFilteredList(filteredItems);
   };
 
   return (
