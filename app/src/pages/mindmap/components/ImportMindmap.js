@@ -213,14 +213,14 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     return(
         <div data-test='mp__import-popup' className = 'mp__import-popup'>
             <div>
-                <label>Import As: </label>
+                <label>Import from: </label>
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                     <option value={'def-val'} disabled>Select Import Format</option>
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
-                    <option value={'excel'}>Excel Workbook (.xls,.xlsx)</option>
-                    <option value={'git'}>Git (.mm)</option> 
-                    <option value={'json'}>MindMap (.mm)</option>
-					<option value={'sel'}>Selenium To Avo (.sel)</option>
+                    <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
+                    {/* <option value={'git'}>Git (.mm)</option>  */}
+                    <option value={'json'}>Complete Module(S) (.mm)</option>
+					<option value={'sel'}>Structure only - Selenium To Avo (.sel)</option>
                 </select>
             </div>
             {isMultiImport && 
