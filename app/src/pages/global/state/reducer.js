@@ -5,7 +5,8 @@ const initialState = {
     roleSwitched: false,
     popup: false,
     showGenuisWindow: false,
-    geniusWindowProps: {}
+    geniusWindowProps: {},
+    showSmallPopup:false
 };
 
 const reducer = (state = initialState , action) => {
@@ -29,6 +30,12 @@ const reducer = (state = initialState , action) => {
             showGenuisWindow: action.payload.showGenuisWindow,
             geniusWindowProps:action.payload.geniusWindowProps
           }
+        case actionTypes.GENIUS_SMALL_POPUP:
+          return{
+            ...state,
+            showSmallPopup:action.payload.showSmallPopup
+
+            }
         default:
             return state;
     }

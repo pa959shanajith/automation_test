@@ -174,7 +174,7 @@ const Messages={
     },
     GENERIC:{
         INVALID_SESSION: {"CONTENT":"Invalid Session.", "VARIANT": VARIANT.ERROR},
-        UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"No Intelligent Core Engine (ICE) connection found with the logged in Avo Assure username. Please run the ICE batch file once again and connect to server.", "VARIANT": VARIANT.ERROR},
+        UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"Avo Assure client is offline. Please reconnect.", "VARIANT": VARIANT.ERROR},
         WARN_EXECUTION_ONLY: {"CONTENT":"ICE is connected in 'Execution Only' mode. Other actions are not permitted.", "VARIANT": VARIANT.WARNING},
         WARN_NO_REVIEWER: {"CONTENT":"Reviewer is not assigned .", "VARIANT": VARIANT.WARNING},
         ERR_FETCH_POOLS: {"CONTENT":"Failed to fetch pools.", "VARIANT": VARIANT.ERROR},

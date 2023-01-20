@@ -11,10 +11,13 @@ import { useHistory } from 'react-router-dom';
 import * as DesignApi from "../../design/api";
 import * as PluginApi from "../../plugin/api";
 import * as mindmapActionTypes from "../../mindmap/state/action";
+import * as actionTypesGlobal from "../../global/state/action";
+
 import GeniusMindmap from "../../mindmap/containers/GeniusMindmap";
 import { ConfirmDialog } from 'primereact/confirmdialog';
 
 import { useSelector, useDispatch } from 'react-redux';
+
 
 
 let port = null;
@@ -50,12 +53,18 @@ const Genius = (props) => {
   const[visibleScenario,setVisibleScenario]=useState(false)
   const[visibleReset,setVisibleReset]=useState(false)
   const[scenarioChosen,setScenarioChosen]=useState(null)
+  const[BrowserName,setBrowserName]=useState(null)
+  const[screenNamesList,setScreenNameList]=useState(null)
+  const[errorMessage,setErrorMessage]=useState(false)
+  
   const userInfo = useSelector(state => state.login.userinfo);
   const savedRef = useRef(false);
   const finalDataRef = useRef([])
   const dispatch = useDispatch();
   const history = useHistory();
   const userRole = useSelector(state=>state.login.SR);
+  
+  
   const displayError = (error) => {
     
     setBlockui({ show: false })
@@ -64,7 +73,7 @@ const Genius = (props) => {
   }
 
   const backgroundListener = async (data) => {
-    debugger;
+    
     if (data === "getMindmap") {
       loadModule(selectedModule.key, selectedProject.key);
       
@@ -80,8 +89,8 @@ const Genius = (props) => {
     }
   }
     else if (data === "disconnect") {
-      if(!props.selectedModule){
       setLoading(false);
+      if(!props.selectedModule){
       setSelectedProject(null);
       setSelectedModule(null);
       setSelectedScenario(null);
@@ -158,6 +167,7 @@ const Genius = (props) => {
       try {
         const scenarioData = getExcludedMindmapInternals(modScenarios, selectedScenario.key);
         const res = await PluginApi.getGeniusData(data, scenarioData);
+       
         savedRef.current = true;
         
         if (port) port.postMessage({
@@ -170,6 +180,9 @@ const Genius = (props) => {
     }
     else if (data === "pleaseBeConnected") {
       console.log("got the message for being connected")
+      dispatch({type:actionTypesGlobal.GENIUS_SMALL_POPUP,payload:{showSmallPopup:false}}) 
+
+
     }
 
     else {
@@ -238,7 +251,7 @@ const Genius = (props) => {
 
   const reconnectEx = () => {
    
-    port = undefined; connect()
+    port = undefined; connect(BrowserName)
   }
   useEffect(() => {
     if (port) {
@@ -270,6 +283,8 @@ const Genius = (props) => {
         setProjModules(modulesdata);
         
         setSelectedModule(props.selectedModule?props.selectedModule:null)
+        const screenName=await getScreens(selectedProject.key)
+        setScreenNameList(screenName)
       }
     })()
   }, [selectedProject])
@@ -288,10 +303,32 @@ const Genius = (props) => {
   }, [selectedModule])
 
   useEffect(() => {
+   
+   
+    let browserName = (function (agent) {        
+      switch (true) {
+      case agent.indexOf("edge") > -1: return "MS Edge";
+      case agent.indexOf("edg/") > -1: return "Edge ( chromium based)";
+      case agent.indexOf("opr") > -1 && !!window.opr: return "Opera";
+      case agent.indexOf("chrome") > -1 && !!window.chrome: return "Chrome";
+      case agent.indexOf("trident") > -1: return "MS IE";
+      case agent.indexOf("firefox") > -1: return "Mozilla Firefox";
+      case agent.indexOf("safari") > -1: return "Safari";
+      default: return "other";
+   }
+    })(window.navigator.userAgent.toLowerCase());
+    setBrowserName(browserName)
+
+
   
-  
-    connect();
+    if(userInfo.isTrial){
+      fetch("/getClientConfig").then(data=>data.json()).then(response=>setNavURL(response.geniusTrialUrl))
+        }
+      
+    
+    connect(browserName);
     (async () => {
+     
       setBlockui({ show: true, content: 'Loading...' })
       let res = await getProjectList();
       if (res === "Invalid Session") return RedirectPage(history);
@@ -343,7 +380,11 @@ const Genius = (props) => {
     if (port) port.postMessage(msg);
   }
 
-  function connect() {
+  function connect(browserName) {
+    
+  if(browserName=="Edge ( chromium based)" || browserName=="Chrome")
+  {
+  
     if (window.chrome.runtime) {
       if (!port) {
         try {
@@ -371,12 +412,23 @@ const Genius = (props) => {
       }
     }
     else {
+
       setLoading(false);
       // add popup message to show that extension is not present.
       setWarning(true)
-      setMsg(MSG.CUSTOM("Extension not found!!! Download it and re-open the Genius popup","error"))
+      dispatch({type:actionTypesGlobal.GENIUS_SMALL_POPUP,payload:{showSmallPopup:true}}) 
+
+      setErrorMessage(true)
      
     }
+  }
+  else{
+    
+  setErrorMessage(true)
+  dispatch({type:actionTypesGlobal.GENIUS_SMALL_POPUP,payload:{showSmallPopup:true}}) 
+
+
+  }
   }
   const createPort = (keywordData, idx = 0) => {
     if (window.chrome.runtime) {
@@ -394,7 +446,8 @@ const Genius = (props) => {
             "browser": selectedBrowser,
             "siteURL": window.location.origin,
             "keywordData": keywordData,
-            "appType": appType ? appType.text : ""
+            "appType": appType ? appType.text : "",
+            "screenNames":screenNamesList
           });
          
         }
@@ -477,6 +530,7 @@ const Genius = (props) => {
 
 };
   const handleModuleCreate = async (e) => {
+    
     if (!(moduleName)) {
       setMsg(MSG.CUSTOM("Please fill the mandatory fields", "error"));
       return;
@@ -495,7 +549,7 @@ const Genius = (props) => {
       return;
     }
     else if(!validNodeDetails(moduleName)){
-       setMsg(MSG.CUSTOM("Module name must include _ ", "error"));
+       setMsg(MSG.CUSTOM(`Module name must include underscore("_")`, "error"));
       return;
     }
     const module_data = {
@@ -594,7 +648,7 @@ const Genius = (props) => {
       return;
     }
     else if (!validNodeDetails(scenarioName)){
-      setMsg(MSG.CUSTOM("Scenario name must include _", "error"));
+      setMsg(MSG.CUSTOM(`Scenario name must  include underscore("_")`, "error"));
       return;
     }
 
@@ -702,6 +756,7 @@ const Genius = (props) => {
   
   return (
     <div className="plugin-bg-container">
+      {!errorMessage?<>
       <Header geniusPopup={true}/>
       <ConfirmDialog 
       visible={visibleScenario ||visibleReset} 
@@ -771,7 +826,7 @@ const Genius = (props) => {
       <Dialog header={'Create Module'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setModuleName(""); setDisplayCreateModule(false); }}>
         <div>
           <div className='dialog__child'>
-            <TextField required label='Module Name' onGetErrorMessage={(value) => { return validateNames(value, "module") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder={`Ex-: Module_0`} value={moduleName} onChange={(e) => { setModuleName(e.target.value.trim()) }} />
+            <TextField required label='Module Name' onGetErrorMessage={(value) => { return validateNames(value, "module") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder={`Module_0`} value={moduleName} onChange={(e) => { setModuleName(e.target.value.trim()) }} />
           </div>
           <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
             <button className="dialog__footer__action" onClick={handleModuleCreate}>{'Create'}</button>
@@ -781,7 +836,7 @@ const Genius = (props) => {
       <Dialog header={'Create Scenario'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}>
         <div>
           <div className='dialog__child'>
-            <TextField required label='Scenario Name' onGetErrorMessage={(value) => { return validateNames(value, "scenario") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder={`Ex-:Scenario_0`} value={scenarioName} onChange={(e) => { setScenarioName(e.target.value.trim()) }} />
+            <TextField required label='Scenario Name' onGetErrorMessage={(value) => { return validateNames(value, "scenario") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder={`Scenario_0`} value={scenarioName} onChange={(e) => { setScenarioName(e.target.value.trim()) }} />
           </div>
           <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
             <button className="dialog__footer__action" onClick={handleScenarioCreate}>{'Create'}</button>
@@ -831,7 +886,7 @@ const Genius = (props) => {
               placeholder="Select"
               width="300px"
               required
-              disabled={props.selectedProject}
+              disabled={(BrowserName=="Chrome"||BrowserName=="Edge ( chromium based)")?(props.selectedProject)? true:false:true }
               selectedKey={selectedProject ? selectedProject.key : null}
             />
           </div>
@@ -928,7 +983,8 @@ const Genius = (props) => {
               width="300px"
               required
               type="url"
-              disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
+              disabled={userInfo.isTrial?true:false}
+                // (appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
           </div>
          
@@ -937,15 +993,15 @@ const Genius = (props) => {
 
        
         <div className="genius__footer">
-       
-        {warning && <h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"red",fontSize:'18px' }} >Extension not found!!! Download it and re-open the Genius popup.</h5>} 
-          <div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
+             
+           { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?<div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
         
-        <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to download the Genius Extension.</h5>
+        <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5>
+        {userInfo.isTrial && <h5 style={{color:"#343A40",fontSize:'18px'}}><i>As part of trial, Avo Genius is restricted to work only with Avo Test applications.</i></h5>}
         
       
         </span>
-          </div>
+          </div>:null}
             <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
             {/* <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div> */}
             <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>&nbsp;Mandatory Fields</div>
@@ -973,6 +1029,22 @@ const Genius = (props) => {
         </div>
       </div>
       {/* <FooterOne /> */}
+      </>:<>
+      <div style={{marginTop:'auto',marginBottom:'auto'}}>
+     
+      
+      {(BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")? null:<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >{`Avo Genius is supported only on Google Chrome and Microsoft Edge.`}</h5>}
+        { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?(warning ?<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >Avo Genius extension not found. Install it from <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> and re-launch Avo Genius</h5>:null):null} 
+        {/* { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?<div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
+        
+        <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5>
+        
+      
+        </span>
+          
+          </div>:null} */}
+          </div>
+        </>}
     </div>
   );
 };
