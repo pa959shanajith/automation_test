@@ -166,7 +166,7 @@ const ScheduleContentModuleWise = ({scheduledDate, configKey, configName, showSc
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div> */}
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, fontWeight: 'bold'}}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
                                                                     {/* {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null} */}
@@ -206,7 +206,7 @@ const ScheduleContentModuleWise = ({scheduledDate, configKey, configName, showSc
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div> */}
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, fontWeight: 'bold'}}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
                                                                     {/* {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null} */}
