@@ -418,7 +418,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                     <div className='button-design'>
 
 
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
+            <button className="reset-action__exit" title="Create / modify Mindmap via visual design, capture screen elements and design test steps" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
                                             dispatch({type: actionTypesMindmap.SELECT_PROJECT, payload:projectNames.projectId[idx]});
                                             dispatch({type:actionTypesMindmap.SELECT_MODULE,payload:{}})
                                             dispatch({type:actionTypesMindmap.SELECT_MODULELIST,payload:[]})
@@ -426,7 +426,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
 
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"500px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => { 
+            <button className="reset-action__exit" title="Create / modify execution profiles and configure automation execution" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"500px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => { 
                                             dispatch({type: actionTypes.SET_PN, payload:idx});
                                              window.localStorage['navigateScreen'] = "TestSuite";
                                              setRedirectTo(`/execute`);
