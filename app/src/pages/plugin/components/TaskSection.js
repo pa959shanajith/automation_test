@@ -159,8 +159,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                 icon: x,
                             },
                             key: x,
-                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
-                            title: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "Mobile App" : x === "mobileweb" ? "Mobile Web" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            title: x === "mobileapp"? "Mobile App" : x === "mobileweb" ? "Mobile Web" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             disabled: false
                         })
                     }
@@ -170,7 +170,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                 icon: x,
                             },
                             key: x,
-                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "Mobile App" : x === "mobileweb" ? "Mobile Web" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             title: 'License Not Supported',
                             disabled: true
                         })
@@ -495,7 +495,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         <div className='dialog_dropDown'>
                             {
                                 createProjectCheck ? <NormalDropDown
-                                    label="App Type"
+                                    label="Application Type"
                                     options={getplugins_list}
                                     placeholder="Select"
                                     width="300px"
