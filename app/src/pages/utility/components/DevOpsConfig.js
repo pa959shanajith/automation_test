@@ -75,7 +75,7 @@ const DevOpsConfig = props => {
             filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
                 let filterModule = {
                     value: module.moduleid,
-                    label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                    label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
                         event.preventDefault();
                         onClick('displayMaximizable');
                         onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
@@ -95,7 +95,7 @@ const DevOpsConfig = props => {
             filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
                 let filterModule = {
                     value: module.moduleid,
-                    label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                    label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
                         event.preventDefault();
                         onClick('displayMaximizable');
                         onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
@@ -123,7 +123,7 @@ const DevOpsConfig = props => {
                     filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 > 0 } ).map((module) => {
                         let filterModule = {
                             value: module.moduleid,
-                            label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                            label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
                                 event.preventDefault();
                                 onClick('displayMaximizable');
                                 onDataParamsIconClick1(module.moduleid, module.name)}}/></div>

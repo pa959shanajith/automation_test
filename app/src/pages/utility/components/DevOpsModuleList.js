@@ -277,7 +277,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
-                                label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
                                     event.preventDefault();
                                     onClick('displayMaximizable');
                                     setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
@@ -308,7 +308,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                                     let filterModule = {  
                                         value: module.moduleid,
-                                        label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                        label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
                                             event.preventDefault();
                                             onClick('displayMaximizable');
                                             setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
@@ -347,7 +347,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
-                                label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
                                     event.preventDefault();
                                     onClick('displayMaximizable');
                                     setNotExeInternalState(notExeState[module.moduleid]?notExeState[module.moduleid]:[]);
