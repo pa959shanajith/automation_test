@@ -482,15 +482,15 @@ const ScrapeObjectList = (props) => {
                         disabled={(disableAction || compareFlag)}
                         
                         options={[
-                            {
-                              data: {
-                                icon: 'internet',
-                              },
+                            // {
+                            //   data: {
+                            //     icon: 'internet',
+                            //   },
   
-                              key: "ie",
-                              text: "Internet Explorer",
+                            //   key: "ie",
+                            //   text: "Internet Explorer",
                               
-                            },
+                            // },
   
                             {
                               data: {
@@ -519,21 +519,21 @@ const ScrapeObjectList = (props) => {
                               text: "Mozilla Firefox",
                             },
   
-                            {
-                              data: {
-                                icon: "edge",
-                              },
+                            // {
+                            //   data: {
+                            //     icon: "edge",
+                            //   },
   
-                              key: "edge",
-                              text: "Microsoft Edge",
-                            },
+                            //   key: "edge",
+                            //   text: "Microsoft Edge",
+                            // },
                             {
                               data: {
                                 icon: "edge",
                               },
   
                               key: "chromium",
-                              text: "Edge Chromium",
+                              text: "Microsoft Edge",
                             },
                           ]}
                           selectedKey={captureButton}

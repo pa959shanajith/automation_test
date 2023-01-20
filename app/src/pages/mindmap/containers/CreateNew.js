@@ -137,7 +137,7 @@ const CreateNew = ({importRedirect}) => {
                 
                 <ModuleListDrop />
                 <div className='note'>
-                <p><b>Note </b>- Read the Mindmap from left to right</p>
+              <p style={{ position: 'fixed',top: '6.7rem',right: '7.9rem',}}><b>Note </b>- Read the Mindmap from left to right</p>
                 </div>
                 <div id='mp__canvas' className='mp__canvas'>
                      {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?

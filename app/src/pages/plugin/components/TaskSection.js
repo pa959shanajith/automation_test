@@ -414,7 +414,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
-            <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh',textOverflow: 'ellipsis', textAlign: 'left',overflow: 'hidden',width: '18rem'}}> {projectNames && `${idx+1}.${singleProj}`}</span></span>
+            <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh',textOverflow: 'ellipsis', textAlign: 'left',overflow: 'hidden',width: '15rem'}}> {projectNames && `${idx+1}.${singleProj}`}</span></span>
                                     <div className='button-design'>
 
 

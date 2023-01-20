@@ -2,9 +2,10 @@
 #search-canvas-icon {
     width: 14rem;
     // height: 87rem;
-    left: 64.4rem;
-    top: 0.3rem;
-    position: absolute;
+    
+    top: 8rem;
+    position: fixed;
+    right:8rem;
     display: flex;
     font-weight: 300;
     font-size: 0.78rem;
@@ -25,6 +26,8 @@
     user-select:none;
     cursor: pointer;
     background: $whiteColor;
+    // position: fixed;
+    // right: 0rem;
 }
 .search-canvas {
     border: 1px solid $primaryColor;

@@ -118,7 +118,7 @@ const CanvasNew = (props) => {
                 setDelSnrWarnPop(false)                
                 dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
                 setBlockui({show:false})
-                setMsg(MSG.MINDMAP.SUCC_DELETE_SCENARIO)
+                setMsg(MSG.MINDMAP.SUCC_DELETE_NODE)
                 setCreateNew('autosave')                             
             })()
 
@@ -505,11 +505,12 @@ const CanvasNew = (props) => {
 
     return (
         <Fragment>
+             {/* <SearchBox  setCtScale={setCtScale} zoom={zoom}/> */}
              <ConfirmDialog />
-             <Dialog header={(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Capture Elements" : taskname+" : Capture Elements"} visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
+             <Dialog header={taskname + " : Capture Elements"}  visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
              <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} openScrapeScreen={props.onClick}/></div>
              </Dialog>
-             <Dialog header={(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Design Test Steps" : taskname+" : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
+             <Dialog header={taskname  +  " : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
              <div style={{ height: '50vh'}}><DesignHome fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} appType={appType} openScrapeScreen={props.onClick} /></div>
              </Dialog>
             {/* <Dialog
@@ -548,9 +549,10 @@ const CanvasNew = (props) => {
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
-            <SearchBox setCtScale={setCtScale} zoom={zoom}/>
+           
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             {/* <Legends/> */}
+            <SearchBox  setCtScale={setCtScale} zoom={zoom}/>
             {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
             {props.GeniusDialog ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>

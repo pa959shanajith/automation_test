@@ -949,14 +949,14 @@ const DesignContent = props => {
 
 
                             options={[
-                            {
-                                data: {
-                                icon: 'internet',
-                                },
+                            // {
+                            //     data: {
+                            //     icon: 'internet',
+                            //     },
 
-                                key: "3",
-                                text: "Internet Explorer",
-                            },
+                            //     key: "3",
+                            //     text: "Internet Explorer",
+                            // },
 
                             {
                                 data: {
@@ -984,21 +984,21 @@ const DesignContent = props => {
                                 text: "Mozilla Firefox",
                             },
 
-                            {
-                                data: {
-                                icon: "edge",
-                                },
+                            // {
+                            //     data: {
+                            //     icon: "edge",
+                            //     },
 
-                                key: "7",
-                                text: "Microsoft Edge",
-                            },
+                            //     key: "7",
+                            //     text: "Microsoft Edge",
+                            // },
                             {
                                 data: {
                                 icon: "edge",
                                 },
 
                                 key: "8",
-                                text: "Edge Chromium",
+                                text: "Microsoft Edge",
                             },
                             ]}
                             selectedKey={debugButton}

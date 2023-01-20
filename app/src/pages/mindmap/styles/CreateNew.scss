@@ -14,11 +14,14 @@
     font-family: 'LatoWeb';
     width: 57rem;
     // height: px;
-    left: 65rem;
-    top: 2rem;
-    position: absolute;
-    display: flex;
+    // margin-left: 80vw;
+    // top: 2rem;
+    position: fixed;
+    // display: flex;
     // z-index: 1;
+     left: 63rem;
+    top: 6.7rem;
+    right: 3rem;
 }
 .mp__canvas_container{
     position: relative;

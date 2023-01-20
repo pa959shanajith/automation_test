@@ -168,21 +168,24 @@ const DevOpsConfig = props => {
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
     const [browserlist, setBrowserlist] = useState([
+        // {
+        //     key: '3',
+        //     text: 'Internet Explorer'
+        // }
         {
-            key: '3',
-            text: 'Internet Explorer'
-        },{
             key: '1',
             text: 'Google Chrome'
         },{
             key: '2',
             text: 'Mozilla Firefox'
-        },{
-            key: '7',
-            text: 'Microsoft Edge'
-        },{
+        },
+        // {
+        //     key: '7',
+        //     text: 'Microsoft Edge'
+        // },
+        {
             key: '8',
-            text: 'Edge Chromium'
+            text: 'Microsoft Edge'
         }
     ]);
     const [integration,setIntegration] = useState(props.currentIntegration.executionRequest ? props.currentIntegration.executionRequest.integration : {

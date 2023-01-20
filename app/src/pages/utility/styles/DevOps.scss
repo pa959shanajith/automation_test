@@ -604,35 +604,12 @@
     cursor: pointer;
 }
 
-// .root-151 svg{
-//     display: none !important;
-// }
-
-// .iconContainer-191 svg{
-//     display: none !important;
-// }
-
-.dropdownItems-208 > div:first-child{
-    display: none;
+.dropdownItemHeader-217{
+    height: 1px !important;
 }
-.dropdownItems-203 > div:first-child{
-    display: none;
+.dropdownItemHeader-212{
+    height: 1px !important;
 }
-
-.dropdownItems-208{
-    overflow: unset !important; 
-    margin-top: 0rem;
-}
-.dropdownItems-203{
-    overflow: unset !important; 
-    margin-top: 0rem;
-}
-.dropdownItem-228 label{
-    margin-bottom: 0 !important;
-}
-.dropdownItem-233 label{
-    margin-bottom: 0 !important;
-}
-.callout-212 .ms-Callout-main .ms-Dropdown-header {
-    height: 0.1rem;
+.dropdownItemHeader-222{
+    height: 1px !important;
 }
