@@ -650,6 +650,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             return response;
         }
         synchronousFlag = await this.checkForCompletion(req.body.key,gettingTestSuiteIds.executionData.executionListId);
+
         let synchronous_report = await cache.get('synchronous_report');
         // console.log(synchronous_report);
         //Below code is to generate synchronous report.
@@ -851,11 +852,12 @@ module.exports.Execution_Queue = class Execution_Queue {
                 }
             }
             let keyQueue = this.key_list[resultData.configkey];
+            let statusCount = 0;
+            let updatedKeyQueue = [];
             if (dataFromIce.status == 'finished')
             {
                 //Changing the status to completed in the cache.
-                let updatedKeyQueue = [];
-                let listIndex = -1,statusCount = 0;
+                let listIndex = -1;
                 for(let executionList of keyQueue) {
                     listIndex++;
                     
@@ -896,10 +898,10 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                 }
                 //To delete the execution from the cache
-                if(statusCount == -1){
-                    this.key_list[resultData.configkey] = updatedKeyQueue
-                    await cache.set("execution_list", this.key_list);
-                }
+                // if(statusCount == -1){
+                //     this.key_list[resultData.configkey] = updatedKeyQueue
+                //     await cache.set("execution_list", this.key_list);
+                // }
 
                 //User Manually deleted from cache
                 if(!checkInCache) {
@@ -917,7 +919,15 @@ module.exports.Execution_Queue = class Execution_Queue {
             if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
                 resultData.reportData.overallstatus.overallstatus = 'Terminated';
             }
-            return await this.executionInvoker.setExecStatus(dataFromIce);
+            let responseFromExecutionInvoker =  await this.executionInvoker.setExecStatus(dataFromIce);
+
+            // To delete the list from the cache
+            if(statusCount == -1 && dataFromIce.status == 'finished'){
+                this.key_list[resultData.configkey] = updatedKeyQueue
+                await cache.set("execution_list", this.key_list);
+            }
+
+            return responseFromExecutionInvoker;
 
         } catch (error) {
             console.info(error);
