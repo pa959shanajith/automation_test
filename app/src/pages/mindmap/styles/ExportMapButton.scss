@@ -32,3 +32,37 @@
         outline: none;
     }
 }
+.export-rec-row{
+    margin: 20px 2%;
+    label{
+        font-weight: 600;
+        margin-left: 3px;
+    }
+    input{
+        border: 1px solid $black;
+    }
+    input:focus{
+        outline: none;
+    }
+    select{
+        border: 1px solid $black;
+        width: 70%;
+        height: 25px;
+        margin-left: 5px;
+    }
+    select:focus{
+        outline: none;
+    }
+}
+.export-file-row{
+    
+    label{
+        font-weight: 600;
+        margin-left: 24px;
+    }
+    input{
+        border: 1px solid $black;
+        margin-left: 5px;
+    }
+    
+}
