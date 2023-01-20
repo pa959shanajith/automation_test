@@ -337,7 +337,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/getClientConfig', (req,res) => {
-			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl})
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {

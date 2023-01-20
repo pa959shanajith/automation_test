@@ -39,6 +39,8 @@
         "videos": "https://elearning.avoassure.ai/#/",
         "documentation": "https://docs.avoautomation.com/"
     },
+    "customerSupportEmail":"support@avoautomation.com",
+    "sampleAvoGeniusUrl":"https://avotestlab.avoassure.ai/",
     "enableNotification": {
         "assignTabMindmap" : false
     }

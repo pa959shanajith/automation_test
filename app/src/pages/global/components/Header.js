@@ -75,9 +75,9 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
        
         (async()=>{
             const response = await fetch("/getClientConfig")
-            let {avoClientConfig,trainingLinks} = await response.json();
+            let {avoClientConfig,trainingLinks,customerSupportEmail} = await response.json();
             setConfig(avoClientConfig);
-            setTrainLinks({videos:trainingLinks.videos, docs:trainingLinks.documentation});
+            setTrainLinks({videos:trainingLinks.videos, docs:trainingLinks.documentation,support:customerSupportEmail});
         })();
     },[])
     useEffect(()=>{
@@ -260,7 +260,9 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
                             <div onClick={()=>{window.open(trainLinks.videos,'_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
                             <div onClick={()=>{window.open(trainLinks.docs,'_blank')
-                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
+                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div> 
+                            <div onClick={()=>{window.location= `mailto:${trainLinks.support}`
+                                setShowHelp(false)}} ><Link to="#">Contact Us</Link></div>   
                         </div>
                         {show_WP_POPOVER ? 
                             <WelcomePopover 
