@@ -118,7 +118,7 @@ const CanvasNew = (props) => {
                 setDelSnrWarnPop(false)                
                 dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
                 setBlockui({show:false})
-                setMsg(MSG.MINDMAP.SUCC_DELETE_SCENARIO)
+                setMsg(MSG.MINDMAP.SUCC_DELETE_NODE)
                 setCreateNew('autosave')                             
             })()
 
