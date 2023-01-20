@@ -327,7 +327,8 @@ const Messages={
         SUCC_DATA_COPIED : {"CONTENT":"Data Copied successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_RULES_UPDATE : {"CONTENT":"Rules updated successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DELETE_SCENARIO : {"CONTENT":"Scenarios successfully deleted.", "VARIANT": VARIANT.SUCCESS},
-        
+        SUCC_DELETE_NODE : {"CONTENT":"Data deleted successfully.", "VARIANT": VARIANT.SUCCESS},
+
         WARN_PROJECT_ASSIGN_USER: {"CONTENT":'This project is not assigned to user.', "VARIANT": VARIANT.WARNING},
         WARN_SELECT_COMPLETE_FLOW: {"CONTENT":"Please select a complete flow to assign tasks.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_E2E: {"CONTENT":"First, Please select an end to end module or create a new one.", "VARIANT": VARIANT.WARNING},
