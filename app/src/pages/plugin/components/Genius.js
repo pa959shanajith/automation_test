@@ -984,7 +984,6 @@ const Genius = (props) => {
               required
               type="url"
               disabled={userInfo.isTrial?true:false}
-                // (appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
           </div>
          
@@ -1035,14 +1034,7 @@ const Genius = (props) => {
       
       {(BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")? null:<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >{`Avo Genius is supported only on Google Chrome and Microsoft Edge.`}</h5>}
         { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?(warning ?<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >Avo Genius extension not found. Install it from <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> and re-launch Avo Genius</h5>:null):null} 
-        {/* { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?<div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
-        
-        <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5>
-        
       
-        </span>
-          
-          </div>:null} */}
           </div>
         </>}
     </div>

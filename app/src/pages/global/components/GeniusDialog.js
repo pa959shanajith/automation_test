@@ -4,7 +4,6 @@ import Genius from "../../plugin/components/Genius";
 import { useDispatch, useSelector } from "react-redux";
 import * as actionTypesGlobal from "../state/action";
 import "../styles/GeniusDialog.scss";
-import { ScreenWidthMaxSmall } from "@fluentui/react";
 
 const GeniusDialog = () => {
   const showGeniusDialog = useSelector((state) => state.progressbar.showGenuisWindow)
