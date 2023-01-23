@@ -174,7 +174,6 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
     var moduledata = await getModules(req);
     dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
     setTimeout(() => dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected}), 150);    
-    // dispatch({type:actionTypes.SELECT_MODULE,payload:res})
     return;
 
 }
