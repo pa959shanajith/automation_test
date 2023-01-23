@@ -283,16 +283,18 @@ const ModuleListDrop = (props) =>{
                                 {
                                     key: 'csv',
                                     text: 'Create New',
-                                    onClick: () => {CreateNew()
+                                    onClick: () => {CreateNew();
+                                        setSearchForNormal(true);
                                     }
                                 },
                                 {
                                     key: 'image',
                                     text: 'Import Module',
-                                    onClick:()=>{setImportPop(true);}}
+                                    onClick:()=>{setImportPop(true);
+                                        setSearchForNormal(true);}}
                                 ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
                             />  :null}
-                            {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
+                            {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}   />:null}
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
                         <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
