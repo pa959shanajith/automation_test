@@ -49,9 +49,17 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
             : agentData[index].icecount - 1,
       };
       setAgentData([...updatedData]);
+      let filteredItems = updatedData.filter(
+        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      );
+      setFilteredList(filteredItems);
     } else if (operation === "update" && newVal > 0) {
       updatedData[index] = { ...agentData[index], icecount: parseInt(newVal) };
       setAgentData([...updatedData]);
+      let filteredItems = updatedData.filter(
+        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      );
+      setFilteredList(filteredItems);
     }
   };
   const onAgentToggle = (name) => {
@@ -63,6 +71,11 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
       status: agentData[index].status === "active" ? "inactive" : "active",
     };
     setAgentData([...updatedData]);
+    
+    let filteredItems = updatedData.filter(
+      (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+    );
+    setFilteredList(filteredItems);
   };
   const onConfirmDeleteAgent = (name) => {
     setIsDataUpdated(true);
@@ -70,6 +83,11 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
     const index = updatedData.findIndex((agent) => agent.name === name);
     updatedData.splice(index, 1);
     setAgentData([...updatedData]);
+
+    let filteredItems = updatedData.filter(
+      (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+    );
+    setFilteredList(filteredItems);
 
     setShowConfirmPop(false);
     showMessageBar(
