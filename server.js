@@ -262,7 +262,7 @@ if (cluster.isMaster) {
 
 		//Only Test Engineer and Test Lead have access
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
-			var roles = ["Test Lead", "Test Engineer", "Test Manager"]; //Allowed roles
+			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
@@ -337,7 +337,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/getClientConfig', (req,res) => {
-			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl})
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {
@@ -512,6 +512,9 @@ if (cluster.isMaster) {
 		//Report Screen Routes
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
+		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
+		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
+		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
