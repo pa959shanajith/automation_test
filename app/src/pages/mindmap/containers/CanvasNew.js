@@ -175,7 +175,13 @@ const CanvasNew = (props) => {
                 tree.links = {}
                 tree.dLinks = []
                 if(zoom){
+                    if(!props.gen){
                     zoom.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg`))
+                    }
+                    else{
+                        zoom.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg_genius`))
+
+                    }
                     zoom.on("zoom",null)
                 }
                 count['modules'] = 1
@@ -191,8 +197,8 @@ const CanvasNew = (props) => {
             tree = generateTree(tree,types,{...count},props.verticalLayout)
             count= {...count,...tree.count}
         }
-        d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")");
-        zoom = bindZoomListner(setCtScale,tree.translate,ctScale)
+        {!props.gen?d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")"):d3.select('.ct-container-genius').attr("transform", "translate(" + 50+','+tree.translate[1] + ")scale(" + 1 + ")")}
+        zoom = bindZoomListner(setCtScale,tree.translate,ctScale,props.gen)
         setLinks(tree.links)
         setdLinks(tree.dLinks)
         setNodes(tree.nodes)
@@ -496,7 +502,8 @@ const CanvasNew = (props) => {
       geniusWindowProps:{
         selectedProject:{key: proj,text: ""},
         selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
-        selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]}
+        selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
+        geniusFromMindmap:true
       }
     }}) 
   }
@@ -550,13 +557,13 @@ const CanvasNew = (props) => {
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
            
-            <NavButton setCtScale={setCtScale} zoom={zoom}/>
+            {props.GeniusDialog?null:<NavButton setCtScale={setCtScale} zoom={zoom}/>}
             {/* <Legends/> */}
-            <SearchBox  setCtScale={setCtScale} zoom={zoom}/>
+            {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
             {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
             {props.GeniusDialog ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
-            <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
-                <g className='ct-container'>
+            {props.gen?<svg id="mp__canvas_svg_genius" className='mp__canvas_svg_genius' ref={CanvasRef}>
+                <g className='ct-container-genius'>
                 {Object.entries(links).map((link)=>{
                 return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} d={link[1].d}></path>)
                 })}
@@ -577,7 +584,30 @@ const CanvasNew = (props) => {
                         :null}
                     </g>)}
                 </g>
-            </svg>
+            </svg>:
+            <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
+            <g className='ct-container'>
+            {Object.entries(links).map((link)=>{
+            return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} d={link[1].d}></path>)
+            })}
+            {Object.entries(nodes).map((node)=>
+                <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
+                   <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                    <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
+                    <title val={node[0]} className="ct-node-title">{node[1].title}</title>
+                    {(node[1].type!=='testcases')?
+                    <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
+                    :null}
+                    {(node[1].type!=='modules')?
+                    <circle 
+                    onMouseUp={(e)=>moveNode(e,'KeyUp')}
+                    onMouseDown={(e)=>moveNode(e,'KeyDown')}
+                    cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
+                    className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
+                    :null}
+                </g>)}
+            </g>
+        </svg>}
             {reuseDelConfirm?<ModalContainer 
                 title='Confirmation'
                 content= {<DelReuseMsgContainer message={reuseDelContent}/>}
@@ -615,7 +645,6 @@ const CanvasNew = (props) => {
         </Fragment>
     );
 }
-
 const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,verticalLayout) => {
     var dNodes_c = copyNodes.nodes
     var dLinks_c = copyNodes.links
@@ -700,10 +729,11 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
     return {cnodes,clinks,cdNodes,cdLinks,csections,count};
 }
 
-const bindZoomListner = (setCtScale,translate) => {
+const bindZoomListner = (setCtScale,translate,ctScale,geniusMindmap) => {
+    
     //need global move
-    const svg = d3.select(`.mp__canvas_svg`);
-    const g = d3.select(`.ct-container`);
+    const svg = geniusMindmap?d3.select(`.mp__canvas_svg_genius`):d3.select(`.mp__canvas_svg`)
+    const g = geniusMindmap?d3.select(`.ct-container-genius`):d3.select(`.ct-container`);
     const zoom  = d3.behavior.zoom()
         .scaleExtent([0.1, 3])
         .on('zoom', () => {

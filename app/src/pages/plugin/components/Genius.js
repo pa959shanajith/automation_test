@@ -56,8 +56,7 @@ const Genius = (props) => {
   const[BrowserName,setBrowserName]=useState(null)
   const[screenNamesList,setScreenNameList]=useState(null)
   const[errorMessage,setErrorMessage]=useState(false)
-  
-  const userInfo = useSelector(state => state.login.userinfo);
+   const userInfo = useSelector(state => state.login.userinfo);
   const savedRef = useRef(false);
   const finalDataRef = useRef([])
   const dispatch = useDispatch();
@@ -304,7 +303,7 @@ const Genius = (props) => {
 
   useEffect(() => {
    
-   
+  
     let browserName = (function (agent) {        
       switch (true) {
       case agent.indexOf("edge") > -1: return "MS Edge";
@@ -769,7 +768,7 @@ const Genius = (props) => {
       reject={()=>{}} 
       />
       {loading ? <ScreenOverlay content={loading} /> : null}
-      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && mindmapShow ? <GeniusMindmap displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
+      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && mindmapShow ? <GeniusMindmap gen={props.geniusFromMindmap} displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
       <Dialog header={'Create Project'} visible={displayCreateProject} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setSearchUsers(""); setProjectName(""); setAppTypeDialog(null); setAssignedUsers({}); setDisplayCreateProject(false) }}>
         <div>
           <div className='dialog__child'>
