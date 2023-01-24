@@ -651,7 +651,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 width='35%'
                             /> */}
                         </div>
-                        <div id="moduleScenarioList" className="devOps_module_list_container">
+                        <div id="moduleScenarioList" className="devOps_module_list_container devOps_module_list_container_module">
                             <ScrollBar scrollId='moduleScenarioList' thumbColor="#929397" >
                             <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
                             </ScrollBar>

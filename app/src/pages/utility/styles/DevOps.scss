@@ -255,7 +255,7 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 61vh;
+    height: 58vh !important;
     &_filter {
         margin-bottom: 2%;
         display: flex;
@@ -513,6 +513,8 @@
 .radiobutton1{
     width:31vh;
     height: 4vh;
+    position: relative;
+    bottom: 0.1rem;
 }
 .configImg{
     width: auto;
@@ -560,6 +562,7 @@
 }
 .radiobutton_config{
     display: flex;
+    margin-top: 0.4rem;
 }
 .radioinputs{
     width:2vh;
@@ -606,4 +609,12 @@
 
 .ms-Callout-main .ms-Dropdown-header {
     height: 0.01rem !important;
+}
+
+.multiSelectDropdown_avo-multi-select__callout__item__3WZ7a{
+    padding-bottom: 2rem !important;
+}
+
+.devOps_module_list_container_module{
+ height: 45vh !important;
 }
