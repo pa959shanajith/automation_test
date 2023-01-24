@@ -184,6 +184,11 @@ const DevOpsConfig = props => {
         //     text: 'Microsoft Edge'
         // },
         {
+            key: "safari",
+            text: "Safari",
+            disabled:true,
+        },
+        {
             key: '8',
             text: 'Microsoft Edge'
         }
