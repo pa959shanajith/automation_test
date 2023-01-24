@@ -40,11 +40,6 @@ const JiraContent = props => {
     const [disabled, setDisabled] = useState(true);
     
  
-//     useEffect(() =>{
-
-//         console.log(props.domainDetails);
-
-// },[]);
 
     const callProjectDetails_ICE=async(e)=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
@@ -242,7 +237,6 @@ const JiraContent = props => {
                                 scenarioId: selectedScIds
                             }
                         ];
-                        console.log("vallue,,,,,,,,",mappedPair)
                         dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
                         dispatch({type: actionTypes.SYNCED_TC, payload: selected});
             }
