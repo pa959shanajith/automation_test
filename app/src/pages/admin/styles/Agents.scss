@@ -1,5 +1,5 @@
 .agent-container {
-    padding: 2%;
+    padding: 1%;
 }
 .page-taskName {
     margin-top: 0%;
@@ -342,7 +342,6 @@
 .searchBoxInput {
     position: relative;
     float: right;
-    margin-right: 4%;
 }
 .agents{
     &__action_icons {
@@ -368,7 +367,9 @@
     align-items: center;
     .api-ut__inputLabel_text{
         font-weight: 700;
-    }
+            float: left;
+            margin-right: 1%;
+    } 
 }
 .devOps_dropdown_label {
     font-weight: 700;
@@ -463,7 +464,7 @@
         background-color: #a19f9d;
     }
     &__legends {
-        display: flex;
+        display: -webkit-inline-box;
         width: inherit;
     }
     &__legends_grid{

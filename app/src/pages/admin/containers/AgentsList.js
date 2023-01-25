@@ -38,15 +38,13 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
     if (
-      operation === "add" ||
-      (operation === "sub" && agentData[index].icecount > 1)
-    ) {
+      operation === "add" || (operation === "sub" && parseInt(agentData[index].icecount) > 1)) {
       updatedData[index] = {
         ...agentData[index],
         icecount:
           operation === "add"
-            ? agentData[index].icecount + 1
-            : agentData[index].icecount - 1,
+            ? parseInt(agentData[index].icecount) + 1
+            : parseInt(agentData[index].icecount) - 1,
       };
       setAgentData([...updatedData]);
       let filteredItems = updatedData.filter(
@@ -157,7 +155,6 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           setMsg(MSG.CUSTOM("Error While Fetching Agent List", VARIANT.ERROR));
         }
       } else {
-        console.log(agentList);
         setOriginalAgentData(
           agentList.avoagents.map((agent) => ({
             ...agent,
@@ -301,7 +298,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           Save
         </button>
       </div>
-      <div style={{ position: "absolute", width: "96%", height: "76%" }}>
+      <div style={{ position: "absolute", width: "98%", height: "-webkit-fill-available" }}>
         <DetailsList
           columns={agentListHeader}
           items={(searchText.length > 0 ? filteredList : agentData).map(
