@@ -514,10 +514,10 @@ const CanvasNew = (props) => {
         <Fragment>
              {/* <SearchBox  setCtScale={setCtScale} zoom={zoom}/> */}
              <ConfirmDialog />
-             <Dialog header={taskname + " : Capture Elements"}  visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
-             <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} openScrapeScreen={props.onClick}/></div>
+             <Dialog header={props.populateTestcaseDetails?(props.populateTestcaseDetails.name.length > 55) ? props.populateTestcaseDetails.name.slice(0, 55)+"...   : Capture Elements" : props.populateTestcaseDetails.name+" : Capture Elements":(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Capture Elements" : taskname+" : Capture Elements"} visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
+             <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} appType={appType} openScrapeScreen={props.onClick}/></div>
              </Dialog>
-             <Dialog header={taskname  +  " : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
+             <Dialog header={props.populateTestcaseDetails?(props.populateTestcaseDetails.name.length > 55) ? props.populateTestcaseDetails.name.slice(0, 55)+"...   : Design Test Steps" : props.populateTestcaseDetails.name+" : Design Test Steps":(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Design Test Steps" : taskname+" : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
              <div style={{ height: '50vh'}}><DesignHome fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} appType={appType} openScrapeScreen={props.onClick} /></div>
              </Dialog>
             {/* <Dialog
