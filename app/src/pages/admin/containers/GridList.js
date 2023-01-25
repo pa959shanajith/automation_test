@@ -41,6 +41,8 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                     }
                 }else {
                     setGridList(gridList.avogrids);
+                    let filteredItems = gridList.avogrids.filter(item => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
+                    setFilteredList(filteredItems);
                 }
                 setMsg(MSG.CUSTOM( grid.name+" Deleted Successfully.",VARIANT.SUCCESS));
             }
@@ -291,7 +293,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                         name: '',
                         agents: []
                     })} >New Grid</button>
-                    <div>
+                    <div style={{margin: '0.5rem'}}>
                         <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Click <a style={{ textDecoration: 'underline', color: 'blueviolet', cursor: 'pointer' }} onClick={() => setHideDialog(!hideDialog)}>here</a> to get the Agent </span>
                     </div>
                     { gridList.length > 0 && <>
@@ -300,7 +302,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                         </div>
                     </> }
                 </div>
-                { gridList.length > 0 ? <div style={{ position: 'absolute', width: '100%', height: '82%', marginTop: '1.5%' }}>
+                { gridList.length > 0 ? <div style={{ position: 'absolute', width: '98%', height:'-webkit-fill-available', marginTop: '1.5%' }}>
                     <DetailsList columns={listHeaders} items={((searchText.length > 0) ? filteredList : gridList).map((grid) => ({
                         name: grid.name,
                         editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid(grid)} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,

@@ -68,22 +68,20 @@ const CreateGrid = ({
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
 
-    if (
-      operation === "add" ||
-      (operation === "sub" && agentData[index].icecount > 1)
-    ) {
-      updatedData[index] = {
-        ...agentData[index],
-        icecount:
-          operation === "add"
-            ? agentData[index].icecount + 1
-            : agentData[index].icecount - 1,
-      };
-      setAgentData([...updatedData]);
-      let filteredItems = updatedData.filter(
-        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
-      );
-      setFilteredList(filteredItems);
+    if (operation === "add" || (operation === "sub" && parseInt(agentData[index].icecount) > 1))
+    {
+        updatedData[index] = {
+          ...agentData[index],
+          icecount:
+            operation === "add"
+              ? parseInt(agentData[index].icecount) + 1
+              : parseInt(agentData[index].icecount) - 1,
+        };
+        setAgentData([...updatedData]);
+        let filteredItems = updatedData.filter(
+          (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+        );
+        setFilteredList(filteredItems);
     } else if (operation === "update" && newVal > 0) {
       updatedData[index] = { ...agentData[index], icecount: parseInt(newVal) };
       setAgentData([...updatedData]);
@@ -133,9 +131,7 @@ const CreateGrid = ({
     },
   ];
   useEffect(() => {
-    currentGrid.name === gridName
-      ? setDataUpdated(false)
-      : setDataUpdated(true);
+    currentGrid.name === gridName? setDataUpdated(false) : setDataUpdated(true);
   }, [gridName]);
 
   const [selectedAgentsNumbers, setSelectedAgentsNumbers] = useState(0);
@@ -224,6 +220,12 @@ const CreateGrid = ({
       </div>
     );
   };
+
+  const setInputGridName = (inputValue) => {
+    if(inputValue.trim().length > 0) setGridName(inputValue.trim());
+    else setGridName('');
+  }
+
   const handleConfigSave = async () => {
     (async () => {
       setLoading("Loading...");
@@ -337,7 +339,7 @@ const CreateGrid = ({
               width="150%"
               label=""
               standard={true}
-              onChange={(event) => setGridName(event.target.value)}
+              onChange={(event) => { setInputGridName(event.target.value) } }
               autoComplete="off"
               placeholder="Enter Grid Name"
             />
@@ -360,7 +362,7 @@ const CreateGrid = ({
           height: "70%",
           marginTop: "1.5%",
         }}
-      >
+      >    
         <DetailsList
           columns={agentListHeader}
           items={(searchText.length > 0 ? filteredList : agentData).map(
