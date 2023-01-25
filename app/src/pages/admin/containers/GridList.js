@@ -218,7 +218,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
             const gridList = await fetchAvoAgentAndAvoGridList({
                 query: 'avoGridList'
             });
-            console.log(gridList);
+            // console.log(gridList);
             if(gridList.error) {
                 if(gridList.error.CONTENT) {
                     setMsg(MSG.CUSTOM(gridList.error.CONTENT,VARIANT.ERROR));

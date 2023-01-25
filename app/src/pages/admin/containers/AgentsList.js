@@ -157,7 +157,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           setMsg(MSG.CUSTOM("Error While Fetching Agent List", VARIANT.ERROR));
         }
       } else {
-        console.log(agentList);
+        // console.log(agentList);
         setOriginalAgentData(
           agentList.avoagents.map((agent) => ({
             ...agent,

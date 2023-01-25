@@ -24,7 +24,6 @@ import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ScrapeScreen.scss';
 import { Dialog } from 'primereact/dialog';
-import { log } from 'handlebars';
 
 const ScrapeScreen = (props)=>{
     const dispatch = useDispatch();
@@ -416,7 +415,6 @@ const ScrapeScreen = (props)=>{
                             }
                             setshowTeststeps(displayTeststep)
                         }
-                            console.log("screenTestcases",screenTestcases)
                           }
             
                  }
@@ -440,7 +438,6 @@ const ScrapeScreen = (props)=>{
         "_id":displayTest ? displayTest[value]["_id"] : "",
         "name":displayTest ? displayTest[value]["name"] : ""
     }
-    console.log(populateTestcaseDetails)
     props.openScrapeScreen("displayBasic2","","displayBasic",{populateTestcaseDetails})
  }
 
