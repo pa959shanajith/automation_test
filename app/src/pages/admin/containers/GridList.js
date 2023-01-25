@@ -300,7 +300,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                         </div>
                     </> }
                 </div>
-                { gridList.length > 0 ? <div style={{ position: 'absolute', width: '100%', height: '82%', marginTop: '1.5%' }}>
+                { gridList.length > 0 ? <div style={{ position: 'absolute', width: '100%', height: '66%', marginTop: '1.5%' }}>
                     <DetailsList columns={listHeaders} items={((searchText.length > 0) ? filteredList : gridList).map((grid) => ({
                         name: grid.name,
                         editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid(grid)} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,

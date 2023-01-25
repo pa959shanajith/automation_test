@@ -301,7 +301,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           Save
         </button>
       </div>
-      <div style={{ position: "absolute", width: "96%", height: "76%" }}>
+      <div style={{ position: "absolute", width: "100%", height: "68%" }}>
         <DetailsList
           columns={agentListHeader}
           items={(searchText.length > 0 ? filteredList : agentData).map(

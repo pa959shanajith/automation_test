@@ -23,6 +23,8 @@ import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, Mod
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ScrapeScreen.scss';
+import { Dialog } from 'primereact/dialog';
+import { log } from 'handlebars';
 
 const ScrapeScreen = (props)=>{
     const dispatch = useDispatch();
@@ -46,6 +48,9 @@ const ScrapeScreen = (props)=>{
     const [showObjModal, setShowObjModal] = useState(false);
     const [newScrapedData, setNewScrapedData] = useState({});
     const [orderList, setOrderList] = useState([]);
+    const [displayModal, setDisplayModal] = useState(false);
+    const [showTeststeps , setshowTeststeps]=useState([]);
+    const [displayTest , setdisplayTest]=useState({});
 
     useEffect(() => {
         // if(Object.keys(current_task).length !== 0) {
@@ -384,34 +389,70 @@ const ScrapeScreen = (props)=>{
         setScrapeItems([...scrapeItems, ...newList])
     }
 
-    const openScreenTestCase =() =>{
-        let screenTestcases = [];
-        selectedModule.children.some((scenario)=>{
-            if(scenario["_id"]===props.fetchingDetails.parent["_id"]) {
-                scenario.children.some((scr)=>{
-                    if (scr["_id"]===props.fetchingDetails["_id"]){
-                        screenTestcases=scr.children
-                    }
-                    return scr["_id"]===props.fetchingDetails["_id"]
-                })
-            }
-            return scenario["_id"]===props.fetchingDetails.parent["_id"]
-        })
-
-        let populateTestcaseDetails = {
-            "parent":{"_id":props.fetchingDetails["_id"],name:props.fetchingDetails["name"],projectId:props.fetchingDetails["projectId"],"testCaseId":screenTestcases?screenTestcases[0]["_id"]:"","parent":{"_id":props.fetchingDetails.parent["_id"]}},
-            "_id":screenTestcases?screenTestcases[0]["_id"]:"",
-            "name":screenTestcases?screenTestcases[0]["name"]:""
-        }
-
-        
-
-        props.openScrapeScreen("displayBasic2","","displayBasic",{populateTestcaseDetails})
+    const dialogFuncMapS = {
+        'displayModal': setDisplayModal
     }
+    const onClick = (name) => {
+        dialogFuncMapS[`${name}`](true);
+    }
+
+    const onHide = (name) => {
+        dialogFuncMapS[`${name}`](false);
+    }
+
+    const openScreenTestCase =() =>{
+        let screenTestcases = {};
+        if(selectedModule && selectedModule.children && selectedModule.children.length > 0) {
+            for(let scenario of selectedModule.children) {
+                if(scenario && scenario.children && scenario.children.length > 0){
+                    for(let scr of scenario.children) {
+                        if(scr && scr.children && scr.children.length > 0){
+                        if (scr["_id"]===props.fetchingDetails["_id"]){
+                            screenTestcases = scr.children
+                            setdisplayTest(screenTestcases);
+                            let displayTeststep=[];
+                            for( let i=0; screenTestcases.length>i; i++){
+                                displayTeststep.push(screenTestcases[i])
+                            }
+                            setshowTeststeps(displayTeststep)
+                        }
+                            console.log("screenTestcases",screenTestcases)
+                          }
+            
+                 }
+         }
+        }
+        }
+         
+
+       onClick("displayModal")
+    }
+
+ const displayTestCase = (value) => {
+    let populateTestcaseDetails = {
+        "parent":{
+            "_id":props.fetchingDetails["_id"],
+            name:props.fetchingDetails["name"],
+            projectId:props.fetchingDetails["projectId"],
+            "testCaseId":displayTest ? displayTest[value]["_id"] : "",
+            "parent":{"_id":props.fetchingDetails.parent["_id"]}
+        },
+        "_id":displayTest ? displayTest[value]["_id"] : "",
+        "name":displayTest ? displayTest[value]["name"] : ""
+    }
+    console.log(populateTestcaseDetails)
+    props.openScrapeScreen("displayBasic2","","displayBasic",{populateTestcaseDetails})
+ }
 
     return (
         
         <>
+         <Dialog header="Design Test Steps" visible={displayModal} style={{ width: '20vw' }} onHide={() => onHide('displayModal')}>
+         {showTeststeps.map((item, idx)=><div >
+        {/* <div>{idx+1.}</div> */}
+        <div style={{cursor: "pointer",bordeBottomStyle: "ridge",marginBottom: "0.5rem"}} value={idx} onClick={(e)=>{displayTestCase(idx)}}>{ `${idx+1}.${item.name}`}</div>
+            </div>)}
+         </Dialog>
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
@@ -436,7 +477,7 @@ const ScrapeScreen = (props)=>{
                     { props.appType === "Webservice" 
                         ? <WebserviceScrape /> 
                         : compareFlag ? <CompareObjectList fetchingDetails={props.fetchingDetails}/> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
-                    <RefBarItems hideInfo={true} mirror={mirror} collapse={true} appType={props.appType} openScreenTestCase={openScreenTestCase}/>
+                    <RefBarItems hideInfo={true} mirror={mirror} collapse={true} appType={props.appType} openPopup={openScreenTestCase}/>
                 </ScrapeContext.Provider>
             </div>
             {/* <div data-test="ssFooter"className='ss__footer'><Footer/></div> */}

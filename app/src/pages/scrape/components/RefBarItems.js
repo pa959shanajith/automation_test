@@ -281,7 +281,7 @@ const RefBarItems = props => {
         <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} hideInfo={props.hideInfo} collapse={props.collapse} collapsible={true} scrapeScreenURL={scrapedURL} >
 			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title" title="Screenshot">Screenshot</span></div>}
             { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter" title="Filter"/></span><span className="rb_box_title" title="Filter">Filter</span></span>}
-			{/* <div data-test="screenshot" className="ic_box"  onClick={props.openScreenTestCase}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title" title="Screenshot">Design Test Steps</span></div> */}
+			<div data-test="screenshot" className="ic_box"  onClick={props.openPopup}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title" title="Screenshot">Design<span className="rb_box_title" title="Screenshot">Test Steps</span></span></div>
         </ReferenceBar>
         
     

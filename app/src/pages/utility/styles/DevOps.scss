@@ -470,11 +470,9 @@
     font-size:24px;
     margin-top:5vh;
 }
-// #moduleScenarioList{
-//     .react-checkbox-tree button{
-//         display: none;
-//    }
-// }
+.label{
+    margin-bottom: 0rem !important;
+}
 
 .projectName{
     margin-top: 6vh;
@@ -556,6 +554,7 @@
 .devOps_config_name1{
     position: absolute;
     top: 18vh;
+    padding-top: 0.4rem;
 }
 .inputLabel1{
     font-weight: 700;

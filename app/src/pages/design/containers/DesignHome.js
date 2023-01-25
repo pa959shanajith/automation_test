@@ -7,6 +7,7 @@ import { ReferenceContent } from "../components/RefBarItems";
 import { Header, FooterTwo as Footer, ActionBar, ScreenOverlay, ModalContainer } from '../../global';
 import "../styles/DesignHome.scss";
 
+
 /*
     Container: Design Home Container
     Uses: Renders entire design screen
@@ -17,6 +18,7 @@ const DesignHome = (props) => {
     
     const current_task = useSelector(state=>state.plugin.CT)
     const filter_data = useSelector(state=>state.plugin.FD)
+    const selectedModule = useSelector(state=>state.mindmap.selectedModule)
 
     const [isMac, setIsMac] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -51,6 +53,51 @@ const DesignHome = (props) => {
             }
         />
     )
+
+    const openScrapeCapture = async() =>{
+        let screenCapture = [];
+        if(selectedModule && selectedModule.children && selectedModule.children.length > 0) {
+            for(let scenario of selectedModule.children) {
+                console.log("scenario",scenario.children)
+                if(scenario && scenario.children && scenario.children.length > 0){
+                for(let scr of scenario.children) {
+                    if(scr && scr.children && scr.children.length > 0){
+                    for(let ts of scr.children) {
+                        if(ts["_id"]===props.fetchingDetails["_id"]){
+                            screenCapture=ts.parent;
+                            console.log("screen",screenCapture)
+                        }
+                        }
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        // await selectedModule.children.some(async (scenario)=>{
+        //         await scenario.children.some(async (scr)=>{
+        //                 await scr.children.some(async (ts)=>{
+        //                     if(ts["_id"]===props.fetchingDetails["_id"]){
+        //                         screenCapture=ts.parent
+        //                     }
+        //                         return ts["_id"]===props.fetchingDetails["_id"]
+        //                     })
+                            
+        //                     return scr["_id"]===props.fetchingDetails.parent["_id"]
+        //         })
+            
+        //     // return scr["_id"]===props.fetchingDetails["_id"]
+        // });
+
+        let populateTestcaseDetails = {
+            "parent":{"_id":props.fetchingDetails["_id"],name:props.fetchingDetails["name"],projectId:props.fetchingDetails["projectId"],"screenId":screenCapture?screenCapture._id:"","_id":{"_id":props.fetchingDetails.parent["_id"]}},
+            "_id":screenCapture._id?screenCapture._id:"",
+            "name":screenCapture.name?screenCapture.name:""
+        }
+        
+        props.openScrapeScreen("displayBasic","","displayBasic2",{populateTestcaseDetails})
+    }
 
     return (
         <>
@@ -127,7 +174,7 @@ const DesignHome = (props) => {
                 <img style={{ height: '1.1rem' }} onClick={closeBar} src={'static/imgs/collapseButton.png'}/></div> */}
                 {/* {<div style={{width:Collapsed? '5rem':'0rem'}}> */}
                 <div>
-                    <ReferenceContent  hideInfo={props.hideInfo} collapse={true} data-test="d__refBar" mirror={mirror} appType={props.appType} openScrapeScreenCap={props.openScrapeScreen}/> </div>
+                    <ReferenceContent  hideInfo={props.hideInfo} collapse={true} data-test="d__refBar" mirror={mirror} appType={props.appType} openScrapeCapture={openScrapeCapture}/> </div>
                     </div>
                 {/* }</div> */}
                 

@@ -128,7 +128,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         }else{
                 setUserDetailList(userListFromApi);
             }
-            const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
+            const ProjectList = getProjectList();
             setProjectsDetails(ProjectList)
         if(ProjectList.error){
                 setMsg(MSG.CUSTOM("Error while fetching the project Details"));
