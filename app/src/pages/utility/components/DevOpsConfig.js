@@ -512,9 +512,35 @@ const DevOpsConfig = props => {
         const onHide = (name) => {
             dialogFuncMap[`${name}`](false);
         }
+
     const HandleTextValue =(value)=>{
-    setIntegrationConfig({...integrationConfig, name:value})
-    setText(value)
+        const regex = /^\S+(?:\s+\S+)*$/gm;
+        let m;
+
+        while ((m = regex.exec(value)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+    
+    // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                setIntegrationConfig({...integrationConfig, name:match})
+                setText(match)
+            });
+        }      
+    }
+    const handleKey = (event) =>{
+        if(event.key === 'Backspace'){
+            if(text.length>0){
+                let val=text.substring(0,text.length-1);
+                event.preventDefault();
+                setIntegrationConfig({...integrationConfig, name:val})
+                setText(val)
+            }else{
+                setText('')
+            }
+        }
     }
     return (<>
         { showIntegrationModal ? 
@@ -551,7 +577,7 @@ const DevOpsConfig = props => {
                 <span className="api-ut__inputLabel inputLabel1" >Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
-                    <TextField value={text} width='150%' label="" standard={true} onChange={(event) => HandleTextValue(event.target.value)} autoComplete="off" placeholder="Enter Profile Name"
+                    <TextField value={text} width='150%' label="" standard={true} onChange={(event) => HandleTextValue(event.target.value)} onKeyDown={(e)=>handleKey(e)} autoComplete="off" placeholder="Enter Profile Name"
                         errorMessage={(text === '' && error.name && error.name !== '') ?  error.name : null}
                     />
                 </span>
