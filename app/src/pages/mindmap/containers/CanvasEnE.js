@@ -72,11 +72,12 @@ const CanvasEnE =(props)=>{
                     }
                 }
                 
-            } 
+            }
             (async()=>{
                 setBlockui({show:true,content:'Loading ...'})
                 var res = await deleteScenarioETE({scenarioIds:scenarioIds,parentIds:parentIds})
-                if(res.error){displayError(res.error);return;}                 
+                if(res.error){displayError(res.error);setBlockui({show:false});return;}  
+
                 dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
                 setBlockui({show:false})
                 setMsg(MSG.MINDMAP.SUCC_REMOVED_SCENARIO)                

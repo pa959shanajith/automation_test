@@ -146,7 +146,7 @@ const CreateNew = ({importRedirect}) => {
                         <SaveMapButton disabled={true}/>
                         {/* <Legends/> */}
                     </Fragment>) : (Object.keys(moduleSelect).length>0)?
-                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
+                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError}/>
                 :<Fragment>
                     <SaveMapButton disabled={true}/>
                     {/* <Legends isEnE={true}/> */}
