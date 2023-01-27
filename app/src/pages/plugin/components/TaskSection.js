@@ -74,6 +74,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [redirectTo, setRedirectTo] = useState("");
     const [searchText, setSearchText] = useState("");
     const [projectNameError,setProjectNameError] = useState("");
+    const [selectData, setSelectData] = useState(false);
 
     const handleCreateChange = () => {
         setCreateProjectCheck(true);
@@ -87,6 +88,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         setAssignedUsers({});
         setSearchUsers("");
         setSearchText("");
+        setSelectData(true);
     };
 
 
@@ -128,7 +130,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         }else{
                 setUserDetailList(userListFromApi);
             }
-            const ProjectList = getProjectList();
+            const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
             setProjectsDetails(ProjectList)
         if(ProjectList.error){
                 setMsg(MSG.CUSTOM("Error while fetching the project Details"));
@@ -159,8 +161,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                 icon: x,
                             },
                             key: x,
-                            text: x === "mobileapp"? "Mobile App" : x === "mobileweb" ? "Mobile Web" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
-                            title: x === "mobileapp"? "Mobile App" : x === "mobileweb" ? "Mobile Web" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            title: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             disabled: false
                         })
                     }
@@ -170,7 +172,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                 icon: x,
                             },
                             key: x,
-                            text: x === "mobileapp"? "Mobile App" : x === "mobileweb" ? "Mobile Web" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
                             title: 'License Not Supported',
                             disabled: true
                         })
@@ -180,7 +182,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             }
         })()
 
-    },[])
+    },[selectData])
 
 
 
@@ -440,7 +442,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                     </div>
                 </div>
-                <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px',height:'700px',position:'fixed',overflow:'hidden' }} className="dialog__projectDialog" onHide={() => onHide('displayBasic')}>
+                <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px',height:'700px',position:'fixed',overflow:'hidden' }} className="dialog__projectDialog" onHide={() => {onHide('displayBasic');setSelectData(true)}}>
                     <div>
 
                         <form>
@@ -643,8 +645,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                                 }
                                                 // onHide('displayBasic');
                                                 try {
-                                                    const ProjectList = await getProjectIDs();
-                                                    setProjectNames(ProjectList);
+                                                    const ProjectList = getProjectList().then(data => {
+                                                    setProjectNames(data);})
                                         }catch(err) {
                                                     console.log(err)
                                                 }
@@ -671,8 +673,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                         setMsg(MSG.CUSTOM("Project Modified Successfully","success"));
                                                 // onHide('displayBasic');
                                         try{
-                                                    const ProjectList = await getProjectIDs();
-                                                    setProjectNames(ProjectList);
+                                                    const ProjectList = getProjectList().then(data => {
+                                                    setProjectNames(data);})
                                         }catch(err) {
                                                     console.log(err)
                                                 }
