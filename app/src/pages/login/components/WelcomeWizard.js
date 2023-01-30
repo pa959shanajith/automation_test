@@ -229,15 +229,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
 
   
   // send correct filename to getICE and start downloading Client
-  const _handleClientDownload = (pkgName=undefined) =>{
+  const _handleClientDownload = () =>{
     if(showMacOSSelection){
-        // if (selectedMacOS==="") {
-        //     setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
-        // }
-        // else{
-        setSelectedMacOS(pkgName)
-        getIce("avoclientpath_"+pkgName)
-        // }
+        getIce("avoclientpath_Mac")
     }
     else if(showLinuxOSSelection)
     {
@@ -570,23 +564,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
                 // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
                 }
-                
-                {(showMacOSSelection?(
-                    <>
-                        <div className="OSselectionText">Please select Operating System for downloading Avo Assure Client</div>
-                        <div className="choiceGroup">
-                            {Object.keys(config).map((osPathname)=>{
-                                if (osPathname.includes("Windows") || osPathname.includes("Linux")){
-                                    return <></>;
-                                }
-                                let versionName = osPathname.split("_")[1]
-                                return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{_handleClientDownload(versionName)}}>Download on {versionName}</button>
-                            })}
-                        </div>
-                    </>)
-                    :null)}
 
-                {showIndicator && !showMacOSSelection && !showLinuxOSSelection? 
+                {showIndicator ? 
                     <>
                         <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading the Avo Assure Client"}</div>
                         <div className="downloadProgress">
@@ -601,8 +580,11 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         </div>
                     </>
                 :
-                (OS==="Windows" || OS==="Linux"?<button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>:null)}
-                {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
+                <>
+                <button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>
+                </>
+                }
+                            {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
             </div>
   };
 
