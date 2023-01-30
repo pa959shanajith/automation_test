@@ -36,16 +36,12 @@ const CreateGrid = ({
   const [agentData, setAgentData] = useState([]);
   const [filteredList, setFilteredList] = useState(agentData);
   let selectedAgents = undefined;
+  let newselectedAgentsNumbers = 0;
 
   let firstRenderCheck = true;
   const [selection] = useState(
     new Selection({
       onSelectionChanged: () => {
-        console.log(firstRenderCheck);
-        console.log(selection.getSelectedCount());
-        console.log(currentGrid.agents.length);
-        console.log(selectedAgentsNumbers);
-        console.log(newselectedAgentsNumbers);
         if (
           firstRenderCheck &&
           selection.getSelectedCount() === 0 &&
@@ -56,10 +52,6 @@ const CreateGrid = ({
           }
           firstRenderCheck = false;
         }
-        console.log(selection.getItems());
-        console.log(selection.getSelection());
-        console.log(selection.getSelectedCount());
-        // setSelectedAgents(selection.getSelection());
         selectedAgents = selection.getSelection();
       }
     })
@@ -131,11 +123,10 @@ const CreateGrid = ({
     },
   ];
   useEffect(() => {
-    currentGrid.name === gridName? setDataUpdated(false) : setDataUpdated(true);
+    currentGrid.name === gridName ? setDataUpdated(false) : setDataUpdated(true);
+    if(gridName.trim().length > 0) setGridName(gridName);
+    else setGridName('');
   }, [gridName]);
-
-  const [selectedAgentsNumbers, setSelectedAgentsNumbers] = useState(0);
-  let newselectedAgentsNumbers = 0;
 
   useEffect(() => {
     (async () => {
@@ -207,11 +198,6 @@ const CreateGrid = ({
     })();
   }, []);
 
-  useEffect(() => {
-    console.log("agentData", agentData);
-    console.log(selectedAgentsNumbers);
-  }, [selectedAgentsNumbers]);
-
   const showLegend = (state, name) => {
     return (
       <div className="agent_state">
@@ -221,21 +207,18 @@ const CreateGrid = ({
     );
   };
 
-  const setInputGridName = (inputValue) => {
-    if(inputValue.trim().length > 0) setGridName(inputValue.trim());
-    else setGridName('');
-  }
+ 
 
   const handleConfigSave = async () => {
     (async () => {
       setLoading("Loading...");
       let requestData = {};
-      {
-        if (currentGrid._id !== "" && currentGrid.name !== "") {
+
+      if (currentGrid._id !== "" && currentGrid.name !== "") {
           let updateAgentData = {
             action: "update",
             value: {
-              name: gridName,
+              name: gridName.trim(),
               _id: currentGrid._id,
               agents: agentData
                 .filter((agent) => agent.isSelected)
@@ -247,11 +230,11 @@ const CreateGrid = ({
             },
           };
           requestData = updateAgentData;
-        } else {
+      } else {
           let createAgentData = {
             action: "create",
             value: {
-              name: gridName,
+              name: gridName.trim(),
               agents: agentData
                 .filter((agent) => agent.isSelected)
                 .map((agent) => ({
@@ -263,8 +246,10 @@ const CreateGrid = ({
           };
           requestData = createAgentData;
         }
-      }
-
+    if(requestData.value.agents.length < 1) {
+      setMsg(MSG.CUSTOM("Please select atleast one Agent",VARIANT.ERROR));
+    }
+    else{
       const storeConfig = await saveAvoGrid(requestData);
       if (storeConfig !== "success") {
         if (storeConfig.error && storeConfig.error.CONTENT) {
@@ -273,15 +258,15 @@ const CreateGrid = ({
           setMsg(MSG.CUSTOM("Something Went Wrong", VARIANT.ERROR));
         }
       } else {
-        showMessageBar("Grid Create Successfully", "SUCCESS");
+        showMessageBar("Grid Created Successfully", "SUCCESS");
         setCurrentGrid(false);
       }
-      setLoading(false);
+    }
+    setLoading(false);
     })();
   };
   const onAgentSelection = (name) => {
     const updatedData = [...agentData];
-
     const index = updatedData.findIndex((agent) => agent.name === name);
     updatedData[index] = {
       ...agentData[index],
@@ -339,7 +324,7 @@ const CreateGrid = ({
               width="150%"
               label=""
               standard={true}
-              onChange={(event) => { setInputGridName(event.target.value) } }
+              onChange={(event) => { setGridName(event.target.value) } }
               autoComplete="off"
               placeholder="Enter Grid Name"
             />
@@ -358,8 +343,8 @@ const CreateGrid = ({
       <div
         style={{
           position: "absolute",
-          width: "100%",
-          height: "70%",
+          width: "98%",
+          height: "-webkit-fill-available",
           marginTop: "1.5%",
         }}
       >    
