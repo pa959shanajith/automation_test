@@ -13,6 +13,7 @@ import DevOpsModuleList from './DevOpsModuleList';
 const DevOpsConfig = props => {
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
     const [dataDict, setDict] = useState({});
+    const [ inputConfigName , setInputConfigName] = useState(props.currentIntegration.name.trim());
     const dataParametersCollection = [];
     const [error, setError] = useState({});
     const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
@@ -460,7 +461,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: text,
+            configurename: text.trim(),
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
@@ -512,10 +513,18 @@ const DevOpsConfig = props => {
         const onHide = (name) => {
             dialogFuncMap[`${name}`](false);
         }
-    const HandleTextValue =(value)=>{
-        setIntegrationConfig({...integrationConfig, name:value})
-        setText(value)
-    }
+
+    useEffect(() =>{
+            if(inputConfigName.trim().length > 0)  
+            { 
+                setIntegrationConfig({...integrationConfig, name: inputConfigName.trim()}); 
+                setText(inputConfigName);
+            }
+            else { setIntegrationConfig({...integrationConfig, name: ''});
+                setText('');
+            }
+    },[inputConfigName])
+    
     return (<>
         { showIntegrationModal ? 
             <IntegrationDropDown
@@ -535,7 +544,7 @@ const DevOpsConfig = props => {
             </span>
         </div>
         <div className="api-ut__btnGroup">
-        <button data-test="submit-button-test" className='submit-button-test_update' onClick={() => handleConfigSave(props.currentIntegration.name)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
+        <button data-test="submit-button-test" className='submit-button-test_update' disabled={!text} onClick={() => handleConfigSave(props.currentIntegration.name)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test " className='submit-button-test_back'  onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
             {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
@@ -551,7 +560,7 @@ const DevOpsConfig = props => {
                 <span className="api-ut__inputLabel inputLabel1" >Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
-                    <TextField value={text} width='150%' label="" standard={true} onChange={(event) => HandleTextValue(event.target.value)} autoComplete="off" placeholder="Enter Profile Name"
+                    <TextField value={text} width='150%' label="" standard={true} onChange={(event) =>{  setInputConfigName (event.target.value);}} autoComplete="off" placeholder="Enter Profile Name"
                         errorMessage={(text === '' && error.name && error.name !== '') ?  error.name : null}
                     />
                 </span>
