@@ -66,7 +66,7 @@ const ReferenceContent = ({mirror,collapse,appType,openScrapeCapture}) => {
     <>
     <ReferenceBar hideInfo={true} popups={<ScreenPopup/>} collapsible={true} collapse={collapse} closeAllPopups={closeAllPopups}>
     { appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={togglePop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
-    <div className="ic_box" onClick={openScrapeCapture}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Capture<span className="rb_box_title">Elements</span></span></div>
+    <div className="ic_box" onClick={openScrapeCapture}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Capture Elements" src="static/imgs/Capture_Element.png"/><span className="rb_box_title">Capture<span className="rb_box_title">Elements</span></span></div>
     </ReferenceBar>
 
     </>
