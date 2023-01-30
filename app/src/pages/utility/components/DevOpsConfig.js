@@ -512,7 +512,6 @@ const DevOpsConfig = props => {
         const onHide = (name) => {
             dialogFuncMap[`${name}`](false);
         }
-        
     const HandleTextValue =(value)=>{
         setIntegrationConfig({...integrationConfig, name:value})
         setText(value)
