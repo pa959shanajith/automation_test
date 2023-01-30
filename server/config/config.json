@@ -32,7 +32,8 @@
         "avoclientpath_Catalina":"",
         "avoclientpath_BigSur":"",
         "avoclientpath_Monterey":"",
-        "avoclientpath_Linux":""
+        "avoclientpath_Linux":"",
+        "avoclientpath_Mac":""
     },
     "avoAgentConfig": "",
     "trainingLinks":{
