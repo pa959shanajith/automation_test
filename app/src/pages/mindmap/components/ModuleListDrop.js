@@ -53,11 +53,11 @@ const ModuleListDrop = (props) =>{
         else{dispatch({type:actionTypes.SAVED_LIST,payload:true});setSavedList(true)}
        
         setWarning(false);
-     }, [ moduleList || initProj])
+     }, [ moduleList,initProj])
      useEffect (()=>{
         setSavedList(true)
         {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
-     })
+     },[initProj])
 
      useEffect(()=>{
          setSearchForNormal(false);
