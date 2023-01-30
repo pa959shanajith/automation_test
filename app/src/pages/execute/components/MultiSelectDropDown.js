@@ -13,7 +13,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
     const [dropDown,setDropDown] = useState(false)
     const [chatBox , setChatBox] = useState(false);
     useEffect(()=>{
-        inputRef.current.value = (accessibilityParameters.length!==0?accessibilityParameters.length:"") +"Select Standards";
+        inputRef.current.value = (accessibilityParameters.length!==0?accessibilityParameters.length:"") +"  Select Standards";
     },[accessibilityParameters])
     const selectOption = (value, event) =>{
         let acc_param = [...accessibilityParameters];
