@@ -17,7 +17,8 @@ const initialState = {
     importData:{createdby:undefined,data:undefined},
     unassignTask:[],
     toDeleteScenarios: [],
-    appType:undefined
+    appType:undefined,
+    savedList:false,
 };
 
 const reducer = (state = initialState , action) => {
@@ -122,7 +123,12 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 appType: action.payload
-            } 
+            }
+            case actionTypes.SAVED_LIST:
+                return{
+                    ...state,
+                    savedList: action.payload
+                }
         default: 
             return state
     }

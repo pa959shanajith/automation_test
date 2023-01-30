@@ -543,6 +543,7 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
         }
         return !1;
     });
+    if (p["_id"]== null && p["state"]=="created" && p["type"]=="endtoend") {deletedNodes=[]}
     return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }
 

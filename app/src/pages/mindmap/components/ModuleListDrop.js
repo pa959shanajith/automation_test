@@ -18,6 +18,7 @@ const ModuleListDrop = (props) =>{
     const initProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
+    const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
@@ -28,6 +29,7 @@ const ModuleListDrop = (props) =>{
     const SearchMdInp = useRef()
     const [modE2Elist, setModE2EList] = useState(moduleList)
     const [searchForNormal, setSearchForNormal] = useState(false)
+    const [savedList, setSavedList] = useState(false)
     const [importPop,setImportPop] = useState(false)
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
@@ -41,23 +43,34 @@ const ModuleListDrop = (props) =>{
     const [firstRender, setFirstRender] = useState(true);
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
+    const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
     useEffect(()=> {
-        if(!searchForNormal) {
+        if(!searchForNormal && !isCreateE2E ) {
             if(moduleList.length > 0) {
                 const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
                 selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
         }}
+        else{dispatch({type:actionTypes.SAVED_LIST,payload:true});setSavedList(true)}
        
         setWarning(false);
-     }, [ moduleList])
-     useEffect(()=>{
-         setSearchForNormal(false);
-     },[initProj])
+     }, [ moduleList,initProj])
+     useEffect (()=>{
+        setSavedList(true)
+        {dispatch({type:actionTypes.SAVED_LIST,payload:savedList});}
+        setSearchForNormal(false);
+         if(!isE2EOpen){
+        setIsCreateE2E(false);
+        }
+},[initProj])
+     useEffect(() => {
+        setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
+        
+      },[initEnEProj]);
 
      useEffect(()=>{
         if(moduleSelect.type === 'endtoend') {
-            setIsE2EOpen(true)
-            setCollapse(true);
+            // setIsE2EOpen(true)
+            // setCollapse(true);
             
         }
         
@@ -130,7 +143,6 @@ const ModuleListDrop = (props) =>{
 
     // normal module selection
             const selectModule = async (id,name,type,checked, firstRender) => {
-
                 var modID = id
                 var type = name
                 var name = type
