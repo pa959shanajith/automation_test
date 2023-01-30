@@ -513,8 +513,8 @@ const DevOpsConfig = props => {
             dialogFuncMap[`${name}`](false);
         }
     const HandleTextValue =(value)=>{
-    setIntegrationConfig({...integrationConfig, name:value})
-    setText(value)
+        setIntegrationConfig({...integrationConfig, name:value})
+        setText(value)
     }
     return (<>
         { showIntegrationModal ? 
