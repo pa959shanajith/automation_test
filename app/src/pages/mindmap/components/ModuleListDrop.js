@@ -29,7 +29,6 @@ const ModuleListDrop = (props) =>{
     const SearchMdInp = useRef()
     const [modE2Elist, setModE2EList] = useState(moduleList)
     const [searchForNormal, setSearchForNormal] = useState(false)
-    const [savedList, setSavedList] = useState(false)
     const [importPop,setImportPop] = useState(false)
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
@@ -50,18 +49,21 @@ const ModuleListDrop = (props) =>{
                 const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
                 selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
         }}
-        else{dispatch({type:actionTypes.SAVED_LIST,payload:true});setSavedList(true)}
+        else{dispatch({type:actionTypes.SAVED_LIST,payload:true})}
        
         setWarning(false);
      }, [ moduleList,initProj])
      useEffect (()=>{
-        setSavedList(true)
-        {dispatch({type:actionTypes.SAVED_LIST,payload:savedList});}
-        setSearchForNormal(false);
+        {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
+     },[isCreateE2E])
+
+     useEffect(()=>{
+         setSearchForNormal(false);
          if(!isE2EOpen){
         setIsCreateE2E(false);
         }
-},[initProj])
+         
+     },[initProj])
      useEffect(() => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         
