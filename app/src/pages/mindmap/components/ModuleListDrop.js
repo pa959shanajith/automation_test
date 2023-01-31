@@ -56,12 +56,16 @@ const ModuleListDrop = (props) =>{
      }, [ moduleList,initProj])
      useEffect (()=>{
         setSavedList(true)
-        {dispatch({type:actionTypes.SAVED_LIST,payload:savedList});}
-        setSearchForNormal(false);
+        {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
+     },[isCreateE2E])
+
+     useEffect(()=>{
+         setSearchForNormal(false);
          if(!isE2EOpen){
         setIsCreateE2E(false);
         }
-},[initProj])
+         
+     },[initProj])
      useEffect(() => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         
