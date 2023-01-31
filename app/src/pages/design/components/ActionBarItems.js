@@ -88,7 +88,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                     // <div key={1} className={'d__debugOn' + (disable ? " disable-thumbnail" : "")}>Debug On</div>, 
                     <div key={3} title="Add Dependent Test Steps"  className={"d__thumbnail" + (disable ? " disable-thumbnail" : "")}>
                         <input id="add_depend" type="checkbox" onChange={addDependentTestCase} checked={dependCheck}/>
-                        <span className="d__thumbnail_title">Add Dependent Test Steps</span>
+                        <span className="d__thumbnail_title">Add Dependent Test Cases</span>
                     </div>
                     ];
 

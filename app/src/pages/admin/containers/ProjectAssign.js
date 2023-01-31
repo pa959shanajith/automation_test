@@ -404,7 +404,7 @@ const ProjectNew = (props) => {
 				</div>
             </div>    
 
-            {showAssignProjectModal? <ModalContainer title="Update Projects" footer={ModalButtons(clickAssignProjects1, setShowAssignProjectModal)} close={()=>{setShowAssignProjectModal(false)}} content="All the tasks that has been assigned to this user will be removed from this user's queue from the project(s) which are being unassigned (if any). Do you want to proceed?" modalClass=" modal-sm" /> :null}  
+            {showAssignProjectModal? <ModalContainer title="Update Projects" footer={ModalButtons(clickAssignProjects1, setShowAssignProjectModal)} close={()=>{setShowAssignProjectModal(false)}} content="Do you want to proceed?" modalClass=" modal-sm" /> :null}  
         </div>
         </ScrollBar>
     )
