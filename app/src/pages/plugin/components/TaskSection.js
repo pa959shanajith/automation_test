@@ -507,7 +507,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                     onChange={(e, item) => {
                                         setAppType(item)
                                     }}
-                    /> : <TextField label='App Type' disabled value={selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:""} width='19rem' />
+                    /> : <TextField label='Application Type' disabled value={selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:""} width='19rem' />
                             }
                         </div>
                         <div className='labelStyle1'> <label>Users</label>

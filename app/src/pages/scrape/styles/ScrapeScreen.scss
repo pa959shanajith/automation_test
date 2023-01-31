@@ -30,3 +30,18 @@
     bottom: 0px;
     height: 26.9rem;
 }
+
+.Design_test_steps{
+    border-bottom-style: ridge;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.Design_test_steps_name:hover{
+    cursor: pointer;
+    width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: blue;
+    text-decoration: underline;;
+}

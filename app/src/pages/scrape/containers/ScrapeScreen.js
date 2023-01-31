@@ -406,20 +406,19 @@ const ScrapeScreen = (props)=>{
                 if(scenario && scenario.children && scenario.children.length > 0){
                     for(let scr of scenario.children) {
                         if(scr && scr.children && scr.children.length > 0){
-                        if (scr["_id"]===props.fetchingDetails["_id"]){
-                            screenTestcases = scr.children
-                            setdisplayTest(screenTestcases);
-                            let displayTeststep=[];
-                            for( let i=0; screenTestcases.length>i; i++){
-                                displayTeststep.push(screenTestcases[i])
+                            if (scr["_id"]===props.fetchingDetails["_id"] && scenario["_id"] === props.fetchingDetails.parent["_id"]){
+                                screenTestcases = scr.children
+                                setdisplayTest(screenTestcases);
+                                let displayTeststep=[];
+                                for( let i=0; screenTestcases.length>i; i++){
+                                    displayTeststep.push(screenTestcases[i])
+                                }
+                                setshowTeststeps(displayTeststep)
                             }
-                            setshowTeststeps(displayTeststep)
                         }
-                          }
-            
-                 }
-         }
-        }
+                    }
+                }
+            }
         }
          
 
@@ -445,10 +444,12 @@ const ScrapeScreen = (props)=>{
         
         <>
          <Dialog header="Design Test Steps" visible={displayModal} style={{ width: '20vw' }} onHide={() => onHide('displayModal')}>
-         {showTeststeps.map((item, idx)=><div >
+         {(showTeststeps.length !== 0)?<>{showTeststeps.map((item, idx)=><div >
         {/* <div>{idx+1.}</div> */}
-        <div style={{cursor: "pointer",bordeBottomStyle: "ridge",marginBottom: "0.5rem"}} value={idx} onClick={(e)=>{displayTestCase(idx)}}>{ `${idx+1}.${item.name}`}</div>
-            </div>)}
+        <div className='Design_test_steps'  value={idx} onClick={(e)=>{displayTestCase(idx)}}>
+        <span>{`${idx+1}.`}</span><span className='Design_test_steps_name'>{item.name}</span>
+        </div>
+            </div>)}</>:<div>No Test Cases Found</div>}
          </Dialog>
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
