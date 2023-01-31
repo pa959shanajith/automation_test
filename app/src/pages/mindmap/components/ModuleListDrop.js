@@ -56,7 +56,7 @@ const ModuleListDrop = (props) =>{
      }, [ moduleList,initProj])
      useEffect (()=>{
         setSavedList(true)
-        {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
+        {dispatch({type:actionTypes.SAVED_LIST,payload:savedList});}
      },[isCreateE2E])
 
      useEffect(()=>{
