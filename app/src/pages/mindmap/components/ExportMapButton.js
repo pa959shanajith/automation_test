@@ -1,5 +1,5 @@
 import React, { Fragment, useRef, useState } from 'react';
-import {ModalContainer, Messages as MSG, setMsg} from '../../global';
+import {ModalContainer, Messages as MSG, setMsg,ResetSession} from '../../global';
 import {useSelector} from 'react-redux'
 import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit,exportToProject,getModules} from '../api';
 import '../styles/ExportMapButton.scss'
@@ -262,11 +262,14 @@ const exportToProj = async(module,currProjId,displayError,setBlockui) => {
             "projectid":currProjId,
             "moduleid":Array.isArray(module)?module:module._id
         }
+        ResetSession.start()
         var result =  await exportToProject(data)
-        if(result.error){displayError(result.error);return;}
+        if(result.error){displayError(result.error);ResetSession.end();return;}
         setBlockui({show:false,content:''})
         setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
+        ResetSession.end()
     }catch(err){
+        ResetSession.end()
         console.error(err)
         displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
     }
