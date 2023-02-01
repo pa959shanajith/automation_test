@@ -55,7 +55,7 @@ const CanvasNew = (props) => {
     const [fetchingDetails,setFetchingDetails] = useState(null); // this can be used for fetching testcase/screen/scenario/module details
     const [ctrlBox,setCtrlBox] = useState(false);
     const [taskname, setTaskName] = useState("") 
-
+    const [fetchingDetailsId,setFetchingDetailsId] = useState(null)
     const [inpBox,setInpBox] = useState(false);
     const [multipleNode,setMultipleNode] = useState(false)
     const [ctScale,setCtScale] = useState({})
@@ -225,6 +225,7 @@ const CanvasNew = (props) => {
     },[createnew])
     const nodeClick=(e)=>{
         setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
+        setFetchingDetailsId(e.target.parentElement.id.split("_")[1].replace(/['‘’"“”]/g, ''))
         e.stopPropagation()
         if(d3.select('#pasteImg').classed('active-map')){
             var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
@@ -515,10 +516,10 @@ const CanvasNew = (props) => {
              {/* <SearchBox  setCtScale={setCtScale} zoom={zoom}/> */}
              <ConfirmDialog />
              <Dialog header={props.populateTestcaseDetails?(props.populateTestcaseDetails.name.length > 55) ? props.populateTestcaseDetails.name.slice(0, 55)+"...   : Capture Elements" : props.populateTestcaseDetails.name+" : Capture Elements":(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Capture Elements" : taskname+" : Capture Elements"} visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
-             <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} appType={appType} openScrapeScreen={props.onClick}/></div>
+             <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} fetchingDetailsId={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetailsId} appType={appType} openScrapeScreen={props.onClick}/></div>
              </Dialog>
              <Dialog header={props.populateTestcaseDetails?(props.populateTestcaseDetails.name.length > 55) ? props.populateTestcaseDetails.name.slice(0, 55)+"...   : Design Test Steps" : props.populateTestcaseDetails.name+" : Design Test Steps":(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Design Test Steps" : taskname+" : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
-             <div style={{ height: '50vh'}}><DesignHome fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} appType={appType} openScrapeScreen={props.onClick} /></div>
+             <div style={{ height: '50vh'}}><DesignHome fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} fetchingDetailsId={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetailsId} appType={appType} openScrapeScreen={props.onClick} /></div>
              </Dialog>
             {/* <Dialog
             hidden = {props.showScrape === false}

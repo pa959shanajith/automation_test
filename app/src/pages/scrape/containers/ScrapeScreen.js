@@ -401,16 +401,17 @@ const ScrapeScreen = (props)=>{
 
     const openScreenTestCase =() =>{
         let screenTestcases = {};
+        let displayTeststep=[];
         if(selectedModule && selectedModule.children && selectedModule.children.length > 0) {
             for(let scenario of selectedModule.children) {
                 if(scenario && scenario.children && scenario.children.length > 0){
                     for(let scr of scenario.children) {
                         if(scr && scr.children && scr.children.length > 0){
-                            if (scr["_id"]===props.fetchingDetails["_id"] && scenario["_id"] === props.fetchingDetails.parent["_id"]){
+                            if (scr["id"] === parseInt(props.fetchingDetailsId)  && scr["_id"]===props.fetchingDetails["_id"] && scenario["_id"] === props.fetchingDetails.parent["_id"]){
                                 screenTestcases = scr.children
                                 setdisplayTest(screenTestcases);
-                                let displayTeststep=[];
-                                for( let i=0; screenTestcases.length>i; i++){
+                                
+                                for( let i=0; i<screenTestcases.length; i++){
                                     displayTeststep.push(screenTestcases[i])
                                 }
                                 setshowTeststeps(displayTeststep)
@@ -420,35 +421,39 @@ const ScrapeScreen = (props)=>{
                 }
             }
         }
-         
-
-       onClick("displayModal")
+    if(displayTeststep.length===1 ){
+       
+            displayTestCase(0,displayTeststep);
+        }
+        else{
+           
+           onClick("displayModal")
+        }
     }
 
- const displayTestCase = (value) => {
+ const displayTestCase = (value,displayTeststep) => {
     let populateTestcaseDetails = {
         "parent":{
             "_id":props.fetchingDetails["_id"],
             name:props.fetchingDetails["name"],
             projectId:props.fetchingDetails["projectId"],
-            "testCaseId":displayTest ? displayTest[value]["_id"] : "",
+            "testCaseId":displayTeststep[value]["_id"] ,
             "parent":{"_id":props.fetchingDetails.parent["_id"]}
         },
-        "_id":displayTest ? displayTest[value]["_id"] : "",
-        "name":displayTest ? displayTest[value]["name"] : ""
-    }
+        "_id":displayTeststep[value]["_id"] ,
+        "name":displayTeststep[value]["name"]  }
     props.openScrapeScreen("displayBasic2","","displayBasic",{populateTestcaseDetails})
  }
 
     return (
         
         <>
-         <Dialog header="Design Test Steps" visible={displayModal} style={{ width: '20vw' }} onHide={() => onHide('displayModal')}>
-         {(showTeststeps.length !== 0)?<>{showTeststeps.map((item, idx)=><div >
-        {/* <div>{idx+1.}</div> */}
-        <div className='Design_test_steps'  value={idx} onClick={(e)=>{displayTestCase(idx)}}>
-        <span>{`${idx+1}.`}</span><span className='Design_test_steps_name'>{item.name}</span>
-        </div>
+        <Dialog header="Design Test Steps" visible={displayModal} style={{ width: '20vw' }} onHide={() => onHide('displayModal')}>
+            {(showTeststeps.length !== 0)?<>{showTeststeps.map((item, idx)=><div >
+            {/* <div>{idx+1.}</div> */}
+            <div className='Design_test_steps'  value={idx} onClick={(e)=>{displayTestCase(idx,showTeststeps)}}>
+           <span>{`${idx+1}.`}</span><span className='Design_test_steps_name' title={item.name}>{item.name}</span>
+            </div>
             </div>)}</>:<div>No Test Cases Found</div>}
          </Dialog>
         { overlay && <ScreenOverlay content={overlay} />}
