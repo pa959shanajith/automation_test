@@ -86,7 +86,7 @@ const ModuleListDrop = (props) =>{
     },[filterSc,setScenarioList,initScList])
     // about select all check box
     useEffect(()=>{
-        if(moduleSelectlist.length===moduleList.length && moduleSelectlist.length>0){
+        if(moduleSelectlist.length===moduleList.filter(module=> module.type=='basic').length && moduleSelectlist.length>0  ){
           setAllModSelected(true);
         }
         else{
@@ -105,9 +105,7 @@ const ModuleListDrop = (props) =>{
     }
     const clickCreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
-        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-
-    }
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});}
     const searchModule = (val) =>{
         setSearchForNormal(true);
         var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
@@ -121,7 +119,6 @@ const ModuleListDrop = (props) =>{
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
-        
     
         // if(moduleSelect._id === modID){
            
@@ -313,7 +310,7 @@ const ModuleListDrop = (props) =>{
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
                         <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
                   if (!allModSelected) {
-                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: moduleList.map((modd) => modd._id) })
+                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: moduleList.filter(module=> module.type=='basic').map((modd) => modd._id) })
                   } else {
                     dispatch({ type: actionTypes.SELECT_MODULELIST, payload: [] })
                   }
