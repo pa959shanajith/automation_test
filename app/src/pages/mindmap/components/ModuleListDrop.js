@@ -50,9 +50,13 @@ const ModuleListDrop = (props) =>{
                 selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
         }}
         else{dispatch({type:actionTypes.SAVED_LIST,payload:true})}
-       
-        setWarning(false);
+        setWarning(false); 
      }, [ moduleList,initProj])
+     useEffect(()=> {
+         return () => {
+            dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
+        }
+     },[]);
      useEffect (()=>{
         {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
      },[isCreateE2E])
