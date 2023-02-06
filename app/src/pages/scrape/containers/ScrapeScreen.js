@@ -407,7 +407,7 @@ const ScrapeScreen = (props)=>{
                 if(scenario && scenario.children && scenario.children.length > 0){
                     for(let scr of scenario.children) {
                         if(scr && scr.children && scr.children.length > 0){
-                            if (scr["id"] === parseInt(props.fetchingDetailsId)  && scr["_id"]===props.fetchingDetails["_id"] && scenario["_id"] === props.fetchingDetails.parent["_id"]){
+                            if (scr["id"] === (props.fetchingDetailsId["id"]?props.fetchingDetailsId["id"]:parseInt(props.fetchingDetailsId))  && scr["_id"]===props.fetchingDetails["_id"] && scenario["_id"] === props.fetchingDetails.parent["_id"]){
                                 screenTestcases = scr.children
                                 setdisplayTest(screenTestcases);
                                 

@@ -94,7 +94,7 @@ const DesignHome = (props) => {
             "name":screenCapture.name?screenCapture.name:""
         }
         
-        props.openScrapeScreen("displayBasic","","displayBasic2",{populateTestcaseDetails})
+        props.openScrapeScreen("displayBasic","","displayBasic2",{screenCapture})
     }
 
     return (
