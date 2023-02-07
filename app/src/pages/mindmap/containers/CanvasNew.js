@@ -486,7 +486,7 @@ const CanvasNew = (props) => {
 
   const confirm1 = () => {
     confirmDialog({
-        message: "Recording this scenarios with Avo Genius will override the current scenario.Do you wish to proceed?",
+        message: "Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?",
         header: 'Confirmation',
         icon: 'pi pi-exclamation-triangle',
         accept,

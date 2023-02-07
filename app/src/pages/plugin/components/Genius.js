@@ -783,7 +783,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
       <Header geniusPopup={true}/>
       <ConfirmDialog 
       visible={visibleScenario ||visibleReset} 
-      onHide={() =>{visibleScenario? setVisibleScenario(false):setVisibleReset(false)}} message={visibleScenario?"Recording this scenarios with Avo Genius will override the current scenario.Do you wish to proceed?":"All the entered data will be cleared."}
+      onHide={() =>{visibleScenario? setVisibleScenario(false):setVisibleReset(false)}} message={visibleScenario?"Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?":"All the entered data will be cleared."}
       header={visibleScenario?"Override Scenario":"Reset Confirmation"} 
       icon="pi pi-exclamation-triangle"  
       acceptClassName="p-button-rounded"
