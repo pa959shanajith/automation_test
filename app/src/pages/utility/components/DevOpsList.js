@@ -992,7 +992,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 {/* Dialog for CI /CD  */}
                 </ScrollBar>
             </div>
-        </> : (userRole !== "Test Engineer")?<div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' className='configImg' /><span className='configImgspan'>No Execution Profile Found<h4 className='configImgh' ><b>Create Now</b></h4></span> </div>:"" }
+        </> : (userRole !== "Test Engineer")?<div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' className='configImg' /><span className='configImgspan'>No Execution Profile Found<h4 className='configImgh' ><b>Create Now</b></h4></span> </div>:"No Execution Profile Found" }
     </>);
 }
 
