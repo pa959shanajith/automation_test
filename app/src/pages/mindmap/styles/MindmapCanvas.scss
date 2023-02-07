@@ -65,6 +65,7 @@ z-index: 1;
 font-family: 'latoWeb';
 }
 .p-dialog{
+    max-width: 60vw;
     .action__contents{
         position: fixed;
         margin: 83px 15px 16px 18px;

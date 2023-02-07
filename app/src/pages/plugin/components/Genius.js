@@ -12,7 +12,7 @@ import * as DesignApi from "../../design/api";
 import * as PluginApi from "../../plugin/api";
 import * as mindmapActionTypes from "../../mindmap/state/action";
 import * as actionTypesGlobal from "../../global/state/action";
-
+import {deleteScenario} from "../../mindmap/api"
 import GeniusMindmap from "../../mindmap/containers/GeniusMindmap";
 import { ConfirmDialog } from 'primereact/confirmdialog';
 
@@ -21,6 +21,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 
 let port = null;
+let count=0;
 let editorExtensionId = "bcdklcknooclndglabfjppeeomefcjof";
 
 const Genius = (props) => {
@@ -163,10 +164,31 @@ const Genius = (props) => {
       }
     }
     else if (typeof data === "object") {
+
+      count ++;
+      let testcaseids=[]
+      let scrnids
+      if(count===1){
+        const currentScnToDelete=modScenarios.filter(scn=>scn.name===selectedScenario.text)
+       scrnids=currentScnToDelete[0].children.map((screen,idx)=>{
+         return screen._id
+})
+const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
+  screen.children.map((testcase,id)=>{
+  testcaseids.push(testcase._id)
+ })
+})
+  await deleteScenario({scenarioIds:[],screenIds:scrnids,testcaseIds:testcaseids})
+      }
+          
+      var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
+      const completeScenraioDetials=moduledata.children
       try {
         const scenarioData = getExcludedMindmapInternals(modScenarios, selectedScenario.key);
-        const res = await PluginApi.getGeniusData(data, scenarioData);
-       
+        
+        
+        const isAlreadySaved=data.alreadySaved
+        const res = await PluginApi.getGeniusData(data, scenarioData,isAlreadySaved,completeScenraioDetials);
         savedRef.current = true;
         
         if (port) port.postMessage({
@@ -224,7 +246,7 @@ const Genius = (props) => {
       if (scenario._id === excluded_scenario) { return };
       tempArr.push(templateForMindmapSaving(scenario));
     });
-    return tempArr;
+       return tempArr;
   }
 
   const loadModule = async (modID, projectId) => {
@@ -304,6 +326,7 @@ const Genius = (props) => {
   useEffect(() => {
    
   
+  count=0
     let browserName = (function (agent) {        
       switch (true) {
       case agent.indexOf("edge") > -1: return "MS Edge";
@@ -321,6 +344,7 @@ const Genius = (props) => {
 
   
     if(userInfo.isTrial){
+
       fetch("/getClientConfig").then(data=>data.json()).then(response=>setNavURL(response.geniusTrialUrl))
         }
       
@@ -764,6 +788,7 @@ const Genius = (props) => {
       icon="pi pi-exclamation-triangle"  
       acceptClassName="p-button-rounded"
       rejectClassName="p-button-rounded"
+      style={{maxWidth:'60vw'}}
       accept={()=>{visibleScenario?setSelectedScenario(scenarioChosen): resetFields()}} 
       reject={()=>{}} 
       />

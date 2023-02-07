@@ -158,9 +158,16 @@ exports.getGeniusData = async (req, res) => {
   const fnName = "getGeniusData";
   logger.info("Inside UI service: " + fnName);
   try {
+    let screenNames=[]
     const body = req.body;
     const content = body.data.data;
+    for(let screen of content.screens){
+        screenNames.push(screen.name)
+    }
     const existing_data = body.snr_data;
+    const completeScenraioDetials=body.completeScenraioDetials
+    const currentScn=completeScenraioDetials.filter(scenario=>scenario.name===content.scenario.text)
+
     const inputs = {
       "data": {
         "projectid": content.project.key,
@@ -176,7 +183,7 @@ exports.getGeniusData = async (req, res) => {
                 "testscenarioid": content.scenario.key,
                 "testscenarioName": content.scenario.text,
                 "tasks": null,
-                "screenDetails": content.screens.map((screen, idx) => {
+                "screenDetails": (currentScn[0].children.length===0 )?content.screens.map((screen, idx) => {
                   return {
                     "screenid": null,
                     "screenName": screen.name,
@@ -193,6 +200,25 @@ exports.getGeniusData = async (req, res) => {
                     ],
                     "state": "created",
                     "childIndex": idx + 1
+                  }
+                }):
+                currentScn[0].children.map((screen, idx) => {
+                  return {
+                    "screenid": screen._id,
+                    "screenName": screenNames[idx],
+                    "task": null,
+                    "testcaseDetails": [
+                      {
+                        "screenid": screen._id,
+                        "testcaseid": screen.children[0]._id,
+                        "testcaseName": "TC_" + screenNames[idx],
+                        "task": null,
+                        "state": "created",
+                        "childIndex": 1
+                      }
+                    ],
+                    "state": screenNames[idx]!==screen.name?"saved":"created",
+                    "childIndex": screen.childIndex
                   }
                 }),
                 "state": "created",
@@ -217,7 +243,7 @@ exports.getGeniusData = async (req, res) => {
           "addedObj": {
             "scrapetype": "fs",
             "scrapedin": "",
-            "view": screen["data_objects"],
+            "view": currentScn[0].children.length===0?screen["data_objects"]:[],
             "mirror": screen["screenshot"],
             "scrapedurl": screen["scrapedurl"],
             "action": "scrape"

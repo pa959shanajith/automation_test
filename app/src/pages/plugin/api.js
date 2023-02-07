@@ -322,12 +322,12 @@ export const getMappedDiscoverUser = async(data) => {
     }
 }
 
-export const getGeniusData = async(data, snr_data) => {
+export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenraioDetials) => {
   try{
       const res = await axios(url+'/getGeniusData', {
           method: 'POST',
           credentials: 'include',
-          data:{data, snr_data}
+          data:{data, snr_data,isAlreadySaved,completeScenraioDetials}
       });
       if(res.status===200 && res.data !== "fail"){            
           return res.data;
