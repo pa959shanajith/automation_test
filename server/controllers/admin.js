@@ -2516,7 +2516,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin") return next();
 		switch (req.path) {
 			case "/manageUserDetails":
-				if (req.body.user.userid == userid) return next();
+				if (req.body.user.userid == userid && req.body.action == 'update') return next();
 				break;
 			case "/manageCIUsers":
 				if (req.body.CIUser.userId == userid) return next();
