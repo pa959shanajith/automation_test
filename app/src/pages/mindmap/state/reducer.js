@@ -7,6 +7,7 @@ const initialState = {
     selectedProj: undefined,
     searchModule: undefined,
     initEnEProj: undefined,
+    isEnELoad: false,
     selectedModule: {},
     selectedModulelist:[],
     selectBoxState: false,
@@ -42,7 +43,13 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 initEnEProj: action.payload
-            }   
+            }
+        case actionTypes.IS_ENELOAD:
+            return{
+                ...state,
+                isEnELoad: action.payload
+            }
+
         case actionTypes.UPDATE_MODULELIST:
             return{
                 ...state,

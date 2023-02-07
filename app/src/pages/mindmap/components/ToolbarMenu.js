@@ -40,7 +40,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const [exportBox,setExportBox] = useState(false);
     const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
-    
+    const isEnELoad = useSelector(state=>state.mindmap.isEnELoad);
 
     // const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
     useEffect(() => {
@@ -52,7 +52,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         // setselectedProjectNameForDropdown(proj);
-        if(!isCreateE2E){
+        if(!isEnELoad){
             // dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
@@ -167,7 +167,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
             </span>
-            {!isCreateE2E ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
+            {!isEnELoad ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
         </div>
         
 

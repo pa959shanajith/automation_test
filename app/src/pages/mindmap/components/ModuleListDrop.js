@@ -42,6 +42,8 @@ const ModuleListDrop = (props) =>{
     const [firstRender, setFirstRender] = useState(true);
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
+    const isEnELoad = useSelector(state=>state.mindmap.isEnELoad);
+
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
     useEffect(()=> {
         if(!searchForNormal && !isCreateE2E ) {
@@ -53,7 +55,8 @@ const ModuleListDrop = (props) =>{
         setWarning(false); 
      }, [ moduleList,initProj])
      useEffect(()=> {
-         return () => {
+        return () => {
+            dispatch({type:actionTypes.IS_ENELOAD,payload:false});
             dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
         }
      },[]);
@@ -103,13 +106,19 @@ const ModuleListDrop = (props) =>{
     }
     const collapsed =()=> setCollapse(!collapse)
     const CreateNew = () =>{
+        setIsE2EOpen(false);
+        setCollapse(false);
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
-        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
-
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: false}});
+        dispatch({type:actionTypes.IS_ENELOAD,payload:false});
+        setFirstRender(false);
     }
     const clickCreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
-        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});}
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
+        dispatch({type:actionTypes.IS_ENELOAD,payload:true});
+        setFirstRender(false);
+    }
     const searchModule = (val) =>{
         setSearchForNormal(true);
         var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
@@ -122,8 +131,6 @@ const ModuleListDrop = (props) =>{
      const loadModule = async(modID) =>{
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
-        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
-    
         // if(moduleSelect._id === modID){
            
         // }
@@ -164,6 +171,10 @@ const ModuleListDrop = (props) =>{
                         setBlockui({show:false})
                         setShowNote(true)
                         return;}
+                        else {
+                            dispatch({type:actionTypes.IS_ENELOAD,payload:false});
+                            dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
+                        }
                         if(Object.keys(moduleSelect).length===0 || firstRender){
                             loadModule(modID)
                             return;
@@ -187,6 +198,7 @@ const ModuleListDrop = (props) =>{
     
     //E2E properties
     const selectModules= async(e) => {
+        dispatch({type:actionTypes.IS_ENELOAD,payload:true});
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
@@ -205,7 +217,6 @@ const ModuleListDrop = (props) =>{
         setIsE2EOpen(true)
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   
-        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
         // if(moduleSelect._id === modID){
             
             
