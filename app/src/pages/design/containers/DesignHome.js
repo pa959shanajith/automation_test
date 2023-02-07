@@ -58,14 +58,12 @@ const DesignHome = (props) => {
         let screenCapture = [];
         if(selectedModule && selectedModule.children && selectedModule.children.length > 0) {
             for(let scenario of selectedModule.children) {
-                console.log("scenario",scenario.children)
                 if(scenario && scenario.children && scenario.children.length > 0){
                 for(let scr of scenario.children) {
                     if(scr && scr.children && scr.children.length > 0){
                     for(let ts of scr.children) {
                         if(ts["_id"]===props.fetchingDetails["_id"]){
                             screenCapture=ts.parent;
-                            console.log("screen",screenCapture)
                         }
                         }
                         }
@@ -96,7 +94,7 @@ const DesignHome = (props) => {
             "name":screenCapture.name?screenCapture.name:""
         }
         
-        props.openScrapeScreen("displayBasic","","displayBasic2",{populateTestcaseDetails})
+        props.openScrapeScreen("displayBasic","","displayBasic2",{screenCapture})
     }
 
     return (

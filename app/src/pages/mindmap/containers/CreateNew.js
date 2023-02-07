@@ -54,7 +54,9 @@ const CreateNew = ({importRedirect}) => {
       }
       if (extraProps && extraProps.populateTestcaseDetails) {
         setPopulateTestcaseDetails(extraProps.populateTestcaseDetails);
-      }else {
+      }else if(extraProps && extraProps.screenCapture) {
+        setPopulateTestcaseDetails(extraProps.screenCapture);
+      }else{
         setPopulateTestcaseDetails(undefined);
       }
       if (position) {
