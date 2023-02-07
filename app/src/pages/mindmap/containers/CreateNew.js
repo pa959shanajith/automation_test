@@ -41,6 +41,7 @@ const CreateNew = ({importRedirect}) => {
   const [displayBasic, setDisplayBasic] = useState(false);
   const [displayBasic2, setDisplayBasic2] = useState(false);
   const [position, setPosition] = useState('center');
+  const isEnELoad = useSelector(state=>state.mindmap.isEnELoad);
   const [populateTestcaseDetails, setPopulateTestcaseDetails] = useState(undefined)
   const dialogFuncMap = {
       'displayBasic': setDisplayBasic,
@@ -139,20 +140,20 @@ const CreateNew = ({importRedirect}) => {
                 
                 <ModuleListDrop />
                 <div id='mp__canvas' className='mp__canvas'>
-                     {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?
+                     {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?
                     <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap}  displayBasic={displayBasic} displayBasic2= {displayBasic2}  setShowScrape={setShowScrape} populateTestcaseDetails={populateTestcaseDetails} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
-                    // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
-                   
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
                         {/* <Legends/> */}
-                    </Fragment>) : (Object.keys(moduleSelect).length>0)?
+                    </Fragment>
+                    )
+                     : ((Object.keys(moduleSelect).length>0)?
                 <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError}/>
                 :<Fragment>
                     <SaveMapButton disabled={true}/>
                     {/* <Legends isEnE={true}/> */}
-                </Fragment>}
+                </Fragment>)}
                     
                     
                 </div>
