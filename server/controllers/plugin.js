@@ -203,7 +203,6 @@ exports.getGeniusData = async (req, res) => {
                   }
                 }):
                 currentScn[0].children.map((screen, idx) => {
-                  console.log(screenNames[idx])
                   return {
                     "screenid": screen._id,
                     "screenName": screenNames[idx],
