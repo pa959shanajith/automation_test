@@ -60,6 +60,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const current_task = useSelector(state=>state.plugin.PN);
     const [showCICD, setShowCICD] = useState(false);
     const [currentTask, setCurrentTask] = useState({});
+    const userRole = useSelector(state=>state.login.SR);
     const [eachData, setEachData] = useState([]);
     const filter_data = useSelector(state=>state.plugin.FD);
     const [browserTypeExe,setBrowserTypeExe] = useState([]); // Contains selected browser id for execution
@@ -689,7 +690,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" className='submit-button-test_profile' onClick={() => setCurrentIntegration({
+        {userRole!=="Test Engineer"?<button data-test="submit-button-test" className='submit-button-test_profile' onClick={() => setCurrentIntegration({
                     name: '',
                     key: uuid(),
                     selectValues: [
@@ -704,14 +705,14 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false
-                })} >Create Profile</button>
+                })} >Create Profile</button>:null}
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
                     <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
-                { showCICD && <div className="api-ut__btnGroup">
+                { showCICD && (userRole !== "Test Engineer")?<div className="api-ut__btnGroup">
                    <button onClick={() => {onClick('displayBasic3');getCurrentQueueState()} }>Manage Execution Queue</button>
-                </div>}
+                </div>:""}
     
             </> }
             
@@ -742,7 +743,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
                     <span className="d__out_head tkn-table__project tkn-table__head" >Release</span> */}
                     <span className="details_col tkn-table__key d__det_head ">Execution Action</span>
-                    <span className=" details_col tkn-table__key d__det_head" >Action</span>
+                    {userRole!=="Test Engineer"?<span className=" details_col tkn-table__key d__det_head" >Action</span>:null}
                 </div>
             </div>
             <div id="activeUsersToken" className="wrap active-users-token active-users-token1 " >
@@ -806,10 +807,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     {showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon" title='CI/CD'/>}
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
-                                    <td className="tkn-table__button" >
+                                   {userRole !== "Test Engineer"? <td className="tkn-table__button" >
                                         <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons Edit_button" alt="Edit Icon" title='Edit Profile'/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons Delete_button" alt="Delete Icon" title='Delete Profile'/>
-                                    </td>
+                                    </td>:null}
                              </tr>)
                          }
                         {
@@ -868,10 +869,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      { showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" title="CI/CD" className="action_icons" alt="Edit Icon"/>}
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
-                                    <td className="tkn-table__button" >
+                                   {userRole !== "Test Engineer"? <td className="tkn-table__button" >
                                         <img onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" title="Edit" className="action_icons Edit_button1" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" title="Delete" className="action_icons" alt="Delete Icon"/>
-                                   </td>
+                                   </td>:null}
                              </tr>)
                          }
                     </tbody>
@@ -991,7 +992,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 {/* Dialog for CI /CD  */}
                 </ScrollBar>
             </div>
-        </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' className='configImg' /><span className='configImgspan'>No Execution Profile Found<h4 className='configImgh' ><b>Create Now</b></h4></span> </div> }
+        </> : (userRole !== "Test Engineer")?<div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' className='configImg' /><span className='configImgspan'>No Execution Profile Found<h4 className='configImgh' ><b>Create Now</b></h4></span> </div>:"No Execution Profile Found" }
     </>);
 }
 
