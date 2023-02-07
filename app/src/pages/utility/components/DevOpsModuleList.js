@@ -247,7 +247,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
         }
 
         if(selectedTab === 'all') {
-            setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
+            if(searchText === '') setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
+            else {
+                setIntegrationConfig({ ...integrationConfig, scenarioList: [...integrationConfig.scenarioList.filter((element) => !checked.includes(element)), ...checked], notexe });
+                setModuleState({...moduleState, checked: [...integrationConfig.scenarioList.filter((element) => !checked.includes(element)), ...checked]});
+                return;
+            }
         }
         else if(selectedTab === 'selected') {
             setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
@@ -640,7 +645,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                         <div className='devOps_module_list_filter'>
                             <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
-                            <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={(event)=>{handleKeyDown(event)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                           {(selectedTab === 'all')?<SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => {handleSearchChange('');setFilteredModuleList(initialFilteredModuleList)}} onKeyDown={(event)=>{handleKeyDown(event)}} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />:""}
                             {/* <SearchDropdown
                                 calloutMaxHeight="30vh"
                                 noItemsText={'Loading...'}
