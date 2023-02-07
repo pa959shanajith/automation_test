@@ -129,11 +129,8 @@ const ModuleListDrop = (props) =>{
         setFilterSc(val)
     }
      const loadModule = async(modID) =>{
-        // dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: false}})
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
-        
-    
         // if(moduleSelect._id === modID){
            
         // }
@@ -156,7 +153,6 @@ const ModuleListDrop = (props) =>{
 
     // normal module selection
             const selectModule = async (id,name,type,checked, firstRender) => {
-                // dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: false}})
                 var modID = id
                 var type = name
                 var name = type
@@ -217,7 +213,6 @@ const ModuleListDrop = (props) =>{
         return; 
     }    
     const loadModuleE2E = async(modID) =>{
-        //dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
         setWarning(false)
         setIsE2EOpen(true)
         setCollapse(true)
