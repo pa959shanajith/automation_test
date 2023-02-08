@@ -107,6 +107,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
         const key = tab.props.itemKey;
         if(key === 'all') setFilteredModuleList(moduleList);
         else if(key === 'selected'){
+            handleSearchChange('')
+            setFilteredModuleList(initialFilteredModuleList)
             let newFilteredList = [];
             if (selectedExecutionType === 'normalExecution' || selectedExecutionType === 'e2eExecution') {
                 newFilteredList = moduleList.filter( (element) => {
@@ -153,6 +155,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
             setFilteredModuleList(newFilteredList);
         }
         else if(key === 'unselected') {
+            handleSearchChange('')
+            setFilteredModuleList(initialFilteredModuleList)
             let newFilteredList = [];
             if (selectedExecutionType === 'normalExecution' || selectedExecutionType === 'e2eExecution') {
                 newFilteredList = moduleList.filter( (element) => {
