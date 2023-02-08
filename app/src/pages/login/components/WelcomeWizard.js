@@ -258,8 +258,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
     document.getElementsByClassName("stepper")[0].style.visibility="hidden";
     return (
         <div>
-            <img src={`static/imgs/${imageName}.svg`} className="enlargeImage"/>
-            <img src={`static/imgs/close-btn.svg`} className="close-btn" onClick={()=>
+            <img src={`static/imgs/${imageName}.jpg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "enlargeImage-modified" :"enlargeImage"}/>
+            <img src={`static/imgs/close-btn.svg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "close-btn-modified" : "close-btn"} onClick={()=>
                 {setShowImage("");
                 document.getElementsByClassName("form-container")[0].style.visibility="visible";
                 document.getElementsByClassName("stepper")[0].style.visibility="visible";}} />
@@ -275,7 +275,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <div key={title+idx} className="d-p-card__item">
                       <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
                       {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
-                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image" onClick={()=>enlargeImage(item.imageName)}/></div>
+                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.jpg`} className={(["WW_mac_2_1", "WW_mac_4_1"].includes(item.imageName)) ? "d-p-card__image-modified_2" : (["WW_win_2_1", "WW_win_2_2", "WW_win_4_1", "WW_win_4_2"].includes(item.imageName) ? "d-p-card__image-modified" : "d-p-card__image")} onClick={()=>enlargeImage(item.imageName)}/></div>
                     </div>
                     {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
                   </>))}
