@@ -309,8 +309,8 @@ module.exports.initListeners = mySocket => {
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
-	mySocket.on("Jira_Projects", value => {
-		const dataToNode = JSON.stringify({"username": username, "onAction": "Jira_Projects", "value": value});
+	mySocket.on("Jira_details", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "Jira_details", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 

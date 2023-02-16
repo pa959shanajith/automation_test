@@ -446,7 +446,7 @@ exports.connectJira_ICE = function(req, res) {
 
                             function jira_login_4_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Jira_Projects"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", jira_login_4_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
@@ -454,7 +454,7 @@ exports.connectJira_ICE = function(req, res) {
                                             var soc = myserver.socketMapNotify[username];
                                             soc.emit("ICEnotAvailable");
                                         }
-                                    } else if (data.onAction == "Jira_Projects") {
+                                    } else if (data.onAction == "Jira_details") {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
