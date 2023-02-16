@@ -241,7 +241,7 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
 
     const WP_ITEM_LIST =  useMemo(()=>[
         {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
-        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Training document.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training document or choose <br/> "Training Document" from "Need Help" button.</>}
+        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Documentation.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch documentation or choose <br/> "Documentation" from "Need Help" button.</>}
     ],[trainLinks]);
 
     return(
@@ -260,7 +260,7 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
                             <div onClick={()=>{window.open(trainLinks.videos,'_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
                             <div onClick={()=>{window.open(trainLinks.docs,'_blank')
-                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div> 
+                                setShowHelp(false)}} ><Link to="#">Documentation</Link></div> 
                             <div onClick={()=>{window.location= `mailto:${trainLinks.support}`
                                 setShowHelp(false)}} ><Link to="#">Contact Us</Link></div>   
                         </div>
