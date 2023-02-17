@@ -6,7 +6,8 @@ const initialState = {
     popup: false,
     showGenuisWindow: false,
     geniusWindowProps: {},
-    showSmallPopup:false
+    showSmallPopup:false,
+    showTrialVideo:false,
 };
 
 const reducer = (state = initialState , action) => {
@@ -36,6 +37,12 @@ const reducer = (state = initialState , action) => {
             showSmallPopup:action.payload.showSmallPopup
 
             }
+        case actionTypes.OPEN_TRIAL_VIDEO:
+                return{
+                  ...state,
+                  showTrialVideo:action.payload.showTrialVideo
+      
+                  }
         default:
             return state;
     }

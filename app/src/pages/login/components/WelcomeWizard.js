@@ -423,14 +423,6 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         <button className="type1-button static-button" disabled={!tncAcceptEnabled} onClick={()=>{updateStepNumber(1)}}>I Agree</button>
     </div>
   };
-  const getVideoBg = ()=>{
-    return <div className={"welcomeInstall "+AnimationClassNames.slideDownIn20} style={{justifyContent:"unset !important"}}>
-    <video width="100%" height="375px" controls loop autoPlay >
-        <source src={videoUrl} type="video/mp4" />
-    </video>
-     <button className="type1-button static-button" style={{marginTop:"1rem"}} onClick={()=>{tcAction("Accept")}}>NEXT</button>
-    </div>
-  };
   const InstallationSteps_win = [
       {
         title:"Open the AvoAssureClient.exe file either from:", 
@@ -600,14 +592,14 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         <a href={docLink} target={"_blank"} referrerPolicy="no-referrer">Training Document</a>
                     </div> */}
                     <button className="type2-button" style={{marginTop: "2rem"}} onClick={() => {
-                        updateStepNumber(1);}}>Get Started</button>
+                       tcAction("Accept");}}>Get Started</button>
                 </div>
                 <button className="type1-button" data-type={"bordered"} onClick={()=>{updateStepNumber(-1)}}>Back</button>
             </div>
   }
 
   return (
-      <div className={"WW_container "+(activeStep>4?AnimationClassNames.fadeOut500:AnimationClassNames.fadeIn100)}>
+      <div className={"WW_container "+(activeStep>3?AnimationClassNames.fadeOut500:AnimationClassNames.fadeIn100)}>
         <div className="form">
         {showImage !== "" && <GetImageModal imageName = {showImage} /> } 
         <div className="progressbar">
@@ -639,7 +631,6 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
             {activeStep===1?getDownloadStep():null}
             {activeStep===2?afterDownloadInstructions():null}
             {activeStep===3?getStartTrialStep():null}
-            {activeStep===4?getVideoBg():null}
             {downloadPopover==="chrome" ?        
                 <div className="chrome-popover">
                     <div className='chrome-popover_body'>

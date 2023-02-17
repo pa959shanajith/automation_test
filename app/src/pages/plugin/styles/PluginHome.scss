@@ -104,3 +104,11 @@
         padding: 2% 10% 0 15%;
     }
 }
+.tranparentBlocker {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: 5;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+}
