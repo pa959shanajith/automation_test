@@ -513,8 +513,10 @@ exports.connectJira_ICE = function(req, res) {
                                     "inputs": inputs,
                                     "project_selected": {
                                         'project':req.body.project,
-                                        'key':req.body.key
-                                    }
+                                        'key':req.body.key,
+                                        "item_type":req.body.item_type
+                                    },
+                                    
                                 };
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
