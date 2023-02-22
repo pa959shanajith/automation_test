@@ -513,9 +513,9 @@ exports.connectJira_ICE = function(req, res) {
                                     "inputs": inputs,
                                     "project_selected": {
                                         'project':req.body.project,
-                                        'key':req.body.key,
-                                        "item_type":req.body.item_type
+                                        'key':req.body.key
                                     },
+                                    "item_type":req.body.item_type,
                                     
                                 };
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
@@ -734,8 +734,9 @@ exports.saveJiraDetails_ICE = async (req, res) => {
 				'projectid': itr.projectId,			
 				'projectName': itr.projectName,
 				'projectCode': itr.projectCode,
-				'testId': itr.testId,
-				'testCode': itr.testCode,
+				'itemId': itr.testId,
+				'itemCode': itr.testCode,
+                'itemType': itr.itemType,
 				"query": "saveJiraDetails_ICE"
 			};
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
