@@ -20,7 +20,7 @@ const JiraContent = props => {
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
     const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
     const selectedTC = useSelector(state=>state.integration.selectedTestCase);
-    const [projectId, setProjectId] = useState(null);
+    const [releaseId, setReleaseId] = useState(null);
     const [projectDetails , setProjectDetails]=useState({});
     const [avoProjects , setAvoProjects]= useState(null);
     const [scenarioArr , setScenarioArr] = useState(false);
@@ -162,6 +162,7 @@ const JiraContent = props => {
 
     
     const jiraTest = async(e) => {
+        
         if(e.target.tilte !== "Select Project"){
             let projectName = ""
             let projectID = ''
@@ -192,6 +193,8 @@ const JiraContent = props => {
                 
                 }
                 const testData = await api.getJiraTestcases_ICE(jira_info)
+                console.log(testData)
+                
                 setTestCaseData(testData.testcases)
     }
 
@@ -343,7 +346,7 @@ const JiraContent = props => {
                         <option value="Select Project" disabled >Select Project</option>
                         {  props.domainDetails ? 
                             
-                            props.domainDetails.projects.map(e => (<option key={e.id} value={e.code} title={e.name} onChange={(e)=> {setProjectId(e.target.value) }} >{e.name} </option>)) : null
+                            props.domainDetails.projects.map(e => (<option key={e.id} value={e.code} title={e.name}>{e.name} </option>)) : null
                             
                         }
                        
@@ -353,11 +356,11 @@ const JiraContent = props => {
 
 
                      selectWorkitem={
-                        <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{callProjectDetails_ICE(e);handleSecondOptionChange(e);jiraTestIssue(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
+                        <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{handleSecondOptionChange(e);jiraTestIssue(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
                             <option value="Select WorkItems"  >Select WorkItems</option>
                             {  props.domainDetails ? 
                                 
-                                props.domainDetails.issue_types.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setProjectId(e.target.value) }} >{e.name} </option>)) : null
+                                props.domainDetails.issue_types.map(e => (<option key={e.id} value={e.code} title={e.name} onChange={(e)=> {setReleaseId(e.target.value) }} >{e.name}  </option>)) : null
                                 
                             }
                            
@@ -366,6 +369,24 @@ const JiraContent = props => {
                        
                          
                      
+                    //  selectWorkitem={
+                    //     <select data-test="intg_jira_workitem_drpdwn" value={selectedRel} onChange={onSelect} className="qcSelectDomain" style={{marginRight : "5px"}} disabled>
+                    //         <option value="Select Release" disabled>Select Workitem</option>
+                    //         {   releaseArr.length &&
+                    //             releaseArr.map(e => (
+                    //                 <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
+                    //             ))
+                    //         }
+                    //         {/* {
+                    //              <option value="Select Release"  >Select UserStory</option>
+                                 
+                    //         }
+                    //         {
+                    //              <option value="Select Release"  >Select TestCase</option>
+                    //         } */}
+                    //     </select>
+                        
+                    // }
             
                 selectScenarioProject={
                     <select data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
@@ -379,7 +400,7 @@ const JiraContent = props => {
                     </select>
                 }
                 testList={
-                    <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>jiraTest(e)} className="qtestAvoAssureSelectProject">
+                    <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>{callProjectDetails_ICE(e);jiraTest(e);onProjectSelect(e);handleFirstOptionChange(e)}} className="qtestAvoAssureSelectProject">
                     {
                         testCaseData ?
                         testCaseData.map((e,i)=>(
