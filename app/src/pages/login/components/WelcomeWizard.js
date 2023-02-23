@@ -501,7 +501,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       return <div className={"welcomeInstall "+(animationDir?AnimationClassNames.slideRightIn400:AnimationClassNames.slideLeftIn400)} style={{justifyContent:"space-evenly"}}>
         <div className="d-p-header">
             <div className="d-p-header__title"><div>Thanks for downloading !</div></div>
-            <div className="d-p-header__subtitle">If your download didn't start you can download it from <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
+            <div className="d-p-header__subtitle">If your download didn't start you can download it from the <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
         </div>
         <div className="installation-instructions-container">
             <div className="d-p-card-container">

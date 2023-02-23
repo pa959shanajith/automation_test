@@ -84,9 +84,15 @@ const Genius = (props) => {
       setSelectedModule(null);
       setSelectedScenario(null);
       setAppType(null);
-      setNavURL("");
+      if(!userInfo.isTrial){
+        setNavURL("")
+       }
       setSelectedBrowser("chrome");
     }
+    count=0
+  }
+  else if (data==="resetCount"){
+    count=0
   }
     else if (data === "disconnect") {
       setLoading(false);
@@ -95,7 +101,9 @@ const Genius = (props) => {
       setSelectedModule(null);
       setSelectedScenario(null);
       setAppType(null);
-      setNavURL("");
+      if(!userInfo.isTrial){
+        setNavURL("")
+       }
       setSelectedBrowser("chrome");
       }
     }
@@ -172,14 +180,14 @@ const Genius = (props) => {
         const currentScnToDelete=modScenarios.filter(scn=>scn.name===selectedScenario.text)
        scrnids=currentScnToDelete[0].children.map((screen,idx)=>{
          return screen._id
-})
+       })
 const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
   screen.children.map((testcase,id)=>{
   testcaseids.push(testcase._id)
  })
 })
   await deleteScenario({scenarioIds:[],screenIds:scrnids,testcaseIds:testcaseids})
-      }
+    }
           
       var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
       const completeScenraioDetials=moduledata.children
@@ -773,7 +781,9 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
     setSelectedModule(null);
     setSelectedScenario(null);
     setAppType(null);
+    if(!userInfo.isTrial){
     setNavURL("");
+    }
     setSelectedBrowser("chrome");
   }
   
@@ -1001,7 +1011,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
             <TextField
               label="Application URL"
               onChange={(e) => { setNavURL(e.target.value) }}
-              placeholder="https://www.google.com"
+              placeholder="URL:"
               standard
               value={navURL}
               width="300px"
