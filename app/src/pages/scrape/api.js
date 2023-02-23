@@ -28,7 +28,7 @@ export const initScraping_ICE = screenViewObject => {
     });
 }
 
-export const highlightScrapElement_ICE = (xpath, objurl, appType) => {
+export const highlightScrapElement_ICE = (xpath, objurl, appType, top, left, width, height) => {
     return new Promise((resolve, reject)=> {
         axios(url+"/highlightScrapElement_ICE", {
             method: 'POST',
@@ -38,7 +38,11 @@ export const highlightScrapElement_ICE = (xpath, objurl, appType) => {
             data : {"action": "highlightScrapElement_ICE",
                     "elementXpath": xpath, 
                     "elementUrl": objurl,
-                    "appType": appType
+                    "appType": appType,
+                    "top": top,
+                    "left": left,
+                    "width": width,
+                    "height": height
                 },
             credentials : 'include',
         })
