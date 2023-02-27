@@ -30,15 +30,13 @@ const PluginBox = ({pluginName, pluginTitle}) => {
       return
     }
 		pluginName = pluginName.split(' ').join('').toLowerCase();
-    if (pluginName !== "genius")
-		    window.localStorage['navigateScreen'] = pluginName;
-			if (pluginName === "MR") {
+			if (pluginName === "mr") {
 				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
 				window.localStorage['integrationScreenType'] = null
 				window.localStorage['navigateScreen'] = 'reports';
 				setRedirectTo('/reports') 
 			}
-			else if (pluginName === "MD") {
+			else if (pluginName === "md") {
 				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
 				window.localStorage['integrationScreenType'] = null
 				window.localStorage['navigateScreen'] = 'dashboard';
@@ -49,7 +47,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 				window.localStorage['navigateScreen'] = 'integration';
 				setRedirectTo('/integration') 
 			}
-			else if (pluginName === "STAVO") {
+			else if (pluginName === "stavo") {
 				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
 				window.localStorage['integrationScreenType'] = null
 				window.localStorage['navigateScreen'] = 'seleniumtoavo';
