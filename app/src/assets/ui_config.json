@@ -1,12 +1,12 @@
 {
   "pluginData":{
-    "integration":{
+    "almdmt":{
       "tooltip":{
         "generic":"Configure Avo Assure to integrate with external systems"
       },
       "availableForTrial":false
     },
-    "utility":{
+    "de":{
       "tooltip":{
         "generic":"Utilities for encryption and data tables"
       },
@@ -18,19 +18,19 @@
       },
       "availableForTrial":true
     },
-    "reports":{
+    "mr":{
       "tooltip":{
         "generic":"View, analyze and export executed test scenarios "
       },
       "availableForTrial":true
     },
-    "dashboard":{
+    "md":{
       "tooltip":{
         "generic":"Create, view and manage your test automation dashboard"
       },
       "availableForTrial":false
     },
-    "seleniumtoavo":{
+    "stavo":{
       "tooltip":{
         "generic":"This is selenium to avo"
       }
@@ -56,7 +56,7 @@
       },
       "availableForTrial":false
     },
-    "genius":{
+    "ags":{
       "tooltip":{
         "generic":"Smart recorder to capture your end-to-end test scenario"
       },
