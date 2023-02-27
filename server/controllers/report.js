@@ -676,7 +676,7 @@ exports.getReport_API = async (req, res) => {
         finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo).report;
+            const report = prepareReportData(reportInfo,'prepareDevopsReport').report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
