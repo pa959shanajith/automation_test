@@ -515,7 +515,7 @@ exports.connectJira_ICE = function(req, res) {
                                         'project':req.body.project,
                                         'key':req.body.key
                                     },
-                                    "item_type":req.body.item_type,
+                                    "itemType":req.body.itemType,
                                     
                                 };
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
@@ -720,6 +720,7 @@ exports.getReport_API = async (req, res) => {
 
 
 exports.saveJiraDetails_ICE = async (req, res) => {
+    
 	const fnName = "saveJiraDetails_ICE";
 	logger.info("Inside UI service: " + fnName);
     // console.log(req.body);
@@ -1156,6 +1157,7 @@ function projectandscenario(projectid, cb) {
 					} else {
 						projectDetails.project_id = projectid;
 						projectDetails.project_name = projectname;
+
 					}
 				}
 				callback1();
