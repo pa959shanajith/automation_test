@@ -7,14 +7,12 @@ const PluginSection = ({userInfo}) => {
 
     const [pluginList, setPluginList] = useState({
         "iTDM": {title:"iTDM", show: false},
-        "Reports": { title: "Reports", show: false},
-        "Dashboard": {title:"Dashboard", show: false},
-        "Utility" : { title: "Utilities", show: false},
-        "Integration": { title: "Integrations", show: false },
-        "Mindmap": { title: "Mindmaps", show: false },
-        "Neuron Graphs": {title:"Neuron Graphs", show: false},
-        "Selenium To Avo": {title:"Selenium To Avo", show: false},
-        "Avo Discover": {title:"Avo Discover", show: false},
+        "MR": { title: "Reports", show: false},
+        "MD": {title:"Dashboard", show: false},
+        "DE" : { title: "Utilities", show: false},
+        "ALMDMT": { title: "Integrations", show: false },
+        "AGS":{ title: "Avo Genius", show: false },
+        "STAVO":{ title: "Selenium To Avo", show: false },
         "showList" : false,
     });
 
@@ -31,9 +29,12 @@ const PluginSection = ({userInfo}) => {
                     // else tempList[pluginName] = { title: pluginName, show: true};
                 // }
             }
-            tempList["Avo Discover"].show = false;
-            tempList["Mindmap"].show = false;
-            tempList["Selenium To Avo"].show = false;
+            // tempList["Avo Discover"].show = false;
+            // tempList["Mindmap"].show = false;
+            // tempList["Selenium To Avo"].show = false;
+            tempList["AGS"].show = true;
+            tempList["DE"].show = true;
+            tempList["MR"].show = true;
             tempList.showList = true;
             setPluginList(tempList);
         }
@@ -41,35 +42,7 @@ const PluginSection = ({userInfo}) => {
 
     return(
         <div data-test="plugins-section" className="plugin-section">
-            {/* <div data-test="available-plugins-title" className="avail-plugin-title">Get Started</div> */}
-            {/* <div data-test="plugins-blocks" className="plugin-blocks" data-value="get-started"> */}
-            {/* <Fragment key={"Genius"} >
-                  {
-                      <PluginBox 
-                          pluginName={"Genius"} 
-                          pluginTitle={"Avo Genius"}
-                      />
-                  }
-            </Fragment> */}
-            {/* <Fragment key={"Mindmap"} >
-                  {
-                      <PluginBox 
-                          pluginName={"Mindmap"} 
-                          pluginTitle={"Design Studio"}
-                      />
-                  }
-            </Fragment> */}
-            {/* </div> */}
-            {/* <div data-test="available-plugins-title" className="avail-plugin-title" style={{marginTop:"30px"}}>Available Plugins</div> */}
-            <div data-test="plugins-blocks" className="plugin-blocks">
-                <Fragment key={"Genius"} >
-                    {
-                        <PluginBox 
-                            pluginName={"Genius"} 
-                            pluginTitle={"Avo Genius"}
-                        />
-                    }
-                </Fragment>
+                <div data-test="plugins-blocks" className="plugin-blocks">
 
                 {
                     pluginList.showList && Object.keys(pluginList).map(pluginName =>
