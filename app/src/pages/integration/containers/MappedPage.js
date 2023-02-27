@@ -99,11 +99,11 @@ const MappedPage = props =>{
                     mappedScenarios = mappedScenarios + object.testscenarioname.length;
                     mappedTests = mappedTests + 1;
                     tempRow.push({
-                        'testCaseNames': object.testCode, 
+                        'testCaseNames': object.itemCode, 
                         'scenarioNames': object.testscenarioname,
                         'mapId': object._id,
                         'scenarioId': object.testscenarioid,
-                        'testid':object.testId
+                        'testid':object.itemId
                     });
                 });
                 setCounts({
