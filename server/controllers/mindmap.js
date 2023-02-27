@@ -14,6 +14,12 @@ var epurl = process.env.DAS_URL;
 var client = new Client();
 const configpath= require('../config/options');
 
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
+
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function (workbook, sheetname) {
 	var result = [];
@@ -461,6 +467,7 @@ exports.saveData = async (req, res) => {
 				"delete": tasks_remove,
 				"action": "modify"
 			}
+			inputs.host = headers.headers.host;
 			var args={
 				data: inputs,
 				headers: {

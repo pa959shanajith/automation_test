@@ -32,25 +32,38 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 		pluginName = pluginName.split(' ').join('').toLowerCase();
     if (pluginName !== "genius")
 		    window.localStorage['navigateScreen'] = pluginName;
-		if(['dashboard', 'neurongraphs', 'seleniumtoavo', "reports"].includes(pluginName)){
-			window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
-			window.location.href = "/"+ pluginName;
-		}
-		else if (['report', 'performancetesting'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
-		else if(pluginName === "avodiscover"){
-			//calling a function to redirect to Avo Discover
-			openDiscover();
-		}
-		else if (pluginName === "integration") {
-			window.localStorage['integrationScreenType'] = null
-			setRedirectTo(`/${pluginName}`) 
-		}
-		//All the plugins that require direct Redirect
-		else if(['mindmap','utility'].includes(pluginName)){
-			setRedirectTo(`/${pluginName}`) 
-		}
-    else if (pluginName === "genius") {
-			dispatch({type:actionTypesGlobal.OPEN_GENIUS,payload:{showGenuisWindow:true,geniusWindowProps:{}}}) 
+			if (pluginName === "MR") {
+				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
+				window.localStorage['integrationScreenType'] = null
+				window.localStorage['navigateScreen'] = 'reports';
+				setRedirectTo('/reports') 
+			}
+			else if (pluginName === "MD") {
+				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
+				window.localStorage['integrationScreenType'] = null
+				window.localStorage['navigateScreen'] = 'dashboard';
+				setRedirectTo('/dashboard') 
+			}
+			else if (pluginName === "almdmt") {
+				window.localStorage['integrationScreenType'] = null
+				window.localStorage['navigateScreen'] = 'integration';
+				setRedirectTo('/integration') 
+			}
+			else if (pluginName === "STAVO") {
+				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
+				window.localStorage['integrationScreenType'] = null
+				window.localStorage['navigateScreen'] = 'seleniumtoavo';
+				setRedirectTo('/seleniumtoavo') 
+			}
+			else if (pluginName === "de") {
+				window.localStorage['integrationScreenType'] = null
+				window.localStorage['navigateScreen'] = 'utility';
+				setRedirectTo('/utility') 
+			}
+			else if (pluginName === "ags") {
+					dispatch({type:actionTypesGlobal.OPEN_GENIUS,payload:{showGenuisWindow:true,geniusWindowProps:{}
+					}}
+					) 
       return
 		}
 		else {
@@ -65,7 +78,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 		<>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
             <div data-test="plugin-blocks" className={"plugin-block " +(disabled?"disabled-plugin":"")} title={pluginData[pluginName.split(' ').join('').toLowerCase()]["tooltip"]["generic"]} onClick={pluginRedirect}>
-                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}${pluginName==="Genius"?userInfo.isTrial?"_cloud":"":""}.svg`} />
+                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}${pluginName==="AGS"?userInfo.isTrial?"_cloud":"":""}.svg`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
                 {disabled?
                   <div className='disabled-info'><i class="fa fa-lock fa-fw" style={{color:"#ffcc62",paddingLeft:1,fontSize:9, marginRight:4}} aria-hidden="true"></i>Premium</div>

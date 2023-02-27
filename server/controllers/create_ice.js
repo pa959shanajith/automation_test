@@ -8,6 +8,11 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = process.env.DAS_URL;
 
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
 //Create Structure
 exports.saveMindmap = function(req,res) {
 	logger.info("Inside UI service: saveMindmap");
@@ -19,6 +24,7 @@ exports.saveMindmap = function(req,res) {
 	var inputs = {
 		"data": RequestedJSON 
 	};
+	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {
@@ -47,6 +53,7 @@ exports.saveMindmapE2E = function(req,res) {
 	var inputs = {
 		"data": RequestedJSON 
 	};
+	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {
@@ -93,6 +100,7 @@ exports.getProjectType = function (req, res) {
 	var inputs = {
 		"projectid": project_id
 	};
+	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {
@@ -135,6 +143,7 @@ exports.submitTask = function (req, res) {
 		'username': req.user,
 		'versionnumber': req.versionnumber
 	};
+	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {

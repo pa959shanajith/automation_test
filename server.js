@@ -171,6 +171,34 @@ if (cluster.isMaster) {
 			next();
 		});
 
+		app.use((req, res, next) => {
+			const utils = require('./server/lib/utils');
+			const admin = require('./server/controllers/admin');
+			const create_ice = require('./server/controllers/create_ice');
+			const design = require('./server/controllers/design');
+			const flowGraph = require('./server/controllers/flowGraph');
+			const mindmap = require('./server/controllers/mindmap');
+			const pdintegration = require('./server/controllers/pdintegration');
+			const qtest = require('./server/controllers/qtest');
+			const qualityCenter = require('./server/controllers/qualityCenter');
+			const report = require('./server/controllers/report');
+			const zephyr = require('./server/controllers/zephyr');
+			const executionInvoker = require('./server/lib/execution/executionInvoker');
+			req.session.executionInvoker = executionInvoker.setReq(req)
+			req.session.zephyr = zephyr.setReq(req)
+			req.session.report = report.setReq(req)
+			req.session.qualityCenter = qualityCenter.setReq(req)
+			req.session.qtest = qtest.setReq(req)
+			req.session.pdintegration = pdintegration.setReq(req)
+			req.session.mindmap = mindmap.setReq(req)
+			req.session.flowGraph = flowGraph.setReq(req)
+			req.session.design = design.setReq(req)
+			req.session.create_ice = create_ice.setReq(req)
+			req.session.utils = utils.setReq(req)
+			req.session.admin = admin.setReq(req)
+			next();	
+		});
+
 		// For Selecting Authentication Strategy and adding required routes
 		const authlib = require("./server/lib/auth");
 		const authconf = authlib();

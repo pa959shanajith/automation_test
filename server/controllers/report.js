@@ -13,6 +13,11 @@ var path = require('path');
 const tokenAuth = require('../lib/tokenAuth')
 const constants = require('../lib/execution/executionConstants');
 
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
 const formatDate = (date) => {
     if (!date || date == ""){
         return false;
@@ -676,7 +681,7 @@ exports.getReport_API = async (req, res) => {
         finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo,'prepareDevopsReport').report;
+            const report = prepareReportData(reportInfo).report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
@@ -1059,6 +1064,7 @@ function getProjectsForUser(userid, cb) {
 				"userid": userid,
 				"query": "getprojectDetails"
 			};
+            inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -1108,6 +1114,7 @@ function projectandscenario(projectid, cb) {
 				"projectid": projectid,
 				"query": "projectname1"
 			};
+            inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -1133,6 +1140,7 @@ function projectandscenario(projectid, cb) {
 				"projectid": projectid,
 				"query": "scenariodata"
 			};
+            inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {

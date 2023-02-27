@@ -9,6 +9,12 @@ var client = new Client();
 var jwt = require('jsonwebtoken')
 var utils = require('../lib/utils');
 
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
+
 //PD import
 exports.pdProcess = function (req, res) {
 	try {
@@ -149,6 +155,7 @@ exports.pdProcess = function (req, res) {
 				'createdthrough':'PD',
 				'scrapedata': screendataobj[name].data
 			};
+			inputs.host = headers.headers.host;
 			ordernameidlist.push({'name':'Screen_'+name,'type':3})
 
 			var args = {
@@ -185,6 +192,7 @@ exports.pdProcess = function (req, res) {
 								'dataobjects':dobjects,
 								'steps':screendataobj[name].script
 							};
+							inputs.host = headers.headers.host;
 							ordernameidlist.push({'name':'Testcase_'+name,'type':4})
 							var args = {
 								data: inputs,

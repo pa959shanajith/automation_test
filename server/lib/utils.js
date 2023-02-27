@@ -127,7 +127,18 @@ module.exports.approvalStatusCheck = async executionData => {
 	return data;
 };
 
+module.exports.setReq = async (req) =>
+{
+	this.avoreq=req;
+}
+
+
 const fetchData = async (inputs, url, from, all) => {
+	if(this.avoreq != null)
+	{
+		if(Array.isArray(inputs)) inputs.push({"host":this.avoreq.headers.host});
+		else inputs.host = this.avoreq.headers.host;
+	}
 	let args = (inputs.headers)? inputs : {
 		data: inputs,
 		headers: {

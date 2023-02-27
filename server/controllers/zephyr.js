@@ -13,7 +13,11 @@ var utils = require('../lib/utils');
 var xlsx = require('xlsx');
 var xl = require('excel4node');
 
-
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function (workbook, sheetname) {
 	var result = [];
@@ -495,6 +499,7 @@ function fetchParentIds(userid, treeid, parentid, cb){
 				"parentid": parentid,
 				"query": "zephyrdetails"
 			};
+			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -570,6 +575,7 @@ function updateTest(mappedTest, testNames, testIds, selectedPhase, mappedTestIds
 					'oldreleaseid':mappedReleaseId,
 					"query": "saveZephyrDetails_ICE"
 				};
+				inputs.host = headers.headers.host;
 				var args = {
 					data: inputs,
 					headers: {
@@ -767,6 +773,7 @@ function getProjectsForUser(userid, cb) {
 				"userid": userid,
 				"query": "getprojectDetails"
 			};
+			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -816,6 +823,7 @@ function projectandscenario(projectid, cb) {
 				"projectid": projectid,
 				"query": "projectname1"
 			};
+			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -841,6 +849,7 @@ function projectandscenario(projectid, cb) {
 				"projectid": projectid,
 				"query": "scenariodata"
 			};
+			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -935,6 +944,7 @@ function getProjectsAndModules(userid,cb){
     async.series({
         getprojectDetails:function(callback){
             var inputs = {"userid":userid,"query":"getprojectDetails"};
+			inputs.host = headers.headers.host;
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}                
@@ -976,6 +986,7 @@ function projectandmodule(projectid,cb,data){
     async.series({
         projectname1 : function(callback1){
             var inputs = {"projectid":projectid,"query":"projectname1"};
+			inputs.host = headers.headers.host;
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}
