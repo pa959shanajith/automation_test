@@ -21,6 +21,9 @@ const PluginSection = ({userInfo}) => {
             let tempList = { ...pluginList };
             let availablePlugins = userInfo.pluginsInfo;
             let pluginsLength = availablePlugins.length;
+            tempList["AGS"].show = true;
+            tempList["DE"].show = true;
+            tempList["MR"].show = true;
             for(let i=0 ; i < pluginsLength ; i++){
                 // if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
@@ -32,9 +35,6 @@ const PluginSection = ({userInfo}) => {
             // tempList["Avo Discover"].show = false;
             // tempList["Mindmap"].show = false;
             // tempList["Selenium To Avo"].show = false;
-            tempList["AGS"].show = true;
-            tempList["DE"].show = true;
-            tempList["MR"].show = true;
             tempList.showList = true;
             setPluginList(tempList);
         }
