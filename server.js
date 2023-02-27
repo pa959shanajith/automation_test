@@ -206,6 +206,7 @@ if (cluster.isMaster) {
 
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
+    var plugin = require('./server/controllers/plugin');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -218,6 +219,7 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
+		app.post('/getGeniusData',plugin.getGeniusData);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -260,12 +262,12 @@ if (cluster.isMaster) {
 
 		//Only Test Engineer and Test Lead have access
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
-			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
+			var roles = ["Test Lead", "Test Engineer", "Test Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings|genius)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -335,7 +337,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/getClientConfig', (req,res) => {
-			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl,"customerSupportEmail":uiConfig.customerSupportEmail,"videoTrialUrl":uiConfig.videoTrialUrl})
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {
@@ -370,7 +372,6 @@ if (cluster.isMaster) {
 		var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
 		var designscreen = require('./server/controllers/designscreen');
-		var plugin = require('./server/controllers/plugin');
 		var utility = require('./server/controllers/utility');
 		var qc = require('./server/controllers/qualityCenter');
 		var qtest = require('./server/controllers/qtest');
@@ -404,6 +405,7 @@ if (cluster.isMaster) {
 		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
 		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		app.post('/deleteScenarioETE', auth.protect, mindmap.deleteScenarioETE);
+		app.post('/exportToProject', auth.protect, mindmap.exportToProject);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -505,11 +507,18 @@ if (cluster.isMaster) {
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
 		app.post('/testSuitesSchedulerRecurring_ICE', auth.protect, suite.testSuitesSchedulerRecurring_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
+		app.post('/getScheduledDetailsOnDate_ICE', auth.protect, suite.getScheduledDetailsOnDate_ICE);
 		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
+		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
+		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
+		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);
 		//Plugin Routes
+		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
+        app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
+        app.post('/getUsers_ICE', auth.protect, plugin.getUsers_ICE)
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', auth.protect, taskbuilder.updateTaskstatus_mindmaps);

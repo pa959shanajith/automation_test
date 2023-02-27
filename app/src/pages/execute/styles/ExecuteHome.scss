@@ -12,10 +12,11 @@
 .e__mid_section{
     display: flex;
     flex: auto;
+    flex-direction: column;
     width: 100%;
     background-color: rgb(255, 255, 255);
     margin: 0;
-    padding: 0;
+    padding: 1%;
 }
 
 .e__footer .main-footer{

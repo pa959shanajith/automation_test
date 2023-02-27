@@ -23,6 +23,7 @@ import "../styles/TableRow.scss";
 */
 
 const TableRow = (props) => {
+
     const rowRef = useRef(null);
     const [checked, setChecked] = useState(false);
     const [objName, setObjName] = useState(null);
@@ -32,7 +33,6 @@ const TableRow = (props) => {
     const [output, setOutput] = useState('');
     const [inputPlaceholder, setInputPlaceholder] = useState('');
     const [outputPlaceholder, setOutputPlaceholder] = useState('');
-    const [tooltip, setTooltip] = useState(null);
     const [keywordList, setKeywordList] = useState(null);
     const [focused, setFocused] = useState(false);
     const [commented, setCommented] = useState(false);
@@ -55,7 +55,6 @@ const TableRow = (props) => {
             setOutput(props.testCase.outputVal);
             setInputPlaceholder(null);
             setOutputPlaceholder(null);
-            setTooltip(props.testCase.tooltip);
             setKeywordList(null);
             setTcAppType(props.testCase.appType);
             // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,7 +153,6 @@ const TableRow = (props) => {
         setObjType(caseData.obType);
         setOutputPlaceholder(placeholders.outputval);
         setInputPlaceholder(placeholders.inputval);
-        setTooltip(placeholders.tooltip?placeholders.tooltip:null);
         setObjName(event.target.value)
         setKeyword(caseData.keywords[0]);
         setTcAppType(caseData.appType);
@@ -167,7 +165,6 @@ const TableRow = (props) => {
         setOutput("");
         setOutputPlaceholder(placeholders.outputval);
         setInputPlaceholder(placeholders.inputval);
-        setTooltip(placeholders.tooltip?placeholders.tooltip:null);
         setKeyword(event.target.value);
     };
 
@@ -201,7 +198,7 @@ const TableRow = (props) => {
                     <div className="d__row_text" title={objName} >{objName}</div>
                     }
                 </span>
-                <span className="keyword_col" >
+                <span className="keyword_col" title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
                     { focused ? 
                     <>
                         <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} disabled={disableStep}>
@@ -222,7 +219,7 @@ const TableRow = (props) => {
                     <div className="d__row_text" title={output}>{output}</div> }
                 </span>
             </div>
-            <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span>
+            {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
             <span className={"details_col"+(disableStep? " d__disabled_step":"")} onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>{props.showDetailDialog(props.idx); setFocused(false)}} /></span>
         </div>
         </>

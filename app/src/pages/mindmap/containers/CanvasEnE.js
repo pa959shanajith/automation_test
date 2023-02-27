@@ -43,7 +43,7 @@ const CanvasEnE =(props)=>{
     const [dLinks,setdLinks] = useState([])
     const [sections,setSection] =  useState({})
     const [ctScale,setCtScale] = useState({})
-    const [verticalLayout,setVerticalLayout] = useState(false)
+    const [verticalLayout,setVerticalLayout] = useState(true)
     const [createnew,setCreateNew] = useState(false)
     const scenarioList = useSelector(state=>state.mindmap.scenarioList)
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
@@ -72,11 +72,12 @@ const CanvasEnE =(props)=>{
                     }
                 }
                 
-            } 
+            }
             (async()=>{
                 setBlockui({show:true,content:'Loading ...'})
                 var res = await deleteScenarioETE({scenarioIds:scenarioIds,parentIds:parentIds})
-                if(res.error){displayError(res.error);return;}                 
+                if(res.error){displayError(res.error);setBlockui({show:false});return;}  
+
                 dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
                 setBlockui({show:false})
                 setMsg(MSG.MINDMAP.SUCC_REMOVED_SCENARIO)                
@@ -85,12 +86,12 @@ const CanvasEnE =(props)=>{
         }
     },[deletedNodes]
     )
-    useEffect(()=>{
-        //useEffect to clear redux data selected module on unmount
-        return ()=>{
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        }
-    },[dispatch])
+    // useEffect(()=>{
+    //     //useEffect to clear redux data selected module on unmount
+    //     return ()=>{
+    //         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+    //     }
+    // },[dispatch])
     useEffect(()=>{
         var tree;
         count = {
@@ -204,10 +205,10 @@ const CanvasEnE =(props)=>{
     }
     return (
         <Fragment>
-            <Legends isEnE={true}/>
+            {/* <Legends isEnE={true}/> */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            <SaveMapButton createnew={createnew} isEnE={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
+            <SaveMapButton createnew={createnew} isEnE={true} verticalLayout={setVerticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
@@ -217,7 +218,7 @@ const CanvasEnE =(props)=>{
                 })}
                 {Object.entries(nodes).map((node)=>
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                        <image  onClick={(e)=>nodeClick(e)} style={{height:'40px',width:'40px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                         <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='scenarios')?

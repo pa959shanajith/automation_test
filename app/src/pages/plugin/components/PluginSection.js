@@ -6,15 +6,15 @@ import PropTypes from 'prop-types';
 const PluginSection = ({userInfo}) => {
 
     const [pluginList, setPluginList] = useState({
-        "Integration": { title: "Integrations", show: false },
-        "Utility" : { title: "Utilities", show: false},
-        "Mindmap": { title: "Mindmaps", show: false },
-        "Neuron Graphs": {title:"Neuron Graphs", show: false},
+        "iTDM": {title:"iTDM", show: false},
         "Reports": { title: "Reports", show: false},
         "Dashboard": {title:"Dashboard", show: false},
+        "Utility" : { title: "Utilities", show: false},
+        "Integration": { title: "Integrations", show: false },
+        "Mindmap": { title: "Mindmaps", show: false },
+        "Neuron Graphs": {title:"Neuron Graphs", show: false},
         "Selenium To Avo": {title:"Selenium To Avo", show: false},
         "Avo Discover": {title:"Avo Discover", show: false},
-        "iTDM": {title:"iTDM", show: false},
         "showList" : false,
     });
 
@@ -32,6 +32,8 @@ const PluginSection = ({userInfo}) => {
                 // }
             }
             tempList["Avo Discover"].show = false;
+            tempList["Mindmap"].show = false;
+            tempList["Selenium To Avo"].show = false;
             tempList.showList = true;
             setPluginList(tempList);
         }
@@ -39,8 +41,36 @@ const PluginSection = ({userInfo}) => {
 
     return(
         <div data-test="plugins-section" className="plugin-section">
-            <div data-test="available-plugins-title" className="avail-plugin-title">Available Plugins</div>
+            {/* <div data-test="available-plugins-title" className="avail-plugin-title">Get Started</div> */}
+            {/* <div data-test="plugins-blocks" className="plugin-blocks" data-value="get-started"> */}
+            {/* <Fragment key={"Genius"} >
+                  {
+                      <PluginBox 
+                          pluginName={"Genius"} 
+                          pluginTitle={"Avo Genius"}
+                      />
+                  }
+            </Fragment> */}
+            {/* <Fragment key={"Mindmap"} >
+                  {
+                      <PluginBox 
+                          pluginName={"Mindmap"} 
+                          pluginTitle={"Design Studio"}
+                      />
+                  }
+            </Fragment> */}
+            {/* </div> */}
+            {/* <div data-test="available-plugins-title" className="avail-plugin-title" style={{marginTop:"30px"}}>Available Plugins</div> */}
             <div data-test="plugins-blocks" className="plugin-blocks">
+                <Fragment key={"Genius"} >
+                    {
+                        <PluginBox 
+                            pluginName={"Genius"} 
+                            pluginTitle={"Avo Genius"}
+                        />
+                    }
+                </Fragment>
+
                 {
                     pluginList.showList && Object.keys(pluginList).map(pluginName =>
                         <Fragment key={pluginName} >

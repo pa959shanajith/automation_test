@@ -23,13 +23,15 @@ import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, Mod
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ScrapeScreen.scss';
+import { Dialog } from 'primereact/dialog';
 
-const ScrapeScreen = ()=>{
+const ScrapeScreen = (props)=>{
     const dispatch = useDispatch();
     const history = useHistory();
     const current_task = useSelector(state=>state.plugin.CT);
     const certificateInfo = useSelector(state=>state.scrape.cert);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
+    const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
     const [overlay, setOverlay] = useState(null);
     const [showPop, setShowPop] = useState("");
@@ -45,13 +47,18 @@ const ScrapeScreen = ()=>{
     const [showObjModal, setShowObjModal] = useState(false);
     const [newScrapedData, setNewScrapedData] = useState({});
     const [orderList, setOrderList] = useState([]);
+    const [displayModal, setDisplayModal] = useState(false);
+    const [showTeststeps , setshowTeststeps]=useState([]);
+    const [displayTest , setdisplayTest]=useState({});
 
     useEffect(() => {
-        if(Object.keys(current_task).length !== 0) {
+        // if(Object.keys(current_task).length !== 0) {
             fetchScrapeData()
-            .then(data => setIsUnderReview(current_task.status === "underReview"))
+            .then(data => {
+                // setIsUnderReview(current_task.status === "underReview")
+            })
             .catch(error=> console.log(error));
-        }
+        // }
         //eslint-disable-next-line
     }, [current_task])
 
@@ -86,12 +93,14 @@ const ScrapeScreen = ()=>{
             let viewString = scrapeItems;
             let haveItems = viewString.length !== 0;
 
-            scrapeApi.getScrapeDataScreenLevel_ICE(current_task.appType, current_task.screenId, current_task.projectId, current_task.testCaseId)
+            // (type, screenId, projectId, testCaseId:optional)
+            scrapeApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails["_id"], props.fetchingDetails.projectID, "")
             .then(data => {
-                if (current_task.subTask === "Scrape") setScrapedURL(data.scrapedurl);
+                // current_task.subTask === "Scrape" (not sure !!)
+                if (data.scrapedurl) setScrapedURL(data.scrapedurl);
                 
                 if (data === "Invalid Session") return RedirectPage(history);
-                else if (typeof data === "object" && current_task.appType!=="Webservice") {
+                else if (typeof data === "object" && props.appType!=="Webservice") {
                     haveItems = data.view.length !== 0;
                     let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
 
@@ -106,7 +115,7 @@ const ScrapeScreen = ()=>{
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                     dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                 }
-                else if (typeof data === "object" && current_task.appType==="Webservice"){
+                else if (typeof data === "object" && props.appType==="Webservice"){
                     haveItems = data.endPointURL && data.method;
                     if (haveItems) {
                         
@@ -164,7 +173,7 @@ const ScrapeScreen = ()=>{
     }
 
     const startScrape = (browserType, compareFlag, replaceFlag) => {
-        let appType = current_task.appType;
+        let appType = props.appType;
         if (appType === "Webservice") {
             let arg = {}
             let testCaseWS = []
@@ -240,7 +249,7 @@ const ScrapeScreen = ()=>{
                 setShowObjModal(false);
             };
 
-            screenViewObject = getScrapeViewObject(appType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
+            screenViewObject = getScrapeViewObject(props.appType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
             setShowAppPop(false);
             setOverlay(blockMsg);
 
@@ -379,35 +388,102 @@ const ScrapeScreen = ()=>{
         setScrapeItems([...scrapeItems, ...newList])
     }
 
+    const dialogFuncMapS = {
+        'displayModal': setDisplayModal
+    }
+    const onClick = (name) => {
+        dialogFuncMapS[`${name}`](true);
+    }
+
+    const onHide = (name) => {
+        dialogFuncMapS[`${name}`](false);
+    }
+
+    const openScreenTestCase =() =>{
+        let screenTestcases = {};
+        let displayTeststep=[];
+        if(selectedModule && selectedModule.children && selectedModule.children.length > 0) {
+            for(let scenario of selectedModule.children) {
+                if(scenario && scenario.children && scenario.children.length > 0){
+                    for(let scr of scenario.children) {
+                        if(scr && scr.children && scr.children.length > 0){
+                            if (scr["id"] === (props.fetchingDetailsId["id"]?props.fetchingDetailsId["id"]:parseInt(props.fetchingDetailsId))  && scr["_id"]===props.fetchingDetails["_id"] && scenario["_id"] === props.fetchingDetails.parent["_id"]){
+                                screenTestcases = scr.children
+                                setdisplayTest(screenTestcases);
+                                
+                                for( let i=0; i<screenTestcases.length; i++){
+                                    displayTeststep.push(screenTestcases[i])
+                                }
+                                setshowTeststeps(displayTeststep)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    if(displayTeststep.length===1 ){
+       
+            displayTestCase(0,displayTeststep);
+        }
+        else{
+           
+           onClick("displayModal")
+        }
+    }
+
+ const displayTestCase = (value,displayTeststep) => {
+    let populateTestcaseDetails = {
+        "parent":{
+            "_id":props.fetchingDetails["_id"],
+            name:props.fetchingDetails["name"],
+            projectId:props.fetchingDetails["projectId"],
+            "testCaseId":displayTeststep[value]["_id"] ,
+            "parent":{"_id":props.fetchingDetails.parent["_id"]}
+        },
+        "_id":displayTeststep[value]["_id"] ,
+        "name":displayTeststep[value]["name"]  }
+    props.openScrapeScreen("displayBasic2","","displayBasic",{populateTestcaseDetails})
+ }
+
     return (
+        
         <>
+        <Dialog header="Design Test Steps" visible={displayModal} style={{ width: '20vw' }} onHide={() => onHide('displayModal')}>
+            {(showTeststeps.length !== 0)?<>{showTeststeps.map((item, idx)=><div >
+            {/* <div>{idx+1.}</div> */}
+            <div className='Design_test_steps'  value={idx} onClick={(e)=>{displayTestCase(idx,showTeststeps)}}>
+           <span>{`${idx+1}.`}</span><span className='Design_test_steps_name' title={item.name}>{item.name}</span>
+            </div>
+            </div>)}</>:<div>No Test Cases Found</div>}
+         </Dialog>
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
-        { showObjModal === "exportObject" && <ExportObjectModal  setOverlay={setOverlay} setShow={setShowObjModal} />}
-        { showObjModal === "importObject" && <ImportObjectModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} />}
-        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} /> }
+        { showObjModal === "exportObject" && <ExportObjectModal  appType={props.appType}  fetchingDetails={props.fetchingDetails} setMsg={setMsg} setOverlay={setOverlay} setShow={setShowObjModal} />}
+        { showObjModal === "importObject" && <ImportObjectModal  fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType={props.appType}  fetchingDetails={props.fetchingDetails} />}
+        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} fetchingDetails={props.fetchingDetails}  /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
-        { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
+        { showObjModal === "compareObject" && <CompareObjectModal fetchingDetails={props.fetchingDetails} setShow={setShowObjModal} startScrape={startScrape} /> }
         { showObjModal === "replaceObjectSelBr" && <ReplaceObjectSelBrModal setShow={setShowObjModal} startScrape={startScrape} /> }
-        { showObjModal === "replaceObject" && <ReplaceObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} setOverlay={setOverlay} /> }
+        { showObjModal === "replaceObject" && <ReplaceObjectModal appType={props.appType}  fetchingDetails={props.fetchingDetails} setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} setOverlay={setOverlay} /> }
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setOrderList={setOrderList} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
-        { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber, appType: current_task.appType}} />}
+        { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name,versionnumber:0 /** version no. not avail. */, appType: props.appType}} />}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div data-test="ssBody" className="ss__body">
-            <Header/>
+            {/* <Header/> */}
+            
             <div data-test="ssMidSection" className="ss__mid_section">
                 <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
-                    <ActionBarItems />
-                    { current_task.appType === "Webservice" 
+                <ActionBarItems appType={props.appType}  fetchingDetails={props.fetchingDetails} />
+                    { props.appType === "Webservice" 
                         ? <WebserviceScrape /> 
-                        : compareFlag ? <CompareObjectList /> : <ScrapeObjectList />}
-                    <RefBarItems mirror={mirror}/>
+                        : compareFlag ? <CompareObjectList fetchingDetails={props.fetchingDetails}/> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
+                    <RefBarItems hideInfo={true} mirror={mirror} collapse={true} appType={props.appType} openPopup={openScreenTestCase}/>
                 </ScrapeContext.Provider>
             </div>
-            <div data-test="ssFooter"className='ss__footer'><Footer/></div>
+            {/* <div data-test="ssFooter"className='ss__footer'><Footer/></div> */}
         </div>
         </>
     );

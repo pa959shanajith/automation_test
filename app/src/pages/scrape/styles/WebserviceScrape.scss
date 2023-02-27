@@ -1,12 +1,13 @@
 @import "../../global/styles/ColorVariables.scss";
 .ws__row{
     display: flex;
-    width: 100%;
+    width: 97%;
 }
 
 .ws__url_method{
     flex: 1 0;
     margin-top: -5px;
+    // z-index: 10;
 
     label{
         font-family: $avoSecondaryFont;
@@ -18,28 +19,28 @@
     }
 
     .ws__input{
-        width: 360px;
+        width: 171px;
         border-radius: 4px 0 0 4px!important;
     }
 
     .ws__select{
-        width: 225px;
+        width: 156px;
     }
 
     .ws__addBtn{
-        margin-left: 40px;
+        margin-left: 14px;
     }
     
     .ws__goBtn{
-        color: $whiteColor;
+        color: #ffffff;
         font-size: 15px;
-        border: 1px solid $primaryColor;
-        background: $primaryColor;
-        font-family: $avoSecondaryFont;
+        border: 1px solid #643693;
+        background: #643693;
+        font-family: "LatoWebLight";
         margin-left: -2px;
-        margin-right: 50px;
-        border-radius: 0 4px 4px 0;
-        padding: 0 14px 0 10px;
+        margin-right: 21px;
+        border-radius: 0 4px 5px 0;
+        padding: 0px 7px 0 7px;
         outline: 0;
     }
 }
@@ -54,17 +55,17 @@
     border-bottom: 1px solid $pluginGray;
 
     .ws__input{
-        width: 345px;
+        width: 107px;
         margin: 0 10px 0 5px;
     }
 
     .ws__select{
-        width: 120px;
+        width: 114px;
         margin: 0 10px 0 0;
     }
     
     .ws__op_input{
-        width: 110px!important;
+        width: 74px!important;
         margin: 0 10px 0 0;
     }
 }
@@ -78,7 +79,7 @@
 
     img{
         height: 24px;
-        width: 24px;
+        width: 22px;
     }
 }
 
@@ -139,19 +140,22 @@
     width: fit-content;
     align-items: center;
     border-radius: 4px;
-    padding: 10px 40px 10px 15px;
+    padding: 11px 3px 7px 1px;;
     background-color: $borderThree;
 }
 
 .ws__mainContainer{
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 84%;
     width: 100%;
+}
+.mainContainerAd{
+    margin: 4rem 12rem -1rem 0rem
 }
 
 .ws__rqst_resp_header, .ws__rqst_resp_body{
-    width: 100%;
+    width: 97%;
     resize: none;
     padding: 10px;
     background: $borderThree;
@@ -175,7 +179,7 @@
 
 .ws__action_btn{
     position: relative;
-    padding: 1px 13px;
+    padding: 1px 8px;
     margin-right: 7px;
     height: 21px;
     font-size: 13px;
@@ -197,4 +201,28 @@
 
 .ws_eb{
     border: 2px solid  $redError !important;
+}
+.space{
+    margin: 0rem 1.15rem 0rem -0.85rem;
+}
+.webservice_btn{
+    margin-Left:24px;
+    margin-Bottom: 0px;
+    width:63px;
+    font-family: $avoFont;
+    padding-left: 57px;
+    background: white;
+    border: none;
+    color: black;
+    // margin-right: -55px;
+    height: 27px;  
+}
+.webservice_img{
+    height: 27px;
+    width: 23px;
+    margin: 0.5rem 0.9rem 0.5rem -7rem;
+}
+#Websevice_name
+{
+    margin-left:  -0.72rem;
 }

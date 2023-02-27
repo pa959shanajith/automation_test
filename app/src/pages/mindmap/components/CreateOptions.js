@@ -13,7 +13,7 @@ const CreateOptions = (props) => {
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
   const options = [
-    {ico : "ic-create-newMindmap.png",label:'Create New',comp:'newmindmap'},
+    {ico : "ic-create-newMindmap.png",label:'Create New..!',comp:'newmindmap'},
     {ico : "ic-endtoendFlow.png",label:'End to End Flow',comp:'enemindmap'},
     // {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'importmindmap'}
   ]

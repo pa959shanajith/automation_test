@@ -47,7 +47,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"moduleid": moduleId,
 			"batchname": testsuite.batchname,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber
+			"versionnumber": suite.versionnumber,
+			"accessibilityParameters": testsuite.accessibilityParameters
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -160,6 +161,7 @@ exports.updateTestSuite_ICE = async (req, res) => {
 			"modifiedbyrole": userInfo.role,
 			"testsuiteid": testsuite.testsuiteid,
 			"name": testsuite.testsuitename,
+			"accessibilityParameters": testsuite.accessibilityParameters
 		};
 		const result = await utils.fetchData(inputs, "suite/updateTestSuite_ICE", "updateTestSuite_ICE")
 		if (result == "fail") overallstatusflag = "fail";
@@ -361,7 +363,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 /** This service fetches all the schedule jobs */
 exports.getScheduledDetails_ICE = async (req, res) => {
 	logger.info("Inside UI service getScheduledDetails_ICE");
-	const inputs = { "query": "getallscheduledata" };
+	const inputs = { "query": "getallscheduledata", "configKey": req.body.configKey, "configName": req.body.configName };
 	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
 	return res.send(result);
 }
@@ -414,5 +416,18 @@ exports.getQueueState = async(req,res) => {
 
 exports.deleteExecutionListId = async(req,res) => {
 	let result = await queue.Execution_Queue.deleteExecutionListId(req, res);
+	return res.send(result);
+}
+
+// TODO:
+exports.getScheduledDetailsOnDate_ICE = async (req, res) => {
+	logger.info("Inside UI service getScheduledDetailsOnDate_ICE");
+	let scheduledDate = req.body.scheduledDate;
+	let dateString = scheduledDate.split(' ');
+    let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[2]) / 3;
+	let timeValue = dateString[4];
+    let timestamp = + new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[1]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+	const inputs = { "query": "getallscheduledataondate", "scheduledDate": timestamp, "configKey": req.body.configKey, "configName": req.body.configName };
+	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
 	return res.send(result);
 }

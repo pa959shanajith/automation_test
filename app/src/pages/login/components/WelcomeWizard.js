@@ -19,6 +19,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const [activeStep, setActiveStep] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
   const [showMacOSSelection, setShowMacOSSelection] = useState(false);
+  const [showLinuxOSSelection, setShowLinuxOSSelection] = useState(false);
   const [selectedMacOS, setSelectedMacOS] = useState("");
   const [downloadPopover, setDownloadPop] = useState("");
   const userInfo = useSelector(state=>state.login.userinfo);
@@ -35,6 +36,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const history = useHistory();
   const dispatch = useDispatch();
   const [showImage , setShowImage] = useState("")
+  const[videoUrl,setVideoUrl]=useState("")
    const enlargeImage = (imageName) => {
     setShowImage(imageName)
        
@@ -53,6 +55,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       : 'other';
 
   useEffect(()=>{
+    fetch("/getClientConfig").then(data=>data.json()).then(response=>setVideoUrl(response.videoTrialUrl))
     getOS();
     if(activeStep===0){
       let observer = new IntersectionObserver(function(entries) {
@@ -100,7 +103,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const updateStepNumber = async(n) => {
     let stepNo = activeStep + n;
 
-    if(stepNo===3)
+    if(stepNo===4)
         setAnimationDir(true);
 
     setActiveStep((currPage) => currPage + n);
@@ -174,7 +177,11 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         setShowMacOSSelection(true)
         setOS("MacOS");
     }
-
+    else if (navigator.userAgent.indexOf("Linux") != -1) 
+    {
+        setShowLinuxOSSelection(true)
+        setOS("Linux");
+    }
     else 
         setOS("Not Supported");
   }
@@ -222,15 +229,13 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
 
   
   // send correct filename to getICE and start downloading Client
-  const _handleClientDownload = (pkgName=undefined) =>{
+  const _handleClientDownload = () =>{
     if(showMacOSSelection){
-        // if (selectedMacOS==="") {
-        //     setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
-        // }
-        // else{
-        setSelectedMacOS(pkgName)
-        getIce("avoclientpath_"+pkgName)
-        // }
+        getIce("avoclientpath_Mac")
+    }
+    else if(showLinuxOSSelection)
+    {
+        getIce("avoclientpath_Linux")
     }
     else if (OS==="Windows")
         getIce("avoclientpath_Windows")
@@ -253,8 +258,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
     document.getElementsByClassName("stepper")[0].style.visibility="hidden";
     return (
         <div>
-            <img src={`static/imgs/${imageName}.svg`} className="enlargeImage"/>
-            <img src={`static/imgs/close-btn.svg`} className="close-btn" onClick={()=>
+            <img src={`static/imgs/${imageName}.jpg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "enlargeImage-modified" :"enlargeImage"}/>
+            <img src={`static/imgs/close-btn.svg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "close-btn-modified" : "close-btn"} onClick={()=>
                 {setShowImage("");
                 document.getElementsByClassName("form-container")[0].style.visibility="visible";
                 document.getElementsByClassName("stepper")[0].style.visibility="visible";}} />
@@ -270,7 +275,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <div key={title+idx} className="d-p-card__item">
                       <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
                       {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
-                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image" onClick={()=>enlargeImage(item.imageName)}/></div>
+                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.jpg`} className={(["WW_mac_2_1", "WW_mac_4_1"].includes(item.imageName)) ? "d-p-card__image-modified_2" : (["WW_win_2_1", "WW_win_2_2", "WW_win_4_1", "WW_win_4_2"].includes(item.imageName) ? "d-p-card__image-modified" : "d-p-card__image")} onClick={()=>enlargeImage(item.imageName)}/></div>
                     </div>
                     {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
                   </>))}
@@ -418,7 +423,6 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         <button className="type1-button static-button" disabled={!tncAcceptEnabled} onClick={()=>{updateStepNumber(1)}}>I Agree</button>
     </div>
   };
-
   const InstallationSteps_win = [
       {
         title:"Open the AvoAssureClient.exe file either from:", 
@@ -442,7 +446,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         items:[
           {title:"Intialise installation",imageName:"WW_win_3_1"},
           {title:"Extracting files",imageName:"WW_win_3_2"},
-          {title:"Finish and Launch",imageName:"WW_win_3_2"}
+          {title:"Finish and Launch",imageName:"WW_win_3_3"}
         ],
         type:"NOR"
       },
@@ -497,7 +501,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       return <div className={"welcomeInstall "+(animationDir?AnimationClassNames.slideRightIn400:AnimationClassNames.slideLeftIn400)} style={{justifyContent:"space-evenly"}}>
         <div className="d-p-header">
             <div className="d-p-header__title"><div>Thanks for downloading !</div></div>
-            <div className="d-p-header__subtitle">If your download didn't start then don't worry, you can download it from <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
+            <div className="d-p-header__subtitle">If your download didn't start you can download it from the <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
         </div>
         <div className="installation-instructions-container">
             <div className="d-p-card-container">
@@ -552,23 +556,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
                 // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
                 }
-                
-                {(showMacOSSelection?(
-                    <>
-                        <div className="OSselectionText">Please select Operating System for downloading Avo Assure Client</div>
-                        <div className="choiceGroup">
-                            {Object.keys(config).map((osPathname)=>{
-                                if (osPathname.includes("Windows") || osPathname.includes("Linux")){
-                                    return <></>;
-                                }
-                                let versionName = osPathname.split("_")[1]
-                                return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{_handleClientDownload(versionName)}}>Download on {versionName}</button>
-                            })}
-                        </div>
-                    </>)
-                    :null)}
 
-                {showIndicator && !showMacOSSelection ? 
+                {showIndicator ? 
                     <>
                         <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading the Avo Assure Client"}</div>
                         <div className="downloadProgress">
@@ -583,8 +572,11 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         </div>
                     </>
                 :
-                (OS==="Windows"?<button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>:null)}
-                {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
+                <>
+                <button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>
+                </>
+                }
+                            {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
             </div>
   };
 
@@ -599,7 +591,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         <a href={vidLink} target={"_blank"} referrerPolicy="no-referrer">Training Videos</a>
                         <a href={docLink} target={"_blank"} referrerPolicy="no-referrer">Training Document</a>
                     </div> */}
-                    <button className="type2-button" style={{marginTop: "2rem"}} onClick={() => {tcAction("Accept");}}>Get Started</button>
+                    <button className="type2-button" style={{marginTop: "2rem"}} onClick={() => {
+                       tcAction("Accept");}}>Get Started</button>
                 </div>
                 <button className="type1-button" data-type={"bordered"} onClick={()=>{updateStepNumber(-1)}}>Back</button>
             </div>
@@ -660,7 +653,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 </div>
                 :null
             }
-          {<div className="WelcomeContactUs">In case you need any help, <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">Click here</a> OR <a href="mailto:support@avoautomation.com">Contact us</a></div>}
+          {<div className="WelcomeContactUs">For help <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">click here</a> OR <a href="mailto:support@avoautomation.com">contact us</a></div>}
         </div>
         </div>
     </div>

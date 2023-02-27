@@ -1,28 +1,29 @@
 @import "../../global/styles/ColorVariables.scss";
 
 .ss__thumbnail input[type='checkbox']{
-    width: 18px;
-    height: 18px;
+    width: 15px;
+    height: 16px;
     outline: none;
 }
 
 .ss__thumbnail{
     display: flex;
-    flex-direction: column;
+    
     align-items: center;
-    margin: 20% 20px 15%;
-    font-size: 14px;
+    margin: 15% 27px 14% 33px;
+    font-size: 12.6px;
     font-family: Mulish;
     font-weight: 600;
 }
 
 .ss__thumbnail_title{
     text-align: center;
+    margin-top: -4px;
 }
 
 .ss__scrapeOn{
     font-family: $avoPrimaryFont;
-    font-size: 18px;
+    font-size: 15px;
     user-select: none;
 }
 
@@ -31,6 +32,32 @@
     height: 36px;
     width: 36px;
 }
+
+#Insprint{
+    border-bottom: 1px solid grey;
+    font-family: $avoPrimaryFont;
+    font-size: 15px;
+    user-select: none;
+}
+#UpgradeAn{
+    border-bottom: 1px solid grey;
+    font-family: $avoPrimaryFont;
+    font-size: 15px;
+    user-select: none;
+    margin-top: 16px;
+    margin-left: -14px;
+}
+#Otherapp{
+    border-bottom: 1px solid grey;
+    font-family: $avoPrimaryFont;
+    font-size: 15px;
+    user-select: none;
+    margin-top: 28px;
+    margin-left: 1px;
+
+}
+
+
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){
     

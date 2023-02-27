@@ -2,11 +2,13 @@
 
 .ss__body, .s__body, .d__body {
   .thumbnail{
-    height: 92px;
-    justify-content: center;
-    color: #000000 !important;
-    font-weight: 600 !important;
-    font-family: Mulish !important;
+    height: 4rem;
+    margin-top: 0rem;
+    justify-content: left;
+    color: #615277 !important;
+    // font-weight: 600 !important;
+    font-family: LatoWeb !important;
+    font-size: 14px;
     &:hover {
       background-color: #1817170a;
     }
@@ -18,12 +20,12 @@
 
 .thumbnail{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     font-family: $avoSecondaryFont;
     font-size: 12px;
     color: $whisper;
-    margin: 10% 0 5%;
+    margin:-8px 0px -15%;
     width: 100%;
     cursor: pointer;
     &:hover .thumbnail__img, &:hover .thumbnail__svg{
@@ -40,11 +42,22 @@
     padding: 8px 10px;
     margin-bottom: 2px;
     border-radius: 5px;
+    // margin-left: -93px;
+    color: #615277 !important;
 }
+
+.thumbnail .thumbnail__img {
+  color: #1817170a !important;
+}
+
 
 .svg_ic{
     padding: 6px 8px;
 }
+
+// .thumbnail__title{
+//   margin: -32px -16px 11px 8px;
+// }
 
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){
@@ -61,3 +74,16 @@
 //         border-radius: 0.65vh;
 //     }
 // }
+
+.ms-Dialog-content .ss__body {
+  .thumbnail__title{
+    margin: -28px -20px 6px 2px;
+  }
+  .thumbnail__img{
+    margin-left: -93px;
+  } 
+  .thumbnail {
+    height: 32px;
+
+  }
+}

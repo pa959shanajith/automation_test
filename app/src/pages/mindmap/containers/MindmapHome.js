@@ -1,13 +1,14 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import { Header, FooterTwo as Footer,ActionBar,ReferenceBar, setMsg, ScreenOverlay} from '../../global'
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
-import CreateEnE from './CreateEnE.js'
-import CreateAssign from './CreateAssign.js';
 import ImportMindmap from'../components/ImportMindmap.js';
-import {exportMindmap} from '../api';
+import {exportMindmap, getProjectList, getModules} from '../api';
 import '../styles/MindmapHome.scss';
 import {Messages as MSG} from '../../global';
+import {parseProjList} from './MindmapUtils';
+import {useDispatch, useSelector} from 'react-redux';
+
 
 /*Component MindmapHome
   use: renders mindmap plugins landing page 
@@ -18,15 +19,9 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
-  // const selectedModule = useSelector(state=>state.mindmap.selectedModule)
-  // const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
-  // const selectedProj = useSelector(state=>state.mindmap.selectedProj)
-  
+  const selectProj = useSelector(state=>state.plugin.PN)
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
-    //'importmindmap': React.memo(() => (<CreateNew importRedirect={true}/>)),
-    'enemindmap': React.memo(() => (<CreateEnE/>)),
-    'assignmap': React.memo(() => (<CreateAssign/>)),
     'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))
  
     
@@ -38,16 +33,33 @@ const MindmapHome = () => {
     setBlockui({show:false})
     setMsg(error)
   }
+  useEffect(() => {
+    (async () => {
+      const res = await getProjectList()
+      if(res.error){return;}
+      const data = parseProjList(res)
+      var req={
+        tab:"endToend",
+        projectid:selectProj?selectProj:res.projectId[0],
+        version:0,
+        cycId: null,
+        modName:"",
+        moduleid:null
+      }
+      var moduledata = await getModules(req);
+      if(moduledata.length > 0) setOptions1('newmindmap');
+    })()
+  },[]);
  
 
-
-  var Component = (!options)? null : createType[options];
+//data-selected="true"
+  var Component = createType["newmindmap"];
   return (
     <div className='mp__container'>
       <Header/> 
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       <div className='mp__body'>
-        <ActionBar collapsible={true} collapse={options}>
+        <ActionBar collapsible={false} collapse={"newmindmap"}>
           <div className="mp__ic_box">
             <div className="ic_box" title="Create">
               <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options!=='assignmap' && options!=='importmodules'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
@@ -61,24 +73,13 @@ const MindmapHome = () => {
               <img onClick={()=>{setOptions('importmodules');setImportPop(true);}} alt='Import Modules' className={"thumb__ic"+(options==='importmodules'? " selected_rb_thumb":"")} src="static/imgs/ic-import-script.png"/>
               <span className="rb_box_title">Import Modules</span>
             </div>
-            {/* <div className="ic_box" title="Export Modules">
-              <img onClick={()=>exportSelectedModules()} alt='Export Modules' className={"thumb__ic"+(options==='exportmodules'? " selected_rb_thumb":"")} src="static/imgs/ic-export-script.png"/>
-              <span className="rb_box_title">Export Modules</span>
-            </div> */}
           </div> 
       </ActionBar>
-        {(!options)?
-        <Fragment>
-          <div className='mp__middle_container'>
-            <CreateOptions setOptions={setOptions1}/>
-          </div>
-          <ReferenceBar taskTop={true} collapsible={true} hideInfo={true}/>
-        </Fragment>:
         <Fragment>
           {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={setOptions} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
           <Component/>
         </Fragment>        
-        }
+        {/* } */}
       </div>
       <div className='mp__footer'><Footer/></div>
     </div>

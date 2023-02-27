@@ -1,6 +1,10 @@
 var myserver = require('../lib/socket');
 var validator = require('validator');
 var logger = require('../../logger');
+var async = require('async');
+var Client = require("node-rest-client").Client;
+var epurl = process.env.DAS_URL;
+var client = new Client();
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var fs = require('fs');
@@ -153,60 +157,58 @@ const prepareReportData = (reportData, embedImages) => {
     report.overallstatus.EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
     report.overallstatus.video = report.overallstatus.video || '-'
 
-    if(embedImages !== 'prepareDevopsReport'){
-        report.rows.forEach((row, i) => {
-            row.slno = i + 1;
-            if (row["Step "]) row.Step = row["Step "];
-            // if (row.EllapsedTime && row.EllapsedTime.trim() != "") {
-            //     const eT = row.EllapsedTime.split(".");
-            //     elapTime = eT[0].split(":")
-            //     if (!eT[1]) eT[1] = ((eT[1] || "") + "000").slice(0, 3);
-            //     if (eT.length < 3 && eT[0].indexOf(":") === -1) { // Time is x.x not xx:xx:xx.xx
-            //         row.EllapsedTime = "00:00:" + ("0" + elapTime[0]).slice(-2) + ":" + eT[1];
-            //     } else {
-            //         row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
-            //     }
-            // }
-            if (embedImages && row.screenshot_path) {
-                scrShots.idx.push(i);
-                scrShots.paths.push(row.screenshot_path);
+    report.rows.forEach((row, i) => {
+        row.slno = i + 1;
+        if (row["Step "]) row.Step = row["Step "];
+        // if (row.EllapsedTime && row.EllapsedTime.trim() != "") {
+        //     const eT = row.EllapsedTime.split(".");
+        //     elapTime = eT[0].split(":")
+        //     if (!eT[1]) eT[1] = ((eT[1] || "") + "000").slice(0, 3);
+        //     if (eT.length < 3 && eT[0].indexOf(":") === -1) { // Time is x.x not xx:xx:xx.xx
+        //         row.EllapsedTime = "00:00:" + ("0" + elapTime[0]).slice(-2) + ":" + eT[1];
+        //     } else {
+        //         row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
+        //     }
+        // }
+        if (embedImages && row.screenshot_path) {
+            scrShots.idx.push(i);
+            scrShots.paths.push(row.screenshot_path);
+        }
+
+        if (row.testcase_details) {
+            if (typeof(row.testcase_details) == "string" && row.testcase_details != "undefined")
+                row.testcase_details = JSON.parse(row.testcase_details);
+        } else if (row.testcase_details === "") {
+            row.testcase_details = {
+                "actualResult_pass": "",
+                "actualResult_fail": "",
+                "testcaseDetails": ""
             }
-    
-            if (row.testcase_details) {
-                if (typeof(row.testcase_details) == "string" && row.testcase_details != "undefined")
-                    row.testcase_details = JSON.parse(row.testcase_details);
-            } else if (row.testcase_details === "") {
-                row.testcase_details = {
-                    "actualResult_pass": "",
-                    "actualResult_fail": "",
-                    "testcaseDetails": ""
-                }
-            }
-            if (row.status == "Pass") pass++;
-            else if (row.status == "Fail") fail++;
-            else if (row.Step && row.Step == "Terminated") terminated++
-            if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
-            if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
-        });
-        const total = pass+fail+terminated;
-        const passPercent = parseFloat(100 * pass / total).toFixed(2);
-        const otherPercent = (100-passPercent).toFixed(2);
-        const totalRemaining = (fail+terminated) || 1;
-        const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
-        const termPercent = (otherPercent - failPercent).toFixed(2);
-        report.overallstatus.pass = passPercent > 0 ? passPercent : "0.00";
-        report.overallstatus.fail = failPercent > 0 ? failPercent : "0.00";
-        report.overallstatus.terminate = termPercent > 0 ? termPercent : "0.00";
-        report.remarksLength = remarksLength;
-        report.commentsLength = commentsLength;
-    }
+        }
+        if (row.status == "Pass") pass++;
+        else if (row.status == "Fail") fail++;
+        else if (row.Step && row.Step == "Terminated") terminated++
+        if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
+        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
+    });
+    const total = pass+fail+terminated;
+    const passPercent = parseFloat(100 * pass / total).toFixed(2);
+    const otherPercent = (100-passPercent).toFixed(2);
+    const totalRemaining = (fail+terminated) || 1;
+    const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
+    const termPercent = (otherPercent - failPercent).toFixed(2);
+    report.overallstatus.pass = passPercent > 0 ? passPercent : "0.00";
+    report.overallstatus.fail = failPercent > 0 ? failPercent : "0.00";
+    report.overallstatus.terminate = termPercent > 0 ? termPercent : "0.00";
+    report.remarksLength = remarksLength;
+    report.commentsLength = commentsLength;
     return { report, scrShots };
 };
-
+ 
 //Connect to Jira
 exports.connectJira_ICE = function(req, res) {
-    logger.info("Inside UI service: connectJira_ICE");
     try {
+        logger.info("Inside UI service: connectJira_ICE");
         var username=req.session.username;
         var icename = undefined
         if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
@@ -283,7 +285,7 @@ exports.connectJira_ICE = function(req, res) {
             }
         } else if (req.body.action == 'createIssueInJira') { //Create issues in the Jira
             var createObj = req.body.issue_dict;
-            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty")  && !validateData(createObj.description, "empty") && !validateData(createObj.priority, "empty")) {
+            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty")  && !validateData(createObj.description, "empty")) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
@@ -343,7 +345,7 @@ exports.connectJira_ICE = function(req, res) {
             } else {
                 logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid inputs");
                 res.send("Fail");
-            }
+            }  
         } else if (req.body.action == 'getJiraConfigureFields') { //gets jira configure fields for given project and issue type
             var createObj = req.body.jira_input_dict;
             var project = req.body.project;
@@ -416,12 +418,209 @@ exports.connectJira_ICE = function(req, res) {
                 logger.error("Error occurred in the service connectJira_ICE - getJiraConfigureFields: Invalid inputs");
                 res.send("Fail");
             }
-
         }
+        else if (req.body.action == 'jiraLogin' ) { //Login to Jira for mapping screen
+            var jiraurl = req.body.url;
+            var jirausername = req.body.username;
+            var jirapwd = req.body.password;
+            if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
+                var inputs = {
+                    "jira_serverlocation": jiraurl,
+                    "jira_uname": jirausername,
+                    "jira_pwd": jirapwd
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for jira_login to cachedb");
+                            var dataToIce = {
+                                "emitAction": "jiralogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
+
+                            function jira_login_4_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_Projects"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", jira_login_4_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "Jira_Projects") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                logger.info('Jira: Login successfully.');
+                                            } else {
+                                                logger.error('Jira: Login Failed.');
+                                            }
+                                            res.send(resultData);
+                                            count++;
+                                        }
+                                    }
+                                }
+                            }
+                            redisServer.redisSubServer.on("message", jira_login_4_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
+            }}
+            else if (req.body.action == 'getJiraTestcases' ) { //Login to Jira for mapping screen
+                var jiraurl = req.body.url;
+                var jirausername = req.body.username;
+                var jirapwd = req.body.password;
+                if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
+                    //var inputs = [jiraurl,jirausername,jirapwd];
+                    var inputs = {
+                        "jira_serverlocation": jiraurl,
+                        "jira_uname": jirausername,
+                        "jira_pwd": jirapwd
+                    };
+                    try {
+                        logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                        logger.debug("ICE Socket requesting Address: %s", icename);
+                        // redisServer.redisSubServer.subscribe('ICE2_' + icename);
+                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                            if (redisres[1] > 0) {
+                                logger.info("Sending socket request for jira_login to cachedb");
+                                var dataToIce = {
+                                    "emitAction": "jiralogin",
+                                    "username": icename,
+                                    "action": req.body.action,
+                                    "inputs": inputs,
+                                    "project_selected": {
+                                        'project':req.body.project,
+                                        'key':req.body.key
+                                    }
+                                };
+                                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                                var count = 0;
+    
+                                function jira_login_5_listener(channel, message) {
+                                    var data = JSON.parse(message);
+                                    if (icename == data.username && ["unavailableLocalServer", "Jira_testcases"].includes(data.onAction)) {
+                                        redisServer.redisSubServer.removeListener("message", jira_login_5_listener);
+                                        if (data.onAction == "unavailableLocalServer") {
+                                            logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                                var soc = myserver.socketMapNotify[username];
+                                                soc.emit("ICEnotAvailable");
+                                            }
+                                        } else if (data.onAction == "Jira_testcases") {
+                                            var resultData = data.value;
+                                            if (count == 0) {
+                                                if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                    logger.info('Jira: Login successfully.');
+                                                } else {
+                                                    logger.error('Jira: Login Failed.');
+                                                }
+                                                res.send(resultData);
+                                                count++;
+                                            }
+                                        }
+                                    }
+                                }
+                                redisServer.redisSubServer.on("message", jira_login_5_listener);
+                            } else {
+                                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                    var flag = "";
+                                    if (found) flag = "scheduleModeOn";
+                                    else {
+                                        flag = "unavailableLocalServer";
+                                        logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                    }
+                                    res.send(flag);
+                                });
+                            }
+                        });
+                    } catch (exception) {
+                        logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                    }
+                } else {
+                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                    res.send("Fail");
+                }}
     } catch (exception) {
         logger.error("Exception in the service connectJira_ICE: %s", exception);
         res.send("Fail");
     }
+    
+};
+
+exports.getJiraTestcases_ICE = function (req, res) {
+	logger.info("Inside UI service: getJiraTestcases_ICE");
+	try {
+		var username = req.session.username;
+		var name = undefined;
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.debug("ICE Socket requesting Address: %s" , name);
+		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			if (redisres[1]>0) {
+				var zephyrDetails = {
+					"treeId": req.body.treeId,
+					"zephyraction": req.body.zephyraction
+				};
+				logger.info("Sending socket request for zephyrlogin to redis");
+				dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
+				redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+				function zephyrlogin_listener(channel,message) {
+					var data = JSON.parse(message);
+					if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+						redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
+						if (data.onAction == "unavailableLocalServer") {
+							logger.error("Error occurred in zephyrTestcaseDetails_ICE: Socket Disconnected");
+							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+								var soc = myserver.socketMapNotify[name];
+								soc.emit("ICEnotAvailable");
+							}
+						} else if (data.onAction == "qcresponse") {
+							data = data.value;
+							res.send(data);
+						}
+					}
+				}
+				redisServer.redisSubServer.on("message",zephyrlogin_listener);
+			} else {
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else {
+						flag = "unavailableLocalServer";
+						logger.info("ICE Socket not Available");
+					}
+					res.send(flag);
+				});
+			}
+		});
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
 };
 
 const updateDbReportData = async (reportId, slno, defectId) => {
@@ -516,6 +715,66 @@ exports.getReport_API = async (req, res) => {
         return res.status("500").send("fail");
     }
 };
+
+
+exports.saveJiraDetails_ICE = async (req, res) => {
+	const fnName = "saveJiraDetails_ICE";
+	logger.info("Inside UI service: " + fnName);
+    // console.log(req.body);
+	try {
+		var mappedDetails = req.body.mappedDetails;
+		var flag = mappedDetails.length > 0;
+		if (!flag) return res.send('fail');
+		for (let i=0; i<mappedDetails.length; i++) {
+			let itr = mappedDetails[i];
+			const inputs = {
+				"testscenarioid": itr.scenarioId[0],
+				'projectid': itr.projectId,			
+				'projectName': itr.projectName,
+				'projectCode': itr.projectCode,
+				'testId': itr.testId,
+				'testCode': itr.testCode,
+				"query": "saveJiraDetails_ICE"
+			};
+			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
+			if (result == "fail") flag = false;
+		}
+		if (!flag) return res.send('fail');
+		res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in jira/"+fnName+":", exception);
+		res.send("fail");
+	}
+};
+
+
+exports.viewJiraMappedList_ICE = async (req, res) => {
+    // console.log(args);
+	const fnName = "viewJiraMappedList_ICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+        if (!req.body.scenarioName) {
+            var inputs = {
+                "userid": userid,
+                "query": "jiradetails"
+            };
+        } else {
+            var inputs = {
+                "userid": userid,
+                'scenarioName':req.body.scenarioName,
+                "query": "jiradetails"
+            };
+        }
+		const result = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+		if (result == "fail") res.send('fail');
+		else res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		res.send("fail");
+	}
+};
+
 
 exports.getAccessibilityReports_API = async(req, res)=>{
     const executionId = req.body.execution_data.executionId;
@@ -713,7 +972,7 @@ exports.getDevopsReport_API = async (req) => {
         // execResponse.tokenValidation = 'passed';
 
         const inputs = { executionId, scenarioIds, 'query': 'devopsReport' };
-        const data = await utils.fetchData(inputs, "reports/getDevopsReport_API", fnName, true);
+        const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
         let reportResult = data[0];
         let reportStatus = data[2];
         if (reportResult == "fail") {
@@ -726,7 +985,7 @@ exports.getDevopsReport_API = async (req) => {
         // finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo,'prepareDevopsReport').report;
+            const report = prepareReportData(reportInfo).report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
@@ -764,3 +1023,142 @@ exports.getDevopsReport_API = async (req) => {
         return 'fail'
     }
 };
+
+
+exports.getAvoDetails = async (req, res) => {
+	logger.info("Inside UI service: getAvoDetails");
+	var projectDetailList = {
+		"avoassure_projects": '',
+		"project_dets": ""
+	};
+	try {
+		var userid = req.session.userid;
+        getProjectsForUser(userid, function (projectdata) {
+            try {
+                projectDetailList.avoassure_projects = projectdata;
+                res.send(projectDetailList);
+            } catch (ex) {
+                logger.error(ex);
+                res.send("fail");
+            }
+		});
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+function getProjectsForUser(userid, cb) {
+	logger.info("Inside function getProjectsForUser");
+	var projectDetailsList = [];
+	var projectidlist = [];
+	async.series({
+		getprojectDetails: function (callback1) {
+			var getprojects = "select projectids from icepermissions where userid=" + userid;
+			var inputs = {
+				"userid": userid,
+				"query": "getprojectDetails"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling DAS Service from getProjectsForUser: qualityCenter/qcProjectDetails_ICE");
+			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
+				function (projectrows, response) {
+				if (response.statusCode != 200 || projectrows.rows == "fail") {
+					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRDAS");
+				} else {
+					if (projectrows.rows.length != 0) {
+						projectidlist = projectrows.rows[0].projects;
+					}
+				}
+				callback1();
+			});
+		},
+		scenarioDetails: function (callback1) {
+			async.forEachSeries(projectidlist, function (itr, callback2) {
+				projectandscenario(itr, function (err, projectDetails) {
+					projectDetailsList.push(projectDetails);
+					callback2();
+				});
+
+			}, callback1);
+		},
+		data: function (callback1) {
+			cb(projectDetailsList);
+		}
+	});
+}
+
+function projectandscenario(projectid, cb) {
+		logger.info("Inside function projectandscenario");
+	var scenarios_list;
+	var projectDetails = {
+		"project_id": '',
+		"project_name": '',
+		"scenario_details": ''
+	};
+	var projectname = '';
+	async.series({
+		projectname1: function (callback1) {
+			var inputs = {
+				"projectid": projectid,
+				"query": "projectname1"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+				logger.info("Calling DAS Service : qualityCenter/qcProjectDetails_ICE");
+			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
+				function (projectdata, response) {
+				if (response.statusCode != 200 || projectdata.rows == "fail") {
+					
+					logger.error("Error occurred in getProjectsForUser from projectname1 Error Code : ERRDAS");
+				} else {
+					if (projectdata.rows.length != 0) {
+						projectname = projectdata.rows[0].name;
+					}
+				}
+				callback1();
+			});
+		},
+		scenariodata: function (callback1) {
+			var inputs = {
+				"projectid": projectid,
+				"query": "scenariodata"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+				logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
+			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
+				function (scenariorows, response) {
+				if (response.statusCode != 200 || scenariorows.rows == "fail") {
+					logger.error("Error occurred in getProjectsForUser from scenariodata Error Code : ERRDAS");
+				} else {
+					if (scenariorows.rows.length != 0) {
+						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
+						projectDetails.project_id = projectid;
+						projectDetails.scenario_details = scenarios_list;
+						projectDetails.project_name = projectname;
+					} else {
+						projectDetails.project_id = projectid;
+						projectDetails.project_name = projectname;
+					}
+				}
+				callback1();
+			});
+		}
+	}, function (err, data) {
+		cb(null, projectDetails);
+	});
+}
