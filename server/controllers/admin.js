@@ -20,6 +20,11 @@ const char_check=/[<'>"]/;
 const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
 //GetUserRoles
 exports.getUserRoles = async (req, res) => {
 	const fnName = "getUserRoles";
@@ -971,6 +976,7 @@ exports.getDetails_ICE = function (req, res) {
 			"type": type,
 			"id": id,
 		};
+		inputs.host = headers.headers.host;
 		var args = {
 			data: inputs,
 			headers: {
@@ -1074,6 +1080,7 @@ exports.assignProjects_ICE = function (req, res) {
 				"projectids": projectIds
 			};
 		}
+		inputs.host = headers.headers.host;
 		var args = {
 			data: inputs,
 			headers: {
@@ -1110,6 +1117,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 			"query": "projectid",
 			"userid": requestDetails.userId
 		};
+		inputs.host=headers.headers.host;
 		var args = {
 			data: inputs,
 			headers: {
@@ -1132,6 +1140,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 								"domain": requestDetails.domainname,
 								"projectid": assignedProjectIds
 							};
+							inputs.host = headers.headers.host;
 							var args = {
 								data: inputs,
 								headers: {
@@ -1179,6 +1188,7 @@ function createCycle(args, createCycleCallback) {
 	logger.info("Inside function createCycle");
 	var statusFlag = "";
 	logger.info("Calling DAS Service from createCycle:createProject_ICE");
+	args.host = this.avoreq.headers.host;
 	client.post(epurl + "admin/updateProject_ICE", args,
 		function (result, response) {
 		try {
@@ -1278,6 +1288,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 										"createdby": userinfo.user_id,
 										"createdbyrole":userinfo.role
 									};
+									inputs.host = headers.headers.host;
 									var args = {
 										data: inputs,
 										headers: {
@@ -1376,6 +1387,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 										"projectid": requestedprojectid,
 										"releaseid": eachprojectDetail.releaseId
 									};
+									inputs.host = headers.headers.host;
 									var args = {
 										data: inputs,
 										headers: {
@@ -1400,6 +1412,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 															"releaseid": eachprojectDetail.releaseId,
 															"cycleid": eachCycleDetail.cycleId
 														};
+														inputs.host = headers.headers.host;
 														var args = {
 															data: inputs,
 															headers: {
@@ -1440,6 +1453,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 															"releaseid": eachprojectDetail.releaseId,
 															"cycleid": eachCycleDetail.cycleId
 														};
+														inputs.host = headers.headers.host;
 														var args = {
 															data: inputs,
 															headers: {
@@ -1496,6 +1510,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 											"modifiedby":userinfo.user_id,
 											"modifiedbyrole":userinfo.role
 										};
+										inputs.host = headers.headers.host;
 										var args = {
 											data: inputs,
 											headers: {
@@ -1532,6 +1547,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																			"modifiedby":userinfo.user_id,
 																			"modifiedbyrole":userinfo.role
 																		};
+																		inputs.host = headers.headers.host;
 																		var args = {
 																			data: inputs,
 																			headers: {
@@ -1596,6 +1612,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 															"modifiedby":userinfo.user_id,
 															"modifiedbyrole":userinfo.role
 														};
+														inputs.host = headers.headers.host;
 														var args = {
 															data: inputs,
 															headers: {
@@ -1657,6 +1674,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 						"modifiedby":userinfo.user_id,
 						"modifiedbyrole":userinfo.role
 					};
+					inputs.host = headers.headers.host;
 					var args = {
 						data: inputs,
 						headers: {
@@ -1709,10 +1727,11 @@ exports.getUsers = function (req, res) {
 				"userroles": userrolesresult.rows,
 				"projectid": prjId
 			};
+			inputs.host = headers.headers.host;
 			args = {
 				data: inputs,
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json" 
 				}
 			};
 			logger.info("Calling DAS Service: getUsers");
