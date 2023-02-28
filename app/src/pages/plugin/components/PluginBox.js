@@ -31,10 +31,9 @@ const PluginBox = ({pluginName, pluginTitle}) => {
     }
 		pluginName = pluginName.split(' ').join('').toLowerCase();
 			if (pluginName === "mr") {
-				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
-				window.localStorage['integrationScreenType'] = null
-				window.localStorage['navigateScreen'] = 'reports';
-				setRedirectTo('/reports') 
+				window.localStorage['navigateScreen'] = "reports";
+				window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+				window.location.href = "/reports";
 			}
 			else if (pluginName === "md") {
 				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
