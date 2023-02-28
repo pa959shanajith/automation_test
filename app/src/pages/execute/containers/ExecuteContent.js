@@ -11,11 +11,21 @@ import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import AdvancedOptions from '../../mindmap/components/AdvancedOptions'
 
-const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
+const ExecuteContent = (integrationConfig) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const tasksJson = useSelector(state=>state.plugin.tasksJson)
     const userInfo = useSelector(state=>state.login.userinfo);
+    const current_task = useSelector(state=>state.plugin.CT)
+    const filter_data = useSelector(state=>state.plugin.FD)
+	const [browserTypeExe,setBrowserTypeExe] = useState([]); // Contains selected browser id for execution
+	const [execAction,setExecAction] = useState("serial"); 
+	const [execEnv,setExecEnv] = useState("default");
+    const [taskName, setTaskName] = useState(null);
+    const [status, setStatus] = useState(null);
+    const appType = useSelector(state=>state.mindmap.appType);
+    const [syncScenario, setSyncScenario] = useState(false);
+    const [readTestSuite,setreadTestSuite] = useState("");
     const [loading,setLoading] = useState(false)
     const [eachData,setEachData] = useState([])
     const [update,updateScreen] = useState(true)
@@ -41,7 +51,54 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const [accessibilityParameters,setAccessibilityParameters] = useState(current_task.accessibilityParameters)
     const [scenarioTaskType,setScenarioTaskType] = useState(current_task.scenarioTaskType);
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
+    const isMac = navigator.appVersion.toLowerCase().indexOf("mac") !== -1;
+    var versionnumber;
+    var projectdata =filter_data
+    
+    useEffect(()=>{
+        if (Object.keys(current_task).length!==0 && Object.keys(filter_data).length!==0){
+            if(current_task.taskName.indexOf("Execute Batch") < 0) setTaskName("Suite Execution");
+            else setTaskName("Batch Execution");
+            setStatus(current_task.status);
+            // setAppType(current_task.appType);
+            // eslint-disable-next-line
+            versionnumber = current_task.versionnumber;
+            let readTestSuiteData = current_task.testSuiteDetails;
+            if(typeof readTestSuiteData === "string") readTestSuiteData = JSON.parse(current_task.testSuiteDetails);
+            for (var rti = 0; rti < readTestSuiteData.length; rti++) {
+                readTestSuiteData[rti].versionnumber = parseFloat(versionnumber);
+            }
+            setreadTestSuite(readTestSuiteData);
+            reset();
+        }
+    }, [current_task, filter_data]);
+console.log(readTestSuite)
+    const reset = () => {
+        setBrowserTypeExe([]);
+        if(document.getElementById('syncScenario') != undefined) document.getElementById('syncScenario').value = '';
+        setSyncScenario(false);
+    }
 
+    const UpdateBrowserTypeExe = (browserId) => {
+        let browserTypeExecute = [...browserTypeExe];
+		if (browserId!==undefined && browserTypeExecute.includes(browserId)) {
+			var getSpliceIndex = browserTypeExecute.indexOf(browserId);
+			browserTypeExecute.splice(getSpliceIndex, 1);
+		} else browserTypeExecute.push(browserId); 
+        setBrowserTypeExe(browserTypeExecute);
+		if (browserTypeExecute.length > 0) setSyncScenario(true);
+		else setSyncScenario(false);
+    }
+
+    const updateExecAction = () => {
+        if (execAction ==="serial") setExecAction("parallel");
+		else setExecAction("serial");
+    }
+
+    const updateExecEnv = () => {
+        if (execEnv ==="default") setExecEnv("Saucelabs");
+		else setExecEnv("default");
+    }
     useEffect(()=>{
         if (Object.keys(current_task).length!==0){
             setAccessibilityParameters(current_task.accessibilityParameters);
@@ -355,8 +412,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
                             </div>
                         </div>
                     } 
-                    /
-                >
+                />
             :null} 
             { showIntegrationModal ? 
                 <IntegrationDropDown

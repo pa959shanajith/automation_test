@@ -48,7 +48,8 @@ const TableRow = (props) => {
     useEffect(()=>{
         if (!focused){
             setObjName(props.testCase.custname);
-            setObjType(null);
+            const caseData = props.getKeywords(props.testCase.custname);
+            setObjType(caseData.obType);
             setKeyword(props.testCase.keywordVal);
             setInput(props.testCase.inputVal[0]);
             setOutput(props.testCase.outputVal);
@@ -197,13 +198,15 @@ const TableRow = (props) => {
                     <div className="d__row_text" title={objName} >{objName}</div>
                     }
                 </span>
-                <span className="keyword_col" >
+                <span className="keyword_col" title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
                     { focused ? 
-                    <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={keyword} disabled={disableStep}>
-                        { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
-                        { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword}>{keyword}</option>) }
-                    </select> :
-                    <div className="d__row_text" title={keyword} >{keyword}</div> }
+                    <>
+                        <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} disabled={disableStep}>
+                            { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
+                            { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</option>) }
+                        </select>
+                    </> :
+                    <div className="d__row_text" title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</div>}
                 </span>
                 <span className="input_col" >
                     { focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ? 
@@ -216,7 +219,7 @@ const TableRow = (props) => {
                     <div className="d__row_text" title={output}>{output}</div> }
                 </span>
             </div>
-            <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span>
+            {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
             <span className={"details_col"+(disableStep? " d__disabled_step":"")} onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>{props.showDetailDialog(props.idx); setFocused(false)}} /></span>
         </div>
         </>

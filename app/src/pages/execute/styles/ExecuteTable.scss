@@ -14,9 +14,9 @@
 }
 .e__batchSuites{
     position: relative !important;
-    top: 22px;
+    top: 3px;
     display: block;
-    height: 56vh;
+    // height: 56vh;
     width: 100%;
 }
 [id^=page-taskName] {
@@ -38,7 +38,7 @@ input[type="checkbox"] {
 }
 .testSuiteBatch {
     float: left;
-    width: 97%;
+    width: 100%;
     padding-bottom: 12%;
 }
 .executionDataTable{
@@ -82,12 +82,13 @@ input[type="checkbox"] {
     white-space:nowrap !important; 
     text-overflow: ellipsis;
     background: inherit !important;
+    margin-right: 2vh;
 }
 @media only screen and (height:1080px){
 	.tabeleCellPadding{width: 4%;overflow: hidden;white-space:nowrap !important; text-overflow: ellipsis;}
 }
 .e__table_scenaio-name{
-    width: 16%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left !important
+    width: 20%; margin-right: 0%; cursor:pointer; word-break: break-all; text-align:left !important; margin-left: 0.3rem;
 }
 .e__getParamPath{
     display: inline-block;
@@ -116,7 +117,7 @@ input[type="checkbox"] {
 	background: $whiteColor url("/static/imgs/ic-false.png") 90% center no-repeat !important
 }
 .projectName{
-    width:17%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important
+    width:30%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important
 }
 .e__table_row_status{
     border-left: 4px solid $red !important;
@@ -171,10 +172,15 @@ input[type="checkbox"] {
 }
 .e__selectAll{
     width: 3%;
-    padding: 5px 0px !important
+    padding: 5px 0px !important;
+    margin-left: -0.2rem;
 }
 .e__selectAll-exe{
     font-size: 14px
+}
+.e__selectAll-name{
+    margin-right: 0.5rem;
+    display: none !important;
 }
 .e-execute {
     width: 18px;
@@ -182,16 +188,17 @@ input[type="checkbox"] {
     float: left;
 }
 .e__scenario{
-    width: 18%;
+    width: 20%;
     text-align:left !important;
     border-right: 1px solid $whiteColor;
+    margin-left: 0.3rem;
 }
 .e__param{
-    width: 27%;
+    width: 32%;
     border-right: 1px solid $whiteColor;
 }
 .e__condition{
-    width: 18%;
+    width: 20%;
     border-right: 1px solid $whiteColor;
 }
 .e__projectName{
@@ -199,32 +206,40 @@ input[type="checkbox"] {
     border-right: 1px solid rgb(255, 255, 255)
 }
 .e__apptype{
-    width: 12%;
+    width: 17%;
     text-align:center;
-    float: right
+    float: right;
+    margin-right: 0vh !important;
 }
 .e__accessibilityTesting{
     border-left: 1px solid rgb(255, 255, 255);  
     width: 23%
 }
 .exe-ExecuteStatus{
-    width: 3%;
+    width: 4%;
     padding-top: 7px !important;
 }
 .exe-dataParam{
-    width: 27%
+    width: 32%;
+    margin-right: 1rem;
 }
 .exe__table-multiDropDown{
-    width: 23%;
+    width: 22%;
+    height: 2rem;
 }
-.exe__table-multiDropDown-pad{
+.exe__table-multiDropDown-pad:nth-child(even){
     padding-left: 8%;
+    background: #ffffff !important;
+    margin-left: 1.5rem;
+    width: 10rem;
 }
 .exe-conditionCheck{
-    width: 18%
+    width: 18%;
+    // margin-right: 0vh !important;
 }
 .exe-apptype{
-    width: 12%;
+    width: 16%;
+    margin-right: 0.5rem;
     float:right
 }
 
@@ -261,9 +276,10 @@ input[type="checkbox"] {
     float: left !important;
     padding-top: 5px !important;
     padding-bottom: 5px !important;
+    margin-left: -1vh;
 }
 .e__table-bodyContainer{
-    overflow: auto;
+    // overflow: auto;
     margin-top: 0px !important;
     position: absolute;
     width: 100%;
@@ -298,7 +314,7 @@ input[type="checkbox"] {
     border-left: 4px solid transparent;
     display: flex;
     justify-content: space-between;
-    margin-right: 2px;
+    // margin-right: 2px;
 }
 .e__table-head-row div{
     font-weight: normal !important;
@@ -313,4 +329,62 @@ input[type="checkbox"] {
 }
 .e__table_webImg{
     background: inherit !important;
+}
+
+.devopsModList__Dialog.p-dialog-maximized {
+    transition: none;
+    transform: none;
+    width: 73vw !important;
+    height: 100vh !important;
+    max-height: 100%;
+    top: 0px !important;
+    left: 0px !important;
+    .e__batchSuites_Max{
+        position: relative !important;
+        top: 3px;
+        display: block;
+        height: 73vh !important;
+        width: 100%;
+    }
+}
+.p-dialog .p-dialog-header {
+    border-bottom: 0 none;
+    background: #ffffff;
+    color: #343a40;
+    padding: 1rem;
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+}
+.p-dialog .p-dialog-footer {
+    border-top: 0 none;
+    background: #ffffff;
+    color: #495057;
+    padding: 5px 1rem 1rem 1rem;
+    text-align: right;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+.p-dialog .p-dialog-footer button{
+    height: 2.5rem;
+    background-color: #633693;
+}
+.p-button-label .p-c {
+    font-weight: 600;
+    font-size: 17px;
+    font-family: "LatoWebLight";
+}
+.p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
+    background: #633693;
+    color: #ffffff;
+    border-color: #633693;
+}
+
+.e__table-col1{
+    margin-right: 0.2rem;
+    margin-top: 0.3rem;
+}
+.e__table-col2{
+    margin-right: 0.1rem;
+    display: none;
+    // margin-left: -0.4rem;
 }

@@ -4,6 +4,7 @@ const initialState = {
     tasksJson: {},
     FD: {},
     CT: {},
+    PN: 0,
     RD: {
         'cycleid': undefined,
         'releaseid': undefined,
@@ -26,6 +27,10 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_CT:
             return {
                 ...state, CT: action.payload
+            }
+        case actionTypes.SET_PN:
+            return {
+                ...state, PN: action.payload
             }
         case actionTypes.UPDATE_REPORTDATA:
             var data = action.payload.testSuiteDetails[0]

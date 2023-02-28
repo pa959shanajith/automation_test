@@ -6,15 +6,13 @@ import PropTypes from 'prop-types';
 const PluginSection = ({userInfo}) => {
 
     const [pluginList, setPluginList] = useState({
-        "Integration": { title: "Integrations", show: false },
-        "Utility" : { title: "Utilities", show: false},
-        "Mindmap": { title: "Mindmaps", show: false },
-        "Neuron Graphs": {title:"Neuron Graphs", show: false},
-        "Reports": { title: "Reports", show: false},
-        "Dashboard": {title:"Dashboard", show: false},
-        "Selenium To Avo": {title:"Selenium To Avo", show: false},
-        "Avo Discover": {title:"Avo Discover", show: false},
         "iTDM": {title:"iTDM", show: false},
+        "MR": { title: "Reports", show: false},
+        "MD": {title:"Dashboard", show: false},
+        "DE" : { title: "Utilities", show: false},
+        "ALMDMT": { title: "Integrations", show: false },
+        "AGS":{ title: "Avo Genius", show: false },
+        "STAVO":{ title: "Selenium To Avo", show: false },
         "showList" : false,
     });
 
@@ -23,6 +21,9 @@ const PluginSection = ({userInfo}) => {
             let tempList = { ...pluginList };
             let availablePlugins = userInfo.pluginsInfo;
             let pluginsLength = availablePlugins.length;
+            tempList["AGS"].show = true;
+            tempList["DE"].show = true;
+            tempList["MR"].show = true;
             for(let i=0 ; i < pluginsLength ; i++){
                 // if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
@@ -31,7 +32,9 @@ const PluginSection = ({userInfo}) => {
                     // else tempList[pluginName] = { title: pluginName, show: true};
                 // }
             }
-            tempList["Avo Discover"].show = false;
+            // tempList["Avo Discover"].show = false;
+            // tempList["Mindmap"].show = false;
+            // tempList["Selenium To Avo"].show = false;
             tempList.showList = true;
             setPluginList(tempList);
         }
@@ -39,8 +42,8 @@ const PluginSection = ({userInfo}) => {
 
     return(
         <div data-test="plugins-section" className="plugin-section">
-            <div data-test="available-plugins-title" className="avail-plugin-title">Available Plugins</div>
-            <div data-test="plugins-blocks" className="plugin-blocks">
+                <div data-test="plugins-blocks" className="plugin-blocks">
+
                 {
                     pluginList.showList && Object.keys(pluginList).map(pluginName =>
                         <Fragment key={pluginName} >

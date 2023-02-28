@@ -16,7 +16,7 @@ const RefBarItems = props => {
 	const dispatch = useDispatch();
 	const highlightRef = useRef();
 	const history = useHistory();
-	const { appType, uid } = useSelector(state=>state.plugin.CT);
+	const {uid } = useSelector(state=>state.plugin.CT);
 	const compareFlag = useSelector(state=>state.scrape.compareFlag);
 	const objValue = useSelector(state=>state.scrape.objValue);
     const [toFilter, setToFilter] = useState([]);
@@ -32,6 +32,7 @@ const RefBarItems = props => {
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
 	const [imageHeight,setImageHeight]=useState(0)
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);
+	const appType= props.appType;
 
 	useEffect(()=>{
 		return ()=>{
@@ -148,7 +149,7 @@ const RefBarItems = props => {
 				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
 			} else setHighlight(false);
 			if(!ScrapedObject.xpath.startsWith('iris')){
-				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
+				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
 					.then(data => {
 						if (data === "Invalid Session") return RedirectPage(history);
 						if (data === "fail") setMsg(Messages.SCRAPE.ERR_HIGHLIGHT)
@@ -264,7 +265,7 @@ const RefBarItems = props => {
 					</div>
 					<div className="scrape__filterTagBtns">
 					{ tagList.map((tag, index)=>(
-						<button key={index} data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
+						<button key={index} data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
 					))}
 					</div>
                 </div>
@@ -277,9 +278,10 @@ const RefBarItems = props => {
     
     return (
     
-        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
+        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} hideInfo={props.hideInfo} collapse={props.collapse} collapsible={true} scrapeScreenURL={scrapedURL} >
 			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title" title="Screenshot">Screenshot</span></div>}
             { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter" title="Filter"/></span><span className="rb_box_title" title="Filter">Filter</span></span>}
+			<div data-test="screenshot" className="ic_box"  onClick={props.openPopup}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Design Test Step" src="static/imgs/Design_Test_Step.png"/><span className="rb_box_title" title="Design Test Step">Design<span className="rb_box_title" title="Design Test Step">Test Steps</span></span></div>
         </ReferenceBar>
         
     

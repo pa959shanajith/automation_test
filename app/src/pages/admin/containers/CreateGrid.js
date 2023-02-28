@@ -34,17 +34,14 @@ const CreateGrid = ({
   const [searchText, setSearchText] = useState("");
   const [dataUpdated, setDataUpdated] = useState(false);
   const [agentData, setAgentData] = useState([]);
+  const [filteredList, setFilteredList] = useState(agentData);
   let selectedAgents = undefined;
+  let newselectedAgentsNumbers = 0;
 
   let firstRenderCheck = true;
   const [selection] = useState(
     new Selection({
       onSelectionChanged: () => {
-        console.log(firstRenderCheck);
-        console.log(selection.getSelectedCount());
-        console.log(currentGrid.agents.length);
-        console.log(selectedAgentsNumbers);
-        console.log(newselectedAgentsNumbers);
         if (
           firstRenderCheck &&
           selection.getSelectedCount() === 0 &&
@@ -55,10 +52,6 @@ const CreateGrid = ({
           }
           firstRenderCheck = false;
         }
-        console.log(selection.getItems());
-        console.log(selection.getSelection());
-        console.log(selection.getSelectedCount());
-        // setSelectedAgents(selection.getSelection());
         selectedAgents = selection.getSelection();
       }
     })
@@ -67,25 +60,30 @@ const CreateGrid = ({
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
 
-    if (
-      operation === "add" ||
-      (operation === "sub" && agentData[index].icecount > 1)
-    ) {
-      updatedData[index] = {
-        ...agentData[index],
-        icecount:
-          operation === "add"
-            ? agentData[index].icecount + 1
-            : agentData[index].icecount - 1,
-      };
-      setAgentData([...updatedData]);
+    if (operation === "add" || (operation === "sub" && parseInt(agentData[index].icecount) > 1))
+    {
+        updatedData[index] = {
+          ...agentData[index],
+          icecount:
+            operation === "add"
+              ? parseInt(agentData[index].icecount) + 1
+              : parseInt(agentData[index].icecount) - 1,
+        };
+        setAgentData([...updatedData]);
+        let filteredItems = updatedData.filter(
+          (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+        );
+        setFilteredList(filteredItems);
     } else if (operation === "update" && newVal > 0) {
       updatedData[index] = { ...agentData[index], icecount: parseInt(newVal) };
       setAgentData([...updatedData]);
+      let filteredItems = updatedData.filter(
+        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+      );
+      setFilteredList(filteredItems);
     }
   };
 
-  const [filteredList, setFilteredList] = useState(agentData);
   const handleSearchChange = (value) => {
     let filteredItems = agentData.filter(
       (item) => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1
@@ -125,13 +123,10 @@ const CreateGrid = ({
     },
   ];
   useEffect(() => {
-    currentGrid.name === gridName
-      ? setDataUpdated(false)
-      : setDataUpdated(true);
+    currentGrid.name === gridName ? setDataUpdated(false) : setDataUpdated(true);
+    if(gridName.trim().length > 0) setGridName(gridName);
+    else setGridName('');
   }, [gridName]);
-
-  const [selectedAgentsNumbers, setSelectedAgentsNumbers] = useState(0);
-  let newselectedAgentsNumbers = 0;
 
   useEffect(() => {
     (async () => {
@@ -203,11 +198,6 @@ const CreateGrid = ({
     })();
   }, []);
 
-  useEffect(() => {
-    console.log("agentData", agentData);
-    console.log(selectedAgentsNumbers);
-  }, [selectedAgentsNumbers]);
-
   const showLegend = (state, name) => {
     return (
       <div className="agent_state">
@@ -216,16 +206,19 @@ const CreateGrid = ({
       </div>
     );
   };
+
+ 
+
   const handleConfigSave = async () => {
     (async () => {
       setLoading("Loading...");
       let requestData = {};
-      {
-        if (currentGrid._id !== "" && currentGrid.name !== "") {
+
+      if (currentGrid._id !== "" && currentGrid.name !== "") {
           let updateAgentData = {
             action: "update",
             value: {
-              name: gridName,
+              name: gridName.trim(),
               _id: currentGrid._id,
               agents: agentData
                 .filter((agent) => agent.isSelected)
@@ -237,11 +230,11 @@ const CreateGrid = ({
             },
           };
           requestData = updateAgentData;
-        } else {
+      } else {
           let createAgentData = {
             action: "create",
             value: {
-              name: gridName,
+              name: gridName.trim(),
               agents: agentData
                 .filter((agent) => agent.isSelected)
                 .map((agent) => ({
@@ -253,8 +246,10 @@ const CreateGrid = ({
           };
           requestData = createAgentData;
         }
-      }
-
+    if(requestData.value.agents.length < 1) {
+      setMsg(MSG.CUSTOM("Please select atleast one Agent",VARIANT.ERROR));
+    }
+    else{
       const storeConfig = await saveAvoGrid(requestData);
       if (storeConfig !== "success") {
         if (storeConfig.error && storeConfig.error.CONTENT) {
@@ -263,21 +258,26 @@ const CreateGrid = ({
           setMsg(MSG.CUSTOM("Something Went Wrong", VARIANT.ERROR));
         }
       } else {
-        showMessageBar("Grid Create Successfully", "SUCCESS");
+        showMessageBar("Grid Created Successfully", "SUCCESS");
         setCurrentGrid(false);
       }
-      setLoading(false);
+    }
+    setLoading(false);
     })();
   };
   const onAgentSelection = (name) => {
     const updatedData = [...agentData];
-
     const index = updatedData.findIndex((agent) => agent.name === name);
     updatedData[index] = {
       ...agentData[index],
       isSelected: !agentData[index].isSelected,
     };
     setAgentData([...updatedData]);
+
+    let filteredItems = updatedData.filter(
+      (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+    );
+    setFilteredList(filteredItems);
   };
 
   return (
@@ -290,7 +290,7 @@ const CreateGrid = ({
       </div>
       <div className="api-ut__btnGroup">
         {/* <button data-test="submit-button-test" onClick={() => console.log()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button> */}
-        <button data-test="submit-button-test" onClick={handleConfigSave}>
+        <button data-test="submit-button-test" disabled={!gridName} onClick={handleConfigSave}>
           Save
         </button>
         <button
@@ -303,7 +303,7 @@ const CreateGrid = ({
           <>
             <div className="searchBoxInput">
               <SearchBox
-                placeholder="Enter Text to Search"
+                placeholder="Search"
                 width="20rem"
                 value={searchText}
                 onClear={() => handleSearchChange("")}
@@ -317,17 +317,14 @@ const CreateGrid = ({
           </>
         )}
         <div className="devOps_config_name">
-          <span className="api-ut__inputLabel" style={{ fontWeight: "700" }}>
-            Avo Grid Name :{" "}
-          </span>
-          &nbsp;&nbsp;
+          <span className="api-ut__inputLabel_text" >Avo Grid Name :</span>
           <span className="api-ut__inputLabel">
             <TextField
               value={gridName}
               width="150%"
               label=""
               standard={true}
-              onChange={(event) => setGridName(event.target.value)}
+              onChange={(event) => { setGridName(event.target.value) } }
               autoComplete="off"
               placeholder="Enter Grid Name"
             />
@@ -335,7 +332,7 @@ const CreateGrid = ({
         </div>
       </div>
       <div>
-        <div className="agent_state__legends">
+        <div className="agent_state__legends_grid">
           {showLegend("inactive", "Inactive")}
           {showLegend("idle", "Active - Idle")}
           {showLegend("in-progress", "Active - In Progress")}
@@ -346,11 +343,11 @@ const CreateGrid = ({
       <div
         style={{
           position: "absolute",
-          width: "100%",
-          height: "70%",
+          width: "98%",
+          height: "-webkit-fill-available",
           marginTop: "1.5%",
         }}
-      >
+      >    
         <DetailsList
           columns={agentListHeader}
           items={(searchText.length > 0 ? filteredList : agentData).map(

@@ -10,9 +10,8 @@ import { ReferenceBar, ScrollBar } from '../../global';
         mirror -> base64 screenshot
 */
 
-const ReferenceContent = ({mirror}) => {
-
-    const { appType } = useSelector(state=>state.plugin.CT);
+const ReferenceContent = ({mirror,collapse,appType,openScrapeCapture}) => {
+    // const { appType } = useSelector(state=>state.plugin.CT);
     const [showScreenPop, setShowScreenPop] = useState(false);
     const [screenshotY, setScreenshotY] = useState(null);
 	const [mirrorHeight, setMirrorHeight] = useState("0px");
@@ -32,15 +31,16 @@ const ReferenceContent = ({mirror}) => {
 		mirrorImg.src = `data:image/PNG;base64,${mirror}`;
 	}, [mirror])
 
-    const closeAllPopups = () => setShowScreenPop(false);
+    const closeAllPopups = () =>  setShowScreenPop(false);
+    
 
     const ScreenPopup = () => (
         <>
         {
             showScreenPop && 
-            <ClickAwayListener onClickAway={closeAllPopups}>
+            // <ClickAwayListener onClickAway={()=>{debugger; closeAllPopups();}}>
             <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`, height: `${mirrorHeight}px`}}>
-                <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
+                <h4 className="pop__header" onClick={()=>{setShowScreenPop(false)}}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div className="screenshot_pop__content" >
 				<div className="scrsht_outerContainer" id="ss_ssId">
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
@@ -51,7 +51,7 @@ const ReferenceContent = ({mirror}) => {
 				</div>
 				</div>
             </div>
-            </ClickAwayListener>
+            // </ClickAwayListener>
         }
         </>
     );
@@ -64,9 +64,11 @@ const ReferenceContent = ({mirror}) => {
 
     return (
     <>
-    <ReferenceBar popups={<ScreenPopup/>} closeAllPopups={closeAllPopups}>
+    <ReferenceBar hideInfo={true} popups={<ScreenPopup/>} collapsible={true} collapse={collapse} closeAllPopups={closeAllPopups}>
     { appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={togglePop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
+    <div className="ic_box" onClick={openScrapeCapture}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Capture Elements" src="static/imgs/Capture_Element.png"/><span className="rb_box_title">Capture<span className="rb_box_title">Elements</span></span></div>
     </ReferenceBar>
+
     </>
     );
 };

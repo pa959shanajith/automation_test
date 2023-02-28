@@ -6,6 +6,11 @@ var client = new Client();
 var epurl = process.env.DAS_URL;
 // var utils = require('../lib/utils');
 
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
 exports.flowGraphResults = function(req, res){
 	logger.info("Inside UI service: flowGraphResults");
 	try{
@@ -128,6 +133,7 @@ exports.APG_createAPGProject = function(req,res){
 		var inputs = req.body.data;
 		inputs.createdby = name;
 		inputs.modifiedby = name;
+		inputs.host = headers.headers.host;
 		var args = {
 			data: inputs,
 			headers: {

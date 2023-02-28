@@ -1,14 +1,14 @@
 {
   "pluginData":{
-    "integration":{
+    "almdmt":{
       "tooltip":{
-        "generic":"Connect Avo Assure to other test management systems, ALM and DevOps Tools"
+        "generic":"Configure Avo Assure to integrate with external systems"
       },
       "availableForTrial":false
     },
-    "utility":{
+    "de":{
       "tooltip":{
-        "generic":"Setup data encryption, imbedded data tables, and more for use during test design"
+        "generic":"Utilities for encryption and data tables"
       },
       "availableForTrial":false
     },
@@ -18,19 +18,19 @@
       },
       "availableForTrial":true
     },
-    "reports":{
+    "mr":{
       "tooltip":{
-        "generic":"View, analyze and export executed tests"
+        "generic":"View, analyze and export executed test scenarios "
       },
       "availableForTrial":true
     },
-    "dashboard":{
+    "md":{
       "tooltip":{
-        "generic":"Create, view, manage your own test automation dashboard"
+        "generic":"Create, view and manage your test automation dashboard"
       },
       "availableForTrial":false
     },
-    "seleniumtoavo":{
+    "stavo":{
       "tooltip":{
         "generic":"This is selenium to avo"
       }
@@ -55,6 +55,12 @@
         "generic":"Test Data Management tool to create synthetic data"
       },
       "availableForTrial":false
+    },
+    "ags":{
+      "tooltip":{
+        "generic":"Smart recorder to capture your end-to-end test scenario"
+      },
+      "availableForTrial":true
     }
   }
 }

@@ -1,16 +1,68 @@
 .agent-container {
-    padding: 2%;
+    padding: 1%;
 }
 .page-taskName {
-    margin-top: 1%;
+    margin-top: 0%;
 }
 .agent-icons {
     width: fit-content;
 }
 .api-ut__btnGroup {
     width: 100%;
-    margin-bottom: 1%;
+    margin-bottom: 1.5%;
+    height: 6vh;
+    &>button{
+        position: relative;
+        float: right;
+        padding: 2px 25px;
+        margin-right: 7px;
+        height: 2.5rem;
+        font-size: 17px;
+        font-family: "LatoWebLight";
+        background-color: #633693;
+        border: none;
+        outline: none;
+        color: #fff;
+        border-radius: 20px;
+        &:disabled{
+            background-color: #997cb8;
+            cursor: not-allowed;
+        }
+    }
+}
 
+.api-ut__btnGroup__grid {
+    width: 100%;
+    margin-bottom: 1.5%;
+    height: 6vh;
+    display: flex;
+    flex-direction: row-reverse;
+    &>button{
+        position: relative;
+        float: right;
+        padding: 2px 25px;
+        margin-right: 7px;
+        height: 2.5rem;
+        font-size: 17px;
+        font-family: "LatoWebLight";
+        background-color: #633693;
+        border: none;
+        outline: none;
+        color: #fff;
+        border-radius: 20px;
+        &:disabled{
+            background-color: #997cb8;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.api-ut__btnGroup__agent {
+    width: 100%;
+    margin-bottom: 1.5%;
+    height: 6vh;
+    display: flex;
+    flex-direction: row;
     &>button{
         position: relative;
         float: right;
@@ -206,7 +258,7 @@
     white-space: nowrap;
 }
 .tkn-table__head {
-    text-align: center !important;
+    text-align: end !important;
 }
 .tkn-table__sr_no{
     flex: 0 0 5% !important;
@@ -259,36 +311,37 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 60vh;
+    height: 61vh;
     &_filter {
-        margin-bottom: 3%;
+        margin-bottom: 2%;
         display: flex;
         justify-content: space-between;
     }
     &_container {
-        height: 47vh;
+        height: 48vh;
         max-height: 100%;
     }
 }
 .devOps_pool_list {
     width: 45%;
+    margin-top: 3vh;
     & > div {
-        margin: 5.4% 0;
+        margin: 1.4% 0;
         display: flex;
         align-items: center;
+        margin-bottom: 7vh;
     }
 }
 .devOps__scenario_list {
     padding-left: 2%;
 }
 .active-users-token {
-    max-height: 70vh;
+    max-height: 62.6vh;
     height: 100% !important;
 }
 .searchBoxInput {
     position: relative;
     float: right;
-    margin-right: 1%;
 }
 .agents{
     &__action_icons {
@@ -309,8 +362,14 @@
     margin: 0 10% !important;
 }
 .devOps_config_name {
+    margin: 0% 16% 0% 0% !important;
     display: flex;
     align-items: center;
+    .api-ut__inputLabel_text{
+        font-weight: 700;
+            float: left;
+            margin-right: 1%;
+    } 
 }
 .devOps_dropdown_label {
     font-weight: 700;
@@ -319,10 +378,10 @@
         margin-right: 8%;
     }
     &_browser {
-        margin-right: 15%;
+        margin-right: 20.5%;
     }
     &_integration {
-        margin-right: 19%;
+        margin-right: 18.5%;
     }
     &_execution {
         margin-right: 15.5%;
@@ -343,7 +402,7 @@
         justify-content: space-between;
     }
     &_execution_mode {
-        margin-right: 14.5%;
+        margin-right: 15.5%;
     }
 }
 .devOps_seperation {
@@ -353,13 +412,13 @@
     border-radius: 50%;
 }
 .select_project_img {
-    width: 80%;
+    width: 50%;
 }
 .react-checkbox-tree label {
     display: flex;
 }
 .no_config_img{
-    height: 78vh;
+    height: 28rem;
     display: flex;
     justify-content: flex-end;
     margin-right: 11%;
@@ -405,8 +464,13 @@
         background-color: #a19f9d;
     }
     &__legends {
+        display: -webkit-inline-box;
+        width: inherit;
+    }
+    &__legends_grid{
         display: flex;
         width: inherit;
+        margin-top: 3rem;
     }
 }
 .grid_download_dialog{

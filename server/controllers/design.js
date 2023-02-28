@@ -11,6 +11,14 @@ const utils = require('../lib/utils');
 const axios = require('axios');
 const ClientOAuth2 = require('client-oauth2');
 
+
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
+
+
 exports.readTestCase_ICE = async (req, res) => {
 	const fnName = "readTestCase_ICE";
 	logger.info("Inside UI service: " + fnName);
@@ -178,6 +186,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								"testcaseid": requestedtestcaseids,
 								"userid": req.body.userInfo.user_id
 							};
+							inputs.host = headers.headers.host;
 							var args = {
 								data: inputs,
 								headers: {
@@ -185,6 +194,31 @@ exports.debugTestCase_ICE = function (req, res) {
 								}
 							};
 							logger.info("Calling DAS Service from debugTestCase_ICE: design/readTestCase_ICE");
+              const startDebugging = (dataToIce)=>{
+                redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+										function result_debugTestCase_listener(channel, message) {
+											data = JSON.parse(message);
+											//LB: make sure to send recieved data to corresponding user
+											if (icename == data.username && ["unavailableLocalServer", "result_debugTestCase"].includes(data.onAction)) {
+												redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
+												if (data.onAction == "unavailableLocalServer") {
+													logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
+													if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+														var soc = myserver.socketMapNotify[username];
+														soc.emit("ICEnotAvailable");
+													}
+												} else if (data.onAction == "result_debugTestCase") {
+													try {
+														res.send(data.value);
+													} catch (exception) {
+														logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+													}
+												}
+											}
+										}
+										redisServer.redisSubServer.on("message",result_debugTestCase_listener);
+              }
+              if(!req.body.geniusExecution){
 							client.post(epurl + "design/readTestCase_ICE", args,
 								function (testcasedataresult, response) {
 								try {
@@ -212,33 +246,18 @@ exports.debugTestCase_ICE = function (req, res) {
 										responsedata.push(browsertypeobject);
 										logger.info("Sending socket request for debugTestCase to cachedb");
 										dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
-										redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-										function result_debugTestCase_listener(channel, message) {
-											data = JSON.parse(message);
-											//LB: make sure to send recieved data to corresponding user
-											if (icename == data.username && ["unavailableLocalServer", "result_debugTestCase"].includes(data.onAction)) {
-												redisServer.redisSubServer.removeListener('message', result_debugTestCase_listener);
-												if (data.onAction == "unavailableLocalServer") {
-													logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
-													if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-														var soc = myserver.socketMapNotify[username];
-														soc.emit("ICEnotAvailable");
-													}
-												} else if (data.onAction == "result_debugTestCase") {
-													try {
-														res.send(data.value);
-													} catch (exception) {
-														logger.error("Exception in the service debugTestCase_ICE: %s", exception);
-													}
-												}
-											}
-										}
-										redisServer.redisSubServer.on("message",result_debugTestCase_listener);
+										startDebugging(dataToIce);
 									}
 								} catch (exception) {
 									logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 								}
 							});
+            }else {
+              let responsedata = [{apptype, template:"",datatables:[], testcase:requestedtestcaseids, testcasename:"geniusExecution"}];
+              responsedata.push(browsertypeobject);
+              dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
+              startDebugging(dataToIce);
+            }
 						} catch (exception) {
 							logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 						}

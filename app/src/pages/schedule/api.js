@@ -38,14 +38,14 @@ export const readTestSuite_ICE = async(readTestSuite) => {
   api returns 
 */
 
-export const getScheduledDetails_ICE = async() => { 
+export const getScheduledDetails_ICE = async(configKey, configName) => { 
     try{
         const res = await axios(url+'/getScheduledDetails_ICE', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {param : 'getScheduledDetails_ICE'},
+            data: {param : 'getScheduledDetails_ICE', configKey: configKey, configName: configName},
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -149,5 +149,32 @@ export const testSuitesSchedulerRecurring_ICE = async(executionData) => {
     } catch(err) {
         console.error(err)
         return {error:MSG.SCHEDULE.ERR_SCHEDULE}
+    }
+}
+
+
+// get scheduled details from scheduled date
+export const getScheduledDetailsOnDate_ICE = async(scheduledDate, configKey, configName) => { 
+    try{
+        const res = await axios(url+'/getScheduledDetailsOnDate_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {param : 'getScheduledDetails_ICE', scheduledDate: scheduledDate, configKey: configKey, configName: configName},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SCHEDULE.ERR_FETCH_SCHEDULE}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SCHEDULE.ERR_FETCH_SCHEDULE}
     }
 }

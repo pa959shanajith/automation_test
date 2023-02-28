@@ -8,28 +8,37 @@ import '../styles/Legends.scss'
 
 const Legends = ({isEnE}) => {
     return(
-        <svg className="ct-legendBox">
+        <svg className="ct-legendBox legendBoxAlignment">
             <g  transform="translate(10,10)">
-                <g data-test="modules">
-                    <circle className="ct-modules" cx="0" cy="0" r="10"></circle>
-                    <text className="ct-nodeLabel" x="15" y="3">Modules</text>
-                </g>
-                <g data-test="scenarios">
-                    <circle className="ct-scenarios" cx="90" cy="0" r="10"></circle>
-                    <text className="ct-nodeLabel" x="105" y="3">Scenarios</text>
-                </g>
                 {!isEnE?
                 <Fragment>
+                    <g data-test="modules">
+                        <circle className="ct-modules" cx="667" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="681" y="3">Module</text>
+                    </g>
+                    <g data-test="scenarios">
+                    <circle className="ct-scenarios" cx="739" cy="0" r="10"></circle>
+                    <text className="ct-nodeLabel" x="759" y="3">Scenario</text>
+                </g>
                     <g data-test="screens">
-                        <circle className="ct-screens" cx="180" cy="0" r="10"></circle>
-                        <text className="ct-nodeLabel" x="195" y="3">Screens</text>
+                        <circle className="ct-screens" cx="823" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="839" y="3">Screen</text>
                     </g>
                     <g data-test="testcases">
-                        <circle className="ct-testcases" cx="270" cy="0" r="10"></circle>
-                        <text className="ct-nodeLabel" x="285" y="3">Test Cases</text>
+                        <circle className="ct-testcases" cx="893" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="909" y="3">Testcase</text>
                     </g>
                 </Fragment>
-                :null}
+                :(<>
+                    <g data-test="endtoend">
+                        <circle className="ct-endtoend" cx="667" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="681" y="3">End to End Flow</text>
+                    </g>
+                    <g data-test="scenarios">
+                        <circle className="ct-scenarios" cx="789" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="804" y="3">Scenario</text>
+                    </g>
+                </> )}
             </g>
         </svg>
     )

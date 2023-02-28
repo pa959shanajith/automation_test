@@ -5,6 +5,23 @@
     flex-wrap: wrap;
 }
 
+
+
+.ref__bar {
+    background: #321e4f;
+    position: absolute;
+    color: #ffffff;
+    font-family: "LatoWebLight";
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    // margin: -4% -30% 10% 3%;
+
+}
+
 .ss__filterDisable{
     pointer-events: none;
 }

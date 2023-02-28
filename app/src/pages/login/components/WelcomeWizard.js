@@ -13,28 +13,13 @@ import { useHistory } from 'react-router-dom';
 import { manageUserDetails } from '../../admin/api';
 import { IconButton } from "@avo/designcomponents"
 
-const DPCard = ({title, items, type}) => {
-    return (<div className="d-p-card">
-                <div className="d-p-card__title">{title}</div>
-                <div className="d-p-card__itemsContainer">
-                  {items.map((item,idx)=> (<>
-                    <div key={title+idx} className="d-p-card__item">
-                      <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
-                      {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
-                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image"/></div>
-                    </div>
-                    {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
-                  </>))}
-                </div>
-            </div>)
-}
-
 
 const WelcomeWizard = ({showWizard, setPopover}) => {
   const [percentComplete,setPercentComplete] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
   const [showMacOSSelection, setShowMacOSSelection] = useState(false);
+  const [showLinuxOSSelection, setShowLinuxOSSelection] = useState(false);
   const [selectedMacOS, setSelectedMacOS] = useState("");
   const [downloadPopover, setDownloadPop] = useState("");
   const userInfo = useSelector(state=>state.login.userinfo);
@@ -50,6 +35,12 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const TnCInnerRef = useRef(undefined);
   const history = useHistory();
   const dispatch = useDispatch();
+  const [showImage , setShowImage] = useState("")
+  const[videoUrl,setVideoUrl]=useState("")
+   const enlargeImage = (imageName) => {
+    setShowImage(imageName)
+       
+  };
 
   // getting the browser name using userAgent
   const userAgent = window.navigator.userAgent.toLowerCase();
@@ -64,6 +55,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       : 'other';
 
   useEffect(()=>{
+    fetch("/getClientConfig").then(data=>data.json()).then(response=>setVideoUrl(response.videoTrialUrl))
     getOS();
     if(activeStep===0){
       let observer = new IntersectionObserver(function(entries) {
@@ -111,7 +103,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const updateStepNumber = async(n) => {
     let stepNo = activeStep + n;
 
-    if(stepNo===3)
+    if(stepNo===4)
         setAnimationDir(true);
 
     setActiveStep((currPage) => currPage + n);
@@ -185,7 +177,11 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         setShowMacOSSelection(true)
         setOS("MacOS");
     }
-
+    else if (navigator.userAgent.indexOf("Linux") != -1) 
+    {
+        setShowLinuxOSSelection(true)
+        setOS("Linux");
+    }
     else 
         setOS("Not Supported");
   }
@@ -233,15 +229,13 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
 
   
   // send correct filename to getICE and start downloading Client
-  const _handleClientDownload = (pkgName=undefined) =>{
+  const _handleClientDownload = () =>{
     if(showMacOSSelection){
-        // if (selectedMacOS==="") {
-        //     setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
-        // }
-        // else{
-        setSelectedMacOS(pkgName)
-        getIce("avoclientpath_"+pkgName)
-        // }
+        getIce("avoclientpath_Mac")
+    }
+    else if(showLinuxOSSelection)
+    {
+        getIce("avoclientpath_Linux")
     }
     else if (OS==="Windows")
         getIce("avoclientpath_Windows")
@@ -259,11 +253,41 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   // //   }
   // }
 
+  const GetImageModal = ({imageName}) =>{ 
+    document.getElementsByClassName("form-container")[0].style.visibility="hidden";
+    document.getElementsByClassName("stepper")[0].style.visibility="hidden";
+    return (
+        <div>
+            <img src={`static/imgs/${imageName}.jpg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "enlargeImage-modified" :"enlargeImage"}/>
+            <img src={`static/imgs/close-btn.svg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "close-btn-modified" : "close-btn"} onClick={()=>
+                {setShowImage("");
+                document.getElementsByClassName("form-container")[0].style.visibility="visible";
+                document.getElementsByClassName("stepper")[0].style.visibility="visible";}} />
+        </div>
+    )
+}
+
+  const DPCard = ({title, items, type}) => {
+    return (<div className="d-p-card">
+                <div className="d-p-card__title">{title}</div>
+                <div className="d-p-card__itemsContainer">
+                  {items.map((item,idx)=> (<>
+                    <div key={title+idx} className="d-p-card__item">
+                      <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
+                      {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
+                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.jpg`} className={(["WW_mac_2_1", "WW_mac_4_1"].includes(item.imageName)) ? "d-p-card__image-modified_2" : (["WW_win_2_1", "WW_win_2_2", "WW_win_4_1", "WW_win_4_2"].includes(item.imageName) ? "d-p-card__image-modified" : "d-p-card__image")} onClick={()=>enlargeImage(item.imageName)}/></div>
+                    </div>
+                    {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
+                  </>))}
+                </div>
+            </div>)
+}
+
   const getTermsAndConditions = () => {
       return (
             <div id="tnc_content" ref={TnCInnerRef}>
                 <h4 className="tnc_header">SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT</h4>
-                <p className="tnc_bold">THIS SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION, A DIVISION OF SLK SOFTWARE SERVICES PVT LTD (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
+                <p className="tnc_bold">THIS SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION, A DIVISION OF SLK SOFTWARE PVT LTD (FORMERLY KNOWN AS SLK SOFTWARE SERVICES PVT LTD) (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">1.        </span> DEFINITIONS</h5>
@@ -275,16 +299,17 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         <p>"<b>Intellectual Property Rights</b>" means all trade secrets, patents and patent applications, trademarks (whether registered or unregistered and including any goodwill acquired in such trade marks), service marks, trade names, business names, internet domain names, e-mail address names, copyrights (including rights in computer software), moral rights, database rights, design rights, rights in know-how, rights in confidential information, rights in inventions (whether patentable or not) and all other intellectual property and proprietary rights (whether registered or unregistered, and any application for the foregoing), and all other equivalent or similar rights which may subsist anywhere in the world.</p>
                         <p>"<b>License</b>" means a license to use the Software granted pursuant to the terms and conditions of this License Agreement.</p>
                         <p>"<b>Licensee</b>" means the person or entity that has entered into this License Agreement.</p>
-                        <p>"<b>Licensor</b>" means Avo Automation, a division of SLK Software Services Pvt Ltd.</p>
+                        <p>"<b>Licensor</b>" means Avo Automation, a division of SLK Software Pvt Ltd (formerly known as SLK Software Services Pvt Ltd).</p>
                         <p>"<b>Party</b>" means either the "Licensor" or "Licensee", individually as the context so requires; and "<b>Parties</b>" means the "Licensor" and "Licensee", collectively.</p>
                         <p>"<b>Personnel</b>" means and includes a Party’s or an Affiliate’s directors, officers, employees, agents, auditors, consultants, contract employees and subcontractors.</p>
                         <p>"<b>Software</b>" means the appropriate software product licenses made available to Licensee and its Authorized Users by Licensor under this License Agreement.</p>
+                        <p><span className="tnc_num_idx">1.2.    </span> <b>Common Words.</b>The following words shall be interpreted as designated: (i) “or” connotes any combination of all or any of the items listed; (ii) where “including” is used to refer to an example or begins a list of items, such example or items shall not be exclusive; and (iii) “specified” requires that an express statement is contained in the relevant document.</p>
                     </div>
                 </div>
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">2.        </span> TERM AND TERMINATION</h5>
-                    <p><span className="tnc_num_idx">2.1.    </span> <b>Term.</b> This License Agreement shall remain in effect for {userInfo.isTrial?"a period of fifteen (15) days":"the provided period"} from the date of download of the Software (‘Term’). The License term shall automatically expire on the end of the Term.</p>
+                    <p><span className="tnc_num_idx">2.1.    </span> <b>Term.</b> This License Agreement shall remain in effect for {userInfo.isTrial?"a period of fifteen (15) days":"the provided period"} from the date of installation of the Software (‘Term’). The License term shall automatically expire on the end of the Term.</p>
                     <p><span className="tnc_num_idx">2.2.    </span> <b>Termination for Cause.</b> If Licensee breaches a material obligation under this Agreement, then Licensor may terminate this Agreement with immediate effect.</p>
                 </div>
                 <div>
@@ -296,14 +321,13 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <br/>
                     <h5><span className="tnc_num_idx">4.        </span> SCOPE OF LICENSE</h5>
                     <p><span className="tnc_num_idx">4.1.    </span> <b>Proprietary Rights to Software.</b> As between Licensor and Licensee, Licensor shall be deemed to own the Intellectual Property Rights in or to the Software; and nothing contained in this License Agreement shall be construed to convey any Intellectual Property Rights in or to the Software to Licensee (or to any party claiming through Licensee) other than the license rights expressly set forth in this License Agreement.</p>
-                    <p><span className="tnc_num_idx">4.2.    </span> <b>License Grant.</b></p>
-                    <p className="tnc_third"><span className="tnc_num_idx">4.2.1.  </span> As between Licensor and Licensee, Licensor shall be deemed to own the Intellectual Property Rights in or to the Software; and nothing contained in this License Agreement shall be construed to convey any Intellectual Property Rights in or to the Software to Licensee (or to any party claiming through Licensee) other than the license rights expressly set forth in this License Agreement.</p>
-                    <p><span className="tnc_num_idx">4.3.    </span> <b>Restrictions.</b> Except to the extent authorized or permitted in this License Agreement or by applicable law without the possibility of contractual waiver, Licensee shall not directly or indirectly: (i) copy, modify, create derivative work; (ii), transfer or distribute the Software (electronically or otherwise); (iii) reverse assemble, reverse engineer, reverse compile, or otherwise translate the Software; (iv) sublicense or assign the license for the Software; (v) remove, delete or alter any content, trademark, copyright or other intellectual property rights from the Software including any copies thereof; (vi) use the Software in violation of the applicable laws.</p>
+                    <p><span className="tnc_num_idx">4.2.    </span> <b>License Grant.</b>Subject to the compliance of the terms and conditions of this License Agreement by Licensee, Licensor hereby grants Licensee a non- exclusive, non-transferable, and non- sub licensable License to download and use one copy of the Software solely for Licensee’s own internal trial purpose during the Term</p>
+                    <p><span className="tnc_num_idx">4.3.    </span> <b>Restrictions.</b> Except to the extent authorized or permitted in this License Agreement or by applicable law without the possibility of contractual waiver, Licensee shall not directly or indirectly: (i) copy, modify, create derivative work; (ii), transfer or distribute the Software (electronically or otherwise); (iii) reverse assemble, disassemble,reverse engineer, reverse compile, or otherwise translate the Software; (iv) sublicense or assign the license for the Software; (v) remove, delete or alter any content, trademark, copyright or other intellectual property rights from the Software including any copies thereof; (vi) use the Software for comparison, and marketing any other similar purpose; (vii) use the Software to derive ideas for developing similar features on any other similar products; (viii) use the Software in violation of the applicable laws.</p>
                 </div>
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">5.        </span> REPRESENTATIONS AND WARRANTIES</h5>
-                    <p><span className="tnc_num_idx">5.1.    </span> <b>Authority and Non-Infringement.</b> Licensor represents and warrants that Licensor has all rights and authority required to enter into this License Agreement, and to provide the Software and perform the services contemplated by this License Agreement, free from all liens, claims, encumbrances, security interests and other restrictions. Subject to the applicable terms and conditions of this License Agreement, Licensee will be entitled to use and enjoy the benefit of all Software without adverse interruption or disturbance by Licensor or any entity asserting a claim under or through Licensor. Licensor further represents and warrants that the Software  and the use thereof by Licensee in accordance with the terms and conditions of this License Agreement, will not infringe (whether directly, contributorily, by inducement or otherwise), misappropriate or violate the Intellectual Property Rights of any third party, or violate the laws, regulations or orders of any governmental or judicial authority. Licensee represents and warrants that Licensee has all rights and authority required to enter into this License Agreement and Licensee has provided inaccurate information about itself for accessing the Software.</p>
+                    <p><span className="tnc_num_idx">5.1.    </span> <b>Authority and Non-Infringement.</b> Licensor represents and warrants that Licensor has all rights and authority required to enter into this License Agreement, and to provide the Software and perform the services contemplated by this License Agreement, free from all liens, claims, encumbrances, security interests and other restrictions. Subject to the applicable terms and conditions of this License Agreement, Licensee will be entitled to use and enjoy the benefit of all Software without adverse interruption or disturbance by Licensor or any entity asserting a claim under or through Licensor. Licensor further represents and warrants that the Software  and the use thereof by Licensee in accordance with the terms and conditions of this License Agreement, will not infringe (whether directly, contributorily, by inducement or otherwise), misappropriate or violate the Intellectual Property Rights of any third party, or violate the laws, regulations or orders of any governmental or judicial authority. Licensee represents and warrants that Licensee has all rights and authority required to enter into this License Agreement and Licensee has provided accurate information about itself for accessing the Software.</p>
                     <p><span className="tnc_num_idx">5.2.    </span> <b>Standard of Service.</b> Licensor warrants that the maintenance service provided by Licensor pursuant to this License Agreement or any other agreement relating to the Software, will be performed in a timely and professional manner, in conformity with standards generally accepted in the software industry, by qualified and skilled individuals. Licensor further warrants that its personnel will provide services with a minimal amount of interference to Licensee’s normal business operations and subject to Licensee’s security and work place policies and procedures.</p>
                     <p><span className="tnc_num_idx">5.3.    </span> <b>Disabling Devices.</b> Licensor represents and warrants that at the time of download the Software shall not contain any computer code or any other procedures, routines or mechanisms designed by Licensor (or its personnel or licensors) to: (i) disrupt, disable, harm or impair in any way the Software’s (or any other software’s) orderly operation based on the elapsing of a period of time advancement to a particular date or other numeral (sometimes referred to as “time bombs”, “time locks”, or “drop dead” devices); (ii) cause the Software to damage or corrupt any of Licensee’s, data, storage media, programs, equipment or communications, or otherwise interfere with Licensee’s use of the Software in accordance with this Agreement, or (iii) permit Licensor, its personnel, or any other third party, to access the Software (or any other software or Licensee’s or its Affiliates’ computer systems) for any reason (sometimes referred to as “traps”, “access codes” or “trap door” devices).</p>
                     <p><span className="tnc_num_idx">5.4.    </span> <b>Disclaimer. EXCEPT FOR THE REPRESENTATIONS AND WARRANTIES EXPRESSLY SET FORTH IN THIS LICENSE AGREEMENT OR THE AGREEMENT, THE SOFTWARE AND DOCUMENTATION ARE LICENSED “AS IS,” AND LICENSOR DISCLAIMS ANY AND ALL OTHER WARRANTIES, EXPRESS OR IMPLIED, WITH RESPECT TO THE SOFTWARE, THE DOCUMENTATION, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</b></p>
@@ -335,7 +359,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">8.        </span> LIMITATION OF LIABILITY</h5>
-                    <p>LICENSOR WILL NOT BE LIABLE TO THE OTHER PARTY (OR TO ANY PERSON OR ENTITY CLAIMING THROUGH THE OTHER PARTY) FOR LOST PROFITS OR FOR SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR EXEMPLARY DAMAGES ARISING OUT OF OR IN ANY MANNER CONNECTED WITH THIS AGREEMENT OR THE SUBJECT MATTER HEREOF, REGARDLESS OF THE FORM OF ACTION AND WHETHER OR NOT SUCH PARTY HAS BEEN INFORMED OF, OR OTHERWISE MIGHT HAVE ANTICIPATED, THE POSSIBILITY OF SUCH DAMAGES. NOTWITHSTANDING ANYTHING CONTAINED HEREIN, LICENSOR’S TOTAL LIABILITY, (WHETHER IN CONTRACT, TORT, INCLUDING NEGLIGENCE, OR OTHERWISE) UNDER OR IN CONNECTION WITH THIS AGREEMENT SHALL NOT EXCEED USD $1.</p>
+                    <p>LICENSOR WILL NOT BE LIABLE TO THE OTHER PARTY (OR TO ANY PERSON OR ENTITY CLAIMING THROUGH THE OTHER PARTY) FOR LOST PROFITS OR FOR SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL OR EXEMPLARY DAMAGES ARISING OUT OF OR IN ANY MANNER CONNECTED WITH THIS AGREEMENT OR THE SUBJECT MATTER HEREOF, REGARDLESS OF THE FORM OF ACTION AND WHETHER OR NOT LICENSEE HAS BEEN INFORMED OF, OR OTHERWISE MIGHT HAVE ANTICIPATED, THE POSSIBILITY OF SUCH DAMAGES. NOTWITHSTANDING ANYTHING CONTAINED HEREIN, LICENSOR’S TOTAL LIABILITY, (WHETHER IN CONTRACT, TORT, INCLUDING NEGLIGENCE, OR OTHERWISE) UNDER OR IN CONNECTION WITH THIS AGREEMENT SHALL NOT EXCEED USD $1.</p>
                 </div>
                 <div>
                     <br/>
@@ -361,7 +385,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">13.        </span> CHOICE OF LAW, JURISDICTION</h5>
-                    <p><b>Governing Law.</b> The Parties hereby agrees that this License Agreement shall be governed by and construed in accordance with the laws of Singapore.</p>
+                    <p><b>Governing Law.</b> The Parties hereby agrees that this License Agreement shall be governed by and construed in accordance with the laws of India.</p>
                 </div>
                 <div>
                     <br/>
@@ -376,14 +400,14 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">16.        </span> FORCE MAJEURE</h5>
-                    <p>A Party will be excused from a delay in performing, or a failure to perform, its obligations under this Agreement to the extent such delay or failure is caused by the occurrence of any contingency beyond the reasonable control, and without any fault, of such Party. In such event, the performance times shall be extended for a period of time equivalent to the time lost because of the excusable delay. However, if an excusable delay continues more than sixty (60) days, the Party not relying on the excusable delay may, at its option, terminate the Agreement in whole or in part, upon notice to the other Party. In order to avail itself of the relief provided in this Section for an excusable delay, the Party must act with due diligence to remedy the cause of, or to mitigate or overcome, such delay or failure.</p>
+                    <p>A Party will be excused from a delay in performing, or a failure to perform, its obligations under this Agreement to the extent such delay or failure is caused by the occurrence of any contingency beyond the reasonable control including epidemics and pandemics, and without any fault, of such Party. In such event, the performance times shall be extended for a period of time equivalent to the time lost because of the excusable delay. However, if an excusable delay continues more than sixty (60) days, the Party not relying on the excusable delay may, at its option, terminate the Agreement in whole or in part, upon notice to the other Party. In order to avail itself of the relief provided in this Section for an excusable delay, the Party must act with due diligence to remedy the cause of, or to mitigate or overcome, such delay or failure.</p>
                 </div>
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">17.        </span> CONSTRUCTION</h5>
-                    <p><span className="tnc_num_idx">17.1.    </span> <b>Inconsistencies.</b> In the event of any inconsistency between the provisions of this Agreement and the Appendix-A, the provisions of the Appendix-A shall govern for purposes of such Appendix-A. The provisions of this Agreement and the Appendix-A shall supersede the provisions of any shrink-wrap, click wrap or other license provisions included with the Software.</p>
-                    <p><span className="tnc_num_idx">17.2.    </span> <b>Modification.</b> The terms, conditions, covenants and other provisions of this Agreement may hereafter be modified, amended, supplemented or otherwise changed only by a written instrument (excluding e-mail or similar electronic transmissions) that specifically purports to do so and is physically executed by a duly authorized representative of each Party.</p>
-                    <p><span className="tnc_num_idx">17.3.    </span> <b>Severability.</b> If a court of competent jurisdiction declares any provision of this Agreement to be invalid, unlawful or unenforceable as drafted, the Parties intend that such provision be amended and construed in a manner designed to effectuate the purposes of the provision to the fullest extent permitted by law. If such provision cannot be so amended and construed, it shall be severed, and the remaining provisions shall remain unimpaired and in full force and effect to the fullest extent permitted by law.</p>
+                    <p><span className="tnc_num_idx">17.1.    </span> <b>Modification.</b> The terms, conditions, covenants and other provisions of this Agreement may hereafter be modified, amended, supplemented or otherwise changed only by a written instrument (excluding e-mail or similar electronic transmissions) that specifically purports to do so and is physically executed by a duly authorized representative of each Party.</p>
+                    <p><span className="tnc_num_idx">17.2.    </span> <b>Severability.</b>  If a court of competent jurisdiction declares any provision of this Agreement to be invalid, unlawful, or unenforceable as drafted, the Parties intend that such provision be amended and construed in a manner designed to effectuate the purposes of the provision to the fullest extent permitted by law. If such provision cannot be so amended and construed, it shall be severed, and the remaining provisions shall remain unimpaired and in full force and effect to the fullest extent permitted by law.</p>
+                    
                 </div>
                 <br/>
                 <p id="lastStepTnC"><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
@@ -399,7 +423,6 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         <button className="type1-button static-button" disabled={!tncAcceptEnabled} onClick={()=>{updateStepNumber(1)}}>I Agree</button>
     </div>
   };
-
   const InstallationSteps_win = [
       {
         title:"Open the AvoAssureClient.exe file either from:", 
@@ -423,7 +446,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         items:[
           {title:"Intialise installation",imageName:"WW_win_3_1"},
           {title:"Extracting files",imageName:"WW_win_3_2"},
-          {title:"Finish and Launch",imageName:"WW_win_3_2"}
+          {title:"Finish and Launch",imageName:"WW_win_3_3"}
         ],
         type:"NOR"
       },
@@ -478,11 +501,13 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       return <div className={"welcomeInstall "+(animationDir?AnimationClassNames.slideRightIn400:AnimationClassNames.slideLeftIn400)} style={{justifyContent:"space-evenly"}}>
         <div className="d-p-header">
             <div className="d-p-header__title"><div>Thanks for downloading !</div></div>
-            <div className="d-p-header__subtitle">If your download didn't start then don't worry, you can download it from <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
+            <div className="d-p-header__subtitle">If your download didn't start you can download it from the <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
         </div>
         <div className="installation-instructions-container">
             <div className="d-p-card-container">
-                <IconButton id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
+                { cardListNo===0 ? null : 
+                    <IconButton id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
+                }
                 {OS==="Windows" && InstallationSteps_win.map((item,idx)=>{
                     if (cardListNo===idx){
                       return <DPCard key={item.title+idx} title={item.title} items={item.items} type={item.type}></DPCard>
@@ -501,7 +526,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     // }
                     else return null;
                 })}
+                { cardListNo===3 ? null : 
                 <IconButton id="arrow__WW" disabled={cardListNo===3} data-type={cardListNo===3?"disabled":"not-disabled"} icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState+1)}} variant="borderless" />
+                }
             </div>
             <div style={{display:"flex", flexDirection:"row"}}>
               {OS==="Windows" ? InstallationSteps_win.map((item,idx)=> <div key={"select-"+idx} className="circle" data-type={cardListNo===idx} onClick={()=>{setCardListNo(idx)}}></div>):null}
@@ -529,23 +556,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
                 // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
                 }
-                
-                {(showMacOSSelection?(
-                    <>
-                        <div className="OSselectionText">Please select Operating System for downloading Avo Assure Client</div>
-                        <div className="choiceGroup">
-                            {Object.keys(config).map((osPathname)=>{
-                                if (osPathname.includes("Windows")){
-                                    return <></>;
-                                }
-                                let versionName = osPathname.split("_")[1]
-                                return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{_handleClientDownload(versionName)}}>Download on {versionName}</button>
-                            })}
-                        </div>
-                    </>)
-                    :null)}
 
-                {showIndicator && !showMacOSSelection ? 
+                {showIndicator ? 
                     <>
                         <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading the Avo Assure Client"}</div>
                         <div className="downloadProgress">
@@ -560,8 +572,11 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         </div>
                     </>
                 :
-                (OS==="Windows"?<button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>:null)}
-                {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
+                <>
+                <button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>
+                </>
+                }
+                            {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
             </div>
   };
 
@@ -576,7 +591,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         <a href={vidLink} target={"_blank"} referrerPolicy="no-referrer">Training Videos</a>
                         <a href={docLink} target={"_blank"} referrerPolicy="no-referrer">Training Document</a>
                     </div> */}
-                    <button className="type2-button" style={{marginTop: "2rem"}} onClick={() => {tcAction("Accept");}}>Get Started</button>
+                    <button className="type2-button" style={{marginTop: "2rem"}} onClick={() => {
+                       tcAction("Accept");}}>Get Started</button>
                 </div>
                 <button className="type1-button" data-type={"bordered"} onClick={()=>{updateStepNumber(-1)}}>Back</button>
             </div>
@@ -585,6 +601,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   return (
       <div className={"WW_container "+(activeStep>3?AnimationClassNames.fadeOut500:AnimationClassNames.fadeIn100)}>
         <div className="form">
+        {showImage !== "" && <GetImageModal imageName = {showImage} /> } 
         <div className="progressbar">
              <Stepper
                 steps={[
@@ -636,7 +653,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 </div>
                 :null
             }
-          {<div className="WelcomeContactUs">In case you need any help, <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">Click here</a> OR <a href="mailto:support@avoautomation.com">Contact us</a></div>}
+          {<div className="WelcomeContactUs">For help <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">click here</a> OR <a href="mailto:support@avoautomation.com">contact us</a></div>}
         </div>
         </div>
     </div>

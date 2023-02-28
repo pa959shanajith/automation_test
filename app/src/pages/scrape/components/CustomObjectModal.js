@@ -267,15 +267,15 @@ const CreateObjectModal = props => {
     return (
         <div data-test="createObject" className="ss__createObj">
             <ModalContainer 
-                title={props.editFlag ? "Edit Object" : "Create Object"}
+                title={props.editFlag ? "Edit Object" : "Create Element"}
                 content={
                     <div data-test="createObjectModalContent" className="ss__createObj_content" id="createObjListId">
                         <ScrollBar scrollId="createObjListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div data-test="ssCreateObjectItem" className="ss__createObj_item" key={object.tempId}>
                                         <div data-test="createObjectRow" className="createObj_row">
-                                            <input  data-test="createObjectInput" className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Object Name" />
+                                            <input  data-test="createObjectInput" className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Element Name" />
                                             <select data-test="createObjectType" className={"createObj_objType"+(error[object.tempId] === "objType" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} value={object.objType} onChange={(e)=>handleType(e, index)}>
-                                                <option className="createObj_option" disabled value="">Select Object Type</option>
+                                                <option className="createObj_option" disabled value="">Select Element Type</option>
                                                 { objectTypes.map( (objectType, i) =>
                                                     <option key={i} className="createObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>{objectType.name}</option>
                                                 ) }
