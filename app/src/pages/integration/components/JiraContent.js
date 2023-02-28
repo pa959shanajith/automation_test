@@ -36,11 +36,13 @@ const JiraContent = props => {
     const [testCaseData, setTestCaseData] = useState([]);
     const [selected,setSelected]=useState(false);
     const [selectedId, setSelectedId] = useState('');
+    const [selectedSummary, setSelectedSummary] = useState('');
     const [proj, setProj] = useState('');
     const [projCode, setProjCode] = useState('');
     const [projName, setProjName] = useState('');
     const [disabled, setDisabled] = useState(true);
     const [projectDropdn3 , setProjectDropdn3]= useState("Select Project1");
+    // const[summary1,setSummary1]=useState('');
     console.log(releaseId)
  
 
@@ -189,7 +191,9 @@ const JiraContent = props => {
                     username: props.user['username'],
                     password: props.user['password'],
                     project_data: props.domainDetails,
+                
                     key:projCode,
+                    // summary:summary1,
                     
                 
                 }
@@ -215,11 +219,12 @@ const JiraContent = props => {
         dispatch({type: actionTypes.SEL_SCN_IDS, payload: newScenarioIds});	
     }
 
-    const handleClick=(value, id)=>{
+    const handleClick=(value, id,summary)=>{
         let newSelectedTCDetails = { ...selectedZTCDetails };
         let newSelectedTC = [...value];
        setSelected(value)
        setSelectedId(id)
+       setSelectedSummary(summary)
        setDisabled(true)
        dispatch({type: actionTypes.SEL_TC_DETAILS, payload: newSelectedTCDetails});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
@@ -247,7 +252,9 @@ const JiraContent = props => {
                                 testId: selectedId,
                                 testCode: selected, 
                                 scenarioId: selectedScIds,
-                                itemType:releaseId
+                                itemType:releaseId,
+                                itemSummary:selectedSummary
+                               
 
                             }
                         ];
@@ -322,7 +329,7 @@ const JiraContent = props => {
                         <option value="Select Project" disabled >Select Project</option>
                         {  props.domainDetails ? 
                             
-                            props.domainDetails.projects.map(e => (<option key={e.id} value={e.code} title={e.name}>{e.name} </option>)) : null
+                            props.domainDetails.projects.map(e => (<option  key={e.id} value={e.code} title={e.name}>{e.name} </option>)) : null
                             
                         }
                        
@@ -381,9 +388,9 @@ const JiraContent = props => {
                         testCaseData ?
                         testCaseData.map((e,i)=>(
                             <div className={"test_tree_leaves"+ ( selected===e.code ? " test__selectedTC" : "")}>
-                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id)}>
-                                <span className="leafId">{e.id}</span>    
-                                <span className="test__tcName">{e.code}</span>
+                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id,e.summary)}>
+                                <span className="leafId">{e.code}</span>    
+                                <span className="test__tcName">{e.summary} </span>
                             </label>
                             {selected===e.code 
                                     && <><div className="test__syncBtns"> 

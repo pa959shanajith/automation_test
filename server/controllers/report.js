@@ -738,6 +738,7 @@ exports.saveJiraDetails_ICE = async (req, res) => {
 				'itemId': itr.testId,
 				'itemCode': itr.testCode,
                 'itemType': itr.itemType,
+                'itemSummary':itr.itemSummary,
 				"query": "saveJiraDetails_ICE"
 			};
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
