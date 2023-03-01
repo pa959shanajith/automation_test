@@ -33,6 +33,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 			if (pluginName === "mr") {
 				window.localStorage['navigateScreen'] = "reports";
 				window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+				window.localStorage['integrationScreenType'] = null
 				window.location.href = "/reports";
 			}
 			else if (pluginName === "md") {
