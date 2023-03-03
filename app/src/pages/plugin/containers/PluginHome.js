@@ -5,9 +5,6 @@ import TaskSection from '../components/TaskSection';
 import { useSelector, useDispatch } from 'react-redux';
 import "../styles/PluginHome.scss";
 import WelcomeWizard from '../../login/components/WelcomeWizard.js';
-import "../../login/styles/WelcomeWizard.scss";
-import * as actionTypesGlobal from  "../../global/state/action"
-
 
 
 const PluginHome = () => {
@@ -21,13 +18,6 @@ const PluginHome = () => {
     const [name, setName] = useState("Demo User");
     const [showTCPopup,setShowTCPopup] = useState(false);
     const [show_WP_POPOVER, setPopover] = useState(false);
-    const [showVideo,setShowVideo] = useState(false);
-    // const [playVideo,setPlayideo] = useState(false);
-
-    
-
-
-    
 
     useEffect(()=>{
         if (Object.keys(userInfo).length!==0){
@@ -40,26 +30,18 @@ const PluginHome = () => {
             setShowTCPopup(true);
         }
     },[userInfo])
-  
-   
-     useEffect(()=>{
-if(showVideo){
-    setTimeout(() => {
-        dispatch({type:actionTypesGlobal.OPEN_TRIAL_VIDEO,payload:{showTrialVideo:true}})
-    }, 3000);
-}
-     },[showVideo])
+
+     
     return(
         <div className="plugin-bg-container">
             <img className="plugin-bg-img" alt="bg-img" src="static/imgs/light-bg.png"/>
             {showTCPopup && (userInfo.welcomeStepNo!==undefined)?<WelcomeWizard showWizard={setShowTCPopup} setPopover={setPopover}/>:null}
-            <Header show_WP_POPOVER={show_WP_POPOVER} setPopover={setPopover} showVideo={setShowVideo}/>
-           
+            <Header show_WP_POPOVER={show_WP_POPOVER} setPopover={setPopover}/>
             <div className="plugin-elements" id="plugin__mainScreen">
                 <ScrollBar scrollId="plugin__mainScreen" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                {/* <div className="greeting-text">
+                <div className="greeting-text">
                     Welcome {name}!
-                </div> */}
+                </div>
                 <div className="page-contents">
                     <PluginSection userInfo={userInfo}/>
                     <div className='min_gap'>

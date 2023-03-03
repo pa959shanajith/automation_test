@@ -21,6 +21,7 @@ const TaskContents = (props) => {
     useEffect(()=>{
         setShowPanel("");
     }, [props.items]);
+
     return (
         <>
         {props.items.length !== 0 &&

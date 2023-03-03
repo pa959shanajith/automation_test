@@ -10,19 +10,11 @@ const ImportObjectModal = props => {
     const sheetRef = useRef(undefined)
     const importFormat = useRef(undefined)
     const [error,setError] = useState("")
-
     const [importType,setImportType] = useState("def-val")
     const setOverlay = props.setOverlay
     const fetchScrapeData = props.fetchScrapeData
-    let appType = props.appType;
-    const screenId = props.fetchingDetails["_id"]
-    const projectId = props.fetchingDetails.projectID
-    const screenName = props.fetchingDetails["name"]
-    let versionnumber = 0
-    
     const history = useHistory();
-    // const {appType, screenId, screenName, projectId } = useSelector(state => state.plugin.CT);
-
+    const { appType, screenId, screenName, projectId } = useSelector(state => state.plugin.CT);
     const onImport = async() => {
         setOverlay('Importing ...')
         var err = validate([fileUpload,sheetRef,importFormat])
@@ -134,7 +126,7 @@ const ImportObjectModal = props => {
     }
     return(
         <ModalContainer 
-        title={'Import'}
+        title={'Import Object'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
         content={<Content sheetRef={sheetRef} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay}/>}

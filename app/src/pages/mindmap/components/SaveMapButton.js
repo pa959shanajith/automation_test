@@ -22,13 +22,12 @@ const SaveMapButton = (props) => {
     const projectList = useSelector(state=>state.mindmap.projectList)
     const moduledata = useSelector(state=>state.mindmap.moduleList)
     const verticalLayout= props.verticalLayout
-    const savedList = useSelector(state=>state.mindmap.savedList)
     useEffect(()=>{
-        if(props.createnew==='save'||props.createnew==='autosave')clickSave()      
-          // eslint-disable-next-line react-hooks/exhaustive-deps
+        if(props.createnew==='save')clickSave()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -41,8 +40,8 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList)=>{
-    var tab = "endToend"
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop)=>{
+    var tab = "tabCreate"
     var selectedProject;
     var error = !1
     var mapData = []
@@ -157,29 +156,14 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
     var screendata = await getScreens(projId)
     if(screendata.error){displayError(screendata.error);return}
     dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
-    // if(!savedList){ dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})}
+    dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
-    if(createnew!=='autosave') setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
+    setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
     if(result.scenarioInfo){
         dispatch({type:actionTypes.DELETE_SCENARIO,payload:result.scenarioInfo})
         setDelSnrWarnPop(true);
     }
-    var req={
-        tab:"endToend" && "createTab",
-        projectid:projId?projId:"",
-        version:0,
-        cycId: null,
-        modName:"",
-        moduleid:null
-    }
-    var moduledata = await getModules(req);
-    // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-    if(savedList){
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-    setTimeout(() => dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected}), 150)
-    }
     return;
-
 }
 
 const treeIterator = (c, d, e) =>{

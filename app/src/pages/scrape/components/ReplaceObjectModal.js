@@ -46,7 +46,6 @@ const RenderGroupItem = (props) =>{
                 </div>
                 <div style={{display: expanded?"flex":"none",width:"100%",flex:1,flexDirection:"column"}}>
                     {keywords.map(((k_word,idx)=>{
-                        const similarTagNames = (tagListToReplace.includes(oldObj.tag)?oldObj.tag:"element")===(tagListToReplace.includes(newObj.tag)?newObj.tag:"element")
                         return (
                             <div key={idx} className="r-group__item">
                                 <div className='r-group__spacer'></div>
@@ -60,7 +59,7 @@ const RenderGroupItem = (props) =>{
                                         {/** If we want to retain the selected mappings after saving also */}
                                         {/* defaultValue={(COKMap[oldObj.objId] && COKMap[oldObj.objId]["keywordMap"][k_word])? COKMap[oldObj.objId]["keywordMap"][k_word]: ""}  */}
 
-                                        <select className="r-group__select" defaultValue={ similarTagNames && newkeywords.includes(k_word)?k_word:""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
+                                        <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
                                             <option key={"notSelected"} value={""} title={"Select keyword"} disabled>{"Select keyword"}</option>
                                             { newkeywords && newkeywords.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
                                         </select>
@@ -129,34 +128,11 @@ const ReplaceObjectModal = props => {
     }, [])
 
     useEffect(()=>{
-      updateScrollBar();
-      if(activeTab==="keywordsReplacement" && !document.querySelector(".r-group__container")){
-          _handleModalClose()
-      }
-    },[replace])
-    
-    useEffect(()=>{
-        if(Object.keys(replace).length>0){
-          Object.keys(replace).forEach((val_id,idx)=>{
-            if(replace[val_id] && (tagListToReplace.includes(replace[val_id][0].tag)?replace[val_id][0].tag:"element")===(tagListToReplace.includes(replace[val_id][1].tag)?replace[val_id][1].tag:"element")){
-              let keywords = CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords:[]
-              keywords.forEach((keyword,idx1)=>{
-                if (!CrossObjKeywordMap[replace[val_id][0].objId]){
-                  CrossObjKeywordMap[replace[val_id][0].objId] = {
-                    "keywordMap":{
-                      [keyword]:keyword
-                    }
-                  }
-                }
-                else{
-                  CrossObjKeywordMap[replace[val_id][0].objId]["keywordMap"][keyword] = keyword;
-                }
-                setCrossObjKeywordMap(CrossObjKeywordMap);
-              })
-            } 
-          })
+        updateScrollBar();
+        if(activeTab==="keywordsReplacement" && !document.querySelector(".r-group__container")){
+            _handleModalClose()
         }
-    },[CORData])
+    },[replace])
 
     const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
 
@@ -218,8 +194,7 @@ const ReplaceObjectModal = props => {
             </div>,
             'footer': <button onClick={() => {
                 props.setShowPop("")
-                // let { screenId } = props.current_task;
-                const screenId = props.fetchingDetails["_id"];
+                let { screenId } = props.current_task;
 
                 let arg = {
                     screenId,
@@ -242,15 +217,11 @@ const ReplaceObjectModal = props => {
                                 setMsg(MSG.SCRAPE.SUCC_OBJ_TESTCASES_REPLACED)
                                 if(!objectsReplaced)
                                     setObjectsReplaced(true)
-                                /** comment the line below when retaining the selected mappings, for deleting only saved object */
-                                setCrossObjKeywordMap((prevData) => {
-                                  const newData = {...prevData}
-                                  delete newData[oldObjId]
-                                  return newData;
-                                })
+                                /** uncomment the line below when retaining the selected mappings, for deleting only saved object */
+                                // delete CrossObjKeywordMap[oldObjId]
 
-                                /** uncomment the line below when retaining the selected mappings, currently deleting all mappings after saving */
-                                // setCrossObjKeywordMap({})
+                                /** comment the line below when retaining the selected mappings, currently deleting all mappings after saving */
+                                setCrossObjKeywordMap({})
                             }
                             else {
                                 setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
@@ -318,9 +289,7 @@ const ReplaceObjectModal = props => {
         } else {
             props.setOverlay("Fetching Keywords for selected objects...")
 
-            // let { screenId,appType } = props.current_task;
-            const appType= props.appType;
-            const screenId = props.fetchingDetails["_id"];
+            let { screenId,appType } = props.current_task;
             
             let arg = {
                 screenId,    

@@ -1,17 +1,13 @@
 import React, {useState, useEffect } from 'react';
 import {ScreenOverlay, ScrollBar, IntegrationDropDown, Messages as MSG, VARIANT, setMsg} from '../../global' 
 import { useSelector } from 'react-redux';
-import {getScheduledDetails_ICE, testSuitesScheduler_ICE, cancelScheduledJob_ICE, testSuitesSchedulerRecurring_ICE, getScheduledDetailsOnDate_ICE} from '../api';
+import {getScheduledDetails_ICE, testSuitesScheduler_ICE, cancelScheduledJob_ICE, testSuitesSchedulerRecurring_ICE} from '../api';
 import "../styles/ScheduleContent.scss";
 import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
-import DevOpsList from '../../utility/components/DevOpsList';
-import { CheckBox } from '@avo/designcomponents';
-import ScheduleContentModuleWise from './ScheduleContentModuleWise';
-import { Dialog } from 'primereact/dialog';
 
-const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction,item}) => {
+const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -36,40 +32,15 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [scheduledRecurringDataOriginal, setScheduledRecurringDataOriginal] =	useState([]);
     const [statusChange, setStatusChange] = useState("Select Status");
     const [clearScheduleData, setClearScheduleData] = useState(false);
-    const [selectedItem, setSelectedItem] = useState({});
-    const [currentTask, setCurrentTask] = useState({});
-    const [showModuleInfo, setShowModuleInfo] = useState(false);
-    const [scheduledDate, setScheduledDate] = useState('');
 
     useEffect(()=>{
-        if (typeof current_task.testSuiteDetails === 'undefined') {
-            let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
-                return ({
-                    assignedTime: "",
-                    releaseid: element.releaseId,
-                    cycleid: element.cycleId,
-                    testsuiteid: element.testsuiteId,
-                    testsuitename: element.testsuiteName,
-                    projectidts: element.projectId,
-                    assignedTestScenarioIds: "",
-                    subTaskId: "",
-                    versionnumber: element.versionNumber,
-                    domainName: element.domainName,
-                    projectName: element.projectName,
-                    cycleName: element.cycleName
-                });                                   
-            });
-            setCurrentTask({
-                testSuiteDetails: testSuiteDetails
-            });
-        }
-        getScheduledDetails(item.configurekey, item.configurename);
+        getScheduledDetails()
     }, []);
 
-    const getScheduledDetails = async (configKey, configName) => {
+    const getScheduledDetails = async () => {
         try{
             setLoading('Loading...');
-            const result = await getScheduledDetails_ICE(configKey, configName);
+            const result = await getScheduledDetails_ICE();
             if (result && result.length > 0 && result !== "fail") {
                 for (var k = 0; k < result.length; k++) {
                     if (result[k].scenariodetails[0].scenarioids !== undefined) result[k].scenariodetails = [result[k].scenariodetails];
@@ -84,47 +55,29 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 }
                 var scheduledDataParsed = [];
                 var scheduledRecurringDataParsed = [];
-                // var eachScenarioDetails;
+                var eachScenarioDetails;
                 for(var i =result.length-1 ; i>=0  ; i-- ) {
-                    // eachScenarioDetails = result[i].scenariodetails[0].length>1 ? result[i].scenariodetails[0] : result[i].scenariodetails;
-                    // eachScenarioDetails = result[i].scenariodetails;
-                    // for(var j =eachScenarioDetails.length-1 ; j>=0  ; j-- ) {
-                    //     for (var k=eachScenarioDetails[j].length-1 ; k>=0 ; k-- ) {
-                    //         let newScheduledScenario = {};
-                    //         let columnValue = eachScenarioDetails[j][k];
-                    //         newScheduledScenario["target"] = result[i].target;
-                    //         newScheduledScenario["scheduletype"] = result[i].scheduletype ? result[i].scheduletype : "One Time";
-                    //         newScheduledScenario["recurringpattern"] = result[i].recurringpattern ? result[i].recurringpattern : "One Time";	
-                    //         newScheduledScenario["recurringstringonhover"] = result[i].recurringstringonhover ? result[i].recurringstringonhover : "One Time";
-                    //         newScheduledScenario["scheduledby"] = result[i].scheduledby;
-                    //         newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
-                    //         newScheduledScenario["startdatetime"] = result[i].startdatetime;
-                    //         newScheduledScenario["testsuitenames"] = [result[i].testsuitenames[j]];
-                    //         newScheduledScenario["browserlist"] = result[i].browserlist;
-                    //         newScheduledScenario["_id"] = result[i]._id;
-                    //         newScheduledScenario["status"] = result[i].status;
-                    //         newScheduledScenario["scenarioname"] = columnValue["scenarioname"];
-                    //         newScheduledScenario["appType"] = columnValue["appType"];
-                    //         newScheduledScenario["poolname"] =  result[i].poolname ? result[i].poolname : 'Unallocated ICE';
-                    //         newScheduledScenario["cycleid"] = columnValue["cycleid"];
-                    //         scheduledDataParsed.push(newScheduledScenario);
-                    //     }
-                    // }
-                    let newScheduledScenario = {};
-                    newScheduledScenario["target"] = result[i].target;
-                    newScheduledScenario["scheduletype"] = result[i].scheduletype ? result[i].scheduletype : "One Time";
-                    newScheduledScenario["recurringpattern"] = result[i].recurringpattern ? result[i].recurringpattern : "One Time";	
-                    newScheduledScenario["recurringstringonhover"] = result[i].recurringstringonhover ? result[i].recurringstringonhover : "One Time";
-                    newScheduledScenario["scheduledby"] = result[i].scheduledby;
-                    newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
-                    newScheduledScenario["startdatetime"] = result[i].startdatetime;
-                    // newScheduledScenario["testsuitenames"] = [result[i].testsuitenames[j]];
-                    newScheduledScenario["browserlist"] = result[i].browserlist;
-                    newScheduledScenario["_id"] = result[i]._id;
-                    newScheduledScenario["status"] = result[i].status;
-                    newScheduledScenario["poolname"] =  result[i].poolname ? result[i].poolname : 'Unallocated ICE';
-                    newScheduledScenario["getscheduleondate"] = result[i].scheduledon;
-                    scheduledDataParsed.push(newScheduledScenario);
+                    eachScenarioDetails = result[i].scenariodetails[0].length>1 ? result[i].scenariodetails[0] : result[i].scenariodetails;
+                    for(var j =eachScenarioDetails.length-1 ; j>=0  ; j-- ) {
+                        let newScheduledScenario = {};
+                        let columnValue = eachScenarioDetails[j][0] ? eachScenarioDetails[j][0] : eachScenarioDetails[j];
+                        newScheduledScenario["target"] = result[i].target;
+                        newScheduledScenario["scheduletype"] = result[i].scheduletype ? result[i].scheduletype : "One Time";
+                        newScheduledScenario["recurringpattern"] = result[i].recurringpattern ? result[i].recurringpattern : "One Time";	
+                        newScheduledScenario["recurringstringonhover"] = result[i].recurringstringonhover ? result[i].recurringstringonhover : "One Time";
+                        newScheduledScenario["scheduledby"] = result[i].scheduledby;
+                        newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
+                        newScheduledScenario["startdatetime"] = result[i].startdatetime;
+                        newScheduledScenario["testsuitenames"] = result[i].testsuitenames;
+                        newScheduledScenario["browserlist"] = result[i].browserlist;
+                        newScheduledScenario["_id"] = result[i]._id;
+                        newScheduledScenario["status"] = result[i].status;
+                        newScheduledScenario["scenarioname"] = columnValue["scenarioname"];
+                        newScheduledScenario["appType"] = columnValue["appType"];
+                        newScheduledScenario["poolname"] =  result[i].poolname ? result[i].poolname : 'Unallocated ICE';
+                        newScheduledScenario["cycleid"] = columnValue["cycleid"];
+                        scheduledDataParsed.push(newScheduledScenario);
+                    }
                 } 
                 setScheduledData(scheduledDataParsed);
                 setScheduledDataOriginal(scheduledDataParsed);
@@ -203,9 +156,8 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 
     const ScheduleTestSuitePopup = () => {
         setClosePopups(true);
-        const valid = true
-        const check = SelectBrowserCheck(appType,browserTypeExe,execAction,displayError,item);
-        // const valid = checkSelectedModules(scheduleTableData, displayError);
+        const check = SelectBrowserCheck(appType,browserTypeExe,execAction,displayError);
+        const valid = checkSelectedModules(scheduleTableData, displayError);
         const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, displayError);
         if(check && valid && checkDateTime) setAllocateICE(true);
     } 
@@ -213,7 +165,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
         setClearScheduleData(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, currentTask, item.executionRequest.batchInfo[0].appType, filter_data);
+        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, current_task, appType, filter_data);
         if(!modul_Info){
             return
         }
@@ -221,13 +173,11 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["source"]="schedule";
         executionData["exectionMode"]=execAction;
         executionData["executionEnv"]=execEnv;
-        executionData["browserType"]=browserTypeExe || (item.executionRequest.browserType.length !== 0 ? item.executionRequest.browserType : ["1"]);
+        executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
         executionData["type"] = schedulePoolDetails.type;
-        executionData["configureKey"]=item.configurekey;
-        executionData["configureName"]=item.configurename;
         
         setLoading("Scheduling...");
         let data = "";
@@ -246,7 +196,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
             if (data.includes("Set"))  setMsg(MSG.CUSTOM(data.replace('success', ''),VARIANT.SUCCESS)); 
             else displayError(MSG.SCHEDULE.SUCC_SHEDULE)
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
-            getScheduledDetails(item.configurekey, item.configurename);
+            getScheduledDetails();
             setClearScheduleData(true);
         } else if (data === "few") {
             displayError(MSG.SCHEDULE.ERR_FEW_TESTSUITE_SCHEDULE);
@@ -365,13 +315,12 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     SubmitButton={ScheduleTestSuite} 
                     setAllocateICE={setAllocateICE} 
                     allocateICE={allocateICE} 
-                    modalTitle={"Allocate Avo Assure Client to Schedule"} 
+                    modalTitle={"Allocate ICE to Schedule"} 
                     modalButton={"Schedule"}
-                    icePlaceholder={'Search'}
+                    icePlaceholder={'Search ICE to allocate'}
                     exeTypeLabel={"Select Schedule type"}
-                    exeIceLabel={"Allocate Avo Assure Client"}
+                    exeIceLabel={"Allocate ICE"}
                     scheSmartMode={smartMode}
-                    currentTask={currentTask}
                 />
             :null}
             { showIntegrationModal ? 
@@ -387,7 +336,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
             :null} 
             
             <div className="s__task_container">
-                <div className="s__task_title"> <div className="s__task_name">{ item.executionRequest.configurename } - Schedule</div></div>
+                <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
                     
                 </div>
                 <div id="pageContent">
@@ -399,17 +348,14 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                             <option value="2">Zephyr</option>
                         </select>
                         <div id="s__btns">
-
-                            <button className="s__btn-md btnAddToSchedule only_schedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add" >Schedule</button>
-
+                            <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={currentTask} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} item={item} />
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
-                        <div>
                         <select value={statusChange} onChange={(event)=>{selectStatus(event.target.value); setStatusChange(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
                             <option disabled={true} value={"Select Status"}>Select Status</option>
                             <option value={"Completed"}>Completed</option>
@@ -423,38 +369,26 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                             <option value={"Skipped"}>Skipped</option>
                             <option value={"Show All"}>Show All</option>
                         </select>
-                        {/* <div>
-                            <CheckBox name='Saucelabs'/>
-                        </div> */}
-                       
-                        </div>
-                        </div>
-
-                       
-                        
-                        
-                        <div id="s__btns">
-                            <button className={"s__btn-md btnAddToSchedule"+(showRecurringSchedules?" disabled":"")} onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
-                                Scheduled Tasks
-                            </button>
-
-                        </div>
+                        <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
                         <div id="s__btns">
                             <button className={"s__btn-md btnAddToSchedule"+(showScheduledTasks?" disabled":"")} onClick={() => {handleOnButtonClickRecurring();}} title="Recurring Schedules">
                                 Recurring Schedules
                             </button>
                         </div>
-                        <div id="s__btns" onClick={()=>{getScheduledDetails(item.configurekey, item.configurename)}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
-                        
-                    
+                        <div id="s__btns">
+                            <button className={"s__btn-md btnAddToSchedule"+(showRecurringSchedules?" disabled":"")} onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
+                                Scheduled Tasks
+                            </button>
+                        </div>
+                    </div>
 
                     <div className="scheduleDataTable">
 						<div className="scheduleDataHeader">
 							<span className="s__Table_date s__table_Textoverflow s__cursor s__Table_border" onClick={()=>{sortDateTime()}} title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
 							<span className="s__Table_host s__table_Textoverflow s__Table_border" >Host</span>
-							{/* <span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
+							<span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
 							<span className="s__Table_suite s__table_Textoverflow s__Table_border" >Test Suite</span>
-							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span>  */}
+							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span>
                             <span className="s__Table_scheduleType s__table_Textoverflow s__Table_border" >Schedule Type</span>
 							<span className="s__Table_status s__table_Textoverflow s__Table_border" >Status</span>
 						</div>
@@ -469,21 +403,21 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                         {pageOfItems.map((data,index)=>( data.status != "recurring" && data.recurringpattern == "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
-                                                                <div data-test = "schedule_data_target_user" className="s__Table_host">{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
-                                                                {/* <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                                 <div data-test = "schedule_data_browser_type" className="s__Table_appType">
                                                                     {data.browserlist.map((brow,index)=>(
                                                                         <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
-                                                                </div> */}
+                                                                </div>
                                                                 <div data-test="schedule_data_schedule_type" className="s__Table_scheduleType" title={data.recurringstringonhover}>   
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(data.getscheduleondate) }}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
+                                                                    {data.status === "Terminate" ? "Terminated" : data.status}
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
-                                                                        <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
+                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null}
                                                                 </div> 
                                                             </div>
@@ -506,24 +440,24 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                             <div id="scheduledDataBody" className="scheduledDataBody">
                                                 <ScrollBar scrollId="scheduledDataBody" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                     <div className='scheduleDataBodyRow'>
-                                                        {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed" || data.status == "Completed") && data.recurringpattern != "One Time" &&
+                                                        {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed") && data.recurringpattern != "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
-                                                                <div data-test = "schedule_data_target_user" className="s__Table_host">{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
-                                                                {/* <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                                 <div data-test = "schedule_data_browser_type" className="s__Table_appType">
                                                                     {data.browserlist.map((brow,index)=>(
                                                                         <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
-                                                                </div> */}
+                                                                </div>
                                                                 <div data-test="schedule_data_schedule_type" className="s__Table_scheduleType" title={data.recurringstringonhover}>   
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(data.getscheduleondate) }}>{data.status}</span>
+                                                                    {data.status}
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
-                                                                        <span className="fa fa-trash s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
+                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null}
                                                                 </div> 
                                                             </div>
@@ -540,10 +474,6 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 
 					</div>
                 </div>
-            
-                {/* Dialog for Schedule module wise info */}
-                <Dialog header={ item.executionRequest.configurename + " - Status" } visible={showModuleInfo} style={{ width: '60vw',height:'80rem' }} onHide={() => setShowModuleInfo(false)}><ScheduleContentModuleWise scheduledDate={scheduledDate} configKey={item.configurekey} configName={item.configurename} showScheduledTasks={showScheduledTasks} showRecurringSchedules={showRecurringSchedules} /></Dialog>
-                {/* Dialog for Schedule module wise info */}
             </div>
         </>
     );
@@ -559,7 +489,6 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
                 time:"",
                 recurringValue: "",
                 recurringString: "",
-                endAfter: "",
                 inputPropstime: {readOnly:"readonly" ,
                     disabled : true,
                     className:"fc-timePicker",
@@ -576,18 +505,13 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
                     readOnly: "readonly",
                     className: "fc-timePicker textbox-container",
                 },
-                inputPropsEndDate: {readOnly:"readonly" ,
-                disabled : true,
-                className:"fc-timePicker textbox-container",
-                placeholder: "Select End After"
-            }
             };
         }
     })
     setModuleScheduledate(moduleScheduledateTime);
 }
 
-const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,displayError,configurekey,configurename) => {
+const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,displayError) => {
     if(cycleid===undefined) cycleid=""
     const schDetails = {
         cycleid:cycleid,
@@ -600,15 +524,13 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
     if (data === "success") {
         setMsg(MSG.CUSTOM("Job is " + status + ".",VARIANT.SUCCESS));
         // target.innerText = status;
-        getScheduledDetails(configurekey, configurename);
+        getScheduledDetails();
     } else if (data === "inprogress") displayError(MSG.SCHEDULE.ERR_JOB_PROGRESS);
     else if (data === "not authorised") displayError(MSG.SCHEDULE.ERR_JOB_CANCEL_AUTH);
     else displayError(MSG.SCHEDULE.ERR_JOB_CANCEL);
 }
 
-const SelectBrowserCheck = (appType,browserTypeExe,execAction,displayError,item)=>{ 
-    // console.log(item)
-    browserTypeExe = browserTypeExe || (item.executionRequest.browserType.length !==0 ? item.executionRequest.browserType : ['1'])
+const SelectBrowserCheck = (appType,browserTypeExe,execAction,displayError)=>{
     if ((appType === "Web") && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_BROWSER);
     else if (appType === "Webservice" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_WEBSERVICE);
     else if (appType === "MobileApp" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE_APP);
@@ -657,7 +579,6 @@ const checkSelectedModules = (scheduleTableData, displayError) => {
 } 
 
 const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate, displayError) => {
-    let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     for(var i =0 ;i<eachData.length;i++){
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
@@ -666,14 +587,10 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsrecurring"]["className"] = "fc-timePicker textbox-container";
-                moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsEndDate"]["className"]="fc-timePicker textbox-container";
 
                 var dateValue = moduleScheduledate[eachData[i].testsuiteid]["date"];
                 var timeValue = moduleScheduledate[eachData[i].testsuiteid]["time"];
                 var recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
-                var recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
-                var recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid]["recurringStringOnHover"];
-                var endAfterValue = moduleScheduledate[eachData[i].testsuiteid]["endAfter"];
 
                 if (recurringValue === "") {
                     // Check if schedule recurring is not empty
@@ -689,10 +606,6 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                     moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"] = "fc-datePicker s__err-Border";
                     doNotSchedule = true;
                 }
-                else if (recurringValue != "" && recurringValue !== "One Time" && timeValue != "" && endAfterValue === "") {
-                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsEndDate"]["className"] = "fc-datePicker textbox-container s__err-Border";
-                    doNotSchedule = true;
-                }
                 setModuleScheduledate(moduleScheduledateTime);
                 if(doNotSchedule) return false
 
@@ -704,8 +617,8 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 const sltime_2 = timeValue.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 const diff = (timestamp - new Date()) / 60000;
-                if (diff < 5 && (recurringString === "One Time" || recurringString === "Every Day" || (recurringString === "Every Week" && (recurringStringOnHover.includes(days[new Date().getDay()]) || recurringStringOnHover === "Occurs every day")) || (recurringString === "Every Month" && (recurringValue.split(' ')[2] == new Date().getDate() || recurringStringOnHover.includes(days[new Date().getDay()]))))) { // Check if schedule time is not ahead of 5 minutes from current time
-                    if (recurringValue !== "One Time") {
+                if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
+                    if (recurringValue != "One Time") {
                         moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
                     } else {
                         if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
@@ -748,11 +661,11 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
         suiteInfo.versionNumber = testsuiteDetails.versionnumber;
         suiteInfo.appType = appType;
         suiteInfo.batchname = eachData[i].batchname;
-        suiteInfo.domainName = (projectid in projectdata.project) ? projectdata.project[projectid].domain : testsuiteDetails.domainName;
-        suiteInfo.projectName = (projectid in projectdata.projectDict) ? projectdata.projectDict[projectid] : testsuiteDetails.projectName;
+        suiteInfo.domainName = projectdata.project[projectid].domain;
+        suiteInfo.projectName = projectdata.projectDict[projectid];
         suiteInfo.projectId = projectid;
         suiteInfo.releaseId = relid;
-        suiteInfo.cycleName = (cycid in projectdata.cycleDict) ? projectdata.cycleDict[cycid] : testsuiteDetails.cycleName;
+        suiteInfo.cycleName = projectdata.cycleDict[cycid];
         suiteInfo.cycleId = cycid;
         suiteInfo.suiteDetails = selectedRowData;
         suiteInfo.poolid = schedulePoolDetails.poolid;
@@ -776,9 +689,6 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
                 suiteInfo.recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
                 suiteInfo.recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
                 suiteInfo.recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid][	"recurringStringOnHover"];
-                suiteInfo.endAfter = moduleScheduledate[eachData[i].testsuiteid]["endAfter"];
-                suiteInfo.clientTime = moduleScheduledate[eachData[i].testsuiteid]["clientTime"];
-                suiteInfo.clientTimeZone = moduleScheduledate[eachData[i].testsuiteid]["clientTimeZone"];
             } 
         }
         if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);

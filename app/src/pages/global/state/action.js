@@ -1,8 +1,3 @@
 export const SET_PROGRESS = "SET_PROGRESS";
 export const SWITCHED = "ROLE_SWITCHED";
 export const SET_POPUP = "SET_POPUP";
-export const OPEN_GENIUS = "OPEN_GENIUS";
-export const CLOSE_GENIUS = "CLOSE_GENIUS";
-export const GENIUS_SMALL_POPUP = "GENIUS_SMALL_POPUP";
-export const OPEN_TRIAL_VIDEO = "OPEN_TRIAL_VIDEO";
-

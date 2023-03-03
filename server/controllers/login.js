@@ -113,8 +113,8 @@ const verifyPasswordHistory = async (uData) => {
 	uData.user = userDet;
 	oldpass = uData.oldpass = userDet.auth.password;
 	const passHistory = userDet.auth.passwordhistory;
-	if (uData.currpass!=undefined && !bcrypt.compareSync(uData.currpass, oldpass)) return "invalid";
-	if (uData.currdefpass!=undefined && !bcrypt.compareSync(uData.currdefpass, userDet.auth.defaultpassword)) return "invalid";
+	if (uData.currpass && !bcrypt.compareSync(uData.currpass, oldpass)) return "invalid";
+	if (uData.currdefpass && !bcrypt.compareSync(uData.currdefpass, userDet.auth.defaultpassword)) return "invalid";
 	if (bcrypt.compareSync(newpass, oldpass)) return "same";
 	for (let pass of passHistory) {
 		if (bcrypt.compareSync(newpass, pass)) return "reuse";

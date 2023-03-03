@@ -142,7 +142,7 @@ const CanvasAssign =(props)=>{
                 })}
                 {Object.entries(nodes).map((node)=>
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                        <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created"?0.5:1)}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                        <image  onClick={(e)=>nodeClick(e)} style={{height:'40px',width:'40px',opacity:(node[1].state==="created"?0.5:1)}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <image className={"ct-nodeTask"+(node[1].task?"":" no-disp")} style={{opacity:node[1].taskOpacity}} xlinkHref={assignedIco} x="29" y="-10" width="21px" height="21px"></image>
                         <image className={"ct-nodeTask"+((node[1].task && node[1].ac !== 'Disable' && node[1].type==='scenarios')?"":" no-disp")} style={{opacity:node[1].taskOpacity}} xlinkHref={accessibilityIco} x="-10" y="-10" width="21px" height="21px"></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
@@ -155,12 +155,11 @@ const CanvasAssign =(props)=>{
                         onMouseUp={(e)=>moveNode(e,'KeyUp')}
                         onMouseDown={(e)=>moveNode(e,'KeyDown')}
                         cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
-                        className={"ct-"+node[1].type+"ct-nodeBubble"} r="4"></circle>
+                        className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
                         :null}
                     </g>)}
                 </g>
             </svg>
-            
         </Fragment>
     )
 }

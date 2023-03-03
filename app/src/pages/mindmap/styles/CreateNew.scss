@@ -7,22 +7,6 @@
     border: 1px solid transparent;
     width: 100%;
 }
-.note{
-    
-    font-size: 12px;
-    font-weight: 400;
-    font-family: 'LatoWeb';
-    width: 57rem;
-    // height: px;
-    // margin-left: 80vw;
-    // top: 2rem;
-    position: fixed;
-    // display: flex;
-    // z-index: 1;
-     left: 63rem;
-    top: 6.7rem;
-    right: 3rem;
-}
 .mp__canvas_container{
     position: relative;
     margin: 2px;
@@ -36,30 +20,4 @@
 }
 .loading-bar{
     position:absolute!important;
-}
-.ms-Dialog-title {
-
-    font-size: 16px;
-
-    font-family: 'LatoWebLight';
-
-    display: inline-block;
-
-    background: #331d4c;
-
-    color: #ffffff;
-
-    margin: 4px 8px 28px 3px;
-
-    padding: 8px 8px 7px 6px;
-
-    border-radius: -5px;
-
-    -moz-border-radius: 5px;
-
-    -webkit-border-radius: -49px;
-
-}
-.p-button-rounded {
-    border-radius: 2rem !important;
 }

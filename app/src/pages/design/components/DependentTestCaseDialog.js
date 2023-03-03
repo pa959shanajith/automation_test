@@ -145,7 +145,7 @@ const TestCaseItem = ({index, testCase, updateChecklist}) => {
         <div className="testCaseItem" data-test="d__dtc_item">
             <input className="tcCheck" type="checkbox" onChange={handleCheck} disabled={testCase.disableAndBlock} checked={check}/>
             <label className="tcName" title={testCase.testCaseName}>{testCase.testCaseName}</label>
-            <div className="tcView" to="#" onClick={onView}>View</div>
+            <Link className="tcView" to="#" onClick={onView}>View</Link>
         </div>
     );
 }

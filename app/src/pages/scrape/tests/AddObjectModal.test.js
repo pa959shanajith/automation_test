@@ -175,7 +175,7 @@ describe('<AddObjectModel/> Positive Sceanrios',()=>{
       let submitButton=findByTestAtrr(modalContainer,'submit')
       submitButton.simulate('click')
       wrapper.update();
-      expect(props.setShowPop.mock.calls).toEqual([[{title: "Add Object", content: "Element(s) added sucessfully."}]])
+      expect(props.setShowPop.mock.calls).toEqual([[{title: "Add Object", content: "Objects has been added successfully."}]])
     })
 });
 // Negative Sceanrios

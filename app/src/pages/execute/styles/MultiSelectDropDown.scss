@@ -1,12 +1,11 @@
 @import "../../global/styles/ColorVariables.scss";
 .ms__input{
-    width: 100%;
+    width: 90%;
     height: 30px;
     border: 1px solid;
-    padding: .375rem 1.3rem;
+    padding: .375rem .75rem;
     font-size: 14px;
     border-radius: .25rem;
-    background: white !important;
 }
 .ms__dropDown{
     font-size: 14px;
@@ -43,15 +42,3 @@
         cursor: pointer;
     }
 }
-.down-arrow-img1 {
-     width: 1rem !important;
-     position: relative;
-     left: 8.8rem;
-     top: -1.7rem;
- }
- .Pad{
-    background: white !important;
-    height: 2rem;
-    margin-left: 0.1rem;
-    width: 10.5rem;
- }

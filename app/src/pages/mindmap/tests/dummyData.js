@@ -215,24 +215,24 @@ export const docTaskBox=
 '<path id="link-1-2" class="ct-link" d="M230.53,110C256.88,110 256.88,110 283.23,110"></path>'+
 '<path id="link-2-3" class="ct-link" d="M329.23,110C355.58000000000004,110 355.58000000000004,110 381.93,110"></path>'+
 '<g id="node_0" class="ct-node" data-nodetype="modules" transform="translate(88.83,90)">'+
-'<image class="ct-nodeIcon" xlink:href="static/imgs/node-modules.png" style="height: 45px; width: 45px; opacity: 1;">'+
+'<image class="ct-nodeIcon" xlink:href="static/imgs/node-modules.png" style="height: 40px; width: 40px; opacity: 1;">'+
 '</image><image class="ct-nodeTask" xlink:href="static/imgs/node-task-assigned.png" x="29" y="-10" width="21px" height="21px" style="opacity: 1;"></image>'+
 '<text class="ct-nodeLabel" text-anchor="middle" x="20" title="Module_0" y="50">Module_0</text>'+
 '<title val="0" class="ct-node-title">Module_0</title>'+
 '<circle class="ct-modules ct-cRight ct-nodeBubble" cx="44" cy="20" r="4"></circle>'+
 '</g><g id="node_1" class="ct-node" data-nodetype="scenarios" transform="translate(187.53,90)">'+
-'<image class="ct-nodeIcon" xlink:href="static/imgs/node-scenarios.png" style="height: 45px; width: 45px; opacity: 1;"></image>'+
+'<image class="ct-nodeIcon" xlink:href="static/imgs/node-scenarios.png" style="height: 40px; width: 40px; opacity: 1;"></image>'+
 '<image class="ct-nodeTask" xlink:href="static/imgs/node-task-assigned.png" x="29" y="-10" width="21px" height="21px" style="opacity: 1;"></image>'+
 '<text class="ct-nodeLabel" text-anchor="middle" x="20" title="Scenario_login" y="50">Scenario_login</text>'+
 '<title val="1" class="ct-node-title">Scenario_login</title>'+
 '<circle class="ct-scenarios ct-cRight ct-nodeBubble" cx="44" cy="20" r="4"></circle>'+
 '<circle cx="-3" cy="20" class="ct-scenarios ct-nodeBubble" r="4"></circle></g><g id="node_2" class="ct-node" data-nodetype="screens" transform="translate(286.23,90)">'+
-'<image class="ct-nodeIcon" xlink:href="static/imgs/node-screens.png" style="height: 45px; width: 45px; opacity: 1;"></image>'+
+'<image class="ct-nodeIcon" xlink:href="static/imgs/node-screens.png" style="height: 40px; width: 40px; opacity: 1;"></image>'+
 '<image class="ct-nodeTask" xlink:href="static/imgs/node-task-assigned.png" x="29" y="-10" width="21px" height="21px" style="opacity: 1;"></image>'+
 '<text class="ct-nodeLabel" text-anchor="middle" x="20" title="Screen_login" y="50">Screen_login</text>'+
 '<title val="2" class="ct-node-title">Screen_login</title><circle class="ct-screens ct-cRight ct-nodeBubble" cx="44" cy="20" r="4"></circle>'+
 '<circle cx="-3" cy="20" class="ct-screens ct-nodeBubble" r="4"></circle></g>'+
 '<g id="node_3" class="ct-node node-highlight" data-nodetype="testcases" transform="translate(384.93,90)">'+
-'<image class="ct-nodeIcon" xlink:href="static/imgs/node-testcases.png" style="height: 45px; width: 45px; opacity: 1;"></image>'+
+'<image class="ct-nodeIcon" xlink:href="static/imgs/node-testcases.png" style="height: 40px; width: 40px; opacity: 1;"></image>'+
 '<image class="ct-nodeTask" xlink:href="static/imgs/node-task-assigned.png" x="29" y="-10" width="21px" height="21px" style="opacity: 1;"></image><text class="ct-nodeLabel" text-anchor="middle" x="20" title="Testcase_login" y="50">Testcase_login</text>'+
 '<title val="3" class="ct-node-title">Testcase_login</title><circle cx="-3" cy="20" class="ct-testcases ct-nodeBubble" r="4"></circle></g></g></svg>'

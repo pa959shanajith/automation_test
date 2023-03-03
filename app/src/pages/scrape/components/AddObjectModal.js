@@ -130,14 +130,14 @@ const AddObjectModal = props => {
     return (
         <div data-test="ssObjectModal" className="ss__objModal">
             <ModalContainer 
-                title="Add Element"
+                title="Add Object"
                 content={
                     <div data-test="ssObjModalContent" className="ss__objModal_content" id="ss__objModalListId">
                         <ScrollBar scrollId="ss__objModalListId" thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div data-test="objModalItem" className="ss__objModal_item" key={index}>
-                                        <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Element Name" name="addObjName" />
+                                        <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" name="addObjName" />
                                         <select  data-test="addObjectTypeSelect" className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
-                                            <option className="addObj_option" disabled value="">Select Element Type</option>
+                                            <option className="addObj_option" disabled value="">Select Object Type</option>
                                             { objectTypes.map((objectType, i) =>
                                                 <option key={i} className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>
                                                     {objectType.name}

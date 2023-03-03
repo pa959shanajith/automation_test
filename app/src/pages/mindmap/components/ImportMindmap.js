@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap} from '../api';
-import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
+import {ModalContainer, Messages as MSG,setMsg, VARIANT} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -8,14 +8,18 @@ import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
 
+
+
+
+
 const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport}) => {
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
-    const [disableSubmit,setDisableSubmit] = useState(true)
+    const [disableSubmit,setDisableSubmit] = useState(false)
     const [mindmapData,setMindmapData] = useState([])
-    const [duplicateModuleList,setDuplicateModuleList] = useState([]);
-    const [duplicateFlag,setDuplicateFlag] = useState(false);
+    const [duplicateModuleList,setDuplicateModuleList] = useState([])
+    
     
     useEffect(()=>{
         (async()=>{
@@ -25,32 +29,17 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
             var data = parseProjList(res)
             setProjList(data)
             setBlockui({show:false})
-            setDuplicateModuleList([])
         })()
     },[]) 
     if(!Object.keys(projList).length >0) return null
     return(
-    <>
         <ModalContainer 
         modalClass = "modal-mmd"
         title='Import Modules'
         close={()=>setImportPop(false)}
-        footer={<Footer error={error} disableSubmit={disableSubmit} duplicateModuleList={duplicateModuleList} setDuplicateFlag={setDuplicateFlag} setSubmit={setSubmit}/>}
+        footer={<Footer error={error} disableSubmit={disableSubmit} duplicateModuleList={duplicateModuleList} setSubmit={setSubmit}/>}
         content={<Container submit={submit} setMindmapData={setMindmapData} setDuplicateModuleList={setDuplicateModuleList}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>} 
       />
-      {duplicateFlag && 
-        <ModalContainer
-        modalClass='modal-md'
-        title={"Duplicate Modules Names"}
-        content={<ScrollBar thumbColor="#321e4f">
-                  <div style={{maxHeight:440, display:"flex", flexDirection:"column"}}>
-                    {Array.from(duplicateModuleList).map((module_name,idx)=> {return <li key={idx+module_name}>{module_name}</li>})} 
-                  </div>
-                </ScrollBar>}
-        close={()=>{setDuplicateFlag(false)}}
-        />
-        }
-    </>
     )
 }
 
@@ -67,7 +56,6 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     const [importType,setImportType] = useState(undefined)
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
-    const [uploadFileField,setUploadFileField] = useState(false)
     
     const upload = () => {
         let  project = "";
@@ -82,35 +70,17 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     }
         setError('')
         setFiledUpload(undefined)
-        setDisableSubmit(false)
-        setDuplicateModuleList([])
         uploadFile({setBlockui,setMindmapData,setDuplicateModuleList,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project})
     }
     const changeImportType = (e) => {
-        // projRef.current.value = ""
-        if(projRef.current)projRef.current.value = ''
-        if(uploadFileRef.current)uploadFileRef.current.value = ''
-        setImportType(e.target.value)        
-        setFiledUpload(undefined)
-        setDisableSubmit(true)
-        setError('')
-        if(e.target.value==="json"){ setUploadFileField(false); resetImportModule();}
+        resetImportModule();
+        setImportType(e.target.value)
     }
-    const resetImportModule = async() => {
-      if(uploadFileRef.current)uploadFileRef.current.value = ''
-        if(projRef.current.value) {
-            var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
-            if (moduledata.length>0){
-                setError('Please select a Project which has no Modules.')                
-                setUploadFileField(false)
-                setFiledUpload(undefined)
-                return
-            }
-        }
-        if(projRef.current.value) setUploadFileField(true)
+    const resetImportModule = () => {
         setSheetList([])
         setFiledUpload(undefined)
-        setError('')        
+        setError('')
+        if(uploadFileRef.current)uploadFileRef.current.value = ''
     }
     const acceptType = {
         pd:".pd",
@@ -122,18 +92,15 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     useEffect(()=>{
         if(submit){
             setSubmit(false)
-            setDisableSubmit(true)
-            setImportPop(false)
-            setError('')           
+            setError('')
             var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
-                setBlockui({show:false})
                 return;
             }
             var importData = fileUpload;
             (async()=>{
                 if(importType === 'git'){
-                    // setBlockui({content:'Importing ...',show:true})
+                    setBlockui({content:'Importing ...',show:true})
                     var data = await importGitMindmap ({
                         projectid : projRef.current.value,
                         gitname : gitconfigRef.current.value,
@@ -171,26 +138,22 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                 }
                 
                 if(isMultiImport && importType === 'json'){
-                    setBlockui({content:'Importing ...',show:true})
-                    ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end(); return;}
+                    if(res.error){setError(res.error);setBlockui({show:false});return;}
                     var req={
                         tab:"tabCreate",
-                        projectid:mindmapData[0]?mindmapData[mindmapData.length -1]["projectid"]:mindmapData.projectid,
+                        projectid:mindmapData[0]?mindmapData[0].projectid:mindmapData.projectid,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(res)?res:res
+                        moduleid:Array.isArray(res._id)?res._id:res
                     }
                     res = await getModules(req)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end();return;}
+                    if(res.error){setError(res.error);setBlockui({show:false});return;}
                     setFiledUpload(res)
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                     setImportPop(false);
-                    setBlockui({show:false})
-                    ResetSession.end();
                 }else{
                         loadImportData({
                             importType,
@@ -203,7 +166,6 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                             setOptions:setOptions,
                             setImportPop:setImportPop,
                         changeImportType:changeImportType
-                        
                         })
 
                 } 
@@ -213,14 +175,14 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     return(
         <div data-test='mp__import-popup' className = 'mp__import-popup'>
             <div>
-                <label>Import from: </label>
+                <label>Import As: </label>
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                     <option value={'def-val'} disabled>Select Import Format</option>
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
-                    <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
-                    {/* <option value={'git'}>Git (.mm)</option>  */}
-                    <option value={'json'}>Complete Module(S) (.mm)</option>
-					<option value={'sel'}>Structure only - Selenium To Avo (.sel)</option>
+                    <option value={'excel'}>Excel Workbook (.xls,.xlsx)</option>
+                    <option value={'git'}>Git (.mm)</option> 
+                    <option value={'json'}>MindMap (.mm)</option>
+					<option value={'sel'}>Selenium To Avo (.sel)</option>
                 </select>
             </div>
             {isMultiImport && 
@@ -275,10 +237,10 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
-                        (<>{uploadFileField || (["excel","sel"].includes(importType))?<div>
+                        <div>
                             <label>Upload File: </label>
-                            <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="json"} type='file' onChange={upload} ref={uploadFileRef}/>
-                            </div>:null}</>)
+                            <input accept={acceptType[importType]} type='file' onChange={upload} ref={uploadFileRef}/>
+                            </div>
                     }
                     
                 </Fragment>
@@ -360,14 +322,23 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     )
 }
 // Footer for sheet choose popup
-const Footer = ({error,setSubmit,disableSubmit,duplicateModuleList,setDuplicateFlag}) =>{
+const Footer = ({error,setSubmit,disableSubmit,duplicateModuleList}) =>{
+    const [duplicateFlag,setDuplicateFlag] = useState(false);
     return(
       <Fragment>
             <div className='mnode__buttons'>
                 <label className='err-message'>{error}
-                {error && duplicateModuleList?.size>0 && error.indexOf("duplicate")>-1 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>}</label>                
+                {error && duplicateModuleList?.size>0 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>
+                }</label>                
                 <button disabled={disableSubmit} onClick={()=>setSubmit(true)}>Import</button>                
             </div>
+           {duplicateFlag &&  <ModalContainer
+                modalClass='modal-md'
+                title={"Duplicate Modules Names"}
+                content={Array.from(duplicateModuleList).join("\n")}
+                close={()=>setDuplicateFlag(false)}
+            />
+           }
       </Fragment>
     )
 }
@@ -397,7 +368,7 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitV
 const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType}) =>{
     var mindmapData = importData
     // console.log("ImportProj: " + importProj)
-    // setBlockui({content:'Importing ...',show:true})
+    setBlockui({content:'Importing ...',show:true})
     if(importType === 'excel'){
         let validateNode = true;
         var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheet})
@@ -410,7 +381,6 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
             displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
         }
         mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
-        
     }
     if(importType === 'pd'){
         var res =  await pdProcess({'projectid':importProj,'file':importData})
@@ -438,7 +408,6 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
         })
         setImportPop(false)
         setOptions('importmodules')
-        // setBlockui({show:false})
         }, 200);
     // }
    
@@ -494,97 +463,108 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
         }else if(extension === 'json' || extension === 'mm'){
             var projFlag = false
             var duplicateData = JSON.parse(result);
-            let selectedAppType = projList[selectedProject].apptypeName;  
-            var importedAppType=duplicateData[duplicateData.length -2]["apptype"];
+            let selectedAppType = projList[selectedProject].apptypeName;
+            let importedProjId = duplicateData[0].projectid.$oid;
+            let importedAppType = projList[importedProjId].apptypeName;
             if(selectedAppType!==importedAppType){
                 setError("Selected project is of different App Type");
                 setDisableSubmit(true)
                 return false
             }
-            // var existingModulesInSelectedProject = await getModules({"tab":"tabCreate","projectid":selectedProject,"moduleid":null})
-            // var uniqueModuleNames = new Set();
-            // existingModulesInSelectedProject.map((m) => {
-            //     uniqueModuleNames.add(m.name)
-            // })
-            // console.log('existingModulesInSelectedProject: ', JSON.stringify(existingModulesInSelectedProject))
-            // console.log('uniqueModuleNames: ', JSON.stringify(uniqueModuleNames))
+            var existingModulesInSelectedProject = await getModules({"tab":"tabCreate","projectid":selectedProject,"moduleid":null})
+            var uniqueModuleNames = new Set();
+            existingModulesInSelectedProject.map((m) => {
+                uniqueModuleNames.add(m.name)
+            })
+            console.log('existingModulesInSelectedProject: ', JSON.stringify(existingModulesInSelectedProject))
+            console.log('uniqueModuleNames: ', JSON.stringify(uniqueModuleNames))
 
             
-            // var duplicateModuleNames = new Set();
-            // console.log('duplicateData',duplicateData);
-            duplicateData[duplicateData.length -1]["projectid"]=selectedProject
-            // var data = duplicateData[2]
-            //     // if(uniqueModuleNames.has(d.name)){
-            //     //     duplicateModuleNames.add(d.name);
-            //     //     return false;
-            //     // }else{
-            //     //     return true;
-            //     // }
-            // // })
-            // .map((d)=>{
-            //     // Override projectId with the selected projectId
-            //     d.projectid = selectedProject;
-            //     // uniqueModuleNames.add(d.name);
-            //     return d;
-            // })
+            var duplicateModuleNames = new Set();
+            console.log('duplicateData',duplicateData);
+            var data = duplicateData.filter((d)=>{
+                if(uniqueModuleNames.has(d.name)){
+                    duplicateModuleNames.add(d.name);
+                    return false;
+                }else{
+                    return true;
+                }
+            })
+            .map((d)=>{
+                // Override projectId with the selected projectId
+                d.projectid = selectedProject;
+                uniqueModuleNames.add(d.name);
+                return d;
+            })
             
-            // setDuplicateModuleList(duplicateModuleNames)
-            // console.log('data',data);
-            // var totallength=duplicateData.length;
-            // var uniqlength=data.length;
-            // var duplicatelength=totallength-uniqlength
+            setDuplicateModuleList(duplicateModuleNames)
+            console.log('data',data);
+            var totallength=duplicateData.length;
+            var uniqlength=data.length;
+            var duplicatelength=totallength-uniqlength
             
             
-            // if(duplicatelength ==0){
-            //     setError("All "+(uniqlength)+" modules are unique and will be imported");
-            // }
-            // else    if(duplicatelength == totallength) {
-            //     setError("All "+(duplicatelength)+" modules are duplicate and none will be imported");
-            //     setBlockui({show:false});
-            //     setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
-            // }
-            // else if(duplicatelength > 0) {
-            //     setError((duplicatelength)+" modules are duplicate. Only"+ (uniqlength)+" will be imported");
+            if(duplicatelength ==0){
+                setError("All "+(uniqlength)+" modules are unique and will be imported");
+            }
+            else    if(duplicatelength == totallength) {
+                setError("All "+(duplicatelength)+" modules are duplicate and none will be imported");
+                setBlockui({show:false});
+                setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
+            }
+            else if(duplicatelength > 0) {
+                setError((duplicatelength)+" modules are dupliacte. Only"+ (uniqlength)+" will be imported");
                 
-            // }
+            }
             
                
             
-            // if( !data  || data.length == 0){
-            //     setDisableSubmit(true)
-            //     return;
-            // }
-            // else {
-            //     setDisableSubmit(false)
-            setMindmapData(duplicateData)
+            if( !data  || data.length == 0){
+                setDisableSubmit(true)
+                return;
+            }
+            else {
+                setDisableSubmit(false)
+                setMindmapData(data)
                 
-            // }
+            }
 
-            // var isMultiMindmap = Array.isArray(data);
-            // var hasError = false,hasNoScenarios= false;
-            // if(isMultiMindmap){
-            //     hasError = data.find(element => !('testscenarios' in element))!=undefined;   
-            //     if(!hasError){
-            //         hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
-            //     }             
-            // }
-            // if (!isMultiMindmap && !('testscenarios' in data) || hasError){
-            //     setError("Incorrect JSON imported. Please check the contents!!");
-            //     setDisableSubmit(true) 
-            // // }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
-            // //     setError("The file has no node structure to import, please check!!");
-            // //     setDisableSubmit(true)
-            // }else{
-            //     var importProj = data[0].projectid
-            //     if(!importProj || !projList[importProj]){
-            //         setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
-            //         setBlockui({show:false})
-            //         return;
-            //     }
-            // } 
+            var isMultiMindmap = Array.isArray(data);
+            var hasError = false,hasNoScenarios= false;
+            if(isMultiMindmap){
+                hasError = data.find(element => !('testscenarios' in element))!=undefined;   
+                if(!hasError){
+                    hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
+                }             
+            }
+            if (!isMultiMindmap && !('testscenarios' in data) || hasError){
+                setError("Incorrect JSON imported. Please check the contents!!");
+            }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
+                setError("The file has no node structure to import, please check!!");
+            }else{
+                var importProj = data[0].projectid
+                if(!importProj || !projList[importProj]){
+                    setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
+                    setBlockui({show:false})
+                    return;
+                }
+                /* var res = await importMindmap(data)
+                // console.log("ImportMindmap Res: " + res)
+                if(res.error){setError(res.error);setBlockui({show:false});return;}
+                var req={
+                    tab:"tabCreate",
+                    projectid:data[0]?data[0].projectid:data.projectid,
+                    version:0,
+                    cycId: null,
+                    moduleid:Array.isArray(res._id)?res._id:res
+                }
+                res = await getModules(req)
+                // console.log("GetModules res: " + JSON. stringify(res))
+                if(res.error){setError(res.error);setBlockui({show:false});return;}
+                setFiledUpload(res) */
+            } 
         }else{
             setError("File is not supported")
-            setDisableSubmit(true)
         }    
         setBlockui({show:false})
     }catch(err){

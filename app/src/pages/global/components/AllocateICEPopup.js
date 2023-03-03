@@ -8,7 +8,7 @@ import "../styles/AllocateICEPopup.scss";
 //use : Renders Execution Table 
 //todo : remove setEachDataFirst 
 
-const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel, SubmitButton, setAllocateICE, allocateICE, modalTitle, modalButton , icePlaceholder, currentTask} ) => {
+const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel, SubmitButton, setAllocateICE, allocateICE, modalTitle, modalButton , icePlaceholder} ) => {
 
     const current_task = useSelector(state=>state.plugin.CT)
 
@@ -32,7 +32,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     const fetchData = async () => {
         setSmartMode('normal');
 		setSelectedICE("");
-		var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
+		var projId = current_task.testSuiteDetails[0].projectidts
 		var dataforApi = {poolid:"",projectids: [projId]}
 		setLoading('Fetching ICE ...')
         const data = await getPools(dataforApi);
@@ -149,7 +149,7 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
 
     return(
         <div >
-            {/* {ExeScreen!==undefined && ExeScreen===true ?
+            {ExeScreen!==undefined && ExeScreen===true ?
                 <div className='adminControl-ice popup-content'>
                     <div>
                         <span className="leftControl" title="Execution type">{exeTypeLabel}</span>
@@ -171,7 +171,7 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
                         ))}
                     </select>
                 </div>
-            </div> */}
+            </div>
             <div className='adminControl-ice popup-content'>
 				<div>
 					<span className="leftControl" title="Token Name">{exeIceLabel}</span>
@@ -181,9 +181,9 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
 
             <div className='adminControl-ice popup-content popup-content-status'>
 				<div>
-					<span className="leftControl" title="Token Name">Status:</span>
+					<span className="leftControl" title="Token Name">ICE Status:</span>
 					<div>
-						<ul className="e__IceStatus" >
+						<ul className="e__IceStatus">
 							<li className="popup-li">
 								<label title='available' className="legends">
 									<span id='status' className="status-available"></span>

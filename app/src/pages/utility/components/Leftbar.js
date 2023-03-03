@@ -4,7 +4,6 @@ import  "../styles/Leftbar.scss";
 
 const Leftbar=(props)=>{
     const [focus,setFocus] = useState("encryption") //state to manage css on Icon click
-    const [disable, setDisable] = useState(false);
     const upperContent=()=>{
         return(
             <div className="letfnav">
@@ -13,22 +12,22 @@ const Leftbar=(props)=>{
                     <img className="util__execution_ic" src='static/imgs/ic-encryption-utility.png' alt="EncryptIcon" id={(focus==="encryption")? "selected":null}/>
                     <div>Encryption</div>
                 </span>
-                {/* disable && <span onClick={()=>{props.setScreenType("execution");  setFocus("execution"); }} title="Execution Metrics">
+                <span onClick={()=>{props.setScreenType("execution");  setFocus("execution"); }} title="Execution Metrics">
                     <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="execution")? "selected":""}/>
                     <div>Execution Metrics</div>
-                </span> */}
+                </span>
                 <span onClick={()=>{props.setScreenType("datatable-Create");  setFocus("datatable"); }} title="Data Table">
                     <div className="fa fa-table fa-2x util__execution_ic" id={(focus==="datatable")? "selected":""}/>
                     <div>Data Table</div>
                 </span>
-                {/* disable &&  <span onClick={()=>{props.setScreenType("devOps");  setFocus("devOps"); }} title="DevOps">
+                <span onClick={()=>{props.setScreenType("devOps");  setFocus("devOps"); }} title="DevOps">
                     <img className="util__execution_ic util__devOps" src='static/imgs/devOps.svg' alt="devOps Icon" id={(focus==="devOps")? "selected":""}/>
                     <div>DevOps</div>
-                </span> */}
-                {/* disable && <span onClick={()=>{props.setScreenType("api-utils");  setFocus("api-utils"); }} title="Request Body Generator">
+                </span>
+                <span onClick={()=>{props.setScreenType("api-utils");  setFocus("api-utils"); }} title="Request Body Generator">
                     <img className="util__execution_ic" src={"static/imgs/RequestBodyGenerator.svg"} id={(focus==="api-utils")? "selected":""}/>
                     <div>Request Body<br/>Generator</div>
-                </span> */}
+                </span>
             </div>
         )
     }

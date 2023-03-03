@@ -28,40 +28,32 @@ import { Selection } from "@fluentui/react";
 // import "../styles/DevOps.scss";
 const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
   const [searchText, setSearchText] = useState("");
-  const [isDataUpdated, setIsDataUpdated] = useState(false);
+  const [dataUpdated, setDataUpdated] = useState(true);
 
   const [agentData, setAgentData] = useState([]);
   const [originalAgentData, setOriginalAgentData] = useState([]);
 
   const onClientIceCountChange = (operation, name, newVal = "") => {
-    setIsDataUpdated(true);
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
     if (
-      operation === "add" || (operation === "sub" && parseInt(agentData[index].icecount) > 1)) {
+      operation === "add" ||
+      (operation === "sub" && agentData[index].icecount > 1)
+    ) {
       updatedData[index] = {
         ...agentData[index],
         icecount:
           operation === "add"
-            ? parseInt(agentData[index].icecount) + 1
-            : parseInt(agentData[index].icecount) - 1,
+            ? agentData[index].icecount + 1
+            : agentData[index].icecount - 1,
       };
       setAgentData([...updatedData]);
-      let filteredItems = updatedData.filter(
-        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
-      );
-      setFilteredList(filteredItems);
     } else if (operation === "update" && newVal > 0) {
       updatedData[index] = { ...agentData[index], icecount: parseInt(newVal) };
       setAgentData([...updatedData]);
-      let filteredItems = updatedData.filter(
-        (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
-      );
-      setFilteredList(filteredItems);
     }
   };
   const onAgentToggle = (name) => {
-    setIsDataUpdated(true);
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
     updatedData[index] = {
@@ -69,23 +61,12 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
       status: agentData[index].status === "active" ? "inactive" : "active",
     };
     setAgentData([...updatedData]);
-    
-    let filteredItems = updatedData.filter(
-      (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
-    );
-    setFilteredList(filteredItems);
   };
   const onConfirmDeleteAgent = (name) => {
-    setIsDataUpdated(true);
     const updatedData = [...agentData];
     const index = updatedData.findIndex((agent) => agent.name === name);
     updatedData.splice(index, 1);
     setAgentData([...updatedData]);
-
-    let filteredItems = updatedData.filter(
-      (item) => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1
-    );
-    setFilteredList(filteredItems);
 
     setShowConfirmPop(false);
     showMessageBar(
@@ -94,7 +75,6 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
     );
   };
   const deleteAgent = (name) => {
-    setIsDataUpdated(true);
     setShowConfirmPop({
       title: "Delete Avo Agent",
       content: (
@@ -155,6 +135,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           setMsg(MSG.CUSTOM("Error While Fetching Agent List", VARIANT.ERROR));
         }
       } else {
+        console.log(agentList);
         setOriginalAgentData(
           agentList.avoagents.map((agent) => ({
             ...agent,
@@ -221,7 +202,6 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         }
       }
       if (requestData.length > 0) {
-        setIsDataUpdated(true);
         const storeConfig = await saveAvoAgent(requestData);
         if (storeConfig !== "success") {
           if (storeConfig.error && storeConfig.error.CONTENT) {
@@ -231,15 +211,32 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           }
         } else {
           showMessageBar("Agents List updated successfully", "SUCCESS");
-          setIsDataUpdated(false);
         }
       } else {
-        setIsDataUpdated(false);
+        console.log("requestData : " + requestData);
+        console.log(requestData);
       }
       setLoading(false);
     })();
   };
-
+  // useEffect(()=> {
+  //     let isUpdated = false;
+  //     console.log(integrationConfig);
+  //     Object.keys(integrationConfig).some(element => {
+  //         if(typeof(integrationConfig[element]) === 'string' && integrationConfig[element] !== props.currentIntegration[element]) {
+  //             isUpdated = true;
+  //             return true;
+  //         } else if(typeof(integrationConfig[element]) === 'object' && element === 'scenarioList' && (integrationConfig[element].length !== props.currentIntegration[element].length || integrationConfig[element].some((scenario) => { return !props.currentIntegration[element].includes(scenario) }) )) {
+  //             isUpdated = true;
+  //             return true;
+  //         }
+  //     });
+  //     if (dataUpdated !== isUpdated) setDataUpdated(isUpdated);
+  // }, [integrationConfig]);
+  // const displayError = (error) =>{
+  //     setLoading(false)
+  //     setMsg(error)
+  // }
   const [filteredList, setFilteredList] = useState(agentData);
   const handleSearchChange = (value) => {
     let filteredItems = agentData.filter(
@@ -265,7 +262,9 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         </span>
       </div>
       <div
-        className="api-ut__btnGroup__agent">
+        className="api-ut__btnGroup"
+        style={{ display: "flex", justifyContent: "end" }}
+      >
         <div className="agent_state__legends">
           {showLegend("inactive", "Inactive")}
           {showLegend("idle", "Active - Idle")}
@@ -277,7 +276,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           <>
             <div className="searchBoxInput">
               <SearchBox
-                placeholder="Search"
+                placeholder="Enter Text to Search"
                 width="20rem"
                 value={searchText}
                 onClear={() => handleSearchChange("")}
@@ -293,12 +292,12 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         <button
           data-test="submit-button-test"
           onClick={handleAgentsSave}
-          disabled={!isDataUpdated}
+          disabled={!dataUpdated}
         >
           Save
         </button>
       </div>
-      <div style={{ position: "absolute", width: "98%", height: "-webkit-fill-available" }}>
+      <div style={{ position: "absolute", width: "96%", height: "76%" }}>
         <DetailsList
           columns={agentListHeader}
           items={(searchText.length > 0 ? filteredList : agentData).map(

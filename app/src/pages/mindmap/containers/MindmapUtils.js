@@ -313,10 +313,6 @@ export const addNode = (n) =>{
     }
     var img_src = 'static/imgs/node-' + n.type + '.png';
     if (n.reuse && (n.type === 'testcases' || n.type === 'screens')) img_src = 'static/imgs/' + n.type + '-reuse.png';
-    if (n.type === 'screens' && n.objLen===0) img_src = 'static/imgs/' + n.type + '-capture.png';
-    if (n.type === 'screens' && n.objLen===0 && n.reuse) img_src = 'static/imgs/' + n.type + '-reusecapture.png';
-    if (n.type === 'testcases' && n.stepsLen===0) img_src = 'static/imgs/' + n.type + '-teststep.png';
-    if (n.type === 'testcases' && n.stepsLen===0 && n.reuse) img_src = 'static/imgs/' + n.type + '-reuseteststep.png';
     var accessibility = 'Disable'
     if(n.task && n.task.tasktype == 'Execute Scenario Accessibility Only') accessibility = 'Exclusive'
     else if(n.task && n.task.tasktype == 'Execute Scenario with Accessibility') accessibility = 'Enable'
@@ -514,20 +510,20 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
     var t = s.attr('data-nodetype');
     if (t === 'modules' || t === 'endtoend') return;
     var p = dNodes[sid].parent;
-    // if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
-    //     setMsg(MSG.MINDMAP.WARN_TASK_ASSIGNED)
-    //     return; 
-    // }
-    // var taskCheck=checkparenttask(dNodes[sid],false);
-    // if(taskCheck){
-    //     setMsg(MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED)
-    //     return;
-    // }
-    // taskCheck=checkchildrentask(dNodes[sid],false);
-    // if(taskCheck){
-    //     setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
-    //     return;
-    // }
+    if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
+        setMsg(MSG.MINDMAP.WARN_TASK_ASSIGNED)
+        return; 
+    }
+    var taskCheck=checkparenttask(dNodes[sid],false);
+    if(taskCheck){
+        setMsg(MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED)
+        return;
+    }
+    taskCheck=checkchildrentask(dNodes[sid],false);
+    if(taskCheck){
+        setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
+        return;
+    }
     recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
     for (var j = dLinks.length - 1; j >= 0; j--) {
         if (dLinks[j].target.id === sid){
@@ -543,7 +539,6 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
         }
         return !1;
     });
-    if (p["_id"]== null && p["state"]=="created" && p["type"]=="endtoend") {deletedNodes=[]}
     return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }
 

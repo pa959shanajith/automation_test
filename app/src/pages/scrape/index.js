@@ -14,6 +14,7 @@ const Scrape = ()=>{
         }
     }, []);
 
+
     return (
         <ScrapeScreen/>
     );

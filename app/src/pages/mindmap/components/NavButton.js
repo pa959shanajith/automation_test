@@ -62,7 +62,7 @@ const NavButton = (props) => {
    },[move,props.zoom])
 
     return(                                                                     
-        <Rnd enableResizing={false} default={{x:1040,y:60}} bounds="parent">
+        <Rnd enableResizing={false} default={{x:100,y:90}} bounds="parent">
             <div id="navigate-widget">
                 <div className="arrow-box">
                     <p>

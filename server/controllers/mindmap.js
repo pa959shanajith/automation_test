@@ -14,12 +14,6 @@ var epurl = process.env.DAS_URL;
 var client = new Client();
 const configpath= require('../config/options');
 
-let headers
-module.exports.setReq = async (req) =>
-{
-	headers=req;
-}
-
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function (workbook, sheetname) {
 	var result = [];
@@ -467,7 +461,6 @@ exports.saveData = async (req, res) => {
 				"delete": tasks_remove,
 				"action": "modify"
 			}
-			inputs.host = headers.headers.host;
 			var args={
 				data: inputs,
 				headers: {
@@ -974,43 +967,4 @@ exports.deleteScenario = async(req,res) => {
 		logger.error("Error occurred in mindmaps/deleteScenario:", exception);
 		return res.status('500').send("fail");
 	}
-}
-exports.deleteScenarioETE = async(req,res) => {
-	const fnName = "deleteScenarioETE"
-	logger.info("Inside UI service: " + fnName)
-	try{
-		const inputs = {};
-		console.log(req.body);		
-		const result = await utils.fetchData(req.body, "mindmap/deleteScenarioETE", fnName);
-		return res.status('200').send(result);
-	}catch (exception){
-		logger.error("Error occurred in mindmaps/deleteScenarioETE:", exception);
-		return res.status('500').send("fail");
-	}
-}
-exports.exportToProject = async (req, res) => {
-	const fnName = "exportToProject";
-	logger.info("Inside UI service: " + fnName);
-	try {
-		const mindmapId = req.body.mindmapId["moduleid"];
-		const projectId=req.body.mindmapId["projectid"]
-		var userid = req.session.userid;
-		var userroleid = req.session.activeRoleId
-		const inputs= {
-			"mindmapId": mindmapId,
-			"query":"exportToProject",
-			"userid":userid,
-			"role":userroleid,
-			"projectId":projectId
-		}
-		const result = await utils.fetchData(inputs, "mindmap/exportToProject", fnName);
-		if (result == "fail") {
-			return res.send("fail");
-		} else {
-			return res.send(result);
-		}
-	} catch(exception) {
-		logger.error("Error occurred in mindmap/"+fnName+":", exception);
-		return res.status(500).send("fail");
-	}
-}; 
+} 

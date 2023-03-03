@@ -97,12 +97,8 @@ default_sub.on("message", (channel, message) => {
 		break;
 
 	case "jiralogin":
-		mySocket.emit("jiralogin", data.action, data.inputs, data.project_selected);
+		mySocket.emit("jiralogin", data.action, data.inputs);
 		break;
-
-	// case "getJiraTestcases":
-	// 	mySocket.emit("getJiraTestcases", data.action, data.inputs);
-	// 	break;
 
 	case "executeTestSuite":
 		mySocket.emit("executeTestSuite", data.executionRequest);
@@ -306,16 +302,6 @@ module.exports.initListeners = mySocket => {
 
 	mySocket.on("configure_field", value => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "configure_field", "value": value});
-		server_pub.publish("ICE2_" + username, dataToNode);
-	});
-
-	mySocket.on("Jira_Projects", value => {
-		const dataToNode = JSON.stringify({"username": username, "onAction": "Jira_Projects", "value": value});
-		server_pub.publish("ICE2_" + username, dataToNode);
-	});
-
-	mySocket.on("Jira_testcases", value => {
-		const dataToNode = JSON.stringify({"username": username, "onAction": "Jira_testcases", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 

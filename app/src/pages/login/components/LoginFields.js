@@ -264,7 +264,7 @@ const LoginFields = (props) => {
         setLockedOut(false);
         setUserError(false);
         if (email==="" || !regEx_email.test(email)) {
-          setEmailError("Please enter a valid email address")
+          setEmailError("Please Enter a valid email address")
           // retriggerAnimation("rc_email_validation","shakeX")
         }
         else if (duplicateEmails.length>0 && !resetUsername){
@@ -385,6 +385,11 @@ const LoginFields = (props) => {
 
     useEffect(()=>{
         setInitialFormPos(-20);
+        (async()=>{
+          const response = await fetch("/getLicenseInfo")
+          let { isTrialUser } = await response.json();
+          setIsTrialInstance(isTrialUser)
+        })();
         if(props.verifyPage){
             setOverlayText("Loading...");
             (async()=>{
@@ -530,8 +535,8 @@ const LoginFields = (props) => {
         :
         <>
           <div className="form-title">Forgot Username or Password?</div>
-          <div className="forgot-content">Provide your registered e-mail to send a link to reset your Password OR know your Username.</div>
-          <form data-test='login-form' className="login-form" onSubmit={(e)=>{e.preventDefault();setEmailError("");forgotPasswordEmail(recoverEmail);}}>
+          <div className="forgot-content">To reset your password or retrieve your username please provide your email address. We will send you an e-mail with your username and a link to reset your password.</div>
+          <form data-test='login-form' className="login-form" onSubmit={(e)=>{e.preventDefault();forgotPasswordEmail(recoverEmail);}}>
             <div style={{marginBottom:"1rem",justifyContent:"center",display:"flex"}}>
               <TextField
                 iconName="user"
@@ -545,7 +550,7 @@ const LoginFields = (props) => {
                 autoCorrect={"false"} 
                 errorMessage={emailError?emailError:null}
                 autoFocus={true}
-                // type={"email"}
+                type={"email"}
               />
             </div>
             <div style={{display:"flex", flexDirection:"row", gap:"2rem", justifyContent:"flex-end"}}>
@@ -606,9 +611,9 @@ const LoginFields = (props) => {
               <div style={{marginBottom:"1rem"}}>
                 <TextField
                   iconName="user"
-                  label="Username/Email"
+                  label="Username"
                   onChange={handleUsername}
-                  placeholder="Username/Email"
+                  placeholder="Username"
                   value={username}
                   onFocus={()=>setFocus("username")}
                   width="400px"

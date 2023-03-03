@@ -13,7 +13,7 @@ import PropTypes from 'prop-types';
 const ToolbarMenuAssign = (props) => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
-    const selectProj = useSelector(state=>state.plugin.PN)
+    const selectProj = useSelector(state=>state.mindmap.selectedProj)
     const prjList = useSelector(state=>state.mindmap.projectList)
     const [modlist,setModList] = useState([])
     const [relList,setRelList] = useState([])

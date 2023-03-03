@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux';
 import {ModalContainer, CalendarComp, Messages as MSG, VARIANT, setMsg} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
 import PropTypes from 'prop-types'
-import Execute from '../../execute';
 
 var unassignTask = []
 var reassignFlag = false
@@ -38,7 +37,7 @@ const TaskBox = (props) => {
     const [complexity,setComplexity] = useState({show:false,clist:undefined,val:undefined})
     const [assignbtn,SetAssignbtn] = useState({disable:true,reassign:false})
     const [showcomplexity,setShowcomplexity] = useState(false)
-    const appType = useSelector(state=>state.mindmap.appType);
+    const appType = projectList[selectedProj].apptypeName
     const cycleid = props.cycleid;
     const releaseid = props.releaseid;
     const setTaskBox = props.setTaskBox;
@@ -90,14 +89,13 @@ const TaskBox = (props) => {
                 SetAssignbtn({disable:false,reassign:false})
             }            
         }
-        var current = new Date();
         var tObj = {
-            t: 'Execute Batch',
+            t: (nt) ? nt.tasktype : '',
             bn: (nt) ? nt.batchname : '',
             at: (nt) ? nt.assignedto : '',
             rw: (nt && nt.reviewer != null) ? nt.reviewer : '',
-            sd: (nt) ? nt.startdate : `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`,
-            ed: (nt) ? nt.enddate : `${(current.getMonth()+1)%12 + 2}/${current.getDate()}/${current.getFullYear()}`,
+            sd: (nt) ? nt.startdate : '',
+            ed: (nt) ? nt.enddate : '',
             re: (nt && nt.release != null) ? nt.release : '',
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             ac: (nt) ? nt.accessibility_testing : 'Disable',
@@ -131,7 +129,7 @@ const TaskBox = (props) => {
         }
         taskDetailsRef.current.value = tObj.det
         // populate task 
-        var val = 'Execute Batch';
+        var val = dNodes[pi].task ? dNodes[pi].task.tasktype:dNodes[pi].task
         setTask({arr:taskList.task,initVal:val,disabled:tObj.at?true:false})
         taskList.attributes.forEach(e => {
             switch(e){
@@ -152,13 +150,13 @@ const TaskBox = (props) => {
                 case 'rw':
                     return;
                 case 'sd':
-                    setStartDate({show:false,value:tObj.sd})
+                    setStartDate({show:true,value:tObj.sd})
                     return;
                 case 'ed':
-                    setEndDate({show:false,value:tObj.ed})
+                    setEndDate({show:true,value:tObj.ed})
                     return;
                 case 'pg':
-                    setPropagate({show:false,val:true})
+                    setPropagate({show:true,val:false})
                     return;
                 case 'cx':
                     if (dNodes[pi].parent) {
@@ -206,7 +204,7 @@ const TaskBox = (props) => {
     }
     const unAssign = (flag) => {
         if(assignbtn.disable)return;
-        reassignFlag = flag; 
+        reassignFlag = flag;
         var twf= userInfo.taskwflow;
         if (twf && (dNodes[pi].type=="screens" || dNodes[pi].type=="testcases") && !warning){
             setWarning(true)
@@ -235,9 +233,9 @@ const TaskBox = (props) => {
                 addTask_11(pi, tObj, 0, cycleid, dNodes, nodeDisplay);
             }
             //Logic to add tasks for the scenario
-            if (dNodes[pi].children && propagate.val) dNodes[pi].children.forEach(function(tSc){
+            if (dNodes[pi].children && propagate.val) dNodes[pi].children.forEach(function(tSc) {
                 addTask_11(tSc.id, tObj, 1, cycleid, dNodes, nodeDisplay);
-                if (tSc.children != undefined){
+                if (tSc.children != undefined) {
                     tSc.children.forEach(function(scr) {
                         if (appType != "System" && appType != "Mainframe") addTask_11(scr.id, tObj, 2, cycleid, dNodes, nodeDisplay);
                         scr.children.forEach(function(tCa) {
@@ -294,8 +292,8 @@ const TaskBox = (props) => {
         <ClickAwayListener onClickAway={()=>{props.setTaskBox(false)}}>
             <div onClick={stopCal} id='ct-assignTable' className='task-box__container hide'>
                 <ul>
-                    {((task.arr.length>0))?
-                        <li style={{ display: 'none' }}>
+                    {task.arr.length>0?
+                        <li>
                             <label data-test="taskLabel">Task</label>
                             <select onClick={stopPropagate} data-test="taskSelect" onChange={changeTask}  disabled={assignbtn.reassign || task.disabled}  defaultValue={task.initVal} ref={taskRef}>
                                 {task.arr.map((e)=>
@@ -333,7 +331,7 @@ const TaskBox = (props) => {
                         </select>   
                         }                     
                     </li>
-                     {startDate.show?
+                    {startDate.show?
                         <li data-test="startDate" id='ct-startDate'>
                             <label data-test="startDateLabel">Start Date</label>
                             <span onClick={stopPropagate} style={{width:'145px',display:'flex'}}>
@@ -352,9 +350,9 @@ const TaskBox = (props) => {
                     {propagate.show?
                         <li>
                             <label data-test="propogateLabel">Propagate</label>
-                            <input data-test="propogateInput" onChange={()=>setPropagate({show:true,val:!propagate.val})} type='checkbox'  ></input>
+                            <input data-test="propogateInput" onChange={()=>setPropagate({show:true,val:!propagate.val})} type='checkbox'></input>
                         </li>
-                    :null} 
+                    :null}
                     {/* Hiding the Complexity component for every node type in mindmap */}
                     {/* {complexity.show?
                         <li>
@@ -627,13 +625,7 @@ const initTaskObject = ({pi,dNodes,userAsgList,userRevList,batchNameRef,taskRef,
 }
 
 //validate Task box values return boolean and adds error border
-const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,startDate,endDate, taskRef}) =>{
-    
-    if(batchNameRef.current && (batchNameRef.current.value == undefined || batchNameRef.current.value == "")){
-        if(batchNameRef.current.value == '' && taskRef.current) {
-            taskRef.current.value = 'Execute';
-        }
-    }
+const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,startDate,endDate}) =>{
     var pass = true;
     d3.selectAll('#ct-assignTable .errorBorder').classed('errorBorder',false)
     var twf= userInfo.taskwflow; 
@@ -652,6 +644,10 @@ const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,start
         d3.select('#ct-assignRevw').classed('errorBorder',true);
         pass = false;
     }
+    if(batchNameRef.current && !batchNameRef.current.disabled && (batchNameRef.current.value == undefined || batchNameRef.current.value == "")){
+        d3.select('#ct-batchName').classed('errorBorder',true);
+        pass = false;
+    }
     if (startDate.value == "") {
         d3.select('#ct-startDate .fc-datePicker').classed('errorBorder',true);
         pass = false;
@@ -662,7 +658,6 @@ const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,start
     }
     var ed = endDate.value.split('-');
     var sd = startDate.value.split('-');
-    // var start_date  = this.state.startD.getDate() + "/" + (this.state.startD.getMonth() + 1) + "/" + this.state.startD.getFullYear()
     var start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
     var end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
     if (end_date < start_date) {

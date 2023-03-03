@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import {useHistory} from 'react-router-dom';
 import * as actions from './state/action';
 import { SetProgressBar, RedirectPage } from '../global';
-export var history
 
 const Plugin = () => {
 
@@ -20,7 +19,7 @@ const Plugin = () => {
         //eslint-disable-next-line
     }, []);
 
-   
+    
 
     return (
         <>  

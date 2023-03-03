@@ -12,13 +12,6 @@ var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 
-
-let headers
-module.exports.setReq = async (req) =>
-{
-	headers=req;
-}
-
 exports.loginToQTest_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
@@ -173,7 +166,6 @@ function getProjectsForUser(userid, cb) {
 				"userid": userid,
 				"query": "getprojectDetails"
 			};
-			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -224,7 +216,6 @@ function projectandscenario(projectid, cb) {
 				"projectid": projectid,
 				"query": "projectname1"
 			};
-			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -250,7 +241,6 @@ function projectandscenario(projectid, cb) {
 				"projectid": projectid,
 				"query": "scenariodata"
 			};
-			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -425,7 +415,6 @@ function getQcDetailsForUser(userid, cb) {
 				"userid": userid,
 				"query": "getprojectDetails"
 			};
-			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -482,7 +471,6 @@ function qcscenariodetails(projectid, cb) {
 				"projectid": projectid,
 				"query": "scenariodata"
 			};
-			inputs.host = headers.headers.host;
 			var args = {
 				data: inputs,
 				headers: {
@@ -513,7 +501,6 @@ function qcscenariodetails(projectid, cb) {
 					"testscenarioid": itr._id,
 					"query": "qtestdetails"
 				};
-				inputs.host = headers.headers.host;
 				var args = {
 					data: inputs,
 					headers: {
@@ -565,7 +552,6 @@ function getProjectsAndModules(userid,cb){
         getprojectDetails:function(callback){
             //var getprojects = "select projectids from icepermissions where userid="+userid;
             var inputs = {"userid":userid,"query":"getprojectDetails"};
-			inputs.host = headers.headers.host;
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}                
@@ -613,7 +599,6 @@ function projectandmodule(projectid,cb,data){
         projectname1 : function(callback1){
             //var projectnamequery = "SELECT projectname FROM projects WHERE projectid="+projectid;
             var inputs = {"projectid":projectid,"query":"projectname1"};
-			inputs.host = headers.headers.host;
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}

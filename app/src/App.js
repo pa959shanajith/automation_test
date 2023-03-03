@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {Provider, useSelector, useDispatch} from 'react-redux';
-import ServiceBell from "@servicebell/widget";
 import {store} from './reducer';
 import {ProgressBar, ErrorPage, PopupMsg, VARIANT} from './pages/global'
 import { SWITCHED } from './pages/global/state/action';
@@ -17,8 +16,6 @@ import Design from './pages/design';
 import Utility from './pages/utility';
 import Integration from './pages/integration';
 import Settings from './pages/settings';
-import GeniusDialog from './pages/global/components/GeniusDialog';
-import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';
@@ -26,10 +23,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-datetime/css/react-datetime.css';
 import '@avo/designcomponents/lib/assets/styles/avoassure.scss';
-import 'primeicons/primeicons.css';
-import 'primereact/resources/themes/lara-light-indigo/theme.css';
-import 'primereact/resources/primereact.css';
-import 'primeflex/primeflex.css';
 
 const { REACT_APP_DEV } = process.env
 /*Component App
@@ -42,11 +35,6 @@ const App = () => {
   const [blockui,setBlockui] = useState({show:false})
   useEffect(()=>{
     TabCheck(setBlockui);
-    (async()=>{
-      const response = await fetch("/getServiceBell")
-      let { enableServiceBell } = await response.json();
-      if(enableServiceBell) ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
-    })();
   },[])
   return (
     <Provider store={store}>
@@ -72,8 +60,6 @@ const RouteApp = () => {
   return(
     <Router>
     <PopupMsg/>
-    <GeniusDialog/>
-    <ShowTrialVideo />
     { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to`} close={()=>setRole("")} /> }
     <SocketFactory/>
     <Switch>
@@ -98,7 +84,7 @@ const RouteApp = () => {
 //disable duplicate tabs
 const TabCheck = (setBlockui) => {
   const storage_Handler = (e) => {
-    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport')) return false;
+    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport')) return false;
       // if tabGUID does not match then more than one tab and GUID
       if (e.key === 'tabUUID' && e.oldValue !== '') {
           if (e.oldValue !== e.newValue) {

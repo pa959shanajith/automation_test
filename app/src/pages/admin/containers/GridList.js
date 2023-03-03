@@ -12,45 +12,11 @@ import { deleteAvoGrid, fetchAvoAgentAndAvoGridList } from '../api';
 const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
     const [currentGrid, setCurrentGrid] = useState(false);
     const [searchText, setSearchText] = useState("");
+    const deleteGridConfig = async (id) => {
+    
+        setShowConfirmPop({'title': 'Delete Avo Grid Configuration', 'content': <p>Are you sure, you want to delete <b>Name 1</b> Configuration?</p>, 'onClick': ()=>{ setShowConfirmPop(false); showMessageBar('Name 1 Configuration Deleted', 'SUCCESS'); }});
+    }
     const [gridList, setGridList] = useState([]);
-    const deleteGridConfig = (grid) => {
-        setShowConfirmPop({
-            title: 'Delete Avo Grid Configuration', 
-            content: <p>Are you sure, you want to delete <b>{grid.name}</b> Configuration?</p>, 
-        onClick: ()=>{ deleteDevopsAvoGrid(grid); }});
-    }
-    const deleteDevopsAvoGrid = (grid) => {
-        setLoading('Please Wait...');
-        setTimeout(async () => {
-            const deletedAvoGrid = await deleteAvoGrid({'_id':grid._id});
-            if(deletedAvoGrid.error) {
-                if(deletedAvoGrid.error.CONTENT) {
-                    setMsg(MSG.CUSTOM(deletedAvoGrid.error.CONTENT,VARIANT.ERROR));
-                } else {
-                    setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
-                }
-            }else {
-                const gridList = await fetchAvoAgentAndAvoGridList({
-                    query: 'avoGridList'
-                });
-                if(gridList.error) {
-                    if(gridList.error.CONTENT) {
-                        setMsg(MSG.CUSTOM(gridList.error.CONTENT,VARIANT.ERROR));
-                    } else {
-                        setMsg(MSG.CUSTOM("Error While Fetching Grid List",VARIANT.ERROR));
-                    }
-                }else {
-                    setGridList(gridList.avogrids);
-                    let filteredItems = gridList.avogrids.filter(item => item.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1);
-                    setFilteredList(filteredItems);
-                }
-                setMsg(MSG.CUSTOM( grid.name+" Deleted Successfully.",VARIANT.SUCCESS));
-            }
-            setLoading(false);
-        }, 500);
-        setShowConfirmPop(false);
-    }
-   
     
 
     const listHeaders = [
@@ -94,16 +60,16 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
             return (
                 <div>
                     <p className={`${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x64')}>x64</p>
-                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'x86' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('x86')")}>x86</p>
+                    <p className={`${selectedConfig === 'x86' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x86')}>x86</p>
                 </div>
             );
         } else if(selectedTab === 'linux') {
             return (
                 <div>
-                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('x64')")}>x64</p>
-                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'arm' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('arm')")}>ARM</p>
-                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'arm64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('arm64')")}>ARM64</p>
-                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'rhel6' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('rhel6')")}>RHEL6</p>
+                    <p className={`${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x64')}>x64</p>
+                    <p className={`${selectedConfig === 'arm' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('arm')}>ARM</p>
+                    <p className={`${selectedConfig === 'arm64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('arm64')}>ARM64</p>
+                    <p className={`${selectedConfig === 'rhel6' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('rhel6')}>RHEL6</p>
                 </div>
             );
         } else return <></>;
@@ -113,7 +79,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
         if(selectedTab === 'windows') {
             return (
                 <div className='grid_download_dialog__content'>
-                    {/* <div className='grid_download_dialog__prerequisite'>
+                    <div className='grid_download_dialog__prerequisite'>
                         <div className='grid_download_dialog__prerequisite__header'>
                             <p>System Prerequisites</p>
                             <Icon iconName={`chevron-${requisiteExpand ? 'up' : 'down'}`} style={{width: '1rem'}} onClick={() => setRequisiteExpand(!requisiteExpand)} />
@@ -126,43 +92,23 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                                 </ul>
                             </div>
                         }
-                    </div> */}
+                    </div>
                     <div className='grid_download_dialog__content__br' />
-                    <p>Configure Avo Agent</p>
-                    <h6>Configure Avo Agent by following below steps</h6>
+                    <p>Configure your Account</p>
+                    <h6>Configure your account by following the steps</h6>
                     <div className='grid_download_dialog__content__br' />
-                    <p>Download the Agent</p>
-                    <pre className='grid_download_dialog__content__code'>
-                        <code>
-                            Click <u><a onClick={onDownloadAgentClick}>Here</a></u> to Download the Agent
-                        </code>
-                    </pre>
-                    <p>Run Avo Agent</p>
-                    <pre className='grid_download_dialog__content__code'>
-                        <code>
-                            <ol>
-                            <li>Place avo agent.exe file in a seperate folder to track agent logs and configuration file.</li>
-                            <li><p>Run AvoAgent.exe</p></li>
-                            <img src="static/imgs/Run-Agent.png" alt="Run AvoAgent.exe File"/>
-                            <li><p>Track you Avo Agent in Tray Application</p></li>
-                            <img src="static/imgs/Running-Agent.png" alt="Running AvoAgent.exe in Windows Tray Application"/>
-                            </ol>
-                        </code>
-                    </pre>
-                    {/* <p>Run Avo Agent</p>
+                    <p>Create the Agent</p>
                     <pre className='grid_download_dialog__content__code'>
                         <code>
                             PS C:\&gt; mkdir agent ; cd agent 
                             PS C:\agent&gt; Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$HOME\Downloads\vsts-agent-win-x64-2.206.1.zip", "$PWD")
                         </code>
-                    </pre> */}
+                    </pre>
                     <div className='grid_download_dialog__content__br' />
                     <p>Configure the Agent</p>
                     <pre className='grid_download_dialog__content__code'>
                         <code>
-                            {/* PS C:\agent&gt; .\config.cmd */}
-                            You can Track and Update your Avo Agent Logs, Configuration, and Status.
-                            <img src="static/imgs/Config-Agent.png" alt="Options to configure and Track Avo Agent"/>
+                            PS C:\agent&gt; .\config.cmd
                         </code>
                     </pre>
                 </div>
@@ -170,13 +116,13 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
         } else if(selectedTab === 'mac') {
             return (
                 <div>
-                    <p>Coming Soon for MacOS.... Stay Tuned !!!</p>
+                    <p>System Prerequisites</p>
                 </div>
             );
         } else {
             return (
                 <div>
-                    <p>Coming Soon for Linux.... Stay Tuned !!!</p>
+                    <p>System Prerequisites</p>
                 </div>
             );
         }
@@ -189,9 +135,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
         // document.body.appendChild(link);
         // link.click();
         // document.body.removeChild(link);
-        // window.location.href = window.location.origin+"/downloadAgent";
-        window.location.href = "https://driver.avoautomation.com/driver/avoagent.exe";
-
+        window.location.href = window.location.origin+"/downloadAgent";
 
         // const link = document.createElement('a');
         // const file = new Blob([window.location.origin.split("//")[1]], {type: 'text/plain'});
@@ -288,25 +232,25 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                         Avo Grid Configuration
                     </span>
                 </div>
-                <div className="api-ut__btnGroup__grid">
+                <div className="api-ut__btnGroup">
                     <button data-test="submit-button-test" onClick={() => setCurrentGrid({
                         name: '',
                         agents: []
                     })} >New Grid</button>
-                    <div style={{margin: '0.5rem'}}>
+                    <div>
                         <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Click <a style={{ textDecoration: 'underline', color: 'blueviolet', cursor: 'pointer' }} onClick={() => setHideDialog(!hideDialog)}>here</a> to get the Agent </span>
                     </div>
                     { gridList.length > 0 && <>
                         <div className='searchBoxInput'>
-                            <SearchBox placeholder='Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                            <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                         </div>
                     </> }
                 </div>
-                { gridList.length > 0 ? <div style={{ position: 'absolute', width: '98%', height:'-webkit-fill-available', marginTop: '1.5%' }}>
+                { gridList.length > 0 ? <div style={{ position: 'absolute', width: '100%', height: '82%', marginTop: '1.5%' }}>
                     <DetailsList columns={listHeaders} items={((searchText.length > 0) ? filteredList : gridList).map((grid) => ({
                         name: grid.name,
                         editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid(grid)} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
-                        deleteIcon: <img onClick={() => deleteGridConfig(grid)} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
+                        deleteIcon: <img onClick={() => deleteGridConfig(grid._id)} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
                     }))} layoutMode={1} selectionMode={0} variant="variant-two" />
                 </div> : <div className="no_config_img"> <img src="static/imgs/empty-config-list.svg" alt="Empty List Image"/>  </div> }
             </>

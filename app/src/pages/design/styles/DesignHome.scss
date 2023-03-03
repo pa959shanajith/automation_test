@@ -11,7 +11,7 @@
 
 .d__mid_section{
     display: flex;
-    // flex: auto;
+    flex: auto;
     width: 100%;
     background-color: rgb(255, 255, 255);
     margin: 0;
@@ -20,16 +20,6 @@
 
 .d__footer .main-footer{
     position: static;
-}
-
-.d__mid_section {
-    align-items: flex-end;
-    .ref__wrapper {
-        position: absolute;
-        top: 7rem;
-        height: 27.6rem;
-        right: 2px;
-    }
 }
 
 

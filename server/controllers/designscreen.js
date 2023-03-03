@@ -332,13 +332,9 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		var focusParam = req.body.elementXpath;
 		var elementURL = req.body.elementUrl;
 		var appType = req.body.appType;
-		var top = req.body.top;
-		var left = req.body.left;
-		var width = req.body.width;
-		var height = req.body.height;
 		logger.info("ICE Socket requesting Address: %s" , icename);
 		logger.info("Sending socket request for focus to cachedb");
-		var dataToIce = {"emitAction": "focus", "username": icename, "focusParam": focusParam, "elementURL": elementURL, "appType": appType, "top": top, "left": left, "width": width, "height": height};
+		var dataToIce = {"emitAction": "focus", "username": icename, "focusParam": focusParam, "elementURL": elementURL, "appType": appType};
 		redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 		logger.info("Successfully highlighted selected object");
 		res.send('success');

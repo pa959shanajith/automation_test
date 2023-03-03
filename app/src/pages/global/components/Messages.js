@@ -174,7 +174,7 @@ const Messages={
     },
     GENERIC:{
         INVALID_SESSION: {"CONTENT":"Invalid Session.", "VARIANT": VARIANT.ERROR},
-        UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"Avo Assure client is offline. Please reconnect.", "VARIANT": VARIANT.ERROR},
+        UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"No Intelligent Core Engine (ICE) connection found with the logged in Avo Assure username. Please run the ICE batch file once again and connect to server.", "VARIANT": VARIANT.ERROR},
         WARN_EXECUTION_ONLY: {"CONTENT":"ICE is connected in 'Execution Only' mode. Other actions are not permitted.", "VARIANT": VARIANT.WARNING},
         WARN_NO_REVIEWER: {"CONTENT":"Reviewer is not assigned .", "VARIANT": VARIANT.WARNING},
         ERR_FETCH_POOLS: {"CONTENT":"Failed to fetch pools.", "VARIANT": VARIANT.ERROR},
@@ -208,7 +208,6 @@ const Messages={
     PLUGIN:{
         ERR_LOAD_TASK: {"CONTENT":"Fail to load tasks.", "VARIANT": VARIANT.ERROR},
         ERR_UNMAPPED_DISCOVER_USER: {"CONTENT":"The user is not mapped to Avo Discover.", "VARIANT": VARIANT.ERROR},
-        ERR_SAVING_GENIUS_DATA: {"CONTENT":"Failed to save recorded data.", "VARIANT": VARIANT.ERROR},
         ERR_FETCHING_DISCOVER_USER: {"CONTENT":"Error fetching Avo Discover users.", "VARIANT": VARIANT.ERROR}
     },
     EXECUTE:{
@@ -327,8 +326,7 @@ const Messages={
         SUCC_DATA_COPIED : {"CONTENT":"Data Copied successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_RULES_UPDATE : {"CONTENT":"Rules updated successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DELETE_SCENARIO : {"CONTENT":"Scenarios successfully deleted.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_DELETE_NODE : {"CONTENT":"Data deleted successfully.", "VARIANT": VARIANT.SUCCESS},
-
+        
         WARN_PROJECT_ASSIGN_USER: {"CONTENT":'This project is not assigned to user.', "VARIANT": VARIANT.WARNING},
         WARN_SELECT_COMPLETE_FLOW: {"CONTENT":"Please select a complete flow to assign tasks.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_E2E: {"CONTENT":"First, Please select an end to end module or create a new one.", "VARIANT": VARIANT.WARNING},
@@ -380,7 +378,7 @@ const Messages={
         SUCC_WS_TEMP_SAVE: {"CONTENT":"WebService Template saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SCREEN_JSON_IMPORT: {"CONTENT":"Screen Json imported successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SCREEN_EXCEL_IMPORT: {"CONTENT":"Screen Excel imported successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_OBJ_ADD: {"CONTENT":"Element(s) added sucessfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_OBJ_ADD: {"CONTENT":"Objects has been added successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_CERT_SAVE: {"CONTENT":"Certificate Saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_OBJ_CREATE: {"CONTENT":"Objects has been created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},

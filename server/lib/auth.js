@@ -548,16 +548,7 @@ module.exports.validateUserState = async (req, res) => {
 				const sessid = await utils.findSessID(username);
 				if (sessid.length !== 0) {
 					logger.info(`User ${username} is already logged in`);
-					const d2s = {"action":'logout', "key":sessid, "user":user.username, "cmdBy":'admin', "reason": 'duplicatesession'};
-					try {
-						const status = await utils.delSession(d2s);
-						emsg = "reload";
-						return res.send(emsg);
-					} catch (err) {
-						logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user.username);
-						logger.debug(err);
-						return res.send("fail");
-					}
+					emsg = "userLogged";
 				} else {
 					const { err, userid, role, assignedProjects } = await checkAssignedProjects(username, user.type);
 					const ip = (!req.headers['client-ip'])? req.headers['client-ip'] : req.ip;

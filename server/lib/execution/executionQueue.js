@@ -13,8 +13,6 @@ const { timestamp } = require('winston/lib/winston/common');
 const { info } = require('winston');
 const { update } = require('../../notifications');
 const suitFunctions = require('../../controllers/suite');
-const reportFunctions = require('../../controllers/report');
-const screenshotpath = require('../../config/config');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -33,7 +31,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     static poolname_ice_map = {}
     static res_map = {}
     static key_list = {}
-    static synchronous_execution_report = {}
+    static task_list = []
     static agent_list = {}
     // executon queue initialisation
     static queue_init() {
@@ -227,9 +225,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     response['status'] = "pass";
                 } else if (targetICE && targetICE != EMPTYUSER) {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
-                    if (type && type == "SCHEDULE") {
-                        scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Missed');
-                    }
+                    scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Missed');
                     response['status'] = "pass";
                     response['variant'] = "error";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
@@ -552,15 +548,15 @@ module.exports.Execution_Queue = class Execution_Queue {
         const timestamp = Date.parse(new Date);
         return new Promise((rsv,rej) => {
             const configureTime = 1000,response = false;
-            try{
+            let executionCompleted = true;
+            try{      
                 const startChecking = setInterval(()=> {
-                let executionCompleted = true;
-
-                if(configureKey in this.key_list) {
-                    for(let executionQueues of this.key_list[configureKey]){
-                        if(executionQueues[0]['executionListId'] == executionListId){
-                            executionCompleted = false;
-                        }
+                if(this.key_list[configureKey].length == 0){
+                    executionCompleted = true;
+                } 
+                for(let executionQueues of this.key_list[configureKey]){
+                    if(executionQueues[0]['executionListId'] == executionListId){
+                        executionCompleted = false;
                     }
                 }
                 if(executionCompleted) {
@@ -592,11 +588,6 @@ module.exports.Execution_Queue = class Execution_Queue {
             'query': 'fetchExecutionData'
         }
         const executionData = await utils.fetchData(inputs, "devops/configurekey", fnName);
-
-        //Checking for "executiontype" in the request
-        if("executionType" in req.body) {
-            executionData.executionData.executiontype = req.body.executionType;
-        }
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
         const gettingTestSuiteIds = await suitFunctions.ExecuteTestSuite_ICE({
@@ -608,16 +599,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         //Storing the data in executionlist
         const storeInExecutionList =  await utils.fetchData(gettingTestSuiteIds, "devops/executionList", fnName);
 
-        //To get the data from cache if key list is empty
-        if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
-            //check whether cache data is present
-            let cacheData = await cache.get('execution_list')
-            if(cacheData === null) {
-                this.key_list = {};
-            } else {
-                this.key_list = cacheData;
-            }
-        }
         if(!(req.body.key in this.key_list))
             this.key_list[req.body.key] = [];
 
@@ -628,45 +609,23 @@ module.exports.Execution_Queue = class Execution_Queue {
         for (let ids of testSuiteInfo)
             newExecutionList.push({
                 executionListId:newExecutionListId,
-                configurename: gettingTestSuiteIds.executionData.configurename,
-                modulename:ids.testsuiteName,
                 moduleid:ids.testsuiteId,status: 'QUEUED',
                 avoagentList:gettingTestSuiteIds.executionData.avoagents,
-                startTime: new Date().toLocaleString()
             });
 
         keyQueue.push(newExecutionList);
 
         // Update the execution_list
         await cache.set("execution_list", this.key_list);
-
         let execution_Queue = await cache.get('execution_list');
 
-        //Adding the reportLink in the response
-        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
-        
         if(gettingTestSuiteIds.executionData.executiontype == 'asynchronous'){
             response['status'] = "pass";
             return response;
         }
         synchronousFlag = await this.checkForCompletion(req.body.key,gettingTestSuiteIds.executionData.executionListId);
+        if(synchronousFlag) response['status'] = "pass";
 
-        let synchronous_report = await cache.get('synchronous_report');
-        // console.log(synchronous_report);
-        //Below code is to generate synchronous report.
-        let responseFromGetReportApi = [];
-        for(let executions of synchronous_report[newExecutionListId]) {
-            const data = await reportFunctions.getDevopsReport_API({
-                'body':executions,
-                'req': req
-            });
-            responseFromGetReportApi.push(data);
-        }
-        // Deleting the cacheData once that execution is completed 
-        delete synchronous_report[newExecutionListId]
-        await cache.set('synchronous_report',synchronous_report)
-
-        if(synchronousFlag) response['status'] = responseFromGetReportApi;
         } catch (error) {
             console.info(error);
             logger.error("Error in execAutomation. Error: %s", error);
@@ -684,8 +643,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             'tasktype': "EXECUTE",
             'maxicecount': "1",
             'key': "",
-            'executionListId': '',
-            'screenshotpath': screenshotpath.screenShotPath
+            'executionListId': ''
         };
 
         try {
@@ -697,24 +655,10 @@ module.exports.Execution_Queue = class Execution_Queue {
                 "icecount": 1,
                 createdon: new Date().toLocaleString(),
                 status: "inactive",
-                recentCall: new Date().toLocaleString(),
-                //updated to use icecount value from agent
-                currentIceCount: 'icecount' in req.body ? req.body.icecount : 0
-            }
+                recentCall: new Date().toLocaleString()
+            }   
             const agentStatus = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
-            //Update the maxicecount for the agent
-            response['maxicecount'] = agentStatus['icecount']
 
-            // To fetch the data from cache if key_list is empty
-            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
-                //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
-                if(cacheData === null) {
-                    this.key_list = {};
-                } else {
-                    this.key_list = cacheData;
-                }
-            }
             if(agentStatus['status'] != 'inactive') {
                 let executionList = this.key_list;
                 for(let [key, value] of Object.entries(executionList)){
@@ -758,19 +702,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         response['error'] = "None";
         try {
             const configKey = req.body.configkey;
-            const agentName = 'agentName' in req.body ? req.body.agentName : '';
             const executionListId = req.body.executionListId;
-
-            // To store the data from cache if key_list is empty
-            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
-                //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
-                if(cacheData === null) {
-                    this.key_list = {};
-                } else {
-                    this.key_list = cacheData;
-                }
-            }
             if(configKey in this.key_list) {
 
                 const executionQueue = this.key_list[configKey];
@@ -784,8 +716,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
-
-                                executionData = await utils.fetchData({'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
+                                executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
                                     'body': executionData[0],
                                     'session':executionData[0].session,
@@ -795,8 +726,6 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     return response;
                                 }
                                 executionData = [executionRequest];
-
-
                                 //Updating the status to IN_Progress
                                 await cache.set("execution_list", this.key_list);
                                 break;
@@ -836,182 +765,44 @@ module.exports.Execution_Queue = class Execution_Queue {
     //     return result;
     // };
     static setExecStatus = async (req, res) => {
-        let fnName = 'setExecStatus'
-        try {
-            let dataFromIce = req.body,checkInCache = false;
-            let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
-            
-            // To store the data from cache if key list is empty.
-            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
-                //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
-                if(cacheData === null) {
-                    this.key_list = {};
-                } else {
-                    this.key_list = cacheData;
-                }
-            }
+
+        let dataFromIce = req.body;
+        let resultData = dataFromIce.exce_data;
+        if (dataFromIce.status == 'finished')
+        {
+            //Changing the status to completed in the cache.
             let keyQueue = this.key_list[resultData.configkey];
-            let statusCount = 0;
             let updatedKeyQueue = [];
-            if (dataFromIce.status == 'finished')
-            {
-                //Changing the status to completed in the cache.
-                let listIndex = -1;
-                for(let executionList of keyQueue) {
-                    listIndex++;
-                    
-                    if(executionList[0]['executionListId'] == resultData.executionListId)
-                    {
-                        checkInCache = true;
-                        let moduleIndex = -1;
-                        for (let testSuite of executionList){
-                            moduleIndex++;
-                            if(testSuite.moduleid == resultData.testsuiteId){
-                                this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED';
-                                
-                                //Adding details for synchronous report
-                                if(resultData.execReq.executiontype != 'asynchronous') {
-                                    if(!(resultData['executionListId'] in this.synchronous_execution_report))
-                                        this.synchronous_execution_report[[resultData['executionListId']]] = [];
-
-                                    this.synchronous_execution_report[resultData['executionListId']].push({
-                                        "execution_data": {
-                                            "executionId": resultData.executionId,
-                                            "scenarioIds": resultData.execReq.suitedetails[0].scenarioIds
-                                        }
-                                    })
-                                    await cache.set("synchronous_report", this.synchronous_execution_report);
-                                    let synchronous_report = await cache.get('synchronous_report');
-                                    console.log(synchronous_report);
-                                }
-
-                                await cache.set("execution_list", this.key_list);
-                            }
-                            statusCount+=(testSuite.status == 'COMPLETED');
-                            if(statusCount == executionList.length) {
-                                statusCount = -1;
-                            }
+            let listIndex = -1,statusCount = 0;
+            for(let executionList of keyQueue) {
+                listIndex++;
+                
+                if(executionList[0]['executionListId'] == resultData.executionListId)
+                {
+                    let moduleIndex = -1;
+                    for (let testSuite of executionList){
+                        moduleIndex++;
+                        if(testSuite.moduleid == resultData.testsuiteId){
+                            this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED'
+                            await cache.set("execution_list", this.key_list);
                         }
-                    } else {
-                        updatedKeyQueue.push(executionList);
+                        statusCount+=(testSuite.status == 'COMPLETED');
+                        if(statusCount == executionList.length) {
+                            statusCount = -1;
+                        }
                     }
-                }
-                //To delete the execution from the cache
-                // if(statusCount == -1){
-                //     this.key_list[resultData.configkey] = updatedKeyQueue
-                //     await cache.set("execution_list", this.key_list);
-                // }
-
-                //User Manually deleted from cache
-                if(!checkInCache) {
-                    dataFromIce.executionStatus = false;
+                } else {
+                    updatedKeyQueue.push(executionList);
                 }
             }
-            //To check whether executionListId present in cache data.
-            for(let execution of keyQueue) {
-                if(execution[0].executionListId == resultData.executionListId) {
-                    // newConfigureKeyExecution.push(execution);
-                    checkInCache = true
-                }
-            }
-
-            if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
-                resultData.reportData.overallstatus.overallstatus = 'Terminated';
-            }
-            let responseFromExecutionInvoker =  await this.executionInvoker.setExecStatus(dataFromIce);
-
-            // To delete the list from the cache
-            if(statusCount == -1 && dataFromIce.status == 'finished'){
+            //To delete the execution from the cache
+            if(statusCount == -1){
                 this.key_list[resultData.configkey] = updatedKeyQueue
                 await cache.set("execution_list", this.key_list);
             }
-
-            return responseFromExecutionInvoker;
-
-        } catch (error) {
-            console.info(error);
-            logger.error("Error in setExecStatus. Error: %s", error);
-            return 'fail';
         }
+        return await this.executionInvoker.setExecStatus(dataFromIce);
 
-    }
-
-
-    static getQueueState = async (req, res) => {
-        let fnName = 'getQueueState'
-        let response = {}
-        try{
-            //to add the keylist if its empty,, from the cache
-            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
-                //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
-                if(cacheData === null) {
-                    this.key_list = {};
-                } else {
-                    this.key_list = cacheData;
-                }
-            }
-
-            for(let configKeys in this.key_list) {
-                if(this.key_list[configKeys].length){
-                    response[configKeys] = this.key_list[configKeys]
-                }
-            }
-        } catch (error) {
-                console.info(error);
-                logger.error("Error in getQueueState. Error: %s", error);
-                return 'fail';
-        }
-
-        return response;
-    }
-
-    static deleteExecutionListId = async (req, res) => {
-        var fnName = 'deleteExecutionListId';
-        let response = {};
-        let synchronousFlag = false;
-        response['status'] = "fail";
-        response["message"] = "N/A";
-        response['error'] = "None";
-        try {
-
-            const configurekey = req.body.configurekey;
-            const executionListId = req.body.executionListId;
-
-            //to add the key list if its empty,, from the cache
-            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
-                //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
-                if(cacheData === null) {
-                    this.key_list = {};
-                } else {
-                    this.key_list = cacheData;
-                }
-            }
-            const configureKeyExecution = configurekey in this.key_list ? this.key_list[configurekey] : [];
-            let newConfigureKeyExecution = [];
-            for(let execution of configureKeyExecution) {
-                if(execution[0].executionListId != executionListId) {
-                    newConfigureKeyExecution.push(execution);
-                }
-            }
-            this.key_list[configurekey] = newConfigureKeyExecution;
-            if(newConfigureKeyExecution.length === 0)
-                delete this.key_list[configurekey]
-
-
-            await cache.set("execution_list", this.key_list);
-            response['status'] = 'pass';
-            console.log(this.key_list);
-            return response;
-
-        } catch (error) {
-            console.info(error);
-            logger.error("Error in deleteExecutionListId. Error: %s", error);
-        }
-
-        return response;
     }
 }
 

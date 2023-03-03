@@ -5,24 +5,24 @@ import { Header, FooterTwo as Footer, PopupMsg, ActionBar, ReferenceBar } from '
 import "../styles/ScheduleHome.scss";
 import ScheduleContent from './ScheduleContent';
 
-const ScheduleHome = ({item}) => {
+const ScheduleHome = () => {
     
     const current_task = useSelector(state=>state.plugin.CT)
     const filter_data = useSelector(state=>state.plugin.FD)
     const [browserTypeExe,setBrowserTypeExe] = useState([]);
     const [execAction,setExecAction] = useState("serial");
-    const appType = useSelector(state=>state.mindmap.appType);
+    const [appType, setAppType] = useState(null);
     const [syncScenario, setSyncScenario] = useState(false);
     const [execEnv,setExecEnv] = useState("default");
     const [smartMode,setSmartMode] = useState('normal')
     const isMac = navigator.appVersion.toLowerCase().indexOf("mac") !== -1;
 	
     
-    // useEffect(()=>{
-    //     if (Object.keys(current_task).length!==0 && Object.keys(filter_data).length!==0){
-    //         // setAppType(current_task.appType);
-    //     }
-    // }, [current_task, filter_data]);
+    useEffect(()=>{
+        if (Object.keys(current_task).length!==0 && Object.keys(filter_data).length!==0){
+            setAppType(current_task.appType);
+        }
+    }, [current_task, filter_data]);
 
     const UpdateBrowserTypeExe = (browserId) => {
         let browserTypeExecute = [...browserTypeExe];
@@ -48,22 +48,17 @@ const ScheduleHome = ({item}) => {
     return ( 
         <>
         <div className="s__body">
-            {/* {JSON.stringify(item)} */}
-            {/* <Header /> */}
+            <Header />
                 <div className="s__mid_section">
-                    {/* <ActionBar  */}
-                    {/* // upperContent={<UpperContent key={666} appType={appType} isMac={isMac}browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}   */}
-                    {/* bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType ? appType : item.executionRequest.batchInfo[0].appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction} />}/>  */}
+                    <ActionBar  
+                    upperContent={<UpperContent key={666} appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />} 
+                    bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
                     <div className="s__content">
-                        <ScheduleContent setExecEnv={setExecEnv} smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} execAction={execAction} item={item} />
-                        {/* <div id="s__btns">
-                            <button className="s__btn-md btnAddToSchedule"   title="Add">Schedule</button>
-                        </div> */}
+                        <ScheduleContent setExecEnv={setExecEnv} smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} browserTypeExe={browserTypeExe} execAction={execAction} />
                     </div>
-                    
-                    {/* <ReferenceBar />  */}
+                    <ReferenceBar /> 
                 </div>
-            {/* <div className='s__footer'><Footer/></div> */}
+            <div className='s__footer'><Footer/></div>
         </div>
         </>
     );

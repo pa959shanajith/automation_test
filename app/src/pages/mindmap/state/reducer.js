@@ -7,7 +7,6 @@ const initialState = {
     selectedProj: undefined,
     searchModule: undefined,
     initEnEProj: undefined,
-    isEnELoad: false,
     selectedModule: {},
     selectedModulelist:[],
     selectBoxState: false,
@@ -17,9 +16,7 @@ const initialState = {
     scenarioList:[],
     importData:{createdby:undefined,data:undefined},
     unassignTask:[],
-    toDeleteScenarios: [],
-    appType:undefined,
-    savedList:false,
+    toDeleteScenarios: []
 };
 
 const reducer = (state = initialState , action) => {
@@ -43,13 +40,7 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 initEnEProj: action.payload
-            }
-        case actionTypes.IS_ENELOAD:
-            return{
-                ...state,
-                isEnELoad: action.payload
-            }
-
+            }   
         case actionTypes.UPDATE_MODULELIST:
             return{
                 ...state,
@@ -126,16 +117,6 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 toDeleteScenarios: action.payload
             } 
-        case actionTypes.APP_TYPE_FOR_PROJECT:
-            return{
-                ...state,
-                appType: action.payload
-            }
-            case actionTypes.SAVED_LIST:
-                return{
-                    ...state,
-                    savedList: action.payload
-                }
         default: 
             return state
     }

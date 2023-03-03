@@ -19,7 +19,7 @@ const SearchBox = (props) => {
         if(nodeID)d3.select('#'+nodeID).classed('searched-node',false)
         var val = e.target.value
         const reg = /[^a-zA-Z0-9_]+/;
-        if(val === ''){ setErr(false);return;}
+        if(val === '')return;
         if(reg.test(val)){
             setErr(true)
             return;
@@ -58,16 +58,16 @@ const SearchBox = (props) => {
         props.setCtScale({x:x,y:y,k:1})
     }
     return(
-        // <Rnd enableResizing={false} default={{x:10,y:10}} bounds="parent">
+        <Rnd enableResizing={false} default={{x:10,y:10}} bounds="parent">
             <div id="search-canvas-icon" data-test='SearchCanvas'>
                 <img data-test="searchIcon" alt="Search Icon" onClick={(e)=>{
                     if(drag){drag=false; return;}
                     setInp(!inp)}
                     } 
-                className="searchimg-canvas" src="static/imgs/ic-search-icon.png"  title='Search Modules, Scenarios, Screens or Testcases'/>
-                <input data-test="searchBox" id='search-canvas' type="text" onKeyPress={(e)=>{if(e.key==='Enter')onSearch(e)}} onChange={(e)=>onSearch(e)} className={((inp?" search-visible":"")+(err?" inputErrorBorderFull":""))} style={{width:'93%',marginLeft:'6px'}} placeholder="Search"/>
+                className="searchimg-canvas" src="static/imgs/ic-search-icon.png"/>
+                <input data-test="searchBox" type="text" onKeyPress={(e)=>{if(e.key==='Enter')onSearch(e)}} onChange={(e)=>onSearch(e)} className={"search-canvas"+(inp?" search-visible":"")+(err?" inputErrorBorderFull":"")} placeholder="Search Node.."/>
             </div>
-        // </Rnd>
+        </Rnd>
 
     )
 }

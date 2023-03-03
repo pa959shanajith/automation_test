@@ -11,7 +11,6 @@ import Legends from '../components/Legends';
 import ExportMapButton from '../components/ExportMapButton';
 import * as actionTypes from '../state/action';
 
-
 /*Component CreateAssign
   use: renders Mindmap assign page
 */
@@ -24,7 +23,7 @@ const CreateAssign = () => {
     const [verticalLayout,setVerticalLayout] = useState(false)
     const [info,setInfo] = useState(undefined)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
-    const selectProj = useSelector(state=>state.plugin.PN)
+    const selectProj = useSelector(state=>state.mindmap.selectedProj)
     const prjList = useSelector(state=>state.mindmap.projectList)
   
     useEffect(()=>{
@@ -59,10 +58,8 @@ const CreateAssign = () => {
             <div className='mp__canvas_container'>
             <div className='mp__toolbar__container'>
               <ToolbarMenuAssign cycleRef={cycleRef} releaseRef={releaseRef} setBlockui={setBlockui} />
-             
-              
+              <ModuleListDrop cycleRef={cycleRef} isAssign={true}/>
             </div>
-            
             <div id='mp__canvas' className='mp__canvas'>
                 {(Object.keys(moduleSelect).length>0 && cycleRef.current)?<CanvasAssign displayError={displayError} setBlockui={setBlockui} releaseRef={releaseRef} cycleRef={cycleRef} module={moduleSelect} verticalLayout={verticalLayout}/>
                 :<Fragment>
@@ -71,18 +68,12 @@ const CreateAssign = () => {
                     <Legends/>
                 </Fragment>}
             </div>
-            <ModuleListDrop cycleRef={cycleRef} isAssign={true}/>
-            {/* <SideBar/> */}
             </div>
-            
-            
             <ReferenceBar taskTop={true} taskInfo={info} collapsible={true} collapse={true}>
-            
                 <div className="ic_box" title="SwitchLayout" >
                     <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                     <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
                 </div>
-                
                 <div className="ic_box" title="Full Screen">
                     <img alt={"Full Screen"} onClick={()=>ClickFullScreen(setFullScreen)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
                     <span className="rb_box_title">Full Screen</span>

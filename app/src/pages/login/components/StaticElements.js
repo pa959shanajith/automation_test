@@ -17,12 +17,12 @@ const StaticElements = ({children}) => {
             <img className="bg-img" alt="bg-img" src="static/imgs/login-bg.png"/>
             <div className="element-holder">
                 <div className="greet-text">
-                    <h1>Hello</h1>
-                    <h2>Welcome to Avo Assure</h2>
-                    <h3>Login to Experience Intelligence.</h3>
+                    <h1>Hello.</h1>
+                    <h2>Welcome to Avo Assure!</h2>
+                    <h3>Login to Experience Intelligence</h3>
                 </div>
                 <div className="login-block">
-                    <span className="logo-wrap"><img className="logo-img" alt="logo" src="static/imgs/AssureLogo_horizonal.svg"/></span>
+                    <span className="logo-wrap"><img className="logo-img" alt="logo" src="static/imgs/logo.svg"/></span>
                     {children}
                 </div>
             </div>

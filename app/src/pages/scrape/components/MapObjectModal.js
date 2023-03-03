@@ -87,12 +87,7 @@ const MapObjectModal = props => {
             return;
         }
 
-        // let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
-        let appType = props.appType;
-        const screenId = props.fetchingDetails["_id"];
-        const projectId = props.fetchingDetails.projectID;
-        const screenName = props.fetchingDetails["name"];
-        const versionNumber = 0
+        let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
         
         let arg = {
             projectId: projectId,
@@ -102,7 +97,7 @@ const MapObjectModal = props => {
             appType: appType,
             objList: [],
             orderList: orderList,
-            versionnumber: 0,
+            versionnumber: versionnumber
         };
 
         let mapping = {...map};
@@ -149,13 +144,13 @@ const MapObjectModal = props => {
     return (
         <div  data-test="mapObject" className="ss__mapObj">
             <ModalContainer 
-                title="Map Element"
+                title="Map Object"
                 content={
                     <div className="ss__mapObjBody">
-                        <div   data-test="mapObjectHeading" className="ss__mo_lbl headerMargin">Please select the elements to drag and drop</div>
+                        <div   data-test="mapObjectHeading" className="ss__mo_lbl headerMargin">Please select the objects to drag and drop</div>
                         <div className="ss__mo_lists">
                             <div data-test="mapObjectScrapeObjectList" className="ss__mo_scrapeObjectList">
-                                <div  data-test="mapObjectLabel" className="ss__mo_lbl lblMargin">Captured Elements</div>
+                                <div  data-test="mapObjectLabel" className="ss__mo_lbl lblMargin">Scraped Objects</div>
                                 <div className="mo_scrapeListContainer">
                                     <div className="mo_listCanvas">
                                         <div className="mo_listMinHeight">
@@ -178,7 +173,7 @@ const MapObjectModal = props => {
                             </div>
                             
                             <div  data-test="mapObjectCustomObjectList" className="ss__mo_customObjectList">
-                                <div  data-test="mapObjectCustomHeading" className="ss__mo_lbl lblMargin">Custom Elements</div>
+                                <div  data-test="mapObjectCustomHeading" className="ss__mo_lbl lblMargin">Custom Objects</div>
                                 <div className="ss__mo_customOutContainer">
                                 <div className="mo_listCanvas">
                                 <div className="mo_listMinHeight">
@@ -216,7 +211,7 @@ const MapObjectModal = props => {
                 close={()=>props.setShow(false)}
                 footer={<>
                     { errorMsg && <span  data-test="errorMessage" className="mo_errorMsg">{errorMsg}</span>}
-                    <button data-test="showAll" onClick={onShowAllObjects}>Show All Elements</button>
+                    <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button>
                     <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</button>
                     <button data-test="submit" onClick={submitMap}>Submit</button>
                 </>}

@@ -8,11 +8,6 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = process.env.DAS_URL;
 
-let headers
-module.exports.setReq = async (req) =>
-{
-	headers=req;
-}
 //Create Structure
 exports.saveMindmap = function(req,res) {
 	logger.info("Inside UI service: saveMindmap");
@@ -24,7 +19,6 @@ exports.saveMindmap = function(req,res) {
 	var inputs = {
 		"data": RequestedJSON 
 	};
-	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {
@@ -53,7 +47,6 @@ exports.saveMindmapE2E = function(req,res) {
 	var inputs = {
 		"data": RequestedJSON 
 	};
-	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {
@@ -77,13 +70,11 @@ exports.saveMindmapE2E = function(req,res) {
 exports.getProjectIDs =  async(req) => {
 	logger.info("Inside UI service: getProjectIDs");
 	var user_id = req.userid;
-	var user_role = req.userrole;
 	var allflag = req.allflag;
 	if (allflag) allflag = "allflag";
 	else allflag = "emptyflag";
 	var inputs = {
 		"userid": user_id,
-		"userrole": user_role,
 		"query": allflag
 	};
 	return await utils.fetchData(inputs, "create_ice/getProjectIDs", "getProjectIDs");
@@ -100,7 +91,6 @@ exports.getProjectType = function (req, res) {
 	var inputs = {
 		"projectid": project_id
 	};
-	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {
@@ -143,7 +133,6 @@ exports.submitTask = function (req, res) {
 		'username': req.user,
 		'versionnumber': req.versionnumber
 	};
-	inputs.host = headers.headers.host;
 	var args = {
 		data: inputs,
 		headers: {

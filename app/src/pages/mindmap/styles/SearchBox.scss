@@ -1,24 +1,24 @@
 @import "../../global/styles/ColorVariables.scss";
 #search-canvas-icon {
-    width: 14rem;
-    // height: 87rem;
-    
-    top: 8rem;
-    position: fixed;
-    right:8rem;
+    width: 27px;
+    height: 25px;
+    left: 2px;
+    top: 2px;
+    position: absolute;
     display: flex;
     font-weight: 300;
-    font-size: 0.78rem;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none!important;
+    font-size: 14px;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none!important;
     z-index: 1;
 }
 .searchimg-canvas {
     border: 1px solid $primaryColor;
     border-radius: 3px;
     padding: 2px;
-    height: 1.3rem;
     -webkit-touch-callout:none;
     -webkit-user-select:none;
     -moz-user-select:none;
@@ -26,39 +26,24 @@
     user-select:none;
     cursor: pointer;
     background: $whiteColor;
-    // position: fixed;
-    // right: 0rem;
 }
 .search-canvas {
     border: 1px solid $primaryColor;
     border-radius: 3px;
     transition: width 0.4s ease-in-out;
-    width: 200px;
+    width: 0px;
     opacity: 0;
     outline-style: none;
     box-shadow: none;
     cursor: pointer;
-    margin-left: 7px;
-}
-#search-canvas{
-    border: 1px solid $primaryColor;
-    border-radius: 3px;
-    // transition: width 0.4s ease-in-out;
-    width: 200px;
-    // opacity: 0;
-    outline-style: none;
-    box-shadow: none;
-    // cursor: pointer;
-    height: 1.3rem;
-    margin-left: 7px;
 }
 .search-visible {
-    width: 422px;
+    width: 150px;
     opacity: 1;
     transition: width 0.4s ease-in-out;
 }
 .inputErrorBorderFull {
-    border: 2px solid $redError !important;
+    border: 2px solid $redError ;
 }
 .searched-node {
     outline: 2px solid green;
