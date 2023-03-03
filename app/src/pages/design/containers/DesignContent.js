@@ -3,19 +3,35 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer, VARIANT, Messages as MSG, setMsg, SelectRecipients } from '../../global'
-import { getObjNameList, getKeywordList } from '../components/UtilFunctions';
-import TableRow from '../components/TableRow';
-import DetailsDialog from '../components/DetailsDialog';
-import RemarkDialog from '../components/RemarkDialog';
-import PasteStepDialog from '../components/PasteStepDialog';
-import SelectMultipleDialog from '../components/SelectMultipleDialog';
-import * as DesignApi from "../api";
-import { reviewTask } from '../../global/api';
+
 import {getUserDetails,getNotificationGroups} from '../../admin/api';
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
+import {
+    ScreenOverlay,
+    RedirectPage,
+    ScrollBar,
+    ModalContainer,
+    VARIANT,
+    Messages as MSG,
+    setMsg,
+    SelectRecipients,
+  } from "../../global";
+  import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
+import TableRow from "../components/TableRow";
+import DetailsDialog from "../components/DetailsDialog";
+import RemarkDialog from "../components/RemarkDialog";
+import PasteStepDialog from "../components/PasteStepDialog";
+import SelectMultipleDialog from "../components/SelectMultipleDialog";
+import * as DesignApi from "../api";
+import { reviewTask } from "../../global/api";
+import { NormalDropDown } from "@avo/designcomponents";
+import {ResetSession } from '../../global';
+import * as DesignActions from '../state/action';
+import { Button } from "primereact/button";
+
+
 
 /*
     Container: DesignContent
@@ -35,9 +51,13 @@ const DesignContent = props => {
     const copiedContent = useSelector(state=>state.design.copiedTestCases);
     const modified = useSelector(state=>state.design.modified);
     const saveEnable = useSelector(state=>state.design.saveEnable);
+    const mainTestCases = useSelector(state=>state.design.testCases);
 
     const headerCheckRef = useRef();
 
+  const [debugButton,setDebugButton]=useState('1');
+//   const [checkedTc, setCheckedTc] = useState({});
+//   const [dTcFlag, setDTcFlag] = useState(false);
     const history = useHistory();
     const dispatch = useDispatch();
     const [overlay, setOverlay] = useState("");
@@ -66,6 +86,7 @@ const DesignContent = props => {
     const [allUsers,setAllUsers] = useState([])
     const [groupList,setGroupList] = useState([])
     const [showPopup, setShow] = useState(false);
+    const [debugEnable, setDebugEnable] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -90,7 +111,7 @@ const DesignContent = props => {
         {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps', onClick:  ()=>toggleDrag()},
         {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
         {'title': 'Paste Test Step', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste Steps', onClick:  ()=>onPasteSteps()},
-        {'title': 'Skip Test Step', 'img': 'static/imgs/ic-jq-commentstep.png', 'alt': 'Comment Steps', onClick:  ()=>commentRows()}
+        {'title': 'Skip Test Step', 'img': 'static/imgs/skip-test-step.png', 'alt': 'Comment Steps', onClick:  ()=>commentRows()}
     ]
 
     useEffect(()=>{
@@ -101,8 +122,20 @@ const DesignContent = props => {
     }, [draggedFlag])
 
     useEffect(()=>{
+        let shouldDisable = false;
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
         //eslint-disable-next-line
+        for(let value of testCaseData){
+            if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+                shouldDisable = true;         
+            }
+        }
+        // Object.values(testCaseData).forEach(value => {
+        //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+        //         shouldDisable = true;         
+        //      }
+        //     });
+        setDebugEnable(shouldDisable);
     }, [testCaseData]);
 
     useEffect(()=>{
@@ -128,7 +161,8 @@ const DesignContent = props => {
     }, [props.imported]);
 
     useEffect(()=>{
-        if (Object.keys(userInfo).length && Object.keys(props.current_task).length) {
+        if (Object.keys(userInfo).length){
+        //  && Object.keys(props.current_task).length) {
             fetchTestCases()
             .then(data=>{
                 data !== "success" &&
@@ -148,12 +182,12 @@ const DesignContent = props => {
 
     const fetchTestCases = () => {
 		return new Promise((resolve, reject)=>{
-            let { testCaseName, versionnumber, screenName, screenId, projectId, testCaseId, appType } = props.current_task;
+            // let { testCaseName, versionnumber, screenName, screenId, projectId, testCaseId, appType } = props.current_task;
             let deleteObjectFlag = false;
             
             setOverlay("Loading...");
             
-            DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber, screenName)
+            DesignApi.readTestCase_ICE(userInfo, props.fetchingDetails["_id"], props.fetchingDetails["name"], 0 /** versionNumber */, props.fetchingDetails["parent"]["name"])
             .then(data => {
                 if (data === "Invalid Session") return RedirectPage(history);
                 
@@ -172,14 +206,14 @@ const DesignContent = props => {
                 setHideSubmit(data.testcase.length === 0);
                 setReusedTC(data.reuse);
 
-                DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+                DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectId, props.fetchingDetails.testCaseId)
                     .then(scriptData => {
                         if (scriptData === "Invalid Session") return RedirectPage(history);
 
                         setTestScriptData(scriptData.view);
                         props.setMirror(scriptData.mirror);
                         
-                        DesignApi.getKeywordDetails_ICE(appType)
+                        DesignApi.getKeywordDetails_ICE(props.appType)
                             .then(keywordData => {
                                 if (keywordData === "Invalid Session") return RedirectPage(history);
                                 
@@ -197,7 +231,7 @@ const DesignContent = props => {
                                             delete testcase[i];
                                             testcase = testcase.filter(n => n !== null);
                                         } else {
-                                            if (appType === "Webservice") {
+                                            if (props.appType === "Webservice") {
                                                 if (testcase[i].keywordVal === "setHeader" || testcase[i].keywordVal === "setHeaderTemplate") {
                                                     testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
                                                 }
@@ -213,7 +247,7 @@ const DesignContent = props => {
                                 setDraggable(false);
                                 setTestCaseData(testcaseArray);
                                 setPastedTC([]);
-                                setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
+                                setObjNameList(getObjNameList(props.appType, scriptData.view));
                                 let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                 resolve(msg);
                             })
@@ -252,14 +286,20 @@ const DesignContent = props => {
         });
     };
     
+
     const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
             if (reusedTC && !confirmed) {
                 props.setShowConfirmPop({'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': ()=>{props.setShowConfirmPop(false);saveTestCases(null, true)}});
                 return;
             }
+             let screenId = props.fetchingDetails['parent']['_id'];
+             let testCaseId = props.fetchingDetails['_id'];
+             let testCaseName = props.fetchingDetails.testCaseName;
+             let versionnumber = 0;
 
-            let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
+
+            // let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
             let import_status = false;
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
@@ -299,16 +339,16 @@ const DesignContent = props => {
                 }
 
                 if (!errorFlag) {
-                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, versionnumber, import_status, pastedTC)
+                    DesignApi.updateTestCase_ICE(props.fetchingDetails['_id'], props.fetchingDetails['name'], testCases, userInfo, 0 /**versionnumber*/, import_status, pastedTC)
                     .then(data => {
                         if (data === "Invalid Session") return RedirectPage(history);
                         if (data === "success") {
                             
-                            if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
+                            if(props.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
                                 let scrape_data = {};
-                                let { appType, projectId, testCaseId, versionnumber } = props.current_task;
+                                // let { appType, projectId, testCaseId, versionnumber } = props.current_task;
                                 
-                                DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+                                DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails['parent']['_id'], props.fetchingDetails.projectId, props.fetchingDetails['_id'])
                                 .then(res => {
                                     scrape_data=res;
                                     let modifiedObjects = [];
@@ -323,7 +363,7 @@ const DesignContent = props => {
                                         'deletedObj': [],
                                         'modifiedObj': modifiedObjects,
                                         'addedObj': {...scrape_data, view: []},
-                                        'testCaseId': testCaseId,
+                                        'testCaseId': props.fetchingDetails.testCaseId,
                                         'userId': userInfo.user_id,
                                         'roleId': userInfo.role,
                                         'versionnumber': versionnumber,
@@ -385,6 +425,7 @@ const DesignContent = props => {
         setStepSelect({edit: false, check: [], highlight: []});
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
+        setDebugEnable(false);
     }
 
     const setRowData = data => {
@@ -446,14 +487,13 @@ const DesignContent = props => {
             else if (taskstatus === 'underReview'){ setMsg(MSG.DESIGN.SUCC_TASK_APPROVED);redirectToPlugin();}
             else {setMsg(MSG.DESIGN.SUCC_TASK_SUBMIT); redirectToPlugin()}
         })
-        .catch(error => {
-            setMsg(MSG.DESIGN.ERR_SUBMIT_TASK);
-            console.error(error)
-        })
-        
+        .catch(error => {setOverlay("");
+            ResetSession.end();
+            setMsg(MSG.DESIGN.ERR_DEBUG);
+            console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+        });
         props.setShowConfirmPop(false);
-    }
-
+    };
     const deleteTestcase = () => {
         let testCases = [...testCaseData]
         if (testCases.length === 1 && !testCases[0].custname) setMsg(MSG.DESIGN.WARN_DELETE);
@@ -577,7 +617,7 @@ const DesignContent = props => {
             }
             
             if (!copyErrorFlag) {
-                copyContent = {'appType': props.current_task.appType, 'testCaseId': props.current_task.testCaseId, 'testCases': copyTestCases};
+                copyContent = {'appType': props.appType, 'testCaseId': props.fetchingDetails['_id'], 'testCases': copyTestCases};
                 dispatch({type: designActions.SET_COPYTESTCASES, payload: copyContent});
                 setEdit(false);
             }
@@ -595,7 +635,7 @@ const DesignContent = props => {
             return;
         }
 
-        if (copiedContent.testCaseId !== props.current_task.testCaseId) {
+        if (copiedContent.testCaseId !== props.fetchingDetails['_id']) {
             let appTypeFlag = false;
             for (let testCase of copiedContent.testCases){
                 if (["Web", "Desktop", "Mainframe", "OEBS", "MobileApp", "MobileWeb", "MobileApp", "SAP"].includes(testCase.appType)) {
@@ -603,7 +643,7 @@ const DesignContent = props => {
                     break;
                 }
             }
-            if (copiedContent.appType !== props.current_task.appType && appTypeFlag) {
+            if (copiedContent.appType !== props.appType && appTypeFlag) {
                 setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
             }
             else{
@@ -723,14 +763,14 @@ const DesignContent = props => {
         headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
-    const onAction = operation => {
-        switch(operation){
-            case "submit": setShow({'title':'Submit Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            case "reassign": setShow({'title':'Reassign Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            case "approve": setShow({'title':'Approve Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            default: break;
-        }                       
-    }
+    // const onAction = operation => {
+    //     switch(operation){
+    //         case "submit": setShow({'title':'Submit Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         case "reassign": setShow({'title':'Reassign Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         case "approve": setShow({'title':'Approve Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         default: break;
+    //     }                       
+    // }
 
     const onCheckAll = (event) => {
         let checkList = [...stepSelect.check]
@@ -782,16 +822,16 @@ const DesignContent = props => {
                 </div>
             </div>}
             close={()=>{setShow(false);resetData();}}
-            footer={
-                <>
-                <button onClick={()=>{submitTask(showPopup.content)}}>
-                    {showPopup.continueText ? showPopup.continueText : "Yes"}
-                </button>
-                <button onClick={()=>{setShow(false);resetData()}}>
-                    {showPopup.rejectText ? showPopup.rejectText : "No"}
-                </button>
-                </>
-            }
+            // footer={
+            //     <>
+            //     <button onClick={()=>{submitTask(showPopup.content)}}>
+            //         {showPopup.continueText ? showPopup.continueText : "Yes"}
+            //     </button>
+            //     <button onClick={()=>{setShow(false);resetData()}}>
+            //         {showPopup.rejectText ? showPopup.rejectText : "No"}
+            //     </button>
+            //     </>
+            // }
         /> 
     )
 
@@ -815,10 +855,59 @@ const DesignContent = props => {
         }
     }
 
-    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
+    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
+    //Debug function
+
+    const debugTestCases = selectedBrowserType => {
+        let testcaseID = [];
+        let browserType = [];
+        
+        if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
+        
+        // globalSelectedBrowserType = selectedBrowserType;5
+        
+        if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
+        else testcaseID.push(props.fetchingDetails['_id']);
+        setOverlay('Debug in Progress. Please Wait...');
+        ResetSession.start();
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
+            .then(data => {
+                setOverlay("");
+                ResetSession.end();
+                if (data === "Invalid Session") return RedirectPage(history);
+                else if (data === "unavailableLocalServer")  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
+                else if (data === "success") setMsg(MSG.DESIGN.SUCC_DEBUG)
+                else if (data === "fail") setMsg(MSG.DESIGN.ERR_DEBUG)
+                else if (data === "Terminate") setMsg(MSG.DESIGN.WARN_DEBUG_TERMINATE)
+                else if (data === "browserUnavailable") setMsg(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
+                else if (data === "scheduleModeOn") setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
+                else if (data === "ExecutionOnlyAllowed") setMsg(MSG.GENERIC.WARN_EXECUTION_ONLY)
+                else if (data.status === "success"){
+                    let rows={}
+                    mainTestCases.forEach((testCase, index) => {
+                        if(index+1 in data){
+                            rows[testCase.custname]=data[index+1].xpath;
+                        }
+                    });
+                    dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
+                    dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
+                    setMsg(MSG.DESIGN.SUCC_DEBUG);
+                } else {
+                    console.log(data);
+                }										
+            })
+            .catch(error => {
+                setOverlay("");
+                ResetSession.end();
+                setMsg(MSG.DESIGN.ERR_DEBUG);
+                console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+            });
+    };
+    
+    
     return (
         <>
         { showPopup && ConfirmPopup()}
@@ -831,9 +920,9 @@ const DesignContent = props => {
         <div className="d__content">
             <div className="d__content_wrap">
             { /* Task Name */ }
-            <div className="d__task_title">
+            {/* <div className="d__task_title">
                 <div className="d__task_name" data-test="d__taskName">{props.current_task.taskName}</div>
-            </div>
+            </div> */}
 
             { /* Button Group */ }
             <div className="d__btngroup">
@@ -848,9 +937,154 @@ const DesignContent = props => {
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
                     <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
-                </div>
+                    {props.appType==="Web"?<div className='taskButtonWeb'>
 
-                <div className="d__submit" data-test="d__actionBtn">
+                        {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
+                        <NormalDropDown
+                        // style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
+                        
+
+                            onChange={(e,item)=>{
+                                setDebugButton(item.key)}}
+
+
+                            options={[
+                            // {
+                            //     data: {
+                            //     icon: 'internet',
+                            //     },
+
+                            //     key: "3",
+                            //     text: "Internet Explorer",
+                            // },
+
+                            {
+                                data: {
+                                icon: "chrome",
+                                },
+                                key: "1",
+                                text: "Google Chrome",
+                            },
+                            {
+                                data: {
+                                icon: "safari",
+                                },
+
+                                key: "safari",
+                                text: "Safari",
+                                disabled:true,
+                            },
+
+                            {
+                                data: {
+                                icon: "firefox",
+                                },
+
+                                key: "2",
+                                text: "Mozilla Firefox",
+                            },
+
+                            // {
+                            //     data: {
+                            //     icon: "edge",
+                            //     },
+
+                            //     key: "7",
+                            //     text: "Microsoft Edge",
+                            // },
+                            {
+                                data: {
+                                icon: "edge",
+                                },
+
+                                key: "8",
+                                text: "Microsoft Edge",
+                            },
+                            ]}
+                            selectedKey={debugButton}
+                            placeholder="Select Browser"
+                            width="240px"
+                        />
+                        </div>
+                        :
+                        props.appType==="OEBS" ? 
+                        <div className='desktopAppDesign_btn'>
+                            <p onClick={()=> debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>OEBS Apps</span></p>
+                        </div>: 
+                        props.appType==="Desktop"? <div className='desktopAppDesign_btn'>
+                        <p  onClick={()=>debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Desktop Apps</span></p>
+                        </div>:
+                        props.appType==="SAP"?<div className='desktopAppDesign_btn'>
+                        <p  onClick={()=> debugEnable || debugTestCases('1')}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>SAP Apps</span></p>
+                        </div>:
+                        props.appType==="MobileApp"?<div className='mobileAppDesign_btn'>
+                        <p  onClick={()=> debugEnable || debugTestCases('1')} ><img src="static/imgs/ic-mobility.png" style={{opacity:!debugEnable?1:0.5}}/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Mobile App</span></p>
+                        </div>:
+                        props.appType==="MobileWeb"?<div className='mobileAppDesign_btn'>
+                        <p onClick={()=> debugEnable || debugTestCases()}><img src="static/imgs/mobileWeb.png" style={{opacity:!debugEnable?1:0.5}} /><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>Mobile Web</span></p>
+                        </div>:
+                        props.appType==="System"? <div className='desktopAppDesign_btn'>
+                        <p onClick={()=> debugEnable || debugTestCases('1')}><img  style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>System App</span></p>
+                        </div>:
+                        props.appType==="Mainframe"?<div className='mainframeDesign_btn'>
+                            <p onClick={()=>debugEnable || debugTestCases()}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px',opacity:!debugEnable?1:0.5}}>Maniframe</span></p>
+                        </div>:
+                         props.appType==="Webservice"?<div className='webservices_btn'>
+                         <p onClick={()=>debugEnable || debugTestCases()}><img style={{height:'25px', width:'25px', opacity:!debugEnable?1:0.5}} src="static/imgs/ic-webservice.png"/><span style={{paddingLeft:'7px', opacity:!debugEnable?1:0.5}}>WebServices</span></p>
+                     </div>:""}
+
+                </div>
+                    
+               {(props.appType==="Web")?
+               <div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
+                {<Button label="Debug"  disabled={debugEnable} className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>}
+            </div>:""}
+            </div>
+           
+
+            </div>
+
+            { /* Table */ }
+            <div className="d__table">
+                <div className="d__table_header">
+                    <span className="step_col d__step_head" ></span>
+                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
+                    <span className="objname_col d__obj_head" >Element Name</span>
+                    <span className="keyword_col d__key_head" >Operations</span>
+                    <span className="input_col d__inp_head" >Input</span>
+                    <span className="output_col d__out_head" >Output</span>
+                    {/* <span className="remark_col d__rem_head" >Remarks</span> */}
+                    <span className="details_col d__det_head" >Details</span>
+                </div>
+                <div style={{height: '66vh' }}>
+                {testCaseData.length>0 && <div className="d__table_contents"  >
+                <div className="ab">
+                    <div className="min">
+                        <div className="con" id="d__tcListId">
+                            <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor= "#8a8886" trackColor= "#d2d0ce">
+                            <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
+                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
+                                {
+                                testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row" draggable={draggable}
+                                    key={i} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
+                                    getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
+                                    updateChecklist={updateChecklist} setStepSelect={setStepSelect}
+                                    setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
+                                    rowChange={rowChange}
+                                    keywordData={keywordList}
+                                                        />)
+                                } 
+                            </ReactSortable>
+                            </ClickAwayListener>
+                            </ScrollBar>
+                        </div>
+                    </div>
+                </div>
+                </div>}
+                </div>
+          
+          
+            {/* <div className="d__submit" data-test="d__actionBtn">
                     { isUnderReview && 
                         <>
                         <button className="d__reassignBtn d__btn" title="Reassign Task" onClick={()=>onAction("reassign")}>
@@ -861,55 +1095,18 @@ const DesignContent = props => {
                         </button>
                         </>
                     }
-                    { !hideSubmit && !isUnderReview &&
-                        <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
-                            Submit
-                        </button>
-                    }
+                    {/* { !hideSubmit && !isUnderReview &&
+                        // <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
+                        //     Submit
+                        // </button>
+                    } */}
+                </div>
+                
+
                 </div>
 
-            </div>
-            </div>
 
-            { /* Table */ }
-            <div className="d__table">
-                <div className="d__table_header">
-                    <span className="step_col d__step_head" ></span>
-                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
-                    <span className="objname_col d__obj_head" >Object Name</span>
-                    <span className="keyword_col d__key_head" >Keyword</span>
-                    <span className="input_col d__inp_head" >Input</span>
-                    <span className="output_col d__out_head" >Output</span>
-                    <span className="remark_col d__rem_head" >Remarks</span>
-                    <span className="details_col d__det_head" >Details</span>
-                </div>
-                <div style={{height: "100%"}}>
-                {testCaseData.length>0 && <div className="d__table_contents" >
-                <div className="ab">
-                    <div className="min">
-                        <div className="con" id="d__tcListId">
-                            <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
-                            <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
-                                {
-                                testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row" draggable={draggable}
-                                    key={i} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
-                                    getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
-                                    updateChecklist={updateChecklist} setStepSelect={setStepSelect}
-                                    setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
-                                    rowChange={rowChange}
-                                />)
-                                }
-                            </ReactSortable>
-                            </ClickAwayListener>
-                            </ScrollBar>
-                        </div>
-                    </div>
-                </div>
-                </div>}
-                </div>
-            </div>
-        </div>
+        
         </>
     );
 

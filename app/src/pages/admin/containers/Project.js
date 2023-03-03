@@ -96,13 +96,18 @@ const ProjectNew = (props) => {
                 "mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
                 "mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
                 "sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
-                "system":{"data":"System","title":"System Apps","img":"desktop"},
+                // "system":{"data":"System","title":"System Apps","img":"desktop"},
                 "mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"}
             };
             var listPlugin = [];
-            for ( var i = 0; i < plugins.length; i++) {
-                listPlugin.push({...details[plugins[i]], enabled: plugins_list[plugins[i]]});
-            }
+            "WEBT" in plugins_list ?  listPlugin.push({...details["web"], enabled: true}):listPlugin.push({...details["web"], enabled: false})
+            "APIT" in plugins_list ?  listPlugin.push({...details["webservice"], enabled: true}):listPlugin.push({...details["webservice"], enabled: false})
+            "MOBT" in plugins_list ?  listPlugin.push({...details["mobileapp"], enabled: true}):listPlugin.push({...details["mobileapp"], enabled: false})
+            "MOBT" in plugins_list ?  listPlugin.push({...details["mobileweb"], enabled: true}):listPlugin.push({...details["mobileweb"], enabled: false})
+            "ETOAP" in plugins_list ?  listPlugin.push({...details["oebs"], enabled: true}):listPlugin.push({...details["oebs"], enabled: false})
+            "DAPP" in plugins_list ?  listPlugin.push({...details["desktop"], enabled: true}):listPlugin.push({...details["desktop"], enabled: false})
+            "MF" in plugins_list ?  listPlugin.push({...details["mainframe"], enabled: true}):listPlugin.push({...details["mainframe"], enabled: false})
+            "ETSAP" in plugins_list ?  listPlugin.push({...details["sap"], enabled: true}):listPlugin.push({...details["sap"], enabled: false})
             if(screen !== undefined) setSelDomain(data[0]);
             else if(taskName==="Create Project") setSelDomain(data[0]);
             else if(taskName==="Update Project") setSelDomain("");

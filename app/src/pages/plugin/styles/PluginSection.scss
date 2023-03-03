@@ -1,8 +1,13 @@
 @import "../../global/styles/ColorVariables.scss";
 .plugin-blocks{
     display: grid;
-    grid-template-columns: auto auto auto;
-    grid-gap: 10px 20px;
+    grid-template-columns: auto auto;
+    grid-gap: 12px 20px;
+    &[data-value=get-started] {
+      display: flex !important;
+      justify-content: flex-start !important;
+      gap: 20px !important;
+    }
 }
 
 .plugin-ic{
@@ -60,7 +65,7 @@
     font-weight: 500;
     line-height: 1.1;
     padding-left: 15px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .plugin-text{
@@ -68,7 +73,7 @@
     font-size: 16px;
     font-weight: 500;
     line-height: 1.1;
-    margin-top: 10px;
+    margin-top: 2px;
     cursor: pointer;
 }
 
@@ -92,7 +97,7 @@
 @media screen and (max-width: 1000px){
     .plugin-blocks{
         grid-template-columns: auto auto;
-        grid-gap: 10px 20px;
+        grid-gap: 12px 20px;
     }
 }
 

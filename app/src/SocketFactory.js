@@ -54,7 +54,7 @@ const SocketFactory = () => {
         return(
             <div className="afterExecution-modal">
                 <ModalContainer 
-                    title={"Execute Test Suite"}
+                    title={"Execution Status"}
                     content={
                         <p style={{cursor:'default'}}>{showAfterExecution.content} <br />
                         <p> Go to <span onClick={()=>{redirectToReports();setShowAfterExecution({show:false})}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>

@@ -2,7 +2,7 @@ import React from 'react';
 import { SearchDropdown } from '@avo/designcomponents';
 import "../styles/ModuleSelection.scss";
 
-const ReleaseCycleSelection = ({ selectValues, handleSelect }) => {
+const ReleaseCycleSelection = ({ selectValues, handleSelect, isEditing }) => {
     
     return (
         <div className="devOps__module_sel_container">
@@ -12,7 +12,7 @@ const ReleaseCycleSelection = ({ selectValues, handleSelect }) => {
                         key={selectValue.type}
                         calloutMaxHeight="30vh"
                         label={selectValue.label}
-                        disabled={selectValue.disabled}
+                        disabled={isEditing}
                         noItemsText={selectValue.emptyText}
                         onChange={handleSelect(fieldIndex)}
                         options={selectValue.list}

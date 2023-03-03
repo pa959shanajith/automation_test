@@ -2,11 +2,11 @@
 .main-header {
     display: flex;
     flex-direction: row;
-    padding: 10px 0 10px 30px;
-    color: $darkGray;
+    padding: 0.7rem 0 0.7rem 1.5rem;
+    color: #333;
     align-items: center;
     box-shadow: #00000014 0 1px 0;
-    margin-bottom: 1px;
+    margin-bottom: 0.1rem;
 }
 
 .header-logo{
@@ -30,18 +30,17 @@
     flex-grow: 1;
 }
 
-.no-border{
+.no-border {
     border: none;
     outline: none;
     background-color: transparent;
-    padding: 0 24px;
+    padding: 0 0.9rem;
     font-size: 15px;
     font-weight: 400;
     line-height: 1.42857143;
-    margin: 0;
+    margin: 0rem;
     cursor: pointer;
 }
-
 .user-name-icon{
     height: 23px;
     width: 22px;
@@ -49,14 +48,14 @@
 }
 
 .user-name-btn{
-    padding-right: 12px;
+    padding-right: 0.5rem;
     .user-name{
         text-transform: capitalize;
-        margin: 0 15px;
+        margin: 0 0.2rem;
     }
     .help{
         text-transform: capitalize;
-        margin: 0 15px;
+        margin: 0 0.9rem;
         color: $primaryColorLight;
     }
 }
@@ -65,8 +64,8 @@
     .divider{
         background-color: $whisper;
         width: 100%;
-        margin: 9px 0;
-        height: 1px;
+        margin: 0.7rem 0;
+        height: 0.1rem;
     }
     .user-role-item{
         pointer-events: none!important;

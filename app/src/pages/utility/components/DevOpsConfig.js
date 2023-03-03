@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import ReactTooltip from 'react-tooltip';
+import React, { useEffect, useState, useRef} from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
-import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
 
-
+import ReactTooltip from 'react-tooltip';
 // import classes from "../styles/DevOps.scss";
 import "../styles/DevOps.scss";
-import ReleaseCycleSelection from './ReleaseCycleSelection';
+// import ReleaseCycleSelection from './ReleaseCycleSelection';
 import { prepareOptionLists } from './DevOpsUtils';
 import DevOpsModuleList from './DevOpsModuleList';
 
 const DevOpsConfig = props => {
-    const reportData = {hasData: false};
-    const [api, setApi] = useState("Execution");
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-    const [request, setRequest] = useState({});
-    const [requestText, setRequestText] = useState("");
-    const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
+    const [ inputConfigName , setInputConfigName] = useState(props.currentIntegration.name.trim());
     const dataParametersCollection = [];
     const [error, setError] = useState({});
+    const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
+    const [showSelectBrowser, setShowSelectBrowser] = useState(false);
+    const [text, setText] = useState(props.currentIntegration.name);
+    const notexe = useRef(
+        props.currentIntegration.executionRequest != undefined ? props.currentIntegration.executionRequest.donotexe.current : {}
+        );
+    useEffect(() => {
+        props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web" ? setShowSelectBrowser(true) : setShowSelectBrowser(false)
+    }, [props.currentIntegration.selectValues[0].selected])
+
     if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
         if(props.currentIntegration.selectedModuleType === 'normalExecution')
             for (let info of props.currentIntegration.executionRequest.batchInfo) {
@@ -58,25 +62,136 @@ const DevOpsConfig = props => {
         ...props.currentIntegration,
         dataParameters: dataParametersCollection
     });
+    const [moduleState, setModuleState] = useState({
+        checked: props.currentIntegration.scenarioList,
+        expanded: []
+    });
+    const [moduleList, setModuleList] = useState([]);
+    const [filteredModuleList, setFilteredModuleList] = useState([]);
+    const handleExecutionTypeChange = (selectedType) => {
+        notexe['current'] = {}
+        const selectedKey = selectedType;
+        let filteredNodes = [];
+        if(selectedKey === 'normalExecution') {
+            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                let filterModule = {
+                    value: module.moduleid,
+                    label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
+                        event.preventDefault();
+                        onClick('displayMaximizable');
+                        onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
+                };
+                if(module.scenarios && module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario) => {
+                        return ({
+                            value: scenario._id,
+                            label: scenario.name
+                        })
+                    });
+                    filterModule['children'] = moduleChildren;
+                }
+                return filterModule;
+            });
+        } else if(selectedKey === 'e2eExecution') {
+            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                let filterModule = {
+                    value: module.moduleid,
+                    label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
+                        event.preventDefault();
+                        onClick('displayMaximizable');
+                        onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
+                };
+                if(module.scenarios && module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario, index) => {
+                        return ({
+                            value: module.batchname+module.moduleid+index+scenario._id,
+                            label: scenario.name
+                        })
+                    });
+                    filterModule['children'] = moduleChildren;
+                }
+                return filterModule;
+            });
+        }
+        else if(selectedKey === 'batchExecution') {
+            const batchData = moduleScenarioList['batchExecution'];
+            filteredNodes = Object.keys(batchData).map((batch) => {
+                let filterBatch = {
+                    value: batch,
+                    label: batch,
+                };
+                if(batchData[batch].length > 0) {
+                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 > 0 } ).map((module) => {
+                        let filterModule = {
+                            value: module.moduleid,
+                            label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" title="Add / modify data parameterization, execution condition and select accessibility standards"  onClick={(event) => {
+                                event.preventDefault();
+                                onClick('displayMaximizable');
+                                onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
+                        };
+                        if(module.scenarios && module.scenarios.length > 0) {
+                            const moduleChildren = module.scenarios.map((scenario, index) => {
+                                return ({
+                                    value: batch+module.moduleid+index+scenario._id,
+                                    label: scenario.name
+                                })
+                            });
+                            filterModule['children'] = moduleChildren;
+                        }
+                        return filterModule;
+                    });
+                }
+                return filterBatch;
+            });
+        }
+        setSelectedExecutionType(selectedKey);
+        setModuleList(filteredNodes);
+        setFilteredModuleList(filteredNodes);
+        setinitialFilteredModuleList(filteredNodes);
+        setModuleState({expanded: [], checked: []});
+        setIntegrationConfig({ ...props.currentIntegration, scenarioList: [], dataParameters: [] });
+    }
+    const [modalContent, setModalContent] = useState(false);
+    const onDataParamsIconClick1 = (ModuleId, name) => {
+        if(integrationConfig.dataParameters.some((data) => data.Id === ModuleId)) {
+            let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.ModuleId === ModuleId);
+            setModalContent(integrationConfig.dataParameters[paramIndex]);
+        } else {
+            setModalContent({
+                moduleId: ModuleId,
+                name: name,
+                dataparam: '',
+                condition: 0
+            })
+        }
+    }
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
     const [browserlist, setBrowserlist] = useState([
+        // {
+        //     key: '3',
+        //     text: 'Internet Explorer'
+        // }
         {
-            key: '0',
-            text: 'Internet Exploror'
-        },{
             key: '1',
             text: 'Google Chrome'
         },{
             key: '2',
             text: 'Mozilla Firefox'
-        },{
-            key: '3',
+        },
+        // {
+        //     key: '7',
+        //     text: 'Microsoft Edge'
+        // },
+        {
+            key: "safari",
+            text: "Safari",
+            disabled:true,
+        },
+        {
+            key: '8',
             text: 'Microsoft Edge'
-        },{
-            key: '4',
-            text: 'Edge Chromium'
         }
     ]);
     const [integration,setIntegration] = useState(props.currentIntegration.executionRequest ? props.currentIntegration.executionRequest.integration : {
@@ -230,18 +345,22 @@ const DevOpsConfig = props => {
         }
         return data;
     }
-    const handleConfigSave = async () => {
-        if(integrationConfig.name === ''){
+    const handleConfigSave = async (checkForButton) => {
+        if(text === ''){
             setError({
                 ...error,
-                name: 'Please Enter Configuration Name'
+                name: 'Please Enter Profile Name'
             });
             return;
         }
-        if(integrationConfig.browsers.length < 1) {
-            setMsg(MSG.CUSTOM("Please Select atlease one Browser",VARIANT.ERROR));
+        if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
+            setMsg(MSG.CUSTOM("Please select atleast one Browser",VARIANT.ERROR));
             return;
         }
+        if(props.currentIntegration.selectValues[2].selected === '') {
+            setMsg(MSG.CUSTOM("Please Select Project/Release/Cycle",VARIANT.ERROR));
+            return;
+        }    
         let batchInfo = [];
         if(selectedExecutionType === 'normalExecution')
             batchInfo = moduleScenarioList[selectedExecutionType].filter((module) => {
@@ -255,7 +374,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: "",
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -281,9 +400,9 @@ const DevOpsConfig = props => {
                         scenarioTaskType: "disable",
                         testsuiteName: module.name,
                         testsuiteId: module.moduleid,
-                        batchname: "",
+                        batchname: module.batchname,
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -312,7 +431,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: module.batchname,
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -328,7 +447,11 @@ const DevOpsConfig = props => {
                         })).filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario.scenarioId))
                     });
                 }));
-
+        
+        if(batchInfo.length < 1) {
+            setMsg(MSG.CUSTOM("Please select atleast one Scenario",VARIANT.ERROR));
+            return;
+        }
         props.setLoading('Please Wait...');
         const storeConfig = await storeConfigureKey({
             type: "",
@@ -338,7 +461,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: integrationConfig.name,
+            configurename: text.trim(),
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
@@ -347,6 +470,7 @@ const DevOpsConfig = props => {
             avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'a_') ? [integrationConfig.avoAgentGrid.slice(2)] : [],
             integration: integration,
             batchInfo: batchInfo,
+            donotexe: checkForButton == '' ? integrationConfig.notexe : integrationConfig.executionRequest.donotexe,
             scenarioFlag: false
         });
         if(storeConfig !== 'success') {
@@ -356,7 +480,7 @@ const DevOpsConfig = props => {
                 setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
             }
         }else {
-            props.showMessageBar( `Configuration ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS');
+            props.showMessageBar( `Execution profile ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d successfully.` , 'SUCCESS');
             props.setCurrentIntegration(false);
         }
         props.setLoading(false);
@@ -369,6 +493,38 @@ const DevOpsConfig = props => {
         setShowIntegrationModal(status);
     }
 
+ const [displayMaximizable, setDisplayMaximizable] = useState(false);
+ const [position, setPosition] = useState('center');
+    
+        const dialogFuncMap = {
+        
+            'displayMaximizable': setDisplayMaximizable,
+           
+        }
+    
+        const onClick = (name, position) => {
+            dialogFuncMap[`${name}`](true);
+    
+            if (position) {
+                setPosition(position);
+            }
+        }
+    
+        const onHide = (name) => {
+            dialogFuncMap[`${name}`](false);
+        }
+
+    useEffect(() =>{
+            if(inputConfigName.trim().length > 0)  
+            { 
+                setIntegrationConfig({...integrationConfig, name: inputConfigName.trim()}); 
+                setText(inputConfigName);
+            }
+            else { setIntegrationConfig({...integrationConfig, name: ''});
+                setText('');
+            }
+    },[inputConfigName])
+    
     return (<>
         { showIntegrationModal ? 
             <IntegrationDropDown
@@ -384,34 +540,48 @@ const DevOpsConfig = props => {
         :null}
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                { props.currentIntegration.name === '' ? 'Create New' : 'Update'} Configuration
+                { props.currentIntegration.name === '' ? 'Create' : 'Update'} Execution Profile: {props.currentIntegration.selectValues[0].selectedName}
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
-            <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : 'Back'}</button>
-            <div className="devOps_config_name">
-                <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
+        <button data-test="submit-button-test" className='submit-button-test_update' disabled={!text} onClick={() => handleConfigSave(props.currentIntegration.name)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
+            <button data-test="submit-button-test " className='submit-button-test_back'  onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
+            {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
+                <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
-                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Configuration Name"
+                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Profile Name"
                         errorMessage={(integrationConfig.name === '' && error.name && error.name !== '') ?  error.name : null}
                     />
                 </span>
+            </div> */}
+        </div>
+         <div className="devOps_config_name devOps_config_name1"  >
+                <span className="api-ut__inputLabel inputLabel1" >Profile Name : </span>
+                &nbsp;&nbsp;
+                <span className="api-ut__inputLabel">
+                    <TextField value={text} width='150%' label="" standard={true} onChange={(event) =>{  setInputConfigName (event.target.value);}} autoComplete="off" placeholder="Enter Profile Name"
+                        errorMessage={(text === '' && error.name && error.name !== '') ?  error.name : null}
+                    />
+                </span>
             </div>
-        </div>
-        <div>
+            <div className="radiobutton_config" > 
+                        <input type='radio' id='Normal' className='radioinputs' data-for="Normal" data-tip="Click here to execute Normal modules"  value='normalExecution' disabled={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('normalExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><p data-for="Normal" data-tip=" Click here to select Normal module(s)"   className='radioinputsP'>&nbsp;Normal module(s)</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Normal" effect="solid" backgroundColor="black" />
+                        <input type='radio' id='Batch' className='radioinputs' data-for="Batch" data-tip="Click here to execute Batch of modules" value='batchExecution' disabled ={props.currentIntegration.disable} onChange={()=>handleExecutionTypeChange('batchExecution')}  selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><p data-for="Batch" data-tip="Click here to select batch module(s)"  className='radioinputsP'>&nbsp;Batch module(s)&nbsp;&nbsp;&nbsp;</p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<ReactTooltip id="Batch" effect="solid" backgroundColor="black" />
+                        <input type='radio' id="E2E" className='radioinputs' data-for="E2E" data-tip="Click here to execute end to end flows" value='e2eExecution' disabled ={props.currentIntegration.disable} onChange={() => handleExecutionTypeChange('e2eExecution')} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/><p  data-for="E2E" data-tip=" Click here to select E2E flows"  className='radioinputsP'>&nbsp;E2E Flow&nbsp;&nbsp;&nbsp;&nbsp;</p><ReactTooltip id="E2E" effect="solid" backgroundColor="black" />
+                    </div> 
+        {/* <div>
         {
-            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
+            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} isEditing={props.currentIntegration.name !== ''} />
         }
-        </div>
+        </div> */}
         {
-            <div style={{ display: 'flex', justifyContent:'space-between' }}>
+            <div className="devOps_module_list_div" >
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable} showSelectBrowser={showSelectBrowser} showSelectedBrowserType={props.currentIntegration.selectedBrowserType} notexe={notexe} moduleList={moduleList} setModuleList={setModuleList} initialFilteredModuleList={initialFilteredModuleList} setinitialFilteredModuleList={setinitialFilteredModuleList} />
                 </div>
                 <div className="devOps_pool_list">
-                    <div style={{ marginTop: '0' }}>
+                    <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid : </label>
                         <SearchDropdown
                             calloutMaxHeight="30vh"
@@ -423,19 +593,19 @@ const DevOpsConfig = props => {
                             width='54%'
                         />
                     </div>
-                    <div>
-                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browsers : </label>
+                    { (props.currentIntegration.selectedBrowserType || showSelectBrowser) && <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Browsers : </label>
                         <MultiSelectDropdown
                             hideSelectAll
                             noItemsText={'No Browser available'}
                             onSelectKeysChange={(selectedBrowsers) => setIntegrationConfig({...integrationConfig, browsers: selectedBrowsers})}
                             options={browserlist}
-                            placeholder="Select Browsers"
-                            searchPlaceholder="Search Browser Name"
+                            placeholder="Select"
+                            searchPlaceholder="Search"
                             selectedKeys={integrationConfig.browsers}
-                            width='54%'
+                            width='53.5%'
                             />
-                    </div>
+                    </div> }
                     <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_integration">Integration : </label>
                         <SearchDropdown
@@ -449,14 +619,14 @@ const DevOpsConfig = props => {
                             width='54%'
                         />
                     </div>
-                    <div>
+                    {/* <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Asynchronous </label>
                             <Toggle checked={integrationConfig.executionType == 'synchronous'} onChange={() => setIntegrationConfig({...integrationConfig, executionType: (integrationConfig.executionType === 'synchronous') ? 'asynchronous' : 'synchronous' })} label="" inlineLabel={true} />
                             <label>Synchronous </label>
                         </div>
-                    </div>
+                    </div> */}
                     <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
@@ -465,9 +635,9 @@ const DevOpsConfig = props => {
                             <label>Headless </label>
                         </div>
                     </div>
-                    <div className='devOps_seperation'>
-                    </div>
-                    <div>
+                    {/* <div className='devOps_seperation'>
+                    </div> */}
+                    {/* <div>
                         <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
                         <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                             <label>
@@ -477,8 +647,8 @@ const DevOpsConfig = props => {
                                 </div>
                             </label>
                         </span>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <span className="devOps_dropdown_label devOps_dropdown_label_key">Configuration Key : </span>
                         <span className="devOps_dropdown_label_input"><input type="text" value={integrationConfig.key} id='devops-key' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='Configuration Key' />
                             <label>
@@ -488,7 +658,7 @@ const DevOpsConfig = props => {
                                 </div>
                             </label>
                         </span>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         }

@@ -5,7 +5,7 @@ import MultiNodeBox from '../components/MultiNodeBox'
 import {PopupMsg} from '../../global';
 document.body.innerHTML =
 '<g id="node_0"  class="ct-node node-highlight" data-nodetype="modules" transform="translate(121.32000000000001,199.60000000000002)">'+
-'<image class="ct-nodeIcon" xlink:href="static/imgs/node-modules.png" style="height: 40px; width: 40px; opacity: 0.5;"></image>'+    
+'<image class="ct-nodeIcon" xlink:href="static/imgs/node-modules.png" style="height: 45px; width: 45px; opacity: 0.5;"></image>'+    
 '<text class="ct-nodeLabel" text-anchor="middle" x="20" title="Module_0" y="50">Module_test</text>' +
 '<title val="0" class="ct-node-title">Module_test</title>'+
 '<circle class="ct-modules ct-cRight ct-nodeBubble" cx="44" cy="20" r="4"></circle>'+

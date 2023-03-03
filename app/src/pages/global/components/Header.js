@@ -9,7 +9,9 @@ import ClickAwayListener from 'react-click-away-listener';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
 import { RedirectPage, ModalContainer, ScreenOverlay, WelcomePopover, Messages as MSG, setMsg } from '../../global';
+import ServiceBell from "@servicebell/widget";
 import "../styles/Header.scss";
+import * as crypto from "crypto";
 
 /*
     Component: Header Bar
@@ -18,7 +20,7 @@ import "../styles/Header.scss";
 
 */
 
-const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
+const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -44,15 +46,38 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
 
     useEffect(()=>{
         //on Click back button on browser
+       
+        (async()=>{
+            const response = await fetch("/getServiceBell")
+            let { enableServiceBell } = await response.json();
+           const key = await fetch("/getServiceBellSecretKey")
+           let { SERVICEBELL_IDENTITY_SECRET_KEY } = await key.json();
+           const data = { id: userInfo.email_id,
+            email:userInfo.email_id
+           };
+          if(enableServiceBell){
+            ServiceBell("identify",
+            userInfo.email_id,
+            { 
+            displayName: userInfo.firstname + ' ' + userInfo.lastname,
+            email: userInfo.email_id
+            },
+            crypto
+          .createHmac('sha256', SERVICEBELL_IDENTITY_SECRET_KEY)
+          .update(JSON.stringify(data))
+          .digest('hex'),
+        );
+        }})();
         window.addEventListener('popstate', (e)=> {
             logout(e)
         })
         getOS();
+       
         (async()=>{
             const response = await fetch("/getClientConfig")
-            let {avoClientConfig,trainingLinks} = await response.json();
+            let {avoClientConfig,trainingLinks,customerSupportEmail} = await response.json();
             setConfig(avoClientConfig);
-            setTrainLinks({videos:trainingLinks.videos, docs:trainingLinks.documentation});
+            setTrainLinks({videos:trainingLinks.videos, docs:trainingLinks.documentation,support:customerSupportEmail});
         })();
     },[])
     useEffect(()=>{
@@ -209,6 +234,8 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
         }
         if(WP_STEPNO===1 || skip===true) {
             otherProps.setPopover(false);
+            if(userInfo.isTrial)
+            otherProps.showVideo(true)
             return
         }
         set_WP_STEPNO((prevno)=>prevno + 1)
@@ -216,7 +243,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
 
     const WP_ITEM_LIST =  useMemo(()=>[
         {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
-        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Training document.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training document or choose <br/> "Training Document" from "Need Help" button.</>}
+        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Documentation.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch documentation or choose <br/> "Documentation" from "Need Help" button.</>}
     ],[trainLinks]);
 
     return(
@@ -229,13 +256,15 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/AssureLogo_horizonal.svg" onClick={ !adminDisable ? naviPg : null } /></span>
                     <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(!showHelp)} style={{padding:5}}>
-                            <span className="help">Need Help ?</span>
+                            {geniusPopup?null:<span className="help">Need Help ?</span>}
                         </div>
                         <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
                             <div onClick={()=>{window.open(trainLinks.videos,'_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
                             <div onClick={()=>{window.open(trainLinks.docs,'_blank')
-                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
+                                setShowHelp(false)}} ><Link to="#">Documentation</Link></div> 
+                            <div onClick={()=>{window.location= `mailto:${trainLinks.support}`
+                                setShowHelp(false)}} ><Link to="#">Contact Us</Link></div>   
                         </div>
                         {show_WP_POPOVER ? 
                             <WelcomePopover 
@@ -261,8 +290,8 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                         </div>
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div title={userInfo.isTrial?"Admin role is available as part of premium":"Switch Role"} className={"switch-role-btn no-border "+ (userInfo.isTrial?"logo-grey":"")} data-toggle="dropdown" onClick={switchRole}  >
-                                <span><img className="switch-role-icon" alt="switch-ic" src={"static/imgs/ic-switch-user"+ (userInfo.isTrial?"_disabled.png":".png")}/></span>
-                                <span>Switch Role</span>
+                                {/* <span><img className="switch-role-icon" alt="switch-ic" src={"static/imgs/ic-switch-user"+ (userInfo.isTrial?"_disabled.png":".png")}/></span>
+                                <span>Switch Role</span> */}
                             </div>
                             <div className={ "switch-role-menu dropdown-menu " + (showSR && "show")}>
                                 {roleList.map(role => 
@@ -276,10 +305,11 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                         }
 
                         <ClickAwayListener onClickAway={onClickAwayUD}>
-                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowUD(true)}>
-                            <span className="user-name">{username || "Demo User"}</span>
-                            <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
-                        </div>
+                        
+                            <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowUD(true)}>
+                                <span className="user-name">Welcome {username || "Demo User"}</span>
+                                <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
+                            </div>
                         <div className={"user-name-menu dropdown-menu dropdown-menu-right " + (showUD && "show")} onMouseLeave={(e)=>{setShowICEMenu(false)}}>
                             <div><Link className="user-role-item" to="#">{selectedRole || "Test Manager"}</Link></div>
                             <div className="divider" />
@@ -287,15 +317,16 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                                 !adminDisable &&
                                 <>
                                 {OS==="Windows"?
-                                <div onClick={()=>{getIce("avoclientpath_Windows")}} ><Link to="#">Download ICE</Link></div>:null}
+                                <div onClick={()=>{getIce("avoclientpath_Windows")}} ><Link to="#">Download Client</Link></div>:null}
                                 {OS==="MacOS"?
-                                <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
-                                    <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download ICE<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
-                                </div>:null}
+                                // <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
+                                //     <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download Client<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
+                                // </div>:null}
+                                <div onClick={()=>{getIce("avoclientpath_Mac")}}><Link to="#">Download Client</Link></div>:null}
                                 {OS === "Linux" ?
-                                <div onClick={()=>{getIce("avoclientpath_Linux")}}><Link to="#">Download ICE</Link></div>:null}
+                                <div onClick={()=>{getIce("avoclientpath_Linux")}}><Link to="#">Download Client</Link></div>:null}
                                 
-                                {showICEMenu?
+                                {/* {showICEMenu?
                                 (<div id="downloadICEContainer">
                                     <div id="downloadICEMenu" className="user-name-menu dropdown-menu dropdown-menu-right">
                                         {Object.keys(config).map((osPathname)=>{
@@ -307,7 +338,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                                         })}
                                     </div>
                                 </div>)
-                                :null}
+                                :null} */}
 
                                 { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} onMouseEnter={()=>{setShowICEMenu(false)}}><Link to="#">Settings</Link></div>}
                                 </>

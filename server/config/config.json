@@ -5,6 +5,8 @@
     "strictTaskWorkflow": false,
     "dateFormat": "YYYY-MM-DD",
     "benchmarkRuntimes": ["00:05","08:00","13:00","18:55"],
+    "enableServiceBell":false,
+    "SERVICEBELL_IDENTITY_SECRET_KEY":"cfb418525a6247d3b101d95c1c3b8299",
     "certificate": {
         "key": "./server/https/server.key",
         "cert": "./server/https/server.crt"
@@ -30,13 +32,17 @@
         "avoclientpath_Catalina":"",
         "avoclientpath_BigSur":"",
         "avoclientpath_Monterey":"",
-        "avoclientpath_Linux":""
+        "avoclientpath_Linux":"",
+        "avoclientpath_Mac":""
     },
     "avoAgentConfig": "",
     "trainingLinks":{
-        "videos": "https://elearning.avoassure.ai/#/",
+        "videos": "https://elearning.avoassure.ai/#/pages/evideo/00%20Avo%20Cloud%20Trial%5C01%20Avo%20Assure%20Installation%20Wizard%20%281%20min%29/Avo%20Assure%20Installation%20Wizard%20%28windows%29",
         "documentation": "https://docs.avoautomation.com/"
     },
+    "customerSupportEmail":"support@avoautomation.com",
+    "sampleAvoGeniusUrl":"https://avotestlab.avoassure.ai/",
+    "videoTrialUrl":"https://elearning.avoassure.ai/assets/videos/00 Avo Cloud Trial/02 Avo Genius (7 min).mp4",
     "enableNotification": {
         "assignTabMindmap" : false
     }
