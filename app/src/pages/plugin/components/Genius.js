@@ -916,6 +916,8 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
               }
               onChange={(e, item) => {
                 setSelectedProject(item)
+                setScenarioName('')
+                setModuleName('')  
                               }}
               placeholder="Select"
               width="300px"
