@@ -346,13 +346,13 @@ const DevOpsConfig = props => {
         return data;
     }
     const handleConfigSave = async (checkForButton, value) => {
-        if(text === ''){
+        if(value === false){if(text === ''){
             setError({
                 ...error,
                 name: 'Please Enter Profile Name'
             });
             return;
-        }
+        }}
         if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
             setMsg(MSG.CUSTOM("Please select atleast one Browser",VARIANT.ERROR));
             return;
@@ -461,7 +461,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: text.trim(),
+            configurename: (value === true)?"ExecuteNow":text.trim(),
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
