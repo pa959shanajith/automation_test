@@ -2,7 +2,7 @@ import React, { useEffect,useState } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import { Dialog } from "primereact/dialog";
 
-import * as actionTypesGlobal from "../state/action";
+// import * as actionTypesGlobal from "../state/action";
 
 
 const ShowTrialVideo=()=> {
@@ -18,7 +18,7 @@ const ShowTrialVideo=()=> {
     
   return (
     <>
-    <Dialog style={{width: '80vw',height: '87vh',border:'2px solid #5f338f' }} header={ `Welcome to Avo Assure`} visible={showTrialDemoVideo} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch({type:actionTypesGlobal.OPEN_TRIAL_VIDEO,payload:{showTrialVideo:false}}) }}>
+    <Dialog style={{width: '80vw',height: '87vh',border:'2px solid #5f338f' }} header={ `Welcome to Avo Assure`} visible={showTrialDemoVideo} draggable={false} className="geniusMindmapDialog" onHide={() => { }}>
     <div className={"welcomeInstall "} style={{justifyContent:"unset !important",}}>
         <video width="90%" height="500px" controls loop autoPlay >
             <source src={videoUrl} type="video/mp4" />

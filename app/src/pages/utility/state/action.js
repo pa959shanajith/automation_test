@@ -1,1 +1,0 @@
-export const SET_COPY_CELLS = "DT__SET_COPY_CELLS"

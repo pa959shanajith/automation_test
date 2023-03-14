@@ -1,31 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
-import {Provider, useSelector, useDispatch} from 'react-redux';
+import {Provider} from 'react-redux';
 import ServiceBell from "@servicebell/widget";
-import {store} from './reducer';
-import {ProgressBar, ErrorPage, PopupMsg, VARIANT} from './pages/global'
-import { SWITCHED } from './pages/global/state/action';
+// import {store} from './reducer';
+import store from './store';
+import {ErrorPage} from './pages/global'
 import Login, {Base} from './pages/login';
-import Admin from './pages/admin';
-import Plugin from './pages/plugin';
-import Execute from './pages/execute';
-import Schedule from './pages/schedule';
-import Mindmap from './pages/mindmap';
-import Scrape from './pages/scrape';
-import Design from './pages/design';
-import Utility from './pages/utility';
-import Integration from './pages/integration';
-import Settings from './pages/settings';
-import GeniusDialog from './pages/global/components/GeniusDialog';
-import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
-import {ScreenOverlay,ErrorBoundary} from './pages/global';
-import './pages/global/components/icons.js';
-import SocketFactory from './SocketFactory';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'font-awesome/css/font-awesome.min.css';
-import 'react-datetime/css/react-datetime.css';
-import '@avo/designcomponents/lib/assets/styles/avoassure.scss';
+// import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
+// import SocketFactory from './SocketFactory';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
@@ -50,45 +33,24 @@ const App = () => {
   },[])
   return (
     <Provider store={store}>
-      {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-      <ProgressBar />
-      <ErrorBoundary>
+      {/* {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null} */}
+      {/* <ProgressBar /> */}
+      {/* <ErrorBoundary> */}
         <RouteApp/>
-      </ErrorBoundary>
+      {/* </ErrorBoundary> */}
     </Provider>
   );
 }
 
 const RouteApp = () => {
-  const dispatch = useDispatch();
-  const roleSwitched = useSelector(state=>state.progressbar.roleSwitched);
-  const [role, setRole] = useState(false);
-  useEffect(()=>{
-    if(roleSwitched){
-        dispatch({type: SWITCHED, payload: false});
-        setRole(true);
-    }
-}, [roleSwitched])
   return(
     <Router>
-    <PopupMsg/>
-    <GeniusDialog/>
-    <ShowTrialVideo />
-    { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to`} close={()=>setRole("")} /> }
-    <SocketFactory/>
+    {/* <PopupMsg/> */}
+    {/* <ShowTrialVideo /> */}
+    {/* <SocketFactory/> */}
     <Switch>
       <Route exact path="/" component={Base} />
       <Route path={["/login","/verify","/reset"]} component={Login} />
-      <Route path="/admin" component={Admin} />
-      <Route path="/mindmap" component={Mindmap} />
-      <Route path="/plugin" component={Plugin} />
-      <Route path ="/scrape" component={Scrape}/>
-      <Route path ="/design" component={Design}/>
-      <Route path ="/utility" component={Utility}/>
-      <Route path = "/integration" component={Integration}/>
-      <Route path ="/execute" component={Execute}/>
-      <Route path ="/scheduling" component={Schedule}/>
-      <Route path ='/settings' component={Settings}/>
       <Route component={ErrorPage} />
     </Switch>
   </Router>
