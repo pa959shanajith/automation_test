@@ -1,6 +1,5 @@
 import React from 'react';
-import LoginPage from './containers/LoginPage'
-import BasePage from './containers/BasePage'
+import LoginPage from './containers/LoginPage';
 
 /*Component App
   use: defines components for each url
@@ -14,7 +13,7 @@ const Login = () => {
 
 const Base = () => {
   return (
-      <BasePage/>
+      <LoginPage/>
   );
 }
 
