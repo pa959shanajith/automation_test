@@ -461,7 +461,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: (value === true)?"ExecuteNow":text.trim(),
+            configurename: (value === true)?`${batchInfo[0]['projectName']}_${integrationConfig.key}`:text.trim(),
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
