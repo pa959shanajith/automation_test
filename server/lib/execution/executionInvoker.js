@@ -8,6 +8,11 @@ var scheduler = require('./scheduler')
 const constants = require('./executionConstants')
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
 module.exports.ExecutionInvoker = class ExecutionInvoker {
 
     executeActiveTestSuite = async function (batchExecutionData, execIds, userInfo, type) {
@@ -186,7 +191,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         }
         // This code only executes when request comes from Azure DevOps
         const args = {
-            data: { "name": "TaskCompleted", "taskId": hdrs.taskinstanceid, "jobId": hdrs.jobid, "result": finalResult.executionStatus.status },
+            data: { host :headers.headers.host ,"name": "TaskCompleted", "taskId": hdrs.taskinstanceid, "jobId": hdrs.jobid, "result": finalResult.executionStatus.status },
             headers: {
                 "Authorization": 'Basic ' + Buffer.from(':' + hdrs.authtoken).toString('base64'),
                 "Content-Type": "application/json"

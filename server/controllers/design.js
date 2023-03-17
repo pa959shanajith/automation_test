@@ -11,6 +11,14 @@ const utils = require('../lib/utils');
 const axios = require('axios');
 const ClientOAuth2 = require('client-oauth2');
 
+
+let headers
+module.exports.setReq = async (req) =>
+{
+	headers=req;
+}
+
+
 exports.readTestCase_ICE = async (req, res) => {
 	const fnName = "readTestCase_ICE";
 	logger.info("Inside UI service: " + fnName);
@@ -178,6 +186,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								"testcaseid": requestedtestcaseids,
 								"userid": req.body.userInfo.user_id
 							};
+							inputs.host = headers.headers.host;
 							var args = {
 								data: inputs,
 								headers: {

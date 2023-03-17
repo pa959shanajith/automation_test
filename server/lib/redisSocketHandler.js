@@ -77,7 +77,7 @@ default_sub.on("message", (channel, message) => {
 		break;
 
 	case "focus":
-		mySocket.emit("focus", data.focusParam, data.elementURL, data.appType, data.top, data.left, data.width, data.height);
+		mySocket.emit("focus", data.focusParam, data.elementURL, data.appType);
 		break;
 
 	case "debugTestCase":
