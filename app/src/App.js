@@ -18,6 +18,7 @@ import Utility from './pages/utility';
 import Integration from './pages/integration';
 import Settings from './pages/settings';
 import GeniusDialog from './pages/global/components/GeniusDialog';
+import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';
@@ -72,6 +73,7 @@ const RouteApp = () => {
     <Router>
     <PopupMsg/>
     <GeniusDialog/>
+    <ShowTrialVideo />
     { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to`} close={()=>setRole("")} /> }
     <SocketFactory/>
     <Switch>

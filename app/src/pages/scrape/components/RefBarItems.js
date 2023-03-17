@@ -149,7 +149,7 @@ const RefBarItems = props => {
 				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
 			} else setHighlight(false);
 			if(!ScrapedObject.xpath.startsWith('iris')){
-				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
+				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
 					.then(data => {
 						if (data === "Invalid Session") return RedirectPage(history);
 						if (data === "fail") setMsg(Messages.SCRAPE.ERR_HIGHLIGHT)

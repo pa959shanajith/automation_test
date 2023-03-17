@@ -84,9 +84,15 @@ const Genius = (props) => {
       setSelectedModule(null);
       setSelectedScenario(null);
       setAppType(null);
-      setNavURL("");
+      if(!userInfo.isTrial){
+        setNavURL("")
+       }
       setSelectedBrowser("chrome");
     }
+    count=0
+  }
+  else if (data==="resetCount"){
+    count=0
   }
     else if (data === "disconnect") {
       setLoading(false);
@@ -95,7 +101,9 @@ const Genius = (props) => {
       setSelectedModule(null);
       setSelectedScenario(null);
       setAppType(null);
-      setNavURL("");
+      if(!userInfo.isTrial){
+        setNavURL("")
+       }
       setSelectedBrowser("chrome");
       }
     }
@@ -172,14 +180,14 @@ const Genius = (props) => {
         const currentScnToDelete=modScenarios.filter(scn=>scn.name===selectedScenario.text)
        scrnids=currentScnToDelete[0].children.map((screen,idx)=>{
          return screen._id
-})
+       })
 const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
   screen.children.map((testcase,id)=>{
   testcaseids.push(testcase._id)
  })
 })
   await deleteScenario({scenarioIds:[],screenIds:scrnids,testcaseIds:testcaseids})
-      }
+    }
           
       var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
       const completeScenraioDetials=moduledata.children
@@ -773,7 +781,9 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
     setSelectedModule(null);
     setSelectedScenario(null);
     setAppType(null);
+    if(!userInfo.isTrial){
     setNavURL("");
+    }
     setSelectedBrowser("chrome");
   }
   
@@ -1001,7 +1011,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
             <TextField
               label="Application URL"
               onChange={(e) => { setNavURL(e.target.value) }}
-              placeholder="https://www.google.com"
+              placeholder="URL:"
               standard
               value={navURL}
               width="300px"
@@ -1020,7 +1030,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
            { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?<div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
         
         <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5>
-        {userInfo.isTrial && <h5 style={{color:"#343A40",fontSize:'18px'}}><i>As part of trial, Avo Genius is restricted to work only with Avo Test applications.</i></h5>}
+        {userInfo.isTrial && <h5 style={{color:"#343A40",fontSize:'18px'}}><i>As part of the trial, Avo Genius is restricted to work only with Avo Test applications.</i></h5>}
         
       
         </span>

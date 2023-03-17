@@ -234,6 +234,8 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
         }
         if(WP_STEPNO===1 || skip===true) {
             otherProps.setPopover(false);
+            if(userInfo.isTrial)
+            otherProps.showVideo(true)
             return
         }
         set_WP_STEPNO((prevno)=>prevno + 1)
@@ -241,7 +243,7 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
 
     const WP_ITEM_LIST =  useMemo(()=>[
         {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
-        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Training document.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training document or choose <br/> "Training Document" from "Need Help" button.</>}
+        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Documentation.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch documentation or choose <br/> "Documentation" from "Need Help" button.</>}
     ],[trainLinks]);
 
     return(
@@ -260,7 +262,7 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
                             <div onClick={()=>{window.open(trainLinks.videos,'_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
                             <div onClick={()=>{window.open(trainLinks.docs,'_blank')
-                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div> 
+                                setShowHelp(false)}} ><Link to="#">Documentation</Link></div> 
                             <div onClick={()=>{window.location= `mailto:${trainLinks.support}`
                                 setShowHelp(false)}} ><Link to="#">Contact Us</Link></div>   
                         </div>
@@ -317,13 +319,14 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
                                 {OS==="Windows"?
                                 <div onClick={()=>{getIce("avoclientpath_Windows")}} ><Link to="#">Download Client</Link></div>:null}
                                 {OS==="MacOS"?
-                                <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
-                                    <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download Client<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
-                                </div>:null}
+                                // <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
+                                //     <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download Client<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
+                                // </div>:null}
+                                <div onClick={()=>{getIce("avoclientpath_Mac")}}><Link to="#">Download Client</Link></div>:null}
                                 {OS === "Linux" ?
                                 <div onClick={()=>{getIce("avoclientpath_Linux")}}><Link to="#">Download Client</Link></div>:null}
                                 
-                                {showICEMenu?
+                                {/* {showICEMenu?
                                 (<div id="downloadICEContainer">
                                     <div id="downloadICEMenu" className="user-name-menu dropdown-menu dropdown-menu-right">
                                         {Object.keys(config).map((osPathname)=>{
@@ -335,7 +338,7 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
                                         })}
                                     </div>
                                 </div>)
-                                :null}
+                                :null} */}
 
                                 { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} onMouseEnter={()=>{setShowICEMenu(false)}}><Link to="#">Settings</Link></div>}
                                 </>

@@ -22,7 +22,7 @@ const GeniusDialog = () => {
     }
   })
   return <>
-    <Dialog style={small?{width:'45vw',height:'30vh'}: {width: '80vw',height: '97vh' }} header={ small?null:`Welcome to Avo Genius ${userInfo.firstname}! `} visible={showGeniusDialog} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } }) }}>
+    <Dialog style={small?{width:'45vw',height:'30vh'}: {width: '80vw',height: '97vh' }} header={ small?null:"Avo Genius"} visible={showGeniusDialog} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } }) }}>
       <Genius {...geniusWindowProps}></Genius>
     </Dialog>  
 
