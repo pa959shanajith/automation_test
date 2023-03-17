@@ -31,10 +31,10 @@ const PluginBox = ({pluginName, pluginTitle}) => {
     }
 		pluginName = pluginName.split(' ').join('').toLowerCase();
 			if (pluginName === "mr") {
-				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
+				window.localStorage['navigateScreen'] = "reports";
+        		window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+        		window.location.href = "/reports";
 				window.localStorage['integrationScreenType'] = null
-				window.localStorage['navigateScreen'] = 'reports';
-				setRedirectTo('/reports') 
 			}
 			else if (pluginName === "md") {
 				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
@@ -48,10 +48,10 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 				setRedirectTo('/integration') 
 			}
 			else if (pluginName === "stavo") {
-				window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
+				window.localStorage['navigateScreen'] = "seleniumtoavo";
+        		window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+        		window.location.href = "/seleniumtoavo";
 				window.localStorage['integrationScreenType'] = null
-				window.localStorage['navigateScreen'] = 'seleniumtoavo';
-				setRedirectTo('/seleniumtoavo') 
 			}
 			else if (pluginName === "de") {
 				window.localStorage['integrationScreenType'] = null
