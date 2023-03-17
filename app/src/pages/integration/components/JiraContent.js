@@ -221,7 +221,7 @@ const JiraContent = props => {
 
     const handleClick=(value, id,summary)=>{
         let newSelectedTCDetails = { ...selectedZTCDetails };
-        let newSelectedTC = [...value];
+        let newSelectedTC = [...value,summary];
        setSelected(value)
        setSelectedId(id)
        setSelectedSummary(summary)
@@ -322,7 +322,7 @@ const JiraContent = props => {
                 onUpdateMap={()=>props.callUpdateMappedFiles()}
                 onExit={()=>callExit()}
                 testCaseData={testCaseData}
-                leftBoxTitle="Jira Tests"
+                leftBoxTitle="Jira tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestDomain={
                     <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{setRelease(true) ;callProjectDetails_ICE(e);jiraTest(e);onProjectSelect(e);handleFirstOptionChange(e);jiraTestIssue(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} >
