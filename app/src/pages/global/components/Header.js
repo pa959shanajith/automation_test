@@ -254,7 +254,12 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
             { show_WP_POPOVER && <div className="tranparentBlocker"></div>}
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/AssureLogo_horizonal.svg" onClick={ !adminDisable ? naviPg : null } /></span>
-                    <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
+                <ClickAwayListener >
+                      <div  title={userInfo.isTrial?"Click here to view your plan":""}  className={"user-name-btn no-border" + (userInfo.isTrial?"fa-enabled":"")} >
+                      <span className="viewPlan"><a className='viewPlan plans a hover' href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer">View Plans</a></span>
+                      </div>
+                </ClickAwayListener>
+                <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(!showHelp)} style={{padding:5}}>
                             {geniusPopup?null:<span className="help">Need Help ?</span>}
                         </div>
