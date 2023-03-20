@@ -131,6 +131,8 @@ const ModuleListDrop = (props) =>{
         setFilterSc(val)
     }
      const loadModule = async(modID) =>{
+        dispatch({type:actionTypes.IS_ENELOAD,payload:false});
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
         // if(moduleSelect._id === modID){
@@ -174,8 +176,8 @@ const ModuleListDrop = (props) =>{
                         setShowNote(true)
                         return;}
                         else {
-                            dispatch({type:actionTypes.IS_ENELOAD,payload:false});
-                            dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
+                            // dispatch({type:actionTypes.IS_ENELOAD,payload:false});
+                            // dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
                         }
                         if(Object.keys(moduleSelect).length===0 || firstRender){
                             loadModule(modID)
