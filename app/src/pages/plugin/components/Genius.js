@@ -824,7 +824,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
           </div>
           <div className='dialog__child' style={{ padding: "5px 0px", fontSize: "18px", fontFamily: "Mulish", fontWeight: 600, marginBottom: 0 }}> Users </div>
           <div className="dialog__child" id="projectCreateBox" style={{ height: '12rem', overflowY: "auto" }}>
-            <div style={{ display: 'flex', width: "100%", marginTop: "10px" }}>
+            <div style={{ display: 'flex', width: "100%", marginTop: "10px" }} >
               <SearchBox
                 placeholder="Enter Username"
                 width="20rem"
@@ -916,6 +916,8 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
               }
               onChange={(e, item) => {
                 setSelectedProject(item)
+                setScenarioName('')
+                setModuleName('')  
                               }}
               placeholder="Select"
               width="300px"
@@ -1066,8 +1068,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
       <div style={{marginTop:'auto',marginBottom:'auto'}}>
      
       
-      {(BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")? null:<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >{`Avo Genius is supported only on Google Chrome and Microsoft Edge.`}</h5>}
-        { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?(warning ?<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >Avo Genius extension not found. Install it from <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> and re-launch Avo Genius</h5>:null):null} 
+      {((BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome") ||  warning )? <h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >Avo Genius extension not found. Install it from <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> and re-launch Avo Genius</h5>:<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >{`Avo Genius is supported only on Google Chrome and Microsoft Edge.`}</h5>}
       
           </div>
         </>}

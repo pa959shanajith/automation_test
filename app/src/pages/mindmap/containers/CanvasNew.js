@@ -560,6 +560,7 @@ const CanvasNew = (props) => {
            
             {props.GeniusDialog?null:<NavButton setCtScale={setCtScale} zoom={zoom}/>}
             {/* <Legends/> */}
+            {props.GeniusDialog?<Legends />:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
             {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
             {props.GeniusDialog ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
