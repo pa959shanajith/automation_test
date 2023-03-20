@@ -103,7 +103,7 @@ const ProjectNew = (props) => {
             "WEBT" in plugins_list ?  listPlugin.push({...details["web"], enabled: true}):listPlugin.push({...details["web"], enabled: false})
             "APIT" in plugins_list ?  listPlugin.push({...details["webservice"], enabled: true}):listPlugin.push({...details["webservice"], enabled: false})
             "MOBT" in plugins_list ?  listPlugin.push({...details["mobileapp"], enabled: true}):listPlugin.push({...details["mobileapp"], enabled: false})
-            "MOBT" in plugins_list ?  listPlugin.push({...details["mobileweb"], enabled: true}):listPlugin.push({...details["mobileweb"], enabled: false})
+            "MOBWT" in plugins_list ?  listPlugin.push({...details["mobileweb"], enabled: true}):listPlugin.push({...details["mobileweb"], enabled: false})
             "ETOAP" in plugins_list ?  listPlugin.push({...details["oebs"], enabled: true}):listPlugin.push({...details["oebs"], enabled: false})
             "DAPP" in plugins_list ?  listPlugin.push({...details["desktop"], enabled: true}):listPlugin.push({...details["desktop"], enabled: false})
             "MF" in plugins_list ?  listPlugin.push({...details["mainframe"], enabled: true}):listPlugin.push({...details["mainframe"], enabled: false})
