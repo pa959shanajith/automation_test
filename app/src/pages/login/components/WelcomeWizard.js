@@ -453,8 +453,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       {
         title:"Establish Avo Server and Client Connection:", 
         items:[
-          {title:"Initialise Avo Client via desktop shortcut",imageName:"WW_win_4_1"},
-          {title:"Connect ICE via clicking on Connect Button",imageName:"WW_win_4_2"}
+          {title:"Initialise Avo Assure client via desktop shortcut",imageName:"WW_win_4_1"},
+          {title:"Connect Avo Assure client via clicking on Connect Button",imageName:"WW_win_4_2"}
         ],
         type:"NOR"
       }
