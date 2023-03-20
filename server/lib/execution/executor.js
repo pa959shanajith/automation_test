@@ -620,6 +620,7 @@ class TestSuiteExecutor {
             } else { // This block will trigger when resultData.status has "success or "Terminate"
                 // redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
                 try {
+
                     let result = status;
                     let report_result = {};
                     report_result["status"] = status

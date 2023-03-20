@@ -345,14 +345,14 @@ const DevOpsConfig = props => {
         }
         return data;
     }
-    const handleConfigSave = async (checkForButton) => {
-        if(text === ''){
+    const handleConfigSave = async (checkForButton, value) => {
+        if(value === false){if(text === ''){
             setError({
                 ...error,
                 name: 'Please Enter Profile Name'
             });
             return;
-        }
+        }}
         if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
             setMsg(MSG.CUSTOM("Please select atleast one Browser",VARIANT.ERROR));
             return;
@@ -461,7 +461,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: text.trim(),
+            configurename: (value === true)?`${batchInfo[0]['projectName']}_${integrationConfig.key}`:text.trim(),
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
@@ -471,7 +471,8 @@ const DevOpsConfig = props => {
             integration: integration,
             batchInfo: batchInfo,
             donotexe: checkForButton == '' ? integrationConfig.notexe : integrationConfig.executionRequest.donotexe,
-            scenarioFlag: false
+            scenarioFlag: false,
+            isExecuteNow: value
         });
         if(storeConfig !== 'success') {
             if(storeConfig && storeConfig.error && storeConfig.error.CONTENT) {
@@ -544,8 +545,9 @@ const DevOpsConfig = props => {
             </span>
         </div>
         <div className="api-ut__btnGroup">
-        <button data-test="submit-button-test" className='submit-button-test_update' disabled={!text} onClick={() => handleConfigSave(props.currentIntegration.name)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
+        <button data-test="submit-button-test" className='submit-button-test_update' disabled={!text} onClick={() => handleConfigSave(props.currentIntegration.name, false)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test " className='submit-button-test_back'  onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
+            {!props.currentIntegration.disable?<img src="static/imgs/Execute_now.png" onClick={()=>{handleConfigSave(props.currentIntegration.name, true)}} className='execution-button' title="Execute Now" alt='Execute Now'/>:""}
             {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
