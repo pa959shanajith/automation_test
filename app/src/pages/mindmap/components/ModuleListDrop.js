@@ -175,10 +175,6 @@ const ModuleListDrop = (props) =>{
                         setBlockui({show:false})
                         setShowNote(true)
                         return;}
-                        else {
-                            // dispatch({type:actionTypes.IS_ENELOAD,payload:false});
-                            // dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
-                        }
                         if(Object.keys(moduleSelect).length===0 || firstRender){
                             loadModule(modID)
                             return;
