@@ -747,6 +747,7 @@ export const getJiraTestcases_ICE = async(input_payload) => {
            data: {   
         'project': input_payload['project'],
         'issuetype': input_payload['issuetype'],
+        'itemType': input_payload['itemType'],
         'url': input_payload['url'],
         'username': input_payload['username'],
         'password': input_payload['password'],

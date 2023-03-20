@@ -451,7 +451,7 @@ exports.connectJira_ICE = function(req, res) {
 
                             function jira_login_4_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Jira_Projects"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", jira_login_4_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
@@ -459,7 +459,7 @@ exports.connectJira_ICE = function(req, res) {
                                             var soc = myserver.socketMapNotify[username];
                                             soc.emit("ICEnotAvailable");
                                         }
-                                    } else if (data.onAction == "Jira_Projects") {
+                                    } else if (data.onAction == "Jira_details") {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
@@ -519,7 +519,9 @@ exports.connectJira_ICE = function(req, res) {
                                     "project_selected": {
                                         'project':req.body.project,
                                         'key':req.body.key
-                                    }
+                                    },
+                                    "itemType":req.body.itemType,
+                                    
                                 };
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
@@ -723,6 +725,7 @@ exports.getReport_API = async (req, res) => {
 
 
 exports.saveJiraDetails_ICE = async (req, res) => {
+    
 	const fnName = "saveJiraDetails_ICE";
 	logger.info("Inside UI service: " + fnName);
     // console.log(req.body);
@@ -737,8 +740,10 @@ exports.saveJiraDetails_ICE = async (req, res) => {
 				'projectid': itr.projectId,			
 				'projectName': itr.projectName,
 				'projectCode': itr.projectCode,
-				'testId': itr.testId,
-				'testCode': itr.testCode,
+				'itemId': itr.testId,
+				'itemCode': itr.testCode,
+                'itemType': itr.itemType,
+                'itemSummary':itr.itemSummary,
 				"query": "saveJiraDetails_ICE"
 			};
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
@@ -1161,6 +1166,7 @@ function projectandscenario(projectid, cb) {
 					} else {
 						projectDetails.project_id = projectid;
 						projectDetails.project_name = projectname;
+
 					}
 				}
 				callback1();
