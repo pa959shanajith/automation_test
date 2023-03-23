@@ -161,6 +161,7 @@ exports.getGeniusData = async (req, res) => {
     let screenNames=[]
     const body = req.body;
     const content = body.data.data;
+    const reusedScreens= body.scrnreused
     for(let screen of content.screens){
         screenNames.push(screen.name)
     }
@@ -183,7 +184,7 @@ exports.getGeniusData = async (req, res) => {
                 "testscenarioid": content.scenario.key,
                 "testscenarioName": content.scenario.text,
                 "tasks": null,
-                "screenDetails": (currentScn[0].children.length===0 )?content.screens.map((screen, idx) => {
+                "screenDetails": (currentScn[0].children.length===0 || reusedScreens.length!==0 )?content.screens.map((screen, idx) => {
                   return {
                     "screenid": null,
                     "screenName": screen.name,
@@ -243,7 +244,7 @@ exports.getGeniusData = async (req, res) => {
           "addedObj": {
             "scrapetype": "fs",
             "scrapedin": "",
-            "view": currentScn[0].children.length===0?screen["data_objects"]:[],
+            "view": (currentScn[0].children.length===0 || reusedScreens.length!==0)?screen["data_objects"]:[],
             "mirror": screen["screenshot"],
             "scrapedurl": screen["scrapedurl"],
             "action": "scrape"
