@@ -42,7 +42,7 @@
     },
     "customerSupportEmail":"support@avoautomation.com",
     "sampleAvoGeniusUrl":"https://avotestlab.avoassure.ai/",
-    "videoTrialUrl":"https://elearning.avoassure.ai/assets/videos/00 Avo Cloud Trial/02 Avo Genius (7 min).mp4",
+    "videoTrialUrl":"/welcomevideo.mp4",
     "enableNotification": {
         "assignTabMindmap" : false
     }
