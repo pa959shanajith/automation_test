@@ -42,7 +42,7 @@
     },
     "customerSupportEmail":"support@avoautomation.com",
     "sampleAvoGeniusUrl":"https://avotestlab.avoassure.ai/",
-    "videoTrialUrl":"/welcomevideo.mp4",
+    "videoTrialUrl":"/static/media/welcomevideo.mp4",
     "enableNotification": {
         "assignTabMindmap" : false
     }
