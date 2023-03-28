@@ -22,6 +22,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 let port = null;
 let count=0;
+let scrnreused=[]
 let editorExtensionId = "bcdklcknooclndglabfjppeeomefcjof";
 
 const Genius = (props) => {
@@ -174,19 +175,57 @@ const Genius = (props) => {
     else if (typeof data === "object") {
 
       count ++;
+      
+      var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
+      const completeScenraio=moduledata.children.filter((scenario,idx)=>{
+        return scenario.name==selectedScenario.text
+      })
+      if(completeScenraio[0].children.length!==data.data.screens.length && count!==1){
+        let screenDetails=data.data.screens
+       
+        let deletedScreen=completeScenraio[0].children.filter((screen,idx)=>{
+         let {name }=screen;
+       
+        let deletedScreen= screenDetails.find(screen => screen.name === name)
+        if(deletedScreen===undefined){
+          return screen
+        }
+      })
+      let deletedScrnIds=deletedScreen.map((screen,idx)=>{
+        return screen._id
+      })
+      
+     let deletedTestcaseIds=deletedScreen.map((screen,idx)=>{
+      return screen.children[0]._id
+     })
+    
+   
+     
+      await deleteScenario({scenarioIds:[],screenIds:deletedScrnIds,testcaseIds:deletedTestcaseIds})
+      }
       let testcaseids=[]
       let scrnids
       if(count===1){
-        const currentScnToDelete=modScenarios.filter(scn=>scn.name===selectedScenario.text)
+        const currentScnToDelete=completeScenraio.filter(scn=>scn.name===selectedScenario.text)
        scrnids=currentScnToDelete[0].children.map((screen,idx)=>{
-         return screen._id
+        
+         return {_id:screen._id,screenReused:screen.reuse}
        })
 const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
   screen.children.map((testcase,id)=>{
   testcaseids.push(testcase._id)
  })
 })
-  await deleteScenario({scenarioIds:[],screenIds:scrnids,testcaseIds:testcaseids})
+for(let i =0;i<scrnids.length;i++){
+
+  if(!scrnids[i].screenReused)
+  await deleteScenario({scenarioIds:[],screenIds:[scrnids[i]._id],testcaseIds:[testcaseids[i]]})
+  else scrnreused.push(scrnids[i])
+
+      }
+    }
+    else{
+     scrnreused=[]
     }
           
       var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
@@ -196,7 +235,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
         
         
         const isAlreadySaved=data.alreadySaved
-        const res = await PluginApi.getGeniusData(data, scenarioData,isAlreadySaved,completeScenraioDetials);
+        const res = await PluginApi.getGeniusData(data, scenarioData,isAlreadySaved,completeScenraioDetials,scrnreused);
         savedRef.current = true;
         
         if (port) port.postMessage({
