@@ -211,7 +211,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
+				 
+                link.setAttribute('download',  "AvoAssureClient"+(userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
+//                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
