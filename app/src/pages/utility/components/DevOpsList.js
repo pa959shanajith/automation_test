@@ -589,11 +589,18 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     tableData[m].scenarioids.map((scenarioid, index) => {
                         tableData[m].executestatus[index] = 0;
                         if (m < item.executionRequest.batchInfo.length) {
-                            for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
-                                if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
-                                    tableData[m].executestatus[index] = 1;
-                                    break;
+                            if(item.executionRequest.selectedModuleType === 'normalExecution'){
+                                for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
+                                    if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
+                                        tableData[m].executestatus[index] = 1;
+                                        break;
+                                    }
                                 }
+                            } 
+                            else{
+                                for(var n = 0; n < item.executionRequest.batchInfo[m].scenarionIndex.length; n++){
+                                    tableData[m].executestatus[item.executionRequest.batchInfo[m].scenarionIndex[n]] = 1;
+                                } 
                             }
                         }
                     });

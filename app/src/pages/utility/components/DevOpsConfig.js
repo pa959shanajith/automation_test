@@ -381,6 +381,7 @@ const DevOpsConfig = props => {
                         releaseId: integrationConfig.selectValues[1].selected,
                         cycleName: integrationConfig.selectValues[2].selectedName,
                         cycleId: integrationConfig.selectValues[2].selected,
+                        scenarionIndex:checkForButton === '' ? integrationConfig.notexe.current[module.moduleid]:integrationConfig.executionRequest.donotexe.current[module.moduleid],
                         suiteDetails: module.scenarios.filter((scenario) => integrationConfig.scenarioList.includes(scenario._id)).map((scenario) => ({
                             condition: getScenarioParams(scenario._id).condition,
                             dataparam: [getScenarioParams(scenario._id).dataparam],
@@ -409,6 +410,7 @@ const DevOpsConfig = props => {
                         releaseId: integrationConfig.selectValues[1].selected,
                         cycleName: integrationConfig.selectValues[2].selectedName,
                         cycleId: integrationConfig.selectValues[2].selected,
+                        scenarionIndex:checkForButton === '' ? integrationConfig.notexe.current[module.moduleid]:integrationConfig.executionRequest.donotexe.current[module.moduleid],
                         suiteDetails: module.scenarios.filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario._id)).map((scenario, index) => ({
                             condition: getScenarioParams(module.batchname+module.moduleid+index+scenario._id).condition,
                             dataparam: [getScenarioParams(module.batchname+module.moduleid+index+scenario._id).dataparam],
@@ -438,6 +440,7 @@ const DevOpsConfig = props => {
                         releaseId: integrationConfig.selectValues[1].selected,
                         cycleName: integrationConfig.selectValues[2].selectedName,
                         cycleId: integrationConfig.selectValues[2].selected,
+                        scenarionIndex:checkForButton === '' ? integrationConfig.notexe.current[module.moduleid]:integrationConfig.executionRequest.donotexe.current[module.moduleid],
                         suiteDetails: module.scenarios.map((scenario, index) => ({
                             condition: getScenarioParams(module.batchname+module.moduleid+index+scenario._id).condition,
                             dataparam: [getScenarioParams(module.batchname+module.moduleid+index+scenario._id).dataparam],
