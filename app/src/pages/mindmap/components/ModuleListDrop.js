@@ -269,7 +269,6 @@ const ModuleListDrop = (props) =>{
     const selectedCheckbox=(e,arg="checkbox")=>{
         let modID = e.target.getAttribute("value")
         if(arg==='checkbox'){
-
             let selectedModList = [];
             if(moduleSelectlist.length>0){
                 selectedModList=moduleSelectlist;              
