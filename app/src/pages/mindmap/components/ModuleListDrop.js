@@ -25,7 +25,10 @@ const ModuleListDrop = (props) =>{
     const isAssign = props.isAssign
     const [options,setOptions] = useState(undefined)
     const [modlist,setModList] = useState(moduleList)
-    const SearchInp = useRef()
+    const SearchInp = useRef();
+    const [searchInpText,setSearchInpText] = useState('');
+    const [searchInpTextEnE,setSearchInpTextEnE] = useState('');
+    const SearchInpEnE = useRef();
     const SearchMdInp = useRef()
     const [modE2Elist, setModE2EList] = useState(moduleList)
     const [searchForNormal, setSearchForNormal] = useState(false)
@@ -54,6 +57,7 @@ const ModuleListDrop = (props) =>{
         }}
         else{dispatch({type:actionTypes.SAVED_LIST,payload:true})}
         setWarning(false); 
+        
      }, [ moduleList,initProj])
      useEffect(()=> {
         return () => {
@@ -70,7 +74,7 @@ const ModuleListDrop = (props) =>{
          if(!isE2EOpen){
         setIsCreateE2E(false);
         }
-         
+        
      },[initProj])
      useEffect(() => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
@@ -79,11 +83,12 @@ const ModuleListDrop = (props) =>{
 
      useEffect(()=>{
         if(moduleSelect.type === 'endtoend') {
-            // setIsE2EOpen(true)
-            // setCollapse(true);
             
         }
-        
+        searchModule("");
+        searchModule_E2E("");
+        setSearchInpTextEnE("");
+        setSearchInpText("");
         setWarning(false);
         setScenarioList([]);
      }, [proj])
@@ -122,9 +127,12 @@ const ModuleListDrop = (props) =>{
         setFirstRender(false);
     }
     const searchModule = (val) =>{
-        setSearchForNormal(true);
-        var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+        if(SearchInp && SearchInp.current) {
+            if (val === "") setSearchForNormal(false)
+            else setSearchForNormal(true);
+            SearchInp.current.value = val;
+            setSearchInpText(val);
+        }
         
     }
     const searchScenario = (val) =>{
@@ -257,8 +265,12 @@ const ModuleListDrop = (props) =>{
             initmodule = moduleList
             setModE2EList(moduleList)
         }
-        var filter = initmodule.filter((e)=>(e.type==='endtoend'&&(e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)||e.type==='basic'))
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+        if(SearchInpEnE && SearchInpEnE.current) {
+            SearchInpEnE.current.value = val;
+            setSearchInpTextEnE(val);
+        }
+        // var filter = moduleList.filter((e)=>(e.type==='endtoend'&&(e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)||e.type==='basic'))
+        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter && filter.length ? filter : moduleList})
     }
     const setOptions1 = (data) =>{
         setOptions(data)
@@ -334,12 +346,12 @@ const ModuleListDrop = (props) =>{
                                     }
                                     setAllModSelected(!allModSelected)
                                     }} ></input>
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value);setSearchForNormal(true)}}/>
+                                        <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
                                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                                 </div>
                                 <div className='moduleList'>
                                     {moduleList.map((e,i)=>{
-                                        if(e.type==="basic")
+                                        if(e.type==="basic" && ((searchInpText !== "" && e.name.toUpperCase().indexOf(searchInpText.toUpperCase())!==-1) || searchInpText === ""))
                                         return(
                                             <div key={i}>
                                                     <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
@@ -375,12 +387,12 @@ const ModuleListDrop = (props) =>{
                                 </div>
                                 <div className='searchBox pxBlack'>
                                     <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                        <input className='pFont' placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                                 </div>
                                 <div className='moduleList'>
                                         {moduleList.map((e,i)=>{
-                                            if(e.type==="endtoend")
+                                            if(e.type==="endtoend" && ((searchInpTextEnE !== "" && e.name.toUpperCase().indexOf(searchInpTextEnE.toUpperCase())!==-1) || searchInpTextEnE === ""))
                                             return(<>
                                                     
                                                     <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
