@@ -83,8 +83,6 @@ const ModuleListDrop = (props) =>{
 
      useEffect(()=>{
         if(moduleSelect.type === 'endtoend') {
-            // setIsE2EOpen(true)
-            // setCollapse(true);
             
         }
         searchModule("");
@@ -135,8 +133,6 @@ const ModuleListDrop = (props) =>{
             SearchInp.current.value = val;
             setSearchInpText(val);
         }
-        // var filter = moduleList.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
-        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter && filter.length ? filter : moduleList})
         
     }
     const searchScenario = (val) =>{
@@ -187,10 +183,6 @@ const ModuleListDrop = (props) =>{
                         setBlockui({show:false})
                         setShowNote(true)
                         return;}
-                        else {
-                            // dispatch({type:actionTypes.IS_ENELOAD,payload:false});
-                            // dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
-                        }
                         if(Object.keys(moduleSelect).length===0 || firstRender){
                             loadModule(modID)
                             return;
@@ -358,7 +350,6 @@ const ModuleListDrop = (props) =>{
                                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                                 </div>
                                 <div className='moduleList'>
-                                {/* moduleList.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(SearchInp.current.value.toUpperCase())!==-1) || e.type === 'endtoend')) */}
                                     {moduleList.map((e,i)=>{
                                         if(e.type==="basic" && ((searchInpText !== "" && e.name.toUpperCase().indexOf(searchInpText.toUpperCase())!==-1) || searchInpText === ""))
                                         return(
