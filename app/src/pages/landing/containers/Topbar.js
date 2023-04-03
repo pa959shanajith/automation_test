@@ -10,6 +10,7 @@ import '../styles/userProfile.scss'
 import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
 import "primereact/resources/primereact.min.css";                  //core css
 import "primeicons/primeicons.css";  
+import ProjectCreation from './ProjectCreation';
 
 const MenubarDemo = (props) => {
 
@@ -26,6 +27,7 @@ const MenubarDemo = (props) => {
         <div>
                 <Menubar start={start}  end={end} />
                 <Project />
+                <ProjectCreation/>
         </div>
     );
     }
