@@ -1,8 +1,7 @@
-
-
 .custom-tieredmenu{
     background-color: #030229 !important;
     border-radius: 8px !important;
+    width: 13.5rem !important;
     .p-menuitem-icon ,.p-menuitem-text{
       color: #ffffff !important;
     }
@@ -10,40 +9,18 @@
   .link{
     
     .p-tieredmenu,.p-menuitem-link:not(.p-disabled):hover{
-      // padding: 1.25rem 0rem ;
       background: #bec2be !important;
   }
   }
   .a{
     .p-tieredmenu, .p-submenu-list{
-      background-color: #030229 !important;
-      // border-radius: 8px !important;
-      
+      background-color: #030229 !important;      
     }
   }
-  // .b{
-  //   .p-tieredmenu{
-  //     border-radius: 8px !important;
-  //   }
-  // }
-    // .p-component{
-    //   .p-menuitem-link{
-    //     .p-menuitem-icon{
-    //       .p-menuitem-text{
-    //         background: #030229 !important; 
-    //       // color: #ffffff !important;
-    //         color: #ffffff !important
-  
-    //       }
-    //     }
-    //   }
-    //   }
-  
-  
   .ProfileDisplay{
     text-align: center;
     margin-bottom: 6rem;
-    margin-right: 1.5rem;
+    margin-right: 0.5rem;
     margin-top: 1rem;
     .c{
         color: #ffffff;

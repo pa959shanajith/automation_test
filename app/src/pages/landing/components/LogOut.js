@@ -20,10 +20,8 @@ export default function DeclarativeDemo() {
         <>
             <Toast ref={toast} />
             <ConfirmPopup target={buttonEl.current} visible={visible} onHide={() => setVisible(false)} 
-                message="Are you sure you want to logout?" icon="pi pi-exclamation-triangle" accept={accept} reject={reject} />
-            {/* <div className="card flex justify-content-center"> */}
+                message="Are you sure you want to logout?" icon="pi pi-exclamation-triangle" accept={accept} />
                 <Button id="border-0" className='surface-300' ref={buttonEl} onClick={() => setVisible(true)} icon="pi pi-sign-out" />
-            {/* </div> */}
         </>
     )
 }

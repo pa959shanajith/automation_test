@@ -1,30 +1,16 @@
 import React, { useState,useEffect,useRef } from "react";
 import { Avatar } from 'primereact/avatar';
-import { Chip } from 'primereact/chip';
-import { Menu } from 'primereact/menu';
-import { PrimeIcons } from 'primereact/api';
- import PropTypes from 'prop-types';
-//  import getInitials from "./getInitials";
- import { TieredMenu } from 'primereact/tieredmenu';
-// import TieredMenu from './TiredMenu'
-// import { Menu } from 'primereact/menu';
-// import userLoginInfo from '../userLoginInfo.json';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import '../styles/TiredMenu.scss'
+import { TieredMenu } from 'primereact/tieredmenu';
 import { Button } from 'primereact/button';
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
-import { Toast } from 'primereact/toast';
-// import '../Component/userProfile.css'
-
-//https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png
-
-
+import { Toast } from 'primereact/toast'
+import 'primereact/resources/themes/saga-blue/theme.css';
+import 'primereact/resources/primereact.min.css';
+import '../styles/TiredMenu.scss';
 
 const UserDemo = (props) => {
-  const [showMenu, setShowMenu] = useState(false);
-  // const [data, setData] = useState([]);
-  const [visible, setVisible] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const [visible, setVisible] = useState(false);
     const toast = useRef(null);
     const buttonEl = useRef(null);
 
@@ -35,12 +21,12 @@ const UserDemo = (props) => {
         userRole: "TestLead",
         profilePictureUrl: "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
         userId:"Demouser@123.com"
-      }
+        }
 
 
-  const handleChipClick = () => {
+        const handleChipClick = () => {
     setShowMenu(!showMenu);
-  };
+        };
 
   const getInitials=()=> {
     const firstname = userLoginInfo.firstName.split(' ');
@@ -51,116 +37,87 @@ const UserDemo = (props) => {
 const menuitems = [
   {
       template: () => {
-                          return (
-                            <>
-                            {userLoginInfo.profilePictureUrl ? (
-                              <div className='ProfileDisplay '>
-                              <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='large'/>
-                              <div className="flex flex-column align">
-                              <span className="font-bold c"><p>{userLoginInfo.username}</p></span>
-                              <span className="text-sm c">{userLoginInfo.userRole}</span>
-                              <span className="text-sm c">{userLoginInfo.userId}</span>
-                          </div>
-                      </div>
-                      // </div>
-                            ) : (
-                              <div>
-                              <div className='ProfileDisplay '>
-                              <Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='large' label={getInitials()} onClick={handleChipClick} shape="circle"/>
-                              <div className="flex flex-column align">
-                                      <span className="font-bold c">{userLoginInfo.username}</span>
-                                      <span className="text-sm c">{userLoginInfo.userRole}</span>
-                                      <span className="text-sm c">{userLoginInfo.userId}</span>
-                                  </div>
-                              </div>
-                              </div>)
-                            }
-                            </>
-                              // {...prop.UserProfile.userLoginInfo.profilePictureUrl ? (
-                              //     <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} />
-                          
-                              //   ) : (
-                              //     <Avatar className="pl-0 mt-3 -mb-3 bg-yellow-100" size='small' label={getInitials()} onClick={handleChipClick} shape="circle"/>
-                              //   )
-                  //             <div className='ProfileDisplay '>
-                  //                 <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" className='mar' size='xlarge' shape="circle" />
-                  //                 <div className="flex flex-column align">
-                  //                     <span className="font-bold c">Demo User</span>
-                  //                     <span className="text-sm c">TestLead</span>
-                  //                     <span className="text-sm c">demo.user@xyz.com</span>
-                  //                 </div>
-                  //                 </div>
-                             
-                  // //                } )
-                  //         )
-                  // }  
-                          )}
+        return (
+        <>
+        {userLoginInfo.profilePictureUrl ? (
+        <div className='ProfileDisplay '>
+            <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='large'/>
+                <div className="flex flex-column align">
+                    <span className="font-bold c"><p>{userLoginInfo.username}</p></span>
+                    <span className="text-sm c">{userLoginInfo.userRole}</span>
+                    <span className="text-sm c">{userLoginInfo.userId}</span>
+                </div>
+        </div>) : 
+        (
+            <div>
+                <div className='ProfileDisplay '>
+                    <Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='large' label={getInitials()} onClick={handleChipClick} shape="circle"/>
+                    <div className="flex flex-column align">
+                        <span className="font-bold c">{userLoginInfo.username}</span>
+                        <span className="text-sm c">{userLoginInfo.userRole}</span>
+                        <span className="text-sm c">{userLoginInfo.userId}</span>
+                    </div>
+                </div>
+            </div>)}
+        </> 
+        )}
 },
-  {
-      label: 'Edit Profile',
-      icon: 'pi pi-fw pi-pencil',
-      // command: () => handleItemClick('Item 1'),
-  },
-  {
-      label: 'Change Password',
-      icon: 'pi pi-fw pi-key',
-      // command: () => handleItemClick('Item 2'),
-  },
-  {
-      label: 'Download',
-      icon: 'pi pi-fw pi-download',
-      items: [
-          {
-              label: 'Download Client',
-              icon: 'pi pi-fw pi-download',
-              // command: () => handleItemClick('Log Out'),
-          }
-      ]
-  },
-  {
-      label: 'Notification Setting',
-      icon: 'pi pi-fw pi-bell',
-      // command: () => handleItemClick('Item 4'),
-  },
-  {
-      separator: true
-  },
-  {
-      label: 'Log Out',
-      icon: 'pi pi-fw pi-sign-out',
-      command: () => handleItemClick('Log Out'),
-  }
+{
+    label: 'Edit Profile',
+    icon: 'pi pi-fw pi-pencil',
+},
+{
+    label: 'Change Password',
+    icon: 'pi pi-fw pi-key',
+},
+{
+    label: 'Download',
+    icon: 'pi pi-fw pi-download',
+    items: [
+        {
+            label: 'Download Client',
+            icon: 'pi pi-fw pi-download',
+            command: () => handleItemClick('Log Out'),
+        }
+    ]
+},
+{
+    label: 'Notification Setting',
+    icon: 'pi pi-fw pi-bell',
+},
+{
+    separator: true
+},
+{
+    label: 'Log Out',
+    icon: 'pi pi-fw pi-sign-out',
+    command: () => handleItemClick('Log Out'),
+}
 ];
 
 const handleItemClick = (menuitems) => {
-  switch(menuitems) {
-    case 'Item 1':
-      alert('You clicked Item 1!');
-      break;
-    case 'Item 2':
-      alert('You clicked Item 2!');
-      break;
-    case 'Item 3':
-      alert('You clicked Item 3!');
-      break;
-  case 'Item 4':
-      alert('You clicked Item 2!');
-      break;
-  case 'Log Out':
-      // accept();
-      // Logout();
-    //   <Logout/>;
-      // reject();
-      // alert('You clicked Item 2!');
-      break;
-    default:
-      alert('Unknown item clicked!');
-  }
+    switch(menuitems) {
+        case 'Item 1':
+        alert('You clicked Item 1!');
+        break;
+        case 'Item 2':
+        alert('You clicked Item 2!');
+        break;
+        case 'Item 3':
+        alert('You clicked Item 3!');
+        break;
+        case 'Item 4':
+        alert('You clicked Item 2!');
+        break;
+        case 'Log Out':
+        Logout();
+        break;
+        default:
+        alert('Unknown item clicked!');
+    }
+
 };
-// const menuStyle={
-//     // const labelStyle = { color: 'red' };
-//     '--icon-color': 'red'
-// };
+
 
 const accept = () => {
 toast.current.show({ severity: 'info', detail: 'User successfully logged out from Avo Assure'});
@@ -172,63 +129,39 @@ toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have re
 const Logout=()=>{
 return(
 <>
-  <Toast ref={toast} />
-      <ConfirmPopup target={buttonEl.current} visible={visible} onHide={() => setVisible(false)} 
-          message="Are you sure you want to logout?" icon="pi pi-exclamation-triangle" accept={accept} reject={reject} />
-      {/* <div className="card flex justify-content-center"> */}
-          <Button id="border-0" className='surface-300' ref={buttonEl} onClick={() => setVisible(true)} icon="pi pi-sign-out" />
-      {/* </div> */}
-      </>)
+<Toast ref={toast} />
+    <ConfirmPopup target={buttonEl.current} visible={visible} onHide={() => setVisible(false)} 
+        message="Are you sure you want to logout?" icon="pi pi-exclamation-triangle" accept={accept} reject={reject} />
+        <Button id="border-0" className='surface-300' ref={buttonEl} onClick={() => setVisible(true)} icon="pi pi-sign-out" />
+</>)
 };
 
-  
-  return (
-    <div
-      // className="user-profile"
-      // onMouseEnter={() => setShowMenu(true)}
-      // onMouseLeave={() => setShowMenu(false)}
-    >
-      
-      {/* <div className="card"> */}
-      {/* <div className="p-d-flex p-flex-column"> */}
-      <div>
-        <div>
+return (
+    <div>
+    <div>
+    <div>
 
 {userLoginInfo.profilePictureUrl ? (
         <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='large'/>
+) : (
 
-      ) : (
-        // <div className="card">
-        // {/* <Chip className="pl-0 pr-3"  label={getInitials()} template={content} onClick={handleChipClick}  /> */}
-
-        // </div>
-        //  <div className="card">
-        //  <Chip className="pl-0 pr-3" template={content}  onClick={handleChipClick} />
         <div >
         <Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='large' label={getInitials()} onClick={handleChipClick} shape="circle"/>
-        {/* <div className="flex flex-column ml-6 -mt-5">
-        <span className="font-medium">{userLoginInfo.username}</span>
-        <span className="text-sm">{userLoginInfo.userRole}</span>
-        </div> */}
-          {/* </Avatar> */}
         
-   </div>
+</div>
         
-      )
-      }
-     </div>
-      <div style={{position: 'absolute',marginLeft:'-4rem'}}>
-      {showMenu && (
-        // <menu model={props.items} />      )}
-      //  <TieredMenu model={props.items} />
-      <TieredMenu model={menuitems}  className='custom-tieredmenu link a ' />
+    )
+    }
+    </div>
+<div style={{position: 'absolute',marginLeft:'-4rem'}}>
+    {showMenu && (
+    <TieredMenu model={menuitems}  className='custom-tieredmenu link a ' />
 
-      )}
-      </div>
-       </div>
-       </div>
-  );
-  
+    )}
+    </div>
+    </div>
+    </div>
+);
 
 };
 

@@ -1,0 +1,42 @@
+.cardSize{
+    width: 21rem;
+    height: 35rem; 
+}
+.projectDisplay{
+    .p-panel-content {
+        height: 17rem !important;
+    }
+    position: relative;
+        bottom: 1rem;
+}
+.p{
+    .p-panel .p-panel-header,.p-panel-content{
+        border:none !important;
+    }
+}
+ .c{
+.text-primary{
+    color:rgba(3, 2, 41, 0.6) !important;
+}
+ }
+.card{
+    margin-left: 0rem !important;
+}
+.p-input-icon-left > .p-inputtext{
+    padding-left: 5rem !important;
+}
+ i{
+.p-inputtext{
+    background: #FAFAFB !important;
+border-radius: 10px !important;
+}
+}
+.but{
+    margin: 1rem 0.5rem 1rem 2rem;;
+}
+.but1{
+   margin:  0.25rem -1rem 0rem 0rem;
+}
+.align{
+    margin: -35rem 0rem 0rem 3.5rem;
+}
