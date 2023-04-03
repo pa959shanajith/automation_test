@@ -299,7 +299,7 @@ const MappedPage = props =>{
                                 <div>{counts.mappedScenarios}</div>
                             </div>
                             <div className="viewMap__testCount">
-                                <div>Mapped {props.screenType} Tests</div>
+                                <div>Mapped {props.screenType} items</div>
                                 <div>{counts.mappedTests}</div>
                             </div>
                         </div>
@@ -316,10 +316,11 @@ const MappedPage = props =>{
                         <div className="viewMap__inner">
                             <div className="viewMap__contents" id="viewMapScrollId">
                             <ScrollBar scrollId="viewMapScrollId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                                { rows.map(({scenarioNames, testCaseNames, reqDetails}, index) => <div key={index} className="viewMap__labelRow">
-                                   {console.log(testCaseNames)}
+                                { rows.map(({scenarioNames, testCaseNames, reqDetails,itemSummary}, index) => <div key={index} className="viewMap__labelRow">
+                                  
                                     <MappedLabel 
-                                        list={testCaseNames} 
+                                        list={testCaseNames}
+                                        summary={itemSummary}
                                         type="testcase" 
                                         mapIdx={index} 
                                         screenType = {props.screenType}
