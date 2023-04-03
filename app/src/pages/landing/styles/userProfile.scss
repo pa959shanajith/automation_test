@@ -1,0 +1,35 @@
+.card {
+    background: var(--surface-card);
+    padding: 0.5rem;
+    border-radius: 10px;
+    margin-left: 50rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-picture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  align{
+    margin: -5rem 1rem 1.5rem 4rem;
+  }
+  .tiered-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+  }
