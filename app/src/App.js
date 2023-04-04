@@ -7,6 +7,7 @@ import ServiceBell from "@servicebell/widget";
 import store from './store';
 import {ErrorPage} from './pages/global'
 import Login, {Base} from './pages/login';
+import MenubarDemo from './pages/landing/containers/Topbar';
 // import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
 // import SocketFactory from './SocketFactory';
 import 'primeicons/primeicons.css';
@@ -53,6 +54,7 @@ const RouteApp = () => {
       <Route exact path="/" component={Base} />
       <Route path={["/login","/verify","/reset"]} component={Login} />
       <Route path ="/mindmap" component={staticDataForMindMap}/>
+      <Route path="/landing" component={MenubarDemo} />
       <Route component={ErrorPage} />
     </Switch>
   </Router>
