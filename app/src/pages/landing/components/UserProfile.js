@@ -42,8 +42,8 @@ const menuitems = [
         {userLoginInfo.profilePictureUrl ? (
         <div className='ProfileDisplay '>
             <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='large'/>
-                <div className="flex flex-column align">
-                    <span className="font-bold c"><p>{userLoginInfo.username}</p></span>
+                <div className="flex flex-column">
+                    <span className="font-bold c">{userLoginInfo.username}</span>
                     <span className="text-sm c">{userLoginInfo.userRole}</span>
                     <span className="text-sm c">{userLoginInfo.userId}</span>
                 </div>
@@ -77,7 +77,7 @@ const menuitems = [
         {
             label: 'Download Client',
             icon: 'pi pi-fw pi-download',
-            command: () => handleItemClick('Log Out'),
+            // command: () => handleItemClick('Log Out'),/
         }
     ]
 },
@@ -127,17 +127,19 @@ const reject = () => {
 toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
 };
 const Logout=()=>{
+setVisible(true);
 return(
 <>
 <Toast ref={toast} />
-    <ConfirmPopup target={buttonEl.current} visible={visible} onHide={() => setVisible(false)} 
-        message="Are you sure you want to logout?" icon="pi pi-exclamation-triangle" accept={accept} reject={reject} />
-        <Button id="border-0" className='surface-300' ref={buttonEl} onClick={() => setVisible(true)} icon="pi pi-sign-out" />
 </>)
 };
 
 return (
     <div>
+        <Toast ref={toast} />
+        <ConfirmPopup target={buttonEl.current} visible={visible} onHide={() => setVisible(false)} 
+        message="Are you sure you want to logout?" icon="pi pi-exclamation-triangle" accept={accept} reject={reject} />
+        {/* <Button id="border-0" className='surface-300' ref={buttonEl} onClick={() => setVisible(true)} icon="pi pi-sign-out" /> */}
     <div>
     <div>
 
@@ -153,7 +155,7 @@ return (
     )
     }
     </div>
-<div style={{position: 'absolute',marginLeft:'-4rem'}}>
+<div style={{position: 'absolute',marginLeft:'-10rem', marginTop: '0.9rem'}}>
     {showMenu && (
     <TieredMenu model={menuitems}  className='custom-tieredmenu link a ' />
 

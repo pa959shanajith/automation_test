@@ -1,8 +1,7 @@
-
 import React from 'react'; 
 import  { useState} from 'react';
 import { Card } from 'primereact/card';
-import '../styles/Project.scss'
+import '../styles/DisplayProject.scss'
 import { Panel } from 'primereact/panel';
 import { Ripple } from 'primereact/ripple';
 import { InputText } from "primereact/inputtext";
@@ -10,6 +9,9 @@ import CreateProject from '../components/CreateProject';
 
 
 export default function BasicDemo() {
+    const Dispalyproject = {
+        description: "Description for Project 1"
+    }
     const [visible, setVisible] = useState( false );
     const template = (options) => {
         const toggleIcon = options.collapsed ? 'pi pi-chevron-down' : 'pi pi-chevron-up';
@@ -21,6 +23,7 @@ export default function BasicDemo() {
     
     
 
+        
 
         return (
             <>
@@ -51,6 +54,7 @@ export default function BasicDemo() {
                                 <i className="pi pi-search" />
                                 <InputText id='i' placeholder="Search" />
                             </span>
+                            {/* <span>{Dispalyproject.description}</span> */}
                         </div>
                     </Panel>
 
