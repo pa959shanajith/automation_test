@@ -1,19 +1,22 @@
-
 import React from 'react'; 
 import { Card } from 'primereact/card';
-import '../styles/Project.scss'
+import '../styles/DisplayProject.scss'
 import { Panel } from 'primereact/panel';
 import { Ripple } from 'primereact/ripple';
 import { InputText } from "primereact/inputtext";
 
 
 export default function BasicDemo() {
+    const Dispalyproject = {
+        description: "Description for Project 1"
+    }
     const template = (options) => {
         const toggleIcon = options.collapsed ? 'pi pi-chevron-down' : 'pi pi-chevron-up';
         const className = `${options.className} justify-content-start`;
         const titleClassName = `${options.titleClassName} ml-2 text-primary`;
         const style = { fontSize: '1.1rem' };
 
+        
 
         return (
             <div className={className}>
@@ -40,6 +43,7 @@ export default function BasicDemo() {
                                 <i className="pi pi-search" />
                                 <InputText id='i' placeholder="Search" />
                             </span>
+                            {/* <span>{Dispalyproject.description}</span> */}
                         </div>
                     </Panel>
 
