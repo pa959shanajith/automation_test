@@ -14,6 +14,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
+import staticDataForMindMap from './pages/design/staticDataForMindMap';
 
 const { REACT_APP_DEV } = process.env
 /*Component App
@@ -52,6 +53,7 @@ const RouteApp = () => {
     <Switch>
       <Route exact path="/" component={Base} />
       <Route path={["/login","/verify","/reset"]} component={Login} />
+      <Route path ="/mindmap" component={staticDataForMindMap}/>
       <Route path="/landing" component={MenubarDemo} />
       <Route component={ErrorPage} />
     </Switch>
