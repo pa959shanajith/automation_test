@@ -598,3 +598,34 @@ module.exports.validateUserState = async (req, res) => {
 		res.send("fail");
 	}
 };
+//Ritik sharma add hooks api for cloud license
+module.exports.validateStatus = async (req, res) => {
+	try {
+		const inputs = 	{};
+		const vres = await utils.fetchData(inputs,"/hooks/validateStatus");
+		return res.send(vres)
+	} catch (e) {
+		logger.error("Error occured in license");
+		return false;
+	}
+}
+module.exports.validateUser = async (req, res) => {
+	try {
+		const inputs = 	{ };
+   	    const vres = await utils.fetchData(inputs,"/hooks/validateUser");
+		return res.send(vres)
+	} catch (e) {
+		logger.error("Error occured in license");
+		return false;
+	}
+}
+// module.exports.getLicenseType = async (req, res) => {
+// 	try {
+// 		const inputs = 	{ };
+// 		const gettype = await utils.fetchData(inputs, "/hooks/getLicenseDetails");
+// 		return res.send(gettype)
+// 	} catch (e) {
+// 		logger.error("Error occured in license");
+// 		return false;
+// 	}
+// }

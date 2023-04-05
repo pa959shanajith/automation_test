@@ -61,14 +61,33 @@ export const validateUserState = async() => {
             credentials : 'include'
         });
         if (res.status === 200){
-            return res.data;
+            
+            const validateStatus =  await axios(url+"/hooks/validateStatus", {
+                method: "POST",
+                credentials : 'include'
+            });
+            if (validateStatus.status === 200 && validateStatus.data.status === 'pass'){
+
+                const validateUser =  await axios(url+"/hooks/validateUser", {
+                    method: "POST",
+                    credentials : 'include'
+                });
+    //          if (validateUser.status === 200 && validateUser.data.status==='pass'){
+                return validateUser.data
+    //          }
+            }else{
+                return validateStatus.data
+                //return res.send("fail")
+            }
+        //return res.data;
         }
         else{
-            return {error: 'Failed to validate User'}
+            return {error: "status = " + res.status} 
         }
     }
     catch(err){
-        return {error: 'Failed to validate User'}
+
+        return {error: 'Failed to validate User'+ err}
     }
 }
 
@@ -77,21 +96,21 @@ export const validateUserState = async() => {
 */
 export const checkUser = async(user) => {
     try{
-        const res = await axios(url+"/checkUser", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: {'username': user},
-            credentials : 'include'
-        });
-        if (res.status === 200){
-            return res.data;
+            const res = await axios(url+"/checkUser", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                data: {'username': user},
+                credentials : 'include'
+            });
+            if (res.status === 200){
+                return res.data;
+            }
+            else{
+                return {error: 'Failed to check user'}
+            }
         }
-        else{
-            return {error: 'Failed to check user'}
-        }
-    }
     catch(err){
         return {error: 'Failed to check user'}
     }
@@ -264,3 +283,18 @@ export const unlock = async(username, password) => {
         console.log(err);
     }
 }
+
+// export const getLicenseType = async() => {
+//     try{
+//         const getLicenseInfo = await axios(url+"/hooks/getLicenseDetails" ,{
+//             method: "POST",
+//             credentials : 'include'
+//         });
+//         if(getLicenseInfo=== 200){
+//             return getLicenseInfo.data
+//         }
+
+//     }catch(err){
+//         console.log(err);
+//     }
+// }
