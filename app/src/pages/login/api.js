@@ -283,18 +283,3 @@ export const unlock = async(username, password) => {
         console.log(err);
     }
 }
-
-// export const getLicenseType = async() => {
-//     try{
-//         const getLicenseInfo = await axios(url+"/hooks/getLicenseDetails" ,{
-//             method: "POST",
-//             credentials : 'include'
-//         });
-//         if(getLicenseInfo=== 200){
-//             return getLicenseInfo.data
-//         }
-
-//     }catch(err){
-//         console.log(err);
-//     }
-// }

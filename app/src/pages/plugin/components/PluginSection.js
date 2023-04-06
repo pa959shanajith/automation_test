@@ -6,12 +6,12 @@ import PropTypes from 'prop-types';
 const PluginSection = ({userInfo}) => {
 
     const [pluginList, setPluginList] = useState({
+        "AGS":{ title: "Avo Genius", show: false },
         "iTDM": {title:"iTDM", show: false},
         "MR": { title: "Reports", show: false},
         "MD": {title:"Dashboard", show: false},
         "DE" : { title: "Utilities", show: false},
         "ALMDMT": { title: "Integrations", show: false },
-        "AGS":{ title: "Avo Genius", show: false },
         "STAVO":{ title: "Selenium To Avo", show: false },
         "showList" : false,
     });

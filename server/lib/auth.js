@@ -619,13 +619,3 @@ module.exports.validateUser = async (req, res) => {
 		return false;
 	}
 }
-// module.exports.getLicenseType = async (req, res) => {
-// 	try {
-// 		const inputs = 	{ };
-// 		const gettype = await utils.fetchData(inputs, "/hooks/getLicenseDetails");
-// 		return res.send(gettype)
-// 	} catch (e) {
-// 		logger.error("Error occured in license");
-// 		return false;
-// 	}
-// }

@@ -438,7 +438,6 @@ if (cluster.isMaster) {
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/hooks/validateStatus', authlib.validateStatus);
 		app.post('/hooks/validateUser', authlib.validateUser);
-		// app.post('/hooks/getLicenseDetails', authlib.getLicenseType);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/forgotPasswordEmail', authlib.forgotPasswordEmail);
 		app.post('/unlockAccountEmail', authlib.unlockAccountEmail);

@@ -179,7 +179,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 })
             }
         }    
-        setplugins_list(txt);
+        setplugins_list(plugins_list);
     }
         
     })();
@@ -713,7 +713,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectedModuleType: 'normalExecution',
                     integration: '',
                     executionType: 'asynchronous',
-                    isHeadless: false
+                    isHeadless: false,
+                    licenseType: (getplugins_list.LicenseTypes === "Trial")?true:false
                 })} >Create Profile</button>:null}
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
