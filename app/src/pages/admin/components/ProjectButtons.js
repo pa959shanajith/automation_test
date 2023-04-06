@@ -71,15 +71,22 @@ const ProjectButtons = (props) => {
                         createprojectObj.projectDetails = props.projectDetails;
                         console.log("Controller: " + createprojectObj);
                         const createProjectRes = await createProject_ICE(createprojectObj)
-                        if(createProjectRes.error){displayError(createProjectRes.error);document.getElementById("create_button").disabled = false;return;}
-                        else if (createProjectRes === 'success') {
-                            displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
-                            props.resetForm();
-                            props.setProjectDetails([]);
-                            refreshDomainList();
-                        } else {
-                            displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
-                            props.resetForm();
+                        if(createProjectRes.status !== undefined ){
+                            if(createProjectRes.status === 'fail'){
+                                setMsg(Messages.CUSTOM(createProjectRes.message,VARIANT.ERROR))
+                                props.resetForm();
+                            }
+                        }else {
+                            if(createProjectRes.error){displayError(createProjectRes.error);document.getElementById("create_button").disabled = false;return;}
+                            else if (createProjectRes === 'success') {
+                                displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
+                                props.resetForm();
+                                props.setProjectDetails([]);
+                                refreshDomainList();
+                            } else {
+                                displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
+                                props.resetForm();
+                            }
                         }
                         setLoading(false);
                     }

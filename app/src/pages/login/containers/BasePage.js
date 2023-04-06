@@ -29,6 +29,7 @@ const BasePage = () => {
     const [showChangePass, setShowChangePass] = useState(false);
     const [showSuccessPass, setSuccessPass] = useState(false);
     const [licenceExpired, setLicenseExpired] = useState(false);
+    const [licenseInfo, setLicenseInfo] = useState({});
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -61,10 +62,23 @@ const BasePage = () => {
             else {
                 setLoginAgain(false);
                 try{
-                    let data = await api.validateUserState()
+                    // let res = await api.getLicenseType() 
+                    // dispatch({type:actionTypes.SET_LICENSEINFO, payload: res});
+                    let resdata = await api.validateUserState()
+                    let data
+                    if (resdata.status == undefined) 
+                    data=resdata;
+                    else
+                    data=resdata.status;
                     SetProgressBar("stop");
                     setLoginValidation("Loading Profile...");
-                    if (data === "fail") setLoginValidation("Failed to load user profile.");
+                    if(resdata.message == "License is not active "){
+                        setLicenseExpired(true)
+                    }
+                    
+
+                    
+                    if (data === "fail") setLoginValidation(resdata.message?resdata.message:"Failed to load user profile.");
                     else if (data === "unauthorized") setLoginValidation("User is not authorized to use Avo Assure.");
                     else if (data === "badrequest") setLoginValidation("User does not have sufficient permission to view this page.");
                     else if (data === "nouser") setLoginValidation("User profile not found in Avo Assure.");
