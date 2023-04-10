@@ -169,24 +169,31 @@ export const readTestCase_ICE = async(userInfo,testCaseId,testCaseName,versionnu
 
 export const ExecuteTestSuite_ICE = async(executionData) => { 
     try{
-        const res = await axios(url+'/ExecuteTestSuite_ICE', {
-            method: 'POST',
-            headers: {
-            'Content-type': 'application/json',
-            },
-            data: {param : 'ExecuteTestSuite_ICE',
-            executionData: executionData},
-            credentials: 'include'
+        const steps = await axios(url+'/hooks/validateExecutionSteps',{
+            method: 'POST'
         });
-        if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
-            return {errorapi:MSG.GENERIC.INVALID_SESSION};
+        if(steps.status===200 && steps.data.status === 'pass'){
+            const res = await axios(url+'/ExecuteTestSuite_ICE', {
+                method: 'POST',
+                headers: {
+                'Content-type': 'application/json',
+                },
+                data: {param : 'ExecuteTestSuite_ICE',
+                executionData: executionData},
+                credentials: 'include'
+            });
+            if(res.status === 401 || res.data === "Invalid Session"){
+                RedirectPage(history)
+                return {errorapi:MSG.GENERIC.INVALID_SESSION};
+            }
+            if(res.status===200 && res.data !== "fail"){            
+                return res.data;
+            }
+            console.error(res.data)
+            return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}
+        }else{
+           return {errorsteps:steps.data}
         }
-        if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        console.error(res.data)
-        return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}
     }catch(err){
         console.error(err)
         return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}

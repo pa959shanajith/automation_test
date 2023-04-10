@@ -623,6 +623,8 @@ if (cluster.isMaster) {
 		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
+		app.post('/hooks/validateExecutionSteps', devOps.executionSteps);
+		app.post('/hooks/validateParallelExecutions', devOps.executionParallel);
 
 
 
