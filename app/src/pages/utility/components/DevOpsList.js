@@ -715,7 +715,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false,
-                    licenseType: (getplugins_list.LicenseTypes === "Trial")?true:false
+                    isLicenseTrial: (getplugins_list.LicenseTypes === "Trial")?true:false
                 })} >Create Profile</button>:null}
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>

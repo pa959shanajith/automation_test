@@ -281,6 +281,7 @@ exports.executionSteps = async(req, res)=>{
 		const steps = await utils.fetchData(inp,"/hooks/validateExecutionSteps")
 		res.send(steps)
 	} catch (error) {
+		logger.error("Error occurred in devops/hooks: "+error)
 		return res.send("fail")
 	}
 }
@@ -291,6 +292,7 @@ exports.executionParallel = async(req, res)=>{
 		const parallel = await utils.fetchData(inp,"/hooks/validateParallelExecutions")
 		res.send(parallel)
 	} catch (error) {
+		logger.error("Error occurred in devops/hooks: "+error)
 		return res.send("fail")
 	}
 }
