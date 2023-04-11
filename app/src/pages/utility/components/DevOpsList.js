@@ -179,7 +179,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 })
             }
         }    
-        setplugins_list(txt);
+        setplugins_list(plugins_list);
     }
         
     })();
@@ -530,6 +530,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         try{
             setLoading(false);
             const data = await ExecuteTestSuite_ICE(executionData);
+            if(data.errorsteps){setMsg(MSG.CUSTOM(data.errorsteps.message,data.errorsteps.status.variant));}
             if (data.errorapi){displayError(data.errorapi);return;}
             if (data === "begin"){
                 return false;
@@ -713,7 +714,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectedModuleType: 'normalExecution',
                     integration: '',
                     executionType: 'asynchronous',
-                    isHeadless: false
+                    isHeadless: false,
+                    isLicenseTrial: (getplugins_list.LicenseTypes === "Trial")?true:false
                 })} >Create Profile</button>:null}
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>

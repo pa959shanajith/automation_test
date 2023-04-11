@@ -5,8 +5,7 @@ const initialState = {
     userinfo: {},
     socket:undefined,
     notify:{data:[],unread:0},
-    dateformat:"DD-MM-YYYY",
-    licenseInfo:{}
+    dateformat:"DD-MM-YYYY"
 }
 
 const reducer = (state=initialState, action) => {
@@ -53,10 +52,6 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_DATEFORMAT:
             return{
                 ...state, dateformat: action.payload
-            }
-        case actionTypes.SET_LICENSEINFO:
-            return{
-                ...state, licenseInfo: action.payload
             }
         default:
             return state

@@ -438,7 +438,6 @@ if (cluster.isMaster) {
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/hooks/validateStatus', authlib.validateStatus);
 		app.post('/hooks/validateUser', authlib.validateUser);
-		// app.post('/hooks/getLicenseDetails', authlib.getLicenseType);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/forgotPasswordEmail', authlib.forgotPasswordEmail);
 		app.post('/unlockAccountEmail', authlib.unlockAccountEmail);
@@ -624,6 +623,8 @@ if (cluster.isMaster) {
 		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
+		app.post('/hooks/validateExecutionSteps', devOps.executionSteps);
+		app.post('/hooks/validateParallelExecutions', devOps.executionParallel);
 
 
 

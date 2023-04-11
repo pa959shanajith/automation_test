@@ -148,6 +148,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             }
             var plugins = [];
         const plugins_list= await getAvailablePlugins();
+        dispatch({type: actionTypes.SET_LS, payload:plugins_list})
 
 
         if(plugins_list.error){

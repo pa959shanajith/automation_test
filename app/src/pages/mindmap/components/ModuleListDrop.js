@@ -47,6 +47,7 @@ const ModuleListDrop = (props) =>{
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoad = useSelector(state=>state.mindmap.isEnELoad);
+    const plugin = useSelector(state=>state.plugin.LS)
 
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
     useEffect(()=> {
@@ -372,7 +373,8 @@ const ModuleListDrop = (props) =>{
                                         <h6 id='Endto' style={{margin: '6px -230px 3px -13px', display: !collapseForModules? 'none': ''}}>
                                                 End to End Flows
                                         </h6>
-                                    {userRole!=="Test Engineer"? <IconDropdown items={[ 
+                                    {plugin.ETT!==undefined?<>
+                                        {userRole!=="Test Engineer" ? <IconDropdown items={[ 
                                             {
                                                 key: 'csv',
                                                 text: 'Create New',
@@ -384,6 +386,7 @@ const ModuleListDrop = (props) =>{
                                             ]}
                                             id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
                                         />  :null}
+                                    </>:null} 
                                 </div>
                                 <div className='searchBox pxBlack'>
                                     <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />

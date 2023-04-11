@@ -69,7 +69,6 @@ const ProjectButtons = (props) => {
                         createprojectObj.projectName = props.projectName.trim();
                         createprojectObj.appType = props.projectTypeSelected;
                         createprojectObj.projectDetails = props.projectDetails;
-                        console.log("Controller: " + createprojectObj);
                         const createProjectRes = await createProject_ICE(createprojectObj)
                         if(createProjectRes.status !== undefined ){
                             if(createProjectRes.status === 'fail'){

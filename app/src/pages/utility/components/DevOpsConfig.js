@@ -550,7 +550,7 @@ const DevOpsConfig = props => {
         <div className="api-ut__btnGroup">
         <button data-test="submit-button-test" className='submit-button-test_update' disabled={!text} onClick={() => handleConfigSave(props.currentIntegration.name, false)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test " className='submit-button-test_back'  onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
-            {!props.currentIntegration.disable?<img src="static/imgs/Execute_now.png" onClick={()=>{handleConfigSave(props.currentIntegration.name, true)}} className='execution-button' title="Execute Now" alt='Execute Now'/>:""}
+            {(props.currentIntegration.isLicenseTrial === false && !props.currentIntegration.disable)?<img src="static/imgs/Execute_now.png" onClick={()=>{handleConfigSave(props.currentIntegration.name, true)}} className='execution-button' title="Execute Now" alt='Execute Now'/>:""}
             {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;

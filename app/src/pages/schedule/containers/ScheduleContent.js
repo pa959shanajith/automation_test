@@ -236,6 +236,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         } else {
             data = await testSuitesScheduler_ICE(executionData);
         }
+        if(data.errorparallel){setMsg(MSG.CUSTOM(data.errorparallel, VARIANT.ERROR))}
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "NotApproved") displayError(MSG.SCHEDULE.ERR_DEPENDENT_TASK);
