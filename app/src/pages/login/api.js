@@ -61,33 +61,14 @@ export const validateUserState = async() => {
             credentials : 'include'
         });
         if (res.status === 200){
-            
-            const validateStatus =  await axios(url+"/hooks/validateStatus", {
-                method: "POST",
-                credentials : 'include'
-            });
-            if (validateStatus.status === 200 && validateStatus.data.status === 'pass'){
-
-                const validateUser =  await axios(url+"/hooks/validateUser", {
-                    method: "POST",
-                    credentials : 'include'
-                });
-    //          if (validateUser.status === 200 && validateUser.data.status==='pass'){
-                return validateUser.data
-    //          }
-            }else{
-                return validateStatus.data
-                //return res.send("fail")
-            }
-        //return res.data;
+            return res.data;
         }
         else{
-            return {error: "status = " + res.status} 
+            return {error: 'Failed to validate User'}
         }
     }
     catch(err){
-
-        return {error: 'Failed to validate User'+ err}
+        return {error: 'Failed to validate User'}
     }
 }
 
