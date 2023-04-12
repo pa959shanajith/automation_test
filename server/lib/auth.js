@@ -569,19 +569,43 @@ module.exports.validateUserState = async (req, res) => {
 						emsg = "noProjectsAssigned";
 					} else {
 						emsg = "ok";
-						res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
-						req.session.userid = userid;
-						req.session.ip = ip;
-						req.session.loggedin = (new Date()).toISOString();
-						req.session.username = username;
-						req.session.uniqueId = req.session.id;;
-						req.session.usertype = user.type;
-						logger.rewriters[0] = function(level, msg, meta) {
-							meta.username = username;
-							meta.userid = userid;
-							meta.userip = ip;
-							return meta;
-						};
+						const vstatus = await utils.fetchData({},"/hooks/validateStatus");
+                        if(vstatus.status === 'pass'){
+							const vuser = await utils.fetchData({},"/hooks/validateUser");
+							if(vuser.status === 'pass'){
+								res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
+								req.session.userid = userid;
+								req.session.ip = ip;
+								req.session.loggedin = (new Date()).toISOString();
+								req.session.username = username;
+								req.session.uniqueId = req.session.id;;
+								req.session.usertype = user.type;
+								logger.rewriters[0] = function(level, msg, meta) {
+									meta.username = username;
+									meta.userid = userid;
+									meta.userip = ip;
+									return meta;
+								};
+							}else{
+								return res.send(vuser)
+							}
+						}else{
+							return res.send(vstatus)
+						}
+						
+						// res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
+						// req.session.userid = userid;
+						// req.session.ip = ip;
+						// req.session.loggedin = (new Date()).toISOString();
+						// req.session.username = username;
+						// req.session.uniqueId = req.session.id;;
+						// req.session.usertype = user.type;
+						// logger.rewriters[0] = function(level, msg, meta) {
+						// 	meta.username = username;
+						// 	meta.userid = userid;
+						// 	meta.userip = ip;
+						// 	return meta;
+						// };
 					}
 				}
 			} catch (err) {
@@ -598,24 +622,3 @@ module.exports.validateUserState = async (req, res) => {
 		res.send("fail");
 	}
 };
-//Ritik sharma add hooks api for cloud license
-module.exports.validateStatus = async (req, res) => {
-	try {
-		const inputs = 	{};
-		const vres = await utils.fetchData(inputs,"/hooks/validateStatus");
-		return res.send(vres)
-	} catch (e) {
-		logger.error("Error occured in license");
-		return false;
-	}
-}
-module.exports.validateUser = async (req, res) => {
-	try {
-		const inputs = 	{ };
-   	    const vres = await utils.fetchData(inputs,"/hooks/validateUser");
-		return res.send(vres)
-	} catch (e) {
-		logger.error("Error occured in license");
-		return false;
-	}
-}
