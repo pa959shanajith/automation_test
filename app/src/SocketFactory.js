@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Fragment} from 'react';
 import socketIOClient from "socket.io-client";
 import {useDispatch, useSelector} from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ModalContainer, VARIANT, RedirectPage, Messages as MSG, setMsg } from './pages/global';
 import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
@@ -20,7 +20,7 @@ const SocketFactory = () => {
     const userInfo = useSelector(state=>state.login.userinfo);
     const socket = useSelector(state=>state.login.socket);
     const dispatch = useDispatch()
-    const history = useHistory();
+    const history = useNavigate();
     useEffect(()=>{
       if(socket){
         socket.on('notify',(value)=> {

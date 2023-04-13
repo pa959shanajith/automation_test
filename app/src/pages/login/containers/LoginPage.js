@@ -1,7 +1,7 @@
 import React from 'react';
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const Login = () => {
-    let history = useHistory();
+    let history = useNavigate();
     return (<div className="bg-container">
         <img className="bg-img" alt="bg-img" src="static/imgs/login-bg.png" />
         <button style={{ position: 'absolute', top: '50%', right: '10%' }} onClick={() => history.push("/landing")}>Click Here to Login</button>
