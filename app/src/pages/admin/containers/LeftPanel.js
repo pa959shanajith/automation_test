@@ -37,6 +37,8 @@ const LeftPanel = (props) => {
 						<span><img style={{height:'60px'}} src={"static/imgs/CreateICEPool.png"} alt={"Create ICE Pool"} className={((props.middleScreen==="CreateIcePool") ? " selected-icon" : "")} ></img></span><span>ICE Pool</span></i></li>
 					<li className='userDivider'><i id='AllocateIcePool' alt={"Allocate ICE Pool"} onClick={()=>{props.setMiddleScreen("AllocateIcePool");resetScreen("AllocateIcePool");}} className="selectBrowser">
 						<span><img style={{height:'60px'}} src={"static/imgs/AllocateICEPool.png"} alt={"Allocate ICE Pool"} className={((props.middleScreen==="AllocateIcePool") ? " selected-icon" : "")} ></img></span><span>Allocate ICE Pool</span></i></li>
+					<li><i id='LicenseManagement' title="License Managementt" onClick={()=>{props.setMiddleScreen("LicenseManagement");resetScreen("LicenseManagement");}} className="LicenseManagement">
+						<span><img style={{height:'60px'}} src={"static/imgs/LicenseManagement.png"} alt={"License Management"} className={((props.middleScreen==="LicenseManagement") ? " selected-icon" : "")} ></img></span>License Management</i></li>
 					{/* <li><i id='avoDiscoverConfigTab' title="Manage Avo Discover Configuration" onClick={()=>{props.setMiddleScreen("avoDiscoverConfigTab");resetScreen("avoDiscoverConfigTab")}} className="selectBrowser" >
 						<span><img style={{height:'47px'}} src={"static/imgs/GitIcon.png"} alt={"Create Avo Discover Configuration"}  className={((props.middleScreen==="avoDiscoverConfigTab") ? " selected-icon" : "")} ></img></span>Avo Discover Configuration</i></li> */}
 					<li><i id='gitConfigure' title="Manage Git Configuration" onClick={()=>{props.setMiddleScreen("gitConfigure");resetScreen("gitConfigure")}} className="selectBrowser" >
