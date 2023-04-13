@@ -106,7 +106,7 @@ const getModule = async (d) => {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
 		"moduleid":d.moduleid,
-		"cycleid":d.cycId,
+		"cycleid":d.cycId || null,
 		"name":"getModules"
 	}
 	return utils.fetchData(inputs, "mindmap/getModules", "getModules");
@@ -596,7 +596,7 @@ exports.saveEndtoEndData = function (req, res) {
 	}
 };
 
-exports.excelToMindmap = function (req, res) {
+exports.excelToMindmap = function (req, res){
 	const fnName = "excelToMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
@@ -605,67 +605,197 @@ exports.excelToMindmap = function (req, res) {
 			return res.status(200).send(wb1.SheetNames);
 		}
 		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+
 		var numSheets = myCSV.length / 2;
 		var qObj = [];
 		var err;
 		if (numSheets == 0) {
 			return res.status(200).send("emptySheet");
 		}
-		for (var k = 0; k < numSheets; k++) {
-			var cSheet = myCSV[k * 2 + 1];
+		
+			var cSheet = myCSV[0 * 2 + 1];
 			var cSheetRow = cSheet.split('\n');
-			var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
-			var uniqueIndex = 0;
-			cSheetRow[0].split(',').forEach(function (e, i) {
-				if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-				if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
-				if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-				if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
-			});
-			if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
-				err = true;
-				break;
+			excelrows=[]
+			for (var i = 0; i < cSheetRow.length; i++) {
+				row=cSheetRow[i].split(",")
+				excelrows.push(row)
+
+
 			}
-			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
-			for (var i = 1; i < cSheetRow.length; i++) {
-				var row = cSheetRow[i].split(',');
-				if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]=="")) {
-					return res.status(200).send('valueError');
-				}
-				if (row.length < 3) continue;
-				if (row[modIdx] !== '') {
-					e = { id: uuidV4(), name: row[modIdx], type: 0 };
-					qObj.push(e);
-				}
-				if (row[scoIdx] !== '') {
-					lastSco = uniqueIndex; lastScr = -1; scrDict = {};
-					e = { id: uuidV4(), name: row[scoIdx], type: 1 };
-					qObj.push(e);
-					nodeDict[e.id] = uniqueIndex;
-					uniqueIndex++;
-				}
-				if (row[scrIdx] !== '' && lastSco != -1) {
-					var tName = row[scrIdx];
-					var lScr = qObj[lastScr];
-					if (lScr === undefined || (lScr)) {
-						if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
-						lastScr = uniqueIndex;
-						e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
-						qObj.push(e);
-						nodeDict[e.id] = uniqueIndex;
-						uniqueIndex++;
+			var dataRows=[]
+			var p_count=[]
+			var q_count=[]
+			for (var p = 0; p < excelrows.length; p++) {
+				if (p==0){continue}
+				if (p == excelrows.length - 1){continue}
+				var data={"name":"","testscenarios":[]}
+				var data1={"name":"","screens":[]}
+				var data2={"name":"","testcases":[]} 
+				for (var q = 0; q < excelrows[p].length; q++) {
+					if (p_count.includes (p) && q_count.includes(q)){
+						continue
 					}
+					if ( q == 0 ){
+						if(excelrows[p][q] !==''){
+							data["name"]=excelrows[p][q]
+						}
+						else{
+							ts = q+1
+							
+							if(excelrows[p][ts] !==''){
+							p_count.push(p)
+							q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"].splice(dataRows[dataRows.length -1]["testscenarios"].length -0,0,{"name":excelrows[p][ts],"screens":[]})
+							ts=ts+1
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+							
+							ts=ts+1
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+									
+							}}
+							else{
+								p_count.push(p)
+								q_count.push(ts)
+								ts=ts+1
+								if(excelrows[p][ts] !==''){
+									p_count.push(p)
+									q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])		
+								}}}
+							else{
+								p_count.push(p)
+								q_count.push(ts)
+								ts=ts+1
+								if(excelrows[p][ts] !==''){
+									p_count.push(p)
+									q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+								ts=ts+1
+								if(excelrows[p][ts] !==''){
+									p_count.push(p)
+									q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+										
+								}else{p_count.push(p)
+									q_count.push(ts)}}
+								else{
+									p_count.push(p)
+									q_count.push(ts)
+									ts=ts+1
+									if(excelrows[p][ts] !==''){
+										p_count.push(p)
+										q_count.push(ts)
+									dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])		
+									}}
+								
+							}
+							
+						}
+						
+					}
+					else if ( q == 1 ){
+						if(excelrows[p][q] !==''){
+							data1["name"]=excelrows[p][q]
+						}
+						else{
+							ts = q+1
+							p_count.push(p)
+							q_count.push(ts)
+							
+							
+							
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+							
+							ts=ts+1
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+									
+							}
+						}else{
+								p_count.push(p)
+								q_count.push(ts)
+								ts=ts+1
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+									
+							}
+							else{p_count.push(p)
+								q_count.push(ts)
+								dataRows.push(data)
+							}}
+							
+						}
+						
+					}
+					else if ( q == 2 ){
+						if(excelrows[p][q] !==''){
+							data2["name"]=excelrows[p][q]
+						}
+						else{
+							
+							ts = q+1							
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+										
+								}
+							else{
+								p_count.push(p)
+								q_count.push(ts)
+								data["testscenarios"].push(data1)
+								dataRows.push(data)
+							}
+						}
+						
+					}
+					else if (excelrows[p][q] !=='' && q == 3 ){
+						
+						data2["testcases"].push(excelrows[p][q])
+						data1["screens"].push(data2)
+						data["testscenarios"].push(data1)
+						dataRows.push(data)
+					} 
+					else{
+						data1["screens"].push(data2)
+						data["testscenarios"].push(data1)
+						dataRows.push(data)
+					}
+					
 				}
-				if (row[sctIdx] !== '' && lastScr != -1) {
-					e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
-					qObj.push(e);
-					nodeDict[e.id] = uniqueIndex;
-					uniqueIndex++;
-				}
+			
 			}
-		}
-		if (err) res.status(200).send('fail');
-		else res.status(200).send(qObj);
+		var importProj = req.body.importProj
+		let user =  req.session.username;
+		let path = configpath.importMindmap;
+		user = user.split('.').join("");
+		let importPath=path+"/"+"excel"+"/"+user+".json"
+		if (fs.existsSync(importPath)) {
+			fs.unlinkSync(importPath)
+		  }
+		
+		writedata=fs.writeFile(importPath, JSON.stringify(dataRows), (err) => {
+			if (err) {
+				res.status(500).send("fail")
+			}
+			else{
+				res.send(result)
+			}
+		})
+
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
@@ -696,7 +826,12 @@ exports.exportToExcel = async (req, res) =>{
 	try {
 		logger.info("Fetching Module details");
 		var d = req.body;
-		var excelMap = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
+		var excelMap=[]
+		var excelMM = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
+		if(excelMM.constructor === Array) {
+			excelMap=excelMM			
+		 }else{
+			excelMap.push(excelMM)}
 		logger.info("Writing Module structure to Excel");
 		var excelDirPath = path.join(__dirname, './../../output');
 		var filePath = path.join(excelDirPath, 'samp234.xlsx');
@@ -718,19 +853,22 @@ exports.exportToExcel = async (req, res) =>{
 		var curr = excelMap;
 
 		//Sorting the positions of the child nodes according to their childindex
-		for (i = 0; i < curr.children.length; i++) {
-			for (j = 0; j < curr.children[i].children.length; j++) {
-				//sort the testcases based on childindex
-				curr.children[i].children[j].children.sort(function(a,b){
+		for (k = 0; k < curr.length; k++) {
+			for (i = 0; i < curr[k].children.length; i++) {
+				for (j = 0; j < curr[k].children[i].children.length; j++) {
+					//sort the testcases based on childindex
+					curr[k].children[i].children[j].children.sort(function(a,b){
+						return parseInt(a.childIndex)-parseInt(b.childIndex)});
+				}
+				//sort the screens based on childindex
+				curr[k].children[i].children.sort(function(a,b){
 					return parseInt(a.childIndex)-parseInt(b.childIndex)});
-			}
-			//sort the screens based on childindex
-			curr.children[i].children.sort(function(a,b){
-				return parseInt(a.childIndex)-parseInt(b.childIndex)});
 		}
+	}
 		//sort the scenarios based on childindex
-		curr.children.sort(function(a,b){
-		return parseInt(a.childIndex)-parseInt(b.childIndex)});
+		for (k = 0; k < curr.length; k++) {
+		curr[k].children.sort(function(a,b){
+		return parseInt(a.childIndex)-parseInt(b.childIndex)});}
 
 		//Set some width for first 4 columns
 		ws.column(1).setWidth(40);
@@ -761,24 +899,50 @@ exports.exportToExcel = async (req, res) =>{
 		ws.cell(1, 4)
 				.string('Script')
 				.style(style);
-
+		var min_mm_idx =1
 		var min_scen_idx = 1;
 		var min_scr_idx = 1;
-		ws.cell(2,1).string(curr.name);
 		var tc_count=0;
-		for (i = 0; i < curr.children.length; i++) {
-			for (j = 0; j < curr.children[i].children.length; j++) {
-				for (k = 0; k < curr.children[i].children[j].children.length; k++) {
-					tc_count++;
-					ws.cell(1 + tc_count,4).string(curr.children[i].children[j].children[k].name);
+		for (l = 0; l < curr.length; l++) {
+			if (curr[l].children.length>0){		
+			for (i = 0; i < curr[l].children.length; i++) {
+				if (curr[l].children[i].children.length>0){
+				for (j = 0; j < curr[l].children[i].children.length; j++) {
+					if(curr[l].children[i].children[j].children.length>0){
+					for (k = 0; k < curr[l].children[i].children[j].children.length; k++) {
+						tc_count++;
+						ws.cell(1 + tc_count,4).string(curr[l].children[i].children[j].children[k].name);
+					}
+					
+					ws.cell(1 + min_scr_idx,3).string(curr[l].children[i].children[j].name);
+					min_scr_idx= tc_count+1;}
+					else{
+						ws.cell(1 + min_scr_idx,3).string(curr[l].children[i].children[j].name);
+						tc_count++
+						min_scr_idx++
+					}
 				}
-				
-				ws.cell(1 + min_scr_idx,3).string(curr.children[i].children[j].name);
-				min_scr_idx= tc_count+1;
-			}
-			ws.cell( 1 + min_scen_idx,2).string(curr.children[i].name);
-			min_scen_idx=tc_count+1;
+				ws.cell( 1 + min_scen_idx,2).string(curr[l].children[i].name);
+				min_scen_idx=tc_count+1;}
+				else{
+					ws.cell( 1 + min_scen_idx,2).string(curr[l].children[i].name);
+					tc_count++
+					min_scen_idx++
+					min_scr_idx++
+				}
 		}
+		ws.cell(1+min_mm_idx,1).string(curr[l].name);
+		min_mm_idx= tc_count+1;}
+		else{
+			ws.cell(1+min_mm_idx,1).string(curr[l].name);
+			tc_count++
+			min_mm_idx++
+			min_scen_idx++
+			min_scr_idx++
+		}
+		
+		
+	}
 		//save it
 		wb.write(filePath,function (err) {
 			if (err) return res.send('fail');
@@ -828,10 +992,24 @@ exports.exportMindmap = async (req, res) => {
 	const fnName = "exportMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		const mindmapId = req.body.mindmapId;
+		const mindmapId = req.body.mindmapId["moduleid"];
+		const projectName=req.body.mindmapId["projectName"];
+		const exportProjId=req.body.mindmapId["exportProjId"];
+		const exportProjAppType=req.body.mindmapId["exportProjAppType"];
 		const inputs= {
 			"mindmapId": mindmapId,
-			"query":"exportMindmap"
+			"projectName":projectName,
+			"query":"exportMindmap",
+			"exportedfilepath":path.join(process.cwd(),configpath.exportedmindmap.ExportedMindmapFilePath),
+			"exportquery":path.join(process.cwd(),configpath.exportedmindmap.Exportquery),
+			"exportbatfile":path.join(process.cwd(),configpath.exportedmindmap.ExportMindmapBatch),
+			"mongopath": configpath.mongopath,
+			"mongoexportpath":configpath.mongoexportpath,
+			"username":req.session.username,
+			"exportProjId":exportProjId,
+			"exportProjAppType":exportProjAppType,
+			"mongodumpbat":path.join(process.cwd(),configpath.exportedmindmap.mongodumpbat)
+
 		}
 		const result = await utils.fetchData(inputs, "mindmap/exportMindmap", fnName);
 		if (result == "fail") {
@@ -850,9 +1028,18 @@ exports.importMindmap = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const content = req.body;
+		var userid = req.session.userid;
+		var userroleid = req.session.activeRoleId;
 		const inputs= {
-			"mindmap": content,
-			"query":"importMindmap"
+			"projectid": content["projid"],
+			"apptype": content["apptype"],
+			"query":"importMindmap",
+			"user":req.session.username,
+			"importpath":path.join(process.cwd(),configpath.importMindmap),
+			"importquerypath":path.join(process.cwd(),configpath.importquerypath),
+			"mongoimportpath":configpath.mongoimportpath,
+			"userid":userid,
+			"role":userroleid
 		}
 		const result = await utils.fetchData(inputs, "mindmap/importMindmap", fnName);
 		res.send(result)
@@ -861,6 +1048,73 @@ exports.importMindmap = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+exports.writeFileServer = async (req, res) => {
+	const fnName = "writeFileServer";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		let data = req.body;
+		let user =  req.session.username;
+		let path = configpath.importMindmap;
+		user = user.split('.').join("");
+		if (data.type=="json"){
+			var importPath=path+"/"+"json"+"/"+user+".json"
+		}
+		else{
+			var importPath=path+"/"+user+".json"
+		}
+		if (data.status=="start"){
+			if (fs.existsSync(importPath)) {
+				fs.unlinkSync(importPath)
+				console.log("Deleted");
+			  }
+			fs.appendFile(importPath,"[", (err) => { 
+				if(err) { 
+				res.status(500).send('Fail')}
+				else{
+				res.send(result)
+				console.log("Data has been written to file successfully."); 
+				}})
+		}
+		else if (data.status=="stop"){
+			fs.appendFile(importPath,"]", (err) => { 
+				if(err) { 
+				res.status(500).send('Fail')}
+				else{
+				res.send(result)
+				console.log("Data has been written to file successfully."); 
+				}})
+		}
+		else if (data.status=="first"){
+			fs.appendFile(importPath, JSON.stringify(data), (err) => { 
+				if(err) { 
+				res.status(500).send('Fail')}
+				else{
+				res.send(result)
+				console.log("Data has been written to file successfully."); 
+				}})
+		}
+		else {			
+			fs.appendFile(importPath,",", (err) => {
+			if(err) { 
+			res.status(500).send('Fail')}
+			else{
+			
+				fs.appendFile(importPath, JSON.stringify(data), (err) => {  
+					if(err) { 
+					res.status(500).send('Fail')}
+					else{
+					res.send(result)
+					console.log("Data has been written to file successfully."); 
+					}})
+			}})
+		
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
 exports.gitToMindmap = async (req, res) => {
 	const fnName = "gitToMindmap";
 	logger.info("Inside UI service: " + fnName);
@@ -1014,3 +1268,92 @@ exports.exportToProject = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 }; 
+
+exports.exportToMMSkel = async (req, res) => {
+	const fnName = "exportToMMSkel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const inputs= {
+			"tab":req.body.data.tab,
+		"projectid":req.body.data.projectid,
+		"moduleid":req.body.data.moduleid,
+		"cycleid":null,
+		"name":"getModules"
+		}
+		var data=[]
+		var output = await getModule(inputs);
+		if (output == "fail") {
+			return res.send("fail");
+		} else {	
+		if(output.constructor === Array) {
+			data=output			
+		 }else{
+			data.push(output)} 
+			mindmapStructure=[]
+			for (i = 0; i < data.length; i++) {
+				var module={"name":"","testscenarios":[]}
+				for (j = 0; j < data[i].children.length; j++) {
+					var scenario={"name":"","screens":[]}
+					for (k = 0; k < data[i].children[j].children.length; k++) {
+						var screen={"name":"","testcases":[]}
+						for (l = 0; l < data[i].children[j].children[k].children.length; l++) {
+							screen["testcases"].push(data[i].children[j].children[k].children[l].name)
+
+						}
+						screen["name"]=data[i].children[j].children[k].name
+						scenario["screens"].push(screen)
+					}
+					scenario["name"]=data[i].children[j].name
+					module["testscenarios"].push(scenario)
+				}
+				module["name"]=data[i].name
+				
+				mindmapStructure.push(module)
+
+			}
+			result=mindmapStructure
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.jsonToMindmap = async (req, res) => {
+	const fnName = "jsonToMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var username = req.session.username;
+		var importproj = req.body["mindmapId"]["importproj"]
+		var importtype=req.body["mindmapId"]["type"]
+		if (req.body["mindmapId"]["type"]){
+			 
+			var importpath =path.join(process.cwd(),configpath.importjsonfile) 
+		}
+		else{
+			var importpath =path.join(process.cwd(),configpath.importexceljsonfile)
+		}
+		var userid = req.session.userid;
+		var userroleid = req.session.activeRoleId;
+		const inputs= {
+			"username": username,
+			"importproj":importproj,
+			"importpath":importpath,
+			"importquerypath":path.join(process.cwd(),configpath.importquerypath),
+			"mongoimportpath":configpath.mongoimportpath,
+			"userid":userid,
+			"role":userroleid,
+			"importtype":importtype
+
+		}
+		const result = await utils.fetchData(inputs, "mindmap/jsonToMindmap", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};

@@ -1,0 +1,3 @@
+@echo off
+@echo ...
+call  %1 --db avoassure --username avoassure --password %2 --collection ExportedFile -o %3//%4//%5.json  --jsonArray

@@ -1,5 +1,5 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
-import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap} from '../api';
+import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer , jsonToMindmap} from '../api';
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
+
 
 const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport}) => {
     const [projList,setProjList] = useState({})
@@ -71,7 +72,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     
     const upload = () => {
         let  project = "";
-        if(importType === 'json'){
+        if(importType === 'avo'){
             project = projRef.current.value;
         if(project=='def-val'){
             displayError({CONTENT:"Please select project",VARIANT:VARIANT.WARNING});
@@ -82,8 +83,8 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     }
         setError('')
         setFiledUpload(undefined)
-        setDisableSubmit(false)
         setDuplicateModuleList([])
+        setBlockui({show:true,content:'Uploading ...'})
         uploadFile({setBlockui,setMindmapData,setDuplicateModuleList,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project})
     }
     const changeImportType = (e) => {
@@ -94,7 +95,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         setFiledUpload(undefined)
         setDisableSubmit(true)
         setError('')
-        if(e.target.value==="json"){ setUploadFileField(false); resetImportModule();}
+        if(e.target.value==="avo"){ setUploadFileField(false); resetImportModule();}
     }
     const resetImportModule = async() => {
       if(uploadFileRef.current)uploadFileRef.current.value = ''
@@ -104,6 +105,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                 setError('Please select a Project which has no Modules.')                
                 setUploadFileField(false)
                 setFiledUpload(undefined)
+                setDisableSubmit(true)
                 return
             }
         }
@@ -116,8 +118,8 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         pd:".pd",
         excel:".xls,.xlsx",
         git:".mm",
-        json:".mm",
-		sel:".sel"
+        avo:".avo",
+		json:".json"
     }
     useEffect(()=>{
         if(submit){
@@ -170,8 +172,8 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     setBlockui({show:false})
                 }
                 
-                if(isMultiImport && importType === 'json'){
-                    setBlockui({content:'Importing ...',show:true})
+                if(isMultiImport && importType === 'avo'){
+                    // setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
@@ -191,7 +193,31 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     setImportPop(false);
                     setBlockui({show:false})
                     ResetSession.end();
-                }else{
+                }else if(importType === 'excel'){
+                    // setBlockui({content:'Importing ...',show:true})
+                    ResetSession.start()
+                    var importproj=projRef.current ? projRef.current.value: undefined          
+                    var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheetRef.current? sheetRef.current.value: undefined})
+                    if(res.error){displayError(res.error);return;}                    
+                    else{
+                        
+                        var importexcel = await jsonToMindmap({"importproj":importproj})
+                        if(importexcel.error){displayError(importexcel.error);return;}
+                        setImportPop(false);
+                        setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
+                        setBlockui({show:false})
+                        ResetSession.end();
+                }}else if(importType === 'json'){
+                    // setBlockui({content:'Importing ...',show:true})
+                    ResetSession.start()          
+                    var res = await jsonToMindmap({"type":"importjson","importproj":projRef.current ? projRef.current.value: undefined})
+                    if(res.error){displayError(res.error);return;}
+                    setImportPop(false);
+                    setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
+                    setBlockui({show:false})
+                    ResetSession.end();
+            }
+                else{
                         loadImportData({
                             importType,
                             importData, 
@@ -219,13 +245,13 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
                     <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
                     {/* <option value={'git'}>Git (.mm)</option>  */}
-                    <option value={'json'}>Complete Module(S) (.mm)</option>
-					<option value={'sel'}>Structure only - Selenium To Avo (.sel)</option>
+                    {/* <option value={'avo'}>Complete Module(S) (.avo)</option> */}
+					<option value={'json'}>Structure only - Json (.json)</option>
                 </select>
             </div>
             {isMultiImport && 
                 <Fragment>
-                    {(importType==='json')?
+                    {(importType==='avo')?
                         <div>
                             <label>
                             Project:   
@@ -275,9 +301,9 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
-                        (<>{uploadFileField || (["excel","sel"].includes(importType))?<div>
+                        (<>{uploadFileField || (["excel","json"].includes(importType))?<div>
                             <label>Upload File: </label>
-                            <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="json"} type='file' onChange={upload} ref={uploadFileRef}/>
+                            <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="avo"} type='file' onChange={upload} ref={uploadFileRef}/>
                             </div>:null}</>)
                     }
                     
@@ -285,7 +311,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
             }
             {fileUpload && /* !isMultiImport && */
                 <Fragment>
-                    {(importType==='json')?
+                    {(importType==='avo')?
                     <div>
                         <label>Project: </label>
                         <select className='imp-inp' disabled={false} ref={projRef}>
@@ -317,20 +343,14 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                         </select>
                     </div>:null
                     }
-					{(importType==='sel')?
+					{(importType==='json')?
                     <div>
                         <label>Project: </label>
                         <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
                             <option value={'def-val'} disabled>Select Project</option>
-                            {(()=>{
-                                var appType = 'web';
-                                return Object.entries(projList).map((e)=>{
-                                    if(appType === e[1].apptypeName.toLowerCase()){
-                                        return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
-                                    }
-                                })
-                            })()       
-                            }
+                            {Object.entries(projList).map((e,i)=>
+                            <option value={e[1].id} key={i}>{e[1].name}</option>
+                        )}
                         </select>
                     </div>:null
                     }
@@ -398,32 +418,36 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
     var mindmapData = importData
     // console.log("ImportProj: " + importProj)
     // setBlockui({content:'Importing ...',show:true})
-    if(importType === 'excel'){
-        let validateNode = true;
-        var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheet})
-        if(res.error){displayError(res.error);return;}
-        res.forEach((e, i) =>{
-            if (!validNodeDetails(e.name)) validateNode = false;
-        });
-        if(!validateNode){
-            changeImportType({target: {value: "excel"}});
-            displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
-        }
-        mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
+    // if(importType === 'excel'){
+    //     let validateNode = true;
+    //     var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheet,"importProj":importProj})
+    //     if(res.error){displayError(res.error);return;}
+    //     else{
+    //         var importexcel = await jsonToMindmap({"data":"importexcel","importproj":importProj})
+    //     if(importexcel.error){displayError(importexcel.error);return;}}
+    //     res.forEach((e, i) =>{
+    //         if (!validNodeDetails(e.name)) validateNode = false;
+    //     });
+    //     if(!validateNode){
+    //         changeImportType({target: {value: "excel"}});
+    //         displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
+    //     }
+
+         
         
-    }
+    // }
     if(importType === 'pd'){
         var res =  await pdProcess({'projectid':importProj,'file':importData})
         if(res.error){displayError(res.error);return;}
         var data = getJsonPd(res.data)
         mindmapData = {createnew:true,importData:{createdby:'pd',data:data}}
     }
-	if(importType === 'sel'){
-        var res =  await pdProcess({'projectid':importProj,'file':importData})
-        if(res.error){displayError(res.error);return;}
-        var data = getJsonPd(res.data)
-        mindmapData = {createnew:true,importData:{createdby:'sel',data:data}}
-    }
+	// if(importType === 'json'){
+    //     var res =  await pdProcess({'projectid':importProj,'file':importData})
+    //     if(res.error){displayError(res.error);return;}
+    //     var data = getJsonPd(res.data)
+    //     mindmapData = {createnew:true,importData:{createdby:'file',data:data}}
+    // }
         var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(importProj)
@@ -444,7 +468,7 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
    
 }
 
-const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,setSheetList,setDisableSubmit,setistrue,setError,setFiledUpload,projList,setData,fileImport,setBlockui,selectedProject}) =>{
+const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateModuleList,setSheetList,setDisableSubmit,setistrue,setError,setFiledUpload,projList,setData,fileImport,selectedProject}) =>{
     var file = uploadFileRef.current.files[0]
     
     
@@ -452,8 +476,10 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
     var extension = file.name.substr(file.name.lastIndexOf('.')+1)
     setBlockui({content:'Uploading ...',show:true})
     try{
-        const result =  await read(file)
+        
         if(extension === 'pd'){
+            const result =  await read(file)
+            setDisableSubmit(false)
             var appType = getApptypePD(result)
             var projFlag = false
             Object.keys(projList).map((e)=>{
@@ -465,126 +491,94 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
                 setFiledUpload(result)
             }else{
                 setError("no project of same apptype is assigned to the user")
+                setBlockui({show:false})
             }
         }
-		else if(extension === 'sel'){
-            var appType = 'web';
-            var projFlag = false
-            Object.keys(projList).map((e)=>{
-                if(appType === projList[e].apptypeName.toLowerCase()){
-                    projFlag = true ;
-                }
-            })
-            if(projFlag){
-                setFiledUpload(result)
-            }else{
-                setError("no project of same apptype is assigned to the user")
-            }
-        }
+		else if(extension === 'json'){
+            const result =  await read(file)
+            var duplicateData = JSON.parse(result);
+            if(duplicateData.length>0){
+            let startData={"status":"start","type":"json"}
+            let endData={"status":"stop","type":"json"} 
+            const start= await writeFileServer(startData)
+            if(start.error){setDisableSubmit(true);setBlockui({show:false});return}                    
+            for (let i=0;i<duplicateData.length;i++){
+                if (i==0){
+                    duplicateData[i]["status"]="first"
+                    duplicateData[i]["type"]="json"
+                    const res1= await writeFileServer(duplicateData[i])
+                    if(res1.error){setDisableSubmit(true);setBlockui({show:false});return}}
+                else{
+                duplicateData[i]["type"]="json"
+                const res1= await writeFileServer(duplicateData[i])
+                if(res1.error){setDisableSubmit(true);setBlockui({show:false});return}}}
+            
+            
+            const end= await writeFileServer(endData)
+            if(end.error){setDisableSubmit(true);setBlockui({show:false});return}
+            else{setDisableSubmit(false);
+                setBlockui({show:false})}
+            setBlockui({show:false})
+            setFiledUpload(result)
+        }else{
+            setBlockui({show:false})
+                setError("File is empty")
+    }}
+         
 		else if(extension === 'xls' || extension === 'xlsx'){
+            const result =  await read(file)
+            setDisableSubmit(false)
             var res = await excelToMindmap({'content':result,'flag':"sheetname"})
                     setBlockui({show:false})
-            if(res.error){setError(res.error);return;}
+            if(res.error){setError(res.error);setBlockui({show:false});return;}
             if(res.length>0){
                 setFiledUpload(result)
                 setSheetList(res)
             }else{
+                setBlockui({show:false})
                 setError("File is empty")
                 }
-        }else if(extension === 'json' || extension === 'mm'){
+        }else if(extension === 'avo'){
+            const result =  await read(file)             
             var projFlag = false
             var duplicateData = JSON.parse(result);
             let selectedAppType = projList[selectedProject].apptypeName;  
-            var importedAppType=duplicateData[duplicateData.length -2]["apptype"];
+            var importedAppType=duplicateData[duplicateData.length -1]["apptype"];
             if(selectedAppType!==importedAppType){
                 setError("Selected project is of different App Type");
                 setDisableSubmit(true)
-                return false
+                setBlockui({show:false})
+                return
             }
-            // var existingModulesInSelectedProject = await getModules({"tab":"tabCreate","projectid":selectedProject,"moduleid":null})
-            // var uniqueModuleNames = new Set();
-            // existingModulesInSelectedProject.map((m) => {
-            //     uniqueModuleNames.add(m.name)
-            // })
-            // console.log('existingModulesInSelectedProject: ', JSON.stringify(existingModulesInSelectedProject))
-            // console.log('uniqueModuleNames: ', JSON.stringify(uniqueModuleNames))
-
             
-            // var duplicateModuleNames = new Set();
-            // console.log('duplicateData',duplicateData);
-            duplicateData[duplicateData.length -1]["projectid"]=selectedProject
-            // var data = duplicateData[2]
-            //     // if(uniqueModuleNames.has(d.name)){
-            //     //     duplicateModuleNames.add(d.name);
-            //     //     return false;
-            //     // }else{
-            //     //     return true;
-            //     // }
-            // // })
-            // .map((d)=>{
-            //     // Override projectId with the selected projectId
-            //     d.projectid = selectedProject;
-            //     // uniqueModuleNames.add(d.name);
-            //     return d;
-            // })
-            
-            // setDuplicateModuleList(duplicateModuleNames)
-            // console.log('data',data);
-            // var totallength=duplicateData.length;
-            // var uniqlength=data.length;
-            // var duplicatelength=totallength-uniqlength
+            let data={"apptype":duplicateData[duplicateData.length -1]["apptype"],
+            "projid":selectedProject}
+            setMindmapData(data) 
+            let startData={"status":"start"}
+            let endData={"status":"stop"} 
+            const start= await writeFileServer(startData)                    
+            for (let i=0;i<duplicateData.length;i++){
+                if (i==0){
+                    duplicateData[i]["status"]="first"
+                    const res1= await writeFileServer(duplicateData[i])
+                    if(res1.error){setDisableSubmit(true)}}
+                else{
+                const res1= await writeFileServer(duplicateData[i])
+                if(res1.error){setDisableSubmit(true)}}}
             
             
-            // if(duplicatelength ==0){
-            //     setError("All "+(uniqlength)+" modules are unique and will be imported");
-            // }
-            // else    if(duplicatelength == totallength) {
-            //     setError("All "+(duplicatelength)+" modules are duplicate and none will be imported");
-            //     setBlockui({show:false});
-            //     setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
-            // }
-            // else if(duplicatelength > 0) {
-            //     setError((duplicatelength)+" modules are duplicate. Only"+ (uniqlength)+" will be imported");
+            const end= await writeFileServer(endData)
+            if(end.error){setDisableSubmit(true);setBlockui({show:false});return}
+            else{setDisableSubmit(false);
+                setBlockui({show:false})}
+            setBlockui({show:false})
                 
-            // }
             
-               
-            
-            // if( !data  || data.length == 0){
-            //     setDisableSubmit(true)
-            //     return;
-            // }
-            // else {
-            //     setDisableSubmit(false)
-            setMindmapData(duplicateData)
-                
-            // }
-
-            // var isMultiMindmap = Array.isArray(data);
-            // var hasError = false,hasNoScenarios= false;
-            // if(isMultiMindmap){
-            //     hasError = data.find(element => !('testscenarios' in element))!=undefined;   
-            //     if(!hasError){
-            //         hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
-            //     }             
-            // }
-            // if (!isMultiMindmap && !('testscenarios' in data) || hasError){
-            //     setError("Incorrect JSON imported. Please check the contents!!");
-            //     setDisableSubmit(true) 
-            // // }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
-            // //     setError("The file has no node structure to import, please check!!");
-            // //     setDisableSubmit(true)
-            // }else{
-            //     var importProj = data[0].projectid
-            //     if(!importProj || !projList[importProj]){
-            //         setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
-            //         setBlockui({show:false})
-            //         return;
-            //     }
-            // } 
+             
         }else{
             setError("File is not supported")
             setDisableSubmit(true)
+            setBlockui({show:false})
         }    
         setBlockui({show:false})
     }catch(err){

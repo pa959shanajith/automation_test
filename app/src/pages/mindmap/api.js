@@ -346,6 +346,29 @@ export const importMindmap = async(data) => {
         return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }
+export const writeFileServer = async(data) => {
+    try{
+        const res = await axios(url+'/writeFileServer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
 /*Component gitToMindmap
   api return {"_id":"5f6d956afc748e91d0f8b74e"} on success
 */
@@ -698,5 +721,55 @@ export const exportToProject = async(moduleId) => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }
+}
+export const exportToMMSkel = async(data) => {
+    try{
+        const res = await axios(url+'/exportToMMSkel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }
+}
+export const jsonToMindmap = async(moduleId) => {
+    try{
+        const res = await axios(url+'/jsonToMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+                mindmapId:moduleId
+            },
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }

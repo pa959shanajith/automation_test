@@ -354,6 +354,33 @@ if (cluster.isMaster) {
 			}
 		});
 
+		app.get('/downloadExportfile', async (req, res) => {
+			let projName = req.query.projName	
+			projName = projName.replace(/\s+/g, '');											
+			let clientVer = String(req.query.ver);
+			let exportfile = uiConfig.exportedmindmap.ExportedMindmapFilePath;
+			let username = req.user.username;
+			username = username.split('.').join("");
+			exportfile=exportfile+"/"+username+"/"+projName+".json";			
+			if (req.query.file == "getExportFile") {
+			  return res.download(path.resolve(exportfile),projName+(req.query.fileName?(req.query.fileName):"")+".avo")
+			} else {
+				let status = "na";
+				try {
+					let stats = await fs.promises.stat(path.resolve(exportfile))
+					
+					if(stats.isFile()){
+						status = "available";
+					}else {
+						console.error("Error Occurred while downloading the exported file")
+					}
+				} catch (error) {
+					console.error("Catch: Error Occurred while downloading the exported file")
+				}
+				return res.send({status});
+			}
+		});
+
 		app.get('/downloadAgent', async (req, res) => {
 			try {
 				let agentFile = uiConfig.avoAgentConfig;
@@ -434,6 +461,9 @@ if (cluster.isMaster) {
 		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		app.post('/deleteScenarioETE', auth.protect, mindmap.deleteScenarioETE);
 		app.post('/exportToProject', auth.protect, mindmap.exportToProject);
+		app.post('/writeFileServer', auth.protect, mindmap.writeFileServer);
+		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
+		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);

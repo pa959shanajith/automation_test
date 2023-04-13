@@ -20,6 +20,9 @@ const initialState = {
     toDeleteScenarios: [],
     appType:undefined,
     savedList:false,
+    enableExport:false,
+    exportProjname:"",
+    enableExportMindmapButton:true
 };
 
 const reducer = (state = initialState , action) => {
@@ -136,6 +139,22 @@ const reducer = (state = initialState , action) => {
                     ...state,
                     savedList: action.payload
                 }
+        case actionTypes.ENABLE_EXPORT_BUTTON:
+                    return{
+                        ...state,
+                        enableExport:action.payload
+                    } 
+        case actionTypes.EXPORT_PROJNAME:
+            return{
+                ...state,
+                exportProjname:action.payload
+            }
+        case actionTypes.ENABLE_EXPORT:
+            return{
+                ...state,
+                enableExportMindmapButton:action.payload
+            } 
+
         default: 
             return state
     }
