@@ -1,15 +1,11 @@
 
 import React from 'react';
 import { Menubar } from 'primereact/menubar';
-import LogOut from '../components/LogOut';
-import DisplayProject from '../components/DisplayProject';
-import UserProfile from '../components/UserProfile'
+import LogOut from './LogOut';
+import DisplayProject from './DisplayProject';
+import UserProfile from './UserProfile'
 import '../styles/userProfile.scss'
-
-
-import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
-import "primereact/resources/primereact.min.css";                  //core css
-import "primeicons/primeicons.css";  
+ 
 import ProjectCreation from './ProjectCreation';
 
 const MenubarDemo = (props) => {
@@ -24,11 +20,9 @@ const MenubarDemo = (props) => {
     );
 
     return (
-        <div>
+            <>
                 <Menubar start={start}  end={end} />
-                <DisplayProject />
-                <ProjectCreation/>
-        </div>
+            </>
     );
     }
 
