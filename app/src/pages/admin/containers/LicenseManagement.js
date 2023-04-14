@@ -41,7 +41,7 @@ return true;
         <>
         <div className="card">
             <div className="Right">
-                <div className="D">
+                <div className="Platform">
                 <h4>Avo Assure Platform License</h4>
                 <div id="top" className="Box">
                     <DataTable value={headerData} tableStyle={{ minWidth: '50rem' }}>
@@ -52,7 +52,7 @@ return true;
                     </DataTable>
                 </div>
                 </div>
-                <div id="bottom" className="E">
+                <div id="bottom" className="Features">
                 <h4>Avo Assure Features</h4>
                     <DataTable  value={headerData1} tableStyle={{ minWidth: '50rem' }} scrollable scrollHeight="44vh">
                         <Column field="License_Type" header="Feature "></Column>
