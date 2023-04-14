@@ -632,14 +632,14 @@ const DevOpsConfig = props => {
                             <label>Synchronous </label>
                         </div>
                     </div> */}
-                    <div>
+                    {props.currentIntegration.isLicenseTrial === false?<div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Non-Headless </label>
                             <Toggle checked={integrationConfig.isHeadless} onChange={() => setIntegrationConfig({...integrationConfig, isHeadless: !integrationConfig.isHeadless })} label="" inlineLabel={true} />
                             <label>Headless </label>
                         </div>
-                    </div>
+                    </div>:null}
                     {/* <div className='devOps_seperation'>
                     </div> */}
                     {/* <div>
