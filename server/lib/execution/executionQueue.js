@@ -241,7 +241,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                         return executionRequest;
                     }
                     response['status'] = "pass";
-                    response["message"] = "ICE not selected."
+                    response["message"] = "Client not selected."
                     response['variant'] = "info";
                 }
             }
