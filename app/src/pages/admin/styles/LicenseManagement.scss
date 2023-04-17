@@ -38,6 +38,9 @@
     .p-datatable .p-datatable-tbody > tr > td{
         text-align: center !important;
      }
+     .p-datatable-scrollable .p-datatable-wrapper {
+        overflow-y: auto !important;
+    }
 }
 #top{
     .p-datatable .p-datatable-tbody > tr > td{

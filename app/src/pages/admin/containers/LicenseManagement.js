@@ -48,13 +48,13 @@ return true;
                         <Column field="Subscribed_Licenses" header="Subscribed Licenses"></Column>
                         <Column field="License_Type" header="License Type"></Column>
                         <Column field="License_Status" header="License Status"></Column>
-                        <Column field="Valid_To" header="Valid To"></Column>
+                        <Column field="Valid_To" header="Valid Upto"></Column>
                     </DataTable>
                 </div>
                 </div>
                 <div id="bottom" className="Features">
                 <h4>Avo Assure Features</h4>
-                    <DataTable  value={headerData1} tableStyle={{ minWidth: '50rem' }} scrollable scrollHeight="44vh">
+                    <DataTable  value={headerData1} tableStyle={{ minWidth: '50rem' }} scrollable scrollHeight="48vh">
                         <Column field="License_Type" header="Feature "></Column>
                         <Column field="License_Status" header="Status"></Column>
                     </DataTable>

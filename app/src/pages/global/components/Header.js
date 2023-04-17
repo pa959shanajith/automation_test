@@ -278,8 +278,8 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     }
 
     const WP_ITEM_LIST =  useMemo(()=>[
-        {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
-        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Documentation.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch documentation or choose <br/> "Documentation" from "Need Help" button.</>}
+        {imageName:"wp_video_image.svg",content:<>Make your automation journey smoother by viewing our<br/>  <b><a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">training videos</a></b> OR choose <br/> "Training Videos" from "Need Help" button.</>},
+        {imageName:"wp_docs_image.svg",content:<>Make your automation journey smoother by reading our<br/>  <b><a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">documentation</a></b> OR Choose <br/> “Documentation” from the “Need Help” button.</>}
     ],[trainLinks]);
 
     return(

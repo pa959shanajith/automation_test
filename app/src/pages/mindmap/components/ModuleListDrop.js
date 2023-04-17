@@ -13,6 +13,7 @@ import { Button } from "primereact/button";
 
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
+    const userInfo = useSelector(state=>state.login.userinfo);
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
     const initProj = useSelector(state=>state.mindmap.selectedProj)
@@ -332,6 +333,7 @@ const ModuleListDrop = (props) =>{
                                                 {
                                                 key: 'image',
                                                 text: 'Import Module',
+                                                disabled:userInfo.isTrial?true:false,
                                                 onClick:()=>{setImportPop(true);
                                         setSearchForNormal(true);}}
                                             ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
@@ -374,7 +376,7 @@ const ModuleListDrop = (props) =>{
                                                 End to End Flows
                                         </h6>
                                     {plugin.ETT!==undefined?<>
-                                        {userRole!=="Test Engineer" ? <IconDropdown items={[ 
+                                        {userRole!=="Test Engineer" ? <IconDropdown disabled={userInfo.isTrial} items={[ 
                                             {
                                                 key: 'csv',
                                                 text: 'Create New',
@@ -386,7 +388,7 @@ const ModuleListDrop = (props) =>{
                                             ]}
                                             id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
                                         />  :null}
-                                    </>:null} 
+                                    </>:null}
                                 </div>
                                 <div className='searchBox pxBlack'>
                                     <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />

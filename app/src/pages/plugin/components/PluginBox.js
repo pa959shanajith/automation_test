@@ -76,7 +76,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 		<>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
             <div data-test="plugin-blocks" className={"plugin-block " +(disabled?"disabled-plugin":"")} title={pluginData[pluginName.split(' ').join('').toLowerCase()]["tooltip"]["generic"]} onClick={pluginRedirect}>
-                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}${pluginName==="AGS"?userInfo.isTrial?"_cloud":"":""}.svg`} />
+                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}${pluginName==="AGS"?userInfo.isTrial?"_cloud":"":""}.${pluginName==="AGS"?userInfo.isTrial?"png":"png":"svg"}`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
                 {disabled?
                   <div className='disabled-info'><i class="fa fa-lock fa-fw" style={{color:"#ffcc62",paddingLeft:1,fontSize:9, marginRight:4}} aria-hidden="true"></i>Premium</div>
