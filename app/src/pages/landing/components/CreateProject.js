@@ -11,13 +11,16 @@ import { MultiSelect } from 'primereact/multiselect';
 
 
 
-const  CreateProject=({ setVisible }) =>{
-    // const [visible, setVisible] = useState(true);
+const  CreateProject=({ visible, onHide  }) =>{
     const [value, setValue] = useState('');
     const [selectedCity, setSelectedCity] = useState(null);
-    const toastBR = useRef(null);
+    const toast = useRef(null);
     const [ selectedRole, setSelectedRole]=useState(null);
-    const [ selectedUser, setSelecteduser]= useState([]);
+    const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
+    const [displayUser, setDisplayUser]=useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+    const [showToast, setShowToast] = useState(false); 
+
 
     const apps = [
         { name: 'Web', code: 'NY' },
@@ -28,52 +31,91 @@ const  CreateProject=({ setVisible }) =>{
         { name: 'Mainframe', code: 'PRS' },
        
     ];
-    const Names = [
-        { name: 'Gabrial', key: 'A' },
-        { name: 'Alexa', key: 'M' },
-        { name: 'Siri', key: 'P' },
-        { name: 'Emily', key: 'E' },
-    ];
+    const [items, setItems] = useState([
+        { id: 1, name: 'Gabrial ' ,checked: false },
+        { id: 2, name: 'Alexa ', checked: false   },
+        { id: 3, name: 'Siri ', checked: false   },
+      ]);
+
     const roles=[
         {name:'Team Lead',code:'T'},
         {name:'Test Manager',code:'M'},
         {name:'QA Engineer',code:'Q'},
     ];
 
-    const onHide = () => {
-        setVisible(false);
-        toastBR.current.show({
-          severity: 'success',
-          summary: 'Project Created Succesfully.',
-          detail: 'You have created the project succesfully.',
-          life: 3000,
-        });
+
+      const handleCheckboxChange = (event) => {
+    
+        const { value, checked } = event.target;
+        const assignedUser = [];
+    
+        if (value === "all") {
+            setSelectedCheckboxes(checked ? items.map((item) =>item.id) : []);
+            for(var i=0; i<items.length; i++){
+                assignedUser.push({id:items[i].id,name:items[i].name})
+            }
+            setSelectedCheckboxes(assignedUser)
+        //   setSelectedCheckboxes(checked ? items.map((item) =>item.id) : []);
+          setSelectAll(checked);
+        } else {
+          setSelectedCheckboxes((prevSelectedCheckboxes) => {
+            if (checked) {
+              return [...prevSelectedCheckboxes, 
+                {id:value,name:items.map((item) => (value === item.id)?item.name:"")},
+            ];
+          
+            
+            } 
+            else {
+              return prevSelectedCheckboxes.filter(
+                (checkboxId) => checkboxId !== value
+               
+              );
+            }
+          });
+          setSelectAll(false);
+        }
+       
       };
 
-    const [selectedCategories, setSelectedCategories] = useState([Names[1]]);
-    const onCategoryChange = (e) => {
-        let _selectedCategories = [...selectedCategories];
+      const handleClose = () => {
+        onHide(); // Close the dialog
+      };
 
-        if (e.checked)
-            _selectedCategories.push(e.value);
-        else
-            _selectedCategories = _selectedCategories.filter(category => category.key !== e.value.key);
 
-        setSelectedCategories(_selectedCategories);
-    };
+      const handleButtonClick = () => {
+        setDisplayUser(selectedCheckboxes)
+   };
+
+   const handleCreate = () => {
+    toast.current.show({
+      severity: "success",
+      summary: "Project Created Successfully..",
+      detail: "Project Created Successfully....!",
+      life: 3000 // Set the duration for which the toast message will be displayed in milliseconds
+    });
+    onHide(); // Close the dialog
+  };
     
+
+
+  const handleCloseToast = () => {
+    setShowToast(false); // Set the state to hide the toast message
+  };
 
     const footerContent = (
         <div className='btn-11'>
         <Button label="Cancel" severity="secondary" text className='btn1' />
-        <Button  className="btn2" label='Create' onClick={onHide}></Button>
+        <Button  className="btn2" label='Create' onClick={handleCreate}></Button>
         </div>  
     );
+
+  
 
    
     return (
         <>
-        <Dialog className='Project-Dialog' header="Create Project" visible={true} style={{ width: "74.875rem" }} onHide={onHide} footer={footerContent}>  
+        <Dialog className='Project-Dialog' header="Create Project" visible={visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>  
         <Card className='project-name-1'>
         <div className='pro-name1'>
         < h5>Project Name</h5>
@@ -86,7 +128,7 @@ const  CreateProject=({ setVisible }) =>{
         </div>
         
         </Card>
-        <Card className='card11'>
+        <Card className='card11' style={{height:'17rem'}}>
             <div className="card-input1">
             <h5>Select Users</h5>
             <div className='selectallbtn'>
@@ -99,19 +141,19 @@ const  CreateProject=({ setVisible }) =>{
 
 <div className='user-select-checkbox '>
 <div className='check1'>
-<Checkbox onChange={e => setSelectedCategories(e.selectedCategories)} selectedCategories={selectedCategories}></Checkbox>
+<Checkbox checked={selectAll}  onChange={handleCheckboxChange} value="all" ></Checkbox>
 <h5 className='label1'> Select All</h5>
 </div>
 <div className='dropdown_role'>
     <h5>Project level role(optional)</h5>
 </div>
 <div className="check2">
-{Names.map((category) => {
+{items.map((item) => {
                     return (
-<div key={category.key} className="flex align-items-center">
-                            <Checkbox  className=" checkbox1" inputId={category.key} name="category" value={category} onChange={onCategoryChange} checked={selectedCategories.some((item) => item.key === category.key)} />
-                            <h5 htmlFor={category.key} className="label-2 ml-2 mr-2 mt-2 mb-2">
-                                {category.name}
+<div key={item.key} className="flex align-items-center">
+                            <Checkbox  className=" checkbox1" inputId={item.key} name="item" value={item.id}   checked={selectedCheckboxes.includes(item.id)}  onChange={handleCheckboxChange}/>
+                            <h5 htmlFor={item.key} className="label-2 ml-2 mr-2 mt-2 mb-2">
+                                {item.name}
                                 </h5>
 
                                 <MultiSelect value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={roles} optionLabel="name"  display="chip" 
@@ -128,11 +170,11 @@ const  CreateProject=({ setVisible }) =>{
 
         </Card>
 
-        <Button  className="gtbtn" label='>'>  </Button>
+        <Button  className="gtbtn" label='>' onClick={handleButtonClick}>  </Button>
         <Button className="ltbtn" label='<'>   </Button>
 
 
-        <Card className='card22'>
+        <Card className='card22' style={{height:'17rem'}}>
             <div className='card-input2'>
             <h5>Selected Users</h5>
             <div className='selectallbtn'>
@@ -144,14 +186,29 @@ const  CreateProject=({ setVisible }) =>{
 
 </div>
 <div className='checkbox-2'>
-<Checkbox onChange={e => setSelectedCategories(e.selectedCategories)} selectedCategories={selectedCategories}></Checkbox>
+<Checkbox ></Checkbox>
 <h5 className='label1'> Select All</h5>
 </div>
- </Card>
+  
+<div className='check-bx3'>
+    <ul>  
+{displayUser.map((checkboxId) => (
+    <>
+         <Checkbox key={checkboxId} className="assigned-checkbox">{checkboxId}</Checkbox>
+         <h5 htmlFor={checkboxId.key} className="label-2 ml-2 mr-2 mt-2 mb-2">
+                                {checkboxId.name}
+                                </h5>
+                                </>
+       
+        ))}
+        </ul>
+     
+    </div>
 
-   
+
+ </Card> 
 </Dialog>
-<Toast ref={toastBR} position="bottom-right" />
+<Toast ref={toast} position="bottom-right" />
 
         </>
     )

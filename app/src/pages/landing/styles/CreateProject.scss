@@ -1,28 +1,4 @@
-.list_btns{
-    display: flex;
-    justify-content: center;
-    margin-bottom: 22px;
-    }
-    
-    .CreateProj-card{
-        position: relative;
-        top: -24rem;
-        width: 50rem;
-        height: 9rem;
-        left: 25rem;
-        margin-bottom: 3rem;
-    }
-    .gotoadmin-card{
-        position: relative;
-        top: -26rem;
-        width: 50rem;
-        height: 14rem;
-        left: 25rem;
-    }
-    .projbtn{
-        font-size: 14px;
-    }
-    
+ 
     .list1{
         margin: 1em 1em 1em 1em;
     }
@@ -40,17 +16,22 @@
     }
     .pro-name1{
         position: relative;
-        top:-3.5rem;
+        bottom: 1.7rem;
     }
     .dropdown-1{
         float: right;
         position: relative;
-        top: -4rem;
+        top: -1rem;
         right: 3rem;
     }
-    .proj-input, .app-dropdown{
+    .proj-input{
         position: relative;
-        bottom: 0.7rem;
+        bottom: -0.3rem;
+    }
+
+    .app-dropdown{
+        position: relative;
+        bottom: -0.3rem;
     }
     
     .proj-input::placeholder{
@@ -86,7 +67,7 @@
         width: 30rem;
         float: right;
         position: relative;
-        top:-18.9rem;
+        bottom:17rem;
     }
     .card22{
         .p-card-body{
@@ -98,12 +79,12 @@
     }
     .card-input1{
         position: relative;
-        bottom: 3rem;
+        bottom: 2rem;
     }
     
     .card-input2{
         position: relative;
-        bottom: 3rem;
+        bottom: 2rem;
     }
      .p.button{
         margin: 2px !important;
@@ -128,11 +109,11 @@
      }
      .check1{
         position: relative;
-        bottom: 2rem;
+        bottom: 1rem;
      }
      .check2{
-        position: relative;
-        bottom: 6rem;
+         position: relative;
+         bottom: 4rem;
      }
      .p-dialog-content{
     overflow: hidden !important;
@@ -215,11 +196,11 @@
     }
     .checkbox-2{
         position: relative;
-        bottom: 3.2rem;
+        bottom: 2.2rem;
     }
     .dropdown_role{
         position: relative;
-        top: -6rem;
+        top: -5rem;
         left: 20rem;
         color: #9E9E9E;
         font-size: 14px;

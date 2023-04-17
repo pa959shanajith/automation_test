@@ -6,10 +6,14 @@ import VerticalSteps from './VerticalStpes';
 
 
 
+
 const Project = ( props) => {
     return (
     <>
-    <VerticalSteps/>
+    
+        {/* <VerticalSteps/> */}
+        <ProjectCreation/>
+  
     </>
     );
 }
