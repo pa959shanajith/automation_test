@@ -72,7 +72,7 @@ export const testSuitesScheduler_ICE = async(executionData) => {
         const parallel = await axios(url+"/hooks/validateParallelExecutions",{
             method: 'POST'
         });
-        if(parallel.status===200 && parallel.data.status==='sucess'){
+        if(parallel.status===200 && parallel.data.status==='pass'){
             const res = await axios(url+'/testSuitesScheduler_ICE', {
                 method: 'POST',
                 headers: {
