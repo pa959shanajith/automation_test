@@ -156,7 +156,7 @@ function StaticDataForMindMap() {
     {visible && <img src='static\imgs\MindmapImage.PNG' alt='MindMap'/>}
      <ConfirmDialog visible={visible} position='bottom-right'  onHide={() => setVisible(false)} message="Are you sure you want to proceed?"
                     header="Confirmation" icon="pi pi-info-circle" accept={accept} reject={reject} />
-    {showMindmap && <TreeGraph nodes={nodes} links={links} dNodes={dNodes}/>}
+    {showMindmap && <TreeGraph nodes_arr={nodes} links_arr={links} dNodes_arr={dNodes}/>}
     </>
   );
 }
