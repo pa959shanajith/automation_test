@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './Mindmap.scss';
 import Module from './node-modules.png';
 import Scenario from './node-scenarios.png';
 import Screen from './node-screens.png';
 import Test from './node-testcases.png';
 import TreeGraph from './TreeGraph';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 
 
 const nodes = {
@@ -137,12 +138,27 @@ const dNodes = {
 
 
 
-function staticDataForMindMap() {
+function StaticDataForMindMap() {
+
+  const [visible, setVisible] = useState(true);
+  const [showMindmap, setShowMindmap] = useState(false);
+
+    const accept = () => {
+        setShowMindmap(true)
+    }
+
+    const reject = () => {
+      setShowMindmap(true)
+    }
+
   return (
     <>
-    <TreeGraph nodes={nodes} links={links} dNodes={dNodes}/>
+    {visible && <img src='static\imgs\MindmapImage.PNG' alt='MindMap'/>}
+     <ConfirmDialog visible={visible} position='bottom-right'  onHide={() => setVisible(false)} message="Are you sure you want to proceed?"
+                    header="Confirmation" icon="pi pi-info-circle" accept={accept} reject={reject} />
+    {showMindmap && <TreeGraph nodes={nodes} links={links} dNodes={dNodes}/>}
     </>
   );
 }
 
-export default staticDataForMindMap;
+export default StaticDataForMindMap;

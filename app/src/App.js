@@ -21,7 +21,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
-import staticDataForMindMap from './pages/design/staticDataForMindMap';
+import StaticDataForMindMap from './pages/design/staticDataForMindMap';
 import './App.css';
 
 import HomePage from './pages/landing/containers/HomePage';
@@ -77,6 +77,7 @@ const RouteApp = () => {
         <Route path="/reports" element={<Report/>} />
         <Route path="/settings" element={<Settings/>} />
         <Route path="/more" element={<more/>} />
+        <Route path="/mindmap" element={<StaticDataForMindMap/>}/>
       </Routes>
     </>
   )
