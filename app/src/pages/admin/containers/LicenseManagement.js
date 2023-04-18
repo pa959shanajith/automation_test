@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { ColumnGroup } from 'primereact/columngroup';
+import { Row } from 'primereact/row';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';   // theme
 import 'primereact/resources/primereact.css';                       // core css
 import 'primeicons/primeicons.css';                                 // icons
@@ -14,18 +16,13 @@ function LicenseManagement() {
         (async()=>{
             const LicenseData = await getAvailablePlugins()
             setLicenseData(LicenseData)
-            console.log(LicenseData)
-        setHeaderData1(Object.entries(LicenseData).filter(entry=>{
-            if(entry[1]==="true" || entry[1]==="false") {
-return true;
-            }
-        }      
-        ).map(finalData=>{
-            return {
-                License_Type: finalData[0],
-                License_Status: finalData[1]==="true"?"Enabled":"Disabled"
-            }
-        }))
+            setHeaderData1(LicenseData.FeatureDetails.map(finalData=>{
+                return{
+                    License_Type:finalData.code,
+                    License_Descriptions:finalData.featurename,
+                    License_Status:finalData.value
+                }
+            }))
         })()
     },[])
 
@@ -36,7 +33,7 @@ return true;
             License_Status: licenseData.Status,
             Valid_To: licenseData.ExpiresOn
         }]
-       
+
     return(
         <>
         <div className="card">
@@ -50,12 +47,14 @@ return true;
                         <Column field="License_Status" header="License Status"></Column>
                         <Column field="Valid_To" header="Valid Upto"></Column>
                     </DataTable>
+                    <div>*All licenses are concurrent license</div>
                 </div>
                 </div>
                 <div id="bottom" className="Features">
                 <h4>Avo Assure Features</h4>
-                    <DataTable  value={headerData1} tableStyle={{ minWidth: '50rem' }} scrollable scrollHeight="48vh">
+                    <DataTable  value={headerData1} tableStyle={{ minWidth: '52rem' }} scrollable scrollHeight="45vh">
                         <Column field="License_Type" header="Feature "></Column>
+                        <Column field="License_Descriptions" header="Descriptions "></Column>
                         <Column field="License_Status" header="Status"></Column>
                     </DataTable>
                 </div>

@@ -5,7 +5,8 @@ const initialState = {
     userinfo: {},
     socket:undefined,
     notify:{data:[],unread:0},
-    dateformat:"DD-MM-YYYY"
+    dateformat:"DD-MM-YYYY",
+    highlightAGS:false,
 }
 
 const reducer = (state=initialState, action) => {
@@ -52,6 +53,12 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_DATEFORMAT:
             return{
                 ...state, dateformat: action.payload
+            }
+        case actionTypes.HIGHLIGHT_AGS:
+            return{
+                ...state,
+                highlightAGS:action.payload
+      
             }
         default:
             return state

@@ -392,7 +392,7 @@ const ModuleListDrop = (props) =>{
                                 </div>
                                 <div className='searchBox pxBlack'>
                                     <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                        <input disabled={userInfo.isTrial} className='pFont' placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                                 </div>
                                 <div className='moduleList'>
@@ -400,7 +400,7 @@ const ModuleListDrop = (props) =>{
                                             if(e.type==="endtoend" && ((searchInpTextEnE !== "" && e.name.toUpperCase().indexOf(searchInpTextEnE.toUpperCase())!==-1) || searchInpTextEnE === ""))
                                             return(<>
                                                     
-                                                    <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
+                                                    <div key={i} data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={!userInfo.isTrial?(e)=>selectModules(e):""} title={e.name} >
                                                     <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.75rem', display:'flex',flexDirection:'row-reverse',marginLeft:'-6px'}}> <span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span> <div  ><img style={{marginLeft:'-24px'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" /></div></div>
                                                     
                                                     </div>

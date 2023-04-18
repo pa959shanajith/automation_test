@@ -266,12 +266,14 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     const handleWPEvents = (skip = false) => {
         if (typeof skip === 'number') {
             set_WP_STEPNO(skip);
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         if(WP_STEPNO===1 || skip===true) {
             otherProps.setPopover(false);
             if(userInfo.isTrial)
             otherProps.showVideo(true)
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         set_WP_STEPNO((prevno)=>prevno + 1)
