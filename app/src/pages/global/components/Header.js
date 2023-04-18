@@ -266,20 +266,22 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     const handleWPEvents = (skip = false) => {
         if (typeof skip === 'number') {
             set_WP_STEPNO(skip);
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         if(WP_STEPNO===1 || skip===true) {
             otherProps.setPopover(false);
             if(userInfo.isTrial)
             otherProps.showVideo(true)
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         set_WP_STEPNO((prevno)=>prevno + 1)
     }
 
     const WP_ITEM_LIST =  useMemo(()=>[
-        {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
-        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Documentation.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch documentation or choose <br/> "Documentation" from "Need Help" button.</>}
+        {imageName:"wp_video_image.svg",content:<>Make your automation journey smoother by viewing our<br/>  <b><a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">training videos</a></b> OR choose <br/> "Training Videos" from "Need Help" button.</>},
+        {imageName:"wp_docs_image.svg",content:<>Make your automation journey smoother by reading our<br/>  <b><a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">documentation</a></b> OR Choose <br/> “Documentation” from the “Need Help” button.</>}
     ],[trainLinks]);
 
     return(

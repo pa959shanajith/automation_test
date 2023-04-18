@@ -6,6 +6,7 @@ import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents,ValidationExpressi
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as actionTypesMindmap from '../../mindmap/state/action';
+import * as actionTypesLogin from '../../login/state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
 import PropTypes from 'prop-types';
@@ -425,6 +426,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                             dispatch({type: actionTypesMindmap.SELECT_PROJECT, payload:projectNames.projectId[idx]});
                                             dispatch({type:actionTypesMindmap.SELECT_MODULE,payload:{}})
                                             dispatch({type:actionTypesMindmap.SELECT_MODULELIST,payload:[]})
+                                            dispatch({type:actionTypesLogin.HIGHLIGHT_AGS,payload:false})
                                             window.localStorage['navigateScreen'] = "mindmap";
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
