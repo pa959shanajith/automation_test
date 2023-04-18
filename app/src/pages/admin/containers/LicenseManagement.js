@@ -18,9 +18,8 @@ function LicenseManagement() {
             setLicenseData(LicenseData)
             setHeaderData1(LicenseData.FeatureDetails.map(finalData=>{
                 return{
-                    License_Type:finalData.code,
-                    License_Descriptions:finalData.featurename,
-                    License_Status:finalData.value
+                    License_Type:finalData.featurename,
+                    License_Status:finalData.value==="true"?"Enabled":finalData.value==="false"?"Disabled":finalData.value
                 }
             }))
         })()
@@ -54,7 +53,6 @@ function LicenseManagement() {
                 <h4>Avo Assure Features</h4>
                     <DataTable  value={headerData1} tableStyle={{ minWidth: '52rem' }} scrollable scrollHeight="45vh">
                         <Column field="License_Type" header="Feature "></Column>
-                        <Column field="License_Descriptions" header="Descriptions "></Column>
                         <Column field="License_Status" header="Status"></Column>
                     </DataTable>
                 </div>
