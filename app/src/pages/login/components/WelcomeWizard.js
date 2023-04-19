@@ -555,7 +555,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     {/* <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/> */}
                 </span>}
 
-                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
+                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 5 - 10 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
                 // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
                 }
 
