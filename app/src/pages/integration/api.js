@@ -2,6 +2,7 @@ import axios from 'axios';
 import {RedirectPage, Messages as MSG} from '../global';
 import {history} from './index';
 import {url} from '../../App';
+import async from 'async';
 
 /*Component loginToQTest_ICE
   use: logins to qTets Environment  
@@ -698,6 +699,29 @@ export const getDetails_ZEPHYR = async() => {
         return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
     }
 }
+export const getDetails_Azure=async()=>{
+    try{
+        const res = await axios(url+'/getDetails_Azure', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+
+}
 
 
 /*Component connectJira_ICE
@@ -735,6 +759,37 @@ export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }
+
+// export const connectADO_ICE = async(ADOurl,ADOusername,ADOpwd) => {
+//     try{
+
+//         const res = await axios(url+'/connectADO_ICE', {
+//             method: 'POST',
+//             headers: {
+//             'Content-type': 'application/json',
+//             },
+//            data: {   
+//            "action" : 'jiraLogin',
+//             "url": ADOurl,
+//             "username": ADOusername,
+//             "password": ADOpwd,
+
+//             }
+//         });
+//         if(res.status === 401 || res.data === "Invalid Session"){
+//             RedirectPage(history)
+//             return {error:MSG.GENERIC.INVALID_SESSION};
+//         }
+//         if(res.status===200 && res.data !== "fail"){            
+//             return res.data;
+//         }
+//         console.error(res.data)
+//         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+//     }catch(err){
+//         console.error(err)
+//         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+//     }
+// }
 
 
 export const getJiraTestcases_ICE = async(input_payload) => {

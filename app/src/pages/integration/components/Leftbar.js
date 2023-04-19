@@ -1,18 +1,23 @@
-import React, { Fragment} from 'react';
-import { ActionBar, Thumbnail } from '../../global';
+import React, { Fragment, useState} from 'react';
+import { ActionBar, Header, Thumbnail } from '../../global';
 import  "../styles/Leftbar.scss";
 import { useDispatch ,useSelector } from 'react-redux';
 import * as actionTypes from '../state/action.js';
+import { Dialog } from '@avo/designcomponents';
+// import { Dialog } from 'primereact/dialog';
+import AzureContent from './AzureContent';
+
 
 const Leftbar = (props) => {
     const dispatch = useDispatch();
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
     const screenType = useSelector(state=>state.integration.screenType);
+    const [displayBasic, setDisplayBasic] = useState(false);
 
     const callIconClick = iconType => {
         let clickedScreen = null;
 
-        if(["qTest","ALM","Zephyr","Jira"].includes(iconType)) clickedScreen = iconType;
+        if(["qTest","ALM","Zephyr","Jira","Azure"].includes(iconType)) clickedScreen = iconType;
         else if(iconType === "Import") 
         {   clickedScreen = "Zephyr";
             props.setImportPop(true)
@@ -75,7 +80,21 @@ const Leftbar = (props) => {
                         />
                         <div>Jira</div>
                     </span> 
-                </Fragment> )     
+                </Fragment> )  
+
+            case "Azure":
+                case "AzureUpdate":
+                    return(
+                    <Fragment>
+                        <h4>Integration</h4>
+                       <span onClick={()=>callIconClick("Azure")} title="Azure">
+                            <img alt="AzureIcon"  
+                                id={(screenType === "Azure")? "selectedIcon" : null} 
+                                src='static/imgs/JiraSoftware.png'
+                            />
+                            <div>Azure</div>
+                        </span> 
+                    </Fragment> )    
             default :
             return(
             <Fragment>
@@ -107,6 +126,13 @@ const Leftbar = (props) => {
                             src='static/imgs/JiraSoftware.png'
                         />
                         <div>Jira</div>
+                    </span>
+                    <span onClick={()=>callIconClick("Azure")} title="Azure">
+                        <img alt="AzureIcon" 
+                            id={(screenType === "Azure")? "selectedIcon" : null} 
+                            src='static/imgs/JiraSoftware.png'
+                        />
+                        <div>Azure</div>
                     </span>
             </Fragment>    )
         }

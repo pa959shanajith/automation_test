@@ -489,7 +489,9 @@ if (cluster.isMaster) {
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/getDetails_Azure',auth.protect,admin.getDetails_Azure);
 		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
+		app.post('/manageAzureDetails',auth.protect,admin.manageAzureDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
