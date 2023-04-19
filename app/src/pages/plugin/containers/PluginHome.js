@@ -46,7 +46,7 @@ const PluginHome = () => {
 if(showVideo){
     setTimeout(() => {
         dispatch({type:actionTypesGlobal.OPEN_TRIAL_VIDEO,payload:{showTrialVideo:true}})
-    }, 3000);
+    }, 5000);
 }
      },[showVideo])
     return(

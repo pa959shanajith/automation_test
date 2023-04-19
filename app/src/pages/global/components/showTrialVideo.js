@@ -48,7 +48,7 @@ const ShowTrialVideo=()=> {
   return (
     <> 
      {showOverlay?<GetOverlayPlan/>:
-     <><Dialog style={{width: '80vw',height: '87vh',border:'2px solid #5f338f' }} header={ `Welcome to Avo Assure`} visible={showTrialDemoVideo} draggable={false} className="geniusMindmapDialog" onHide={() =>{handleClose()}}>
+     <><Dialog style={{width: '80vw',height: '87vh',border:'2px solid #5f338f' ,zIndex:'999'}} header={ `Welcome to Avo Assure`} visible={showTrialDemoVideo} draggable={false} className="geniusMindmapDialog" onHide={() =>{handleClose()}}>
  <div className={"welcomeInstall "} style={{justifyContent:"unset !important",}}>
     <video width="90%" height="500px" controls loop autoPlay >
          <source src={videoUrl} type="video/mp4" />

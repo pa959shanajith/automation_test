@@ -112,3 +112,34 @@
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
 }
+.tranparentBlocker_ags {
+    position: fixed;
+    top: 0;
+    width: 200vw;
+    z-index: 5;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.startGeniusFocus{
+    z-index: 10;
+    background: white;
+    border-radius: 5px;
+    position: absolute;
+    top: 19vh;
+    text-align:center;
+    font-weight: 400;
+    width: 7.5rem;
+    height: 3rem;
+
+}
+.tip_genius{
+    background: white;
+    height: 15px;
+    width: 15px;
+    position: relative;
+    top: -5px;
+    transform: rotate(45deg);
+    z-index: -1;
+    left: 42%;
+}
