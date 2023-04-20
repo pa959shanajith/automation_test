@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import uiConfig from "../../../assets/ui_config.json";
 import * as actionTypesGlobal from "../../global/state/action"
 import * as actionTypesLogin from '../../login/state/action';
-
+import '../styles/PluginHome.scss'
 const displayError = (error) =>{
 	setMsg(error)
 }
@@ -81,8 +81,12 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 
     return (
 		<>
+			
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
             <div data-test="plugin-blocks" className={"plugin-block " +(disabled?"disabled-plugin":"")} title={pluginData[pluginName.split(' ').join('').toLowerCase()]["tooltip"]["generic"]} onClick={pluginRedirect}>
+				{highlightAGS && <div className="tranparentBlocker_ags"></div>}
+				{(highlightAGS && pluginName==="AGS") ?<div className="startGeniusFocus"><div className='tip_genius'></div>
+			Start Genius</div> :null}
                 <img data-test="plugin-image" className={highlightAGS === true?pluginName==="AGS"?userInfo.isTrial?"plugin-ic_ags":"plugin-ic":"plugin-ic":"plugin-ic"} alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}${pluginName==="AGS"?userInfo.isTrial?"_cloud":"":""}.${pluginName==="AGS"?userInfo.isTrial?"png":"png":pluginName==="TV"?"png":"svg"}`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
                 {disabled?

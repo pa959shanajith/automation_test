@@ -18,7 +18,9 @@
 .plugin-ic_ags{
     height: 130px;
     width: 130px;
-    border: 7px solid wheat;
+    border: 9px solid white;
+    box-shadow: 0 0 5px 5px white;
+    z-index: 100;
 }
 
 .plugin-block{
