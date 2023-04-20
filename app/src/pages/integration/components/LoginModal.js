@@ -163,7 +163,7 @@ const LoginModal = props => {
 
     useEffect(()=>{
         props.screenType == "Azure" && getAzureDetails();
-    })
+    },[])
 
     return (
 
