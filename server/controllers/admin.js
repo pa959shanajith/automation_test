@@ -2524,7 +2524,7 @@ exports.manageAzureDetails = async (req, res) => {
 	logger.info("Inside UI service: " + actionName);
 	try {
 		const data = req.body;
-		// const userId = req.session.userid;
+		const userId = req.session.userid;
 		const action = data.action;
 		let result;
 		let inputs;
@@ -2536,17 +2536,16 @@ exports.manageAzureDetails = async (req, res) => {
 			result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
 
 		}else{
-			const AzureUrl = data.user.AzureUrl;
+			const AzureUrl = data.user.AzureURL;
 			const AzureUsername = data.user.AzureUsername;
 			const AzurePAT = data.user.AzurePAT;
 			
 			inputs = {
-				
 				"AzureUrl": AzureUrl,
 				"AzureUsername": AzureUsername,
 				"AzurePAT":AzurePAT,
-				
-				"action": action
+				"action": action,
+				"userId": userId,
 			};
 		
 		result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
