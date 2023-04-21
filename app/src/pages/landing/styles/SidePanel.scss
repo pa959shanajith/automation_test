@@ -1,4 +1,12 @@
 .sidebar_tiles{
-    width: 45vh;
+    width: 41vh;
     border-right: solid 2px rgba(223, 220, 220, 0.925);
+}
+
+.p-panel .p-panel-header{
+    border: none !important;
+    padding: 0.25rem !important;
+}
+.text-primary{
+    color:rgba(3, 2, 41, 0.6) !important;
 }
