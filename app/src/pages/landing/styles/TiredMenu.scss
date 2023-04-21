@@ -2,6 +2,8 @@
     background-color: #030229 !important;
     border-radius: 8px !important;
     width: 13.5rem !important;
+    position: absolute;
+    z-index: 1;
     .p-menuitem-icon ,.p-menuitem-text{
       color: #ffffff !important;
     }

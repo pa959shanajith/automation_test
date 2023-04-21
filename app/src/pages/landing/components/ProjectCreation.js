@@ -29,7 +29,7 @@ const  ProjectCreation=() =>{
     return(
     <>
         {/* {visible && <CreateProject setVisible={setVisible} />} */}
-        <div style={{overflow:'scroll'}}>
+        <div style={{overflow:'scroll',height:'71vh'}}>
         <VerticalSteps/>
         
         <div  className=" CreateProj-card">

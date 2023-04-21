@@ -144,11 +144,11 @@ return (
     <div>
 
 {userLoginInfo.profilePictureUrl ? (
-        <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='large'/>
+        <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='large' title="User Profile"/>
 ) : (
 
         <div >
-        <Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='large' label={getInitials()} onClick={handleChipClick} shape="circle"/>
+        <Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='large' label={getInitials()} onClick={handleChipClick} shape="circle" title="User Profile"/>
         
 </div>
         
