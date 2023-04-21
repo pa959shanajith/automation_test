@@ -150,7 +150,7 @@
      }
     .role-dropdown{
         float: right;
-        width: 13rem;
+        width: 11rem;
         height: 2em;
         position: relative;
         left: 15rem;
@@ -164,8 +164,10 @@
     }
     
     .label-2{
-        margin:0.8rem 0rem 1rem 1rem !important;
-        width: 2rem;
+        // margin:0.8rem 0rem 1rem 1rem !important;
+        display: flex;
+        flex-direction: column;
+        width: 5rem;
     }
     .selectallbtn{
         position: relative;
@@ -201,10 +203,76 @@
     .dropdown_role{
         position: relative;
         top: -5rem;
-        left: 20rem;
+        left: 23rem;
         color: #9E9E9E;
         font-size: 14px;
     }
+    .check-bx3{
+        position: relative;
+        bottom: 2rem;
+
+    }
+    .user-role{
+        color: darkgrey;
+        font-size: 12px;
+    }
+    .assigned-checkbox{
+        position: relative;
+        bottom: 2rem;
+    }
+    .asgnd-name{
+        position: relative;
+        bottom: 4rem;
+        left: 1.5rem;
+    }
+    .asgnd-role{
+        position: relative;
+        bottom: 4.1rem;
+        left: 1rem;
+        color: darkgrey;
+        font-size: 12px;
+    }
+    .label-3{
+        display: flex;
+        flex-direction: column;
+        width: 5rem;
+        margin-bottom: -1rem;
+    }
+    .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      
+      .tooltip::before,
+      .tooltip::after {
+        position: absolute;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      
+      .tooltip::before {
+        content: attr(title);
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        font-size: 14px;
+        border-radius: 5px;
+        z-index: 1;
+      }
+      
+      .tooltip::after {
+        content: "";
+        border: 5px solid transparent;
+        border-top-color: #333;
+        z-index: 2;
+      }
+      
+      .tooltip:hover::before,
+      .tooltip:hover::after {
+        visibility: visible;
+        opacity: 1;
+      }
     
     
     

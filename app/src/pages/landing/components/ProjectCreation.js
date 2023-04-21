@@ -19,11 +19,11 @@ const  ProjectCreation=() =>{
       };
 
     const handleOpenDialog = () => {
-        setVisible(true); // Set the state to show the dialog
+        setVisible(true); 
       };
     
       const handleCloseDialog = () => {
-        setVisible(false); // Set the state to hide the dialog
+        setVisible(false); 
       };
 
     return(
@@ -34,8 +34,8 @@ const  ProjectCreation=() =>{
         
         <div  className=" CreateProj-card">
     <Card  style={{height : '7rem'}} id='Createproj-title' title="Do you want to create a new project?" >
-        <div className="card flex justify-content-center">
-            <Button  className='projbtn'label="Create Project" onClick={handleOpenDialog}  />
+        <div >
+            <button className='projbtn' onClick={handleOpenDialog} > Create Project </button> 
          </div>
         <CreateProject visible={visible} onHide={handleCloseDialog} /> 
         </Card>
@@ -47,8 +47,8 @@ const  ProjectCreation=() =>{
             <Link>   <li className="list1">Manage License</li></Link> 
             <Link>   <li className="list1">Manage Elastic Execution Grid </li></Link> 
             </div>
-        <div className="card flex justify-content-center">
-        <Button className='admin-btn' label="Go to Admin" onClick={handleClick} />
+        <div >
+        <button className='admin-btn'  onClick={handleClick} > Go to Admin</button>
         </div>
         </Card>
         </div>

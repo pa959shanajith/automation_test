@@ -11,6 +11,7 @@ import { MultiSelect } from 'primereact/multiselect';
 
 
 
+
 const  CreateProject=({ visible, onHide  }) =>{
     const [value, setValue] = useState('');
     const [selectedCity, setSelectedCity] = useState(null);
@@ -19,23 +20,29 @@ const  CreateProject=({ visible, onHide  }) =>{
     const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
     const [displayUser, setDisplayUser]=useState([]);
     const [selectAll, setSelectAll] = useState(false);
-    const [showToast, setShowToast] = useState(false); 
+    const [showToast, setShowToast] = useState(false);
+    const [query, setQuery] = useState('');
+    const [selectedAssignedCheckboxes, setSelectedAssignedCheckboxes] = useState([]);
+    const [selectedAssignedCheckboxesToMoveBack,setSelectedAssignedCheckboxesToMoveBack]= useState([]);
 
 
     const apps = [
-        { name: 'Web', code: 'NY' },
-        { name: 'Sap', code: 'RM' },
-        { name: 'Oebs', code: 'LDN' },
-        { name: 'DeskTop', code: 'IST' },
-        { name: 'Webservices', code: 'PRS' },
-        { name: 'Mainframe', code: 'PRS' },
+        { name: 'Web', code: 'NY', image:'/static/imgs/web.png'},
+        { name: 'Sap', code: 'RM' , image:'/static/imgs/SAP.png'},
+        { name: 'Oebs', code: 'LDN',image:'/static/imgs/OEBS.png'  },
+        { name: 'DeskTop', code: 'IST',image:'/static/imgs/ic-desktop.png'  },
+        { name: 'Webservices', code: 'PRS', image:'/static/imgs/webservice.png' },
+        { name: 'Mainframe', code: 'PRS', image:'/static/imgs/mainframe.png' },
+        { name: 'Mobile Web', code: 'PRS', image:'/static/imgs/mobileWeb.png' },
+        { name: 'Mobile Apps', code: 'PRS', image:'/static/imgs/mobileApps.png' },
+
        
     ];
-    const [items, setItems] = useState([
-        { id: 1, name: 'Gabrial ' ,checked: false },
-        { id: 2, name: 'Alexa ', checked: false   },
-        { id: 3, name: 'Siri ', checked: false   },
-      ]);
+    const items =[
+        { id: 1, name: 'Gabrial ', primaryRole:'Team Lead', email:'gabrial@gmail.com' },
+        { id: 2, name: 'Alexa ', primaryRole:'QA Engineer' ,  email:'alexa@gmail.com' },
+        { id: 3, name: 'Siri ',primaryRole:'Test Manager',  email:'siri@gmail.com'  },
+      ];
 
     const roles=[
         {name:'Team Lead',code:'T'},
@@ -43,43 +50,50 @@ const  CreateProject=({ visible, onHide  }) =>{
         {name:'QA Engineer',code:'Q'},
     ];
 
-
-      const handleCheckboxChange = (event) => {
-    
+    const handleCheckboxChange = (event) => {
         const { value, checked } = event.target;
         const assignedUser = [];
-    
+      
         if (value === "all") {
-            setSelectedCheckboxes(checked ? items.map((item) =>item.id) : []);
-            for(var i=0; i<items.length; i++){
-                assignedUser.push({id:items[i].id,name:items[i].name})
+          if (checked) {
+            for (var i = 0; i < items.length; i++) {
+              assignedUser.push({ id: items[i].id, name: items[i].name ,primaryRole:items[i].primaryRole});
             }
-            setSelectedCheckboxes(assignedUser)
-        //   setSelectedCheckboxes(checked ? items.map((item) =>item.id) : []);
+            setSelectedCheckboxes(assignedUser);
+          } else {
+            setSelectedCheckboxes([]);
+          }
           setSelectAll(checked);
         } else {
           setSelectedCheckboxes((prevSelectedCheckboxes) => {
             if (checked) {
-              return [...prevSelectedCheckboxes, 
-                {id:value,name:items.map((item) => (value === item.id)?item.name:"")},
-            ];
-          
-            
-            } 
-            else {
+              return [
+                ...prevSelectedCheckboxes,
+                { id: value, name: items.find((item) => item.id === value)?.name || "" }
+              ];
+            } else {
               return prevSelectedCheckboxes.filter(
-                (checkboxId) => checkboxId !== value
-               
+                (checkbox) => checkbox.id !== value
               );
             }
           });
           setSelectAll(false);
         }
-       
       };
 
+      function handleSearch(event) {
+        setQuery(event.target.value);
+      }
+
+      function getFilteredItems() {
+        return items
+          .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+          .sort((a, b) => a.name.localeCompare(b.name));
+      }
+            
+
       const handleClose = () => {
-        onHide(); // Close the dialog
+        onHide(); 
       };
 
 
@@ -87,20 +101,22 @@ const  CreateProject=({ visible, onHide  }) =>{
         setDisplayUser(selectedCheckboxes)
    };
 
+
+
    const handleCreate = () => {
     toast.current.show({
       severity: "success",
       summary: "Project Created Successfully..",
       detail: "Project Created Successfully....!",
-      life: 3000 // Set the duration for which the toast message will be displayed in milliseconds
+      life: 1000 ,
     });
-    onHide(); // Close the dialog
+    onHide(); 
   };
     
 
 
   const handleCloseToast = () => {
-    setShowToast(false); // Set the state to hide the toast message
+    setShowToast(false); 
   };
 
     const footerContent = (
@@ -109,7 +125,14 @@ const  CreateProject=({ visible, onHide  }) =>{
         <Button  className="btn2" label='Create' onClick={handleCreate}></Button>
         </div>  
     );
-
+    const optionTemplate = (option) => {
+      return (
+        <div className="flex align-items-center">
+          <img src ={option.image} alt={option.label} width="20" height="20" style={{ marginRight: '8px'}} ></img>
+          <div>{option.label}{option.name}</div>
+        </div>
+      );
+    };
   
 
    
@@ -123,7 +146,7 @@ const  CreateProject=({ visible, onHide  }) =>{
             <div className='dropdown-1'>
                 <h5>Application Type</h5>
             <Dropdown  value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={apps} optionLabel="name" 
-                placeholder="Select a appType" className="w-full md:w-26rem app-dropdown vertical-align-middle text-400 " />
+                placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-26rem app-dropdown vertical-align-middle text-400 " />
                 </div>
         </div>
         
@@ -134,7 +157,7 @@ const  CreateProject=({ visible, onHide  }) =>{
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
-        <InputText placeholder="Search users by name or email address" className='usersearch md:w-24rem ' />    
+        <InputText placeholder="Search users by name or email address" className='usersearch md:w-24rem ' onChange={handleSearch} value={query}   />    
 </span>
 </div>
 </div>
@@ -148,22 +171,24 @@ const  CreateProject=({ visible, onHide  }) =>{
     <h5>Project level role(optional)</h5>
 </div>
 <div className="check2">
-{items.map((item) => {
-                    return (
-<div key={item.key} className="flex align-items-center">
-                            <Checkbox  className=" checkbox1" inputId={item.key} name="item" value={item.id}   checked={selectedCheckboxes.includes(item.id)}  onChange={handleCheckboxChange}/>
+{[...items,...getFilteredItems()].map(item => (
+                    
+<div key={item.id} className="flex align-items-center">
+                            <Checkbox  className=" checkbox1" inputId={item.key} name="item" value={item.id}  title={item.email} checked={selectedCheckboxes.includes(item.name)}  onChange={handleCheckboxChange}/>
                             <h5 htmlFor={item.key} className="label-2 ml-2 mr-2 mt-2 mb-2">
-                                {item.name}
+                              <span className='user-name'> {item.name}</span>
+                                <span className='user-role'>{item.primaryRole}</span>
+                                <span className='tooltip'></span>
                                 </h5>
 
                                 <MultiSelect value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={roles} optionLabel="name"  display="chip" 
-                 filter placeholder="Select a Role" maxSelectedLabels={3} className="role-dropdown" />
+                 placeholder="Select a Role" maxSelectedLabels={3} className="role-dropdown" />
                             
               
                         </div>
                        
-                       );
-                    })}
+                       
+                    ))}
                      </div>
                      </div>
                 
@@ -171,7 +196,7 @@ const  CreateProject=({ visible, onHide  }) =>{
         </Card>
 
         <Button  className="gtbtn" label='>' onClick={handleButtonClick}>  </Button>
-        <Button className="ltbtn" label='<'>   </Button>
+        <Button className="ltbtn" label='<' >   </Button>
 
 
         <Card className='card22' style={{height:'17rem'}}>
@@ -180,7 +205,7 @@ const  CreateProject=({ visible, onHide  }) =>{
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
-        <InputText placeholder="Search users by name or email address"  className='selecteduser md:w-24rem'/>
+        <InputText placeholder="Search users by name or email address"  className='selecteduser md:w-24rem'  onChange={handleSearch} value={query} />
 </span>
 </div>
 
@@ -194,9 +219,11 @@ const  CreateProject=({ visible, onHide  }) =>{
     <ul>  
 {displayUser.map((checkboxId) => (
     <>
-         <Checkbox key={checkboxId} className="assigned-checkbox">{checkboxId}</Checkbox>
-         <h5 htmlFor={checkboxId.key} className="label-2 ml-2 mr-2 mt-2 mb-2">
-                                {checkboxId.name}
+         <Checkbox key={checkboxId} className="assigned-checkbox" 
+>{checkboxId} </Checkbox>
+         <h5 htmlFor={checkboxId.key} className="label-3 ml-2 mr-2 mt-2 ">
+                               <span className='asgnd-name'> {checkboxId.name} </span>
+                               <span className='asgnd-role'>{checkboxId.primaryRole}</span>
                                 </h5>
                                 </>
        
