@@ -36,10 +36,23 @@
     
 
     .projbtn, .admin-btn{
-        font-size: 14px !important;
-        height: 2.5rem !important;
+        position: relative;
+        left: 19rem;
+        border: none;
+        background-color: #605bff;
+        color: white;
+        border-color: inherit;
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 21px;
+        cursor: pointer;
+        width: 7rem;
+        height: 1.8rem;
     }
     .admin-btn{
         position: relative;
-        top: -2rem;
+        bottom: 1rem;
     }
+   

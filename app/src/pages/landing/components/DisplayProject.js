@@ -72,6 +72,15 @@ const DisplayProject = (props) => {
     setSortVisible(!sortVisible);
   }
 
+  
+  const handleOpenDialog = () => {
+    setVisible(true); 
+  };
+
+  const handleCloseDialog = () => {
+    setVisible(false); 
+  };
+
   const template = (options) => {
     
     const toggleIcon = options.collapsed
@@ -86,7 +95,7 @@ const DisplayProject = (props) => {
         <div className="card flex justify-content-center">
           {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} />}
         </div>
-        {visible && <CreateProject setVisible={setVisible} />}
+        {/* {visible && <CreateProject setVisible={setVisible} />} */}
         <div className={className}>
           <button
             className={options.togglerClassName}
@@ -103,8 +112,9 @@ const DisplayProject = (props) => {
               <button
                 className="pi pi-plus"
                 style={{ border: "none", cursor: "pointer" }}
-                onClick={() => setVisible(true)}
+                onClick={handleOpenDialog}
               ></button>
+              <CreateProject visible={visible} onHide={handleCloseDialog} /> 
             </span>
           </div>
           <div>
