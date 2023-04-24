@@ -25,12 +25,13 @@ const LoginModal = props => {
 
     const onSubmit = (authType) => {
         let error = {};
-        if ((props.screenType === "Zephyr" && authType === "basic") || (props.screenType !== "Zephyr" && props.screenType=="Azure")) {
+        if ((props.screenType === "Zephyr" && authType === "basic") || (props.screenType !== "Zephyr" )) {
             if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error = { url: true, msg: "Please Enter URL." };
             else if (props.usernameRef && props.usernameRef.current && !props.usernameRef.current.value) error = { username: true, msg: "Please Enter User Name." };
             else if (props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error = { password: true, msg: "Please Enter Password." };
             setError(error);
         } else if (props.screenType === "Zephyr" && authType === "token") {
+        
             if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error = { url: true, msg: "Please Enter URL." };
             else if (props.authtokenRef && props.authtokenRef.current && !props.authtokenRef.current.value) error = { authtoken: true, msg: "Please Enter API Token." };
             setError(error);
@@ -245,14 +246,14 @@ const LoginModal = props => {
                                 <>
                                 <input
                                         className={".ilm_input" + (error.url ? " ilm_input_error" : "")}
-                                        ref={props.urlRef}
+                                        ref={props.azureUrlRef}
                                         type='URL'
                                         placeholder={inpPlaceHolder[props.screenType].url}
                                         data-test="intg_url_inp"
                                     />
                                     <input
                                         className={".ilm_input" + (error.username ? " ilm_input_error" : "")}
-                                        ref={props.usernameRef}
+                                        ref={props.azureUsernameRef}
                                         placeholder={inpPlaceHolder[props.screenType].username}
                                         data-test="intg_username_inp"
                                     />
