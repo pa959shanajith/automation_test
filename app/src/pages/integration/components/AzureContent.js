@@ -1,181 +1,445 @@
-import { NormalDropDown } from '@avo/designcomponents';
-import React, { useRef,useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-// import '../styles/Solman.scss';
-import { parseProjList } from '../../mindmap/containers/MindmapUtils';
-import * as pluginApi from "../api";
-import { getDetails_ICE } from "../../plugin/api";
+import React,{Fragment, useState,useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-
-import { useHistory, Redirect } from 'react-router-dom';
-// import { useHistory } from 'react-router-dom';
-import { getProjectList, getModules, getScreens, saveMindmap } from '../../mindmap/api';
-import { ScreenOverlay, setMsg, ReferenceBar, ResetSession, Messages as MSG, RedirectPage } from '../../global';
-import { ListBox } from 'primereact/listbox';
-import LeftPanel from '../../admin/containers/LeftPanel';
-import { Checkbox } from 'primereact/checkbox';
-import LoginModal from './LoginModal';
-import * as actionTypes from '../state/action.js';
-
-import { Dialog } from 'primereact/dialog';
-import {TextField} from '@avo/designcomponents'
-import * as actionTypesGlobal from "../../global/state/action"
-import * as actionTypesMindmap from '../../mindmap/state/action';
-import { SearchBox } from '@avo/designcomponents';
-import Leftbar from '../../utility/components/Leftbar';
-
-const AzureContent = ({props }) => {
-    // const [testScenarioCheck, settestScenarioCheck] = useState(true);
-    // const [testScenario, settestScenario] = useState(true);
-    // const [selectedModule, setSelectedModule] = useState(null);
-    // const [selectedProject, setSelectedProject] = useState(null);
-    // const [displayCreateModule, setDisplayCreateModule] = useState(false);
-    // const [projModules, setProjModules] = useState([]);
-    // const [allProjects, setAllProjects] = useState([]);
-    // const history = useHistory();
-    // // const [selectedScenario, setSelectedScenario] = useState(null);
-    // // const [appType, setAppType] = useState(null);
-    // // const history = useHistory();
-    // const [blockui, setBlockui] = useState({ show: false })
-    // const [loading, setLoading] = useState(false);
-    // const moduleSelect = useSelector(state => state.mindmap.selectedModule);
-    // const [selectedScenario, setSelectedScenario] = useState(null);
-    // const [modScenarios, setModScenarios] = useState([]);
-
-    
-   
-    // const [redirectTo, setRedirectTo] = useState("");
-    // const [selectedScenarios,setSelectedScenarios]=useState([]);
-
-    // const dispatch = useDispatch();
-    // const screenType = useSelector(state=>state.integration.screenType);
-    // const [displayBasic, setDisplayBasic] = useState(false);
-    // const [position, setPosition] = useState('center');
-    // const [projectNames, setProjectNames] = useState(null);
-
-    // const handleLinkChange = () => {
-    //     settestScenarioCheck(true);
+import { useHistory } from 'react-router-dom';
+import * as api from '../api.js';
+import domainDetails from '../containers/Jira.js';
+import MappingPage from '../containers/MappingPage';
+import { Messages as MSG, setMsg, RedirectPage } from '../../global';
+// import CycleNode from './ZephyrTree';
+import * as actionTypes from '../state/action';
+import "../styles/TestList.scss"
+import { SET_DISABLEAPPEND } from '../../scrape/state/action.js';
+import { NormalDropDown } from '@avo/designcomponents';
 
 
-    // };
-    // const handleCancleChange = () => {
-    //     settestScenarioCheck(false);
+const AzureContent = props => {
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const user_id = useSelector(state=> state.login.userinfo.user_id); 
+    const mappedPair = useSelector(state=>state.integration.mappedPair);
+    const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
+    const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
+    const selectedTC = useSelector(state=>state.integration.selectedTestCase);
+    const [releaseId, setReleaseId] = useState('');
+    const [projectDetails , setProjectDetails]=useState({});
+    const [avoProjects , setAvoProjects]= useState(null);
+    const [scenarioArr , setScenarioArr] = useState(false);
+    const [scenario_ID , setScenario_ID] = useState("Select Project") ;
+    const [projectDropdn1 , setProjectDropdn1]= useState("Select Project");
+    const [projectDropdn2 , setProjectDropdn2]= useState("Select Project");
+    const [SearchIconClicked , setSearchIconClicked] =useState(false);
+    const [filteredNames , setFilteredName]= useState(null);
+    const [screenexit , setScreenExit]= useState(false);
+    const [releaseArr, setReleaseArr] = useState([]);
+    const [release, setRelease] = useState(false);
+    const [selectedRel, setSelectedRel] = useState("Select Release");
+    const [testCaseData, setTestCaseData] = useState([]);
+    const [selected,setSelected]=useState(false);
+    const [selectedId, setSelectedId] = useState('');
+    const [selectedSummary, setSelectedSummary] = useState('');
+    const [proj, setProj] = useState('');
+    const [projCode, setProjCode] = useState('');
+    const [projName, setProjName] = useState('');
+    const [disabled, setDisabled] = useState(true);
+    const [projectDropdn3 , setProjectDropdn3]= useState("Select Project1");
+    // const[summary1,setSummary1]=useState('');
+    console.log(releaseId)
+ 
+
+    // const callProjectDetails_ICE=async(e)=>{
+    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+    //     const projectId = e.target.value;
+    //     const releaseData = await api.getDetails_Jira(projectId, user_id,e.target.value);
+    //     if (releaseData.error)
+    //         setMsg(releaseData.error);
+    //     else if (releaseData === "unavailableLocalServer")
+    //         setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+    //     else if (releaseData === "scheduleModeOn")
+    //         setMsg(MSG.INTEGRATION.WARN_UNCHECK_SCHEDULE);
+    //     else if (releaseData === "Invalid Session"){
+    //         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    //         return RedirectPage(history);
+    //     }
+    //     else if (releaseData === "invalidcredentials")
+    //         setMsg(MSG.INTEGRATION.ERR_INVALID_CRED);
+    //     else if (releaseData) {
+    //         setProjectDetails({});
+    //         setReleaseArr(releaseData);
+    //         setProjectDropdn1(projectId);
+    //         setSelectedRel("Select Release");
+    //         clearSelections();
+    //     }
+    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     // }
-    
-   
-    // const ChangeToGenius = () => {
-    //     settestScenario(true);
-    // }
 
-    // const ChangeToMindmap = (e) => {
-    //     window.localStorage['navigateScreen'] = "mindmap";
-    //     setRedirectTo(`/mindmap`);
-    
-    //     settestScenario(false);
-    // }
-    // const onScenarioSelection = (e) => {
-    //     let Selscenarios= [...selectedScenarios];
+    const onProjectSelect = async(event) => {
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+        const releaseId = event.target.value;
+        const projectScenario =await api.getAvoDetails(user_id);
+        if (projectScenario.error)
+            setMsg(projectScenario.error);
+        else if (projectScenario === "unavailableLocalServer")
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+        else if (projectScenario === "scheduleModeOn")
+            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+        else if (projectScenario === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
+        else if (projectScenario) {
+            setProjectDetails(projectScenario.project_dets);
+            setAvoProjects(projectScenario.avoassure_projects);  
+            setSelectedRel(releaseId);  
+            clearSelections();
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
 
-    //     if (e.checked)
-    //         Selscenarios.push(e.value);
-    //     else
-    //     Selscenarios.splice(Selscenarios.indexOf(e.value), 1);
+    const callScenarios =(e)=>{
+        const scenarioID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id");
+        const project_Name= e.target.value
+        setScenarioArr(true);
+        setScenario_ID(scenarioID);
+        setProjectDropdn2(project_Name)
+        setFilteredName(null);
+        setSearchIconClicked(false);
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+    }
 
-    //     setSelectedScenarios(Selscenarios);
-    // }
-    // const dialogFuncMap = {
-    //     'displayBasic': setDisplayBasic,
-    // }
-    // const onHide = (name) => {
-    //     dialogFuncMap[`${name}`](false);
-    // }
-    
-    // useEffect(() => {
-    //     (async () => {
-    //         let res = await getDetails_ICE(["domaindetails"], ["Banking"]);
-    //         if (res === "Invalid Session") return RedirectPage(history);
-    //         if (res.error) { displayError(res.error); return; }
-    //         const arraynew = res.projectIds.map((element, index) => {
-    //             return (
-    //                 {
-    //                     key: element,
-    //                     text: res.projectNames[index],
-    //                     title: res.projectNames[index],
-    //                     index: index
-    //                 }
-    //             )
-    //         });
-    //         setAllProjects(arraynew);
-    //     })()
-    // }, [])
-
-    // useEffect(() => {
-    //     (async () => {
-    //         if (selectedProject && selectedProject.key) {
-    //             setSelectedModule(null);
-    //             setSelectedScenario(null);
-    //             // setAppType(null);
-    //             var modulesdata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": null });
-    //             if (modulesdata === "Invalid Session") return RedirectPage(history);
-    //             if (modulesdata.error) { displayError(modulesdata.error); return; }
-    //             setProjModules(modulesdata);
+    // const callSaveButton =async()=>{ 
+    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
+    //     const response = await api.saveJiraDetails_ICE(mappedPair);
+    //     if (response.error){
+    //         setMsg(response.error);
+    //     } 
+    //     else if(response === "unavailableLocalServer")
+    //         setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+    //     else if(response === "scheduleModeOn")
+    //         setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+    //     else if ( response === "success"){
+    //         setMsg(MSG.INTEGRATION.SUCC_SAVE);
+    //         dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+    //         clearSelections();
+    //     }
+    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    //     setDisabled(true)
+    //     setSelected(false)
+    //     dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+    //     let popupMsg = false;
+    //         if(selectedScIds.length===0){
+    //             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
     //         }
-    //     })()
-    // }, [selectedProject])
-
-    // useEffect(() => {
-    //     (async () => {
-    //       if (selectedModule && selectedModule.key) {
-    //         setSelectedScenario(null);
-    //         var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
-    //         if (moduledata === "Invalid Session") return RedirectPage(history);
-    //         if (moduledata.error) { displayError(moduledata.error); return; }
-    //         setModScenarios(moduledata.children);
-    //       }
-    //     })()
-    //   }, [selectedModule])
-
-    // const displayError = (error) => {
-    //     console.log(error)
-    //     setBlockui({ show: false })
-    //     setLoading(false)
-    //     setMsg(typeof error === "object" ? error : MSG.CUSTOM(error, "error"))
+    //         else if(selectedId===''){
+    //             popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+    //         }
+    // }
+    // const callExit=()=>{
+    //     setScreenExit(true);
+    //     setScenarioArr(null);
+    //     setProjectDropdn1("Select Project");
+    //     setScenario_ID("Select Project");
+    //     setProjectDropdn2("Select Project");
+    //     dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
     // }
     
-    // const callIconClick = iconType => {
-    //     let clickedScreen = null;
-    //     if(["qTest","ALM","Zephyr","Azure"].includes(iconType)) clickedScreen = iconType;
-    //     else if(iconType === "Import") 
-    //     {   clickedScreen = "Zephyr";
-    //         props.setImportPop(true)
+    const clearSelections = () => {
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: []});
+    }
+    
+    const onSearch=(e)=>{
+        var val = e.target.value;
+        var filter = [];
+        if(scenarioArr){
+            (avoProjects[parseInt(scenario_ID)].scenario_details.length ? 
+            avoProjects[parseInt(scenario_ID)].scenario_details : [])
+                .forEach((e,i)=>{
+                    if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) 
+                        filter.push(e);
+                    }
+                )
+            }
+        setFilteredName(filter)
+    }
+
+    
+    // const jiraTest = async(e) => {
+    //     if(e.target.tilte !== "Select Project"){
+    //         let projectName = ""
+    //         let projectID = ''
+    //         for(let projectDetails of props.domainDetails.projects) {
+    //             if( e.target.value == projectDetails.code ) {
+    //                 projectName = projectDetails.name;
+    //                 projectID = projectDetails.id;
+    //                 setProj(projectID)
+    //                 setProjCode(e.target.value)
+    //                 setProjName(projectName)
+    //                 break;
+    //             };
+    //         }
     //     }
-
-    //     window.localStorage['integrationScreenType'] = clickedScreen;
-    //     dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: clickedScreen });
-    //     dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
-    // }
-    // const onClick = (name, position) => {
-    //     dialogFuncMap[`${name}`](true);
-
-    //     if (position) {
-    //         setPosition(position);
-    //     }
     // }
 
-    return (
-        <div className='Header' >
-            <span className='header-title'>
-                <div className='headeing'>
-                    <span>Solman Integration</span>
-                </div>
+    // const jiraTestIssue = async(e) => {
+    //             let jira_info ={
+    //                 project: projName,
+    //                 action:'getJiraTestcases',
+    //                 issuetype: "",
+    //                 itemType:releaseId, 
+    //                 url: props.user['url'],
+    //                 username: props.user['username'],
+    //                 password: props.user['password'],
+    //                 project_data: props.domainDetails,
+                
+    //                 key:projCode,
+    //                 // summary:summary1,
+                    
+                
+    //             }
                
-            </span>
-            
+    //             const testData = await api.getJiraTestcases_ICE(jira_info)
+    //             setTestCaseData(testData.testcases)
+    // }
+    // useEffect(()=>{
+    //     jiraTestIssue();
+    // },[releaseId, release])
 
+    const selectScenarioMultiple = (e,id) => {
+        let newScenarioIds = [...selectedScIds];
+        if(!e.ctrlKey) {
+			newScenarioIds = [id];
+		} else if (e.ctrlKey) { 
+            const index = newScenarioIds.indexOf(id);
+            if (index !== -1) {
+                newScenarioIds.splice(index, 1);
+            }
+            // else newScenarioIds.push(id);
+        }
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: newScenarioIds});	
+    }
 
+    const handleClick=(value, id,summary)=>{
+        let newSelectedTCDetails = { ...selectedZTCDetails };
+        let newSelectedTC = [...value,summary];
+       setSelected(value)
+       setSelectedId(id)
+       setSelectedSummary(summary)
+       setDisabled(true)
+       dispatch({type: actionTypes.SEL_TC_DETAILS, payload: newSelectedTCDetails});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: newSelectedTC});
+    }
+    const handleSync = () => {
+       let popupMsg = false;
+            if(selectedScIds.length===0){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+            }
+            else if(selectedId===''){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+            }
+            else if(selectedId===selectedId && selectedScIds.length>1) {
+                popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+            }
     
-     </div>
-            );
+            if (popupMsg) setMsg(popupMsg);
+            else{
+                    const mappedPair=[
+                            {
+                                projectId: proj, 
+                                projectCode: projCode,
+                                projectName: projName,        
+                                testId: selectedId,
+                                testCode: selected, 
+                                scenarioId: selectedScIds,
+                                itemType:releaseId,
+                                itemSummary:selectedSummary
+                               
+
+                            }
+                        ];
+                        dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
+                        console.log(mappedPair);
+                        dispatch({type: actionTypes.SYNCED_TC, payload: selected});
+            }
+        setDisabled(false);
+    }
+
+   
+
+    const handleUnSync = () => {
+        dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: []});
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        clearSelections();
+        setDisabled(true)
+        setSelected(false)
+    }
+    const onSelect = async(event) => {
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+        const releaseId = event.target.value;
+        const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId, user_id);
+        if (testAndScenarioData.error)
+            setMsg(testAndScenarioData.error);
+        else if (testAndScenarioData === "unavailableLocalServer")
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+        else if (testAndScenarioData === "scheduleModeOn")
+            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+        else if (testAndScenarioData === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
+        else if (testAndScenarioData) {
+            setProjectDetails(testAndScenarioData.project_dets);
+            setAvoProjects(testAndScenarioData.avoassure_projects);  
+            setSelectedRel(releaseId);  
+            clearSelections();
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
+    
+    // const [firstOption, setFirstOption] = useState('');
+  const [secondOption, setSecondOption] = useState('');
+  const [secondDropdownEnabled, setSecondDropdownEnabled] = useState(false);
+
+  const handleFirstOptionChange = (event) => {
+    setProjectDropdn1(event.target.value);
+    setSecondDropdownEnabled(true);
+    
+  };
+  const handleSecondOptionChange = (event) => {
+    setSecondOption(event.target.value);
+  };
+
+    return(
+         !screenexit?
+        <Fragment>
+            <MappingPage 
+                pageTitle="Azure Integration"
+                // onSave={()=>callSaveButton()}
+                // onViewMap={()=>props.callViewMappedFiles()}
+                // onUpdateMap={()=>props.callUpdateMappedFiles()}
+                // onExit={()=>callExit()}
+                testCaseData={testCaseData}
+                leftBoxTitle="Azure tests"
+                rightBoxTitle="Avo Assure Scenarios"
+                selectTestDomain={
+                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{setRelease(true) ;onProjectSelect(e);handleFirstOptionChange(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} >
+                        <option value="Select Project" disabled >Select Project</option>
+                        {  props.domainDetails ? 
+                            
+                            props.domainDetails.projects.map(e => (<option  key={e.id} value={e.code} title={e.name}>{e.name} </option>)) : null
+                            
+                        }
+                       
+                    </select>
+                    
+                     }
+
+
+                     selectWorkitem={
+                        <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
+                            <option value="Select WorkItems"  >Select WorkItems</option>
+                            {  props.domainDetails ? 
+                                
+                                props.domainDetails.issue_types.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setReleaseId(e.target.value) }} >{e.name}  </option>)) : null
+                                
+                            }
+                           
+                        </select>
+                         }
+                       
+                         
+                     
+                    //  selectWorkitem={
+                    //     <select data-test="intg_jira_workitem_drpdwn" value={selectedRel} onChange={onSelect} className="qcSelectDomain" style={{marginRight : "5px"}} disabled>
+                    //         <option value="Select Release" disabled>Select Workitem</option>
+                    //         {   releaseArr.length &&
+                    //             releaseArr.map(e => (
+                    //                 <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
+                    //             ))
+                    //         }
+                    //         {/* {
+                    //              <option value="Select Release"  >Select UserStory</option>
+                                 
+                    //         }
+                    //         {
+                    //              <option value="Select Release"  >Select TestCase</option>
+                    //         } */}
+                    //     </select>
+                        
+                    // }
+            
+                selectScenarioProject={
+                    <select data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
+                        <option value="Select Project"  >Select Project</option>
+                        {
+                            avoProjects? 
+                            avoProjects.map((e,i)=>(
+                                <option id={i} value={i} key={i+'_proj'} title={e.project_name}>{e.project_name}</option>))
+                                : null 
+                        }
+                    </select>
+                }
+                testList={
+                    <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>{handleSecondOptionChange(e)}} className="qtestAvoAssureSelectProject">
+                    {
+                        testCaseData ?
+                        testCaseData.map((e,i)=>(
+                            <div className={"test_tree_leaves"+ ( selected===e.code ? " test__selectedTC" : "")}>
+                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id,e.summary)}>
+                                <span className="leafId">{e.code}</span>    
+                                <span className="test__tcName">{e.summary} </span>
+                            </label>
+                            {selected===e.code 
+                                    && <><div className="test__syncBtns"> 
+                                    { selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled?"static/imgs/ic-qcSyncronise.png":null} />}
+                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                                    </div></> 
+                            }
+                        </div>
+                            ))
+                            : null
+                            
+                    }
+                </div>
+                }
+                searchScenario={scenarioArr ?
+                    <>
+                        {SearchIconClicked ?
+                            <input onChange={(e)=>onSearch(e)} type="text" placeholder="Scenario Name"/> : null}
+                        <span className="mapping__searchIcon" style={{display:"inline" , float:"right"}}> 
+                            <img alt="searchIcon" 
+                                onClick={()=>{setSearchIconClicked(!SearchIconClicked);setFilteredName(null)}} 
+                                style={{cursor: "pointer" , display:"inline",float:"right"}} 
+                                src="static/imgs/ic-searchIcon-black.png"
+                            />
+                        </span>
+                    </> : null    
+                }
+
+                scenarioList={scenarioArr &&
+                    (filteredNames ? filteredNames : 
+                        avoProjects[parseInt(scenario_ID)].scenario_details.length ? 
+                        avoProjects[parseInt(scenario_ID)].scenario_details : [])
+                        .map((e, i)=>(
+                            <div 
+                                key={i}
+                                className={"scenario__listItem" + (selectedScIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")}
+                                title={e.name}
+                                onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
+                            >
+                                {e.name}
+                            </div>))
+                }
+               
+            />
+            
+            
+    </Fragment>
+    :null)
 }
 
+    
 export default AzureContent;

@@ -25,7 +25,7 @@ const LoginModal = props => {
 
     const onSubmit = (authType) => {
         let error = {};
-        if ((props.screenType === "Zephyr" && authType === "basic") || props.screenType !== "Zephyr") {
+        if ((props.screenType === "Zephyr" && authType === "basic") || (props.screenType !== "Zephyr" && props.screenType=="Azure")) {
             if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error = { url: true, msg: "Please Enter URL." };
             else if (props.usernameRef && props.usernameRef.current && !props.usernameRef.current.value) error = { username: true, msg: "Please Enter User Name." };
             else if (props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error = { password: true, msg: "Please Enter Password." };
@@ -94,23 +94,25 @@ const LoginModal = props => {
         try {
             setLoading("Loading...")
             const data = await getDetails_Azure()
+            console.log(data)
             if (data.error) { setMsg(data.error); return; }
             if (data !== "empty") {
                 setIsEmpty(false);
                 let tempDefaultValues = {};
-                if (data.AzureURL && props.urlRef && props.urlRef.current) {
-                    props.urlRef.current.value = data.AzureURL;
+                if (data.AzureURL ) {
+                    props.azureUrlRef.current.value = data.AzureURL;
                     tempDefaultValues['url'] = data.AzureURL;
                 }
                 if (data.AzureUsername) {
-                    if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.AzureUsername;
+                    if (props.azureUsernameRef && props.azureUsernameRef.current) props.azureUsernameRef.current.value = data.AzureUsername;
                     tempDefaultValues['username'] = data.AzureUsername;
                 }
                 if (data.AzurePAT) {
-                    if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.AzurePAT;
-                    tempDefaultValues['PAT'] = data.AzurePAT;
+                    if (props.azurePATRef && props.azurePATRef.current) props.azurePATRef.current.value = data.AzurePAT;
+                    tempDefaultValues['PAT'] = props.AzurePAT;
                 }
                 setDefaultValues(tempDefaultValues);
+                onSubmit(data.AzurePAT);
 
     }
     setLoading(false);
@@ -163,7 +165,8 @@ const LoginModal = props => {
 
     useEffect(()=>{
         props.screenType == "Azure" && getAzureDetails();
-    })
+
+    },[])
 
     return (
 
@@ -256,7 +259,7 @@ const LoginModal = props => {
                                     />
                                     <input
                                         className={".ilm_input" + (error.PAT ? " ilm_input_error" : "")}
-                                        ref={props.PATRef}
+                                        ref={props.azurePATRef}
                                         type="PAT"
                                         placeholder={inpPlaceHolder[props.screenType].PAT}
                                         data-test="intg_pAT_inp"
@@ -310,9 +313,9 @@ const inpPlaceHolder = {
         password: "Enter qTest Password"
     },
     Azure: {
-        url:"enter the URL",
-        username: "enter the username",
-        PAT: "enter your PAT"
+        url:"enter the Azure URL",
+        username: "enter the Azure username",
+        PAT: "enter Azure PAT"
     }
 }
 
