@@ -8,7 +8,7 @@ import LoginModal from '../components/LoginModal';
 // import ZephyrUpdateContent from '../components/ZephyrUpdateContent';
 import * as api from '../api.js';
 import * as actionTypes from '../state/action.js';
-import {connectJira_ICE} from  '../api.js'
+import {connectJira_ICE,connectAzure_ICE} from  '../api.js'
 import { SET_USERINFO } from '../../login/state/action';
 import { setDefaultUserICE } from '../../global/api';
 // 0 vvimport "../styles/TestList.scss"
@@ -113,6 +113,11 @@ const Azure = () => {
     //         setMsg(MSG.INTEGRATION.ERR_FETCH_DATA);
     //     }
     // }
+
+    const callLogin_Azure = async()=>{
+        const api = await api.connectAzure_ICE('https://dev.azure.com/AvoAutomation','sushanth.gupta1','xbgz54ugaxrqs7ljm5mn46aprbg37coxgijg4mx7atze47u2fbeq')
+    }
+    
     return(
         <>
         {/* {viewMappedFlies === "Jira" && 
@@ -136,7 +141,7 @@ const Azure = () => {
                 error={loginError}
                 setLoginError={setLoginError}
                 // azurePAT={"NIVI"}
-                // login={callLogin_Jira}
+                login={callLogin_Azure}
             />
              {/* } */}
         {/* { viewMappedFlies ===null && screenType=== "Jira" &&
