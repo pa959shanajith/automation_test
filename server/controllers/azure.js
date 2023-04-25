@@ -296,84 +296,380 @@ exports.connectAzure_ICE = function(req, res) {
             } else {
                 logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
                 res.send("Fail");
-            }}
-            else if (req.body.action == 'getJiraTestcases' ) { //Login to Jira for mapping screen
-                var jiraurl = req.body.url;
-                var jirausername = req.body.username;
-                var jirapwd = req.body.password;
-                if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
-                    //var inputs = [jiraurl,jirausername,jirapwd];
-                    var inputs = {
-                        "jira_serverlocation": jiraurl,
-                        "jira_uname": jirausername,
-                        "jira_pwd": jirapwd
-                    };
-                    try {
-                        logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-                        logger.debug("ICE Socket requesting Address: %s", icename);
-                        // redisServer.redisSubServer.subscribe('ICE2_' + icename);
-                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                            if (redisres[1] > 0) {
-                                logger.info("Sending socket request for jira_login to cachedb");
-                                var dataToIce = {
-                                    "emitAction": "jiralogin",
-                                    "username": icename,
-                                    "action": req.body.action,
-                                    "inputs": inputs,
-                                    "project_selected": {
-                                        'project':req.body.project,
-                                        'key':req.body.key
-                                    },
-                                    "itemType":req.body.itemType,
-                                    
-                                };
-                                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-                                var count = 0;
-    
-                                function jira_login_5_listener(channel, message) {
-                                    var data = JSON.parse(message);
-                                    if (icename == data.username && ["unavailableLocalServer", "Jira_testcases"].includes(data.onAction)) {
-                                        redisServer.redisSubServer.removeListener("message", jira_login_5_listener);
-                                        if (data.onAction == "unavailableLocalServer") {
-                                            logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
-                                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                                var soc = myserver.socketMapNotify[username];
-                                                soc.emit("ICEnotAvailable");
+        }}
+        else if (req.body.action == 'getJiraTestcases' ) { //Login to Jira for mapping screen
+            var jiraurl = req.body.url;
+            var jirausername = req.body.username;
+            var jirapwd = req.body.password;
+            if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
+                //var inputs = [jiraurl,jirausername,jirapwd];
+                var inputs = {
+                    "jira_serverlocation": jiraurl,
+                    "jira_uname": jirausername,
+                    "jira_pwd": jirapwd
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    // redisServer.redisSubServer.subscribe('ICE2_' + icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for jira_login to cachedb");
+                            var dataToIce = {
+                                "emitAction": "jiralogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs,
+                                "project_selected": {
+                                    'project':req.body.project,
+                                    'key':req.body.key
+                                },
+                                "itemType":req.body.itemType,
+                                
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
+
+                            function jira_login_5_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_testcases"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", jira_login_5_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "Jira_testcases") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                logger.info('Jira: Login successfully.');
+                                            } else {
+                                                logger.error('Jira: Login Failed.');
                                             }
-                                        } else if (data.onAction == "Jira_testcases") {
-                                            var resultData = data.value;
-                                            if (count == 0) {
-                                                if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
-                                                    logger.info('Jira: Login successfully.');
-                                                } else {
-                                                    logger.error('Jira: Login Failed.');
-                                                }
-                                                res.send(resultData);
-                                                count++;
-                                            }
+                                            res.send(resultData);
+                                            count++;
                                         }
                                     }
                                 }
-                                redisServer.redisSubServer.on("message", jira_login_5_listener);
-                            } else {
-                                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                    var flag = "";
-                                    if (found) flag = "scheduleModeOn";
-                                    else {
-                                        flag = "unavailableLocalServer";
-                                        logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
-                                    }
-                                    res.send(flag);
-                                });
                             }
-                        });
-                    } catch (exception) {
-                        logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
-                    }
-                } else {
-                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
-                    res.send("Fail");
-                }}
+                            redisServer.redisSubServer.on("message", jira_login_5_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
+        }}
+        else if(req.body.action == 'azureUserStories' ) {
+            var azureurl = req.body.baseurl;
+            var azureusername = req.body.username;
+            var azurepat = req.body.pat;
+            var azureprojectdetails = req.body.projectdetails
+            if (!validateData(azureurl, "empty") && !validateData(azureusername, "empty") && !validateData(azurepat, "empty")) {
+                var inputs = {
+                    "azureBaseUrl": azureurl,
+                    "azure_uname": azureusername,
+                    "azurepat": azurepat,
+                    "projectDetails":azureprojectdetails
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for azure_user_stories to cachedb");
+                            var dataToIce = {
+                                "emitAction": "azureLogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
+
+                            function azure_login_5_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", azure_login_5_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "Jira_details") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                logger.info('Jira: Login successfully.');
+                                            } else {
+                                                logger.error('Jira: Login Failed.');
+                                            }
+                                            res.send(resultData);
+                                            count++;
+                                        }
+                                    }
+                                }
+                            }
+                            redisServer.redisSubServer.on("message", azure_login_5_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
+            }
+        }
+        else if(req.body.action == 'azureTestPlans') {
+            var azureurl = req.body.baseurl;
+            var azureusername = req.body.username;
+            var azurepat = req.body.pat;
+            var azureprojectdetails = req.body.projectdetails
+            if (!validateData(azureurl, "empty") && !validateData(azureusername, "empty") && !validateData(azurepat, "empty")) {
+                var inputs = {
+                    "azureBaseUrl": azureurl,
+                    "azure_uname": azureusername,
+                    "azurepat": azurepat,
+                    "projectDetails":azureprojectdetails
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for azure_user_stories to cachedb");
+                            var dataToIce = {
+                                "emitAction": "azureLogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
+
+                            function azure_login_6_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", azure_login_6_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "Jira_details") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                logger.info('Jira: Login successfully.');
+                                            } else {
+                                                logger.error('Jira: Login Failed.');
+                                            }
+                                            res.send(resultData);
+                                            count++;
+                                        }
+                                    }
+                                }
+                            }
+                            redisServer.redisSubServer.on("message", azure_login_6_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
+            }
+        }
+        else if(req.body.action == 'azureTestSuites') {
+            var azureurl = req.body.baseurl;
+            var azureusername = req.body.username;
+            var azurepat = req.body.pat;
+            var azuretestplandetails = req.body.testplandetails
+            var azureprojectdetails = req.body.projectdetails
+
+            if (!validateData(azureurl, "empty") && !validateData(azureusername, "empty") && !validateData(azurepat, "empty")) {
+                var inputs = {
+                    "azureBaseUrl": azureurl,
+                    "azure_uname": azureusername,
+                    "azurepat": azurepat,
+                    "testPlanDetails":azuretestplandetails,
+                    "projectDetails":azureprojectdetails
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for azure_user_stories to cachedb");
+                            var dataToIce = {
+                                "emitAction": "azureLogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
+
+                            function azure_login_7_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", azure_login_7_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "Jira_details") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                logger.info('Jira: Login successfully.');
+                                            } else {
+                                                logger.error('Jira: Login Failed.');
+                                            }
+                                            res.send(resultData);
+                                            count++;
+                                        }
+                                    }
+                                }
+                            }
+                            redisServer.redisSubServer.on("message", azure_login_7_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
+            }
+        }
+        else if(req.body.action == 'azureTestCases') {
+            var azureurl = req.body.baseurl;
+            var azureusername = req.body.username;
+            var azurepat = req.body.pat;
+            var azuretestsuitedetails = req.body.testsuitedetails
+            var azuretestplandetails = req.body.testplandetails
+            var azureprojectdetails = req.body.projectdetails
+
+            if (!validateData(azureurl, "empty") && !validateData(azureusername, "empty") && !validateData(azurepat, "empty")) {
+                var inputs = {
+                    "azureBaseUrl": azureurl,
+                    "azure_uname": azureusername,
+                    "azurepat": azurepat,
+                    "testSuiteDetails":azuretestsuitedetails,
+                    "testPlanDetails":azuretestplandetails,
+                    "projectDetails":azureprojectdetails
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for azure_user_stories to cachedb");
+                            var dataToIce = {
+                                "emitAction": "azureLogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
+
+                            function azure_login_8_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", azure_login_8_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "Jira_details") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                logger.info('Jira: Login successfully.');
+                                            } else {
+                                                logger.error('Jira: Login Failed.');
+                                            }
+                                            res.send(resultData);
+                                            count++;
+                                        }
+                                    }
+                                }
+                            }
+                            redisServer.redisSubServer.on("message", azure_login_8_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
+            }
+        }
     } catch (exception) {
         logger.error("Exception in the service connectAzure_ICE: %s", exception);
         res.send("Fail");

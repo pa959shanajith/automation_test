@@ -104,6 +104,9 @@ default_sub.on("message", (channel, message) => {
 		mySocket.emit("azurelogin", data.action, data.inputs);
 		break;
 
+	case "azureUserStories":
+		mySocket.emit("azureUserStories", data.action, data.inputs);
+		break;
 
 	// case "getJiraTestcases":
 	// 	mySocket.emit("getJiraTestcases", data.action, data.inputs);
