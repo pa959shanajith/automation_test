@@ -27,6 +27,7 @@ const Azure = () => {
     const  azurePATRef=useRef();
 
     const JiraAuthTokenRef = useRef();
+    // const azureAuthTokenRef = useRef();
     const [domainDetails , setDomainDetails] = useState(null);
     const [loginSuccess , setLoginSuccess]=useState(false);
     const [loginError , setLoginError]= useState(null);
@@ -52,33 +53,33 @@ const Azure = () => {
         }
     }, [])
 
-    // const callLogin_Jira = async()=>{
-    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
-    //     const jiraurl = JiraUrlRef.current.value;
-    //     const jirausername =JiraUsernameRef.current.value;
-    //     const jirapwd =JiraPasswordRef.current.value;
-    //     setUser({url: jiraurl,
-    //     username: jirausername,
-    //     password: jirapwd})
+    const callLogin_Azure = async()=>{
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
+        const azureurl = azureUrlRef.current.value;
+        const azureusername =azureUsernameRef.current.value;
+        const azurepwd =azurePATRef.current.value;
+        setUser({url: azureurl,
+        username: azureusername,
+        password: azurepwd})
 
-    //    const domainDetails =await api.connectJira_ICE(jiraurl,jirausername,jirapwd);
+       const domainDetails =await api.connectAzure_ICE(azureurl,azureusername,azurepwd);
 
-    //     if (domainDetails.error) setMsg( domainDetails.error);
-    //     else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
-    //     else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-    //     else if (domainDetails === "Invalid Session"){
-    //         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-    //         return RedirectPage(history);
-    //     }
-    //     else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
-    //     else if (domainDetails === "fail") setLoginError("Fail to Login");
-    //     else if (domainDetails === "notreachable") setLoginError("Host not reachable.");
-    //     else if (domainDetails) {
-    //         setDomainDetails(domainDetails);
-    //         setLoginSuccess(true);
-    //     } 
-    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
-    // }
+        if (domainDetails.error) setMsg( domainDetails.error);
+        else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
+        else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
+        else if (domainDetails === "fail") setLoginError("Fail to Login");
+        else if (domainDetails === "notreachable") setLoginError("Host not reachable.");
+        else if (domainDetails) {
+            setDomainDetails(domainDetails);
+            setLoginSuccess(true);
+        } 
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
+    }
 
     // const callViewMappedFiles=async(saveFlag)=>{
     //     try{
@@ -114,9 +115,9 @@ const Azure = () => {
     //     }
     // }
 
-    const callLogin_Azure = async()=>{
-        const api = await api.connectAzure_ICE('https://dev.azure.com/AvoAutomation','sushanth.gupta1','xbgz54ugaxrqs7ljm5mn46aprbg37coxgijg4mx7atze47u2fbeq')
-    }
+    // const callLogin_Azure = async()=>{
+    //     const api = await api.connectAzure_ICE('https://dev.azure.com/AvoAutomation','sushanth.gupta1','xbgz54ugaxrqs7ljm5mn46aprbg37coxgijg4mx7atze47u2fbeq')
+    // }
     
     return(
         <>
@@ -129,21 +130,20 @@ const Azure = () => {
                 fetchMappedFiles={callViewMappedFiles}
             /> 
         } */}
-        {/* { viewMappedFlies ===null && !loginSuccess &&  */}
+        { viewMappedFlies ===null && true && 
             <LoginModal 
-                // urlRef={JiraUrlRef}
-                // usernameRef={JiraUsernameRef}
-                // passwordRef={JiraPasswordRef}
-                azureUrlRef={azureUrlRef}
-                azureUsernameRef={azureUsernameRef}
-                azurePATRef={azurePATRef}
-                screenType={screenType}
-                error={loginError}
-                setLoginError={setLoginError}
-                // azurePAT={"NIVI"}
-                login={callLogin_Azure}
+               urlRef={azureUrlRef}
+               usernameRef={azureUsernameRef}
+               passwordRef={azurePATRef}
+            //    authtokenRef={azureAuthTokenRef}
+               authType={authType}
+               setAuthType={setAuthType}
+               screenType={screenType}
+               error={loginError}
+               setLoginError={setLoginError}
+               login={callLogin_Azure}
             />
-             {/* } */}
+              }
         {/* { viewMappedFlies ===null && screenType=== "Jira" &&
             <JiraContent
                 domainDetails={domainDetails}

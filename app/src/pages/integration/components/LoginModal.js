@@ -28,7 +28,7 @@ const LoginModal = props => {
         if ((props.screenType === "Zephyr" && authType === "basic") || (props.screenType !== "Zephyr" )) {
             if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error = { url: true, msg: "Please Enter URL." };
             else if (props.usernameRef && props.usernameRef.current && !props.usernameRef.current.value) error = { username: true, msg: "Please Enter User Name." };
-            else if (props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error = { password: true, msg: "Please Enter Password." };
+            else if (props.screenType !== "Azure" && props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error = { password: true, msg: "Please Enter Password." };
             setError(error);
         } else if (props.screenType === "Zephyr" && authType === "token") {
         
@@ -94,22 +94,22 @@ const LoginModal = props => {
     const getAzureDetails = async () => {
         try {
             setLoading("Loading...")
-            const data = await getDetails_Azure()
-            console.log(data)
+            const data = await getDetails_Azure();
+            console.log(data,' data from getDetails_Azure');
             if (data.error) { setMsg(data.error); return; }
             if (data !== "empty") {
                 setIsEmpty(false);
                 let tempDefaultValues = {};
                 if (data.AzureURL ) {
-                    props.azureUrlRef.current.value = data.AzureURL;
+                    props.urlRef.current.value = data.AzureURL;
                     tempDefaultValues['url'] = data.AzureURL;
                 }
                 if (data.AzureUsername) {
-                    if (props.azureUsernameRef && props.azureUsernameRef.current) props.azureUsernameRef.current.value = data.AzureUsername;
+                    if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.AzureUsername;
                     tempDefaultValues['username'] = data.AzureUsername;
                 }
                 if (data.AzurePAT) {
-                    if (props.azurePATRef && props.azurePATRef.current) props.azurePATRef.current.value = data.AzurePAT;
+                    if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.AzurePAT;
                     tempDefaultValues['PAT'] = props.AzurePAT;
                 }
                 setDefaultValues(tempDefaultValues);
@@ -246,20 +246,20 @@ const LoginModal = props => {
                                 <>
                                 <input
                                         className={".ilm_input" + (error.url ? " ilm_input_error" : "")}
-                                        ref={props.azureUrlRef}
+                                        ref={props.urlRef}
                                         type='URL'
                                         placeholder={inpPlaceHolder[props.screenType].url}
                                         data-test="intg_url_inp"
                                     />
                                     <input
                                         className={".ilm_input" + (error.username ? " ilm_input_error" : "")}
-                                        ref={props.azureUsernameRef}
+                                        ref={props.usernameRef}
                                         placeholder={inpPlaceHolder[props.screenType].username}
                                         data-test="intg_username_inp"
                                     />
                                     <input
                                         className={".ilm_input" + (error.PAT ? " ilm_input_error" : "")}
-                                        ref={props.azurePATRef}
+                                        ref={props.passwordRef}
                                         type="PAT"
                                         placeholder={inpPlaceHolder[props.screenType].PAT}
                                         data-test="intg_pAT_inp"

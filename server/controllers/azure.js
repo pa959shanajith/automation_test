@@ -19,8 +19,6 @@ exports.connectAzure_ICE = function(req, res) {
     try {
         logger.info("Inside UI service: connectAzure_ICE");
         var username=req.session.username;
-        //To be removed
-        username = 's.2'
         var icename = undefined
         if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
         redisServer.redisSubServer.subscribe('ICE2_' + icename);
