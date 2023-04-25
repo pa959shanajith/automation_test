@@ -19,6 +19,8 @@ exports.connectAzure_ICE = function(req, res) {
     try {
         logger.info("Inside UI service: connectAzure_ICE");
         var username=req.session.username;
+        //To be removed
+        username = 's.2'
         var icename = undefined
         if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
         redisServer.redisSubServer.subscribe('ICE2_' + icename);
@@ -228,15 +230,15 @@ exports.connectAzure_ICE = function(req, res) {
                 res.send("Fail");
             }
         }
-        else if (req.body.action == 'jiraLogin' ) { //Login to Jira for mapping screen
-            var jiraurl = req.body.url;
-            var jirausername = req.body.username;
-            var jirapwd = req.body.password;
-            if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
+        else if (req.body.action == 'azureLogin' ) { //Login to azure for mapping scenarios
+            var azureurl = req.body.url;
+            var azureusername = req.body.username;
+            var azurepat = req.body.pat;
+            if (!validateData(azureurl, "empty") && !validateData(azureusername, "empty") && !validateData(azurepat, "empty")) {
                 var inputs = {
-                    "jira_serverlocation": jiraurl,
-                    "jira_uname": jirausername,
-                    "jira_pwd": jirapwd
+                    "azureBaseUrl": azureurl,
+                    "azure_uname": azureusername,
+                    "azurepat": azurepat
                 };
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -245,7 +247,7 @@ exports.connectAzure_ICE = function(req, res) {
                         if (redisres[1] > 0) {
                             logger.info("Sending socket request for jira_login to cachedb");
                             var dataToIce = {
-                                "emitAction": "jiralogin",
+                                "emitAction": "azureLogin",
                                 "username": icename,
                                 "action": req.body.action,
                                 "inputs": inputs
@@ -375,8 +377,30 @@ exports.connectAzure_ICE = function(req, res) {
                     res.send("Fail");
                 }}
     } catch (exception) {
-        logger.error("Exception in the service connectJira_ICE: %s", exception);
+        logger.error("Exception in the service connectAzure_ICE: %s", exception);
         res.send("Fail");
     }
-    
+
 };
+
+function validateData(content, type) {
+    logger.info("Inside function: validateData");
+    switch (type) {
+        case "empty":
+            return validator.isEmpty(content);
+        case "url":
+            return validator.isURL(content);
+        case "num":
+            return validator.isNumeric(content);
+        case "alph":
+            return validator.isAlpha(content);
+        case "len":
+            return validator.isLength(content);
+        case "uuid":
+            return validator.isUUID(content);
+        case "email":
+            return validator.isEmail(content);
+        case "json":
+            return validator.isJSON(content);
+    }
+}

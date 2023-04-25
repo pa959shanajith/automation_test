@@ -760,38 +760,6 @@ export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
     }
 }
 
-// export const connectADO_ICE = async(ADOurl,ADOusername,ADOpwd) => {
-//     try{
-
-//         const res = await axios(url+'/connectADO_ICE', {
-//             method: 'POST',
-//             headers: {
-//             'Content-type': 'application/json',
-//             },
-//            data: {   
-//            "action" : 'jiraLogin',
-//             "url": ADOurl,
-//             "username": ADOusername,
-//             "password": ADOpwd,
-
-//             }
-//         });
-//         if(res.status === 401 || res.data === "Invalid Session"){
-//             RedirectPage(history)
-//             return {error:MSG.GENERIC.INVALID_SESSION};
-//         }
-//         if(res.status===200 && res.data !== "fail"){            
-//             return res.data;
-//         }
-//         console.error(res.data)
-//         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
-//     }catch(err){
-//         console.error(err)
-//         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
-//     }
-// }
-
-
 export const getJiraTestcases_ICE = async(input_payload) => {
     try{
         const res = await axios(url+'/connectJira_ICE', {
@@ -946,5 +914,37 @@ export const getConfigurFieldJIRA_ICE = async(input_payload) => {
     }catch(err){
         console.error(err)
         return {error:MSG.JIRA.ERR_JIRA_CONFIG_FIELDS}
+    }
+}
+
+
+// Azure Integeration API's
+export const connectAzure_ICE = async(ADOurl,ADOusername,ADOpwd) => {
+    try{
+
+        const res = await axios(url+'/connectAzure_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {   
+           "action" : 'azureLogin',
+            "url": ADOurl,
+            "username": ADOusername,
+            "pat": ADOpwd,
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }

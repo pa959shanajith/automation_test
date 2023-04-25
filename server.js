@@ -235,6 +235,8 @@ if (cluster.isMaster) {
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
     var plugin = require('./server/controllers/plugin');
+    var azure = require('./server/controllers/azure');
+
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -248,6 +250,7 @@ if (cluster.isMaster) {
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/connectAzure_ICE', azure.connectAzure_ICE);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -410,6 +413,8 @@ if (cluster.isMaster) {
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
 		var devOps = require('./server/controllers/devOps');
+		// var azure = require('./server/controllers/azure');
+
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
@@ -624,7 +629,9 @@ if (cluster.isMaster) {
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
 
-
+		// Azure integeration API's
+		// app.post('/connectAzure_ICE', azure.connectAzure_ICE);
+		
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
