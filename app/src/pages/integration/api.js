@@ -777,7 +777,7 @@ export const connectAzure_ICE = async(Azureurl,Azureusername,Azurepwd) => {
            "action" : 'azureLogin',
             "url": Azureurl,
             "username": Azureusername,
-            "password": Azurepwd,
+            "pat": Azurepwd,
 
             }
         });
