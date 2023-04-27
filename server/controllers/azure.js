@@ -23,15 +23,15 @@ exports.connectAzure_ICE = function(req, res) {
         if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
         redisServer.redisSubServer.subscribe('ICE2_' + icename);
         if (req.body.action == 'loginToAzure') { //Login to Jira for creating issues
-            var jiraurl = req.body.url;
-            var jirausername = req.body.username;
-            var jirapwd = req.body.password;
-            if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
+            var azureurl = req.body.url;
+            var azureusername = req.body.username;
+            var azurepat = req.body.pat;
+            if (!validateData(azureurl, "empty") && !validateData(azureusername, "empty") && !validateData(azurepat, "empty")) {
                 //var inputs = [jiraurl,jirausername,jirapwd];
                 var inputs = {
-                    "jira_serverlocation": jiraurl,
-                    "jira_uname": jirausername,
-                    "jira_pwd": jirapwd
+                    "azureBaseUrl": azureurl,
+                    "azure_uname": azureusername,
+                    "azurepat": azurepat
                 };
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -40,7 +40,7 @@ exports.connectAzure_ICE = function(req, res) {
                         if (redisres[1] > 0) {
                             logger.info("Sending socket request for jira_login to cachedb");
                             var dataToIce = {
-                                "emitAction": "jiralogin",
+                                "emitAction": "azureLogin",
                                 "username": icename,
                                 "action": req.body.action,
                                 "inputs": inputs
@@ -48,10 +48,10 @@ exports.connectAzure_ICE = function(req, res) {
                             redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                             var count = 0;
 
-                            function jira_login_1_listener(channel, message) {
+                            function azure_login_1_listener(channel, message) {
                                 var data = JSON.parse(message);
                                 if (icename == data.username && ["unavailableLocalServer", "auto_populate"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", jira_login_1_listener);
+                                    redisServer.redisSubServer.removeListener("message", azure_login_1_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
                                         if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
@@ -72,7 +72,7 @@ exports.connectAzure_ICE = function(req, res) {
                                     }
                                 }
                             }
-                            redisServer.redisSubServer.on("message", jira_login_1_listener);
+                            redisServer.redisSubServer.on("message", azure_login_1_listener);
                         } else {
                             utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
                                 var flag = "";
@@ -677,6 +677,64 @@ exports.connectAzure_ICE = function(req, res) {
 
 };
 
+exports.saveAzureDetails_ICE = async (req, res) => {
+    
+	const fnName = "saveAzureDetails_ICE";
+	logger.info("Inside UI service: " + fnName);
+    // console.log(req.body);
+	try {
+		var mappedDetails = req.body.mappedDetails;
+		var flag = mappedDetails.length > 0;
+		if (!flag) return res.send('fail');
+		for (let i=0; i<mappedDetails.length; i++) {
+			let itr = mappedDetails[i];
+			const inputs = {
+				"testscenarioid": itr.scenarioId[0],
+				'projectid': itr.projectId,			
+				'projectName': itr.projectName,
+				'userStoryId': itr.userStoryId,
+				// 'itemCode': itr.testCode,
+                'itemType': itr.itemType,
+                'userStorySummary':itr.userStorySummary,
+				"query": "saveAzureDetails_ICE"
+			};
+			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
+			if (result == "fail") flag = false;
+		}
+		if (!flag) return res.send('fail');
+		res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in jira/"+fnName+":", exception);
+		res.send("fail");
+	}
+};
+
+exports.viewAzureMappedList_ICE = async (req, res) => {
+    // console.log(args);
+	const fnName = "viewJiraMappedListAzure";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+        if (!req.body.scenarioName) {
+            var inputs = {
+                "userid": userid,
+                "query": "azuredetails"
+            };
+        } else {
+            var inputs = {
+                "userid": userid,
+                'scenarioName':req.body.scenarioName,
+                "query": "azuredetails"
+            };
+        }
+		const result = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+		if (result == "fail") res.send('fail');
+		else res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		res.send("fail");
+	}
+};
 function validateData(content, type) {
     logger.info("Inside function: validateData");
     switch (type) {

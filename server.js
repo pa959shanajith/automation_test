@@ -631,6 +631,11 @@ if (cluster.isMaster) {
 
 		// Azure integeration API's
 		// app.post('/connectAzure_ICE', azure.connectAzure_ICE);
+		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
+		// app.post('/viewAzureMappedList_ICE', auth.protect, report.viewAzureMappedList_ICE);
+
+
+
 		
 
 		//-------------Route Mapping-------------//
