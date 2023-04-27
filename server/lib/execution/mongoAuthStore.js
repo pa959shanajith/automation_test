@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const credsPath = path.join(path.dirname(fs.realpathSync(__filename)), '../../config/.dbtokens');
 
 if (!fs.existsSync(credsPath)) {  // Write default creds to tokens
-	const encryptedData = "6458bb45807de4ee1bb32cdcd874970028ed1445542f97406148a717b66b78f4714cfbbc541f53be7dcc16fdcb46a5c55be04fc9331682a2280dd2a7c0625cfe";
+	const encryptedData = "6458bb45807de4ee1bb32cdcd874970028ed1445542f97406148a717b66b78f476c5baa7395379c026a0af2b380ad54cd13be055080e5f33e94f3a386dab108d2a569bf2ddd54b25f5c0197f6754fc8a";
 	fs.writeFileSync(credsPath, encryptedData, err => { throw "Invalid Mongo Database credentials!"; });
 }
 
