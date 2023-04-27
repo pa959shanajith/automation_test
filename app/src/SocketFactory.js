@@ -7,6 +7,7 @@ import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
 import {url} from './App'
+import {UpdateUserInfoforLicence} from './pages/login/api'; 
 
 /*Component SocketFactory
   use: creates/updates socket connection
@@ -104,7 +105,7 @@ const SocketFactory = () => {
         window.location.href = "/reports";
     }
 
-    const executionDATA = (result) => {
+    const executionDATA = async(result) => {
         var data = result.status
         var testSuiteIds = result.testSuiteDetails;
         var msg = "";
@@ -124,6 +125,7 @@ const SocketFactory = () => {
             setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
         } 
         else if (data === "success") {
+            await UpdateUserInfoforLicence()
             setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
             setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
 

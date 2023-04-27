@@ -264,3 +264,20 @@ export const unlock = async(username, password) => {
         console.log(err);
     }
 }
+
+export const UpdateUserInfoforLicence = async() => {
+    try{
+        const res = await axios(url+"/hooks/upgradeLicense", {
+            method: "POST"
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            return {error: 'Failed to update user licence details'}
+        }
+    }
+    catch(err){
+        return {error: 'Failed to update user licence details'}
+    }
+}

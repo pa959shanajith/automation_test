@@ -448,6 +448,7 @@ if (cluster.isMaster) {
 		app.post('/resetPassword', login.resetPassword);
 		app.post('/updatePassword', login.updatePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
+		app.post ('/hooks/upgradeLicense', login.upgradeLicense)
 		//Admin Routes
 		app.post('/getUserRoles', auth.protect, admin.getUserRoles);
 		app.post('/getDomains_ICE', auth.protect, admin.getDomains_ICE);
