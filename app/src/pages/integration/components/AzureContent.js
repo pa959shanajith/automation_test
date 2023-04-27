@@ -10,6 +10,7 @@ import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
 import { SET_DISABLEAPPEND } from '../../scrape/state/action.js';
 import { NormalDropDown } from '@avo/designcomponents';
+import async from 'async';
 
 
 const AzureContent = props => {
@@ -42,6 +43,9 @@ const AzureContent = props => {
     const [projName, setProjName] = useState('');
     const [disabled, setDisabled] = useState(true);
     const [projectDropdn3 , setProjectDropdn3]= useState("Select Project1");
+    const [userStories,setUserStories] = useState([]);
+    const [workItemsTitle,setWorkItemsTitle] = useState([{id:1,name:'Story'},{id:2,name:'TestPlans'}]);
+
     // const[summary1,setSummary1]=useState('');
     console.log(releaseId)
  
@@ -92,6 +96,25 @@ const AzureContent = props => {
             setSelectedRel(releaseId);  
             clearSelections();
         }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
+
+    const getWorkItems = async (e) => {
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+        console.log(e,' its e');
+        let apiObj = {
+            "action": "azureUserStories",
+            "baseurl": "https://dev.azure.com/AvoAutomation",
+            "username": "udshfuo",
+            "pat": "g2e35zqgnu7jppx3z7bqrzic7qjn5kaiijoqxdnrssogcsjsga5a",
+            "projectdetails": {
+                "id": "c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd",
+                "name": "AvoAssure"
+            }
+
+        }
+        const workItemsDetails = await api.connectAzure_ICE(apiObj);
+        setUserStories(workItemsDetails.userStories);
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
 
@@ -222,7 +245,7 @@ const AzureContent = props => {
     const handleClick=(value, id,summary)=>{
         let newSelectedTCDetails = { ...selectedZTCDetails };
         let newSelectedTC = [...value,summary];
-       setSelected(value)
+    //    setSelected(value)
        setSelectedId(id)
        setSelectedSummary(summary)
        setDisabled(true)
@@ -325,9 +348,9 @@ const AzureContent = props => {
                 leftBoxTitle="Azure tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestDomain={
-                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{setRelease(true) ;onProjectSelect(e);handleFirstOptionChange(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} >
+                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{setRelease(true) ;onProjectSelect(e);handleFirstOptionChange(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} >
                         <option value="Select Project" disabled >Select Project</option>
-                        {  props.domainDetails ? 
+                        { props &&  props.domainDetails ? 
                             
                             props.domainDetails.projects.map(e => (<option  key={e.id} value={e.code} title={e.name}>{e.name} </option>)) : null
                             
@@ -339,11 +362,11 @@ const AzureContent = props => {
 
 
                      selectWorkitem={
-                        <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
+                        <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e);getWorkItems(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
                             <option value="Select WorkItems"  >Select WorkItems</option>
-                            {  props.domainDetails ? 
-                                
-                                props.domainDetails.issue_types.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setReleaseId(e.target.value) }} >{e.name}  </option>)) : null
+                            {
+                                // props.domainDetails.issue_types
+                                workItemsTitle.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setReleaseId(e.target.value) }} >{e.name}  </option>))
                                 
                             }
                            
@@ -351,25 +374,7 @@ const AzureContent = props => {
                          }
                        
                          
-                     
-                    //  selectWorkitem={
-                    //     <select data-test="intg_jira_workitem_drpdwn" value={selectedRel} onChange={onSelect} className="qcSelectDomain" style={{marginRight : "5px"}} disabled>
-                    //         <option value="Select Release" disabled>Select Workitem</option>
-                    //         {   releaseArr.length &&
-                    //             releaseArr.map(e => (
-                    //                 <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
-                    //             ))
-                    //         }
-                    //         {/* {
-                    //              <option value="Select Release"  >Select UserStory</option>
-                                 
-                    //         }
-                    //         {
-                    //              <option value="Select Release"  >Select TestCase</option>
-                    //         } */}
-                    //     </select>
-                        
-                    // }
+                    
             
                 selectScenarioProject={
                     <select data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
@@ -385,14 +390,14 @@ const AzureContent = props => {
                 testList={
                     <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>{handleSecondOptionChange(e)}} className="qtestAvoAssureSelectProject">
                     {
-                        testCaseData ?
-                        testCaseData.map((e,i)=>(
-                            <div className={"test_tree_leaves"+ ( selected===e.code ? " test__selectedTC" : "")}>
-                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id,e.summary)}>
-                                <span className="leafId">{e.code}</span>    
-                                <span className="test__tcName">{e.summary} </span>
+                        userStories ?
+                        userStories.map((e,i)=>(
+                            <div className={"test_tree_leaves"+ ( selected===e.id ? " test__selectedTC" : "")}>
+                            <label className="test__leaf" title={e.id} onClick={()=>handleClick(e.id,e.fields['System.Title'])}>
+                                <span className="leafId">{e.id}</span>    
+                                <span className="test__tcName">{e.fields['System.Title']} </span>
                             </label>
-                            {selected===e.code 
+                            {selected===e.id 
                                     && <><div className="test__syncBtns"> 
                                     { selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled?"static/imgs/ic-qcSyncronise.png":null} />}
                                     <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />

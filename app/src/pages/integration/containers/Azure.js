@@ -11,6 +11,7 @@ import * as actionTypes from '../state/action.js';
 import {connectJira_ICE,connectAzure_ICE} from  '../api.js'
 import { SET_USERINFO } from '../../login/state/action';
 import { setDefaultUserICE } from '../../global/api';
+import AzureContent from '../components/AzureContent';
 // 0 vvimport "../styles/TestList.scss"
 const Azure = () => {
     const history = useHistory();
@@ -61,8 +62,14 @@ const Azure = () => {
         setUser({url: azureurl,
         username: azureusername,
         password: azurepwd})
-
-       const domainDetails =await api.connectAzure_ICE(azureurl,azureusername,azurepwd);
+        let apiObj = {   
+            "action" : 'azureLogin',
+             "url": azureurl,
+             "username": azureusername,
+             "pat": azurepwd,
+ 
+             }    
+       const domainDetails =await api.connectAzure_ICE(apiObj);
 
         if (domainDetails.error) setMsg( domainDetails.error);
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
@@ -130,7 +137,7 @@ const Azure = () => {
                 fetchMappedFiles={callViewMappedFiles}
             /> 
         } */}
-        { viewMappedFlies ===null && true && 
+        { viewMappedFlies ===null && !loginSuccess && 
             <LoginModal 
                urlRef={azureUrlRef}
                usernameRef={azureUsernameRef}
@@ -144,6 +151,13 @@ const Azure = () => {
                login={callLogin_Azure}
             />
               }
+              { viewMappedFlies ===null && screenType=== "Azure" &&
+              <AzureContent  
+                domainDetails={domainDetails}
+                user={user}
+                // callViewMappedFiles={callViewMappedFiles} 
+                />  
+            } 
         {/* { viewMappedFlies ===null && screenType=== "Jira" &&
             <JiraContent
                 domainDetails={domainDetails}
