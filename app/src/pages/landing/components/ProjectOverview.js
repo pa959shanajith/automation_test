@@ -18,7 +18,7 @@ const ProjectOverview=({ DefaultProject })=> {
             <h1> {DefaultProject}</h1>
             {/* <DisplayProject projects={projects} /> */}
             <button className="manage-btn">Manage Project</button>
-            <TabMenu className='a ab' model={items} />
+            <TabMenu className='tab-menu' model={items} />
         </div>
     )
 }

@@ -14,7 +14,7 @@ const Project = ( props) => {
     <>
     
         {/* <VerticalSteps/> */}
-        <div><ProjectOverview/></div>
+        <div className='Project_Tab'><ProjectOverview/></div>
         <div className='ProjectCreationAlignment'><ProjectCreation/></div>
   
     </>

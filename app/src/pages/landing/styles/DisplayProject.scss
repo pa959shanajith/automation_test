@@ -71,5 +71,24 @@
 }
 .Project-Panel{
     height:1vh;
-
 }
+.sort_menu_hover
+      .p-menu .p-menuitem-link:not(.p-disabled):hover{
+        background: rgba(96, 91, 255, 0.2) !important;
+      }
+
+.All_Project_font {
+  font-family: 'Open Sans';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 24px;
+color: rgba(3, 2, 41, 0.6);
+margin-left: 0.5rem;
+}
+.i{
+  font-family: 'Open Sans' !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+}
+

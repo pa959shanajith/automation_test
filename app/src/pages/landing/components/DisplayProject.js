@@ -87,13 +87,11 @@ const DisplayProject = (props) => {
       ? "pi pi-chevron-down"
       : "pi pi-chevron-up";
     const className = `${options.className} justify-content-start`;
-    const titleClassName = `${options.titleClassName} ml-2 text-primary`;
-    const style = { fontSize: "1.1rem" };
 
     return (
       <>
         <div className="card flex justify-content-center">
-          {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} />}
+          {sortVisible && <Menu className="sort-Menu sort_menu_hover" setsortVisible={setSortVisible} model={sortItems} />}
         </div>
         {/* {visible && <CreateProject setVisible={setVisible} />} */}
         <div className={className}>
@@ -104,7 +102,7 @@ const DisplayProject = (props) => {
             <span className={toggleIcon}></span>
             <Ripple />
           </button>
-          <span className={titleClassName} style={style}>
+          <span className="All_Project_font" >
             ALL PROJECTS
           </span>
           <div>
@@ -140,7 +138,7 @@ const DisplayProject = (props) => {
       >
         <span className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
-          <InputText
+          <InputText className="i"
             id="i"
             placeholder="Search"
             value={searchProjectName}
