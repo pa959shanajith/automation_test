@@ -13,6 +13,11 @@ var notification = require('../notifications/index')
 var epurl = process.env.DAS_URL;
 var client = new Client();
 const configpath= require('../config/options');
+const archiver = require('archiver');
+const zlib = require('zlib');
+const unzipper = require('unzipper');
+const { Readable } = require('stream');
+
 
 let headers
 module.exports.setReq = async (req) =>
@@ -988,24 +993,47 @@ exports.exportToGit = async (req, res) => {
 	}
 };
 
+const removeDir = function(path) {
+	if (fs.existsSync(path)) {
+		const files = fs.readdirSync(path);
+		if (files.length > 0) {
+			files.forEach(function(filename) {
+				if (fs.statSync(path + "/" + filename).isDirectory()) {
+					removeDir(path + "/" + filename);
+				} else {
+					fs.unlinkSync(path + "/" + filename);
+				}
+			});
+			fs.rmdirSync(path);
+		} else {
+			fs.rmdirSync(path);
+		}
+	} else {
+		logger.error("Directory path not found.")
+	}
+}
 exports.exportMindmap = async (req, res) => {
 	const fnName = "exportMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
+		
 		const mindmapId = req.body.mindmapId["moduleid"];
 		const projectName=req.body.mindmapId["projectName"];
 		const exportProjId=req.body.mindmapId["exportProjId"];
 		const exportProjAppType=req.body.mindmapId["exportProjAppType"];
+		var exportedfilepath=path.join(process.cwd(),configpath.exportedmindmap.ExportedMindmapFilePath);
+		var username=req.session.username;
+		username = username.split('.').join("");
 		const inputs= {
 			"mindmapId": mindmapId,
 			"projectName":projectName,
 			"query":"exportMindmap",
-			"exportedfilepath":path.join(process.cwd(),configpath.exportedmindmap.ExportedMindmapFilePath),
+			"exportedfilepath":exportedfilepath,
 			"exportquery":path.join(process.cwd(),configpath.exportedmindmap.Exportquery),
 			"exportbatfile":path.join(process.cwd(),configpath.exportedmindmap.ExportMindmapBatch),
 			"mongopath": configpath.mongopath,
 			"mongoexportpath":configpath.mongoexportpath,
-			"username":req.session.username,
+			"username":username,
 			"exportProjId":exportProjId,
 			"exportProjAppType":exportProjAppType,
 			"mongodumpbat":path.join(process.cwd(),configpath.exportedmindmap.mongodumpbat)
@@ -1015,6 +1043,19 @@ exports.exportMindmap = async (req, res) => {
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
+			let zip_path = exportedfilepath+'/'+username+'.zip'
+			const archive = archiver('zip', { zlib: { level: 9 }});
+			const stream = fs.createWriteStream(zip_path);
+			stream.on('close', ()=>{
+				removeDir(exportedfilepath+'/'+username);
+				// res.writeHead(200, {
+				// 	'Content-Type' : 'application/zip',
+				// });
+				var filestream = fs.createReadStream(zip_path);
+				filestream.pipe(res);
+			})
+			archive.directory(exportedfilepath+'/'+username, false).pipe(stream);
+			archive.finalize();
 			return res.send(result);
 		}
 	} catch(exception) {
@@ -1048,14 +1089,146 @@ exports.importMindmap = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.writeZipFileServer = async(req,res) => {
+	try {
+		const fnName = "writeZipFileServer";
+		let user =  req.session.username;
+		let filepath = configpath.importMindmap;
+		user = user.split('.').join("");
+		const filePath = req.file.path;
+
+		// Check if request contains a ZIP file
+		if (req.file && path.extname(req.file.originalname) === '.zip') {
+			// Create target directory for extracted files
+			const targetDir = path.join(__dirname, '../../assets/ImportMindmap/'+user);
+			if (!fs.existsSync(targetDir)) {
+			  fs.mkdirSync(targetDir);
+			}
+			const bufferStream = new Readable();
+			bufferStream.push(req.file.buffer);
+			bufferStream.push(null);
+			// Extract files from ZIP
+			const unzipStream = bufferStream.pipe(unzipper.Parse());
+			await unzipStream.on('entry', (entry) => {
+			  const filePath = path.join(targetDir, entry.path);
+			  if (!entry.path.startsWith('__MACOSX/') && !entry.path.endsWith('/')) {
+				entry.pipe(fs.createWriteStream(filePath));
+			  } else {
+				entry.autodrain();
+			  }
+			});
+			await unzipStream.on('close', async () => {
+				let jsonResponse = {msg : 'Files extracted successfully',appType:''};
+				let jsonFilepath = targetDir +'\\'+ 'Modules1.json';
+				 fs.readFile(jsonFilepath, 'utf8', (err, data) => {
+					if (err) throw err;
+					let jsonData = JSON.parse(data);
+					if(jsonData.length){
+						jsonResponse.msg = 'Files extracted successfully';
+						jsonResponse.appType = jsonData[0].appType ? jsonData[0].appType: '';
+					}
+					res.status(200).send(jsonResponse);
+				});
+			  	// res.status(200).send(getJsonResponse);
+			});
+		  } else {
+			// If no ZIP file is present, send error response
+			res.status(400).send('Invalid file format');
+		  }
+		
+	} catch (error) {
+		logger.error("Error occurred in mindmap/"+fnName+":", error);
+		return res.status(500).send("fail");
+	}
+}
+
+
+
 exports.writeFileServer = async (req, res) => {
 	const fnName = "writeFileServer";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		let data = req.body;
+		//let data = req.body;
 		let user =  req.session.username;
-		let path = configpath.importMindmap;
+		let filepath = configpath.importMindmap;
 		user = user.split('.').join("");
+		var importPath=filepath+"/"+user
+		let files = req.body;
+
+
+    	// fs.writeFile(files.fileName, files.data, "base64", function (err) {
+		// 	if(err)
+		// 		res.send(err);
+		// 	else
+		// 		res.end("Uploaded");
+		// 	});
+
+
+		// const writeStream = fs.createWriteStream("unzipped");
+
+		// const filePath = path;
+
+		// const fileWriteStream = fs.createWriteStream(filePath);
+
+		// req.on('data', (data) => {
+		// fileWriteStream.write(data);
+		// });
+
+		// req.on('end', () => {
+		// console.log('Finished writing file.');
+		// fileWriteStream.end();
+		// // res.writeHead(200, { 'Connection': 'close' });
+		// res.end();
+		// });
+
+
+		// req.pipe(zlib.createGunzip()).pipe(writeStream);
+		// console.log(writeStream);
+		// writeStream.on('finish', () => {
+		// console.log('File unzipped successfully.');
+		// res.end('File unzipped successfully.');
+		// });
+
+		// let fileContents = null;
+
+		// req.on('data', (data) => {
+		// // create a gunzip stream to decompress the file contents
+		// const gunzip = zlib.createGunzip();
+
+		// gunzip.on('data', (decompressedData) => {
+		// 	fileContents = decompressedData;
+		// });
+
+		// gunzip.on('end', () => {
+		// 	// do something with the decompressed file contents
+		// 	console.log(fileContents.toString());
+		// 	writeStream.on('finish', () => {
+		// 		console.log('File unzipped successfully.');
+		// 		res.end('File unzipped successfully.');
+		// 		});
+		// });
+
+		// gunzip.write(data);
+		// gunzip.end();
+		// });
+
+		// req.on('end', () => {
+		// console.log('Finished parsing request body.');
+		// res.writeHead(200, { 'Connection': 'close' });
+		// res.end();
+		// });
+
+		// const readStream = fs.createReadStream(data);
+		// const writeStream = fs.createWriteStream(importPath);
+		// readStream.pipe(zlib.createGunzip()).pipe(writeStream);
+
+		// Listen for the finish event to know when the unzip is complete
+		// writeStream.on('finish', () => {
+		// console.log('File unzipped successfully!');
+		// });
+		
+		
 		if (data.type=="json"){
 			var importPath=path+"/"+"json"+"/"+user+".json"
 		}

@@ -1,5 +1,5 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
-import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer , jsonToMindmap} from '../api';
+import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap} from '../api';
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,9 @@ import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import {url} from '../../../App';
+
 
 
 const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport}) => {
@@ -69,10 +72,11 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
     const [uploadFileField,setUploadFileField] = useState(false)
-    
-    const upload = () => {
+    const [uploadFilezip,setUploadFilezip] = useState("") 
+
+    const upload = (e) => {
         let  project = "";
-        if(importType === 'avo'){
+        if(importType === 'zip'){
             project = projRef.current.value;
         if(project=='def-val'){
             displayError({CONTENT:"Please select project",VARIANT:VARIANT.WARNING});
@@ -85,7 +89,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         setFiledUpload(undefined)
         setDuplicateModuleList([])
         setBlockui({show:true,content:'Uploading ...'})
-        uploadFile({setBlockui,setMindmapData,setDuplicateModuleList,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project})
+        uploadFile({setBlockui,setMindmapData,setDuplicateModuleList,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project,setUploadFilezip,uploadFilezip})
     }
     const changeImportType = (e) => {
         // projRef.current.value = ""
@@ -95,7 +99,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         setFiledUpload(undefined)
         setDisableSubmit(true)
         setError('')
-        if(e.target.value==="avo"){ setUploadFileField(false); resetImportModule();}
+        if(e.target.value==="zip"){ setUploadFileField(false); resetImportModule();}
     }
     const resetImportModule = async() => {
       if(uploadFileRef.current)uploadFileRef.current.value = ''
@@ -118,7 +122,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         pd:".pd",
         excel:".xls,.xlsx",
         git:".mm",
-        avo:".avo",
+        zip:".zip",
 		json:".json"
     }
     useEffect(()=>{
@@ -172,7 +176,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     setBlockui({show:false})
                 }
                 
-                if(isMultiImport && importType === 'avo'){
+                if(isMultiImport && importType === 'zip'){
                     // setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
                     var res = await importMindmap(mindmapData)
@@ -245,13 +249,13 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
                     <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
                     {/* <option value={'git'}>Git (.mm)</option>  */}
-                    {/* <option value={'avo'}>Complete Module(S) (.avo)</option> */}
+                    <option value={'zip'}>Complete Module(S) (.avo)</option>
 					<option value={'json'}>Structure only - Json (.json)</option>
                 </select>
             </div>
             {isMultiImport && 
                 <Fragment>
-                    {(importType==='avo')?
+                    {(importType==='zip')?
                         <div>
                             <label>
                             Project:   
@@ -303,7 +307,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                         </Fragment>:
                         (<>{uploadFileField || (["excel","json"].includes(importType))?<div>
                             <label>Upload File: </label>
-                            <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="avo"} type='file' onChange={upload} ref={uploadFileRef}/>
+                            <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="zip"} type='file' onChange={(e) => upload(e)} ref={uploadFileRef}/>
                             </div>:null}</>)
                     }
                     
@@ -311,7 +315,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
             }
             {fileUpload && /* !isMultiImport && */
                 <Fragment>
-                    {(importType==='avo')?
+                    {(importType==='zip')?
                     <div>
                         <label>Project: </label>
                         <select className='imp-inp' disabled={false} ref={projRef}>
@@ -468,9 +472,9 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
    
 }
 
-const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateModuleList,setSheetList,setDisableSubmit,setistrue,setError,setFiledUpload,projList,setData,fileImport,selectedProject}) =>{
+const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateModuleList,setSheetList,setDisableSubmit,setistrue,setError,setFiledUpload,projList,setData,fileImport,selectedProject,setUploadFilezip,uploadFilezip}) =>{
     var file = uploadFileRef.current.files[0]
-    
+
     
     if(!file)return;
     var extension = file.name.substr(file.name.lastIndexOf('.')+1)
@@ -538,12 +542,19 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
                 setBlockui({show:false})
                 setError("File is empty")
                 }
-        }else if(extension === 'avo'){
-            const result =  await read(file)             
-            var projFlag = false
-            var duplicateData = JSON.parse(result);
+        }else if(extension === 'zip'){
+            const formData = new FormData();
+            formData.append('file',file)
+            const res = await writeZipFileServer(formData);
+            console.log(res,' its res from server');
+
+        
+            // reader.readAsArrayBuffer(fileInput.files[0]);
+            // const result =  await read(file)             
+            // var projFlag = false
+            // var duplicateData = JSON.parse(result);
             let selectedAppType = projList[selectedProject].apptypeName;  
-            var importedAppType=duplicateData[duplicateData.length -1]["apptype"];
+            var importedAppType = res.appType;
             if(selectedAppType!==importedAppType){
                 setError("Selected project is of different App Type");
                 setDisableSubmit(true)
@@ -551,24 +562,25 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
                 return
             }
             
-            let data={"apptype":duplicateData[duplicateData.length -1]["apptype"],
+            
+            let data={"apptype":res.appType,
             "projid":selectedProject}
-            setMindmapData(data) 
-            let startData={"status":"start"}
-            let endData={"status":"stop"} 
-            const start= await writeFileServer(startData)                    
-            for (let i=0;i<duplicateData.length;i++){
-                if (i==0){
-                    duplicateData[i]["status"]="first"
-                    const res1= await writeFileServer(duplicateData[i])
-                    if(res1.error){setDisableSubmit(true)}}
-                else{
-                const res1= await writeFileServer(duplicateData[i])
-                if(res1.error){setDisableSubmit(true)}}}
+            setMindmapData(data); 
+            // let startData={"status":"start"}
+            // let endData={"status":"stop"} 
+            // const start= await writeFileServer(startData)                    
+            // for (let i=0;i<duplicateData.length;i++){
+            //     if (i==0){
+            //         duplicateData[i]["status"]="first"
+            //         const res1= await writeFileServer(duplicateData[i])
+            //         if(res1.error){setDisableSubmit(true)}}
+            //     else{
+            //     const res1= await writeFileServer(duplicateData[i])
+            //     if(res1.error){setDisableSubmit(true)}}}
             
             
-            const end= await writeFileServer(endData)
-            if(end.error){setDisableSubmit(true);setBlockui({show:false});return}
+            // const end= await writeFileServer(endData)
+            if(res.error || !res.appType){setDisableSubmit(true);setBlockui({show:false});return}
             else{setDisableSubmit(false);
                 setBlockui({show:false})}
             setBlockui({show:false})
@@ -590,20 +602,27 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
 }
 
 // read promise that resolves on successful input file read
-function read(file) {
-    return new Promise ((res,rej)=>{
-        var reader = new FileReader();
-        reader.onload = function() {
-        res(reader.result);
-        }
-        reader.onerror = () => {
-        rej("fail")
-        }
-        reader.onabort = () =>{
-        rej("fail")
-        }
-        reader.readAsBinaryString(file);
-    })
+
+    async function read(file) {
+        await axios
+            .post(url+'/writeFileServer', file)
+            .then(() => {
+                console.log('file processed');
+            });
+
+    // return new Promise ((res,rej)=>{
+    //     var reader = new FileReader();
+    //     reader.onload = function() {
+    //     res(reader.result);
+    //     }
+    //     reader.onerror = () => {
+    //     rej("fail")
+    //     }
+    //     reader.onabort = () =>{
+    //     rej("fail")
+    //     }
+    //     reader.readAsBinaryString(file);
+    // })
 }
 
 const validNodeDetails = (value) =>{
