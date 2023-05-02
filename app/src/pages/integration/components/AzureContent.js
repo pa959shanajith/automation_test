@@ -45,6 +45,8 @@ const AzureContent = props => {
     const [projectDropdn3 , setProjectDropdn3]= useState("Select Project1");
     const [userStories,setUserStories] = useState([]);
     const [workItemsTitle,setWorkItemsTitle] = useState([{id:1,name:'Story'},{id:2,name:'TestPlans'}]);
+    const [isShowTestplan,setIsShowTestplan] = useState(false);
+    const [selectedTestplan,setSelectedTestplan] = useState('');
 
     // const[summary1,setSummary1]=useState('');
     console.log(releaseId)
@@ -129,33 +131,33 @@ const AzureContent = props => {
         dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
     }
 
-    // const callSaveButton =async()=>{ 
-    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
-    //     const response = await api.saveJiraDetails_ICE(mappedPair);
-    //     if (response.error){
-    //         setMsg(response.error);
-    //     } 
-    //     else if(response === "unavailableLocalServer")
-    //         setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-    //     else if(response === "scheduleModeOn")
-    //         setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
-    //     else if ( response === "success"){
-    //         setMsg(MSG.INTEGRATION.SUCC_SAVE);
-    //         dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
-    //         clearSelections();
-    //     }
-    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-    //     setDisabled(true)
-    //     setSelected(false)
-    //     dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
-    //     let popupMsg = false;
-    //         if(selectedScIds.length===0){
-    //             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
-    //         }
-    //         else if(selectedId===''){
-    //             popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
-    //         }
-    // }
+    const callSaveButton =async()=>{ 
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
+        const response = await api.saveJiraDetails_ICE(mappedPair);
+        if (response.error){
+            setMsg(response.error);
+        } 
+        else if(response === "unavailableLocalServer")
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+        else if(response === "scheduleModeOn")
+            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+        else if ( response === "success"){
+            setMsg(MSG.INTEGRATION.SUCC_SAVE);
+            dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+            clearSelections();
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        setDisabled(true)
+        setSelected(false)
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        let popupMsg = false;
+            if(selectedScIds.length===0){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+            }
+            else if(selectedId===''){
+                popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+            }
+    }
     // const callExit=()=>{
     //     setScreenExit(true);
     //     setScenarioArr(null);
@@ -242,11 +244,12 @@ const AzureContent = props => {
         dispatch({type: actionTypes.SEL_SCN_IDS, payload: newScenarioIds});	
     }
 
-    const handleClick=(value, id,summary)=>{
+    const handleClick=(value, summary)=>{
         let newSelectedTCDetails = { ...selectedZTCDetails };
-        let newSelectedTC = [...value,summary];
-    //    setSelected(value)
-       setSelectedId(id)
+        console.log(summary,' ', typeof(summary) ,' its summary');
+        let newSelectedTC = [value,summary];
+       setSelectedId(value)
+       setSelected(value)
        setSelectedSummary(summary)
        setDisabled(true)
        dispatch({type: actionTypes.SEL_TC_DETAILS, payload: newSelectedTCDetails});
@@ -333,6 +336,12 @@ const AzureContent = props => {
   };
   const handleSecondOptionChange = (event) => {
     setSecondOption(event.target.value);
+      if (event.target.value === 'TestPlans') {
+          setIsShowTestplan(true);
+      }
+      else if (event.target.value === 'Story') {
+          setIsShowTestplan(false);
+      }
   };
 
     return(
@@ -340,7 +349,7 @@ const AzureContent = props => {
         <Fragment>
             <MappingPage 
                 pageTitle="Azure Integration"
-                // onSave={()=>callSaveButton()}
+                onSave={()=>callSaveButton()}
                 // onViewMap={()=>props.callViewMappedFiles()}
                 // onUpdateMap={()=>props.callUpdateMappedFiles()}
                 // onExit={()=>callExit()}
@@ -362,6 +371,7 @@ const AzureContent = props => {
 
 
                      selectWorkitem={
+                        <>
                         <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e);getWorkItems(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
                             <option value="Select WorkItems"  >Select WorkItems</option>
                             {
@@ -371,6 +381,18 @@ const AzureContent = props => {
                             }
                            
                         </select>
+
+                            {
+                                isShowTestplan ?
+                                <select data-test="intg_Zephyr_project_drpdwn" value={selectedTestplan} className="qcSelectDomain" onChange={(e) => { setSelectedTestplan(e.target.value) }} style={{ marginRight: "5px" }}>
+                                    <option value="Select TestPlans"  >Select TestPlans</option>
+                                    <option> t1</option>
+                                    <option>t2</option>
+                                </select>
+                                :
+                                null
+                            }
+                            </>
                          }
                        
                          
@@ -386,7 +408,9 @@ const AzureContent = props => {
                                 : null 
                         }
                     </select>
+                    
                 }
+
                 testList={
                     <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>{handleSecondOptionChange(e)}} className="qtestAvoAssureSelectProject">
                     {
