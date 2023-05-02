@@ -43,10 +43,15 @@ const AzureContent = props => {
     const [projName, setProjName] = useState('');
     const [disabled, setDisabled] = useState(true);
     const [projectDropdn3 , setProjectDropdn3]= useState("Select Project1");
+    const [selectedProject,setSelectedProject] = useState({});
     const [userStories,setUserStories] = useState([]);
+    const [testSuites,setTestSuites] = useState([]);
     const [workItemsTitle,setWorkItemsTitle] = useState([{id:1,name:'Story'},{id:2,name:'TestPlans'}]);
     const [isShowTestplan,setIsShowTestplan] = useState(false);
     const [selectedTestplan,setSelectedTestplan] = useState('');
+    const [testPlansDropdown ,setTestPlansDropdown] = useState([]);
+    const azureLogin = useSelector(state=>state.integration.projectLogin);
+    const azureapiKeys = useSelector(state=>state.integration.azureApikeys);
 
     // const[summary1,setSummary1]=useState('');
     console.log(releaseId)
@@ -104,17 +109,7 @@ const AzureContent = props => {
     const getWorkItems = async (e) => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         console.log(e,' its e');
-        let apiObj = {
-            "action": "azureUserStories",
-            "baseurl": "https://dev.azure.com/AvoAutomation",
-            "username": "udshfuo",
-            "pat": "g2e35zqgnu7jppx3z7bqrzic7qjn5kaiijoqxdnrssogcsjsga5a",
-            "projectdetails": {
-                "id": "c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd",
-                "name": "AvoAssure"
-            }
-
-        }
+        let apiObj = Object.assign({"action": azureapiKeys.stories},azureLogin,selectedProject);
         const workItemsDetails = await api.connectAzure_ICE(apiObj);
         setUserStories(workItemsDetails.userStories);
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
@@ -133,7 +128,7 @@ const AzureContent = props => {
 
     const callSaveButton =async()=>{ 
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
-        const response = await api.saveJiraDetails_ICE(mappedPair);
+        const response = await api.saveAzureDetails_ICE(mappedPair);
         if (response.error){
             setMsg(response.error);
         } 
@@ -188,48 +183,6 @@ const AzureContent = props => {
         setFilteredName(filter)
     }
 
-    
-    // const jiraTest = async(e) => {
-    //     if(e.target.tilte !== "Select Project"){
-    //         let projectName = ""
-    //         let projectID = ''
-    //         for(let projectDetails of props.domainDetails.projects) {
-    //             if( e.target.value == projectDetails.code ) {
-    //                 projectName = projectDetails.name;
-    //                 projectID = projectDetails.id;
-    //                 setProj(projectID)
-    //                 setProjCode(e.target.value)
-    //                 setProjName(projectName)
-    //                 break;
-    //             };
-    //         }
-    //     }
-    // }
-
-    // const jiraTestIssue = async(e) => {
-    //             let jira_info ={
-    //                 project: projName,
-    //                 action:'getJiraTestcases',
-    //                 issuetype: "",
-    //                 itemType:releaseId, 
-    //                 url: props.user['url'],
-    //                 username: props.user['username'],
-    //                 password: props.user['password'],
-    //                 project_data: props.domainDetails,
-                
-    //                 key:projCode,
-    //                 // summary:summary1,
-                    
-                
-    //             }
-               
-    //             const testData = await api.getJiraTestcases_ICE(jira_info)
-    //             setTestCaseData(testData.testcases)
-    // }
-    // useEffect(()=>{
-    //     jiraTestIssue();
-    // },[releaseId, release])
-
     const selectScenarioMultiple = (e,id) => {
         let newScenarioIds = [...selectedScIds];
         if(!e.ctrlKey) {
@@ -272,14 +225,14 @@ const AzureContent = props => {
             else{
                     const mappedPair=[
                             {
-                                projectId: proj, 
-                                projectCode: projCode,
-                                projectName: projName,        
-                                testId: selectedId,
-                                testCode: selected, 
                                 scenarioId: selectedScIds,
-                                itemType:releaseId,
-                                itemSummary:selectedSummary
+                                projectId: selectedProject.projectdetails.id, 
+                                projectName: selectedProject.projectdetails.name,        
+                                // testId: selectedId,
+                                // testCode: selected,
+                                userStoryId:selectedTC[0] || '', 
+                                itemType:releaseId === 'Story' ? 'UserStory' : 'TestSuite' ,
+                                userStorySummary:selectedTC[1] || ''
                                
 
                             }
@@ -330,19 +283,50 @@ const AzureContent = props => {
   const [secondDropdownEnabled, setSecondDropdownEnabled] = useState(false);
 
   const handleFirstOptionChange = (event) => {
-    setProjectDropdn1(event.target.value);
-    setSecondDropdownEnabled(true);
-    
+    if(event.target.value){
+        const selectedOption = event.target.options[event.target.selectedIndex];
+        setProjectDropdn1(event.target.value);
+        setSelectedProject({projectdetails:{id:event.target.value,name:selectedOption.title}});
+        setSecondDropdownEnabled(true);
+    }
+   return;
   };
-  const handleSecondOptionChange = (event) => {
+  const handleSecondOptionChange = async (event) => {
     setSecondOption(event.target.value);
+    setTestSuites([]);
       if (event.target.value === 'TestPlans') {
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});  
+          setUserStories([]);
+          let apiObj = Object.assign({"action": azureapiKeys.testplans},azureLogin,selectedProject);
+          const getTestplans = await api.connectAzure_ICE(apiObj);
+          if(getTestplans && getTestplans.testplans && getTestplans.testplans.length){
+            setTestPlansDropdown(getTestplans.testplans);
+          }
           setIsShowTestplan(true);
+          dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
       }
       else if (event.target.value === 'Story') {
+          setTestPlansDropdown([]);
+          setSelectedTestplan('');
           setIsShowTestplan(false);
+          getWorkItems(event.target.value);
       }
   };
+
+  const handleTestSuite = async (event) => {
+        if(event.target.value){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+            setTestSuites([]);
+            let apiObj = Object.assign({"action": azureapiKeys.testsuites},azureLogin,{"testplandetails":{"id":parseInt(event.target.value) || ''}},selectedProject);
+            const getTestSuites = await api.connectAzure_ICE(apiObj);
+            if(getTestSuites && getTestSuites.testsuites && getTestSuites.testsuites.length){
+                setTestSuites(getTestSuites.testsuites);
+            }
+            
+            console.log(getTestSuites,' its getTestplans');
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        }
+  }
 
     return(
          !screenexit?
@@ -361,7 +345,7 @@ const AzureContent = props => {
                         <option value="Select Project" disabled >Select Project</option>
                         { props &&  props.domainDetails ? 
                             
-                            props.domainDetails.projects.map(e => (<option  key={e.id} value={e.code} title={e.name}>{e.name} </option>)) : null
+                            props.domainDetails.projects.map(e => (<option  key={e.id} value={e.id} title={e.name}>{e.name} </option>)) : null
                             
                         }
                        
@@ -372,11 +356,11 @@ const AzureContent = props => {
 
                      selectWorkitem={
                         <>
-                        <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e);getWorkItems(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
+                        <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
                             <option value="Select WorkItems"  >Select WorkItems</option>
                             {
                                 // props.domainDetails.issue_types
-                                workItemsTitle.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setReleaseId(e.target.value) }} >{e.name}  </option>))
+                                workItemsTitle.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setReleaseId(e.target.value); }} >{e.name}  </option>))
                                 
                             }
                            
@@ -384,10 +368,13 @@ const AzureContent = props => {
 
                             {
                                 isShowTestplan ?
-                                <select data-test="intg_Zephyr_project_drpdwn" value={selectedTestplan} className="qcSelectDomain" onChange={(e) => { setSelectedTestplan(e.target.value) }} style={{ marginRight: "5px" }}>
-                                    <option value="Select TestPlans"  >Select TestPlans</option>
-                                    <option> t1</option>
-                                    <option>t2</option>
+                                <select data-test="intg_Zephyr_project_drpdwn" value={selectedTestplan} className="qcSelectDomain" onChange={(e) => { handleTestSuite(e); setSelectedTestplan(e.target.value) }} style={{ marginRight: "5px" }}>
+                                    <option value="Select TestPlans" >Select TestPlans</option>
+                                   { testPlansDropdown ? 
+                                    testPlansDropdown.map((e,i) => (
+                                        <option id={i} value={e.id} key={e.id}>{e.name}</option>))
+                                    : null   
+                                }
                                 </select>
                                 :
                                 null
@@ -414,7 +401,7 @@ const AzureContent = props => {
                 testList={
                     <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>{handleSecondOptionChange(e)}} className="qtestAvoAssureSelectProject">
                     {
-                        userStories ?
+                        userStories && userStories.length ?
                         userStories.map((e,i)=>(
                             <div className={"test_tree_leaves"+ ( selected===e.id ? " test__selectedTC" : "")}>
                             <label className="test__leaf" title={e.id} onClick={()=>handleClick(e.id,e.fields['System.Title'])}>
@@ -429,7 +416,21 @@ const AzureContent = props => {
                             }
                         </div>
                             ))
-                            : null
+                            : 
+                            testSuites.map((e,i)=>(
+                                <div className={"test_tree_leaves"+ ( selected===e.id ? " test__selectedTC" : "")}>
+                                <label className="test__leaf" title={e.id} onClick={()=>handleClick(e.id,e.name)}>
+                                    <span className="leafId">{e.id}</span>    
+                                    <span className="test__tcName">{e.name} </span>
+                                </label>
+                                {selected===e.id 
+                                        && <><div className="test__syncBtns"> 
+                                        { selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled?"static/imgs/ic-qcSyncronise.png":null} />}
+                                        <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                                        </div></> 
+                                }
+                            </div>
+                                ))   
                             
                     }
                 </div>

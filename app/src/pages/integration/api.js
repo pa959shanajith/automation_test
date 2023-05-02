@@ -857,6 +857,34 @@ export const saveJiraDetails_ICE = async(mappedDetails) => {
     }
 }
 
+export const saveAzureDetails_ICE = async(mappedDetails) => {
+    try{
+        const res = await axios(url+'/saveAzureDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            mappedDetails : mappedDetails,
+            action : 'saveAzureDetails_ICE'
+            
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
+    }
+}
+
 
 export const viewJiraMappedList_ICE = async(userID) => {
     try{

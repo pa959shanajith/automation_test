@@ -35,6 +35,7 @@ const Azure = () => {
     const [mappedfilesRes,setMappedFilesRes]=useState([]);
     const [authType, setAuthType]=useState("basic");
     const [user, setUser] = useState([]);
+    const azureapiKeys = useSelector(state=>state.integration.azureApikeys);
     
 
     useEffect(() => {
@@ -62,8 +63,8 @@ const Azure = () => {
         setUser({url: azureurl,
         username: azureusername,
         password: azurepwd})
-        let apiObj = {   
-            "action" : 'azureLogin',
+        var apiObj = {   
+            "action" : azureapiKeys.login,
              "url": azureurl,
              "username": azureusername,
              "pat": azurepwd,
@@ -84,6 +85,7 @@ const Azure = () => {
         else if (domainDetails) {
             setDomainDetails(domainDetails);
             setLoginSuccess(true);
+            dispatch({type: actionTypes.PROJECT_LOGIN, payload: { "baseurl": azureurl,"username": azureusername,"pat": azurepwd}});
         } 
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
     }

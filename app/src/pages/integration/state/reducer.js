@@ -27,6 +27,8 @@ const initialState = {
         selectedPhase: []
     },
     projectList: [],
+    projectLogin:{},
+    azureApikeys:{'login':'azureLogin', 'stories':'azureUserStories','testplans':'azureTestPlans','testsuites':'azureTestSuites'}
 };
 
 const reducer = (state = initialState , action) => {
@@ -87,6 +89,11 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 projectList: action.payload
             }
+        case actionTypes.PROJECT_LOGIN:
+        return{
+            ...state,
+            projectLogin: action.payload
+        }
         default: 
             return state
     }
