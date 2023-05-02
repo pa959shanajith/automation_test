@@ -138,8 +138,7 @@ const DisplayProject = (props) => {
       >
         <span className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
-          <InputText className="i"
-            id="i"
+          <InputText className="Search_name"
             placeholder="Search"
             value={searchProjectName}
             onChange={handleSearchProject}
