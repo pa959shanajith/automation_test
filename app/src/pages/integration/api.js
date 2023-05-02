@@ -765,7 +765,7 @@ export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
   api returns [{id:"",name:""}]
 */
 
-export const connectAzure_ICE = async(Azureurl,Azureusername,Azurepwd) => {
+export const connectAzure_ICE = async(dataObj) => {
     try{
 
         const res = await axios(url+'/connectAzure_ICE', {
@@ -773,13 +773,7 @@ export const connectAzure_ICE = async(Azureurl,Azureusername,Azurepwd) => {
             headers: {
             'Content-type': 'application/json',
             },
-           data: {   
-           "action" : 'azureLogin',
-            "url": Azureurl,
-            "username": Azureusername,
-            "pat": Azurepwd,
-
-            }
+           data:dataObj
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)

@@ -92,9 +92,9 @@ exports.connectAzure_ICE = function(req, res) {
                 logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
                 res.send("Fail");
             }
-        } else if (req.body.action == 'createIssueInJira') { //Create issues in the Jira
+        } else if (req.body.action == 'createIssueInAzure') { //Create issues in the Jira
             var createObj = req.body.issue_dict;
-            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty")  && !validateData(createObj.description, "empty")) {
+            if (!validateData(createObj.info.project.text, "empty") && !validateData(createObj.info.issue.text, "empty") && !validateData(createObj.info.summary.value, "empty")  && !validateData(createObj.info.reproSteps.value, "empty")) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
@@ -102,7 +102,7 @@ exports.connectAzure_ICE = function(req, res) {
                         if (redisres[1] > 0) {
                             logger.info("Sending socket request for jira_login to cachedb");
                             dataToIce = {
-                                "emitAction": "jiralogin",
+                                "emitAction": "azureLogin",
                                 "username": icename,
                                 "action": req.body.action,
                                 "inputs": createObj
@@ -155,21 +155,22 @@ exports.connectAzure_ICE = function(req, res) {
                 logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid inputs");
                 res.send("Fail");
             }  
-        } else if (req.body.action == 'getJiraConfigureFields') { //gets jira configure fields for given project and issue type
-            var createObj = req.body.jira_input_dict;
+        } else if (req.body.action == 'getAzureConfigureFields') { //gets jira configure fields for given project and issue type
+            var createObj = req.body.azure_input_dict;
             var project = req.body.project;
+            project = 'AvoAssure'
             var issuetype = req.body.issuetype;
             var url =req.body.url;
             var username= req.body.username;
-            var password= req.body.password;
+            var pat= req.body.pat;
             var projects=req.body.projects;
             if (!validateData(project, "empty") && !validateData(issuetype, "empty")){
                 var inputs = {
                     "project": project,
                     "issuetype": issuetype,
-                    "url": url,
+                    "azureBaseUrl": url,
                     "username": username,
-                    "password": password,
+                    "azurepat": pat,
                     "projects_data":projects
                 };
                 try {
@@ -179,7 +180,7 @@ exports.connectAzure_ICE = function(req, res) {
                         if (redisres[1] > 0) {
                             logger.info("Sending socket request for jira_login to cachedb");
                             dataToIce = {
-                                "emitAction": "jiralogin",
+                                "emitAction": "azureLogin",
                                 "username": icename,
                                 "action": req.body.action,
                                 "inputs": inputs

@@ -51,7 +51,7 @@ const Integrations = () => {
                     { screenType === "qTest" && <QTest /> }
                     { screenType === "Jira" && <Jira /> }  
                     { screenType === "Azure" && <Azure/>}  
-                    <AzureContent/>              
+                    {/* <AzureContent/>               */}
                 </div>
 
                 <Rightbar />
