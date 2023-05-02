@@ -689,16 +689,21 @@ exports.saveAzureDetails_ICE = async (req, res) => {
 		if (!flag) return res.send('fail');
 		for (let i=0; i<mappedDetails.length; i++) {
 			let itr = mappedDetails[i];
-			const inputs = {
+			let inputs = {
 				"testscenarioid": itr.scenarioId[0],
 				'projectid': itr.projectId,			
 				'projectName': itr.projectName,
-				'userStoryId': itr.userStoryId,
 				// 'itemCode': itr.testCode,
                 'itemType': itr.itemType,
-                'userStorySummary':itr.userStorySummary,
 				"query": "saveAzureDetails_ICE"
 			};
+            if(inputs.itemType == 'UserStory') {
+                inputs['userStoryId'] = itr.userStoryId;
+                inputs['userStorySummary'] = itr.userStorySummary
+            } else {
+                inputs['TestSuiteId'] = itr.TestSuiteId;
+                inputs['testSuiteSummary'] = itr.testSuiteSummary
+            }
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
 			if (result == "fail") flag = false;
 		}
