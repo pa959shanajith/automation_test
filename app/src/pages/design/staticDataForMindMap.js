@@ -6,6 +6,8 @@ import Screen from './node-screens.png';
 import Test from './node-testcases.png';
 import TreeGraph from './TreeGraph';
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import ControlBox from './ControlBox';
+
 
 
 const nodes = {
@@ -151,12 +153,19 @@ function StaticDataForMindMap() {
       setShowMindmap(true)
     }
 
+
+
+
   return (
     <>
     {visible && <img src='static\imgs\MindmapImage.PNG' alt='MindMap'/>}
      <ConfirmDialog visible={visible} position='bottom-right'  onHide={() => setVisible(false)} message="Are you sure you want to proceed?"
                     header="Confirmation" icon="pi pi-info-circle" accept={accept} reject={reject} />
-    {showMindmap && <TreeGraph nodes_arr={nodes} links_arr={links} dNodes_arr={dNodes}/>}
+    {showMindmap && <TreeGraph nodes_arr={nodes} links_arr={links} dNodes_arr={dNodes}/> }
+   {showMindmap && <ControlBox />}
+
+
+  
     </>
   );
 }

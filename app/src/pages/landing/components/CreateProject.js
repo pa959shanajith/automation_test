@@ -8,22 +8,26 @@ import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
+import { Avatar } from 'primereact/avatar';
 
 
 
 
 const  CreateProject=({ visible, onHide  }) =>{
     const [value, setValue] = useState('');
-    const [selectedCity, setSelectedCity] = useState(null);
+    const [selectedApp, setSelectedApp] = useState(null);
     const toast = useRef(null);
-    const [ selectedRole, setSelectedRole]=useState(null);
+    const [ selectedRole, setSelectedRole]=useState("");
     const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
     const [displayUser, setDisplayUser]=useState([]);
     const [selectAll, setSelectAll] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [query, setQuery] = useState('');
     const [selectedAssignedCheckboxes, setSelectedAssignedCheckboxes] = useState([]);
-    const [selectedAssignedCheckboxesToMoveBack,setSelectedAssignedCheckboxesToMoveBack]= useState([]);
+    const[selectallAssaigned,setSelectallAssaigned]= useState(false);
+    const [queryDisplayUser, setQueryDisplayUser] = useState('');
+
+ 
 
 
     const apps = [
@@ -34,15 +38,16 @@ const  CreateProject=({ visible, onHide  }) =>{
         { name: 'Webservices', code: 'PRS', image:'/static/imgs/webservice.png' },
         { name: 'Mainframe', code: 'PRS', image:'/static/imgs/mainframe.png' },
         { name: 'Mobile Web', code: 'PRS', image:'/static/imgs/mobileWeb.png' },
-        { name: 'Mobile Apps', code: 'PRS', image:'/static/imgs/mobileApps.png' },
-
-       
+        { name: 'Mobile Apps', code: 'PRS', image:'/static/imgs/mobileApps.png' }, 
     ];
-    const items =[
-        { id: 1, name: 'Gabrial ', primaryRole:'Team Lead', email:'gabrial@gmail.com' },
-        { id: 2, name: 'Alexa ', primaryRole:'QA Engineer' ,  email:'alexa@gmail.com' },
-        { id: 3, name: 'Siri ',primaryRole:'Test Manager',  email:'siri@gmail.com'  },
-      ];
+    const [items , setItems]= useState ([
+        { id: 1,name: 'Jadeja D', primaryRole:'Team Lead', email:'jadeja@gmail.com' },
+        { id: 2, name: 'Mahendra dhoni', primaryRole:'QA Engineer' ,  email:'mahi@gmail.com' },
+        { id: 3, name: 'Sachin T',primaryRole:'Test Manager',  email:'sachin@gmail.com'  },
+        { id: 4, name: 'Virat Kohli',primaryRole:'Test Manager',  email:'virat@gmail.com'  },
+        { id: 5, name: 'Emily cooper', primaryRole:'Test Manager',  email:'emily@gmail.com'  },
+ 
+      ]);
 
     const roles=[
         {name:'Team Lead',code:'T'},
@@ -84,12 +89,29 @@ const  CreateProject=({ visible, onHide  }) =>{
       function handleSearch(event) {
         setQuery(event.target.value);
       }
+      function handleSearchDisplayUser(event) {
+        setQueryDisplayUser(event.target.value);
+      }
 
       function getFilteredItems() {
         return items
           .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
           .sort((a, b) => a.name.localeCompare(b.name));
       }
+
+      
+    function getFilteredDisplayUser() {
+    return displayUser
+    .filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function getInitials(name) {
+      const names = name.split(' ');
+      const initials = names.map(name => name.charAt(0).toUpperCase()).join('');
+      return initials;
+    }
+
             
 
       const handleClose = () => {
@@ -98,8 +120,78 @@ const  CreateProject=({ visible, onHide  }) =>{
 
 
       const handleButtonClick = () => {
-        setDisplayUser(selectedCheckboxes)
+        const filteredItems = items.filter(
+          (item) => !selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
+        );
+        setItems(filteredItems);
+
+        const assignedUsers = items.filter(
+          (item) => selectedCheckboxes.some((checkbox)=> checkbox.id === item.id)
+        );
+
+        setDisplayUser((prevAssignedUsers) => [
+        ...prevAssignedUsers,
+        ...assignedUsers
+  ]);
+       setSelectedCheckboxes([]);
+       setSelectAll(false);
    };
+
+
+   //unassigning users
+
+   const handleAssignedCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+    const unassignedUsers = [];
+  
+    if (value === "all") {
+      if (checked) {
+        for (var i = 0; i < displayUser.length; i++) {
+          unassignedUsers.push({ id: displayUser[i].id, name: displayUser[i].name ,primaryRole:displayUser[i].primaryRole});
+        }  
+        setSelectedAssignedCheckboxes(unassignedUsers) ;
+      }
+      else {
+        setSelectedAssignedCheckboxes([]);
+      }
+      setSelectallAssaigned(checked);
+    } 
+    else 
+    {
+      setSelectedAssignedCheckboxes((prevSelectedAssignedCheckboxes) => {
+        if (checked) {
+          return [
+            ...prevSelectedAssignedCheckboxes,
+            { id: value, name: displayUser.find((item) => item.id === value)?.name || "" }
+          ];
+        } else {
+          return prevSelectedAssignedCheckboxes.filter(
+            (checkboxId) => checkboxId.id !== value
+          );
+        }
+      });
+      setSelectallAssaigned(false);
+    }
+  };
+  
+  const handleMoveBack = () => {
+    const filteredAssignedItems = displayUser.filter(
+      (item) => !selectedAssignedCheckboxes.some((checkbox) => checkbox.id === item.id)
+    );
+    const unassignedUsers = displayUser.filter(
+      (item) => selectedAssignedCheckboxes.some((checkbox) => checkbox.id === item.id)
+    );
+    setItems((prevItems) => [...prevItems, ...unassignedUsers]);
+    setDisplayUser(filteredAssignedItems);
+    setSelectedAssignedCheckboxes([]);
+    setSelectallAssaigned(false);
+
+};
+
+
+const handleRoleChange = (e) => {
+  setSelectedRole(e.value);
+};
 
 
 
@@ -141,11 +233,11 @@ const  CreateProject=({ visible, onHide  }) =>{
         <Dialog className='Project-Dialog' header="Create Project" visible={visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>  
         <Card className='project-name-1'>
         <div className='pro-name1'>
-        < h5>Project Name</h5>
+        < h5 className='proj__name'>Project Name</h5>
             <InputText className="proj-input md:w-28rem text-400"value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter Project Name" />
             <div className='dropdown-1'>
-                <h5>Application Type</h5>
-            <Dropdown  value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={apps} optionLabel="name" 
+                <h5 className='application__name'>Application Type</h5>
+            <Dropdown  value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name" 
                 placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-26rem app-dropdown vertical-align-middle text-400 " />
                 </div>
         </div>
@@ -153,7 +245,7 @@ const  CreateProject=({ visible, onHide  }) =>{
         </Card>
         <Card className='card11' style={{height:'17rem'}}>
             <div className="card-input1">
-            <h5>Select Users</h5>
+            <h5 className='select-users'>Select Users</h5>
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
@@ -171,18 +263,23 @@ const  CreateProject=({ visible, onHide  }) =>{
     <h5>Project level role(optional)</h5>
 </div>
 <div className="check2">
-{[...items,...getFilteredItems()].map(item => (
+{getFilteredItems().map(item => (
                     
-<div key={item.id} className="flex align-items-center">
-                            <Checkbox  className=" checkbox1" inputId={item.key} name="item" value={item.id}  title={item.email} checked={selectedCheckboxes.includes(item.name)}  onChange={handleCheckboxChange}/>
-                            <h5 htmlFor={item.key} className="label-2 ml-2 mr-2 mt-2 mb-2">
+<div key={item.id} className="users-list">
+                            <Checkbox  className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id}  title={item.email} checked={selectedCheckboxes.includes(item.id)}  onChange={handleCheckboxChange}/>
+                            <h5 htmlFor={`checkbox-${item.id}`} className="label-2 ml-2 mr-2 mt-2 mb-2">
+                              
+                              <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff',width:'27px', height:'26px' }} >{getInitials(item.name)}</Avatar></span>
+            
                               <span className='user-name'> {item.name}</span>
                                 <span className='user-role'>{item.primaryRole}</span>
+                               
                                 <span className='tooltip'></span>
+                    
                                 </h5>
 
-                                <MultiSelect value={selectedRole} onChange={(e) => setSelectedRole(e.value)} options={roles} optionLabel="name"  display="chip" 
-                 placeholder="Select a Role" maxSelectedLabels={3} className="role-dropdown" />
+                                <MultiSelect   value={selectedRole} onChange={handleRoleChange} options={roles} optionLabel="name"  display="chip" 
+                                placeholder="Select a Role" maxSelectedLabels={3} className="role-dropdown" />
                             
               
                         </div>
@@ -196,34 +293,37 @@ const  CreateProject=({ visible, onHide  }) =>{
         </Card>
 
         <Button  className="gtbtn" label='>' onClick={handleButtonClick}>  </Button>
-        <Button className="ltbtn" label='<' >   </Button>
+        <Button className="ltbtn" label='<' onClick={handleMoveBack} >   </Button>
 
 
         <Card className='card22' style={{height:'17rem'}}>
             <div className='card-input2'>
-            <h5>Selected Users</h5>
+            <h5 className='selected-users'>Selected Users</h5>
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
-        <InputText placeholder="Search users by name or email address"  className='selecteduser md:w-24rem'  onChange={handleSearch} value={query} />
+        <InputText placeholder="Search users by name or email address"  className='selecteduser md:w-24rem'  onChange={handleSearchDisplayUser} value={queryDisplayUser} />
 </span>
 </div>
 
 </div>
 <div className='checkbox-2'>
-<Checkbox ></Checkbox>
+<Checkbox value='all' checked={ selectallAssaigned}  onChange={handleAssignedCheckboxChange}></Checkbox>
 <h5 className='label1'> Select All</h5>
 </div>
   
 <div className='check-bx3'>
     <ul>  
-{displayUser.map((checkboxId) => (
+{getFilteredDisplayUser().map((checkboxId) => (
     <>
-         <Checkbox key={checkboxId} className="assigned-checkbox" 
+         <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id}  value={checkboxId.id} checked={selectedAssignedCheckboxes.includes(checkboxId.id)}
+            onChange={handleAssignedCheckboxChange}
 >{checkboxId} </Checkbox>
-         <h5 htmlFor={checkboxId.key} className="label-3 ml-2 mr-2 mt-2 ">
+         <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 ">
+         <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width:'27px', height:'26px' }} >{getInitials(checkboxId.name)}</Avatar></span>
                                <span className='asgnd-name'> {checkboxId.name} </span>
                                <span className='asgnd-role'>{checkboxId.primaryRole}</span>
+                               
                                 </h5>
                                 </>
        
