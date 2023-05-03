@@ -8,7 +8,6 @@ import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
-import index from 'uuid-random';
 import { Avatar } from 'primereact/avatar';
 
 

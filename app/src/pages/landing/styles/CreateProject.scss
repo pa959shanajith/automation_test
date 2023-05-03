@@ -220,6 +220,7 @@
       font-size: 20px !important;
         }
     }
+    
     .p-dialog { 
         max-height: 94% !important;
     }
@@ -370,7 +371,10 @@
       .p-checkbox input[type="checkbox"]:checked ~ .p-checkbox-box::before {
         content: '\f00c'; /* This is the FontAwesome checkmark icon */
       }
-      
+      .p-multiselect .p-multiselect-label.p-placeholder{
+      text-align: center !important;
+      line-height: 0.5rem !important; 
+      }
     
     
     
