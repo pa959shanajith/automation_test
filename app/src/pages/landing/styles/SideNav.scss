@@ -1,43 +1,65 @@
 .sidebar_container{
     display: flex;
-}
-main{
-    width:100%;
-    // display: flex;
-}
-
-.sidebar{
-    width: 4rem;
-    color: #fff;
-    height: 100vh;
-    transition: all 0.5s;
-    border-right: solid 2px rgba(223, 220, 220, 0.925);
-}
-
-.link{
-    display: flex;
-    color: rgb(136, 132, 132);
-    padding: 1rem 0.3rem;
-    transition: all 0.5s;
-    margin-bottom: 1rem;
-    text-align-last: center;
-    cursor: pointer;
-    &:hover{
-        background: rgb(208, 207, 209);
+    .sidebar {
+        width: 4rem;
+        position: sticky;
         color: #fff;
-        transition: all 0.5s;  
+        height: 100vh;
+        transition: all 0.5s;
+        border-right: solid 2px rgba(223, 220, 220, 0.925);
+        .nav_item {
+            display: flex;
+            flex-direction: column;
+            color: rgb(136, 132, 132);
+            padding: 1rem 0.3rem;
+            transition: all 0.5s;
+            text-align-last: center;
+            cursor: pointer;
+            &_disabled {
+                display: flex;
+                flex-direction: column;
+                color:  rgb(136, 132, 132);
+                padding: 1rem 0.3rem;
+                transition: all 0.5s;
+                text-align-last: center;
+                .p-overlay-badge 
+                {
+                    .p-badge {
+                        min-width: 0.5rem !important;
+                        height: 1rem !important;
+                        right: 1rem !important;
+                        background: none !important;                       }
+                }
+                .icon {
+                    font-size: 10px;
+                    .lock_icon{
+                        position: fixed;
+                    }
+                }
+                .link_text{
+                    font-size: 0.7rem;
+                    text-align: center;
+                }
+            }
+            &:hover{
+                background: rgb(208, 207, 209);
+                color: #fff;
+                transition: all 0.5s;  
+                transition-duration: .15s!important;
+                transition-property: all .15s !important;
+            }
+            .icon{
+                font-size: 10px;
+            }
+            .link_text{
+                font-size: 0.7rem;
+                text-align: center;
+            }
+        }
+        .active{
+            border-left: solid 0.3rem rgb(150, 4, 187);
+            color: rgb(150, 4, 187);
+            border-radius: 0.2rem;
+        }
     }
-    .icon{
-        font-size: 10px;
-
-    }
-   .link_text{
-    font-size: 0.7rem;
-    text-align: center;
-   }
-}
-.active{
-    border-left: solid 0.3rem rgb(150, 4, 187);
-    color: rgb(150, 4, 187);
-    border-radius: 0.2rem;
 }

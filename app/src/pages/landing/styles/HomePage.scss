@@ -1,4 +1,8 @@
-.dashboard_container{
+.HomePage_container{
     display: flex;
     flex-direction: row;
+    &__withTab{
+        overflow: overlay;
+        margin: 1% 3%;
+    }
 }

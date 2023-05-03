@@ -1,16 +1,13 @@
 import React from 'react'; 
 import { TabMenu } from 'primereact/tabmenu';
-import {Card} from 'primereact/card'
-import { Button } from 'primereact/button';
 import '../styles/ProjectOverview.scss'
-import DisplayProject from './DisplayProject'
-
+import { useNavigate } from 'react-router-dom';
 
 const ProjectOverview=({ DefaultProject })=> {
     const items = [
-        {label: 'Overview'},
-        {label: 'Analysis'},
-        {label: 'Report'},
+        {label: 'Overview',},
+        {label: 'Analysis', },
+        {label: 'Report', },
     ];
 
     return (
