@@ -52,7 +52,7 @@ function VerticalSteps(params) {
 
   return (
     <Card className='verticalcard'>
-      <h2>Get Started</h2>
+      <h2 className='ml-2'>Get Started</h2>
       <Box sx={{ maxWidth: 800 }}>
         <Stepper className='Stepper' activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (

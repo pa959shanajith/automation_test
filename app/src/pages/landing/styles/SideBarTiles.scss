@@ -2,16 +2,12 @@
     position: relative;
     text-align: center;
     color: white;
-  }
-  
   .top-left {
     position: absolute;
-    top: 1rem;
+    top: 0rem;
     left: 16px;
-    width: 15rem;
-     
+    width: 15rem;    
   }
-
   .tile_header{
     position: absolute;
     top: 0.3rem;
@@ -28,5 +24,6 @@
     top:2.5rem;
     position: absolute;
  }
+}
 
   

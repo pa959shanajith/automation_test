@@ -2,11 +2,11 @@
 import React from 'react';
 import { Menubar } from 'primereact/menubar';
 import LogOut from './LogOut';
-import DisplayProject from './DisplayProject';
+import DisplayProject from './SidePanelProjectsDisplay';
 import UserProfile from './UserProfile'
 import '../styles/userProfile.scss'
  
-import ProjectCreation from './ProjectCreation';
+import Overview from './ProjectCreation';
 
 const MenubarDemo = (props) => {
 

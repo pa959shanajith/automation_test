@@ -92,9 +92,7 @@ const DisplayProject = (props) => {
 
     return (
       <>
-        <div className="card flex justify-content-center">
-          {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} />}
-        </div>
+        {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} />}
         {/* {visible && <CreateProject setVisible={setVisible} />} */}
         <div className={className}>
           <button
@@ -128,7 +126,7 @@ const DisplayProject = (props) => {
           </div>
         </div>
       </>
-    );
+    )
   };
 
   return (
@@ -138,15 +136,16 @@ const DisplayProject = (props) => {
         headerTemplate={template}
         toggleable
       >
-        <span className="p-input-icon-left Project-search ">
+        <div className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
           <InputText
-            id="i"
+            id="InputSearch"
+            className="p-inputtext-sm"
             placeholder="Search"
             value={searchProjectName}
             onChange={handleSearchProject}
           />
-        </span>
+        </div>
         <div className="project-list">
           {filteredProjects.map((project) => (
             <div key={project.id} className="project-card">
