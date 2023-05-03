@@ -59,7 +59,6 @@ const App = () => {
         <Topbar/>
         <div className="sidebar_sidepanel_homepage">
           <SideNavBar/>
-          <HomePage/>
           <RouteApp/>
         </div>
       </div>
@@ -73,7 +72,7 @@ const RouteApp = () => {
   return(
     <>
       <Routes>
-        <Route path="/myproject" element={<HomePage/>} />
+        <Route exact path="/" element={<HomePage/>} />
         <Route path="/integration" element={<Integration/>} />
         <Route path="/reports" element={<Report/>} />
         <Route path="/settings" element={<Settings/>} />
