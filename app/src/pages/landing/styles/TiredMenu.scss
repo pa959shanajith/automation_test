@@ -1,8 +1,8 @@
 .custom-tieredmenu{
     background-color: #030229 !important;
     border-radius: 8px !important;
-    width: 13.5rem !important;
-    position: absolute;
+    width: 13.3rem !important;
+    position: relative;
     z-index: 1;
     .p-menuitem-icon ,.p-menuitem-text{
       color: #ffffff !important;
@@ -30,6 +30,16 @@
   }
   .mar{
     margin-left: 1.5rem;
+  }
+  .tieredmenu_Font{
+    font-family:'Open Sans' !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+  }
+  .tiredmenu_align{
+    position: absolute;
+    margin-left: -11rem;
+    margin-top: 0.3rem;
   }
   
     
