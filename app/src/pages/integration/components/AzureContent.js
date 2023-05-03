@@ -340,7 +340,7 @@ const AzureContent = props => {
             <MappingPage 
                 pageTitle="Azure Integration"
                 onSave={()=>callSaveButton()}
-                // onViewMap={()=>props.callViewMappedFiles()}
+                onViewMap={()=>props.callViewMappedFiles()}
                 // onUpdateMap={()=>props.callUpdateMappedFiles()}
                 // onExit={()=>callExit()}
                 testCaseData={testCaseData}

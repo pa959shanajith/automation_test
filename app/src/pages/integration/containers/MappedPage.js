@@ -117,7 +117,36 @@ const MappedPage = props =>{
                 type: '',
                 maps: {}
             });
-        }  else {
+        }
+        else if (props.screenType === "Azure") {
+            let totalCounts = 0;
+            let mappedScenarios = 0;
+            let mappedTests = 0;
+            props.mappedfilesRes.forEach(object => {
+                totalCounts = totalCounts + 1;
+                mappedScenarios = mappedScenarios + object.testscenarioname.length;
+                mappedTests = mappedTests + 1;
+                tempRow.push({
+                    'testCaseNames': object.itemType === "UserStory" ? object.userStoryId : object.TestSuiteId, 
+                    'scenarioNames': object.testscenarioname,
+                    'mapId': object._id,
+                    'scenarioId': object.testscenarioid,
+                    'testid':object.itemId,
+                    'itemSummary': object.itemType === "UserStory" ? object.userStorySummary : object.testSuiteSummary
+                });
+            });
+            setCounts({
+                totalCounts: totalCounts,
+                mappedScenarios: mappedScenarios,
+                mappedTests: mappedTests
+            });
+        setRows(tempRow);
+        setUnSyncMaps({
+            type: '',
+            maps: {}
+        });
+    }
+          else {
                 setSelectedSc([]);
                 setSelectedTc([]);
                 setUnSynced(false);
@@ -252,6 +281,37 @@ const MappedPage = props =>{
                 }
             }
         }
+        else if (props.screenType === "Azure"){
+            for (let itemAddress of selectedMaps) {
+                let [rowIdx, labelIdx] = itemAddress.split("-");
+
+                if (type === "scenario") {
+                    if (tempUnSyncMaps.maps[rowIdx]) {
+                        tempUnSyncMaps.maps[rowIdx].testscenarioid.push(rows[rowIdx].scenarioId);
+                    }
+                    else {
+                        tempUnSyncMaps.maps[rowIdx] = {
+                            'mapid': rows[rowIdx].mapId,
+                            'testscenarioid': [rows[rowIdx].scenarioId]
+                        }
+                    }
+                }
+                else if (type === "testcase") {
+                    if (tempUnSyncMaps.maps[rowIdx]) {
+                        tempUnSyncMaps.maps[rowIdx].testCaseNames.push(rows[rowIdx].testCaseNames);
+                        tempUnSyncMaps.maps[rowIdx].testid.push(rows[rowIdx].testid);
+                    }
+                    else {
+                        tempUnSyncMaps.maps[rowIdx] = {
+                            'mapid': rows[rowIdx].mapId,
+                            'testCaseNames': [rows[rowIdx].testCaseNames],
+                            'testid': [rows[rowIdx].testid],
+                            'testSummary':[rows[rowIdx].testSummary]
+                        }
+                    }
+                }
+            }
+        }
         setUnSynced(true);
         setUnSyncMaps(tempUnSyncMaps);
     }
@@ -287,7 +347,7 @@ const MappedPage = props =>{
                     <span className="viewMap__task_name">
                         Mapped files
                     </span>
-                    {(props.screenType === "ALM" || props.screenType === "Zephyr" || props.screenType === "Jira") && 
+                    {(props.screenType === "ALM" || props.screenType === "Zephyr" || props.screenType === "Jira" || props.screenType === "Azure") && 
                     <> 
                         <div className="viewMap__counterContainer">
                             <div className="viewMap__totalCount">
@@ -325,10 +385,10 @@ const MappedPage = props =>{
                                         mapIdx={index} 
                                         screenType = {props.screenType}
                                         reqDetails = {reqDetails}
-                                        handleClick={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira") ? handleClick : null} 
+                                        handleClick={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira" || props.screenType === "Azure" ) ? handleClick : null} 
                                         selected={selectedTc} 
                                         unSynced={unSynced}
-                                        handleUnSync={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira") ? onUnSync : null}
+                                        handleUnSync={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira" || props.screenType === "Azure") ? onUnSync : null}
                                         displayError={displayError}
                                     />
                                     { (props.screenType!=="ALM" && props.screenType!== "Zephyr") && 
@@ -340,11 +400,11 @@ const MappedPage = props =>{
                                         list={scenarioNames} 
                                         type="scenario" 
                                         mapIdx={index} 
-                                        handleClick={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira") ? handleClick : null} 
+                                        handleClick={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira" || props.screenType === "Azure") ? handleClick : null} 
                                         selected={selectedSc} 
                                         unSynced={unSynced}
                                         displayError={displayError}
-                                        handleUnSync={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira") ? onUnSync : null}
+                                        handleUnSync={(props.screenType === "ALM" || props.screenType === "Zephyr"  || props.screenType === "Jira" || props.screenType === "Azure") ? onUnSync : null}
                                     />
                                 </div>) }
                             </ScrollBar>
