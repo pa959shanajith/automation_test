@@ -49,7 +49,7 @@ const SideNav = () =>{
         {
             path: "/itdm",
             name: "ITDM",
-            icon: <img src= {tabSelected==="/more" ? "static/imgs/ITDM_filled_icon.png" : "static/imgs/ITDM_icon.png"} className="icon" data-pr-tooltip="ITDM"  data-pr-position="right" height="25px"/>,
+            icon: <img src= {tabSelected==="/itdm" ? "static/imgs/ITDM_filled_icon.png" : "static/imgs/ITDM_icon.png"} className="icon" data-pr-tooltip="ITDM"  data-pr-position="right" height="25px"/>,
             disabled: true
         },
     ]

@@ -73,15 +73,11 @@ const RouteApp = () => {
   return(
     <>
       <Routes>
-        <Route path="/myproject" element={<HomePage/>} >
-          {/* <Route path="/myproject/overview" element={<Overview/>}></Route>
-          <Route path="/myproject/analysis" element={<Analysis/>}></Route>
-          <Route path="/myproject/report" element={<Overview/>}></Route> */}
-        </Route>
+        <Route path="/myproject" element={<HomePage/>} />
         <Route path="/integration" element={<Integration/>} />
         <Route path="/reports" element={<Report/>} />
         <Route path="/settings" element={<Settings/>} />
-        <Route path="/more" element={<more/>} />
+        <Route path="/itdm" element={<itdm/>} />
         <Route path="/mindmap" element={<StaticDataForMindMap/>}/>
       </Routes>
     </>
