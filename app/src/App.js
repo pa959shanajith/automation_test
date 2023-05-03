@@ -5,9 +5,8 @@ import { createBrowserRouter, RouterProvider, Route, Router, Routes, BrowserRout
 import ServiceBell from "@servicebell/widget";
 // import {store} from './reducer';
 import store from './store';
-import SideNav from './pages/landing/components/SideNav';
 // import HomePage from './pages/landing/containers/HomePage';
-import Project from './pages/landing/components/Project';
+import HomePage from './pages/landing/containers/HomePage';
 import Report from './pages/report/components/reports';
 import More from './pages/more/more';
 import Integration from './pages/integration/Integration';
@@ -24,9 +23,11 @@ import 'primeflex/primeflex.css';
 import StaticDataForMindMap from './pages/design/staticDataForMindMap';
 import './App.css';
 
-import HomePage from './pages/landing/containers/HomePage';
 import Topbar from './pages/landing/components/Topbar';
 import SideNavBar from './pages/landing/components/SideNav';
+import Overview from './pages/landing/components/ProjectCreation';
+import Analysis from './pages/landing/components/Analysis';
+
 
 
 
@@ -54,9 +55,9 @@ const App = () => {
       {/* {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null} */}
       {/* <ProgressBar /> */}
       {/* <ErrorBoundary> */}
-      <div>
+      <div className="main_content">
         <Topbar/>
-        <div className='flex flex-row'>
+        <div className="sidebar_sidepanel_homepage">
           <SideNavBar/>
           <HomePage/>
           <RouteApp/>
@@ -72,11 +73,11 @@ const RouteApp = () => {
   return(
     <>
       <Routes>
-        <Route path="/" element={<Project/>} />
+        <Route path="/myproject" element={<HomePage/>} />
         <Route path="/integration" element={<Integration/>} />
         <Route path="/reports" element={<Report/>} />
         <Route path="/settings" element={<Settings/>} />
-        <Route path="/more" element={<more/>} />
+        <Route path="/itdm" element={<itdm/>} />
         <Route path="/mindmap" element={<StaticDataForMindMap/>}/>
       </Routes>
     </>

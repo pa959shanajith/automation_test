@@ -126,7 +126,7 @@ const DisplayProject = (props) => {
           </div>
         </div>
       </>
-    );
+    )
   };
 
   return (
@@ -136,14 +136,14 @@ const DisplayProject = (props) => {
         headerTemplate={template}
         toggleable
       >
-        <span className="p-input-icon-left Project-search ">
+        <div className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
           <InputText className="Search_name"
             placeholder="Search"
             value={searchProjectName}
             onChange={handleSearchProject}
           />
-        </span>
+        </div>
         <div className="project-list">
           {filteredProjects.map((project) => (
             <div key={project.id} className="project-card">

@@ -3,18 +3,16 @@
   height: 35rem;
 }
 
-.Project-search {
-  margin-left: -0.9rem;
+.Project-search { 
+  margin: 0rem 2rem 1rem 2rem;
 }
 
 .project-list {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  align-items: flex-start;
-  padding: 0.9rem 1.1rem 1.1rem 0.1rem;
+  align-items: center;
   gap: 0.8rem;
-  margin-left: -0.9rem;
 }
 
 .project-card {

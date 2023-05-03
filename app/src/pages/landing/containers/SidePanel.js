@@ -7,18 +7,16 @@ import '../styles/SidePanel.scss';
 const SidePanel = () => {
 
     return(
-            <div className="flex flex-row h-full">
-                 <div className="sidebar_tiles">
-                {/* <> */}
-                    <DisplayProject/>
-                    {/* <div>
+            <div className="sidePanel_container h-full">
+                <DisplayProject/>
+                  {/*<div className="sidebar_tiles">
+                    <div>
                         <h2> Do more with AVO !</h2>
-                        <div className="ml-2 mr-2"><SideBarTiles background_tile_color={"static/imgs/blue_tile.png"} header_txt={"Services Virtualization"} header_icon={"static/imgs/service_icon.png"} text={"kjwekje wekh3eiubiueih13iu 1iueuie 1eudg 1idg4ui 1]f3ug"} footer_icon={"static/imgs/lock_icon.png"} footer_txt={"Get Familiar"}/></div>
+                        <div className="ml-2 mr-2 "><SideBarTiles background_tile_color={"static/imgs/light_blue_tile.png"} header_txt={"Services Virtualization"} header_icon={"static/imgs/service_tree_icon.png"} text={"kjwekje wekh3eiubiueih13iu 1iueuie 1eudg 1idg4ui 1]f3ug"} footer_icon={"static/imgs/lock_icon.png"} footer_txt={"Get Familiar"}/></div>
                         <div className="ml-2 mr-2"><SideBarTiles background_tile_color={"static/imgs/green_tile.png"} header_txt={"TestData Visualizatin"} header_icon={"static/imgs/library_icon.png"} text={"kjwekje wekh3eiubiueih13iu 1iueuie 1eudg 1idg4ui 1]f3ug"} footer_icon={"static/imgs/unlock_icon.png"} footer_txt={"Get Familiar"}/></div>
-                        <div className="ml-2 mr-2"><SideBarTiles background_tile_color={"static/imgs/blue_tile.png"} header_txt={"Services Virtualization"} header_icon={"static/imgs/Service.png"} text={"kjwekje wekh3eiubiueih13iu 1iueuie 1eudg 1idg4ui 1]f3ug"} footer_icon={"static/imgs/lock_icon.png"} footer_txt={"Get Familiar"}/></div>
-                    </div> */}
-                 </div> 
-                {/* </> */}
+                        <div className="ml-2 mr-2"><SideBarTiles background_tile_color={"static/imgs/light_blue_tile.png"} header_txt={"Services Virtualization"} header_icon={"static/imgs/service_tree_icon.png"} text={"kjwekje wekh3eiubiueih13iu 1iueuie 1eudg 1idg4ui 1]f3ug"} footer_icon={"static/imgs/lock_icon.png"} footer_txt={"Get Familiar"}/></div>
+                    </div>
+                </div>  */}
             </div> 
     )
 }
