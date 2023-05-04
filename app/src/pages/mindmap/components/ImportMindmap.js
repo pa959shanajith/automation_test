@@ -256,7 +256,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
                     {/* <option value={'git'}>Git (.mm)</option>  */}                    
 					<option value={'json'}>Structure only - Json (.json)</option>
-                    <option value={'zip'}>Complete Module(S) (.avo)</option>
+                    <option value={'zip'}>Complete Module(S) (.zip)</option>
                 </select>
             </div>
             {isMultiImport && 

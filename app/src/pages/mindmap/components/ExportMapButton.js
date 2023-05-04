@@ -241,7 +241,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
                     <>
                     <option value={'excel'}>Structure only- Excel (.xlx,.xlsx)</option>
                     {/* <option value={'git'}disabled={selectedModulelist.length>1}>Git (.mm)</option> */}
-                    <option value={'json'}>Complete Module (.avo)</option>
+                    <option value={'json'}>Complete Module (.zip)</option>
                     </>}
                 </select>}
                 </div>
