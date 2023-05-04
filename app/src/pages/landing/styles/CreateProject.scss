@@ -18,6 +18,14 @@
         position: relative;
         bottom: 1.7rem;
     }
+    
+
+    .proj__name , .application__name{
+        font-family: 'Open Sans' !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+    }
     .dropdown-1{
         float: right;
         position: relative;
@@ -53,14 +61,15 @@
     
     .card11{
         .p-card-body{
-            background: white;
             margin: 0rem;
-            height: 19rem;
+            overflow-y: auto;
+            height: 17rem;
+            overflow-x: hidden;
         }
     }  
     .card11{
         position: relative;
-        top: 1rem;
+       top:0.5rem;
         width: 36rem;
     }
     .card22{
@@ -71,20 +80,21 @@
     }
     .card22{
         .p-card-body{
-            background: white;
             margin: 0rem;
-            height: 19rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 17rem;
         }
     
     }
     .card-input1{
         position: relative;
-        bottom: 2rem;
+        bottom: 1rem;
     }
     
     .card-input2{
         position: relative;
-        bottom: 2rem;
+        bottom: 1rem;
     }
      .p.button{
         margin: 2px !important;
@@ -113,14 +123,12 @@
      }
      .check2{
          position: relative;
-         bottom: 4rem;
+         bottom: 5rem;
      }
      .p-dialog-content{
     overflow: hidden !important;
      }
-     .p-dialog-header{
-        padding: 1rem !important;
-     }
+     
     .card{
         background: none !important;
     }
@@ -128,6 +136,21 @@
     //     position: relative;
     //     left:28rem;
     //  }
+    .select-users{
+        bottom: 1rem;
+        position: relative;
+        font-size: 14px;
+        font-family: 'open-sans';
+        font-weight: 400;
+    }
+
+    .selected-users{
+        font-size: 14px;
+        font-family: 'open-sans';
+        font-weight: 400;
+        position: relative;
+        bottom: 1rem;
+    }
      .gtbtn {
         color: blue !important;
         right: -37.6rem !important;
@@ -153,8 +176,8 @@
         width: 11rem;
         height: 2em;
         position: relative;
-        left: 15rem;
-        top: 0rem;
+        left: 1rem;
+        bottom: 7rem;
         margin-bottom: 0.5rem;
     }
     .checkbox1{
@@ -164,10 +187,12 @@
     }
     
     .label-2{
-        // margin:0.8rem 0rem 1rem 1rem !important;
         display: flex;
         flex-direction: column;
         width: 5rem;
+        bottom: 3rem;
+        left: 1rem;
+        position: relative;
     }
     .selectallbtn{
         position: relative;
@@ -179,7 +204,7 @@
     }
     .user-select-checkbox {
         position: relative;
-        bottom: 1rem;
+        bottom: 0rem;
     }
     .selecteduser{
         width: 23rem;
@@ -188,8 +213,14 @@
     .Project-Dialog{
         .p-dialog-header {
        background: #e9ecef !important;
+       padding: 1rem !important;
+       font-family: 'Open Sans' !important;
+      font-style: normal !important;
+      font-weight: 600 !important; 
+      font-size: 20px !important;
         }
     }
+    
     .p-dialog { 
         max-height: 94% !important;
     }
@@ -198,7 +229,7 @@
     }
     .checkbox-2{
         position: relative;
-        bottom: 2.2rem;
+        bottom: 1.5rem;
     }
     .dropdown_role{
         position: relative;
@@ -209,34 +240,51 @@
     }
     .check-bx3{
         position: relative;
-        bottom: 2rem;
+        bottom: 1.5rem;
 
     }
     .user-role{
         color: darkgrey;
         font-size: 12px;
+        position: relative;
+        left: 2.2rem;
+        bottom: 1rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
     }
+    
     .assigned-checkbox{
         position: relative;
         bottom: 2rem;
     }
     .asgnd-name{
         position: relative;
-        bottom: 4rem;
-        left: 1.5rem;
+        bottom: 6rem;
+        left: 3.4rem;
+        width: 12rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
     }
     .asgnd-role{
-        position: relative;
-        bottom: 4.1rem;
-        left: 1rem;
-        color: darkgrey;
-        font-size: 12px;
+    position: relative;
+    bottom: 6.1rem;
+    left: 3.4rem;
+    color: darkgrey;
+    font-size: 12px;
+    font-family: 'Open Sans';
+   font-style: normal;
+   font-weight: 400;
+    font-size: 14px;
     }
     .label-3{
         display: flex;
         flex-direction: column;
         width: 5rem;
-        margin-bottom: -1rem;
+        margin-bottom: -3rem;
     }
     .tooltip {
         position: relative;
@@ -272,6 +320,60 @@
       .tooltip:hover::after {
         visibility: visible;
         opacity: 1;
+      }
+
+      .user-name{
+        width: 16rem;
+        position: relative;
+        left: 2.2rem;
+        bottom: 1rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+      }
+      .user-av{
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.85rem;
+      }
+      .user-avatar{
+        position: relative;
+        top: 1rem;
+        left: 0rem;
+      }
+
+      .asgnd-avatar{
+        position: relative;
+        bottom: 4rem;
+        left: 1.2rem;
+        right: 0rem;
+      }
+      .users-list{
+        position: relative;
+        top: 1rem;
+        margin-bottom: -3.5rem;
+      }
+
+      .p-checkbox .p-checkbox-box {
+        height: 1.5rem;
+        width: 1.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #ced4da;
+        background-color: #fff;
+      }
+      
+      .p-checkbox .p-checkbox-box::before {
+        font-size: 1rem;
+        color: #007bff;
+      }
+      
+      .p-checkbox input[type="checkbox"]:checked ~ .p-checkbox-box::before {
+        content: '\f00c'; /* This is the FontAwesome checkmark icon */
+      }
+      .p-multiselect .p-multiselect-label.p-placeholder{
+      text-align: center !important;
+      line-height: 0.5rem !important; 
       }
     
     

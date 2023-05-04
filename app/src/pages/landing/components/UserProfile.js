@@ -144,20 +144,20 @@ return (
     <div>
 
 {userLoginInfo.profilePictureUrl ? (
-        <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='large' title="User Profile"/>
+        <Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='small' title="User Profile"/>
 ) : (
 
         <div >
-        <Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='large' label={getInitials()} onClick={handleChipClick} shape="circle" title="User Profile"/>
+        <Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='small' label={getInitials()} onClick={handleChipClick} shape="circle" title="User Profile"/>
         
 </div>
         
     )
     }
     </div>
-<div style={{position: 'absolute',marginLeft:'-10rem', marginTop: '0.9rem'}}>
+<div className="tiredmenu_align">
     {showMenu && (
-    <TieredMenu model={menuitems}  className='custom-tieredmenu link a ' />
+   <TieredMenu  className='custom-tieredmenu link a tieredmenu_Font' model={menuitems}  />
 
     )}
     </div>
