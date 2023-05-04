@@ -9,7 +9,7 @@ var path = require('path');
 var fs = require('fs');
 var xl = require('excel4node');
 var Client = require("node-rest-client").Client;
-var notification = require('../notifications/index')
+var notification = require('../notifications/index');
 var epurl = process.env.DAS_URL;
 var client = new Client();
 const configpath= require('../config/options');
@@ -1031,6 +1031,8 @@ exports.exportMindmap = async (req, res) => {
 			"exportedfilepath":exportedfilepath,
 			"exportquery":path.join(process.cwd(),configpath.exportedmindmap.Exportquery),
 			"exportbatfile":path.join(process.cwd(),configpath.exportedmindmap.ExportMindmapBatch),
+			"ip":configpath.ip,
+			"password":configpath.password,
 			"mongopath": configpath.mongopath,
 			"mongoexportpath":configpath.mongoexportpath,
 			"username":username,
@@ -1075,6 +1077,8 @@ exports.importMindmap = async (req, res) => {
 			"projectid": content["projid"],
 			"apptype": content["apptype"],
 			"query":"importMindmap",
+			"ip":configpath.ip,
+			"password":configpath.password,
 			"user":req.session.username,
 			"importpath":path.join(process.cwd(),configpath.importMindmap),
 			"importquerypath":path.join(process.cwd(),configpath.importquerypath),
@@ -1120,7 +1124,7 @@ exports.writeZipFileServer = async(req,res) => {
 			});
 			await unzipStream.on('close', async () => {
 				let jsonResponse = {msg : 'Files extracted successfully',appType:''};
-				let jsonFilepath = targetDir +'\\'+ 'Modules1.json';
+				let jsonFilepath = targetDir +'\\'+ 'Modules.json';
 				 fs.readFile(jsonFilepath, 'utf8', (err, data) => {
 					if (err) throw err;
 					let jsonData = JSON.parse(data);
@@ -1149,86 +1153,10 @@ exports.writeFileServer = async (req, res) => {
 	const fnName = "writeFileServer";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		//let data = req.body;
+		let data = req.body;
 		let user =  req.session.username;
-		let filepath = configpath.importMindmap;
+		let path = configpath.importMindmap;
 		user = user.split('.').join("");
-		var importPath=filepath+"/"+user
-		let files = req.body;
-
-
-    	// fs.writeFile(files.fileName, files.data, "base64", function (err) {
-		// 	if(err)
-		// 		res.send(err);
-		// 	else
-		// 		res.end("Uploaded");
-		// 	});
-
-
-		// const writeStream = fs.createWriteStream("unzipped");
-
-		// const filePath = path;
-
-		// const fileWriteStream = fs.createWriteStream(filePath);
-
-		// req.on('data', (data) => {
-		// fileWriteStream.write(data);
-		// });
-
-		// req.on('end', () => {
-		// console.log('Finished writing file.');
-		// fileWriteStream.end();
-		// // res.writeHead(200, { 'Connection': 'close' });
-		// res.end();
-		// });
-
-
-		// req.pipe(zlib.createGunzip()).pipe(writeStream);
-		// console.log(writeStream);
-		// writeStream.on('finish', () => {
-		// console.log('File unzipped successfully.');
-		// res.end('File unzipped successfully.');
-		// });
-
-		// let fileContents = null;
-
-		// req.on('data', (data) => {
-		// // create a gunzip stream to decompress the file contents
-		// const gunzip = zlib.createGunzip();
-
-		// gunzip.on('data', (decompressedData) => {
-		// 	fileContents = decompressedData;
-		// });
-
-		// gunzip.on('end', () => {
-		// 	// do something with the decompressed file contents
-		// 	console.log(fileContents.toString());
-		// 	writeStream.on('finish', () => {
-		// 		console.log('File unzipped successfully.');
-		// 		res.end('File unzipped successfully.');
-		// 		});
-		// });
-
-		// gunzip.write(data);
-		// gunzip.end();
-		// });
-
-		// req.on('end', () => {
-		// console.log('Finished parsing request body.');
-		// res.writeHead(200, { 'Connection': 'close' });
-		// res.end();
-		// });
-
-		// const readStream = fs.createReadStream(data);
-		// const writeStream = fs.createWriteStream(importPath);
-		// readStream.pipe(zlib.createGunzip()).pipe(writeStream);
-
-		// Listen for the finish event to know when the unzip is complete
-		// writeStream.on('finish', () => {
-		// console.log('File unzipped successfully!');
-		// });
-		
-		
 		if (data.type=="json"){
 			var importPath=path+"/"+"json"+"/"+user+".json"
 		}
@@ -1499,7 +1427,7 @@ exports.jsonToMindmap = async (req, res) => {
 		var username = req.session.username;
 		var importproj = req.body["mindmapId"]["importproj"]
 		var importtype=req.body["mindmapId"]["type"]
-		if (req.body["mindmapId"]["type"]){
+		if (req.body["mindmapId"]["type"] ==="importjson"){
 			 
 			var importpath =path.join(process.cwd(),configpath.importjsonfile) 
 		}
@@ -1511,12 +1439,14 @@ exports.jsonToMindmap = async (req, res) => {
 		const inputs= {
 			"username": username,
 			"importproj":importproj,
-			"importpath":importpath,
-			"importquerypath":path.join(process.cwd(),configpath.importquerypath),
+			"importpath":importpath,			
+			"ip":configpath.ip,
+			"password":configpath.password,
 			"mongoimportpath":configpath.mongoimportpath,
 			"userid":userid,
 			"role":userroleid,
-			"importtype":importtype
+			"importtype":importtype,
+			"importJsonQuery":path.join(process.cwd(),configpath.importJsonQuery),
 
 		}
 		const result = await utils.fetchData(inputs, "mindmap/jsonToMindmap", fnName);

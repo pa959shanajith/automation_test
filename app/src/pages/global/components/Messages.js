@@ -322,6 +322,7 @@ const Messages={
         SUCC_NODE_CREATE: {"CONTENT":"Nodes created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED: {"CONTENT":"Data Exported Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED_NOTIFY:{"CONTENT":"Export file is being prepared kindly wait for few minutes", "VARIANT": VARIANT.SUCCESS},
+        SUCC_DATA_IMPORT_NOTIFY:{"CONTENT":"Import is in progress kindly wait for few minutes", "VARIANT": VARIANT.SUCCESS},        
         SUCC_DATA_IMPORTED: {"CONTENT":"Data Imported Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SAVE: {"CONTENT":'Tasks saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_SAVE: {"CONTENT":'Data saved successfully.', "VARIANT": VARIANT.SUCCESS},
@@ -332,6 +333,8 @@ const Messages={
         SUCC_DATA_EXPORTED_ON_FILE:{"CONTENT":"Exported file is ready, click on EXPORT button for link details.", "VARIANT": VARIANT.SUCCESS},
 
         WARN_PROJECT_ASSIGN_USER: {"CONTENT":'This project is not assigned to user.', "VARIANT": VARIANT.WARNING},
+        WARN_EXPORT_INPROGRESS: {"CONTENT":'Please try export after some time', "VARIANT": VARIANT.WARNING},
+        WARN_IMPORT_INPROGRESS: {"CONTENT":'Please try import after some time', "VARIANT": VARIANT.WARNING},
         WARN_SELECT_COMPLETE_FLOW: {"CONTENT":"Please select a complete flow to assign tasks.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_E2E: {"CONTENT":"First, Please select an end to end module or create a new one.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_SCENARIO_PASTE: {"CONTENT":"'Please select a Scenario to paste to..", "VARIANT": VARIANT.WARNING},

@@ -39,8 +39,35 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const userInfo = useSelector(state=>state.login.userinfo);   
     const [showMessage, setShowMessage] = useState(false);    
     const dispatchAction=useDispatch()
-   
-    const getExportFile = async (clientVer) => {
+    const [OS,setOS] = useState("Windows");
+
+    const getOS = 
+   useEffect(()=>{
+    (() => {
+        let userAgent = navigator.userAgent.toLowerCase();
+        if (/windows nt/.test(userAgent))
+            setOS("Windows");
+
+        else if (/mac os x/.test(userAgent))
+            setOS("MacOS");
+
+        else if (/linux x86_64/.test(userAgent))
+            setOS("Linux")
+        else
+            setOS("Not Supported");
+    })()
+   },[])
+    const getExportFile = async () => {
+        let clientVer
+        if(OS==='Windows'){
+            clientVer="avoclientpath_Windows"
+        }
+        if(OS==="MacOS"){
+            clientVer="avoclientpath_Mac"
+        }
+        if(OS==='Linux'){
+            clientVer="avoclientpath_Linux"
+        }
         try {
             setShowUD(false);
             setShowOverlay(`Loading...`);
@@ -116,7 +143,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             content={<Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} 
             expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}/>} 
             />:null}
-            <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)}>
+            <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)} >
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                     <text x="16" y="18">Export</text>
@@ -214,7 +241,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
                     <>
                     <option value={'excel'}>Structure only- Excel (.xlx,.xlsx)</option>
                     {/* <option value={'git'}disabled={selectedModulelist.length>1}>Git (.mm)</option> */}
-                    {/* <option value={'json'}disabled={selectedModulelist.length>1}>Complete Module (.avo)</option> */}
+                    <option value={'json'}>Complete Module (.avo)</option>
                     </>}
                 </select>}
                 </div>
@@ -246,7 +273,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
                 </div>:null
             } */}
             {showMessage?<div > Export file is being prepared. <br></br> You can come back to this section after few minutes for the download</div> :null}
-       {enableExport?<div >Click <span style={{color:'blue',cursor:'pointer',fontWeight:'bold'}} onClick={()=>{getExportFile("avoclientpath_Windows")}}>here</span> to download the exported file </div>:null} 
+       {enableExport?<div >Click <span style={{color:'blue',cursor:'pointer',fontWeight:'bold'}} onClick={()=>{getExportFile()}}>here</span> to download the exported file </div>:null} 
        
             
         </div>
@@ -308,14 +335,19 @@ const toJSON = async(module,fname,displayError,setBlockui,setShowMessage,setMsg,
         }
         ResetSession.start()
         let result = await exportMindmap(data)
-        if(result.error){displayError(result.error);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""});dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false});dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}); ResetSession.end();return;}
-        setBlockui({show:false,content:''})
-        setShowMessage(false);
-        ResetSession.end()
-        // setUserDownloadDetails(true);
         
-        dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:true})
-        setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED_ON_FILE)
+        if(result.error){displayError(result.error);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""});dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false});dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}); ResetSession.end();return;}
+        if(result === "InProgress"){setMsg(MSG.MINDMAP.WARN_EXPORT_INPROGRESS);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""});dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false});dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}); ResetSession.end();return;}
+        
+        ResetSession.end()
+        let showExportEnableTimer=setTimeout(()=>{
+            dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:true})
+            setBlockui({show:false,content:''})
+            setShowMessage(false);
+            setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED_ON_FILE)
+        },5000)
+        
+        
              
         
     }catch(err){
@@ -337,6 +369,7 @@ const exportToProj = async(module,currProjId,displayError,setBlockui) => {
         ResetSession.start()
         var result =  await exportToProject(data)
         if(result.error){displayError(result.error);ResetSession.end();return;}
+        if(result === "InProgress"){setMsg(MSG.MINDMAP.WARN_EXPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
         setBlockui({show:false,content:''})
         setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
         ResetSession.end()

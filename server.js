@@ -364,9 +364,14 @@ if (cluster.isMaster) {
 			let exportfile = uiConfig.exportedmindmap.ExportedMindmapFilePath;
 			let username = req.user.username;
 			username = username.split('.').join("");
-			exportfile=exportfile+"/"+username+"/"+projName+".json";			
+			exportfile=exportfile+"/"+username+".zip";
+			var dateObj = new Date();
+			var month = dateObj.getUTCMonth() + 1;
+			var day = dateObj.getUTCDate();
+			var year = dateObj.getUTCFullYear();
+			var newdate = year + "-" + month + "-" + day;			
 			if (req.query.file == "getExportFile") {
-			  return res.download(path.resolve(exportfile),projName+(req.query.fileName?(req.query.fileName):"")+".avo")
+			  return res.download(path.resolve(exportfile),projName+"_"+(newdate?(newdate):"")+".zip")
 			} else {
 				let status = "na";
 				try {

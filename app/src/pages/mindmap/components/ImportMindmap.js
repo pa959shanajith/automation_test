@@ -178,10 +178,12 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                 
                 if(isMultiImport && importType === 'zip'){
                     // setBlockui({content:'Importing ...',show:true})
+                    setMsg(MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY)
                     ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
                     if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end(); return;}
+                    if(res === "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
                     var req={
                         tab:"tabCreate",
                         projectid:mindmapData[0]?mindmapData[mindmapData.length -1]["projectid"]:mindmapData.projectid,
@@ -199,23 +201,27 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     ResetSession.end();
                 }else if(importType === 'excel'){
                     // setBlockui({content:'Importing ...',show:true})
+                    setMsg(MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY)
                     ResetSession.start()
                     var importproj=projRef.current ? projRef.current.value: undefined          
                     var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheetRef.current? sheetRef.current.value: undefined})
                     if(res.error){displayError(res.error);return;}                    
                     else{
                         
-                        var importexcel = await jsonToMindmap({"importproj":importproj})
+                        var importexcel = await jsonToMindmap({"type":"importexcel","importproj":importproj})
                         if(importexcel.error){displayError(importexcel.error);return;}
+                        if(importexcel == "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setImportPop(false);ResetSession.end();return;}
                         setImportPop(false);
                         setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                         setBlockui({show:false})
                         ResetSession.end();
                 }}else if(importType === 'json'){
+                    setMsg(MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY)
                     // setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
                     var res = await jsonToMindmap({"type":"importjson","importproj":projRef.current ? projRef.current.value: undefined})
                     if(res.error){displayError(res.error);return;}
+                    if(importexcel == "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setImportPop(false);ResetSession.end();return;}
                     setImportPop(false);
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                     setBlockui({show:false})
@@ -248,9 +254,9 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     <option value={'def-val'} disabled>Select Import Format</option>
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
                     <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
-                    {/* <option value={'git'}>Git (.mm)</option>  */}
-                    <option value={'zip'}>Complete Module(S) (.avo)</option>
+                    {/* <option value={'git'}>Git (.mm)</option>  */}                    
 					<option value={'json'}>Structure only - Json (.json)</option>
+                    <option value={'zip'}>Complete Module(S) (.avo)</option>
                 </select>
             </div>
             {isMultiImport && 
@@ -524,6 +530,7 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
                 setBlockui({show:false})}
             setBlockui({show:false})
             setFiledUpload(result)
+            setDisableSubmit(false)
         }else{
             setBlockui({show:false})
                 setError("File is empty")
@@ -547,12 +554,6 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
             formData.append('file',file)
             const res = await writeZipFileServer(formData);
             console.log(res,' its res from server');
-
-        
-            // reader.readAsArrayBuffer(fileInput.files[0]);
-            // const result =  await read(file)             
-            // var projFlag = false
-            // var duplicateData = JSON.parse(result);
             let selectedAppType = projList[selectedProject].apptypeName;  
             var importedAppType = res.appType;
             if(selectedAppType!==importedAppType){
@@ -561,32 +562,14 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
                 setBlockui({show:false})
                 return
             }
-            
-            
             let data={"apptype":res.appType,
             "projid":selectedProject}
             setMindmapData(data); 
-            // let startData={"status":"start"}
-            // let endData={"status":"stop"} 
-            // const start= await writeFileServer(startData)                    
-            // for (let i=0;i<duplicateData.length;i++){
-            //     if (i==0){
-            //         duplicateData[i]["status"]="first"
-            //         const res1= await writeFileServer(duplicateData[i])
-            //         if(res1.error){setDisableSubmit(true)}}
-            //     else{
-            //     const res1= await writeFileServer(duplicateData[i])
-            //     if(res1.error){setDisableSubmit(true)}}}
             
-            
-            // const end= await writeFileServer(endData)
             if(res.error || !res.appType){setDisableSubmit(true);setBlockui({show:false});return}
             else{setDisableSubmit(false);
                 setBlockui({show:false})}
-            setBlockui({show:false})
-                
-            
-             
+            setBlockui({show:false}) 
         }else{
             setError("File is not supported")
             setDisableSubmit(true)
@@ -603,26 +586,20 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
 
 // read promise that resolves on successful input file read
 
-    async function read(file) {
-        await axios
-            .post(url+'/writeFileServer', file)
-            .then(() => {
-                console.log('file processed');
-            });
-
-    // return new Promise ((res,rej)=>{
-    //     var reader = new FileReader();
-    //     reader.onload = function() {
-    //     res(reader.result);
-    //     }
-    //     reader.onerror = () => {
-    //     rej("fail")
-    //     }
-    //     reader.onabort = () =>{
-    //     rej("fail")
-    //     }
-    //     reader.readAsBinaryString(file);
-    // })
+function read(file) {
+    return new Promise ((res,rej)=>{
+        var reader = new FileReader();
+        reader.onload = function() {
+        res(reader.result);
+        }
+        reader.onerror = () => {
+        rej("fail")
+        }
+        reader.onabort = () =>{
+        rej("fail")
+        }
+        reader.readAsBinaryString(file);
+    })
 }
 
 const validNodeDetails = (value) =>{
