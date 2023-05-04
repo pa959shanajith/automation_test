@@ -80,7 +80,7 @@ const SocketFactory = () => {
                         {/* <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br /> */}
                         <p style={{ cursor: 'default' }}>{showAfterExecutionIsTrial.content} 
                         <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false }); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
-                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> Know your plan</a> </span> now.</p>
+                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View plans </a> </span> now.</p>
                         </p></>
                     }
                     
