@@ -14,7 +14,7 @@ const ProjectOverview=({ DefaultProject })=> {
     ];
 
     return (
-        <div className="OverviewSection">
+        <div className="surface-card OverviewSection">
             <h1> {DefaultProject}</h1>
             <button className="manage-btn">Manage Project</button>
             <TabMenu className='tab-menu' model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}/>
