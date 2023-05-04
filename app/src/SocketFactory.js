@@ -81,7 +81,7 @@ const SocketFactory = () => {
                         {/* <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br /> */}
                         <p style={{ cursor: 'default' }}>{showAfterExecutionIsTrial.content} 
                         <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false }); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
-                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View plans</a> </span> now.</p>
+                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.Please logout and login to continue.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View plans</a> </span> now.</p>
                         </p></>
                     }
                     
@@ -125,10 +125,15 @@ const SocketFactory = () => {
             setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
         } 
         else if (data === "success") {
-            await UpdateUserInfoforLicence()
-            setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
-            setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
-
+            if(userInfo.isTrial === true){
+                await UpdateUserInfoforLicence()
+                setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+                setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
+            }
+            else{
+                setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+                setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
+            }
         } else if(data === "Completed"){
             setMsg(MSG.CUSTOM(msg,VARIANT.SUCCESS));
         } else if(data === 'accessibilityTestingSuccess') {
