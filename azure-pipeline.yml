@@ -140,7 +140,7 @@ stages:
         cd $(Build.SourcesDirectory)/Webapp
         if "%ENABLE_NGINX%" == "TRUE" (
           echo "Adding nginx in the package"
-          xcopy /I /Q /Y /E /S D:\AvoAssure\Packages\nginx ..\Nginx
+          xcopy /I /Q /Y /E /S %NAS_WEB%\Build\windows\nginx ..\NginX
           move /Y .\nginx.conf ..\NginX\conf
           copy /Y .\server\https\* ..\NginX\conf
           cd ..
@@ -246,7 +246,11 @@ stages:
         cd $(Build.SourcesDirectory)
         echo Zipping folders - $(FOLDERS_TO_ZIP_AZ)
         REM 7z.exe a -mx7 %tagno%.zip versionnoUI.txt releasenotesUI.log %FOLDERS_TO_ZIP%
-        7z.exe a -tzip -mmt=on -xr!.git\ -mx7 %tagno%.zip versionnoUI.txt releasenotesUI.log %FOLDERS_TO_ZIP_AZ%
+        7z.exe a -tzip -mmt=on -xr!.git\ -mx7 %tagno%.zip versionnoUI.txt releasenotesUI.log %FOLDERS_TO_ZIP_AZ% 
+        echo "UPLOADING TO..... Z:/stage/UI/"
+        echo "BUILD NUMBER=%buildno%"
+        REM copy %tagno%.zip Z:\stage\windows_archive\UI
+        call Z:\stage\windows_archive\UI\updatenodemodules.bat
       name: Package
       displayName: Building package
     
@@ -275,6 +279,17 @@ stages:
         dir $(Build.ArtifactStagingDirectory)
       name: EchoArtifacts
       displayName: Display available Artifacts
+
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.ArtifactStagingDirectory)/$(Version.tagno).zip'
+        MachineNames: '$(NAS_IP)'
+        AdminUserName: '$(SVC_USER)'
+        AdminPassword: '$(SVC_PWD)'
+        TargetPath: '$(NAS_WEB)\$(STAGE_PATH_WEB)'
+        AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+      name: PushToNAS
+      displayName: Pushing to stage server
 
     - task: WindowsMachineFileCopy@2
       inputs:
