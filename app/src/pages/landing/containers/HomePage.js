@@ -15,7 +15,6 @@ const HomePage = () => {
             <SidePanel/>
             <div className='surface-100 flex flex-column h-full'>
                 <div><ProjectOverview/></div>
-                <div className="HomePage_container__withTab"><ProjectCreation/></div>
             </div>    
         </div>
     )

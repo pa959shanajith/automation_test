@@ -66,15 +66,26 @@
     position: absolute;
     z-index: 1;
     margin: 0rem 0rem 0rem -84rem;
+    .p-menu .p-menuitem-link:not(.p-disabled):hover{
+      background: none !important;
+    }
 }
-.Project-Panel{
-    height:1vh;
-}
-.sort_menu_hover
-      .p-menu .p-menuitem-link:not(.p-disabled):hover{
-        background: rgba(96, 91, 255, 0.2) !important;
-      }
 
+  .Project-Panel {
+     .p-panel-header {
+     flex-flow: row;
+     display: flex;
+     height: 3rem !important;
+     border: none !important;
+     align-items: center !important;
+     }
+     .p-toggleable-content {
+     .p-panel-content{
+     border: none !important;
+     padding: none !important;
+     }
+     }
+  }
 .All_Project_font {
   font-family: 'Open Sans';
 font-style: normal;

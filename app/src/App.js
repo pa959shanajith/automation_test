@@ -12,7 +12,6 @@ import More from './pages/more/more';
 import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
 import {ErrorPage} from './pages/global';
-import Login, {Base} from './pages/login';
 import MenubarDemo from './pages/landing/components/Topbar';
 // import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
 // import SocketFactory from './SocketFactory';
@@ -27,6 +26,8 @@ import Topbar from './pages/landing/components/Topbar';
 import SideNavBar from './pages/landing/components/SideNav';
 import Overview from './pages/landing/components/ProjectCreation';
 import Analysis from './pages/landing/components/Analysis';
+import Login from './pages/login/containers/LoginPage';
+
 
 
 
@@ -56,10 +57,10 @@ const App = () => {
       {/* <ProgressBar /> */}
       {/* <ErrorBoundary> */}
       <div className="main_content">
+        {/* <Login/> */}
         <Topbar/>
         <div className="sidebar_sidepanel_homepage">
           <SideNavBar/>
-          <HomePage/>
           <RouteApp/>
         </div>
       </div>
@@ -73,7 +74,7 @@ const RouteApp = () => {
   return(
     <>
       <Routes>
-        <Route path="/myproject" element={<HomePage/>} />
+        <Route exact path="/" element={<HomePage/>} />
         <Route path="/integration" element={<Integration/>} />
         <Route path="/reports" element={<Report/>} />
         <Route path="/settings" element={<Settings/>} />
