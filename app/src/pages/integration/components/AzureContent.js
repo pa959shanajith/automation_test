@@ -153,14 +153,14 @@ const AzureContent = props => {
                 popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
             }
     }
-    // const callExit=()=>{
-    //     setScreenExit(true);
-    //     setScenarioArr(null);
-    //     setProjectDropdn1("Select Project");
-    //     setScenario_ID("Select Project");
-    //     setProjectDropdn2("Select Project");
-    //     dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
-    // }
+    const callExit=()=>{
+        setScreenExit(true);
+        setScenarioArr(null);
+        setProjectDropdn1("Select Project");
+        setScenario_ID("Select Project");
+        setProjectDropdn2("Select Project");
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
+    }
     
     const clearSelections = () => {
         dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
@@ -342,7 +342,7 @@ const AzureContent = props => {
                 onSave={()=>callSaveButton()}
                 onViewMap={()=>props.callViewMappedFiles()}
                 // onUpdateMap={()=>props.callUpdateMappedFiles()}
-                // onExit={()=>callExit()}
+                onExit={()=>callExit()}
                 testCaseData={testCaseData}
                 leftBoxTitle="Azure tests"
                 rightBoxTitle="Avo Assure Scenarios"

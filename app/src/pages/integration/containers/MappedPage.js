@@ -3,6 +3,8 @@ import {ScrollBar, Messages as MSG, setMsg} from '../../global';
 import MappedLabel from '../components/MappedLabel';
 import { saveUnsyncDetails } from '../api';
 import '../styles/MappedPage.scss';
+import { useDispatch } from 'react-redux';
+import * as actionTypes from '../state/action';
 
 /* 
     screenType - ALM/qTest/Zephyr
@@ -12,7 +14,7 @@ import '../styles/MappedPage.scss';
 */
 
 const MappedPage = props =>{
-    
+    const dispatch = useDispatch();
     const [selectedSc, setSelectedSc] = useState([]);
     const [selectedTc, setSelectedTc] = useState([]);
     const [unSynced, setUnSynced] = useState(false);
@@ -317,6 +319,7 @@ const MappedPage = props =>{
     }
 
     const onSave = () => {
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         if(Object.values(unSyncMaps.maps).length > 0){
             let args = Object.values(unSyncMaps.maps);
             args['screenType']=props.screenType;
@@ -336,6 +339,7 @@ const MappedPage = props =>{
 			.catch (error => setMsg(MSG.INTEGRATION.ERR_SAVE))
 		}
 		else setMsg(MSG.INTEGRATION.WARN_UNMAP_TC)
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const displayError = (error) =>{
         setMsg(error)
