@@ -143,7 +143,7 @@ stages:
 
           # copying the nginx from local direcory - changes by Ajay on 03/05/2023
           # xcopy /I /Q /Y /E /S %NAS_WEB%\Build\windows\nginx ..\NginX
-          xcopy /I /Q /Y /E /S D:\AvoAssure\Packages\nginx.7z ..\Nginx
+          xcopy /I /Q /Y /E /S D:\AvoAssure\Packages\nginx ..\Nginx
           move /Y .\nginx.conf ..\NginX\conf
           copy /Y .\server\https\* ..\NginX\conf
           cd ..
