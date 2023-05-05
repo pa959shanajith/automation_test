@@ -90,39 +90,39 @@ const Azure = () => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
     }
 
-    // const callViewMappedFiles=async(saveFlag)=>{
-    //     try{
-    //         dispatch({type: actionTypes.SHOW_OVERLAY, payload: saveFlag?'Updating...':'Fetching...'});
+    const callViewMappedFiles=async(saveFlag)=>{
+        try{
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: saveFlag?'Updating...':'Fetching...'});
         
-    //         const response = await api.viewJiraMappedList_ICE(user_id);
+            const response = await api.viewAzureMappedList_ICE(user_id);
             
-    //         if (response.error){
-    //             setMsg(response.error);
-    //             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-    //         } 
-    //         else if (response.length){
-    //             dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Jira" });
-    //             if (saveFlag) 
-    //                 setMsg(MSG.INTEGRATION.SUCC_SAVE);
-    //             setMappedFilesRes(response);
-    //         }
-    //         else {
-    //             if (saveFlag) {
-    //                 dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
-    //                 setMsg(MSG.INTEGRATION.SUCC_SAVE);
-    //             } else {
-    //                 setMsg(MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS);
-    //             }
-    //         }
-    //         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            if (response.error){
+                setMsg(response.error);
+                dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            } 
+            else if (response.length){
+                dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Azure" });
+                if (saveFlag) 
+                    setMsg(MSG.INTEGRATION.SUCC_SAVE);
+                setMappedFilesRes(response);
+            }
+            else {
+                if (saveFlag) {
+                    dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
+                    setMsg(MSG.INTEGRATION.SUCC_SAVE);
+                } else {
+                    setMsg(MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS);
+                }
+            }
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
 
-    //         return response;
-    //     }
-    //     catch(err) {
-    //         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-    //         setMsg(MSG.INTEGRATION.ERR_FETCH_DATA);
-    //     }
-    // }
+            return response;
+        }
+        catch(err) {
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            setMsg(MSG.INTEGRATION.ERR_FETCH_DATA);
+        }
+    }
 
     // const callLogin_Azure = async()=>{
     //     const api = await api.connectAzure_ICE('https://dev.azure.com/AvoAutomation','sushanth.gupta1','xbgz54ugaxrqs7ljm5mn46aprbg37coxgijg4mx7atze47u2fbeq')
@@ -130,15 +130,15 @@ const Azure = () => {
     
     return(
         <>
-        {/* {viewMappedFlies === "Jira" && 
+        {viewMappedFlies === "Azure" && 
             <MappedPage
-                screenType="Jira"
-                leftBoxTitle="Jira Tests"
+                screenType="Azure"
+                leftBoxTitle="Azure Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
                 fetchMappedFiles={callViewMappedFiles}
             /> 
-        } */}
+        }
         { viewMappedFlies ===null && !loginSuccess && 
             <LoginModal 
                urlRef={azureUrlRef}
@@ -157,7 +157,7 @@ const Azure = () => {
               <AzureContent  
                 domainDetails={domainDetails}
                 user={user}
-                // callViewMappedFiles={callViewMappedFiles} 
+                callViewMappedFiles={callViewMappedFiles} 
                 />  
             } 
         {/* { viewMappedFlies ===null && screenType=== "Jira" &&

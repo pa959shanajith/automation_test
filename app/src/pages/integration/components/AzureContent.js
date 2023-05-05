@@ -237,6 +237,12 @@ const AzureContent = props => {
 
                             }
                         ];
+                        if(releaseId && releaseId === 'TestPlans'){
+                            mappedPair[0].TestSuiteId = mappedPair[0].userStoryId;
+                            mappedPair[0].testSuiteSummary = mappedPair[0].userStorySummary;
+                            delete mappedPair[0].userStoryId;
+                            delete mappedPair[0].userStorySummary;
+                        }
                         dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
                         console.log(mappedPair);
                         dispatch({type: actionTypes.SYNCED_TC, payload: selected});
@@ -334,7 +340,7 @@ const AzureContent = props => {
             <MappingPage 
                 pageTitle="Azure Integration"
                 onSave={()=>callSaveButton()}
-                // onViewMap={()=>props.callViewMappedFiles()}
+                onViewMap={()=>props.callViewMappedFiles()}
                 // onUpdateMap={()=>props.callUpdateMappedFiles()}
                 // onExit={()=>callExit()}
                 testCaseData={testCaseData}
