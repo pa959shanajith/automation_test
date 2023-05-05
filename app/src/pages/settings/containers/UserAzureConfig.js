@@ -105,7 +105,7 @@ const UserAzureConfig = (props) => {
         <>
             {showDelete? <AzureDeleteModal confirmDelete={()=>{setShowDelete(false); manageDetails('delete', {});}} cancelDelete={()=>{setShowDelete(false);}} />: null}
             {loading ? <ScreenOverlay content={loading} /> : null}
-            <Header heading="Azure Configuration" />
+            <Header heading="Azure DevOps Configuration" />
             <form onSubmit={SubmitHandler} className={classes["Azure-form"]}>
                 <div className={classes["action-div"]}>
                     <button data-test="main-button-test" type="submit" className={classes["action-button"]}>{createAzure?'Create':'Update'}</button>
@@ -113,16 +113,16 @@ const UserAzureConfig = (props) => {
                 </div>
                 <div className={classes["Azure-fields"]}>
                     <div className={`col-xs-9 ${classes["form-group"]}`}>
-                        <label htmlFor="Azure-URL">Azure URL</label>
-                        <FormInput data-test="url-test" type="text" id="Azure-URL" placeholder="Enter Azure URL" className={`${classes["Azure-url"]} ${classes["all-inputs"]} ${!isValidURL ? classes["invalid"] : ""}`} value={AzureURL} onChange={(event) => { setAzureURL(event.target.value) }} />
+                        <label htmlFor="Azure-URL">Azure DevOps URL</label>
+                        <FormInput data-test="url-test" type="text" id="Azure-URL" placeholder="Enter Azure DevOps URL" className={`${classes["Azure-url"]} ${classes["all-inputs"]} ${!isValidURL ? classes["invalid"] : ""}`} value={AzureURL} onChange={(event) => { setAzureURL(event.target.value) }} />
                     </div>
                     <div className={` col-xs-9 ${classes["form-group"]}`}>
-                        <label htmlFor="Azure-username">Azure Username</label>
-                        <FormInput data-test="username-test" type="text" id="Azure-username" placeholder="Enter Azure Username" className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidUsername ? classes["invalid"] : ""}`} value={AzureUsername} onChange={(event) => { setAzureUsername(event.target.value) }} />
+                        <label htmlFor="Azure-username">Azure DevOps Username</label>
+                        <FormInput data-test="username-test" type="text" id="Azure-username" placeholder="Enter Azure DevOps Username" className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidUsername ? classes["invalid"] : ""}`} value={AzureUsername} onChange={(event) => { setAzureUsername(event.target.value) }} />
                     </div>
                     <div className={` col-xs-9 ${classes["form-group"]}`}>
-                        <label htmlFor="Azure-PAT">Azure PAT </label>
-                        <FormInput data-test="api-test" type="text" id="Azure-PAT" placeholder="Enter Azure PAT " className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidPAT ? classes["invalid"] : ""}`} value={AzurePAT} onChange={(event) => { setAzurePAT(event.target.value) }} />
+                        <label htmlFor="Azure-Password">Azure DevOps PAT </label>
+                        <FormInput data-test="api-test" type="password" id="Azure-Password" placeholder="Enter Azure DevOps PAT " className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidPAT ? classes["invalid"] : ""}`} value={AzurePAT} onChange={(event) => { setAzurePAT(event.target.value) }} />
                     </div>
                 </div>
             </form>

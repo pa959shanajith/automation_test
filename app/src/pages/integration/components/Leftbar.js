@@ -116,21 +116,21 @@ const Leftbar = (props) => {
                     <span onClick={()=>callIconClick("Zephyr")} title="Zephyr">
                         <img alt="ZephyrIcon" 
                             id={(screenType === "Zephyr")? "selectedIcon" : null} 
-                            src='static/imgs/Zephyr.png'
+                            src='static/imgs/zephyr.png'
                         />
                         <div>Zephyr</div>
                     </span>
                     <span onClick={()=>callIconClick("Jira")} title="Jira">
                         <img alt="JiraIcon" 
                             id={(screenType === "Jira")? "selectedIcon" : null} 
-                            src='static/imgs/JiraSoftware.png'
+                            src='static/imgs/jira.png'
                         />
                         <div>Jira</div>
                     </span>
                     <span onClick={()=>callIconClick("Azure")} title="Azure">
                         <img alt="AzureIcon" 
                             id={(screenType === "Azure")? "selectedIcon" : null} 
-                            src='static/imgs/JiraSoftware.png'
+                            src='static/imgs/Azure.png'
                         />
                         <div>Azure</div>
                     </span>
