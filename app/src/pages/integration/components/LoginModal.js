@@ -260,7 +260,7 @@ const LoginModal = props => {
                                     <input
                                         className={".ilm_input" + (error.PAT ? " ilm_input_error" : "")}
                                         ref={props.passwordRef}
-                                        type="PAT"
+                                        type="password"
                                         placeholder={inpPlaceHolder[props.screenType].PAT}
                                         data-test="intg_pAT_inp"
                                     /></> : null}
