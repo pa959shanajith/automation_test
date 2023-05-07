@@ -392,6 +392,7 @@ exports.testSuitesSchedulerRecurring_ICE = async (req, res) => {
 };
 exports.execAutomation = async(req,res) => {
 	let result = await queue.Execution_Queue.execAutomation(req, res);
+	if(req.body.isExecuteNow) return result;
 	return res.send(result);
 }
 

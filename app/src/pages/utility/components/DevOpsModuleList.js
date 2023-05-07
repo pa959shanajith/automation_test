@@ -244,9 +244,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     }
                 }
                 else {
-                    notexe.current[targetnode.value] = []
-                    // setNotExeState({...notexe.current})
-                }
+                    delete notexe.current[targetnode.value]
+                } 
             }
         }
 

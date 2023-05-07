@@ -51,10 +51,12 @@ const MappingPage = props =>{
                         {props.selectTestDomain}
                         {props.selectTestProject}
                         {props.selectTestRelease} 
+                        {props.selectWorkitem}
                         </> : 
                         <>
                         {props.selectTestProject}
                         {props.selectTestRelease} 
+                        {/* {props.selectWorkitem} */}
                         </>
                         }
                         </>

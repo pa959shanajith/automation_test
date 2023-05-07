@@ -9,6 +9,7 @@ import { Messages as MSG, setMsg, RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
 import { SET_DISABLEAPPEND } from '../../scrape/state/action.js';
+import { NormalDropDown } from '@avo/designcomponents';
 
 
 const JiraContent = props => {
@@ -19,7 +20,7 @@ const JiraContent = props => {
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
     const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
     const selectedTC = useSelector(state=>state.integration.selectedTestCase);
-    const [projectId, setProjectId] = useState('');
+    const [releaseId, setReleaseId] = useState('');
     const [projectDetails , setProjectDetails]=useState({});
     const [avoProjects , setAvoProjects]= useState(null);
     const [scenarioArr , setScenarioArr] = useState(false);
@@ -30,21 +31,25 @@ const JiraContent = props => {
     const [filteredNames , setFilteredName]= useState(null);
     const [screenexit , setScreenExit]= useState(false);
     const [releaseArr, setReleaseArr] = useState([]);
+    const [release, setRelease] = useState(false);
     const [selectedRel, setSelectedRel] = useState("Select Release");
     const [testCaseData, setTestCaseData] = useState([]);
     const [selected,setSelected]=useState(false);
     const [selectedId, setSelectedId] = useState('');
+    const [selectedSummary, setSelectedSummary] = useState('');
     const [proj, setProj] = useState('');
     const [projCode, setProjCode] = useState('');
     const [projName, setProjName] = useState('');
     const [disabled, setDisabled] = useState(true);
-    
+    const [projectDropdn3 , setProjectDropdn3]= useState("Select Project1");
+    // const[summary1,setSummary1]=useState('');
+    console.log(releaseId)
  
 
     const callProjectDetails_ICE=async(e)=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         const projectId = e.target.value;
-        const releaseData = await api.getDetails_Jira(projectId, user_id);
+        const releaseData = await api.getDetails_Jira(projectId, user_id,e.target.value);
         if (releaseData.error)
             setMsg(releaseData.error);
         else if (releaseData === "unavailableLocalServer")
@@ -160,11 +165,11 @@ const JiraContent = props => {
 
     
     const jiraTest = async(e) => {
-        if(e.target.tilte != "Select Project"){
+        if(e.target.tilte !== "Select Project"){
             let projectName = ""
             let projectID = ''
             for(let projectDetails of props.domainDetails.projects) {
-                if( e.target.value == projectDetails.code) {
+                if( e.target.value == projectDetails.code ) {
                     projectName = projectDetails.name;
                     projectID = projectDetails.id;
                     setProj(projectID)
@@ -173,21 +178,32 @@ const JiraContent = props => {
                     break;
                 };
             }
-            let jira_info ={
-                project: projectName,
-                action:'getJiraTestcases',
-                issuetype: "",
-                url: props.user['url'],
-                username: props.user['username'],
-                password: props.user['password'],
-                project_data: props.domainDetails,
-                key:e.target.value,
-            }
-            const testData = await api.getJiraTestcases_ICE(jira_info)
-            setTestCaseData(testData.testcases)
-
         }
     }
+
+    const jiraTestIssue = async(e) => {
+                let jira_info ={
+                    project: projName,
+                    action:'getJiraTestcases',
+                    issuetype: "",
+                    itemType:releaseId, 
+                    url: props.user['url'],
+                    username: props.user['username'],
+                    password: props.user['password'],
+                    project_data: props.domainDetails,
+                
+                    key:projCode,
+                    // summary:summary1,
+                    
+                
+                }
+               
+                const testData = await api.getJiraTestcases_ICE(jira_info)
+                setTestCaseData(testData.testcases)
+    }
+    useEffect(()=>{
+        jiraTestIssue();
+    },[releaseId, release])
 
     const selectScenarioMultiple = (e,id) => {
         let newScenarioIds = [...selectedScIds];
@@ -203,11 +219,12 @@ const JiraContent = props => {
         dispatch({type: actionTypes.SEL_SCN_IDS, payload: newScenarioIds});	
     }
 
-    const handleClick=(value, id)=>{
+    const handleClick=(value, id,summary)=>{
         let newSelectedTCDetails = { ...selectedZTCDetails };
-        let newSelectedTC = [...value];
+        let newSelectedTC = [...value,summary];
        setSelected(value)
        setSelectedId(id)
+       setSelectedSummary(summary)
        setDisabled(true)
        dispatch({type: actionTypes.SEL_TC_DETAILS, payload: newSelectedTCDetails});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
@@ -234,10 +251,15 @@ const JiraContent = props => {
                                 projectName: projName,        
                                 testId: selectedId,
                                 testCode: selected, 
-                                scenarioId: selectedScIds
+                                scenarioId: selectedScIds,
+                                itemType:releaseId,
+                                itemSummary:selectedSummary
+                               
+
                             }
                         ];
                         dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
+                        console.log(mappedPair);
                         dispatch({type: actionTypes.SYNCED_TC, payload: selected});
             }
         setDisabled(false);
@@ -254,6 +276,41 @@ const JiraContent = props => {
         setDisabled(true)
         setSelected(false)
     }
+    // const onSelect = async(event) => {
+    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+    //     const releaseId = event.target.value;
+    //     const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId, user_id);
+    //     if (testAndScenarioData.error)
+    //         setMsg(testAndScenarioData.error);
+    //     else if (testAndScenarioData === "unavailableLocalServer")
+    //         setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+    //     else if (testAndScenarioData === "scheduleModeOn")
+    //         setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+    //     else if (testAndScenarioData === "Invalid Session"){
+    //         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    //         return RedirectPage(history);
+    //     }
+    //     else if (testAndScenarioData) {
+    //         setProjectDetails(testAndScenarioData.project_dets);
+    //         setAvoProjects(testAndScenarioData.avoassure_projects);  
+    //         setSelectedRel(releaseId);  
+    //         clearSelections();
+    //     }
+    //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    // }
+    
+    // const [firstOption, setFirstOption] = useState('');
+  const [secondOption, setSecondOption] = useState('');
+  const [secondDropdownEnabled, setSecondDropdownEnabled] = useState(false);
+
+  const handleFirstOptionChange = (event) => {
+    setProjectDropdn1(event.target.value);
+    setSecondDropdownEnabled(true);
+    
+  };
+  const handleSecondOptionChange = (event) => {
+    setSecondOption(event.target.value);
+  };
 
     return(
          !screenexit?
@@ -265,25 +322,58 @@ const JiraContent = props => {
                 onUpdateMap={()=>props.callUpdateMappedFiles()}
                 onExit={()=>callExit()}
                 testCaseData={testCaseData}
-                leftBoxTitle="Jira Tests"
+                leftBoxTitle="Jira tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestDomain={
-                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{callProjectDetails_ICE(e);jiraTest(e);onProjectSelect(e)}} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{setRelease(true) ;callProjectDetails_ICE(e);jiraTest(e);onProjectSelect(e);handleFirstOptionChange(e);jiraTestIssue(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} >
                         <option value="Select Project" disabled >Select Project</option>
                         {  props.domainDetails ? 
                             
-                            props.domainDetails.projects.map(e => (<option key={e.id} value={e.code} title={e.name} onChange={(e)=> {setProjectId(e.target.value) }} >{e.name} </option>)) : null
+                            props.domainDetails.projects.map(e => (<option  key={e.id} value={e.code} title={e.name}>{e.name} </option>)) : null
                             
                         }
-                        
+                       
                     </select>
-                  
-                
-                }
-               
+                    
+                     }
+
+
+                     selectWorkitem={
+                        <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e)}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
+                            <option value="Select WorkItems"  >Select WorkItems</option>
+                            {  props.domainDetails ? 
+                                
+                                props.domainDetails.issue_types.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setReleaseId(e.target.value) }} >{e.name}  </option>)) : null
+                                
+                            }
+                           
+                        </select>
+                         }
+                       
+                         
+                     
+                    //  selectWorkitem={
+                    //     <select data-test="intg_jira_workitem_drpdwn" value={selectedRel} onChange={onSelect} className="qcSelectDomain" style={{marginRight : "5px"}} disabled>
+                    //         <option value="Select Release" disabled>Select Workitem</option>
+                    //         {   releaseArr.length &&
+                    //             releaseArr.map(e => (
+                    //                 <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
+                    //             ))
+                    //         }
+                    //         {/* {
+                    //              <option value="Select Release"  >Select UserStory</option>
+                                 
+                    //         }
+                    //         {
+                    //              <option value="Select Release"  >Select TestCase</option>
+                    //         } */}
+                    //     </select>
+                        
+                    // }
+            
                 selectScenarioProject={
                     <select data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
-                        <option value="Select Project" disabled >Select Project</option>
+                        <option value="Select Project"  >Select Project</option>
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
@@ -293,14 +383,14 @@ const JiraContent = props => {
                     </select>
                 }
                 testList={
-                    <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>jiraTest(e)} className="qtestAvoAssureSelectProject">
+                    <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>{handleSecondOptionChange(e);jiraTestIssue(e)}} className="qtestAvoAssureSelectProject">
                     {
                         testCaseData ?
                         testCaseData.map((e,i)=>(
                             <div className={"test_tree_leaves"+ ( selected===e.code ? " test__selectedTC" : "")}>
-                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id)}>
-                                <span className="leafId">{e.id}</span>    
-                                <span className="test__tcName">{e.code}</span>
+                            <label className="test__leaf" title={e.code} onClick={()=>handleClick(e.code, e.id,e.summary)}>
+                                <span className="leafId">{e.code}</span>    
+                                <span className="test__tcName">{e.summary} </span>
                             </label>
                             {selected===e.code 
                                     && <><div className="test__syncBtns"> 
@@ -343,7 +433,10 @@ const JiraContent = props => {
                                 {e.name}
                             </div>))
                 }
+               
             />
+            
+            
     </Fragment>
     :null)
 }

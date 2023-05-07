@@ -289,6 +289,9 @@ const DevOpsConfig = props => {
             }
         });
         if (dataUpdated !== isUpdated) setDataUpdated(isUpdated);
+        if(!icepoollist.some(item=>item.key===integrationConfig.avoAgentGrid)){
+            setMsg(MSG.CUSTOM('Moved to Any Agent as selected agent is inactive',VARIANT.WARNING ))
+        }
     }, [integrationConfig]);
 
     const copyKeyUrlFunc = (id) => {
@@ -345,14 +348,14 @@ const DevOpsConfig = props => {
         }
         return data;
     }
-    const handleConfigSave = async (checkForButton) => {
-        if(text === ''){
+    const handleConfigSave = async (checkForButton, value) => {
+        if(value === false){if(text === ''){
             setError({
                 ...error,
                 name: 'Please Enter Profile Name'
             });
             return;
-        }
+        }}
         if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
             setMsg(MSG.CUSTOM("Please select atleast one Browser",VARIANT.ERROR));
             return;
@@ -381,6 +384,7 @@ const DevOpsConfig = props => {
                         releaseId: integrationConfig.selectValues[1].selected,
                         cycleName: integrationConfig.selectValues[2].selectedName,
                         cycleId: integrationConfig.selectValues[2].selected,
+                        scenarionIndex:checkForButton === '' ? integrationConfig.notexe.current[module.moduleid]:integrationConfig.executionRequest.donotexe.current[module.moduleid],
                         suiteDetails: module.scenarios.filter((scenario) => integrationConfig.scenarioList.includes(scenario._id)).map((scenario) => ({
                             condition: getScenarioParams(scenario._id).condition,
                             dataparam: [getScenarioParams(scenario._id).dataparam],
@@ -409,6 +413,7 @@ const DevOpsConfig = props => {
                         releaseId: integrationConfig.selectValues[1].selected,
                         cycleName: integrationConfig.selectValues[2].selectedName,
                         cycleId: integrationConfig.selectValues[2].selected,
+                        scenarionIndex:checkForButton === '' ? integrationConfig.notexe.current[module.moduleid]:integrationConfig.executionRequest.donotexe.current[module.moduleid],
                         suiteDetails: module.scenarios.filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario._id)).map((scenario, index) => ({
                             condition: getScenarioParams(module.batchname+module.moduleid+index+scenario._id).condition,
                             dataparam: [getScenarioParams(module.batchname+module.moduleid+index+scenario._id).dataparam],
@@ -438,6 +443,7 @@ const DevOpsConfig = props => {
                         releaseId: integrationConfig.selectValues[1].selected,
                         cycleName: integrationConfig.selectValues[2].selectedName,
                         cycleId: integrationConfig.selectValues[2].selected,
+                        scenarionIndex:checkForButton === '' ? integrationConfig.notexe.current[module.moduleid]:integrationConfig.executionRequest.donotexe.current[module.moduleid],
                         suiteDetails: module.scenarios.map((scenario, index) => ({
                             condition: getScenarioParams(module.batchname+module.moduleid+index+scenario._id).condition,
                             dataparam: [getScenarioParams(module.batchname+module.moduleid+index+scenario._id).dataparam],
@@ -461,7 +467,7 @@ const DevOpsConfig = props => {
             exectionMode: "serial",
             executionEnv: "default",
             browserType: integrationConfig.browsers,
-            configurename: text.trim(),
+            configurename: (value === true)?`${batchInfo[0]['projectName']}_${integrationConfig.key}`:text.trim(),
             executiontype: integrationConfig.executionType,
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
@@ -471,7 +477,8 @@ const DevOpsConfig = props => {
             integration: integration,
             batchInfo: batchInfo,
             donotexe: checkForButton == '' ? integrationConfig.notexe : integrationConfig.executionRequest.donotexe,
-            scenarioFlag: false
+            scenarioFlag: false,
+            isExecuteNow: value
         });
         if(storeConfig !== 'success') {
             if(storeConfig && storeConfig.error && storeConfig.error.CONTENT) {
@@ -544,8 +551,9 @@ const DevOpsConfig = props => {
             </span>
         </div>
         <div className="api-ut__btnGroup">
-        <button data-test="submit-button-test" className='submit-button-test_update' disabled={!text} onClick={() => handleConfigSave(props.currentIntegration.name)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
+        <button data-test="submit-button-test" className='submit-button-test_update' disabled={!text} onClick={() => handleConfigSave(props.currentIntegration.name, false)} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test " className='submit-button-test_back'  onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
+            {!props.currentIntegration.disable?<img src="static/imgs/Execute_now.png" onClick={()=>{handleConfigSave(props.currentIntegration.name, true)}} className='execution-button' title="Execute Now" alt='Execute Now'/>:""}
             {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
@@ -589,7 +597,7 @@ const DevOpsConfig = props => {
                             onChange={(selectedIce) => setIntegrationConfig({...integrationConfig, avoAgentGrid: selectedIce.key})}
                             options={icepoollist}
                             placeholder="Select Avo Agent or Avo Grid"
-                            selectedKey={integrationConfig.avoAgentGrid}
+                            selectedKey={(integrationConfig.avoAgentGrid && icepoollist.some(item=>item.key === integrationConfig.avoAgentGrid))?integrationConfig.avoAgentGrid:'cicdanyagentcanbeselected' }
                             width='54%'
                         />
                     </div>

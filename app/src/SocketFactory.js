@@ -16,6 +16,7 @@ import {url} from './App'
 
 const SocketFactory = () => {
     const [showAfterExecution,setShowAfterExecution] = useState({show:false})
+    const [showAfterExecutionIsTrial,setShowAfterExecutionIsTrial] = useState({show:false})
     const [reportData,setReportData] = useState(undefined)
     const userInfo = useSelector(state=>state.login.userinfo);
     const socket = useSelector(state=>state.login.socket);
@@ -59,10 +60,35 @@ const SocketFactory = () => {
                         <p style={{cursor:'default'}}>{showAfterExecution.content} <br />
                         <p> Go to <span onClick={()=>{redirectToReports();setShowAfterExecution({show:false})}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>
                     }
+                    
                     close={()=>setShowAfterExecution({show:false})}
                     footer={
+
                         <button onClick={()=>setShowAfterExecution({show:false})}>Ok</button>
                     }
+                />
+            </div>
+        )
+    };
+    const PostExecutionIsTrial = () =>{
+        return(
+            <div className="afterExecution-modal1">
+                <ModalContainer 
+                    title={"Congratulations"}
+                    content={
+                        <><p style={{ cursor: 'default', color: 'green',fontSize:'24px' }}><span>You have done it !!</span></p>
+                        {/* <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br /> */}
+                        <p style={{ cursor: 'default' }}>{showAfterExecutionIsTrial.content} 
+                        <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false }); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
+                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View plans </a> </span> now.</p>
+                        </p></>
+                    }
+                    
+                    close={()=>setShowAfterExecutionIsTrial({show:false})}
+                    // footer={
+
+                        // <button onClick={()=>setShowAfterExecutioIstrial({show:false})}>Ok</button>
+                    // }
                 />
             </div>
         )
@@ -88,15 +114,19 @@ const SocketFactory = () => {
         
         if (data === "Terminate") {
             setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
+            setShowAfterExecutionIsTrial({show:true, title:msg,content: "Execution terminated - By Program." })
         } 
         else if (data === "UserTerminate") {
             setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
+            setShowAfterExecutionIsTrial({show:true, title:msg,content:"Execution terminated - By User." })
         } 
         else if (data === "unavailableLocalServer") {
             setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
         } 
         else if (data === "success") {
             setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+            setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
+
         } else if(data === "Completed"){
             setMsg(MSG.CUSTOM(msg,VARIANT.SUCCESS));
         } else if(data === 'accessibilityTestingSuccess') {
@@ -111,7 +141,13 @@ const SocketFactory = () => {
 
     return(
         <Fragment>
-            { showAfterExecution.show && <PostExecution/> }
+             {userInfo.isTrial ? (
+                (
+                     (showAfterExecutionIsTrial.show && < PostExecutionIsTrial/>) 
+                )
+                ) : (
+                    (showAfterExecution.show && <PostExecution/>)
+                    )}
         </Fragment>
     )
 }

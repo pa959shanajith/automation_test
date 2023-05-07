@@ -547,7 +547,7 @@ const footerContent = (
                 <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
                 <ActionBarItems appType={props.appType}  fetchingDetails={props.fetchingDetails} />
                     { props.appType === "Webservice" 
-                        ? <WebserviceScrape /> 
+                        ? <WebserviceScrape fetchingDetails={props.fetchingDetails}/> 
                         : compareFlag ? <CompareObjectList fetchingDetails={props.fetchingDetails}/> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
                     <RefBarItems hideInfo={true} mirror={mirror} collapse={true} appType={props.appType} openPopup={openScreenTestCase}/>
                 </ScrapeContext.Provider>

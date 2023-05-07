@@ -99,11 +99,12 @@ const MappedPage = props =>{
                     mappedScenarios = mappedScenarios + object.testscenarioname.length;
                     mappedTests = mappedTests + 1;
                     tempRow.push({
-                        'testCaseNames': object.testCode, 
+                        'testCaseNames': object.itemCode, 
                         'scenarioNames': object.testscenarioname,
                         'mapId': object._id,
                         'scenarioId': object.testscenarioid,
-                        'testid':object.testId
+                        'testid':object.itemId,
+                        'itemSummary':object.itemSummary
                     });
                 });
                 setCounts({
@@ -244,7 +245,8 @@ const MappedPage = props =>{
                         tempUnSyncMaps.maps[rowIdx] = {
                             'mapid': rows[rowIdx].mapId,
                             'testCaseNames': [rows[rowIdx].testCaseNames],
-                            'testid': [rows[rowIdx].testid]
+                            'testid': [rows[rowIdx].testid],
+                            'testSummary':[rows[rowIdx].testSummary]
                         }
                     }
                 }
@@ -297,7 +299,7 @@ const MappedPage = props =>{
                                 <div>{counts.mappedScenarios}</div>
                             </div>
                             <div className="viewMap__testCount">
-                                <div>Mapped {props.screenType} Tests</div>
+                                <div>Mapped {props.screenType} items</div>
                                 <div>{counts.mappedTests}</div>
                             </div>
                         </div>
@@ -314,9 +316,11 @@ const MappedPage = props =>{
                         <div className="viewMap__inner">
                             <div className="viewMap__contents" id="viewMapScrollId">
                             <ScrollBar scrollId="viewMapScrollId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                                { rows.map(({scenarioNames, testCaseNames, reqDetails}, index) => <div key={index} className="viewMap__labelRow">
+                                { rows.map(({scenarioNames, testCaseNames, reqDetails,itemSummary}, index) => <div key={index} className="viewMap__labelRow">
+                                  
                                     <MappedLabel 
-                                        list={testCaseNames} 
+                                        list={testCaseNames}
+                                        summary={itemSummary}
                                         type="testcase" 
                                         mapIdx={index} 
                                         screenType = {props.screenType}

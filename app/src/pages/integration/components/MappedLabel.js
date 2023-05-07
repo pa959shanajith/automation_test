@@ -21,7 +21,7 @@ const MappedLabel = props => {
                     <div className="mlalm_label" 
                         onClick={props.handleClick ? (e)=>props.handleClick(e, props.type, `${props.mapIdx}-0`) : null}
                     >
-                        {typeof(props.list) === "object" ? props.list[0] : props.list}
+                        {typeof(props.list) === "object" ? props.list[0] : props.list}{(props.summary) ? ' : '+props.summary : ''}
                     </div>
                     {(type==='testcase' && screenType==='Zephyr')?
                         <i onClick={()=>setInfo(true)} className="fa fa-info" title="Requirement mapping info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
