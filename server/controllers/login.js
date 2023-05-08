@@ -309,7 +309,9 @@ exports.storeUserDetails = async (req, res) => {
 
 exports.upgradeLicense = async(req, res) =>{
 	try {
-		const result =await utils.fetchData({}, "/hooks/upgradeLicense");
+		const inputs = {
+			"username": req.body.username};
+		const result =await utils.fetchData(inputs, "/hooks/upgradeLicense");
 		return res.send(result)
 	} catch (error) {
 		logger.error("License update hooks fail" + error);

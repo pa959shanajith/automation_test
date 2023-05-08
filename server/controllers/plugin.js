@@ -70,13 +70,17 @@ exports.userCreateProject_ICE = async (req, res) =>{
 		};
 
     try {
-
+      const valiproject = await utils.fetchData(inputs, "/hooks/validateProject");
+		  if(valiproject.status === 'pass'){
         var result = await utils.fetchData(inputs,"/plugins/userCreateProject_ICE",fnName);
-
-        if(result != 'fail') status = "success";
-
-        return res.send(status);
-
+        if (result == "fail") {
+          return res.send("fail");
+        } else {
+          return res.send(result)
+        }
+      }else {
+        return res.send(valiproject);
+      }
        
 
     } catch(exception) {

@@ -126,7 +126,7 @@ const SocketFactory = () => {
         } 
         else if (data === "success") {
             if(userInfo.isTrial === true){
-                await UpdateUserInfoforLicence()
+                await UpdateUserInfoforLicence(userInfo.username)
                 setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
                 setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
             }
