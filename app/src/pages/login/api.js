@@ -265,10 +265,17 @@ export const unlock = async(username, password) => {
     }
 }
 
-export const UpdateUserInfoforLicence = async() => {
+export const UpdateUserInfoforLicence = async(username) => {
     try{
         const res = await axios(url+"/hooks/upgradeLicense", {
-            method: "POST"
+            method: "POST",
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                username: username
+            },
+            credentials : 'include'
         });
         if (res.status === 200){
             return res.data;
