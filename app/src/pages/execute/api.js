@@ -170,7 +170,8 @@ export const readTestCase_ICE = async(userInfo,testCaseId,testCaseName,versionnu
 export const ExecuteTestSuite_ICE = async(executionData) => { 
     try{
         const steps = await axios(url+'/hooks/validateExecutionSteps',{
-            method: 'POST'
+            method: 'POST',
+            data: {executionData: executionData}
         });
         if(steps.status===200 && steps.data.status === 'pass'){
             const res = await axios(url+'/ExecuteTestSuite_ICE', {
