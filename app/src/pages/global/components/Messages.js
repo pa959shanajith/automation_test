@@ -481,6 +481,7 @@ const Messages={
         ERR_INVALID_INFO: {"CONTENT": "Enter Correct Details", "VARIANT": VARIANT.ERROR},
         ERR_ENTER_VALID_CRED: {"CONTENT": "Enter Valid Credentials", "VARIANT": VARIANT.ERROR},
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
+        ERR_ADD_FETCH:{"CONTENT": "Failed to fetch Azure details","VARIANT":VARIANT.ERROR},
         
         SUCC_INFO_UPDATED: {"CONTENT": "User Information updated successfully!", "VARIANT": VARIANT.SUCCESS},
     },
