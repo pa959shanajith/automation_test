@@ -38,7 +38,7 @@ const Leftbar = (props) => {
                 <span onClick={()=>callIconClick("qTest")} title="qTest">
                     <img alt="qTestIcon" 
                         id={(screenType === "qTest")? "selectedIcon" : null}  
-                        src='static/imgs/qTest.png'
+                        src='static/imgs/qtest.png'
                     /> 
                     <div>qTest</div>
                 </span>
@@ -50,7 +50,7 @@ const Leftbar = (props) => {
                     <h4>Integration</h4>
                     <span onClick={()=>callIconClick("ALM")} title="ALM">
                         <img alt="ALMIcon" 
-                            src='static/imgs/ALM.png'
+                            src='static/imgs/ALM.svg'
                         />
                         <div>ALM</div>
                     </span>
@@ -63,7 +63,7 @@ const Leftbar = (props) => {
                    <span onClick={()=>callIconClick("Zephyr")} title="Zephyr">
                         <img alt="ZephyrIcon"  
                             id={(screenType === "Zephyr")? "selectedIcon" : null} 
-                            src='static/imgs/Zephyr.png'
+                            src='static/imgs/zephyr.png'
                         />
                         <div>Zephyr</div>
                     </span> 
@@ -76,7 +76,7 @@ const Leftbar = (props) => {
                    <span onClick={()=>callIconClick("Jira")} title="Jira">
                         <img alt="JiraIcon"  
                             id={(screenType === "Jira")? "selectedIcon" : null} 
-                            src='static/imgs/JiraSoftware.png'
+                            src='static/imgs/jira.png'
                         />
                         <div>Jira</div>
                     </span> 
@@ -87,10 +87,10 @@ const Leftbar = (props) => {
                     return(
                     <Fragment>
                         <h4>Integration</h4>
-                       <span onClick={()=>callIconClick("Azure")} title="Azure">
+                       <span onClick={()=>callIconClick("Azure")} title="Azure DevOps">
                             <img alt="AzureIcon"  
                                 id={(screenType === "Azure")? "selectedIcon" : null} 
-                                src='static/imgs/JiraSoftware.png'
+                                src='static/imgs/Azure.png'
                             />
                             <div>Azure</div>
                         </span> 
@@ -109,7 +109,7 @@ const Leftbar = (props) => {
                     </span>
                     <span onClick={()=>callIconClick("ALM")} title="ALM">
                         <img alt="AlmIcon" 
-                            src='static/imgs/ALM.png'
+                            src='static/imgs/ALM.svg'
                         />
                         <div>ALM</div>
                     </span>
