@@ -23,10 +23,7 @@ import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, Mod
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ScrapeScreen.scss';
-import { Dialog } from 'primereact/dialog';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
+import { Dialog,DataTable,Column,Button } from 'primereact/dialog';
 
 
 const ScrapeScreen = (props)=>{
@@ -55,7 +52,6 @@ const ScrapeScreen = (props)=>{
     const [displayModal, setDisplayModal] = useState(false);
     const [showTeststeps , setshowTeststeps]=useState([]);
     const [displayTest , setdisplayTest]=useState({});
-    // const[enableIdentifier,setEnableIdentifier]=useState(false)
     const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]);
 
     useEffect(() => {
@@ -459,17 +455,14 @@ const ScrapeScreen = (props)=>{
     { field: 'name', header: 'Identifier' },
 ];
 const onRowReorder=(e)=>{
-    
-const reorderedProducts=e.value.map((element, idx) => {
+    const reorderedProducts=e.value.map((element, idx) => {
     element.id = idx + 1
     return element
-
 })
-setIdentifierList(reorderedProducts)
+    setIdentifierList(reorderedProducts)
 
 }
 const saveIdentifier=()=>{
-    let dataObjectIds=[]
     const changedIdentifierScrapedItems=[...scrapeItems]
     const finalScrapedItems=changedIdentifierScrapedItems.filter(object=>object.checked).map(Object=>Object.objId)
     let identifierListUpdated=identifierList.map(({id,identifier})=>({id,identifier}))
@@ -490,6 +483,9 @@ const saveIdentifier=()=>{
                 setMsg(MSG.SCRAPE.SUCC_OBJ_IDENTIFIER_LIST);
                 setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
             }
+        })
+        .catch(error => {
+            console.log(error)
         }
         )
    
@@ -530,10 +526,9 @@ const footerContent = (
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
         { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name,versionnumber:0 /** version no. not avail. */, appType: props.appType}} />}
-        {/* <Button label="Show" icon="pi pi-external-link" onClick={() => setVisible(true)} /> */}
         <Dialog header="Prioritize identifier using drag/drop" style={{width:'56vw'}} visible={showObjModal === "identifierlis"}  onHide={() => setShowObjModal('')} footer={footerContent} >
         <div className="card" >
-        <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorder} tableStyle={{ minWidth: '50rem' }} >
+        <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorder} tableStyle={{ minWidth: '50rem' }} >
                 <Column rowReorder style={{ width: '3rem' }} />
                 {dynamicColumns}
         </DataTable>
