@@ -33,15 +33,13 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const [error,setError] = useState(false);
     const [currProjId,setCurrProjId] = useState("");
     const [exportProject,setExportProject] = useState(true)
-    const [exportFile,setExportFile] = useState(false) 
-    const [showOverlay, setShowOverlay] = useState("");
-    const [showUD, setShowUD] = useState(false);
+    const [exportFile,setExportFile] = useState(false);
     const userInfo = useSelector(state=>state.login.userinfo);   
     const [showMessage, setShowMessage] = useState(false);    
     const dispatchAction=useDispatch()
     const [OS,setOS] = useState("Windows");
 
-    const getOS = 
+     
    useEffect(()=>{
     (() => {
         let userAgent = navigator.userAgent.toLowerCase();
@@ -72,10 +70,9 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             setShowUD(false);
             setShowOverlay(`Loading...`);
             dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false})
-            const res = await fetch("/downloadExportfile?ver="+clientVer+"&projName="+exportprojname);
-            debugger;
+            const res = await fetch("/downloadExportfile?ver="+clientVer+"&projName="+exportprojname);            
             await res.json().then(({status})=>{
-            console.log(status)   
+              
                 if (status === "available"){ 
                     window.location.href = window.location.origin+"/downloadExportfile?ver="+clientVer+"&projName="+exportprojname+"&file=getExportFile"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
                      setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED);                     
@@ -85,13 +82,12 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
                      setExportProject(true);
                      setExportFile(false);
 
-                 }                               
-         else {setMsg("error while exporting");
-        dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}) 
-         setExportBox(false); 
-         dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
-         setExportProject(true);
-         setExportFile(false);                                 
+                }else {setMsg("error while exporting");
+                dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}) 
+                setExportBox(false); 
+                dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
+                setExportProject(true);
+                setExportFile(false);                                 
               }     
             })  
         } catch (ex) {
@@ -340,7 +336,7 @@ const toJSON = async(module,fname,displayError,setBlockui,setShowMessage,setMsg,
         if(result === "InProgress"){setMsg(MSG.MINDMAP.WARN_EXPORT_INPROGRESS);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""});dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false});dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}); ResetSession.end();return;}
         
         ResetSession.end()
-        let showExportEnableTimer=setTimeout(()=>{
+        setTimeout(()=>{
             dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:true})
             setBlockui({show:false,content:''})
             setShowMessage(false);
