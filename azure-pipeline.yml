@@ -251,7 +251,7 @@ stages:
         echo Zipping folders - $(FOLDERS_TO_ZIP_AZ)
         REM 7z.exe a -mx7 %tagno%.zip versionnoUI.txt releasenotesUI.log %FOLDERS_TO_ZIP%
         7z.exe a -tzip -mmt=on -xr!.git\ -mx7 %tagno%.zip versionnoUI.txt releasenotesUI.log %FOLDERS_TO_ZIP_AZ%
-
+        
         # commenting the uploading of build to NAS Drive - changes by Ajay on 05/05/2023
         # echo "UPLOADING TO..... Z:/stage/UI/"
         # echo "BUILD NUMBER=%buildno%"
