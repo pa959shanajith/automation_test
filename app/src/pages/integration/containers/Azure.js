@@ -2,15 +2,11 @@ import React, { useRef, useState, useEffect, Fragment } from 'react';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import JiraContent from '../components/JiraContent';
 import MappedPage from '../containers/MappedPage';
 import LoginModal from '../components/LoginModal';
 // import ZephyrUpdateContent from '../components/ZephyrUpdateContent';
 import * as api from '../api.js';
 import * as actionTypes from '../state/action.js';
-import {connectJira_ICE,connectAzure_ICE} from  '../api.js'
-import { SET_USERINFO } from '../../login/state/action';
-import { setDefaultUserICE } from '../../global/api';
 import AzureContent from '../components/AzureContent';
 // 0 vvimport "../styles/TestList.scss"
 const Azure = () => {
@@ -35,7 +31,7 @@ const Azure = () => {
     const [mappedfilesRes,setMappedFilesRes]=useState([]);
     const [authType, setAuthType]=useState("basic");
     const [user, setUser] = useState([]);
-    const azureapiKeys = useSelector(state=>state.integration.azureApikeys);
+    const [azureapiKeys,setAzureApiKeys] = useState({'login':'azureLogin'})
     
 
     useEffect(() => {
@@ -159,14 +155,7 @@ const Azure = () => {
                 user={user}
                 callViewMappedFiles={callViewMappedFiles} 
                 />  
-            } 
-        {/* { viewMappedFlies ===null && screenType=== "Jira" &&
-            <JiraContent
-                domainDetails={domainDetails}
-                user={user}
-                callViewMappedFiles={callViewMappedFiles}
-
-            /> } */}
+            }
         </> 
     )
 }

@@ -3,16 +3,12 @@ import { ActionBar, Header, Thumbnail } from '../../global';
 import  "../styles/Leftbar.scss";
 import { useDispatch ,useSelector } from 'react-redux';
 import * as actionTypes from '../state/action.js';
-import { Dialog } from '@avo/designcomponents';
-// import { Dialog } from 'primereact/dialog';
-import AzureContent from './AzureContent';
 
 
 const Leftbar = (props) => {
     const dispatch = useDispatch();
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
     const screenType = useSelector(state=>state.integration.screenType);
-    const [displayBasic, setDisplayBasic] = useState(false);
 
     const callIconClick = iconType => {
         let clickedScreen = null;

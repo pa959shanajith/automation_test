@@ -8,9 +8,6 @@ import { Messages as MSG, setMsg, RedirectPage } from '../../global';
 // import CycleNode from './ZephyrTree';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
-import { SET_DISABLEAPPEND } from '../../scrape/state/action.js';
-import { NormalDropDown } from '@avo/designcomponents';
-import async from 'async';
 
 
 const AzureContent = props => {
@@ -51,10 +48,9 @@ const AzureContent = props => {
     const [selectedTestplan,setSelectedTestplan] = useState('');
     const [testPlansDropdown ,setTestPlansDropdown] = useState([]);
     const azureLogin = useSelector(state=>state.integration.projectLogin);
-    const azureapiKeys = useSelector(state=>state.integration.azureApikeys);
+    const [azureapiKeys,setAzureApiKeys] = useState({'stories':'azureUserStories','testplans':'azureTestPlans','testsuites':'azureTestSuites'})
 
     // const[summary1,setSummary1]=useState('');
-    console.log(releaseId)
  
 
     // const callProjectDetails_ICE=async(e)=>{
@@ -108,7 +104,6 @@ const AzureContent = props => {
 
     const getWorkItems = async (e) => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
-        console.log(e,' its e');
         let apiObj = Object.assign({"action": azureapiKeys.stories},azureLogin,selectedProject);
         const workItemsDetails = await api.connectAzure_ICE(apiObj);
         setUserStories(workItemsDetails.userStories);

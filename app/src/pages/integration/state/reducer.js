@@ -27,8 +27,7 @@ const initialState = {
         selectedPhase: []
     },
     projectList: [],
-    projectLogin:{},
-    azureApikeys:{'login':'azureLogin', 'stories':'azureUserStories','testplans':'azureTestPlans','testsuites':'azureTestSuites'}
+    projectLogin:{}
 };
 
 const reducer = (state = initialState , action) => {

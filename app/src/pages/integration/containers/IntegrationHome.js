@@ -11,7 +11,6 @@ import Jira from './Jira';
 import Azure from './Azure';
 import * as actionTypes from '../state/action';
 import '../styles/IntegrationHome.scss';
-import AzureContent from '../components/AzureContent';
 
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
@@ -50,8 +49,7 @@ const Integrations = () => {
                     { screenType === "Zephyr" && <Zephyr /> }
                     { screenType === "qTest" && <QTest /> }
                     { screenType === "Jira" && <Jira /> }  
-                    { screenType === "Azure" && <Azure/>}  
-                    {/* <AzureContent/>               */}
+                    { screenType === "Azure" && <Azure/>}
                 </div>
 
                 <Rightbar />

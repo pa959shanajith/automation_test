@@ -185,36 +185,6 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
     useEffect(() => {
         type==="Zephyr" && getZephyrDetails();
     }, [])
-
-    // const getAzureDetails = async () =>{
-    //     try {
-    //         setLoading("Loading...")
-    //         const data = await getDetails_Azure()
-    //         if (data.error) { setMsg(data.error); return; }
-    //         if(data !=="empty"){
-    //             setIsEmpty(false);
-    //             let credentialsData = {
-    //                 url: '',
-    //                 userName: '',
-    //                 password: ''
-    //             };
-    //             if(data.AzureURL) credentialsData['url'] = data.AzureURL;
-    //             if(data.AzureUsername) credentialsData['userName'] = data.AzureUsername;
-    //             if(data.AzurePassword) credentialsData['PAT'] = data.AzurePassword;
-    //             setDefaultValues(credentialsData);
-    //             // setZephAuthType(credentialsData.authtype);
-    //             setCredentials(credentialsData);
-    //             saveAction(true, credentialsData);
-    //         }
-    //         setLoading(false);
-    //     } catch (error) {
-    //         setLoading(false);
-    //         setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
-    //     }
-    // }
-    // useEffect(() => {
-    //     type==="Azure" && getAzureDetails();
-    // }, [])
     
 
     return(
