@@ -9,6 +9,7 @@ const mongoConnectionString = `mongodb://${mongoConfig.username}:${encodeURIComp
 // instantiating the agenda object
 const agenda = new Agenda({
     db: { address: mongoConnectionString, collection: 'agendaJobs' },
+    useNewUrlParser: true,
     useUnifiedTopology: true
 });
 
