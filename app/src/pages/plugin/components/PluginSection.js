@@ -50,10 +50,11 @@ const PluginSection = ({userInfo}) => {
                     pluginList.showList && Object.keys(pluginList).map(pluginName =>
                         <Fragment key={pluginName} >
                         {
-                            pluginList[pluginName].show && 
+                            pluginName !== 'showList' && 
                             <PluginBox 
                                 pluginName={pluginName} 
                                 pluginTitle={pluginList[pluginName].title}
+                                pluginShow={pluginList[pluginName].show}
                             />
                         }
                         </Fragment>

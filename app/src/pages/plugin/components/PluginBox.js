@@ -18,13 +18,14 @@ const openDiscover = async() =>{
 	window.open(res.url+'?jwt='+res.token , '_blank');
 }
 
-const PluginBox = ({pluginName, pluginTitle}) => {
+const PluginBox = ({pluginName, pluginTitle, pluginShow}) => {
 
 	const [redirectTo, setRedirectTo] = useState("");
   const userInfo = useSelector(state=>state.login.userinfo);
   const highlightAGS = useSelector(state=>state.login.highlightAGS);
   const pluginData = uiConfig.pluginData;
-  const disabled = userInfo.isTrial && !pluginData[pluginName.split(' ').join('').toLowerCase()]["availableForTrial"]
+//   const disabled = userInfo.isTrial && !pluginData[pluginName.split(' ').join('').toLowerCase()]["availableForTrial"]
+  const disabled = !pluginShow
   const dispatch = useDispatch()
 
 	const pluginRedirect = async() => {

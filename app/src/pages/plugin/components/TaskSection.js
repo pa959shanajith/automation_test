@@ -665,7 +665,9 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                                 const res = await pluginApi.userCreateProject_ICE(config)
                                                 if(res === "invalid_name_spl") {
                                                     setMsg(MSG.CUSTOM("Special characters are not allowed in project name","error"));
-                                                }else{
+                                                }else if(res.message=="Max Allowed Projects Created"){
+                                                    setMsg(MSG.CUSTOM(res.message,"error"));
+                                                } else{
                                                     setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
                                                 }
                                                 // onHide('displayBasic');
