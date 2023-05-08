@@ -54,7 +54,7 @@ const ScrapeObjectList = (props) => {
   const [disable, setDisable] = useState(false);
   const disableAppend = useSelector((state) => state.scrape.disableAppend);
   const { appType, subTaskId } = useSelector((state) => state.plugin.CT);
-
+const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems);
 
   useEffect(() => {
     setIsMac(navigator.appVersion.toLowerCase().indexOf("mac") !== -1);
@@ -157,6 +157,8 @@ const ScrapeObjectList = (props) => {
             else localItems.forEach(item => { if (!item.hide) {
                 item.checked = false;
             }})
+            dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:localItems.some(((element) => element.checked  === true))})
+
         }
         else {
             localItems.forEach(item => { 
@@ -164,7 +166,13 @@ const ScrapeObjectList = (props) => {
             })
         }
 
+        let listOfCheckedItems=localItems.map(object=>{
+            return object.checked
+        })
+
         setScrapeItems(localItems)
+        dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: listOfCheckedItems})
+        
     }
     
     const modifyScrapeItem = (value, newProperties, customFlag) => {
@@ -603,7 +611,7 @@ const ScrapeObjectList = (props) => {
                         scrapeItems.map((object, index) =><Fragment key={`${object.val}`}> 
                                                         { !object.hide && 
                                                             <ScrapeObject idx={index} object={object} updateChecklist={updateChecklist}
-                                                                modifyScrapeItem={modifyScrapeItem} hide={object.hide} dnd={dnd} />}
+                                                                modifyScrapeItem={modifyScrapeItem} hide={object.hide} dnd={dnd} listOfCheckedItems={listOfCheckedItems} scrapeItems={scrapeItems} />}
                                                         </Fragment>)
                     }
                     </ReactSortable>

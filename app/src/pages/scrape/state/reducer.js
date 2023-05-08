@@ -8,6 +8,8 @@ const initialState = {
     compareData: {},
     compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
     objValue: { val: null },
+    enableIdentifier:false,
+    listofcheckeditems:[],
     isFiltered: false,
     cert: {},
     WsData: {
@@ -82,6 +84,21 @@ const reducer = (state=initialState, action) => {
                 ...state,
                 isFiltered: action.payload
             }
+        case actionTypes.SET_ISENABLEIDENTIFIER:
+                return {
+                    ...state,
+                    enableIdentifier: action.payload
+                
+                }
+        case actionTypes.SET_LISTOFCHECKEDITEMS:
+                return {
+                    ...state,
+                    listofcheckeditems: action.payload
+                
+                }
+                
+
+
         default:
             return state
     }

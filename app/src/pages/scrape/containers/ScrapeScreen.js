@@ -23,7 +23,11 @@ import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, Mod
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ScrapeScreen.scss';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
+
 
 const ScrapeScreen = (props)=>{
     const dispatch = useDispatch();
@@ -31,7 +35,8 @@ const ScrapeScreen = (props)=>{
     const current_task = useSelector(state=>state.plugin.CT);
     const certificateInfo = useSelector(state=>state.scrape.cert);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
-    const selectedModule = useSelector(state=>state.mindmap.selectedModule)
+    const selectedModule = useSelector(state=>state.mindmap.selectedModule);
+    const { user_id, role } = useSelector(state=>state.login.userinfo);
     const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
     const [overlay, setOverlay] = useState(null);
     const [showPop, setShowPop] = useState("");
@@ -50,6 +55,7 @@ const ScrapeScreen = (props)=>{
     const [displayModal, setDisplayModal] = useState(false);
     const [showTeststeps , setshowTeststeps]=useState([]);
     const [displayTest , setdisplayTest]=useState({});
+    const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]);
 
     useEffect(() => {
         // if(Object.keys(current_task).length !== 0) {
@@ -60,6 +66,8 @@ const ScrapeScreen = (props)=>{
             .catch(error=> console.log(error));
         // }
         //eslint-disable-next-line
+        dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
+
     }, [current_task])
 
     useEffect(()=>{
@@ -444,7 +452,58 @@ const ScrapeScreen = (props)=>{
         "name":displayTeststep[value]["name"]  }
     props.openScrapeScreen("displayBasic2","","displayBasic",{populateTestcaseDetails})
  }
+ const columns = [
+   
+    {field:'id',header:'Priority'},
+    { field: 'name', header: 'Identifier' },
+];
+const onRowReorder=(e)=>{
+    const reorderedProducts=e.value.map((element, idx) => {
+    element.id = idx + 1
+    return element
+})
+    setIdentifierList(reorderedProducts)
 
+}
+const saveIdentifier=()=>{
+    const changedIdentifierScrapedItems=[...scrapeItems]
+    const finalScrapedItems=changedIdentifierScrapedItems.filter(object=>object.checked).map(Object=>Object.objId)
+    let identifierListUpdated=identifierList.map(({id,identifier})=>({id,identifier}))
+    let params = {
+        'objectIds':finalScrapedItems,
+        'identifiers':identifierListUpdated,
+        'param':'updatedIdentifier',
+        'userId': user_id,
+        'roleId': role,
+        
+        // 'identifier'
+    }
+    scrapeApi.updateScreen_ICE(params)
+        .then(response => {
+            console.log(response)
+            if(response == "Success"){
+                setShowObjModal('')
+                setMsg(MSG.SCRAPE.SUCC_OBJ_IDENTIFIER_LIST);
+                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+            }
+        })
+        .catch(error => {
+            console.log(error)
+        }
+        )
+   
+    
+}
+const dynamicColumns = columns.map((col, i) => {
+                    return <Column key={col.field} columnKey={col.field} field={col.field} header={col.header} />;
+                });
+
+const footerContent = (
+                    <div>
+                        <Button label="No" icon="pi pi-times" onClick={() => setShowObjModal('')} className="p-button-text" />
+                        <Button label="Yes" icon="pi pi-check" onClick={() => saveIdentifier()} autoFocus />
+                    </div>
+)
     return (
         
         <>
@@ -470,6 +529,14 @@ const ScrapeScreen = (props)=>{
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
         { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name,versionnumber:0 /** version no. not avail. */, appType: props.appType}} />}
+        <Dialog header="Prioritize identifier using drag/drop" style={{width:'56vw'}} visible={showObjModal === "identifierlis"}  onHide={() => setShowObjModal('')} footer={footerContent} >
+        <div className="card" >
+        <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorder} tableStyle={{ minWidth: '50rem' }} >
+                <Column rowReorder style={{ width: '3rem' }} />
+                {dynamicColumns}
+        </DataTable>
+        </div>
+       </Dialog>
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div data-test="ssBody" className="ss__body">
             {/* <Header/> */}
@@ -485,6 +552,7 @@ const ScrapeScreen = (props)=>{
             </div>
             {/* <div data-test="ssFooter"className='ss__footer'><Footer/></div> */}
         </div>
+       
         </>
     );
 }
@@ -640,6 +708,7 @@ function generateScrapeItemList(lastIdx, viewString, type="old"){
                             left: scrapeObject.left,
                             height: scrapeObject.height,
                             width: scrapeObject.width,
+                            identifier:scrapeObject.identifier
                         }
         if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop!=undefined) {
             scrapeItem['viewTop'] = scrapeObject.viewTop;
