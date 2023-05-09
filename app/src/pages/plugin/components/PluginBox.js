@@ -25,7 +25,7 @@ const PluginBox = ({pluginName, pluginTitle, pluginShow}) => {
   const highlightAGS = useSelector(state=>state.login.highlightAGS);
   const pluginData = uiConfig.pluginData;
 //   const disabled = userInfo.isTrial && !pluginData[pluginName.split(' ').join('').toLowerCase()]["availableForTrial"]
-  const disabled = !pluginShow
+  const disabled = (pluginShow!=="true");
   const dispatch = useDispatch()
 
 	const pluginRedirect = async() => {
