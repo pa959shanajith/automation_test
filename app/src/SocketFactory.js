@@ -71,6 +71,14 @@ const SocketFactory = () => {
             </div>
         )
     };
+
+    const closeTrial = () => {
+        if(userInfo.isTrial){
+            userInfo.isTrial = false;    
+            dispatch({type:actionTypes.SET_USERINFO, payload: userInfo});
+        }
+    }
+
     const PostExecutionIsTrial = () =>{
         return(
             <div className="afterExecution-modal1">
@@ -80,12 +88,12 @@ const SocketFactory = () => {
                         <><p style={{ cursor: 'default', color: 'green',fontSize:'24px' }}><span>You have done it !!</span></p>
                         {/* <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br /> */}
                         <p style={{ cursor: 'default' }}>{showAfterExecutionIsTrial.content} 
-                        <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false }); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
+                        <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false });closeTrial(); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
                         <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.Please logout and login to continue.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View plans</a> </span> now.</p>
                         </p></>
                     }
                     
-                    close={()=>setShowAfterExecutionIsTrial({show:false})}
+                    close={()=>{setShowAfterExecutionIsTrial({show:false});closeTrial();}}
                     // footer={
 
                         // <button onClick={()=>setShowAfterExecutioIstrial({show:false})}>Ok</button>
@@ -127,12 +135,12 @@ const SocketFactory = () => {
         else if (data === "success") {
             if(userInfo.isTrial === true){
                 await UpdateUserInfoforLicence(userInfo.username)
-                setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+                // setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
                 setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
             }
             else{
                 setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
-                setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
+                // setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
             }
         } else if(data === "Completed"){
             setMsg(MSG.CUSTOM(msg,VARIANT.SUCCESS));
