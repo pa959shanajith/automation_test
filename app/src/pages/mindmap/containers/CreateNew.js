@@ -138,7 +138,7 @@ const CreateNew = ({importRedirect}) => {
                     
                 </div>
                 
-                <ModuleListDrop />
+                <ModuleListDrop  setBlockui={setBlockui}/>
                 <div id='mp__canvas' className='mp__canvas'>
                      {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?
                     <CanvasNew showScrape={showScrape} onClick={onClick} onHide={onHide} dialogFuncMap={dialogFuncMap}  displayBasic={displayBasic} displayBasic2= {displayBasic2}  setShowScrape={setShowScrape} populateTestcaseDetails={populateTestcaseDetails} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>

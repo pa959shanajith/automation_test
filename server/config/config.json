@@ -45,5 +45,22 @@
     "videoTrialUrl":"/static/media/welcomevideo.mp4",
     "enableNotification": {
         "assignTabMindmap" : false
-    }
+    },
+    "exportedmindmap":{
+        "ExportedMindmapFilePath":"./assets/ExportMindmap",
+        "ExportMindmapBatch":"./assets/ExportMindmap/ExportMindmap.bat",
+        "Exportquery":"./assets/ExportMindmap/ExportQuery.js",
+        "mongodumpbat":"./assets/ExportMindmap/Mongoexport.bat"
+    },
+    "ip":"localhost",
+    "password":"TA@AVO2020",
+    "mongopath":"D:\\source_code\\AvoAssureDB\\bin\\mongo",
+    "mongoexportpath":"D:\\source_code\\AvoAssureDB\\bin\\mongoexport",
+    "mongoimportpath":"D:\\source_code\\AvoAssureDB\\bin\\mongoimport",
+    "importMindmap":"./assets/ImportMindmap",
+    "importquerypath":"./assets/ImportMindmap/ImportQuery.bat",
+    "importexceljsonfile":"./assets/ImportMindmap/excel",
+    "importjsonfile":"./assets/ImportMindmap/json",
+    "importJsonQuery":"./assets/ImportMindmap/importJsonQuery.bat"
+    
 }

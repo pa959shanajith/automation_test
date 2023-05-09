@@ -1,9 +1,13 @@
-import React, { Fragment, useRef, useState } from 'react';
+import React, { Fragment, useRef, useState ,useEffect,useMemo} from 'react';
 import {ModalContainer, Messages as MSG, setMsg,ResetSession} from '../../global';
-import {useSelector} from 'react-redux'
-import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit,exportToProject,getModules} from '../api';
+import * as actionTypes from '../state/action';
+import {useSelector,useDispatch} from 'react-redux';
+import {Link} from 'react-router-dom';
+import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit,exportToProject,getModules,exportToMMSkel} from '../api';
 import '../styles/ExportMapButton.scss'
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
+import axios from 'axios';
+import { dispatch } from 'd3';
 
 /*Component ExportMapButton
   use: renders ExportMapButton and popups for selection on click 
@@ -19,6 +23,9 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const [exportBox,setExportBox] = useState(false)    
     const selectedModule = useSelector(state=>state.mindmap.selectedModule)
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
+    const enableExport = useSelector(state=>state.mindmap.enableExport)
+    const exportprojname = useSelector(state=>state.mindmap.exportProjname)
+    const enableExportMindmapButton = useSelector(state=>state.mindmap.enableExportMindmapButton)
     const selectedProj = useSelector(state=>state.mindmap.selectedProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     const [expType,setExpType] = useState(undefined);
@@ -26,13 +33,75 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const [error,setError] = useState(false);
     const [currProjId,setCurrProjId] = useState("");
     const [exportProject,setExportProject] = useState(true)
-    const [exportFile,setExportFile] = useState(false) 
-    const openExport = ()=>{
-        if(!selectedProj || !selectedModule || !selectedModule._id || selectedModulelist.length==0){
-            return;
+    const [exportFile,setExportFile] = useState(false);
+    const userInfo = useSelector(state=>state.login.userinfo);   
+    const [showMessage, setShowMessage] = useState(false);    
+    const dispatchAction=useDispatch()
+    const [OS,setOS] = useState("Windows");
+
+     
+   useEffect(()=>{
+    (() => {
+        let userAgent = navigator.userAgent.toLowerCase();
+        if (/windows nt/.test(userAgent))
+            setOS("Windows");
+
+        else if (/mac os x/.test(userAgent))
+            setOS("MacOS");
+
+        else if (/linux x86_64/.test(userAgent))
+            setOS("Linux")
+        else
+            setOS("Not Supported");
+    })()
+   },[])
+    const getExportFile = async () => {
+        let clientVer
+        if(OS==='Windows'){
+            clientVer="avoclientpath_Windows"
         }
-        setExportBox(true)
+        if(OS==="MacOS"){
+            clientVer="avoclientpath_Mac"
+        }
+        if(OS==='Linux'){
+            clientVer="avoclientpath_Linux"
+        }
+        try {
+            setShowUD(false);
+            setShowOverlay(`Loading...`);
+            dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false})
+            const res = await fetch("/downloadExportfile?ver="+clientVer+"&projName="+exportprojname);            
+            await res.json().then(({status})=>{
+              
+                if (status === "available"){ 
+                    window.location.href = window.location.origin+"/downloadExportfile?ver="+clientVer+"&projName="+exportprojname+"&file=getExportFile"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
+                     setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED);                     
+                     setExportBox(false);
+                     dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
+                     dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true})
+                     setExportProject(true);
+                     setExportFile(false);
+
+                }else {setMsg("error while exporting");
+                dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}) 
+                setExportBox(false); 
+                dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
+                setExportProject(true);
+                setExportFile(false);                                 
+              }     
+            })  
+        } catch (ex) {
+            console.error("Error while exporting", ex);
+            setMsg("error while exporting");
+            setExportBox(false); 
+            dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
+            setExportProject(true);
+            setExportFile(false);
+            dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true})
+        }
+
     }
+    
     const clickExportProj = ()=>{
         if (currProjId===null || currProjId===""){return;}
         else{let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
@@ -50,26 +119,27 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
         setExportBox(false)
         setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);
         setExportFile(false)
-        setBlockui({show:true,content:'Exporting Mindmap ...'})
-        var ftype = ftypeRef.current.value
-        if(ftype === 'json') {
-            toJSON(selectedModuleVar,fnameRef.current.value,displayError,setBlockui);
-        }
         
-        if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
-        if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
-        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
+        var ftype = ftypeRef.current.value
+        var fname=projectList[selectedProj]["name"];
+        var exportProjId=projectList[selectedProj]["id"];
+        var exportProjAppType=projectList[selectedProj]["apptypeName"];
+        
+        if(ftype === 'json') {dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:false});dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:fname});setShowMessage(true);setBlockui({show:true,content:'Exporting Mindmap ...'});setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED_NOTIFY);toJSON(selectedModuleVar,fname,displayError,setBlockui,setShowMessage,setMsg,dispatchAction,exportProjId,exportProjAppType);}           
+        if(ftype === 'excel') {setBlockui({show:true,content:'Exporting Mindmap ...'});toExcel(selectedProj,selectedModuleVar,fname,displayError,setBlockui)};
+        if(ftype === 'custom') {setBlockui({show:true,content:'Exporting Mindmap ...'});toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fname,displayError,setBlockui)};
+        if(ftype === 'git') {setBlockui({show:true,content:'Exporting Mindmap ...'});toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule})};
     }
     return(
         <Fragment>
             {exportBox?<ModalContainer
             title='Export MindMap'
             close={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}
-            footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}/>}
+            footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>}
             content={<Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} 
-            expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} />} 
+            expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}/>} 
             />:null}
-            <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((selectedModulelist.length>0) ? true : false)}>
+            <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)} >
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                     <text x="16" y="18">Export</text>
@@ -93,12 +163,13 @@ const validate = (arr) =>{
     return err
 }
 
-const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,expTypes,setExpType,setError,selectedProj,currProjId,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile}) =>{
+
+const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,setExpType,setError,selectedProj,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile,getExportFile,showMessage,enableExport}) =>{
     
     const changeExport = (e) => {
         
         setExpType(e.target.value);
-        setCurrProjId(e.target.value)
+        setCurrProjId(e.target.value);
         resetImportModule(e.target.value);
     }
     const changeExportFile=(e) =>{
@@ -158,15 +229,15 @@ const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,selectedModulelist,isAs
                             }
                         </select>}</div>
                 <div className='export-rec-row'>
-                <label ><input type="radio" id ="Export To File" onChange={check}/>Export To File </label>
+                <label ><input type="radio" id ="Export To File" onChange={check}/> Export To File </label>
                 {exportFile && <select defaultValue={'def-option'} disabled={exportProject} ref={ftypeRef} onChange={changeExportFile}>
                     <option value={""} >Select Export Format</option>
-                    {isAssign && <option value={'custom'}disabled={selectedModulelist.length>1}>Structure only - Custom (.json)</option>}
+                    {isAssign && <option value={'custom'}>Structure only - Json (.json)</option>}
                     {!isEndtoEnd &&
                     <>
-                    <option value={'excel'}disabled={selectedModulelist.length>1}>Structure only- Excel(.xlx,.xlsx)</option>
+                    <option value={'excel'}>Structure only- Excel (.xlx,.xlsx)</option>
                     {/* <option value={'git'}disabled={selectedModulelist.length>1}>Git (.mm)</option> */}
-                    <option value={'json'}>Complete Module(s) (.mm)</option>
+                    <option value={'json'}>Complete Module (.zip)</option>
                     </>}
                 </select>}
                 </div>
@@ -191,23 +262,28 @@ const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,selectedModulelist,isAs
                     </div>
                 </Fragment>:null
             }
-           {(exportFile && expType && expType !== 'git' &&  expTypes.includes(expType) )?
+           {/* {(exportFile && expType && expType !== 'git' &&  expTypes.includes(expType) )?
                 <div className='export-file-row'>
                     <label>File Name: </label>
                     <input ref={fnameRef} defaultValue={modName} placeholder={'Enter file name'}></input>
                 </div>:null
-            }
+            } */}
+            {showMessage?<div > Export file is being prepared. <br></br> You can come back to this section after few minutes for the download</div> :null}
+       {enableExport?<div >Click <span style={{color:'blue',cursor:'pointer',fontWeight:'bold'}} onClick={()=>{getExportFile()}}>here</span> to download the exported file </div>:null} 
+       
+            
         </div>
     )
 }
-const Footer = ({clickExport,expType,expTypes,setExpType,clickExportProj,error,exportProject}) => {
-    return (exportProject) ? <div>
+const Footer = ({clickExport,clickExportProj,error,exportProject,enableExportMindmapButton}) => {
+    return ((exportProject)? <div>
        {error && <span>Please select a project which has no modules</span>}
        <button disabled={ error} onClick={clickExportProj} >Export Project</button>
-       </div> : <div><button onClick={clickExport}>Export</button>
-       </div>
+       </div>:(!exportProject && enableExportMindmapButton)? <div><button onClick={clickExport}>Export</button> </div>:null
        
-       }
+     
+      )} 
+       
 
 /*
     function : toExcel()
@@ -218,7 +294,7 @@ const toExcel = async(projId,module,fname,displayError,setBlockui) => {
     try{
         var data = {
             "projectid":projId,
-            "moduleid":module
+            "moduleid":Array.isArray(module)?module:module._id
         }
         var result = await exportToExcel(data)
         if(result.error){displayError(result.error);return;}
@@ -244,16 +320,40 @@ const toExcel = async(projId,module,fname,displayError,setBlockui) => {
     Purpose : Exporting Module in json file
     param :
 */
-const toJSON = async(module,fname,displayError,setBlockui) => {
-    try{
-        var result =  await exportMindmap(Array.isArray(module)?module:module._id)
-        if(result.error){displayError(result.error);return;}
-        jsonDownload(fname+'.mm', JSON.stringify(result));
-        setBlockui({show:false,content:''})
-        setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
+const toJSON = async(module,fname,displayError,setBlockui,setShowMessage,setMsg,dispatchAction,exportProjId,exportProjAppType) => {
+    try{        
+        
+        let data={
+            "projectName":fname,
+            "moduleid":Array.isArray(module)?module:module._id,
+            "exportProjId":exportProjId,
+            "exportProjAppType":exportProjAppType
+        }
+        ResetSession.start()
+        let result = await exportMindmap(data)
+        
+        if(result.error){displayError(result.error);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""});dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false});dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}); ResetSession.end();return;}
+        if(result === "InProgress"){setMsg(MSG.MINDMAP.WARN_EXPORT_INPROGRESS);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""});dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false});dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}); ResetSession.end();return;}
+        
+        ResetSession.end()
+        setTimeout(()=>{
+            dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:true})
+            setBlockui({show:false,content:''})
+            setShowMessage(false);
+            setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED_ON_FILE)
+        },5000)
+        
+        
+             
+        
     }catch(err){
         console.error(err)
-        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
+        ResetSession.end()
+        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP);
+        setShowMessage(false);
+        dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
+        dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false})
+        dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true})
     }
 }
 const exportToProj = async(module,currProjId,displayError,setBlockui) => {
@@ -265,6 +365,7 @@ const exportToProj = async(module,currProjId,displayError,setBlockui) => {
         ResetSession.start()
         var result =  await exportToProject(data)
         if(result.error){displayError(result.error);ResetSession.end();return;}
+        if(result === "InProgress"){setMsg(MSG.MINDMAP.WARN_EXPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
         setBlockui({show:false,content:''})
         setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
         ResetSession.end()
@@ -302,51 +403,19 @@ const toGit = async ({projectList,displayError,setBlockui,gitconfigRef,gitVerRef
     Purpose : Exporting testsuite and executiondata in json file
     param :
 */
-const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setBlockui) =>{
+const toCustom = async (selectedProj,module,projectList,releaseRef,cycleRef,fname,displayError,setBlockui) =>{
     try{
-        var suiteDetailsTemplate = { "condition": 0, "dataparam": [""], "scenarioId": "", "scenarioName": "" };
-        var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": { "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"url":"","username":"","password":"","apitoken":"","authtype":""}}, "gitInfo": {"gitConfiguration":"","gitbranch":"","folderPath":"","gitVersion":""}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))] } };
-        var moduleInfo = { "batchInfo": [] };
-        moduleData.appType = projectList[selectedProj].apptypeName;
-        moduleData.domainName = projectList[selectedProj].domains;
-        moduleData.projectName = projectList[selectedProj].name;
-        moduleData.projectId = projectList[selectedProj].id;
-        moduleData.releaseId = projectList[selectedProj].releases[0].name;
-        moduleData.cycleName = projectList[selectedProj].releases[0].cycles[0].name;
-        moduleData.cycleId = projectList[selectedProj].releases[0].cycles[0]._id;
-        const reqObject = [{
-            "releaseid": moduleData.releaseId,
-            "cycleid": moduleData.cycleId,
-            "testsuiteid": selectedModule._id,
-            "testsuitename": selectedModule.name,
-            "projectidts": moduleData.projectId
-            // "versionnumber": parseFloat(version_num)
-        }];
-        var moduleObj = await readTestSuite_ICE(reqObject)
-        if(moduleObj.error){displayError(moduleObj.error);return;}
-        moduleObj = moduleObj[selectedModule._id];
-        if(moduleObj && moduleObj.testsuiteid != null) {
-            moduleData.testsuiteId = moduleObj.testsuiteid;
-            moduleData.testsuiteName = moduleObj.testsuitename;
-            moduleData.versionNumber = moduleObj.versionnumber;
-            moduleData.suiteDetails = [];
-            for (var j = 0; j < moduleObj.scenarioids.length; j++) {
-                var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
-                s_data.condition = moduleObj.condition[j];
-                s_data.dataparam = [moduleObj.dataparam[j]];
-                s_data.scenarioName = moduleObj.scenarionames[j];
-                s_data.scenarioId = moduleObj.scenarioids[j];
-                moduleData.suiteDetails.push(s_data);
-            }
-            moduleInfo.batchInfo.push(moduleData);
-            jsonDownload(fname+'_moduleinfo.json', JSON.stringify(moduleInfo));
-            jsonDownload(fname+'_executiondata.json', JSON.stringify(executionData));
-            setBlockui({show:false,content:''})
-            setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
-        } else {
-            displayError(MSG.MINDMAP.ERR_EXPORT_DATA);
+        var data = {
+            "tab":"createTab",
+		    "projectid":selectedProj,
+		    "moduleid":Array.isArray(module)?module:module._id,
+		    "cycleid":null,
         }
+        var result = await exportToMMSkel (data)
+        if(result.error){displayError(result.error);return;}
+        jsonDownload(fname+'.json', JSON.stringify(result));
+        setBlockui({show:false,content:''})
+        setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
     }catch(err){
         displayError(MSG.MINDMAP.ERR_EXPORT_DATA);
         console.error(err);
