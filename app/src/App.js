@@ -19,7 +19,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
-import StaticDataForMindMap from './pages/design/staticDataForMindMap';
+import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
 import './App.css';
 
 import Topbar from './pages/landing/components/Topbar';

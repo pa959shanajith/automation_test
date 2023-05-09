@@ -1,0 +1,148 @@
+svg {
+    overflow: visible; 
+    display: block;
+}
+
+.mp__canvas_svg{
+    width: 50%;
+    height: 40%;
+}
+.ct-link{
+    stroke: darkGray;
+    stroke-width: 1px;
+    fill: none;
+}
+.ct-node .ct-nodeIcon {
+    display: inline-block;
+    height: 45px;
+    width: 45px;
+    cursor: pointer;
+    pointer-events: all!important;
+}
+.ct-node .ct-nodeLabel {
+    display: block;
+    font-size: 12px;
+    cursor: default;
+    word-wrap: break-word;
+    padding-top: 2px;
+}
+.ct-node .ct-nodeBubble {
+    stroke-width: 1px;
+    fill: thistle;
+}
+.node-highlight{
+    outline : 2px solid rgb(0, 0, 0);
+}
+.ct-actionButton>rect{
+    fill: blueviolet;
+    height: 25px;
+    width: 80px;
+}
+.ct-actionButton>text{
+    font-size: 17px;
+    fill: white;
+}
+#ct-advanceOptionAction>rect{
+    fill: blueviolet;
+    height: 25px;
+    width: 170px;
+}
+.show-box{
+    display: block!important;
+    opacity: 1 !important;
+}
+.no-disp {
+    display: none!important;
+}
+.node-selected {
+    outline: 1px dashed blue;
+}
+.node-error{
+    outline: 2px dashed red;
+}
+
+.cardMindmap{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.Module{
+    margin: 6%;
+    margin-bottom: 0.5%;
+}
+.avoGenius{
+    margin: 6%;
+    margin-top: 1%;
+}
+.avoGeniusCard{
+    margin: 6%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .avoGeniuscardImg{
+        position: relative;
+        left: 26rem;
+    }
+}
+
+.createBatton{
+    left: 50em;
+    background: #605BFF;
+    border-radius: 8px;
+    &:hover{
+        background: #605BFF !important;
+        border-radius: 8px !important;
+    }
+}
+
+.geniusBatton{
+    left: 50em;
+    background: #605BFF;
+    border-radius: 8px;
+    &:hover{
+        background: #605BFF !important;
+        border-radius: 8px !important;
+    }
+}
+.createBattonImg{
+    height: 140px;
+    width: 160px;
+    position: relative;
+    left: 42.8em;
+    bottom: 5.4em;
+}
+.avoGeniusImg{
+    height: 140px;
+    width: 160px;
+    position: relative;
+    left: 42.8em;
+    bottom: 5.4em;
+}
+.cardText{
+    position: relative;
+    left: 5em;
+    top: 3em;
+    font-family: "Open Sans";
+    font-style: normal;
+    font-size: 20px;
+    #module{
+        font-weight: 900;
+        font-family: "Open Sans";
+        font-style: normal;
+        font-size: 20px;
+    }
+}
+.space{
+    position: relative;
+    left: 25em;
+    width: 20rem;
+}
+#p_card{
+    .p-card-body{
+        padding: 1.25rem 0 !important;
+    }
+}
