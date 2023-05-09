@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import '../styles/MindmapHome.scss';
-import { ConfirmDialog } from 'primereact/confirmdialog';
 import Canvas from './Canvas';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import ControlBox from '../components/ControlBox';
+
+
 const data ={
   name: 'Module_1',
   type: 'modules',
@@ -52,21 +53,12 @@ const data ={
 };
 
 function StaticDataForMindMap() {
-
-  const [visible, setVisible] = useState(false);
   const [showMindmap, setShowMindmap] = useState(false);
   const [showGenius, setShowGenius] = useState(false);
   const [showCard, setShowCard] = useState(true);
 
-    const accept = () => {
-        setShowMindmap(true)
-    }
-
-    const reject = () => {
-      setShowMindmap(true)
-    }
    const handleModule = ()=>{
-    setVisible(true);
+    setShowMindmap(true)
     setShowCard(false)
    }
    const handleGenius = () =>{
@@ -75,6 +67,7 @@ function StaticDataForMindMap() {
    }
   return (
     <>
+    <Card style={{width: '25rem',height: '45rem'}}/>
     {showCard && <div className='cardMindmap'>
       <Card  id='p_card' className='Module'>
         <span className='cardText'>
@@ -94,14 +87,11 @@ function StaticDataForMindMap() {
         <img className='avoGeniusImg' src='static\imgs\AvoGenius.png' alt='Start Avo Genius'/>
       </Card>
     </div>}
-    {visible && <img src='static\imgs\MindmapImage.PNG' alt='MindMap' style={{height:'43em'}} />}
-     <ConfirmDialog visible={visible} position='bottom-right'  onHide={() => setVisible(false)} message="Are you sure you want to proceed?"
-                    header="Help" icon="pi pi-info-circle" accept={accept} reject={reject} />
     {showMindmap && <Canvas selectedModule={data}/>}
     {showMindmap && <ControlBox />}
-    {showGenius && <Card className='avoGeniusCard' title='Welcome to Avo Genius'>
-        <img className='avoGeniuscardImg' src='static\imgs\AGS.svg' alt='Avo Genius Logo'/>
-      </Card>}
+    {showGenius && <div style={{background:'#F5F5F5'}}><Card className='avoGeniusCard' title='Welcome to Avo Genius'>
+            <img className='avoGeniuscardImg' src='static\imgs\AGS.svg' alt='Avo Genius Logo'/>
+          </Card></div>}
     </>
   );
 }

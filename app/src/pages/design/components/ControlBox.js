@@ -2,7 +2,7 @@ import React, { useState, useRef} from 'react';
 import { Menu } from 'primereact/menu';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import '../design/styles/ControlBox.scss';
+import '../styles/ControlBox.scss';
          
 
 

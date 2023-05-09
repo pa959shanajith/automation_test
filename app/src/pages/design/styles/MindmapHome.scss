@@ -4,8 +4,9 @@ svg {
 }
 
 .mp__canvas_svg{
-    width: 50%;
-    height: 40%;
+    width: 81rem;
+    height: 45rem;
+    background: #F5F5F5;
 }
 .ct-link{
     stroke: darkGray;
@@ -62,24 +63,26 @@ svg {
 }
 
 .cardMindmap{
-    width: 100%;
+    width: 71rem;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background: #F5F5F5;
 }
 .Module{
-    margin: 6%;
-    margin-bottom: 0.5%;
+    width: 50rem;
+    margin: 7%;
+    margin-bottom: 1%;
 }
 .avoGenius{
-    margin: 6%;
+    width: 50rem;
+    margin: 7%;
     margin-top: 1%;
 }
 .avoGeniusCard{
     margin: 6%;
-    width: 100%;
-    height: 100%;
+    width: 71rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -90,7 +93,7 @@ svg {
 }
 
 .createBatton{
-    left: 50em;
+    left: 36em;
     background: #605BFF;
     border-radius: 8px;
     &:hover{
@@ -100,7 +103,7 @@ svg {
 }
 
 .geniusBatton{
-    left: 50em;
+    left: 36em;
     background: #605BFF;
     border-radius: 8px;
     &:hover{
@@ -112,37 +115,43 @@ svg {
     height: 140px;
     width: 160px;
     position: relative;
-    left: 42.8em;
-    bottom: 5.4em;
+    left: 29.6em;
+    bottom: 5.7em;
 }
 .avoGeniusImg{
     height: 140px;
     width: 160px;
     position: relative;
-    left: 42.8em;
-    bottom: 5.4em;
+    left: 29.6em;
+    bottom: 5.7em;
 }
 .cardText{
     position: relative;
     left: 5em;
     top: 3em;
-    font-family: "Open Sans";
+    font-family: 'Open Sans';
     font-style: normal;
+    font-weight: 200;
     font-size: 20px;
+    line-height: 27px;
     #module{
-        font-weight: 900;
-        font-family: "Open Sans";
+        font-family: 'Open Sans';
         font-style: normal;
-        font-size: 20px;
+        font-weight: 900;
+        font-size: 32px;
+        line-height: 44px;
     }
 }
 .space{
     position: relative;
-    left: 25em;
+    left: 18em;
     width: 20rem;
 }
 #p_card{
     .p-card-body{
-        padding: 1.25rem 0 !important;
+        padding: 0 !important;
     }
+}
+.Module_Home{
+    width: 50%;
 }

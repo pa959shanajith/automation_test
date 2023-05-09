@@ -180,7 +180,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
     var nodeDisplay = {}
     var linkDisplay = {}
     var s = d3.select('.mp__canvas_svg');
-    let  cSize= [parseFloat(s.style("width"))/2, parseFloat(s.style("height"))/2];
+    let  cSize= [parseFloat(s.style("width"))/3, parseFloat(s.style("height"))];
     var typeNum = {
         'modules': 0,
         'endtoend': 0,
