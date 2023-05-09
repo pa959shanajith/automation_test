@@ -277,7 +277,7 @@ exports.fetchModuleListDevopsReport =  async(req, res) => {
 
 exports.executionSteps = async(req, res)=>{
 	try {
-		const inp = {};
+		const inp = req.body;
 		const steps = await utils.fetchData(inp,"/hooks/validateExecutionSteps")
 		res.send(steps)
 	} catch (error) {
