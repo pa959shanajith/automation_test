@@ -7,8 +7,7 @@ import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import {url} from '../../../App';
+
 
 
 
@@ -205,7 +204,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     ResetSession.start()
                     var importproj=projRef.current ? projRef.current.value: undefined          
                     var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheetRef.current? sheetRef.current.value: undefined})
-                    if(res.error){displayError(res.error);return;}                    
+                    if(res.error){displayError(res.error);ResetSession.end();return;}                    
                     else{
                         
                         var importexcel = await jsonToMindmap({"type":"importexcel","importproj":importproj})
