@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 // for example
 // import loginReducer from './pages/login/loginSlice.js
 import loginReducer from './pages/login/loginSlice'
+import designSlice from "./pages/design/designSlice";
 
 export default configureStore({
     reducer:{
@@ -10,6 +11,7 @@ export default configureStore({
         login:loginReducer,
         // plugin:pluginReducer,
         // admin:adminReducer
+        design: designSlice
         
     }
 })
