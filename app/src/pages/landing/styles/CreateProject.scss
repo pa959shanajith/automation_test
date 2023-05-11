@@ -4,7 +4,7 @@
     }
     .project-name-1{
         .p-card-body{
-    background: white;
+    // background: white;
     margin: 0rem;
     height: 6.5rem;
         }
@@ -34,7 +34,8 @@
     }
     .proj-input{
         position: relative;
-        bottom: -0.3rem;
+        top: 0.5rem;
+       
     }
 
     .app-dropdown{
@@ -107,15 +108,23 @@
      .btn1{
         margin-right: 1rem !important;
         height: 2.5rem;
+        font-family: 'Open Sans'!important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+
      }
      .btn2{
         height: 2.5rem;
+        font-family:'Open sans' !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
      }
     
      .label1{
         margin: -1.3rem 6rem 3rem 2rem;
         color: #9E9E9E;
         font-size: 12px;
+        font-family: 'Open sans' !important;
      }
      .check1{
         position: relative;
@@ -196,7 +205,7 @@
     }
     .selectallbtn{
         position: relative;
-        bottom: 1rem;
+        bottom: 0.5rem;
     }
     .usersearch{
         width: 23rem;
@@ -204,7 +213,7 @@
     }
     .user-select-checkbox {
         position: relative;
-        bottom: 0rem;
+        top: 0.5rem;
     }
     .selecteduser{
         width: 23rem;
@@ -229,7 +238,7 @@
     }
     .checkbox-2{
         position: relative;
-        bottom: 1.5rem;
+        bottom: 1rem;
     }
     .dropdown_role{
         position: relative;
@@ -237,10 +246,11 @@
         left: 23rem;
         color: #9E9E9E;
         font-size: 14px;
+        font-family: 'Open sans' !important;
     }
     .check-bx3{
         position: relative;
-        bottom: 1.5rem;
+        bottom: 1rem;
 
     }
     .user-role{
@@ -253,6 +263,7 @@
         font-style: normal;
         font-weight: 400;
         font-size: 14px;
+        width: 7rem;
     }
     
     .assigned-checkbox{
@@ -279,6 +290,7 @@
    font-style: normal;
    font-weight: 400;
     font-size: 14px;
+    width: 7rem;
     }
     .label-3{
         display: flex;
@@ -333,9 +345,11 @@
         font-size: 14px;
       }
       .user-av{
-        width: 1.5rem;
-        height: 1.5rem;
-        font-size: 0.85rem;
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        font-size: 0.85rem !important;
+        position: relative !important;
+        left: 0.3rem !important;
       }
       .user-avatar{
         position: relative;
@@ -345,9 +359,12 @@
 
       .asgnd-avatar{
         position: relative;
-        bottom: 4rem;
-        left: 1.2rem;
-        right: 0rem;
+        bottom: 4rem !important;
+        left: 1.2rem !important;
+        right: 0rem !important;
+        font-size: 0.85rem !important;
+        width: 1.5rem !important;
+        height: 1.5rem !important;
       }
       .users-list{
         position: relative;
@@ -355,27 +372,17 @@
         margin-bottom: -3.5rem;
       }
 
-      .p-checkbox .p-checkbox-box {
-        height: 1.5rem;
-        width: 1.5rem;
-        border-radius: 0.25rem;
-        border: 1px solid #ced4da;
-        background-color: #fff;
-      }
-      
-      .p-checkbox .p-checkbox-box::before {
-        font-size: 1rem;
-        color: #007bff;
-      }
-      
-      .p-checkbox input[type="checkbox"]:checked ~ .p-checkbox-box::before {
-        content: '\f00c'; /* This is the FontAwesome checkmark icon */
-      }
       .p-multiselect .p-multiselect-label.p-placeholder{
       text-align: center !important;
       line-height: 0.5rem !important; 
       }
-    
+   
+    .gtbtn , .ltbtn{
+        .p-button-label{
+            position: relative;
+            right: 0.2rem;
+        }
+    }
     
     
     
