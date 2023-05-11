@@ -26,6 +26,7 @@ const  CreateProject=({ visible, onHide  }) =>{
     const [selectedAssignedCheckboxes, setSelectedAssignedCheckboxes] = useState([]);
     const[selectallAssaigned,setSelectallAssaigned]= useState(false);
     const [queryDisplayUser, setQueryDisplayUser] = useState('');
+  
 
  
 
@@ -41,11 +42,11 @@ const  CreateProject=({ visible, onHide  }) =>{
         { name: 'Mobile Apps', code: 'PRS', image:'/static/imgs/mobileApps.png' }, 
     ];
     const [items , setItems]= useState ([
-        { id: 1,name: 'Jadeja D', primaryRole:'Team Lead', email:'jadeja@gmail.com' },
-        { id: 2, name: 'Mahendra dhoni', primaryRole:'QA Engineer' ,  email:'mahi@gmail.com' },
-        { id: 3, name: 'Sachin T',primaryRole:'Test Manager',  email:'sachin@gmail.com'  },
-        { id: 4, name: 'Virat Kohli',primaryRole:'Test Manager',  email:'virat@gmail.com'  },
-        { id: 5, name: 'Emily cooper', primaryRole:'Test Manager',  email:'emily@gmail.com'  },
+        { id: 1,name: 'Virat Kohli', primaryRole:'Team Lead', email:'virat@gmail.com' },
+        { id: 2, name: 'Glenn Maxwell', primaryRole:'QA Engineer' ,  email:'glenn@gmail.com' },
+        { id: 3, name: 'Fafdu Plesisi',primaryRole:'Test Manager',  email:'faf@gmail.com'  },
+        { id: 4, name: 'Rajat Patidar',primaryRole:'Test Manager',  email:'rajat@gmail.com'  },
+        { id: 5, name: 'Mohammed  Siraj', primaryRole:'Test Manager',  email:'siraj@gmail.com'  },
  
       ]);
 
@@ -234,7 +235,7 @@ const handleRoleChange = (e) => {
         <Card className='project-name-1'>
         <div className='pro-name1'>
         < h5 className='proj__name'>Project Name</h5>
-            <InputText className="proj-input md:w-28rem text-400"value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter Project Name" />
+            <InputText className="proj-input md:w-30rem text-400"value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter Project Name" />
             <div className='dropdown-1'>
                 <h5 className='application__name'>Application Type</h5>
             <Dropdown  value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name" 
@@ -266,7 +267,7 @@ const handleRoleChange = (e) => {
 {getFilteredItems().map(item => (
                     
 <div key={item.id} className="users-list">
-                            <Checkbox  className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id}  title={item.email} checked={selectedCheckboxes.includes(item.id)}  onChange={handleCheckboxChange}/>
+                            <Checkbox  className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id}  title={item.email} checked={selectedCheckboxes.some((cb) => cb.id === item.id)}  onChange={handleCheckboxChange}/>
                             <h5 htmlFor={`checkbox-${item.id}`} className="label-2 ml-2 mr-2 mt-2 mb-2">
                               
                               <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff',width:'27px', height:'26px' }} >{getInitials(item.name)}</Avatar></span>
@@ -316,7 +317,7 @@ const handleRoleChange = (e) => {
     <ul>  
 {getFilteredDisplayUser().map((checkboxId) => (
     <>
-         <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id}  value={checkboxId.id} checked={selectedAssignedCheckboxes.includes(checkboxId.id)}
+         <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id}  value={checkboxId.id} checked={selectedAssignedCheckboxes.some((ab)=> ab.id === checkboxId.id)}
             onChange={handleAssignedCheckboxChange}
 >{checkboxId} </Checkbox>
          <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 ">
