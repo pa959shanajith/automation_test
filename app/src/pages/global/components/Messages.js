@@ -265,6 +265,7 @@ const Messages={
         ERR_EMPTY_TCS: {"CONTENT":"Please select Test Cases from Mapped Zephyr Test Cases.", "VARIANT": VARIANT.ERROR},
         ERR_EMPTY_PH: {"CONTENT":"Please select Phase from Zephyr Folder Structure.", "VARIANT": VARIANT.ERROR},
         ERR_UPDATE_NOT_FOUND: {"CONTENT":"Failed to Update .", "VARIANT": VARIANT.ERROR},
+        ERR_ENG_MSG: {"CONTENT":"Do not have permission.", "VARIANT": VARIANT.ERROR},
         
         SUCC_SAVE: {"CONTENT":"Saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_IMPORT: {"CONTENT":"Successfully Imported Mappings.", "VARIANT": VARIANT.SUCCESS},
@@ -486,7 +487,7 @@ const Messages={
         ERR_INVALID_INFO: {"CONTENT": "Enter Correct Details", "VARIANT": VARIANT.ERROR},
         ERR_ENTER_VALID_CRED: {"CONTENT": "Enter Valid Credentials", "VARIANT": VARIANT.ERROR},
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
-        ERR_ADD_FETCH:{"CONTENT": "Failed to fetch Azure details","VARIANT":VARIANT.ERROR},
+        ERR_ADD_FETCH:{"CONTENT": "Failed to fetch Azure DevOps details","VARIANT":VARIANT.ERROR},
         
         SUCC_INFO_UPDATED: {"CONTENT": "User Information updated successfully!", "VARIANT": VARIANT.SUCCESS},
     },

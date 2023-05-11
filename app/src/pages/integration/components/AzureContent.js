@@ -14,6 +14,7 @@ const AzureContent = props => {
     const dispatch = useDispatch();
     const history = useHistory();
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
+    const userRole = useSelector(state=>state.login.SR);
     const mappedPair = useSelector(state=>state.integration.mappedPair);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
     const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
@@ -126,7 +127,7 @@ const AzureContent = props => {
         const response = await api.saveAzureDetails_ICE(mappedPair);
         if (response.error){
             setMsg(response.error);
-        } 
+        }
         else if(response === "unavailableLocalServer")
             setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
         else if(response === "scheduleModeOn")
@@ -147,7 +148,7 @@ const AzureContent = props => {
             else if(selectedId===''){
                 popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
             }
-    }
+        }
     const callExit=()=>{
         setScreenExit(true);
         setScenarioArr(null);
@@ -333,7 +334,7 @@ const AzureContent = props => {
          !screenexit?
         <Fragment>
             <MappingPage 
-                pageTitle="Azure Integration"
+                pageTitle="Azure DevOps Integration"
                 onSave={()=>callSaveButton()}
                 onViewMap={()=>props.callViewMappedFiles()}
                 // onUpdateMap={()=>props.callUpdateMappedFiles()}
