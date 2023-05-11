@@ -41,7 +41,9 @@ function VerticalSteps(params) {
       // let path = "/mindmap"; 
       navigate("/mindmap");
   };
-
+  const handleExecute = () => {
+    navigate('/execute');
+  }
   // const handleBack = () => {
   //   // setActiveStep((prevActiveStep) => prevActiveStep - 1);
   // };
@@ -59,7 +61,8 @@ function VerticalSteps(params) {
             <Step key={step.label}>
               <StepLabel>
                 {step.label}
-                <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'} onClick={handleNext}>{step.title}</Button>
+                <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'} onClick={step.title==='Execute'? handleExecute : handleNext}>{step.title}</Button>
+
                 <NavigateNextIcon className='verticalicon'/>
               </StepLabel>
               <StepContent>
