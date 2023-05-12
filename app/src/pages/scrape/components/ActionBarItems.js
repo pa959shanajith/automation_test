@@ -303,7 +303,7 @@ const BottomContent = (props) => {
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>setShowObjModal("exportObject"), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType==="Web", show: (appType==="Web")},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (props.appType!=="Web"), disable: compareFlag && props.appType!=="Webservice"},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>setShowObjModal("importObject"), show: (props.appType==="Web"), disable: compareFlag && props.appType==="Web"}, 
-        {'title':'Prioritize Object','img': enableIdentifier?'static/imgs/identifier-enabled.png':'static/imgs/identifier-disabled.png','action':()=>setShowObjModal("identifierlis"),'show': ((appType === 'Web' || appType === "MobileWeb")),disable:enableIdentifier?false:true}
+        {'title':'Prioritize Object Identifier','img': enableIdentifier?'static/imgs/identifier-enabled.png':'static/imgs/identifier-disabled.png','action':()=>setShowObjModal("identifierlis"),'show': ((appType === 'Web' || appType === "MobileWeb")),disable:enableIdentifier?false:true}
     ]
 
     return (
