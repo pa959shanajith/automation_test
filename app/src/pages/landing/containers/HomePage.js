@@ -5,11 +5,10 @@ import SidePanel from './SidePanel';
 import HomePageContainer from './HomePageContainer';
 import { Outlet } from 'react-router-dom';
 import ProjectOverview from '../components/ProjectOverview';
-import ProjectCreation from '../components/ProjectCreation';
 import '../styles/HomePage.scss';
 
 
-const HomePage = () => {
+const HomePage = (props) => {
     return(
         <div className='HomePage_container'>
             <SidePanel/>
