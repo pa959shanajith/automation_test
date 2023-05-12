@@ -252,8 +252,7 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.post('/getGeniusData',plugin.getGeniusData);
-		app.post('/fetchExecutionDetail',suite.fetchExecutionDetail);
+		app.post('/getGeniusData',plugin.getGeniusData);		
 
 		app.use(csrf({
 			cookie: true

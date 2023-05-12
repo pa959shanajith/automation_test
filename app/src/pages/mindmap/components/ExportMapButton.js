@@ -67,6 +67,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             clientVer="avoclientpath_Linux"
         }
         try {
+            
             dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false})
             const res = await fetch("/downloadExportfile?ver="+clientVer+"&projName="+exportprojname);            
             await res.json().then(({status})=>{

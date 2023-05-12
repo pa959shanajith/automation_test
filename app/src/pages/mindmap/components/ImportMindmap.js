@@ -183,6 +183,8 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                 
                     if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end(); return;}
                     if(res === "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
+                    if(res === "dupMod"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
+                    if(res === "dupSce"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
                     var req={
                         tab:"tabCreate",
                         projectid:mindmapData[0]?mindmapData[mindmapData.length -1]["projectid"]:mindmapData.projectid,
@@ -208,7 +210,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     else{
                         
                         var importexcel = await jsonToMindmap({"type":"importexcel","importproj":importproj})
-                        if(importexcel.error){displayError(importexcel.error);return;}
+                        if(importexcel.error){displayError(importexcel.error);ResetSession.end();return;}
                         if(importexcel == "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setImportPop(false);ResetSession.end();return;}
                         setImportPop(false);
                         setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
@@ -219,7 +221,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     // setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
                     var res = await jsonToMindmap({"type":"importjson","importproj":projRef.current ? projRef.current.value: undefined})
-                    if(res.error){displayError(res.error);return;}
+                    if(res.error){displayError(res.error);ResetSession.end();return;}
                     if(importexcel == "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setImportPop(false);ResetSession.end();return;}
                     setImportPop(false);
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
@@ -506,34 +508,79 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
 		else if(extension === 'json'){
             const result =  await read(file)
             var duplicateData = JSON.parse(result);
-            if(duplicateData.length>0){
-            let startData={"status":"start","type":"json"}
-            let endData={"status":"stop","type":"json"} 
-            const start= await writeFileServer(startData)
-            if(start.error){setDisableSubmit(true);setBlockui({show:false});return}                    
-            for (let i=0;i<duplicateData.length;i++){
-                if (i==0){
-                    duplicateData[i]["status"]="first"
-                    duplicateData[i]["type"]="json"
-                    const res1= await writeFileServer(duplicateData[i])
-                    if(res1.error){setDisableSubmit(true);setBlockui({show:false});return}}
-                else{
-                duplicateData[i]["type"]="json"
-                const res1= await writeFileServer(duplicateData[i])
-                if(res1.error){setDisableSubmit(true);setBlockui({show:false});return}}}
-            
-            
-            const end= await writeFileServer(endData)
-            if(end.error){setDisableSubmit(true);setBlockui({show:false});return}
-            else{setDisableSubmit(false);
-                setBlockui({show:false})}
-            setBlockui({show:false})
-            setFiledUpload(result)
-            setDisableSubmit(false)
-        }else{
-            setBlockui({show:false})
+            if(duplicateData){
+                if(duplicateData.length>0){
+                    let startData={"status":"start","type":"json"}
+                    let endData={"status":"stop","type":"json"} 
+                    const start= await writeFileServer(startData)
+                    if(start.error){setDisableSubmit(true);setBlockui({show:false});return}
+                    var modules=[]
+                    var scenarios=[]                    
+                    for (let i=0;i<duplicateData.length;i++){
+                        if (i==0){
+                            if(duplicateData[i]["name"] && duplicateData[i]["testscenarios"]){
+                                duplicateData[i]["status"]="first"
+                                duplicateData[i]["type"]="json"
+                                
+                                if (modules.includes(duplicateData[i]["name"])){
+                                    setError("Duplicate Modules found");setDisableSubmit(true);setBlockui({show:false});return;
+                                }
+                                modules.push(duplicateData[i]["name"])
+                                if (Array.isArray(duplicateData[i]["testscenarios"])){
+                                    for (let j=0;j<duplicateData[i]["testscenarios"].length;j++){
+                                        if (scenarios.includes(duplicateData[i]["testscenarios"][j]["name"])){
+                                            setError("Duplicate Scenarios found");setDisableSubmit(true);setBlockui({show:false});return;
+                                        }else{scenarios.push(duplicateData[i]["testscenarios"][j]["name"])}
+                                    }
+                                }else{
+                                    setError("Invalid File");setDisableSubmit(true);setBlockui({show:false});return;
+                                }
+                                const res1= await writeFileServer(duplicateData[i])
+                                if(res1.error){setDisableSubmit(true);setBlockui({show:false});return}
+                            }else{
+                                setError("Invalid file format");setDisableSubmit(true);setBlockui({show:false});return;
+                            }
+                        }
+                        else{
+                            if(duplicateData[i]["name"] && duplicateData[i]["testscenarios"]){
+                                if (modules.includes(duplicateData[i]["name"])){
+                                    setError("Duplicate Modules found");setDisableSubmit(true);setBlockui({show:false});return;
+                                }
+                                if (Array.isArray(duplicateData[i]["testscenarios"])){
+                                    for (let j=0;j<duplicateData[i]["testscenarios"].length;j++){
+                                        if (scenarios.includes(duplicateData[i]["testscenarios"][j]["name"])){
+                                            setError("Duplicate scenarios found");setDisableSubmit(true);setBlockui({show:false});return;
+                                        }else{scenarios.push(duplicateData[i]["testscenarios"][j]["name"])}
+                                    }
+                                }else{
+                                    setError("Invalid File");setDisableSubmit(true);setBlockui({show:false});return;
+                                }
+                                duplicateData[i]["type"]="json"
+                                modules.push(duplicateData[i]["name"])
+                                const res1= await writeFileServer(duplicateData[i])
+                                if(res1.error){setDisableSubmit(true);setBlockui({show:false});return}
+                            }else{
+                                setError("Invalid file format");setDisableSubmit(true);setBlockui({show:false});return;
+                            }
+                        }}
+                    
+                    
+                    const end= await writeFileServer(endData)
+                    if(end.error){setDisableSubmit(true);setBlockui({show:false});return}
+                    else{setDisableSubmit(false);
+                        setBlockui({show:false})}
+                    setBlockui({show:false})
+                    setFiledUpload(result)
+                    setDisableSubmit(false)
+                }else{
+                    setBlockui({show:false})
+                    setError("Invalid file format")
+                }
+            }else{
+                setBlockui({show:false})
                 setError("File is empty")
-    }}
+            }
+        }
          
 		else if(extension === 'xls' || extension === 'xlsx'){
             const result =  await read(file)
@@ -552,7 +599,7 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
             const formData = new FormData();
             formData.append('file',file)
             const res = await writeZipFileServer(formData);
-            console.log(res,' its res from server');
+            if(res.error || !res.appType){setError("Invalid Data");;setDisableSubmit(true);setBlockui({show:false});return}
             let selectedAppType = projList[selectedProject].apptypeName;  
             var importedAppType = res.appType;
             if(selectedAppType!==importedAppType){
@@ -564,10 +611,7 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setDuplicateMo
             let data={"apptype":res.appType,
             "projid":selectedProject}
             setMindmapData(data); 
-            
-            if(res.error || !res.appType){setDisableSubmit(true);setBlockui({show:false});return}
-            else{setDisableSubmit(false);
-                setBlockui({show:false})}
+            setDisableSubmit(false);                
             setBlockui({show:false}) 
         }else{
             setError("File is not supported")

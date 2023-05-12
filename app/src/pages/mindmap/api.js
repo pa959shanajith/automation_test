@@ -305,6 +305,12 @@ export const excelToMindmap = async(data) => {
         else if (res.data == 'valueError') {
             return {error : MSG.MINDMAP.ERR_EMPTY_COL}
         } 
+        else if (res.data == 'duplicateSce') {
+            return {error : MSG.MINDMAP.ERR_DUPLI_EXCEL_SCE_DATA}
+        } 
+        else if (res.data == 'duplicateMod') {
+            return {error : MSG.MINDMAP.ERR_DUPLI_EXCEL_MOD_DATA}
+        } 
         else if (res.data == "emptySheet" || res.data == 'fail') {
             return {error : MSG.MINDMAP.ERR_EXCEL_SHEET}
         }
