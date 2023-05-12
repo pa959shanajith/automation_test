@@ -29,7 +29,7 @@ const  ProjectCreation=() =>{
     return(
     <>
         {/* {visible && <CreateProject setVisible={setVisible} />} */}
-        <div className='surface-100 flex flex-column'>
+        <div className='p-4 surface-100 flex flex-column'>
           <VerticalSteps/>
 
           {/* <div className=" CreateProj-card"> */}

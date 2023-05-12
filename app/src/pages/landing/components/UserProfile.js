@@ -7,8 +7,11 @@ import { Toast } from 'primereact/toast'
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import '../styles/TiredMenu.scss';
+import { useDispatch } from "react-redux";
+import { loginSliceActions } from '../../login/loginSlice'
 
 const UserDemo = (props) => {
+    const dispatch = useDispatch();
     const [showMenu, setShowMenu] = useState(false);
     const [visible, setVisible] = useState(false);
     const toast = useRef(null);
@@ -120,18 +123,20 @@ const handleItemClick = (menuitems) => {
 
 
 const accept = () => {
-toast.current.show({ severity: 'info', detail: 'User successfully logged out from Avo Assure'});
+    dispatch(loginSliceActions.logout());
+    toast.current.show({ severity: 'info', detail: 'User successfully logged out from Avo Assure'});
+   
 };
 
 const reject = () => {
-toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
 };
 const Logout=()=>{
-setVisible(true);
-return(
-<>
-<Toast ref={toast} />
-</>)
+    setVisible(true);
+    return(
+    <>
+        <Toast ref={toast} />
+    </>)
 };
 
 return (
