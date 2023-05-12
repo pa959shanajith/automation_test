@@ -56,7 +56,7 @@ const ScrapeScreen = (props)=>{
     const [showTeststeps , setshowTeststeps]=useState([]);
     const [displayTest , setdisplayTest]=useState({});
     const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]);
-    const[identifier,setIdentifier]=useState(false)
+   
     useEffect(() => {
         // if(Object.keys(current_task).length !== 0) {
             fetchScrapeData()
@@ -68,7 +68,7 @@ const ScrapeScreen = (props)=>{
         //eslint-disable-next-line
         dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
 
-    }, [current_task,identifier])
+    }, [current_task])
 
     useEffect(()=>{
         if (!showObjModal) {
@@ -494,9 +494,6 @@ const saveIdentifier=()=>{
                 setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
         }
         )
-
-   setIdentifier(true)
-    
 }
 const dynamicColumns = columns.map((col, i) => {
                     return <Column key={col.field} columnKey={col.field} field={col.field} header={col.header} />;
@@ -533,7 +530,7 @@ const footerContent = (
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
         { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name,versionnumber:0 /** version no. not avail. */, appType: props.appType}} />}
-        <Dialog header="Prioritize identifier using drag/drop" style={{width:'56vw'}} visible={showObjModal === "identifierlis"}  onHide={() => setShowObjModal('')} footer={footerContent} >
+        <Dialog header="Prioritize object identifier using drag/drop" style={{width:'56vw'}} visible={showObjModal === "identifierlis"}  onHide={() => setShowObjModal('')} footer={footerContent} >
         <div className="card" >
         <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorder} tableStyle={{ minWidth: '50rem' }} >
                 <Column rowReorder style={{ width: '3rem' }} />
