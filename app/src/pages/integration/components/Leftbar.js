@@ -3,14 +3,20 @@ import { ActionBar, Header, Thumbnail } from '../../global';
 import  "../styles/Leftbar.scss";
 import { useDispatch ,useSelector } from 'react-redux';
 import * as actionTypes from '../state/action.js';
+import { Messages as MSG, setMsg } from '../../global';
 
 
 const Leftbar = (props) => {
     const dispatch = useDispatch();
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
     const screenType = useSelector(state=>state.integration.screenType);
+    const userRole = useSelector(state=>state.login.SR);
 
     const callIconClick = iconType => {
+        if(userRole === 'Test Engineer'){
+            setMsg(MSG.INTEGRATION.ERR_ENG_MSG);
+            return;
+        }
         let clickedScreen = null;
 
         if(["qTest","ALM","Zephyr","Jira","Azure"].includes(iconType)) clickedScreen = iconType;
@@ -88,7 +94,7 @@ const Leftbar = (props) => {
                                 id={(screenType === "Azure")? "selectedIcon" : null} 
                                 src='static/imgs/Azure.png'
                             />
-                            <div>Azure</div>
+                            <div>Azure DevOps</div>
                         </span> 
                     </Fragment> )    
             default :
@@ -128,7 +134,7 @@ const Leftbar = (props) => {
                             id={(screenType === "Azure")? "selectedIcon" : null} 
                             src='static/imgs/Azure.png'
                         />
-                        <div>Azure</div>
+                        <div>Azure DevOps</div>
                     </span>
             </Fragment>    )
         }

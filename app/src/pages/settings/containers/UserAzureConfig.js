@@ -64,7 +64,7 @@ const UserAzureConfig = (props) => {
                 return;
             }
             setCreateAzure(false);
-            setMsg(MSG.CUSTOM(`The Azure configuration was successfully ${action}d!!`, VARIANT.SUCCESS));
+            setMsg(MSG.CUSTOM(`The Azure DevOps configuration was successfully ${action}d!!`, VARIANT.SUCCESS));
            getAzureDetails();
         }catch(e){
             setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
