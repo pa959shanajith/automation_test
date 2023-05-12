@@ -89,8 +89,11 @@ const SocketFactory = () => {
                         {/* <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br /> */}
                         <p style={{ cursor: 'default' }}>{showAfterExecutionIsTrial.content} 
                         <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false });closeTrial(); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
-                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.Please logout and login to continue.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View plans</a> </span> now.</p>
-                        </p></>
+                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to Free variant of Avo Assure. Click <span><a  style={{ color: '#643693', cursor: 'pointer' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View Plans</a> </span> to know more.</p>
+                        </p>
+                        <p>Please Logout and Login back to access your work in upgraded version of Avo Assure</p>
+                        </>
+
                     }
                     
                     close={()=>{setShowAfterExecutionIsTrial({show:false});closeTrial();}}
@@ -136,7 +139,7 @@ const SocketFactory = () => {
             if(userInfo.isTrial === true){
                 await UpdateUserInfoforLicence(userInfo.username)
                 // setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
-                setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
+                setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your first test scenario." })
             }
             else{
                 setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
