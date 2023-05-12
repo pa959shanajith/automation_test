@@ -38,7 +38,7 @@ function VerticalSteps(params) {
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1); 
       // let path = "/mindmap"; 
-      navigate("/mindmap");
+      navigate("/design");
   };
 
   // const handleBack = () => {
