@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {v4 as uuid} from 'uuid';
-import {Provider} from 'react-redux';
+import {Provider, useSelector} from 'react-redux';
 import { createBrowserRouter, RouterProvider, Route, Router, Routes, BrowserRouter, Outlet} from 'react-router-dom';
 import ServiceBell from "@servicebell/widget";
 // import {store} from './reducer';
@@ -12,6 +12,7 @@ import More from './pages/more/more';
 import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
 import {ErrorPage} from './pages/global';
+import Login from './pages/login/containers/LoginPage';
 import MenubarDemo from './pages/landing/components/Topbar';
 // import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
 // import SocketFactory from './SocketFactory';
@@ -32,7 +33,6 @@ import Login from './pages/login/containers/LoginPage';
 
 
 
-
 const { REACT_APP_DEV } = process.env
 /*Component App
   use: defines components for each url
@@ -41,7 +41,8 @@ const { REACT_APP_DEV } = process.env
 export const url =  REACT_APP_DEV  ? "https://"+window.location.hostname+":8443" : window.location.origin;
 
 const App = () => {
-  const [blockui,setBlockui] = useState({show:false})
+  const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
+  const [blockui,setBlockui] = useState({show:false});
   useEffect(()=>{
     TabCheck(setBlockui);
     (async()=>{
@@ -51,22 +52,23 @@ const App = () => {
     })();
   },[])
  
-  return (
-    <Provider store={store}>
+  return (<>
       {/* {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null} */}
       {/* <ProgressBar /> */}
       {/* <ErrorBoundary> */}
       <div className="main_content">
-        {/* <Login/> */}
+      { !isLoggedIn && <Login/> }
+      { isLoggedIn && <>
         <Topbar/>
         <div className="sidebar_sidepanel_homepage">
           <SideNavBar/>
           <RouteApp/>
         </div>
+      </>
+      }
       </div>
       {/* </ErrorBoundary> */}
-    </Provider>
-
+    </>
   );
 }
 

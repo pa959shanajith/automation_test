@@ -1,28 +1,203 @@
-import React from 'react';
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef } from 'react';
+import * as api from '../api';
+import { InputText } from 'primereact/inputtext';
+import { Tooltip } from 'primereact/tooltip';
+import { Button } from 'primereact/button';
+import { Password } from 'primereact/password';
+import '../styles/login.scss'
+import { loginSliceActions } from '../loginSlice';
+import { useDispatch } from 'react-redux';
+import SidePanel from '../../landing/containers/SidePanel';
+import { classNames } from 'primereact/utils';
+import { Toast } from 'primereact/toast';
+
+
 const Login = () => {
-    let history = useNavigate();
+    const [showForgotPasswordScreen, setShowForgotPasswordScreen] = useState(false);
+    const [singleSignOnScreen, setSingleSignOnScreen] = useState(false);
+    const [showloginScreen, setShowloginScreen] = useState(true);
+    const [disableLoginButton, setdisableLoginButton] = useState(true);
+    const [showError, setShowError] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+    const dispatch = useDispatch();
+    const toast = useRef(null);
+
+    const toastError = (erroMessage) => {
+        toast.current.show({severity:'error', summary: 'Error', detail: erroMessage, life: 3000});
+    }
+
+    const forgotPasswordHandler = () => {
+        setShowForgotPasswordScreen(true);
+        setShowloginScreen(false);
+    }
+    const singleSignOnHandler = () => {
+        setSingleSignOnScreen(true);
+        setShowloginScreen(false);
+    }
+    const backButtonHandler = () => {
+        setShowloginScreen(true);
+        setSingleSignOnScreen(false);
+    }
+    const handleUsername = event => {
+        setUsername(event.target.value);
+        setShowError(false);
+    }
+    const handlePassword = event => {
+        setPassword(event.target.value);
+        setShowError(false);
+    }
+
+    useEffect(() => {
+        if (username.length > 0 && password.length > 0) {
+            setdisableLoginButton(false);
+        }
+        else setdisableLoginButton(true);
+    }, [username, password])
+
+
+    const checkUser = async () => {
+        let errorMsg = "Failed to Login.";
+        try{
+            const checkUserIsPresent = await api.checkUser(username);
+            if (checkUserIsPresent.redirect) {
+                window.location.href = checkUserIsPresent.redirect;
+            }
+            else if (checkUserIsPresent.proceed) {
+                check_credentials();
+            }
+            else if (checkUserIsPresent === "invalidServerConf") toastError("Authentication Server Configuration is invalid!");
+            else toastError(errorMsg); 
+        }
+        catch(err){
+            toastError(err)
+        } 
+    }
+
+    const check_credentials = async () => {
+        try{
+            let userValidate = await api.authenticateUser(username.toLowerCase(), password);
+            if (userValidate === "restart") {
+            }
+            else if (userValidate === 'validCredential') dispatch(loginSliceActions.login());
+            else if (userValidate === 'inValidCredential' || userValidate === "invalid_username_password") {
+                toastError("Please enter a valid Username and Password ");
+            }else if (userValidate === "changePwd") {
+                toastError("Changing Password is not implemented in code");
+            } else if(userValidate === "timeout") {
+                toastError("User Password has expired. Please reset forgot password or contact admin");
+            } else if (userValidate === "userLocked") {
+                toastError("User account is locked!");
+            }
+            else if (userValidate === "userLogged") toastError("User is already logged in! Please logout from the previous session.");
+            else if (userValidate === "inValidLDAPServer") toastError("LDAP Server Configuration is invalid!");
+            else if (userValidate === "invalidUserConf") toastError("User-LDAP mapping is incorrect!");
+            else toastError("Failed to Login.") ;
+        }
+        catch(err){
+            toastError(err)
+        }
+    }
+
+    const loginSubmitHandler = async (event) => {
+        event.preventDefault();
+        if (username.trim().length > 0 && password.length > 0) {
+            checkUser();
+        }
+        else { setShowError(true);}
+    }
+
     return (
-    <div className="bg-container">
-        <img className="bg-img" alt="bg-img" src="static/imgs/login-bg.png" />
-        <button style={{ position: 'absolute', top: '50%', right: '10%' }} onClick={() => history("/landing")}>Click Here to Login</button>
-        {/* <div className="element-holder">
-            <div className="greet-text">
-                <h1>Hello</h1>
-                <h2>Welcome to Avo Assure</h2><h3>Login to Experience Intelligence.</h3>
+        <div className="login_container">
+            <Toast ref={toast} position="bottom-center" />
+            <div className="split">
+                <img className="" src="static/imgs/animated_login.gif" alt="Login" />
             </div>
-            <div className="login-block">
-                <span className="logo-wrap">
-                    <img className="logo-img" alt="logo" src="static/imgs/AssureLogo_horizonal.svg" />
-                </span>
-                <div style={"display: flex; flex-direction: row; width: 100%; flex: 1 1 0%;"}><div className="login-container" style={"opacity: 1; transform: none;"}><div className="form-title">Avo Assure - Log In</div><form data-test="login-form" className="login-form"><div style={"margin-bottom: 1rem;"}><div className="ms-TextField textfield_avo-text-field__1RWxU textfield_avo-text-field--with-icon__1rAqh root-148"><div className="ms-TextField-wrapper"><label htmlFor="TextField0" id="TextFieldLabel2" className="ms-Label root-142">Username/Email</label><div className="ms-TextField-fieldGroup fieldGroup-151"><input type="text" id="TextField0" className="ms-TextField-field field-133" aria-labelledby="TextFieldLabel2" aria-invalid="false" value="arpit.tiwari" /><i data-icon-name="user" aria-hidden="true" className="icon-143">
-                    <svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 52 58" fill="none"><path d="M49 54.75V49C49 45.95 47.7884 43.0249 45.6317 40.8683C43.4751 38.7116 40.55 37.5 37.5 37.5H14.5C11.45 37.5 8.52494 38.7116 6.36827 40.8683C4.2116 43.0249 3 45.95 3 49V54.75" stroke="#323130" strokeWidth="5.75" strokeLinecap="round" strokeLinejoin="round"></path><path d="M26 26C32.3513 26 37.5 20.8513 37.5 14.5C37.5 8.14873 32.3513 3 26 3C19.6487 3 14.5 8.14873 14.5 14.5C14.5 20.8513 19.6487 26 26 26Z" stroke="var(--baseColor)" strokeWidth="5.75" strokeLinecap="round" strokeLinejoin="round"></path></svg>
-                </i></div></div></div></div><div className="ms-TextField textfield_avo-text-field__1RWxU textfield_avo-text-field--with-icon__1rAqh root-148"><div className="ms-TextField-wrapper"><label htmlFor="TextField5" id="TextFieldLabel7" className="ms-Label root-142">Password</label><div className="ms-TextField-fieldGroup fieldGroup-151"><input type="password" id="TextField5" className="ms-TextField-field field-144" aria-labelledby="TextFieldLabel7" aria-invalid="false" value="Arpit@123" /><i data-icon-name="password" aria-hidden="true" className="icon-143">
-                    <svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 53 59" fill="none"><path d="M13.5 26.625V16.125C13.5 12.644 14.8828 9.30564 17.3442 6.84422C19.8056 4.38281 23.144 3 26.625 3C30.106 3 33.4444 4.38281 35.9058 6.84422C38.3672 9.30564 39.75 12.644 39.75 16.125V26.625" stroke="var(--baseColor)" strokeWidth="5.25" strokeLinecap="round" strokeLinejoin="round"></path><path d="M45 26.625H8.25C5.3505 26.625 3 28.9755 3 31.875V50.25C3 53.1495 5.3505 55.5 8.25 55.5H45C47.8995 55.5 50.25 53.1495 50.25 50.25V31.875C50.25 28.9755 47.8995 26.625 45 26.625Z" stroke="#323130" strokeWidth="5.25" strokeLinecap="round" strokeLinejoin="round"></path></svg>
-                </i><button className="ms-TextField-reveal ms-Button ms-Button--icon revealButton-139" aria-pressed="false" type="button"><span className="revealSpan-140"><i data-icon-name="RedEye" aria-hidden="true" className="revealIcon-145"></i></span></button></div></div></div><div><a id="forgotPassword" className="forget-password">Forgot Username or Password?</a></div><div data-test="login-validation" className="error-msg-login" style={"display: none;"}><img height="16" width="16" src="/static/media/error_exclamation.420303a1.svg" alt="error_ex_image" style={"margin-right: 5px;"} />  </div><button data-test="login-button" className="login-btn" type="submit">Log in</button></form><div className="login-hint">Don't have an account? Contact your admin for creating an account.</div></div>
+            <div className="split">
+                <div className="right_side_login">
+                    <img className="icon_img" src="static/imgs/AssureLogo_horizonal.svg"></img>
+                    {showloginScreen &&
+                        <>
+                            <h2>Avo Assure-Login</h2>
+                            <form onSubmit={loginSubmitHandler}>
+                                <div className="p-input-icon-left mb-5">
+                                    <i className='pi pi-user' />
+                                    <InputText
+                                        id="username"
+                                        className='user_input'
+                                        value={username}
+                                        onChange={handleUsername}
+                                        placeholder='Enter your username'
+                                        type="text"
+                                        required
+                                    />
+                                </div>
+                                <div className="p-input-icon-left mb-5">
+                                    <i className='pi pi-lock' />
+                                    <InputText
+                                        id="password"
+                                        value={password}
+                                        className={`user_input `} //${classNames({'p-invalid': showPassword})}
+                                        onChange={handlePassword}
+                                        placeholder='Password'
+                                        type={showPassword ? "type" : "password"}
+                                        required
+                                    />
+                                    {password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={() => { setShowPassword(!showPassword)}}>
+                                        <i className={`${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
+                                    </div>
+                                    }
+                                </div>
+
+                                <div className='forget_password_link mb-5'>
+                                    <Button id="forgetPasswordLink" label='Forget Username & Password' onClick={forgotPasswordHandler} link />
+                                </div>
+                                {showError && <small className='text-red-500'>Enter a valid username and password.</small>}
+                                <div className='login_btn mb-5'>
+                                    <Button id="login" label='Login' disabled={disableLoginButton} text raised></Button>
+                                </div>
+                                <div className='single_sign-on_link mb-3'>
+                                    <Button id="signOn" onClick={singleSignOnHandler} label='Use Single Sign-On' link />
+                                </div>
+                                <p>Don't have an account? <span className='create-on_link'> <Button label='Create one' tooltip='Contact your admin for creating an account' tooltipOptions={{ position: 'bottom' }} link /></span></p>
+                            </form>
+                        </>}
+
+                    {showForgotPasswordScreen && <>
+                        <h2>Forgot Username or Password</h2>
+                        <span>Provide your registered e-mail to send a link to reset your Password or to know Username  </span>
+                        <form>
+                            <div className="p-input-icon-left mb-5">
+                                <i className='pi pi-user'></i>
+                                <InputText id="username" className='forgetPassword_user_input' placeholder='Enter your username' type="email" required />
+                            </div>
+                            <div className='login_btn mb-5'>
+                                <Button id="submit" label='Submit' disabled={false} text raised></Button>
+                            </div>
+                        </form>
+                    </>}
+
+                    {singleSignOnScreen && <>
+                        <h2>Avo Assure - login with SAML SSO</h2>
+                        <form>
+                            <div className="p-input-icon-left mb-5">
+                                <i className='pi pi-user'></i>
+                                <InputText id="username" className='forgetPassword_user_input' placeholder='Enter your username' type="email" required />
+                            </div>
+                            <div className='login_btn mb-5'>
+                                <Button id="submit" label='Submit' disabled={false} text raised></Button>
+                            </div>
+                            <div className='mb-5'>
+                                <Button id="back" label='Back' onClick={backButtonHandler} disabled={false} text raised></Button>
+                            </div>
+                        </form>
+                    </>
+                    }
                 </div>
             </div>
-        </div><div className="login-footer"><div className="footer-content"><span className="lower-text">Avo Assure v23.1.0   <br />© 2023 Avo Automation. All Rights Reserved.</span></div></div> */}
-    </div>);
+        </div>
+
+    );
 }
 export default Login;
