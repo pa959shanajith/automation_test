@@ -627,6 +627,8 @@ exports.excelToMindmap = function (req, res){
 
 
 			}
+			var scenarios=[]
+			var modules=[]
 			var dataRows=[]
 			var p_count=[]
 			var q_count=[]
@@ -642,53 +644,36 @@ exports.excelToMindmap = function (req, res){
 					}
 					if ( q == 0 ){
 						if(excelrows[p][q] !==''){
-							data["name"]=excelrows[p][q]
+							if (modules.includes(excelrows[p][q])){
+								return res.send("duplicateMod");
+							}
+							else{modules.push(excelrows[p][q])
+								data["name"]=excelrows[p][q]}
 						}
 						else{
 							ts = q+1
 							
 							if(excelrows[p][ts] !==''){
-							p_count.push(p)
-							q_count.push(ts)
-							dataRows[dataRows.length -1]["testscenarios"].splice(dataRows[dataRows.length -1]["testscenarios"].length -0,0,{"name":excelrows[p][ts],"screens":[]})
-							ts=ts+1
-							if(excelrows[p][ts] !==''){
+								if (scenarios.includes(excelrows[p][ts])){
+									return res.send("duplicateSce");
+								}
+								scenarios.push(excelrows[p][ts])
 								p_count.push(p)
 								q_count.push(ts)
-							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
-							
-							ts=ts+1
-							if(excelrows[p][ts] !==''){
-								p_count.push(p)
-								q_count.push(ts)
-							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
-									
-							}}
-							else{
-								p_count.push(p)
-								q_count.push(ts)
-								ts=ts+1
-								if(excelrows[p][ts] !==''){
-									p_count.push(p)
-									q_count.push(ts)
-								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])		
-								}}}
-							else{
-								p_count.push(p)
-								q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"].splice(dataRows[dataRows.length -1]["testscenarios"].length -0,0,{"name":excelrows[p][ts],"screens":[]})
 								ts=ts+1
 								if(excelrows[p][ts] !==''){
 									p_count.push(p)
 									q_count.push(ts)
 								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+								
 								ts=ts+1
 								if(excelrows[p][ts] !==''){
 									p_count.push(p)
 									q_count.push(ts)
 								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
 										
-								}else{p_count.push(p)
-									q_count.push(ts)}}
+								}}
 								else{
 									p_count.push(p)
 									q_count.push(ts)
@@ -697,23 +682,50 @@ exports.excelToMindmap = function (req, res){
 										p_count.push(p)
 										q_count.push(ts)
 									dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])		
-									}}
-								
-							}
+									}}}
+								else{
+									p_count.push(p)
+									q_count.push(ts)
+									ts=ts+1
+									if(excelrows[p][ts] !==''){
+										p_count.push(p)
+										q_count.push(ts)
+									dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+									ts=ts+1
+									if(excelrows[p][ts] !==''){
+										p_count.push(p)
+										q_count.push(ts)
+									dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+											
+									}else{p_count.push(p)
+										q_count.push(ts)}}
+									else{
+										p_count.push(p)
+										q_count.push(ts)
+										ts=ts+1
+										if(excelrows[p][ts] !==''){
+											p_count.push(p)
+											q_count.push(ts)
+										dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])		
+										}}
+									
+								}
 							
 						}
 						
 					}
 					else if ( q == 1 ){
 						if(excelrows[p][q] !==''){
+							if (scenarios.includes(excelrows[p][q])){
+								return res.send("duplicateSce");
+							}
+							scenarios.push(excelrows[p][q])
 							data1["name"]=excelrows[p][q]
 						}
 						else{
 							ts = q+1
 							p_count.push(p)
 							q_count.push(ts)
-							
-							
 							
 							if(excelrows[p][ts] !==''){
 								p_count.push(p)
@@ -787,11 +799,14 @@ exports.excelToMindmap = function (req, res){
 		let user =  req.session.username;
 		let path = configpath.importMindmap;
 		user = user.split('.').join("");
-		let importPath=path+"/"+"excel"+"/"+user+".json"
+		importFolderPath= path+"/"+"excel"
+		if (!fs.existsSync(importFolderPath)) {
+			fs.mkdirSync(importFolderPath);
+		  }
+		let importPath=importFolderPath+"/"+user+".json"
 		if (fs.existsSync(importPath)) {
 			fs.unlinkSync(importPath)
-		  }
-		
+		  }		
 		writedata=fs.writeFile(importPath, JSON.stringify(dataRows), (err) => {
 			if (err) {
 				res.status(500).send("fail")
@@ -1124,16 +1139,54 @@ exports.writeZipFileServer = async(req,res) => {
 			});
 			await unzipStream.on('close', async () => {
 				let jsonResponse = {msg : 'Files extracted successfully',appType:''};
-				let jsonFilepath = targetDir +'\\'+ 'Modules.json';
-				 fs.readFile(jsonFilepath, 'utf8', (err, data) => {
-					if (err) throw err;
-					let jsonData = JSON.parse(data);
-					if(jsonData.length){
-						jsonResponse.msg = 'Files extracted successfully';
-						jsonResponse.appType = jsonData[0].appType ? jsonData[0].appType: '';
-					}
-					res.status(200).send(jsonResponse);
-				});
+				let jsonModpath=targetDir +'\\'+ 'Modules.json';
+				let jsontscpath=targetDir +'\\'+ 'Testscenarios.json';
+				let jsonscrpath=targetDir +'\\'+ 'screens.json';
+				let jsontcpath=targetDir +'\\'+ 'Testcases.json';
+				let jsondobpath=targetDir +'\\'+ 'Dataobjects.json';
+				if (fs.existsSync(jsonModpath) && fs.existsSync(jsontscpath) && fs.existsSync(jsonscrpath) && fs.existsSync(jsontcpath) ) {
+					fs.readFile(jsontscpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						let jsonTscData = JSON.parse(data);
+						if(!Array.isArray(jsonTscData)){
+							return res.status(400).send('Invalid file format');}
+					});
+					fs.readFile(jsondobpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						let jsonDobData = JSON.parse(data);
+						if(!Array.isArray(jsonDobData)){
+							return res.status(400).send('Invalid file format');}
+					});
+					fs.readFile(jsonscrpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						let jsonScrData =JSON.parse(data);
+						if(!Array.isArray(jsonScrData)){
+							return res.status(400).send('Invalid file format');}
+					});
+					fs.readFile(jsontcpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						let jsonTcData = JSON.parse(data);
+						if(!Array.isArray(jsonTcData)){
+							return res.status(400).send('Invalid file format');}
+					});
+					fs.readFile(jsonModpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						let jsonData = JSON.parse(data);
+						if(Array.isArray(jsonData) && jsonData.length>0){
+							jsonResponse.msg = 'Files extracted successfully';
+							jsonResponse.appType = jsonData[0].appType ? jsonData[0].appType: '';
+							res.status(200).send(jsonResponse);
+						}
+						else{
+							return res.status(400).send('Invalid file format');
+						}
+						
+					});
+				
+				}else{
+					return res.status(400).send('Invalid file format');
+				}
+				 
 			  	// res.status(200).send(getJsonResponse);
 			});
 		  } else {
@@ -1158,7 +1211,11 @@ exports.writeFileServer = async (req, res) => {
 		let path = configpath.importMindmap;
 		user = user.split('.').join("");
 		if (data.type=="json"){
-			var importPath=path+"/"+"json"+"/"+user+".json"
+			importFolderJPath= path+"/"+"json"
+			if (!fs.existsSync(importFolderJPath)) {
+				fs.mkdirSync(importFolderJPath);
+			}
+			var importPath=importFolderJPath +"/"+user+".json"
 		}
 		else{
 			var importPath=path+"/"+user+".json"
@@ -1166,14 +1223,12 @@ exports.writeFileServer = async (req, res) => {
 		if (data.status=="start"){
 			if (fs.existsSync(importPath)) {
 				fs.unlinkSync(importPath)
-				console.log("Deleted");
 			  }
 			fs.appendFile(importPath,"[", (err) => { 
 				if(err) { 
 				res.status(500).send('Fail')}
 				else{
-				res.send(result)
-				console.log("Data has been written to file successfully."); 
+				res.send(result) 
 				}})
 		}
 		else if (data.status=="stop"){
@@ -1182,7 +1237,6 @@ exports.writeFileServer = async (req, res) => {
 				res.status(500).send('Fail')}
 				else{
 				res.send(result)
-				console.log("Data has been written to file successfully."); 
 				}})
 		}
 		else if (data.status=="first"){
@@ -1190,8 +1244,7 @@ exports.writeFileServer = async (req, res) => {
 				if(err) { 
 				res.status(500).send('Fail')}
 				else{
-				res.send(result)
-				console.log("Data has been written to file successfully."); 
+				res.send(result) 
 				}})
 		}
 		else {			
@@ -1204,8 +1257,7 @@ exports.writeFileServer = async (req, res) => {
 					if(err) { 
 					res.status(500).send('Fail')}
 					else{
-					res.send(result)
-					console.log("Data has been written to file successfully."); 
+					res.send(result) 
 					}})
 			}})
 		

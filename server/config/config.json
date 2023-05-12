@@ -52,8 +52,7 @@
         "Exportquery":"./assets/ExportMindmap/ExportQuery.js",
         "mongodumpbat":"./assets/ExportMindmap/Mongoexport.bat"
     },
-    "ip":"localhost",
-    "password":"TA@AVO2020",
+    "ip":"localhost",   
     "mongopath":"D:\\source_code\\AvoAssureDB\\bin\\mongo",
     "mongoexportpath":"D:\\source_code\\AvoAssureDB\\bin\\mongoexport",
     "mongoimportpath":"D:\\source_code\\AvoAssureDB\\bin\\mongoimport",
