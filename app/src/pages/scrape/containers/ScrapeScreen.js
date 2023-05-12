@@ -56,7 +56,7 @@ const ScrapeScreen = (props)=>{
     const [showTeststeps , setshowTeststeps]=useState([]);
     const [displayTest , setdisplayTest]=useState({});
     const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]);
-
+    const[identifier,setIdentifier]=useState(false)
     useEffect(() => {
         // if(Object.keys(current_task).length !== 0) {
             fetchScrapeData()
@@ -68,7 +68,7 @@ const ScrapeScreen = (props)=>{
         //eslint-disable-next-line
         dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
 
-    }, [current_task])
+    }, [current_task,identifier])
 
     useEffect(()=>{
         if (!showObjModal) {
@@ -489,9 +489,13 @@ const saveIdentifier=()=>{
         })
         .catch(error => {
             console.log(error)
+            setShowObjModal('')
+                setMsg("Some Error occured while saving identifier list.");
+                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
         }
         )
-   
+
+   setIdentifier(true)
     
 }
 const dynamicColumns = columns.map((col, i) => {
