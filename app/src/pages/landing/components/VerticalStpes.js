@@ -76,7 +76,6 @@ function VerticalSteps(params) {
                         <Typography className='description'>{step.description}</Typography>
                      </Box>
                      <Box className='buttonNav'>
-                     {console.log("activestep",activeStep)}
                         <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'}
                            value={step.title}
                              onClick={(e)=>handleNext(e.target.value)}>{step.title}</Button>
