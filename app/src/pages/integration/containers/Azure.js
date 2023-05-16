@@ -129,7 +129,7 @@ const Azure = () => {
         {viewMappedFlies === "Azure" && 
             <MappedPage
                 screenType="Azure"
-                leftBoxTitle="Azure Tests"
+                leftBoxTitle="Azure DevOps Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
                 fetchMappedFiles={callViewMappedFiles}

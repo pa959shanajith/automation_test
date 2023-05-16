@@ -88,7 +88,7 @@ const Leftbar = (props) => {
                                 id={(screenType === "Azure")? "selectedIcon" : null} 
                                 src='static/imgs/Azure.png'
                             />
-                            <div>Azure</div>
+                            <div>Azure DevOps</div>
                         </span> 
                     </Fragment> )    
             default :
@@ -128,7 +128,7 @@ const Leftbar = (props) => {
                             id={(screenType === "Azure")? "selectedIcon" : null} 
                             src='static/imgs/Azure.png'
                         />
-                        <div>Azure</div>
+                        <div>Azure DevOps</div>
                     </span>
             </Fragment>    )
         }

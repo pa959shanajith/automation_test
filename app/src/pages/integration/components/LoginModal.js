@@ -175,7 +175,7 @@ const LoginModal = props => {
         <div className="ilm__container">
             {loading ? <ScreenOverlay content={loading} /> : null}
             <ModalContainer
-                title={`${props.screenType} Login`}
+                title={`${props.screenType} ${props.screenType === 'Azure' ?' DevOps': ''} Login`}
                 content={
                     <>
                         <div className="ilm__inputs">
@@ -313,9 +313,9 @@ const inpPlaceHolder = {
         password: "Enter qTest Password"
     },
     Azure: {
-        url:"enter the Azure URL",
-        username: "enter the Azure username",
-        PAT: "enter Azure PAT"
+        url:"enter the Azure DevOps URL",
+        username: "enter the Azure DevOps username",
+        PAT: "enter Azure DevOps PAT"
     }
 }
 
