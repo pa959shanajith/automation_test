@@ -10,10 +10,16 @@ import { Card } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import '../styles/VerticalSteps.scss';
 import { useNavigate } from "react-router-dom";
+import { useSelector,useDispatch  } from 'react-redux';
+import { updateSteps } from './VerticalComponentsSlice';
+import { disable } from 'agenda/dist/job/disable';
 
+// this component renders the "get started Box" in the landing page with the help of MUI framework
 
 function VerticalSteps(params) {
-    const [activeStep, setActiveStep] = useState(0);
+       const dispatch= useDispatch ();
+        const activeStep= useSelector((state)=>state.steps)
+      
     const navigate = useNavigate();
     const steps = [
     {
@@ -23,7 +29,7 @@ function VerticalSteps(params) {
     },
     {
         label: 'Configure & Execute Test Flow(s)                                        ',
-        description:' Quisque rutrum. Aenean imperdi. Etiam ultricies nisi vel augue. Curabitur ullamcorper',
+        description:' Quisque rutrum. Aenean imperdi. Etiam ultricies nisi vel augue. Curabitur ',
         title:'Execute'
     },
     {
@@ -32,43 +38,61 @@ function VerticalSteps(params) {
         title:'Report'
     },
     ];
+    
+    
 
   
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1); 
-      // let path = "/mindmap"; 
+  const handleNext = (value) => {
+    if(value==="Design"){
+      dispatch(updateSteps(1))
       navigate("/design");
+    }
+    else if(value==="Execute"){
+          dispatch(updateSteps(2))
+          navigate("/execute");
+        }
+       else if(value==="Report"){
+              dispatch(updateSteps(3))
+              navigate("/reports");
+            }
+
   };
 
-  // const handleBack = () => {
-  //   // setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  // };
-
-  // const handleReset = () => {
-  //   setActiveStep(0);
-  // };
 
   return (
-    <Card className='verticalcard'>
-      <h2 className='ml-2'>Get Started</h2>
-      <Box sx={{ maxWidth: 800 }}>
-        <Stepper className='Stepper' activeStep={activeStep} orientation="vertical">
-          {steps.map((step, index) => (
+    <Card className='verticalcard' >
+      <h2 className= "GetStd">Get Started</h2>
+      <Box > 
+        <Stepper  className='Stepper' activeStep = {activeStep.value} orientation="vertical">
+          {steps.map((step, index) => ( 
             <Step key={step.label}>
-              <StepLabel>
-                {step.label}
-                <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'} onClick={handleNext}>{step.title}</Button>
-                <NavigateNextIcon className='verticalicon'/>
+              <StepLabel  className='stepLabel'>
+                <Box className='titleDescBut' >
+                     <Box>
+                        <Box className='label'>
+                          {step.label}
+                        </Box>
+                        <Typography className='description'>{step.description}</Typography>
+                     </Box>
+                     <Box className='buttonNav'>
+                     {console.log("activestep",activeStep)}
+                        <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'}
+                           value={step.title}
+                             onClick={(e)=>handleNext(e.target.value)}>{step.title}</Button>
+                        <NavigateNextIcon className='verticalicon'/>
+                     </Box>
+                </Box>
+               
               </StepLabel>
-              <StepContent>
-                <Typography>{step.description}</Typography>
-              </StepContent>
             </Step>
           ))}
         </Stepper>
+        <StepContent TransitionProps={{ unmountOnExit: false }} />
       </Box>
     </Card>
   );
 }
 export default VerticalSteps;
+
+

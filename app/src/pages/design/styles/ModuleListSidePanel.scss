@@ -1,0 +1,51 @@
+.Whole_container{
+    max-height:100vh;
+    width: 17vw;
+    border-right: 1px solid rgb(91, 89, 89);
+    background-color: rgb(255, 255, 255);
+    z-index: 1;
+}
+.project_name_section{
+    height:9% ;
+    border-bottom:1px solid rgb(91, 89, 89);
+    
+
+}
+.project_name_section select{
+    margin: 1rem 2.5rem 1.7rem;
+}
+.normalModule_main_container{
+    height:40% ;
+    border-bottom: 1px solid rgb(91, 89, 89);
+    
+}
+.E2E_main_container{
+    height:50% ;
+    border-bottom: 1px solid rgb(91, 89, 89);
+}
+.moduleLayer_icon{
+    display: flex;
+    padding-left: 0.5rem;
+
+}
+.moduleLayer_icon img{
+    // border: 1px solid black;
+    height: 27px;
+    width: 27px;
+}
+.moduleLayer_plusIcon{
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.5rem;
+    
+}
+.moduleLayer_plusIcon img{
+    padding-right: 0.5rem;
+
+}
+.BasicDemo_primeReactTree{
+    justify-content: center;
+    align-items: center;
+    margin-right: 10rem;
+    
+}

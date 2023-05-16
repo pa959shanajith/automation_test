@@ -4,6 +4,7 @@ import Canvas from './Canvas';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import ControlBox from '../components/ControlBox';
+import ModuleListSidePanel from '../components/ModuleListSidePanel';
 
 
 const data ={
@@ -67,7 +68,8 @@ function StaticDataForMindMap() {
    }
   return (
     <>
-    <Card style={{width: '25rem',height: '45rem'}}/>
+    {/* <Card style={{width: '25rem',height: '45rem'}}/> */}
+    <ModuleListSidePanel/>
     {showCard && <div className='cardMindmap'>
       <Card  id='p_card' className='Module'>
         <span className='cardText'>

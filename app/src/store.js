@@ -7,11 +7,13 @@ import loginReducer from './pages/login/loginSlice'
 import designSlice from "./pages/design/designSlice";
 
 
+import stepsSlice from './pages/landing/components/VerticalComponentsSlice';
 
 export default configureStore({
     reducer:{
         // All the reducer from the slices needs to be combined here ex
-        login: loginReducer,
+        login:loginReducer,
+        steps:stepsSlice,
         // plugin:pluginReducer,
         // admin:adminReducer
         design: designSlice
