@@ -66,3 +66,16 @@
 .ss__newObj{
     color: $unsavedScrapeObj;
 }
+.arrow-top {
+    margin-top: 4px;
+  }
+.arrow-top:after {
+    content: " ";
+    position: absolute;
+    left: 43%;
+    top: -12px;
+    border-top: none;
+    border-right: 15px solid transparent;
+    border-left: 15px solid transparent;
+    border-bottom: 15px solid #997cb8;
+  }

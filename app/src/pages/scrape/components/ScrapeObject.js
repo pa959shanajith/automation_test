@@ -9,11 +9,14 @@ const ScrapeObject = props => {
 
     const dispatch = useDispatch();
     const objValue = useSelector(state=>state.scrape.objValue);
+    const appType = useSelector(state=>state.mindmap.appType)
 
     const [objName, setObjName] = useState(props.object.title);
     const [checked, setChecked] = useState(props.object.checked);
     const [activeEye, setActiveEye] = useState(false);
     const [edit, setEdit] = useState(false);
+    const[isIdentifierVisible,setIsIdentifierVisible]=useState(false)
+    
 
     const handleObjName = event => setObjName(event.target.value);
     const handleCheckbox = event => {
@@ -51,15 +54,25 @@ const ScrapeObject = props => {
         let objVal = { ...props.object };
         dispatch({type: actions.SET_OBJVAL, payload: objVal});
     }
+const showIdentifierCard=(e)=>{
+    setIsIdentifierVisible(true)
+}
+
+    const defaultNames={xpath:'Absolute X-Path',id:'ID Attribute',rxpath:'Relative X path',name:'Name Attribute',classname:'Classname Attribute'}
 
     return (
+        <>
         <div className="ss__scrape_obj">
             <img data-test="eyeIcon" className="ss_eye_icon" 
                 onClick={onHighlight} 
                 src={activeEye ? 
                         "static/imgs/ic-highlight-element-active.png" : 
                         "static/imgs/ic-highlight-element-inactive.png"} 
-                alt="eyeIcon"/>
+                alt="eyeIcon"
+                onMouseEnter={(appType === 'Web' || appType === "MobileWeb")?(e)=>showIdentifierCard(e):null}
+                onMouseLeave={(appType === 'Web' || appType === "MobileWeb")?()=>setIsIdentifierVisible(false):null}
+                />
+                
             {
                 edit ? 
                 <ClickAwayListener className="ss_obj_name_e" onClickAway={handleOutsideClick}>
@@ -85,6 +98,8 @@ const ScrapeObject = props => {
                 </div>
             }
         </div>
+        {isIdentifierVisible && <div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Object Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>}
+        </>
     )
 }
 
