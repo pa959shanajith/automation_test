@@ -363,7 +363,7 @@ const MappedPage = props =>{
                                 <div>{counts.mappedScenarios}</div>
                             </div>
                             <div className="viewMap__testCount">
-                                <div>Mapped {props.screenType} items</div>
+                                <div>Mapped {props.screenType}{props.screenType === 'Azure' ?' DevOps': ''} items</div>
                                 <div>{counts.mappedTests}</div>
                             </div>
                         </div>

@@ -340,7 +340,7 @@ const AzureContent = props => {
                 // onUpdateMap={()=>props.callUpdateMappedFiles()}
                 onExit={()=>callExit()}
                 testCaseData={testCaseData}
-                leftBoxTitle="Azure tests"
+                leftBoxTitle="Azure DevOps tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestDomain={
                     <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{setRelease(true) ;onProjectSelect(e);handleFirstOptionChange(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} >
