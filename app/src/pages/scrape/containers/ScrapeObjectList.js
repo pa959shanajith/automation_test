@@ -169,7 +169,15 @@ const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems)
         let listOfCheckedItems=localItems.map(object=>{
             return object.checked
         })
-
+        const checkForOnlyOneCheckedItems=localItems.filter(item=>item.checked)
+        if(checkForOnlyOneCheckedItems.length===1) {
+            const defaultNames={xpath:'Absolute X-Path',id:'ID Attribute',rxpath:'Relative X path',name:'Name Attribute',classname:'Classname Attribute'}
+            const currentIdentifier=checkForOnlyOneCheckedItems[0].identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
+            props.setIdentifierList(currentIdentifier)
+        }
+        else{
+            props.setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+        }
         setScrapeItems(localItems)
         dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: listOfCheckedItems})
         

@@ -501,10 +501,16 @@ const dynamicColumns = columns.map((col, i) => {
 
 const footerContent = (
                     <div>
+                        <div style={{position:'absolute',fontStyle:'italic'}}><span style={{color:'red'}}>*</span>Use drag/drop to reorder identifiers.</div>
                         <Button label="No" icon="pi pi-times" onClick={() => setShowObjModal('')} className="p-button-text" />
                         <Button label="Yes" icon="pi pi-check" onClick={() => saveIdentifier()} autoFocus />
                     </div>
 )
+const Header = () => {
+    return (
+        <div>Object Identifier Order<span style={{color:'red'}}>*</span></div>
+    );
+};
     return (
         
         <>
@@ -530,7 +536,7 @@ const footerContent = (
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
         { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name,versionnumber:0 /** version no. not avail. */, appType: props.appType}} />}
-        <Dialog header="Prioritize object identifier using drag/drop" style={{width:'56vw'}} visible={showObjModal === "identifierlis"}  onHide={() => setShowObjModal('')} footer={footerContent} >
+        <Dialog header={Header} style={{width:'56vw'}} visible={showObjModal === "identifierlis"}  onHide={() => setShowObjModal('')} footer={footerContent} >
         <div className="card" >
         <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorder} tableStyle={{ minWidth: '50rem' }} >
                 <Column rowReorder style={{ width: '3rem' }} />
@@ -547,7 +553,7 @@ const footerContent = (
                 <ActionBarItems appType={props.appType}  fetchingDetails={props.fetchingDetails} />
                     { props.appType === "Webservice" 
                         ? <WebserviceScrape fetchingDetails={props.fetchingDetails}/> 
-                        : compareFlag ? <CompareObjectList fetchingDetails={props.fetchingDetails}/> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} />}
+                        : compareFlag ? <CompareObjectList fetchingDetails={props.fetchingDetails}/> : <ScrapeObjectList fetchingDetails={props.fetchingDetails} appType={props.appType} setIdentifierList={setIdentifierList} />}
                     <RefBarItems hideInfo={true} mirror={mirror} collapse={true} appType={props.appType} openPopup={openScreenTestCase}/>
                 </ScrapeContext.Provider>
             </div>
