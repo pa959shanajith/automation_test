@@ -91,7 +91,9 @@ const Genius = (props) => {
       setSelectedBrowser("chrome");
     }
     count=0
+    dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } })
   }
+  
   else if (data==="resetCount"){
     count=0
   }
@@ -107,6 +109,7 @@ const Genius = (props) => {
        }
       setSelectedBrowser("chrome");
       }
+      dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } })
     }
     else if (data.action && data.action === "startDebugging") {
       if (savedRef.current) {
@@ -1070,7 +1073,7 @@ for(let i =0;i<scrnids.length;i++){
              
            { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?<div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
         
-        <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5>
+        {/* <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5> */}
         {userInfo.isTrial && <h5 style={{color:"#343A40",fontSize:'18px'}}><i>As part of the trial, Avo Genius is restricted to work only with Avo Test applications.</i></h5>}
         
       
