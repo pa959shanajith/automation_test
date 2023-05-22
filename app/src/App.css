@@ -13,3 +13,21 @@
     display: inline-flex;
     flex-direction: row;
   }
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #C7C7C7;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #8E8E8E; 
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}

@@ -1,0 +1,15 @@
+.avo_input {    
+    display: flex;
+    flex-direction: column;
+    margin: 1.25rem 0 1.25rem 0;
+    .configinfo_icon {
+        padding: 0 0 0 0.3rem;
+    }
+    .p-inputtext {
+        padding: 0.4rem 0.4rem;
+        margin-top: 10px;
+    }
+    .required_icon {
+        padding: 0.3rem;
+    }
+}

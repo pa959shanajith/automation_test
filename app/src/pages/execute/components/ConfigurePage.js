@@ -10,9 +10,11 @@ import { products } from './products';
 import { Button } from 'primereact/button';
 import { BreadCrumb } from 'primereact/breadcrumb';
 import { Link } from 'react-router-dom';
-
+import AvoModal from '../../../global/AvoModal';
+import ConfigureSetup from './ConfigureSetup';
 
 const ConfigurePage =({})=>{
+  const [visible, setVisible] = useState(false);
     const items = [
         {label: 'Configure'},
         {label: 'Scheduled Executions' },
@@ -152,7 +154,7 @@ const Breadcrumbs = () => {
                  <span className="text1 ">not configured</span>
               </div>
            </div>
-           <Button className='configure_button'> configure </Button>
+           <Button className='configure_button' onClick={() => setVisible(true)}> configure </Button>
       </Panel>
       );
     }
@@ -174,6 +176,14 @@ return(
             <Column field="actions" header="Actions" />
           </DataTable> */}
     </div>
+    <AvoModal
+        visible={visible}
+        setVisible={setVisible}
+        content={<ConfigureSetup />}
+        headerTxt="Execution Configuration set up"
+        footerType="CancelNext"
+        modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
+      />
   </div>
 </>
 );

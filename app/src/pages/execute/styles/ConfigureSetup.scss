@@ -1,0 +1,216 @@
+.config_setup {
+  width: 100%;
+  margin: 0;
+  .p-tabview {
+    width: 100%;
+    .p-tree {
+      border: none;
+    }
+  }
+  .icon_required {
+    color: #D1272C;
+  }
+  .p-tabview .p-tabview-panels {
+    padding: 0;
+  }
+
+  .config_container {
+    padding: 0 1.875rem;
+    .config_subcontainer {
+      display: flex;
+      flex-direction: row;
+
+      .table_section {
+        width: 75%;
+        min-width: 31.25rem;
+        .p-treetable-header {
+          padding: 0.5rem 0.9375rem 0.5rem 0.9375rem;
+          .p-inputtext {
+            padding: 0.4rem 0.4rem;
+          }
+          .p-input-icon-left > .p-inputtext {
+            padding-left: 2.5rem;
+          }
+        }
+        .p-treetable-thead {
+          border: 1px solid #dee2e6;
+        }
+        .tabletree_class {
+          .p-treetable-wrapper {
+            height: 35vh;
+            overflow: auto;
+          }
+          .module_icons {
+            padding-right: 0.25rem;
+            vertical-align: middle;
+          }
+          .p-treetable-header {
+            background: #ffffff;
+            border-width: 1px;
+            font-family: "Open Sans";
+            color: #030229;
+            font-size: 1rem;
+            font-weight: 400;
+            .config_text {
+              width: 50%;
+              .p-input-icon-left {
+                width: 100%;
+                .p-inputtext {
+                  width: 100%;
+                }
+              }
+            }
+          }
+        }
+
+        .p-treetable {
+          font-family: "Open Sans";
+          font-weight: normal;
+
+          .column_class {
+            width: 11.25rem;
+            .p-multiselect .p-multiselect-label.p-placeholder {
+              text-align: left;
+              line-height: 0.5rem;
+            }
+          }
+
+          .column_class_name {
+            width: 17.4375rem;
+          }
+
+          .p-treetable-thead>tr>th {
+            background: #F3F2FF;
+            padding: 0.8rem 0.8rem;
+            font-size: 0.875rem;
+            color: #030229;
+            border: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 9;
+          }
+
+          .p-treetable-tbody>tr>td {
+            padding: 0.4rem 0.4rem;
+            font-size: 1rem;
+            color: #030229;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            .p-multiselect {
+              width: 100%;
+              padding: 0.3rem 0.3rem;
+              font-size: 0.875rem;  
+              .p-multiselect-label {
+                padding: 0;
+                font-size: 0.875rem;       
+              }
+              .p-multiselect-label.p-placeholder {
+                padding: 0.3rem 0.3rem;
+              }
+            }
+            .p-inputtext {
+              padding: 0.3rem 0.3rem;
+              font-size: 0.875rem;
+            }
+            .p-inputtext-sm {
+              width: 100%;
+            }
+            .p-dropdown {
+              width: 100%;
+            }
+          }
+
+          .p-treetable-tbody>tr.customRow {
+            td:nth-child(2),
+            td:nth-child(3),
+            td:nth-child(4) {
+              display: none;
+            }
+            td:nth-child(1) {
+              display: inline-block;
+              width: 293.7%;
+            }
+            .column_class_name{
+              .p-checkbox {
+                width: 42px;
+              }
+              .p-checkbox::after {
+                padding-left: 0.5rem;
+                content: url('../../../../public/static/imgs/signup_module.svg');
+              }
+            }
+          }
+
+          .p-treetable-tbody>tr.genaralRow {
+            .column_class_name{
+              .p-checkbox {
+                width: 46px;
+              }
+              .p-checkbox::after {
+                padding-left: 0.5rem;
+                padding-top: 0.2rem;
+                content: url('../../../../public/static/imgs/signup_scenario.svg');
+              }
+            }
+          }
+        }
+      }
+
+      .avogrid_section {
+        width: 25%;
+        min-width: 14.375rem;
+        padding-left: 0.9375rem;
+        .avogrid_container {
+          padding-top: 1.5625rem;
+          border: 1px solid #dee2e6;
+          display: flex;
+          flex-direction: column;
+          .avogrid_fields {
+            padding: 0.625rem;
+            height: 5.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            .p-multiselect .p-multiselect-label.p-placeholder {
+              text-align: left;
+              line-height: 0.5rem;
+            }
+            .p-inputtext {
+              padding: 0.4rem 0.4rem;
+              font-size: 0.875rem;
+            }
+            .p-dropdown {
+              width: 100%;
+            }
+            .p-selectbutton {
+              .p-highlight {
+                background: rgba(96, 91, 255, 0.1);
+              }
+              .p-button {
+                width: 50%;
+                padding: 0.5rem 0 0.5rem 0;
+                .p-button-label {
+                  font-family: "Open Sans";
+                  color: #030229;
+                  font-size: 0.875rem;
+                  font-weight: 400;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .config_tree {
+    width: 100%;
+    .exe_icons {
+      padding-right: 0.625rem;
+    }
+  }
+}
