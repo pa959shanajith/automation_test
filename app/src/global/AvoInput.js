@@ -2,46 +2,54 @@ import { InputText } from "primereact/inputtext";
 import "./AvoInput.scss";
 
 const AvoInput = ({
-  htmlFor,
+  htmlFor = null,
   labelTxt = null,
   infoIcon,
-  icon = null,
   required = null,
   placeholder,
   inputTxt,
   setInputTxt,
-  inputType,
+  customClass = "",
+  icon = null,
 }) => {
-  const inputObj = {
-    lablelRowReqInfo: (
-      <div className="avo_input">
-        <label htmlFor={htmlFor}>
-          <span>{labelTxt}</span>
-          <img src={infoIcon} className="configinfo_icon" />
-          {required && (
-            <img src="static/imgs/Required.svg" className="required_icon" />
+  const inputJsx = (
+    <div className={`input_container ${customClass}`}>
+      {(labelTxt || infoIcon || required) && (
+        <div className="icons_container">
+          {labelTxt && (
+            <label htmlFor={htmlFor}>
+              <span>{labelTxt}</span>
+            </label>
           )}
-        </label>
-        <InputText
-          id={htmlFor}
-          value={inputTxt}
-          onInput={(e) => setInputTxt(e.target.value)}
-          placeholder={placeholder}
-        />
-      </div>
-    ),
-    searchIcon: (
-      <span className="p-input-icon-left">
-        <i className={icon} />
-        <InputText
-          placeholder="Search"
-          value={inputTxt}
-          onInput={(e) => setInputTxt(e.target.value)}
-        />
-      </span>
-    ),
-  };
-  return <>{inputObj[inputType]}</>
+          <div className="input_icons">
+            {infoIcon && <img src={infoIcon} className="configinfo_icon" />}
+            {required && (
+              <img src="static/imgs/Required.svg" className="required_icon" />
+            )}
+          </div>
+        </div>
+      )}
+      <InputText
+        {...(htmlFor && { id: htmlFor })}
+        placeholder={placeholder}
+        value={inputTxt}
+        onInput={(e) => setInputTxt(e.target.value)}
+      />
+    </div>
+  );
+
+  return (
+    <div className="avo_input">
+      {icon ? (
+        <span className="p-input-icon-left">
+          <i className={icon} />
+          {inputJsx}
+        </span>
+      ) : (
+        inputJsx
+      )}
+    </div>
+  );
 };
 
 export default AvoInput;

@@ -807,7 +807,7 @@ const ConfigureSetup = () => {
       <div className="flex align-items-center config_text">
         <AvoInput
           icon="pi pi-search"
-          placeholder="Enter Configuration Name"
+          placeholder="Search"
           inputTxt={tableFilter}
           setInputTxt={setTableFilter}
           inputType="searchIcon"
@@ -1027,6 +1027,7 @@ const ConfigureSetup = () => {
                   required={true}
                   placeholder="Enter Configuration Name"
                   inputTxt={configTxt}
+                  customClass="inputColumn"
                   setInputTxt={setConfigTxt}
                   inputType="lablelRowReqInfo"
                 />
