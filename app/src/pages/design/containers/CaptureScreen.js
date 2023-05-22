@@ -1,13 +1,11 @@
-import React from 'react';
+import  {React, useState, useRef, useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { useState, useRef, useEffect } from "react";
 import '../styles/CaptureScreen.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-// import { ProductService } from './service/ProductService';
 
 
 
@@ -16,7 +14,7 @@ import ActionPanel from '../components/ActionPanelObjects';
 const CaptureModal = (props) => {
 
   const [visible, setVisible] = useState(false);
-  const [products, setProducts] = useState([]);
+  const [showCaptureData, setShowCaptureData] = useState([]);
   const [showPanel, setShowPanel] = useState(false);
   const [isInsprintHovered, setIsInsprintHovered] = useState(false);
   const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
@@ -39,27 +37,34 @@ const CaptureModal = (props) => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   useEffect(() => {
-    setProducts(CaptureData);
+    setShowCaptureData(CaptureData);
 }, []);
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
   };
-
+ 
+ 
   const headerTemplate = (
+    <>
     <div>
       <h5 className='dailog_header1'>First Header</h5>
       <h4 className='dailog_header2'>Second Header</h4>
       <img className="screen_btn" src="static/imgs/ic-screen-icon.png" />
-      <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
+      {showCaptureData.length>1?<div className='Header__btn'>
+    <button className='add__more__btn'>Add More</button>
+    <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
+    <button className="btn-capture">Capture Objects</button>
+    </div>:<button className='btn_panel__single' onClick={togglePanel}>Action Panel</button>}
     </div>
+  </>
   );
 
   const emptyMessage = (
     <div>
       <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
       <p className="not_captured_message">Not Captured</p>
-      <button className="btn-capture">Capture Objects</button>
+      <button className="btn-capture-single">Capture Objects</button>
     </div>
   );
 
@@ -165,11 +170,11 @@ const renderRowReorderIcon = (rowData) => {
 
 
 
-  console.log("setCurrentDialog", currentDialog);
+
 
   return (
     <>
-      {/* <Button label="Show" icon="pi pi-external-link" style={{ width: '6rem', height: '2rem' }} onClick={() => setVisible(true)} /> */}
+
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin:0}} onHide={() => props.setVisibleCaptureElement(false)}>
         {showPanel && (<div className="card_modal">
           <Card className='panel_card'>
@@ -184,7 +189,7 @@ const renderRowReorderIcon = (rowData) => {
                   <p>Map Object</p>
                 </span>
                 <p className='insprint__text'>In Sprint Automation</p>
-                <img className='info__btn' ref={imageRef1}  onMouseEnter={()=>handleMouseEnter('insprint')} src="static/imgs/more-info.png"></img>
+                <img className='info__btn' ref={imageRef1}  onMouseEnter={()=>handleMouseEnter('insprint')} onMouseLeave={()=>handleMouseLeave('insprint')} src="static/imgs/more-info.png"></img>
                 {isInsprintHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>InSprint Automation</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
@@ -250,8 +255,8 @@ const renderRowReorderIcon = (rowData) => {
           </Card>
         </div>)}
         <div className="card-table">
-        {/* <InputSwitch inputId="input-rowclick" checked={rowClick} onChange={(e) => setRowClick(e.value)} /> */}
-          <DataTable value={products} dragHandleIcon="pi pi-bars" rowReorder resizableColumns reorderableRows onRowReorder={(e) => setProducts(e.value)} showGridlines selectionMode={"multiple"} selection={selectedRows} onSelectionChange={handleSelectionChange} tableStyle={{ minWidth: '50rem' }} emptyMessage={emptyMessage} headerCheckboxToggleAllDisabled={false}>
+
+          <DataTable value={showCaptureData} dragHandleIcon="pi pi-bars" rowReorder resizableColumns reorderableRows onRowReorder={(e) => setShowCaptureData(e.value)} showGridlines selectionMode={"multiple"} selection={selectedRows} onSelectionChange={handleSelectionChange} tableStyle={{ minWidth: '50rem' }} emptyMessage={emptyMessage} headerCheckboxToggleAllDisabled={false}>
           <Column style={{ width: '3em' }} body={renderRowReorderIcon} />
           <Column  headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
             <Column field="selectall" header="Select all"></Column>
@@ -262,8 +267,6 @@ const renderRowReorderIcon = (rowData) => {
           </DataTable>
         </div>
       </Dialog>
-      {console.log(currentDialog==='addObject')}
-      {console.log(currentDialog==='mapObject')}
       {currentDialog==='addObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose}/>}
        {currentDialog==='mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose}/>}  
        {currentDialog==='replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose}/>}

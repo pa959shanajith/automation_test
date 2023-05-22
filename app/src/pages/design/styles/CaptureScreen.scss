@@ -1,334 +1,409 @@
  .p-dialog-header .dailog_header1 {
-     position: absolute;
-     left: 3rem !important;
-     top: 0.5rem;
-     font-family: 'Open Sans';
+   position: absolute;
+   left: 3rem !important;
+   top: 0.5rem;
+   font-family: 'Open Sans';
    //   font-style: normal;
-     font-weight: 500;
-     color: rgba(3, 2, 41, 0.6);
+   font-weight: 500;
+   color: rgba(3, 2, 41, 0.6);
  }
 
- 
+
  .p-dialog .p-dialog-header {
-     background: #E2E2ED !important;
-     border-radius: 0px;
-     padding: 0.3rem 0 !important;
-     height: 5rem !important
+   background: #E2E2ED !important;
+   border-radius: 0px;
+   padding: 0.3rem 0 !important;
+   height: 5rem !important
  }
 
 
  .p-dialog-header .dailog_header2 {
-     position: absolute;
-     left: 3rem !important;
-     top: 2.5rem;
-     font-family: 'Open Sans';
+   position: absolute;
+   left: 3rem !important;
+   top: 2.5rem;
+   font-family: 'Open Sans';
    //   font-style: normal;
-     font-weight: 500;
-     font-size: 20px;
-     color: #030229;
+   font-weight: 500;
+   font-size: 20px;
+   color: #030229;
 
  }
 
-//  .dailog_box{
-//   .p-dialog .p-dialog-header{
-//     height: 5rem !important;
-//   }
-//  }
+ //  .dailog_box{
+ //   .p-dialog .p-dialog-header{
+ //     height: 5rem !important;
+ //   }
+ //  }
 
  .p-dialog-header .btn_panel {
-    position: relative;
-    // bottom: 2rem;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1.5rem;
-    border: 1px solid #C7C7C7;
-    background: #FFFFFF;
-    font-family: "Open Sans";
+  //  position: relative;
+   // bottom: 2rem;
+   border-radius: 0.5rem;
+   padding: 0.5rem 1.5rem;
+   border: 1px solid #C7C7C7;
+   background: #FFFFFF;
+   font-family: "Open Sans";
    //  font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    left: 84%;
-    cursor: pointer;
+   font-weight: 500;
+   font-size: 14px;
+  
+   cursor: pointer;
+ }
+ .p-dialog-header .btn_panel__single{
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid #C7C7C7;
+  background: #FFFFFF;
+  font-family: "Open Sans";
+  //  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  position: absolute;
+  right:2rem
+ }
+ .add__more__btn {
+   /* position: relative; */
+   left: 59%;
+   top: 4%;
+   width: 6.2rem;
+   border: 1px solid #ACA9FF;
+   height: 2.2rem;
+   border-radius: 7px;
+   background: white;
+   font-family: 'Open Sans';
+   font-style: normal;
+   font-weight: 400;
+   font-size: 14px;
+   color: #605BFF;
+ }
+
+ .Header__btn{
+    /* width: 769px; */
+    display: flex;
+    justify-content: end;
+    /* row-gap: 2rem; */
+    gap: 1rem;
  }
 
  .p-dialog .p-dialog-header-icons {
-     position: relative;
-     right: 96%;
+   position: relative;
+   right: 96%;
  }
 
  .p-datatable .p-datatable-thead>tr>th {
-     background: rgba(96, 91, 255, 0.1) !important;
-     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+   background: rgba(96, 91, 255, 0.1) !important;
+   box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
  }
 
- .card_modal{
-  margin:0 !important;
+ .card_modal {
+   margin: 0 !important;
 
  }
 
  .btn-capture {
-     background: #605BFF;
-     border-radius: 10px;
-     font-family: 'Open Sans';
-     font-style: normal;
-     font-weight: 600;
-     font-size: 14px;
-     line-height: 19px;
-     color: #FFFFFF;
-     position: relative;
-     border: none;
-     left: 24.2rem;
-     padding: 0.5rem 0.5rem;
+   background: #605BFF;
+   border-radius: 10px;
+   font-family: 'Open Sans';
+   font-style: normal;
+   font-weight: 600;
+   font-size: 14px;
+   line-height: 19px;
+   color: #FFFFFF;
+  //  position: relative;
+   border: none;
+   left: 24.2rem;
+   padding: 0.5rem 0.5rem;
  }
 
- .card-table{
-    position: relative;
-    top: 1rem;
-    .p-datatable-table{
-      padding: 0 1.5rem !important;
+ .btn-capture-single {
+  background: #605BFF;
+  border-radius: 10px;
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 19px;
+  color: #FFFFFF;
+ //  position: relative;
+  border: none;
+  left: 24.2rem;
+  padding: 0.5rem 0.5rem;
+}
+
+.header_btn{
+  float: right;
+}
+
+ .card-table {
+   position: relative;
+   top: 1rem;
+
+   .p-datatable-table {
+     padding: 0 1.5rem !important;
    }
  }
 
- .screen_btn{
-        height: 4vh;
-        flex-direction: row;
-            position: absolute;
-    left: 12.5rem;
-    top: 2.7rem;
+ .screen_btn {
+   height: 4vh;
+   flex-direction: row;
+   position: absolute;
+   left: 12.5rem;
+   top: 2.7rem;
  }
 
- .not_captured_ele{
-    height: 25vh;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 16vw;
+ .not_captured_ele {
+   height: 25vh;
+   display: block;
+   margin-left: auto;
+   margin-right: auto;
+   width: 16vw;
  }
 
- .not_captured_message{
-    bottom: 1rem;
-    display: flex;
-    align-content: center;
-    flex-wrap: wrap;
-    justify-content: center;
-    position: relative;
-    right: 1rem;
+ .not_captured_message {
+   bottom: 1rem;
+   display: flex;
+   align-content: center;
+   flex-wrap: wrap;
+   justify-content: center;
+   position: relative;
+   right: 1rem;
  }
- .action_panelCard{
+
+ .action_panelCard {
    display: flex;
    flex-wrap: nowrap;
    justify-content: space-between;
    // height: 100%;
  }
 
- .p-card .p-card-body .panel_card{
-    width: 100%;
+ .p-card .p-card-body .panel_card {
+   width: 100%;
  }
 
- .add_obj{
-  .p-dialog-header{
-    height: 2rem !important;
-  }
-    height: 4vh;
-    width: 2vw;
+ .add_obj {
+   .p-dialog-header {
+     height: 2rem !important;
+   }
+
+   height: 4vh;
+   width: 2vw;
  }
 
- .map_obj{
-    height: 4vh;
-    width: 2vw;
+ .map_obj {
+   height: 4vh;
+   width: 2vw;
  }
 
- .insprint_auto{
-    float: left;
-    padding-right: 2rem;
-    position: relative;
-    text-align: center;
-    font-family:'Open Sans';
-    font-weight: 500;
-    font-size: 14px;
-    padding: 0 0.8rem;
-    top: 1rem;
+ .insprint_auto {
+   float: left;
+   padding-right: 2rem;
+   position: relative;
+   text-align: center;
+   font-family: 'Open Sans';
+   font-weight: 500;
+   font-size: 14px;
+   padding: 0 0.8rem;
+   top: 1rem;
  }
 
- .upgrade_auto{
-        float: left;
-        padding-right: 2rem;
-        position: relative;
-        text-align: center;
-        font-family:'Open Sans';
-        font-weight: 500;
-        font-size: 14px;
-        padding: 0 0.8rem;
-        top: 1rem;
+ .upgrade_auto {
+   float: left;
+   padding-right: 2rem;
+   position: relative;
+   text-align: center;
+   font-family: 'Open Sans';
+   font-weight: 500;
+   font-size: 14px;
+   padding: 0 0.8rem;
+   top: 1rem;
  }
 
-//  .upgrade__block{
-//    flex: 1 0 0;
-//    //  height: 100%;
-//     border-right: 1px solid black;
-//  }
+ //  .upgrade__block{
+ //    flex: 1 0 0;
+ //    //  height: 100%;
+ //     border-right: 1px solid black;
+ //  }
 
- .dailog_box{
-   .p-dialog-content{
-      padding: 0 0 !important;
+ .dailog_box {
+   .p-dialog-content {
+     padding: 0 0 !important;
    }
  }
 
-.panel_card{
-     .p-card-body , .p-card-content{
-        padding: 0 0 !important;
+ .panel_card {
+
+   .p-card-body,
+   .p-card-content {
+     padding: 0 0 !important;
    }
+
    // .p-card-body, .p-card-content{
    //    padding: 0 0 !important;
    // }
  }
 
- .card-table{
-   .p-datatable-table{
-      padding: 0 1.5rem;
+ .card-table {
+   .p-datatable-table {
+     padding: 0 1.5rem;
    }
  }
 
- .insprint__block{
+ .insprint__block {
    //  height: 100%;
-    border-right: 1px solid #E2E2ED;
-    .insprint__text{
-      position: relative;
-      top: 2rem;
-      left: 2rem;
-      font-size: 14px;
-      font-family: 'Open sans';
-    }
-    .info__btn{
-      height: 9%;
-      position: relative;
-      left: 95%;
-      top: 13%;
-      cursor: pointer;
-    }
-
- }
-
- .upgrade__block{
    border-right: 1px solid #E2E2ED;
-   .insprint__text{
-      position: relative;
-      top: 2rem;
-    left: 2rem;
-    font-size: 14px;
-    font-family: "Open sans";
-    }
-    .upgrade_auto{
-      right: 1rem;
-    }
-    .info__btn{
-      height: 9%;
-      position: relative;
-      left: 96%;
-      top: 13%;
-      cursor: pointer;
-    }
+
+   .insprint__text {
+     position: relative;
+     top: 2rem;
+     left: 2rem;
+     font-size: 14px;
+     font-family: 'Open sans';
+   }
+
+   .info__btn {
+     height: 9%;
+     position: relative;
+     left: 95%;
+     top: 13%;
+     cursor: pointer;
+   }
+
  }
 
- .imp_exp__block{
-   .insprint__text{
-      position: relative;
-      top: 2rem;
-      right: 1rem;
-      font-size: 14px;
-      font-family: "Open sans";
-    }
-    .insprint_auto{
-      float: left;
-      padding-right: 2rem;
-      position: relative;
-      text-align: center;
-      font-family:'Open Sans';
-      font-weight: 500;
-      font-size: 14px;
-      padding: 0 0.8rem;
-      top: 1rem;
-      right: 0.65rem;;
+ .upgrade__block {
+   border-right: 1px solid #E2E2ED;
+
+   .insprint__text {
+     position: relative;
+     top: 2rem;
+     left: 2rem;
+     font-size: 14px;
+     font-family: "Open sans";
    }
-   .import__block{
-      display: flex;
-      padding: 1.5rem 0rem;
-      position: relative;
-      bottom: 2rem;
+
+   .upgrade_auto {
+     right: 1rem;
    }
-   .export__block{
-      display: flex;
-      position: relative;
-      bottom: 2rem;
+
+   .info__btn {
+     height: 9%;
+     position: relative;
+     left: 96%;
+     top: 13%;
+     cursor: pointer;
    }
-   .add_obj{
-      position: relative;
-      right: 1rem;
+ }
+
+ .imp_exp__block {
+   .insprint__text {
+     position: relative;
+     top: 2rem;
+     right: 1rem;
+     font-size: 14px;
+     font-family: "Open sans";
    }
+
+   .insprint_auto {
+     float: left;
+     padding-right: 2rem;
+     position: relative;
+     text-align: center;
+     font-family: 'Open Sans';
+     font-weight: 500;
+     font-size: 14px;
+     padding: 0 0.8rem;
+     top: 1rem;
+     right: 0.65rem;
+     ;
+   }
+
+   .import__block {
+     display: flex;
+     padding: 1.5rem 0rem;
+     position: relative;
+     bottom: 2rem;
+   }
+
+   .export__block {
+     display: flex;
+     position: relative;
+     bottom: 2rem;
+   }
+
+   .add_obj {
+     position: relative;
+     right: 1rem;
+   }
+
    // .imp__block{
    //    position: relative;
    //  top: 0.5rem;
    // }
-   .imp__text{
-      position: relative;
-    top: 0.5rem;
+   .imp__text {
+     position: relative;
+     top: 0.5rem;
    }
  }
 
- .utility__block{
-   border-right:1px solid #E2E2ED;
-   .insprint__text{
-      position: relative;
-      top: 2rem;
-      right: 1rem;
-      font-size: 14px;
-      font-family: "Open sans";
-    }
-    .insprint_auto{
-      float: left;
-      padding-right: 2rem;
-      position: relative;
-      text-align: center;
-      font-family:'Open Sans';
-      font-weight: 500;
-      font-size: 14px;
-      padding: 0 0.8rem;
-      top: 1rem;
-      right: 0.65rem;;
-   }
-    .create__block{
-      right: 1.45rem;
-    }
-    .info__btn{
-      height: 9%;
-      position: relative;
-      left: 91%;
-      top: 13%;
-      cursor: pointer;
-    }
-  }
+ .utility__block {
+   border-right: 1px solid #E2E2ED;
 
-  .card__insprint{
+   .insprint__text {
+     position: relative;
+     top: 2rem;
+     right: 1rem;
+     font-size: 14px;
+     font-family: "Open sans";
+   }
+
+   .insprint_auto {
+     float: left;
+     padding-right: 2rem;
+     position: relative;
+     text-align: center;
+     font-family: 'Open Sans';
+     font-weight: 500;
+     font-size: 14px;
+     padding: 0 0.8rem;
+     top: 1rem;
+     right: 0.65rem;
+     ;
+   }
+
+   .create__block {
+     right: 1.45rem;
+   }
+
+   .info__btn {
+     height: 9%;
+     position: relative;
+     left: 91%;
+     top: 13%;
+     cursor: pointer;
+   }
+ }
+
+ .card__insprint {
    height: 23%;
    width: 32%;
-    position: absolute;
-    z-index: 1;
+   position: absolute;
+   z-index: 1;
    //  left: 17%;
    //  bottom: 42.3%;
-    background-color: #030229;
-    /* border-radius: 2%; */
-    border-radius: 8px;
-    padding: 0.8rem 0.8rem;
-    color: white;
-    font-family: 'Open Sans';
-    font-size: 14px;
-  }
+   background-color: #030229;
+   /* border-radius: 2%; */
+   border-radius: 8px;
+   padding: 0.8rem 0.8rem;
+   color: white;
+   font-family: 'Open Sans';
+   font-size: 14px;
+ }
 
-  .text__insprint__info{
+ .text__insprint__info {
    padding: 1.2rem 0;
-  }
+ }
 
-//   .p-checkbox{
-//    position: relative !important;
-//    left: 78% !important;
-//   }
-
+ //   .p-checkbox{
+ //    position: relative !important;
+ //    left: 78% !important;
+ //   }

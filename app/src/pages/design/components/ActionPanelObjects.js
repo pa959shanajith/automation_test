@@ -1,6 +1,5 @@
-import React from 'react';
+import {React, useState} from 'react';
 import { Dialog } from 'primereact/dialog';
-import { useState } from 'react';
 import { Card } from 'primereact/card';
 import '../styles/ActionPanelObjects.scss';
 import { Dropdown } from 'primereact/dropdown';
@@ -13,7 +12,6 @@ const ActionPanel = (props) => {
     // const [visible, setVisible] = useState(false);
 
     // const onHandleHide = ()=>{
-    //     console.log("hello this is console log");
     //     // setIsDialogOpen(false)
     const [selectObjectType, setSelectObjectType] = useState(null);
     const [selectCustomObj, setSelectCustomObj] = useState({
@@ -50,12 +48,7 @@ const ActionPanel = (props) => {
         </div>
     )
 
-    // const onDropdownChange = (e) => {
-    //   setSelectCustomObj({
-    //     ...selectCustomObj,
-    //     [e.target.name] : e.target.value
-    //   })
-    // }
+
 
     const handleSpanClick = (index) => {
       if (selectedSpan === index) {
@@ -70,7 +63,7 @@ const ActionPanel = (props) => {
           setSelectObjectType(null);
     }
     
-        console.log(props.isOpen);
+
     return (
      <>
       <Dialog className='add__object__header'  header='Add Object'  visible={props.isOpen==='addObject'} onHide={props.OnClose} style={{height:"28.06rem", width:"38.06rem"}} position='right' footer={footer}>
@@ -84,9 +77,6 @@ const ActionPanel = (props) => {
         <input className='object__type__input' placeholder='Text Input'/>
         <button className='add_object_btn'>Add</button>
       </div>
-       {/* <Card.Footer>
-        <small className="p-d-block">Footer text</small>
-      </Card.Footer> */}
       </Card>
       <Card className='add_object__right' title="Added Objects">
 
