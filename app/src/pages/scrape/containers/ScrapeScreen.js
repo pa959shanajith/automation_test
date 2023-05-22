@@ -56,7 +56,7 @@ const ScrapeScreen = (props)=>{
     const [showTeststeps , setshowTeststeps]=useState([]);
     const [displayTest , setdisplayTest]=useState({});
     const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]);
-   
+   const[identifierModified,setIdentifierModiefied]=useState(false)
     useEffect(() => {
         // if(Object.keys(current_task).length !== 0) {
             fetchScrapeData()
@@ -69,7 +69,19 @@ const ScrapeScreen = (props)=>{
         dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
 
     }, [current_task])
-
+    useEffect(()=>{
+        if(identifierModified){
+            fetchScrapeData()
+        .then(data => {
+            // setIsUnderReview(current_task.status === "underReview")
+        })
+        .catch(error=> console.log(error));
+    // }
+    //eslint-disable-next-line
+    dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
+    setIdentifierModiefied(false)
+        }
+    },[identifierModified])
     useEffect(()=>{
         if (!showObjModal) {
             let selected = 0;
@@ -494,6 +506,7 @@ const saveIdentifier=()=>{
                 setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
         }
         )
+        setIdentifierModiefied(true)
 }
 const dynamicColumns = columns.map((col, i) => {
                     return <Column key={col.field} columnKey={col.field} field={col.field} header={col.header} />;
