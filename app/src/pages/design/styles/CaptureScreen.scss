@@ -3,7 +3,6 @@
    left: 3rem !important;
    top: 0.5rem;
    font-family: 'Open Sans';
-   //   font-style: normal;
    font-weight: 500;
    color: rgba(3, 2, 41, 0.6);
  }
@@ -22,28 +21,18 @@
    left: 3rem !important;
    top: 2.5rem;
    font-family: 'Open Sans';
-   //   font-style: normal;
    font-weight: 500;
    font-size: 20px;
    color: #030229;
 
  }
 
- //  .dailog_box{
- //   .p-dialog .p-dialog-header{
- //     height: 5rem !important;
- //   }
- //  }
-
  .p-dialog-header .btn_panel {
-  //  position: relative;
-   // bottom: 2rem;
    border-radius: 0.5rem;
    padding: 0.5rem 1.5rem;
    border: 1px solid #C7C7C7;
    background: #FFFFFF;
    font-family: "Open Sans";
-   //  font-style: normal;
    font-weight: 500;
    font-size: 14px;
   
@@ -55,14 +44,13 @@
   border: 1px solid #C7C7C7;
   background: #FFFFFF;
   font-family: "Open Sans";
-  //  font-style: normal;
   font-weight: 500;
   font-size: 14px;
   position: absolute;
-  right:2rem
+  right:2rem;
+  top: 1.5rem;
  }
  .add__more__btn {
-   /* position: relative; */
    left: 59%;
    top: 4%;
    width: 6.2rem;
@@ -78,10 +66,8 @@
  }
 
  .Header__btn{
-    /* width: 769px; */
     display: flex;
     justify-content: end;
-    /* row-gap: 2rem; */
     gap: 1rem;
  }
 
@@ -109,7 +95,6 @@
    font-size: 14px;
    line-height: 19px;
    color: #FFFFFF;
-  //  position: relative;
    border: none;
    left: 24.2rem;
    padding: 0.5rem 0.5rem;
@@ -124,9 +109,9 @@
   font-size: 14px;
   line-height: 19px;
   color: #FFFFFF;
- //  position: relative;
+  position: relative;
   border: none;
-  left: 24.2rem;
+  left: 22.2rem;
   padding: 0.5rem 0.5rem;
 }
 
@@ -173,7 +158,6 @@
    display: flex;
    flex-wrap: nowrap;
    justify-content: space-between;
-   // height: 100%;
  }
 
  .p-card .p-card-body .panel_card {
@@ -218,11 +202,6 @@
    top: 1rem;
  }
 
- //  .upgrade__block{
- //    flex: 1 0 0;
- //    //  height: 100%;
- //     border-right: 1px solid black;
- //  }
 
  .dailog_box {
    .p-dialog-content {
@@ -237,9 +216,6 @@
      padding: 0 0 !important;
    }
 
-   // .p-card-body, .p-card-content{
-   //    padding: 0 0 !important;
-   // }
  }
 
  .card-table {
@@ -249,7 +225,6 @@
  }
 
  .insprint__block {
-   //  height: 100%;
    border-right: 1px solid #E2E2ED;
 
    .insprint__text {
@@ -334,11 +309,6 @@
      position: relative;
      right: 1rem;
    }
-
-   // .imp__block{
-   //    position: relative;
-   //  top: 0.5rem;
-   // }
    .imp__text {
      position: relative;
      top: 0.5rem;
@@ -388,10 +358,7 @@
    width: 32%;
    position: absolute;
    z-index: 1;
-   //  left: 17%;
-   //  bottom: 42.3%;
    background-color: #030229;
-   /* border-radius: 2%; */
    border-radius: 8px;
    padding: 0.8rem 0.8rem;
    color: white;
@@ -402,8 +369,3 @@
  .text__insprint__info {
    padding: 1.2rem 0;
  }
-
- //   .p-checkbox{
- //    position: relative !important;
- //    left: 78% !important;
- //   }

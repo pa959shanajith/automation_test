@@ -1,13 +1,4 @@
-// .p-dialog-header{
-// .p-dialog-header-icons{
-//     .p-dialog-header-icon{
-//     .add__object__header{
-//         display: flex;
-//         left: 35rem;
-//     }
-// }
-// }
-// }
+
 .p-dialog {
     .p-dialog-header-icon {
         .add__object__header {
@@ -38,9 +29,6 @@
     width: 46%;
     top: 18%;
     right: 51%;
-    // right: ;
-    // float: left;
-    // display: flex;
     border: 1px solid #C7C7C7;
 
     .p-card-title {
@@ -68,7 +56,6 @@
     width: 46%;
     top: 18%;
     left: 51%;
-    // display: flex;
     border: 1px solid #C7C7C7;
 
     .p-card-title {
@@ -86,7 +73,6 @@
 }
 
 .object__type {
-    // font-weight: bold;
     font-family: 'Open Sans';
     font-size: 14px !important;
     padding: 0.5rem;
@@ -145,7 +131,6 @@
     right: 14%;
     width: 14% !important;
     height: 28px !important;
-    // left: 60% !important;
     left: 2%;
     border: none;
 }
@@ -155,8 +140,6 @@
     top: 12%;
     bottom: 39rem;
     top: 0.8rem;
-    /* left: -10%; */
-    /* top: 8%; */
     width: 12%;
     left: 2%;
     right: 14%;
@@ -166,7 +149,6 @@
     border-radius: 4px;
     color: white;
     border: none;
-    // left:71%;
 }
 
 .map__object__header {
@@ -195,7 +177,6 @@
     flex-direction: column;
     top: 30%;
     position: absolute;
-    /* top: 5%; */
     border: 1px solid black;
     width: 92%;
 }
@@ -225,7 +206,6 @@
 .capture__obj {
     border: 1px solid lightgrey;
     border-radius: 4px;
-    // left: 7%;
     position: relative;
     width: 39%;
     height: 82%;
@@ -257,7 +237,6 @@
 .arrow__right {
     height: 44%;
     position: relative;
-    /* left: -2%; */
     right: 2%;
     top: 11%;
 }
@@ -294,7 +273,6 @@
     .create_obj {
         display: flex !important;
         flex-direction: row !important;
-        // justify-content: flex-start;
         position: relative;
         top: 8%;
     }
@@ -306,7 +284,6 @@
 
 .create__left__panel {
     position: relative;
-    /* width: 100%; */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -359,11 +336,8 @@
 
 .compare__btn {
     padding: 0 1.2rem;
-    /* margin: -0.1rem; */
-    /* margin-bottom: 0.9rem; */
     position: relative;
     top: 3%;
-    /* bottom: 29%; */
     border-bottom: 1px solid lightgray;
     width: 100%;
     display: flex;
@@ -404,7 +378,6 @@
         font-style: normal;
         font-weight: 400;
         font-size: 14px;
-        // margin-bottom: 0.2rem;
     }
 
     .browser__col__name {
