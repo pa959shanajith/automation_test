@@ -16,7 +16,7 @@ import {
 } from "../../utility/mockData";
 import "../styles/ConfigureSetup.scss";
 import GridBrowser from "./GridBrowser";
-import AvoInput from "../../../global/AvoInput";
+import AvoInput from "../../../globalComponents/AvoInput";
 
 const ConfigureSetup = () => {
   const [dataparam, setDataparam] = useState({});

@@ -10,7 +10,7 @@ import { products } from './products';
 import { Button } from 'primereact/button';
 import { BreadCrumb } from 'primereact/breadcrumb';
 import { Link } from 'react-router-dom';
-import AvoModal from '../../../global/AvoModal';
+import AvoModal from '../../../globalComponents/AvoModal';
 import ConfigureSetup from './ConfigureSetup';
 
 const ConfigurePage =({})=>{
