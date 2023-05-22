@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState, Fragment } from 'react';
 import * as d3 from 'd3';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,createNewMap} from './MindmapUtils'
+import { ContextMenu } from 'primereact/contextmenu';
+import CaptureModal from '../containers/CaptureScreen';
+import DesignModal from '../containers/DesignTestStep';
 
 
 
@@ -41,6 +44,8 @@ const Canvas = (module) => {
     const menuRef_scenario =useRef(null);
     const menuRef_screen = useRef(null);
     const menuRef_Teststep = useRef(null);
+    const [visibleCaptureElement, setVisibleCaptureElement] = useState(false);
+    const [visibleDesignStep, setVisibleDesignStep] = useState(false);
 
     useEffect(() => {
         var tree;
@@ -218,14 +223,14 @@ const Canvas = (module) => {
     const menuItemsScreen = [
         { label: 'Add Test step' },
         { label: 'Add Multiple Test step'},
-        { label: 'Capture Elements' },
+        { label: 'Capture Elements',command:()=>setVisibleCaptureElement(true) },
         { label: 'Delete' },
         { label: 'Execute' }
 
     ];
 
     const menuItemsTestSteps = [
-        { label: 'Design Test steps' },
+        { label: 'Design Test steps',command: ()=>setVisibleDesignStep(true) },
         { label: 'Rename' },
         { label: 'Delete' }
 
@@ -243,6 +248,8 @@ const Canvas = (module) => {
 
     return (
         <Fragment>
+            {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} />}
+        {visibleDesignStep && <DesignModal visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
             <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />
