@@ -9,10 +9,6 @@ import { InputText } from "primereact/inputtext";
 
 
 const ActionPanel = (props) => {
-    // const [visible, setVisible] = useState(false);
-
-    // const onHandleHide = ()=>{
-    //     // setIsDialogOpen(false)
     const [selectObjectType, setSelectObjectType] = useState(null);
     const [selectCustomObj, setSelectCustomObj] = useState({
       btn1: '',
