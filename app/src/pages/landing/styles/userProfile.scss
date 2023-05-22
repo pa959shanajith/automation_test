@@ -1,43 +1,211 @@
 .card {
-    background: var(--surface-card);
-    padding: 0.5rem;
-    border-radius: 10px;
-    margin-left: 50rem;
+  background: var(--surface-card);
+  padding: 0.5rem;
+  border-radius: 10px;
+  margin-left: 50rem;
 }
 
 .user-profile {
-    display: flex;
-    align-items: center;
-  }
-  
-  .profile-picture {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #007bff;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.profile-picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.tiered-menu {
+  position: relative;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+}
+
+.Header_size {
+  position: relative;
+  height: 2.6rem;
+  background: #ffffff !important;
+}
+
+.Headers {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Tab_Menu_Header {
+  position: relative;
+  right: 32rem;
+
+  .p-menuitem-link:not(.p-disabled):hover .p-menuitem-text {
+    color: #605BFF !important;
   }
 
-  .tiered-menu {
-    position: relative;
-    top: 100%;
-    left: 0;
-    z-index: 1;
-  }
-  .Header_size{
-    position: relative;
-    height: 2.6rem;
-    background: #ffffff !important;
+  .p-tabmenu-nav .p-menuitem-text {
+    line-height: 0;
   }
 
-//   .p-menubar {
-//     display: flex;
-//     flex-direction: row;
-//     align-items: center;
-// }
+  .p-menuitem-link {
+    box-shadow: none !important;
+    font-family: 'Open Sans' !important;
+    font-style: normal !important;
+    border-width: 0 0 1px 0 !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+  }
+
+}
+
+.heder_dialog {
+  .p-dialog-header {
+    background: #e0dff0 !important;
+    padding: 0.5rem 0.5rem 0.5rem 1.38rem !important;
+    font-family: 'open saas'!important;
+    font-weight: 100 !important;
+    font-style: normal;
+  }
+  .p-dialog-footer {
+    padding: 0.5rem 0rem 0.5rem 0.2rem !important;
+    font-family: 'open saas'!important;
+    font-weight: 100 !important;
+    font-style: normal;
+  }
+  .p-dialog-title {
+    font-weight: 100 !important;
+
+   }
+
+}
+
+label {
+  display: block;
+  font-weight: 300;
+  margin-bottom: 8px;
+  color: #37404C;
+}
+
+input[type="text"],
+input[type="email"] {
+  width: 73%;
+  padding: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+input[readOnly] {
+  background-color: #f1f1f1;
+}
+
+.profileImage {
+  padding: 1rem;
+  position: relative;
+  left: 9rem;
+
+  .p-avatar {
+    width: 6rem !important;
+    height: 6rem !important;
+    font-size: 2rem !important;
+  }
+}
+
+.input_field {
+  position: relative;
+  bottom: 1.8rem;
+}
+
+.userImage {
+  .p-button {
+    background: white !important;
+    border: none !important;
+    bottom: 2rem !important;
+    left: 5rem;
+    padding: 0.2rem 0.2rem !important;
+
+  }
+
+  .p-button .p-component .p-fileupload-choose {
+    position: relative;
+    bottom: 2rem;
+    left: 1rem;
+  }
+}
+
+.pi-camera {
+  color: black;
+}
+
+.heder_dialog {
+  .p-dialog-footer {
+    .Cancel_btn {
+      color: #030229 !important;
+      border-color: transparent !important;
+      background: transparent !important;
+      transition: none !important;
+      height: 2.25rem !important;
+    width: 6.12rem !important;
+  }
+    .Save_btn {
+      height: 2.25rem !important;
+    width: 6.12rem !important;
+
+    }
+    .p-button-label {
+      font-weight: 100 !important;
+  }
+  }
+}
+
+.custom-tieredmenu {
+  background-color: #030229 !important;
+  border-radius: 8px !important;
+  width: 13.3rem !important;
+  position: relative;
+  z-index: 1;
+
+  .p-menuitem-icon,
+  .p-menuitem-text {
+    color: #ffffff !important;
+  }
+
+  .p-menuitem-link:not(.p-disabled):hover {
+    background: #bec2be !important;
+  }
+
+  .p-submenu-list {
+    background-color: #030229 !important;
+  }
+}
+
+.ProfileDisplay {
+  text-align: center;
+  margin-bottom: 0.8rem;
+  margin-right: 0.5rem;
+  margin-top: 1rem;
+  color: #ffffff;
+}
+
+.tieredmenu_Font {
+  font-family: 'Open Sans' !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+}
+
+.tiredmenu_align {
+  position: absolute;
+  right: 0rem;
+  top: 2.7rem;
+}

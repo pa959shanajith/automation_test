@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import { Card } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import '../styles/VerticalSteps.scss';
-import staticDataDataForMindMap from '../../design/staticDataForMindMap';
 import { useNavigate } from "react-router-dom";
 
 
@@ -37,9 +36,9 @@ function VerticalSteps(params) {
   
 
   const handleNext = () => {
-    // setActiveStep((prevActiveStep) => prevActiveStep + 1); 
+    setActiveStep((prevActiveStep) => prevActiveStep + 1); 
       // let path = "/mindmap"; 
-      navigate("/mindmap");
+      navigate("/design");
   };
   const handleExecute = () => {
     navigate('/execute');

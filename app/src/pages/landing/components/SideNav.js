@@ -32,7 +32,7 @@ const SideNav = () =>{
             path: "/integration",
             name: "Integration",
             icon: <img src={tabSelected==="/integration" ? "static/imgs/integration_icon_selected.svg"  :"static/imgs/integration_icon.svg"} className="icon" data-pr-tooltip="Integration"  data-pr-position="right" height="25px"/>,
-            disabled: true
+            disabled: false
         },
         {
             path: "/reports",
@@ -49,7 +49,7 @@ const SideNav = () =>{
         {
             path: "/itdm",
             name: "ITDM",
-            icon: <img src= {tabSelected==="/itdm" ? "static/imgs/ITDM_filled_icon.png" : "static/imgs/ITDM_icon.png"} className="icon" data-pr-tooltip="ITDM"  data-pr-position="right" height="25px"/>,
+            icon: <img src= {tabSelected==="/itdm" ? "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="ITDM"  data-pr-position="right" height="25px"/>,
             disabled: true
         },
     ]
