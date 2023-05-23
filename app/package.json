@@ -57,7 +57,8 @@
     "tough-cookie": "^4.0.0",
     "tough-cookie-web-storage-store": "^1.0.0",
     "uuid": "^8.3.0",
-    "vsts-npm-auth": "^0.41.0"
+    "vsts-npm-auth": "^0.41.0",
+    "react-gtm-module": "^2.0.11"
   },
   "scripts": {
     "start": "set REACT_APP_DEV=true && react-scripts start",

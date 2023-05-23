@@ -19,6 +19,7 @@ import Agents from './Agents';
 import AllocateIcePool from './AllocateIcePool';
 import {Header,FooterTwo,ReferenceBar} from '../../global';
 import '../styles/AdminHome.scss';
+import LicenseManagement from './LicenseManagement';
 
 /*Component AdminHome
   use: renders Admin landing page (footer,header,sidebars,middle saection)
@@ -28,7 +29,7 @@ import '../styles/AdminHome.scss';
 const AdminHome = () => {
   const [middleScreen,setMiddleScreen] = useState("createUser")
   const [showEditUser,setShowEditUser] = useState(false)
-  const [resetMiddleScreen,setResetMiddleScreen] =useState({tokenTab:true,provisionTa:true,Preferences:true,sessionTab:true,gitConfigure:true,ldapConfigTab:true,createUser:true,projectTab:true,assignProjectTab:true,samlConfigTab:true,oidcConfigTab:true,emailGroupTab:true})
+  const [resetMiddleScreen,setResetMiddleScreen] =useState({tokenTab:true,provisionTa:true,Preferences:true,sessionTab:true,gitConfigure:true,ldapConfigTab:true,createUser:true,projectTab:true,assignProjectTab:true,samlConfigTab:true,oidcConfigTab:true,emailGroupTab:true, LicenseManagement:true})
   return (
     <>
     <div className='admin-container'>
@@ -57,6 +58,7 @@ const AdminHome = () => {
                                 {(middleScreen==="agents")?<Agents resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
                                 {(middleScreen==="sessionTab")?<SessionManagement resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen}  />:null}
                                 {(middleScreen==="Preferences")?<Preferences resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
+                                {(middleScreen==="LicenseManagement")?<LicenseManagement resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen}/>:null}
                             </div>
                         </div>
                     </div>    

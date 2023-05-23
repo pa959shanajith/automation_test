@@ -274,3 +274,25 @@ exports.fetchModuleListDevopsReport =  async(req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.executionSteps = async(req, res)=>{
+	try {
+		const inp = req.body;
+		const steps = await utils.fetchData(inp,"/hooks/validateExecutionSteps")
+		res.send(steps)
+	} catch (error) {
+		logger.error("Error occurred in devops/hooks/ExecutionSteps: "+error)
+		return res.send("fail")
+	}
+}
+
+exports.executionParallel = async(req, res)=>{
+	try {
+		const inp = {};
+		const parallel = await utils.fetchData(inp,"/hooks/validateParallelExecutions")
+		res.send(parallel)
+	} catch (error) {
+		logger.error("Error occurred in devops/hooks/ParallelExecutions: "+error)
+		return res.send("fail")
+	}
+}

@@ -13,6 +13,7 @@ import { Button } from "primereact/button";
 
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
+    const userInfo = useSelector(state=>state.login.userinfo);
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
     const initProj = useSelector(state=>state.mindmap.selectedProj)
@@ -47,6 +48,7 @@ const ModuleListDrop = (props) =>{
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoad = useSelector(state=>state.mindmap.isEnELoad);
+    const plugin = useSelector(state=>state.plugin.LS)
 
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
     useEffect(()=> {
@@ -331,6 +333,7 @@ const ModuleListDrop = (props) =>{
                                                 {
                                                 key: 'image',
                                                 text: 'Import Module',
+                                                disabled:userInfo.isTrial?true:false,
                                                 onClick:()=>{setImportPop(true);
                                         setSearchForNormal(true);}}
                                             ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
@@ -372,7 +375,8 @@ const ModuleListDrop = (props) =>{
                                         <h6 id='Endto' style={{margin: '6px -230px 3px -13px', display: !collapseForModules? 'none': ''}}>
                                                 End to End Flows
                                         </h6>
-                                    {userRole!=="Test Engineer"? <IconDropdown items={[ 
+                                    {plugin.ETT!==undefined?<>
+                                        {userRole!=="Test Engineer" ? <IconDropdown disabled={userInfo.isTrial} items={[ 
                                             {
                                                 key: 'csv',
                                                 text: 'Create New',
@@ -384,10 +388,11 @@ const ModuleListDrop = (props) =>{
                                             ]}
                                             id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
                                         />  :null}
+                                    </>:null}
                                 </div>
                                 <div className='searchBox pxBlack'>
                                     <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                        <input disabled={userInfo.isTrial} className='pFont' placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                                 </div>
                                 <div className='moduleList'>
@@ -395,7 +400,7 @@ const ModuleListDrop = (props) =>{
                                             if(e.type==="endtoend" && ((searchInpTextEnE !== "" && e.name.toUpperCase().indexOf(searchInpTextEnE.toUpperCase())!==-1) || searchInpTextEnE === ""))
                                             return(<>
                                                     
-                                                    <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
+                                                    <div key={i} data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={!userInfo.isTrial?(e)=>selectModules(e):""} title={e.name} >
                                                     <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.75rem', display:'flex',flexDirection:'row-reverse',marginLeft:'-6px'}}> <span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span> <div  ><img style={{marginLeft:'-24px'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" /></div></div>
                                                     
                                                     </div>

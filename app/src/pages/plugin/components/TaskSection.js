@@ -6,6 +6,7 @@ import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents,ValidationExpressi
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as actionTypesMindmap from '../../mindmap/state/action';
+import * as actionTypesLogin from '../../login/state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
 import PropTypes from 'prop-types';
@@ -148,37 +149,60 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             }
             var plugins = [];
         const plugins_list= await getAvailablePlugins();
+        dispatch({type: actionTypes.SET_LS, payload:plugins_list})
 
 
         if(plugins_list.error){
                 setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
-                let txt = [];
-                for (let x in plugins_list) {
-                        if(plugins_list[x] === true) {
-                        txt.push({
-                            data:{
-                                icon: x,
-                            },
-                            key: x,
-                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
-                            title: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
-                            disabled: false
-                        })
-                    }
-                    else {
-                        txt.push({
-                            data:{
-                                icon: x,
-                            },
-                            key: x,
-                            text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
-                            title: 'License Not Supported',
-                            disabled: true
-                        })
-                    }
-                }
-                setplugins_list(txt);
+                // let txt = [];
+                // for (let x in plugins_list) {
+                //         if(plugins_list[x] === true) {
+                //         txt.push({
+                //             data:{
+                //                 icon: x,
+                //             },
+                //             key: x,
+                //             text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                //             title: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                //             disabled: false
+                //         })
+                //     }
+                //     else {
+                //         txt.push({
+                //             data:{
+                //                 icon: x,
+                //             },
+                //             key: x,
+                //             text: x === "mobileapp"? "MobileApp" : x === "mobileweb" ? "MobileWeb" : x === "sap" ? "SAP" : x === "oebs" ? "OEBS" : x.charAt(0).toUpperCase()+x.slice(1),
+                //             title: 'License Not Supported',
+                //             disabled: true
+                //         })
+                //     }
+                // }
+                // setplugins_list(txt);
+
+                var details = {
+                    "web":{"data":{"icon":"Web"},"key":"Web","text":"Web","title":"Web","img":"web"},
+                    "webservice":{"data":{"icon":"Webservice"},"key":"Web Service","text":"WebService","title":"Web Service","img":"webservice"},
+                    "desktop":{"data":{"icon":"Desktop"},"key":"Desktop Apps","text":"Desktop","title":"Desktop Apps","img":"desktop"},
+                    "oebs":{"data":{"icon":"OEBS"},"key":"Oracle Apps","text":"OEBS","title":"Oracle Apps","img":"oracleApps"},
+                    "mobileapp":{"data":{"icon":"MobileApp"},"key":"Mobile Apps","text":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+                    "mobileweb":{"data":{"icon":"MobileWeb"},"key":"Mobile Web","text":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+                    "sap":{"data":{"icon":"SAP"},"key":"SAP Apps","text":"SAP","title":"SAP Apps","img":"sapApps"},
+                    // "system":{"data":{"icon":"System"},"key":"System Apps","text":"System Apps","title":"System Apps","img":"desktop"},
+                    "mainframe":{"data":{"icon":"Mainframe"},"key":"Mainframe","text":"Mainframe","title":"Mainframe","img":"mainframe"}
+                };
+                var listPlugin = [];
+                "WEBT" in plugins_list ?  listPlugin.push({...details["web"], enabled: true}):listPlugin.push({...details["web"], enabled: false})
+                "APIT" in plugins_list ?  listPlugin.push({...details["webservice"], enabled: true}):listPlugin.push({...details["webservice"], enabled: false})
+                "MOBT" in plugins_list ?  listPlugin.push({...details["mobileapp"], enabled: true}):listPlugin.push({...details["mobileapp"], enabled: false})
+                "MOBWT" in plugins_list ?  listPlugin.push({...details["mobileweb"], enabled: true}):listPlugin.push({...details["mobileweb"], enabled: false})
+                "ETOAP" in plugins_list ?  listPlugin.push({...details["oebs"], enabled: true}):listPlugin.push({...details["oebs"], enabled: false})
+                "DAPP" in plugins_list ?  listPlugin.push({...details["desktop"], enabled: true}):listPlugin.push({...details["desktop"], enabled: false})
+                "MF" in plugins_list ?  listPlugin.push({...details["mainframe"], enabled: true}):listPlugin.push({...details["mainframe"], enabled: false})
+                "ETSAP" in plugins_list ?  listPlugin.push({...details["sap"], enabled: true}):listPlugin.push({...details["sap"], enabled: false})
+                setplugins_list(listPlugin);
             }
         })()
 
@@ -424,6 +448,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                             dispatch({type: actionTypesMindmap.SELECT_PROJECT, payload:projectNames.projectId[idx]});
                                             dispatch({type:actionTypesMindmap.SELECT_MODULE,payload:{}})
                                             dispatch({type:actionTypesMindmap.SELECT_MODULELIST,payload:[]})
+                                            dispatch({type:actionTypesLogin.HIGHLIGHT_AGS,payload:false})
                                             window.localStorage['navigateScreen'] = "mindmap";
                                             setRedirectTo(`/mindmap`);
                                         }}>Design</button>
@@ -640,7 +665,9 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                                                 const res = await pluginApi.userCreateProject_ICE(config)
                                                 if(res === "invalid_name_spl") {
                                                     setMsg(MSG.CUSTOM("Special characters are not allowed in project name","error"));
-                                                }else{
+                                                }else if(res.message=="Max Allowed Projects Created"){
+                                                    setMsg(MSG.CUSTOM(res.message,"error"));
+                                                } else{
                                                     setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
                                                 }
                                                 // onHide('displayBasic');

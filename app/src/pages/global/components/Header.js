@@ -12,6 +12,7 @@ import { RedirectPage, ModalContainer, ScreenOverlay, WelcomePopover, Messages a
 import ServiceBell from "@servicebell/widget";
 import "../styles/Header.scss";
 import * as crypto from "crypto";
+import axios from "axios";
 
 /*
     Component: Header Bar
@@ -43,6 +44,10 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     const [OS,setOS] = useState("Windows");
     const [WP_STEPNO, set_WP_STEPNO] = useState(0);
     const [trainLinks, setTrainLinks] = useState({videos:"#", docs:"#"});
+    const [showIndicator, setShowIndicator] = useState(false);
+    const [percentComplete,setPercentComplete] = useState(0);
+    const [showMacOSSelection, setShowMacOSSelection] = useState(false);
+    const [showLinuxOSSelection, setShowLinuxOSSelection] = useState(false);
 
     useEffect(()=>{
         //on Click back button on browser
@@ -105,12 +110,14 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     if (/windows nt/.test(userAgent))
         setOS("Windows");
 
-    else if (/mac os x/.test(userAgent))
+    else if (/mac os x/.test(userAgent)){
+        setShowMacOSSelection(true);  
         setOS("MacOS");
-
-    else if (/linux x86_64/.test(userAgent))
+    }
+    else if (/linux x86_64/.test(userAgent)){
+        setShowLinuxOSSelection(true);
         setOS("Linux")
-    else
+    }else
         setOS("Not Supported");
   }
     
@@ -128,7 +135,36 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
         // document.body.appendChild(link);
         // link.click();
         // document.body.removeChild(link);
-        window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
+        // window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
+        setShowMacOSSelection(false);
+        setShowIndicator(true);
+        // const link = document.createElement('a');
+        // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+        // link.setAttribute('download', "avoURL.txt");
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
+        axios({
+            url: window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE",
+            method: "GET",
+            responseType: "blob", 
+            onDownloadProgress(progress) {
+                setPercentComplete(progress.loaded/progress.total)
+            }
+        }).then(response => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+             
+            link.setAttribute('download',  "AvoAssureClient"+(userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
+//                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }).catch((err)=>{
+            console.log(err);
+            setShowIndicator(false);
+        });
       } 
 			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
       setShowOverlay(false)
@@ -230,20 +266,22 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     const handleWPEvents = (skip = false) => {
         if (typeof skip === 'number') {
             set_WP_STEPNO(skip);
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         if(WP_STEPNO===1 || skip===true) {
             otherProps.setPopover(false);
             if(userInfo.isTrial)
             otherProps.showVideo(true)
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         set_WP_STEPNO((prevno)=>prevno + 1)
     }
 
     const WP_ITEM_LIST =  useMemo(()=>[
-        {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
-        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Documentation.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch documentation or choose <br/> "Documentation" from "Need Help" button.</>}
+        {imageName:"wp_video_image.svg",content:<>Make your automation journey smoother by viewing our<br/>  <b><a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">training videos</a></b> OR choose <br/> "Training Videos" from the "Need Help" button.</>},
+        {imageName:"wp_docs_image.svg",content:<>Make your automation journey smoother by reading our<br/>  <b><a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">documentation</a></b> OR Choose <br/> “Documentation” from the “Need Help” button.</>}
     ],[trainLinks]);
 
     return(

@@ -1,0 +1,53 @@
+.card {
+    display: flex;
+    flex-direction: row;
+}
+.line{
+    margin-left: 2em;
+    margin-right: 2em;
+    height: 39em;
+}
+.Left{
+    padding-left: 2em;
+    text-align: center;
+    padding-top: 17em;
+}
+
+.Right{
+    display: flex;
+    flex-direction: column;
+    margin-left: 2em;
+}
+.Platform{
+    padding-top: 1em;
+}
+.Features{
+    padding-top: 5em;
+}
+.AdminButton{
+    padding-left: 22em;
+}
+.Admin{
+    background: rebeccapurple;
+    color: white;
+    height: 3em;
+    border: 1em transparent;
+    cursor: pointer;
+}
+#bottom{
+    .p-datatable .p-datatable-tbody > tr > td{
+        text-align: center !important;
+     }
+     .p-datatable-scrollable .p-datatable-wrapper {
+        overflow-y: auto !important;
+        overflow-x: unset !important;
+    }
+}
+#top{
+    .p-datatable .p-datatable-tbody > tr > td{
+        text-align: center !important;
+     }
+     .p-datatable .p-column-header-content{
+        margin-left: 2em !important;
+     }
+}

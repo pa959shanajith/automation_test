@@ -305,3 +305,16 @@ exports.storeUserDetails = async (req, res) => {
 		return res.send("fail");
 	}
 };
+
+
+exports.upgradeLicense = async(req, res) =>{
+	try {
+		const inputs = {
+			"username": req.body.username};
+		const result =await utils.fetchData(inputs, "/hooks/upgradeLicense");
+		return res.send(result)
+	} catch (error) {
+		logger.error("License update hooks fail" + error);
+		return res.send("fail");
+	}
+}

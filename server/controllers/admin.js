@@ -496,12 +496,18 @@ exports.createProject_ICE = async (req, res) => {
 			modifiedby: userid,
 			modifiedbyrole: roleId
 		};
-		const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
-		if (result == "fail") {
-			return res.send("fail");
-		} else {
-			return res.send(result)
+		const valiproject = await utils.fetchData(inputs, "/hooks/validateProject");
+		if(valiproject.status === 'pass'){
+			const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
+			if (result == "fail") {
+				return res.send("fail");
+			} else {
+				return res.send(result)
+			}
+		}else {
+			return res.send(valiproject);
 		}
+		
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName+":", exception);
 		res.status(500).send("fail");
@@ -2601,6 +2607,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin") return next();
 		switch (req.path) {
 			case "/manageUserDetails":
+			    if(req.body.action == "stepUpdate") return next();
 				if (req.body.user.userid == userid && req.body.action == 'update') return next();
 				break;
 			case "/manageCIUsers":

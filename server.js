@@ -492,6 +492,7 @@ if (cluster.isMaster) {
 		app.post('/resetPassword', login.resetPassword);
 		app.post('/updatePassword', login.updatePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
+		app.post ('/hooks/upgradeLicense', login.upgradeLicense)
 		//Admin Routes
 		app.post('/getUserRoles', auth.protect, admin.getUserRoles);
 		app.post('/getDomains_ICE', auth.protect, admin.getDomains_ICE);
@@ -667,6 +668,8 @@ if (cluster.isMaster) {
 		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
+		app.post('/hooks/validateExecutionSteps', devOps.executionSteps);
+		app.post('/hooks/validateParallelExecutions', devOps.executionParallel);
 
 		// Azure integeration API's
 		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);

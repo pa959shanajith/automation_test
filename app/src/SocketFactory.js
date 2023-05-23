@@ -7,6 +7,7 @@ import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
 import {url} from './App'
+import {UpdateUserInfoforLicence} from './pages/login/api'; 
 
 /*Component SocketFactory
   use: creates/updates socket connection
@@ -70,6 +71,14 @@ const SocketFactory = () => {
             </div>
         )
     };
+
+    const closeTrial = () => {
+        if(userInfo.isTrial){
+            userInfo.isTrial = false;    
+            dispatch({type:actionTypes.SET_USERINFO, payload: userInfo});
+        }
+    }
+
     const PostExecutionIsTrial = () =>{
         return(
             <div className="afterExecution-modal1">
@@ -79,12 +88,15 @@ const SocketFactory = () => {
                         <><p style={{ cursor: 'default', color: 'green',fontSize:'24px' }}><span>You have done it !!</span></p>
                         {/* <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br /> */}
                         <p style={{ cursor: 'default' }}>{showAfterExecutionIsTrial.content} 
-                        <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false }); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
-                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to free variant of Avo Assure.<span><a  style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View plans </a> </span> now.</p>
-                        </p></>
+                        <p><span onClick={() => { redirectToReports(); setShowAfterExecutionIsTrial({ show: false });closeTrial(); } } style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}>Click Here</span> to view your execution report</p>
+                        <p style={{ fontWeight:'bold' }}>As a valued user, we have also upgraded you to Free variant of Avo Assure. Click <span><a  style={{ color: '#643693', cursor: 'pointer' }} href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer"> View Plans</a> </span> to know more.</p>
+                        </p>
+                        <p>Please Logout and Login back to access your work in upgraded version of Avo Assure</p>
+                        </>
+
                     }
                     
-                    close={()=>setShowAfterExecutionIsTrial({show:false})}
+                    close={()=>{setShowAfterExecutionIsTrial({show:false});closeTrial();}}
                     // footer={
 
                         // <button onClick={()=>setShowAfterExecutioIstrial({show:false})}>Ok</button>
@@ -104,7 +116,7 @@ const SocketFactory = () => {
         window.location.href = "/reports";
     }
 
-    const executionDATA = (result) => {
+    const executionDATA = async(result) => {
         var data = result.status
         var testSuiteIds = result.testSuiteDetails;
         var msg = "";
@@ -124,9 +136,15 @@ const SocketFactory = () => {
             setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
         } 
         else if (data === "success") {
-            setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
-            setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
-
+            if(userInfo.isTrial === true){
+                await UpdateUserInfoforLicence(userInfo.username)
+                // setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+                setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your first test scenario." })
+            }
+            else{
+                setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+                // setShowAfterExecutionIsTrial({show:true,title:msg,content:"You have successfully automated your test scenario." })
+            }
         } else if(data === "Completed"){
             setMsg(MSG.CUSTOM(msg,VARIANT.SUCCESS));
         } else if(data === 'accessibilityTestingSuccess') {

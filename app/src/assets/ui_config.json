@@ -61,6 +61,12 @@
         "generic":"Smart recorder to capture your end-to-end test scenario"
       },
       "availableForTrial":true
+    },
+    "tv":{
+      "tooltip":{
+        "generic":"Training Videos"
+      },
+      "availableForTrial":true
     }
   }
 }
