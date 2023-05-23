@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const credsPath = path.join(path.dirname(fs.realpathSync(__filename)), '../../config/.dbtokens');
 
 if (!fs.existsSync(credsPath)) {  // Write default creds to tokens
-	const encryptedData = "6458bb45807de4ee1bb32cdcd874970028ed1445542f97406148a717b66b78f476c5baa7395379c026a0af2b380ad54cd13be055080e5f33e94f3a386dab108d2a569bf2ddd54b25f5c0197f6754fc8a";
+	const encryptedData = "6458bb45807de4ee1bb32cdcd874970011787ff93369691c2740ae84cf5783104680755fbede77dcd7674069e1f370f465eaab8b419238c2536ff96b5372f4b536e75343a7e711da5ca39a63ed2b8c9992fba661cf933b362fb066cc36b6a2d6960e21e801bf262904c5f6e24ffb7b9a45f72d812e37602a50a375ca8165a6b263fad157899219f7a1eb3c1bdb7fe1a9";
 	fs.writeFileSync(credsPath, encryptedData, err => { throw "Invalid Mongo Database credentials!"; });
 }
 
@@ -25,5 +25,5 @@ const decryptMongoDBAuth = () => {
 
 exports.getMongoDBAuth = () => {
     const creds = decryptMongoDBAuth();
-    return { "username": creds.mongodb.username, "password": creds.mongodb.password };
+    return { "usernameadmin": creds.mongodb.usernameadmin, "passwordadmin": creds.mongodb.passwordadmin, "usernameavoassure": creds.mongodb.usernameavoassure, "passwordavoassure": creds.mongodb.passwordavoassure};
 };
