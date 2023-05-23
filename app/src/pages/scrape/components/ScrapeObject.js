@@ -16,6 +16,7 @@ const ScrapeObject = props => {
     const [activeEye, setActiveEye] = useState(false);
     const [edit, setEdit] = useState(false);
     const[isIdentifierVisible,setIsIdentifierVisible]=useState(false)
+    const defaultIdentifier=[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]
     
 
     const handleObjName = event => setObjName(event.target.value);
@@ -98,7 +99,8 @@ const showIdentifierCard=(e)=>{
                 </div>
             }
         </div>
-        {isIdentifierVisible && <div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Object Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>}
+        {isIdentifierVisible?(props.object.identifier!==undefined)?
+        <div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Object Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:<div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Object Identifier Order:</span><br></br>{defaultIdentifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:null}
         </>
     )
 }
