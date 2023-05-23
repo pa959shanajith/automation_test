@@ -27,6 +27,7 @@ const initialState = {
         selectedPhase: []
     },
     projectList: [],
+    projectLogin:{}
 };
 
 const reducer = (state = initialState , action) => {
@@ -87,6 +88,11 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 projectList: action.payload
             }
+        case actionTypes.PROJECT_LOGIN:
+        return{
+            ...state,
+            projectLogin: action.payload
+        }
         default: 
             return state
     }

@@ -2,6 +2,7 @@ import axios from 'axios';
 import {RedirectPage, Messages as MSG} from '../global';
 import {history} from './index';
 import {url} from '../../App';
+import async from 'async';
 
 /*Component loginToQTest_ICE
   use: logins to qTets Environment  
@@ -698,6 +699,29 @@ export const getDetails_ZEPHYR = async() => {
         return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
     }
 }
+export const getDetails_Azure=async()=>{
+    try{
+        const res = await axios(url+'/getDetails_Azure', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+
+}
 
 
 /*Component connectJira_ICE
@@ -735,6 +759,37 @@ export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }
+
+/*Component connectAzure_ICE
+  use: logins to qTets Environment  
+  api returns [{id:"",name:""}]
+*/
+
+export const connectAzure_ICE = async(dataObj) => {
+    try{
+
+        const res = await axios(url+'/connectAzure_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data:dataObj
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
 
 
 export const getJiraTestcases_ICE = async(input_payload) => {
@@ -802,6 +857,34 @@ export const saveJiraDetails_ICE = async(mappedDetails) => {
     }
 }
 
+export const saveAzureDetails_ICE = async(mappedDetails) => {
+    try{
+        const res = await axios(url+'/saveAzureDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            mappedDetails : mappedDetails,
+            action : 'saveAzureDetails_ICE'
+            
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
+    }
+}
+
 
 export const viewJiraMappedList_ICE = async(userID) => {
     try{
@@ -813,6 +896,33 @@ export const viewJiraMappedList_ICE = async(userID) => {
             data: {
                 user_id : userID,
                 action : 'viewJiraMappedList_ICE'
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
+    }
+}
+
+export const viewAzureMappedList_ICE = async(userID) => {
+    try{
+        const res = await axios(url+'/viewAzureMappedList_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                user_id : userID,
+                action : 'viewAzureMappedList_ICE'
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){

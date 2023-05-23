@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
 import { ModalContainer, ScreenOverlay, Messages as MSG, setMsg } from "../../global";
 import "../styles/LoginModal.scss";
-import { getDetails_ZEPHYR,getDetails_Jira} from '../api';
+import { getDetails_ZEPHYR, getDetails_Jira ,getDetails_Azure} from '../api';
 
 /* 
     props:
@@ -25,59 +25,60 @@ const LoginModal = props => {
 
     const onSubmit = (authType) => {
         let error = {};
-        if((props.screenType==="Zephyr" && authType==="basic") || props.screenType!=="Zephyr") {
-            if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
-            else if (props.usernameRef && props.usernameRef.current && !props.usernameRef.current.value) error={username: true, msg: "Please Enter User Name."};
-            else if (props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error={password: true, msg: "Please Enter Password."};
+        if ((props.screenType === "Zephyr" && authType === "basic") || (props.screenType !== "Zephyr" )) {
+            if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error = { url: true, msg: "Please Enter URL." };
+            else if (props.usernameRef && props.usernameRef.current && !props.usernameRef.current.value) error = { username: true, msg: "Please Enter User Name." };
+            else if (props.screenType !== "Azure" && props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error = { password: true, msg: "Please Enter Password." };
             setError(error);
-        } else if (props.screenType==="Zephyr"&&authType==="token") {
-            if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
-            else if(props.authtokenRef && props.authtokenRef.current && !props.authtokenRef.current.value) error={authtoken: true, msg: "Please Enter API Token."};
+        } else if (props.screenType === "Zephyr" && authType === "token") {
+        
+            if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error = { url: true, msg: "Please Enter URL." };
+            else if (props.authtokenRef && props.authtokenRef.current && !props.authtokenRef.current.value) error = { authtoken: true, msg: "Please Enter API Token." };
             setError(error);
         }
-        if(Object.keys(error).length==0 && props.urlRef && props.urlRef.current && props.urlRef.current.value) props.login(authType);
+        if (Object.keys(error).length == 0 && props.urlRef && props.urlRef.current && props.urlRef.current.value) props.login(authType);
     }
-    const populateFields=async(authtype)=>{
+    const populateFields = async (authtype) => {
         await props.setAuthType(authtype);
-        if(authtype==="token") {
-            props.urlRef.current.value=(defaultValues['url']) ? defaultValues['url'] : "";
-            if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value="";
-            if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value="";
-            if(props.authtokenRef.current!=undefined) props.authtokenRef.current.value=(defaultValues['authToken']) ? defaultValues['authToken'] : "";
+        if (authtype === "token") {
+            props.urlRef.current.value = (defaultValues['url']) ? defaultValues['url'] : "";
+            if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = "";
+            if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = "";
+            if (props.authtokenRef.current != undefined) props.authtokenRef.current.value = (defaultValues['authToken']) ? defaultValues['authToken'] : "";
         } else {
-            props.urlRef.current.value=(defaultValues['url']) ? defaultValues['url'] : "";
+            props.urlRef.current.value = (defaultValues['url']) ? defaultValues['url'] : "";
             if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = (defaultValues.username) ? defaultValues.username : "";
             if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = (defaultValues.password) ? defaultValues.password : "";
-            if(props.authtokenRef.current!=undefined) props.authtokenRef.current.value = "";
+            if (props.authtokenRef.current != undefined) props.authtokenRef.current.value = "";
         }
         props.setLoginError(null);
         setError({});
     }
-    const getZephyrDetails = async () =>{
+    const getZephyrDetails = async () => {
         try {
             setLoading("Loading...")
             const data = await getDetails_ZEPHYR()
             if (data.error) { setMsg(data.error); return; }
-            if(data !=="empty"){
+            if (data !== "empty") {
                 setIsEmpty(false);
                 let tempDefaultValues = {};
-                if(data.zephyrURL && props.urlRef && props.urlRef.current ) {
+                if (data.zephyrURL && props.urlRef && props.urlRef.current) {
                     props.urlRef.current.value = data.zephyrURL;
                     tempDefaultValues['url'] = data.zephyrURL;
                 }
-                if(data.zephyrAuthType ) {
+                if (data.zephyrAuthType) {
                     await props.setAuthType(data.zephyrAuthType);
                 }
-                if(data.zephyrToken) {
-                    if(props.authtokenRef && props.authtokenRef.current) props.authtokenRef.current.value = data.zephyrToken;
+                if (data.zephyrToken) {
+                    if (props.authtokenRef && props.authtokenRef.current) props.authtokenRef.current.value = data.zephyrToken;
                     tempDefaultValues['authToken'] = data.zephyrToken;
                 }
-                if(data.zephyrUsername) {
-                    if(props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.zephyrUsername;
+                if (data.zephyrUsername) {
+                    if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.zephyrUsername;
                     tempDefaultValues['username'] = data.zephyrUsername;
                 }
-                if(data.zephyrPassword) {
-                    if(props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.zephyrPassword;
+                if (data.zephyrPassword) {
+                    if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.zephyrPassword;
                     tempDefaultValues['password'] = data.zephyrPassword;
                 }
                 setDefaultValues(tempDefaultValues);
@@ -89,27 +90,60 @@ const LoginModal = props => {
             setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
         }
     }
-    const getJiraDetails = async () =>{
+
+    const getAzureDetails = async () => {
+        try {
+            setLoading("Loading...")
+            const data = await getDetails_Azure();
+            console.log(data,' data from getDetails_Azure');
+            if (data.error) { setMsg(data.error); return; }
+            if (data !== "empty") {
+                setIsEmpty(false);
+                let tempDefaultValues = {};
+                if (data.AzureURL ) {
+                    props.urlRef.current.value = data.AzureURL;
+                    tempDefaultValues['url'] = data.AzureURL;
+                }
+                if (data.AzureUsername) {
+                    if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.AzureUsername;
+                    tempDefaultValues['username'] = data.AzureUsername;
+                }
+                if (data.AzurePAT) {
+                    if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.AzurePAT;
+                    tempDefaultValues['PAT'] = props.AzurePAT;
+                }
+                setDefaultValues(tempDefaultValues);
+                onSubmit(data.AzurePAT);
+
+    }
+    setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+        }
+    }
+
+    const getJiraDetails = async () => {
         try {
             setLoading("Loading...")
             const data = await getDetails_Jira()
             if (data.error) { setMsg(data.error); return; }
-            if(data !=="empty"){
+            if (data !== "empty") {
                 setIsEmpty(false);
                 let tempDefaultValues = {};
-                if(data.jiraURL && props.urlRef && props.urlRef.current ) {
+                if (data.jiraURL && props.urlRef && props.urlRef.current) {
                     props.urlRef.current.value = data.jiraURL;
                     tempDefaultValues['url'] = data.jiraURL;
                 }
                 // if(data.jiraAuthType) {
                 //     await props.setAuthType(authtype);
                 // }
-                if(data.jiraUsername) {
-                    if(props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.jiraUsername;
+                if (data.jiraUsername) {
+                    if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.jiraUsername;
                     tempDefaultValues['username'] = data.jiraUsername;
                 }
-                if(data.jirakey) {
-                    if(props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.jirakey;
+                if (data.jirakey) {
+                    if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.jirakey;
                     tempDefaultValues['password'] = data.jirakey;
                 }
                 setDefaultValues(tempDefaultValues);
@@ -123,108 +157,165 @@ const LoginModal = props => {
     }
 
     useEffect(() => {
-        props.screenType=="Jira" && getJiraDetails();
-    }, [])
-    
-    useEffect(() => {
-        props.screenType=="Zephyr" && getZephyrDetails();
+        props.screenType == "Jira" && getJiraDetails();
     }, [])
 
+    useEffect(() => {
+        props.screenType == "Zephyr" && getZephyrDetails();
+    }, [])
+
+    useEffect(()=>{
+        props.screenType == "Azure" && getAzureDetails();
+    },[])
+
     return (
+
+
+
         <div className="ilm__container">
             {loading ? <ScreenOverlay content={loading} /> : null}
-            <ModalContainer 
-                title={`${props.screenType} Login`}
+            <ModalContainer
+                title={`${props.screenType} ${props.screenType === 'Azure' ?' DevOps': ''} Login`}
                 content={
                     <>
-                    <div className="ilm__inputs">
-                    {/* (props.screenType=="Zephyr") */}
-                        {(props.screenType=="Zephyr")? 
-                        <div className='ilm__authtype_cont'>
-                            <span className="ilm__auth" title="Authentication Type">Authentication Type</span>
-                            <label className="authTypeRadio ilm__leftauth">
-                                <input type="radio" value="basic" checked={props.authType==="basic"} onChange={()=>{populateFields("basic")}}/>
-                                <span>Basic</span>
-                            </label>
-                            <label className="authTypeRadio">
-                                <input type="radio" value="token" checked={props.authType==="token"} onChange={()=>{populateFields("token")}}/>
-                                <span>Token</span>
-                            </label>
-                        </div>:null}
-                        <input
-                            className={"ilm__input"+(error.url ? " ilm_input_error" : "")}
-                            ref={props.urlRef}
-                            placeholder={inpPlaceHolder[props.screenType].url}
-                            data-test="intg_url_inp"
+                        <div className="ilm__inputs">
+                            {/* (props.screenType=="Zephyr") */}
+                            {(props.screenType == "Zephyr") ?
+                                <div className='ilm__authtype_cont'>
+                                    <span className="ilm__auth" title="Authentication Type">Authentication Type</span>
+                                    <label className="authTypeRadio ilm__leftauth">
+                                        <input type="radio" value="basic" checked={props.authType === "basic"} onChange={() => { populateFields("basic") }} />
+                                        <span>Basic</span>
+                                    </label>
+                                    <label className="authTypeRadio">
+                                        <input type="radio" value="token" checked={props.authType === "token"} onChange={() => { populateFields("token") }} />
+                                        <span>Token</span>
+                                    </label>
+                                </div> : null}
+                            {(props.screenType != "Azure") ?
+                                <input
+                                    className={"ilm__input" + (error.url ? " ilm_input_error" : "")}
+                                    ref={props.urlRef}
+                                    placeholder={inpPlaceHolder[props.screenType].url}
+                                    data-test="intg_url_inp"
+                                /> : null}
+                            {(props.screenType == "Zephyr" && props.authType == "basic") || (props.screenType != "Zephyr" && props.screenType != "Azure") ?
+                                <>
+                                    <input
+                                        className={"ilm__input" + (error.username ? " ilm_input_error" : "")}
+                                        ref={props.usernameRef}
+                                        placeholder={inpPlaceHolder[props.screenType].username}
+                                        data-test="intg_username_inp"
+                                    />
+                                    <input
+                                        className={"ilm__input" + (error.password ? " ilm_input_error" : "")}
+                                        ref={props.passwordRef}
+                                        type="password"
+                                        placeholder={inpPlaceHolder[props.screenType].password}
+                                        data-test="intg_password_inp"
+                                    /></> : null}
+
+
+
+
+
+
+
+                            {(props.screenType == "Zephyr" && props.authType == "token") ? <input
+                                className={"ilm__input" + (error.authtoken ? " ilm_input_error" : "")}
+                                ref={props.authtokenRef}
+                                placeholder={inpPlaceHolder[props.screenType].authtoken}
+                                data-test="intg_authtoken_inp"
+                            /> : null}
+                            {/* {(props.screenType=="ADO")?<input
+         
+                        className='ilm_input_ADO'
+                        // placeholder={inpPlaceHolder[props.screenType].username},
+                        placeholder={(inpPlaceHolder[props.screenType].PAT)}
                         />
-                        {(props.screenType=="Zephyr" && props.authType=="basic") || props.screenType !="Zephyr" ? 
-                        <>
-                        <input
-                            className={"ilm__input"+(error.username ? " ilm_input_error" : "")}
-                            ref={props.usernameRef}
-                            placeholder={inpPlaceHolder[props.screenType].username}
-                            data-test="intg_username_inp"
-                        />
-                        <input
-                            className={"ilm__input"+(error.password ? " ilm_input_error" : "")}
-                            ref={props.passwordRef}
-                            type="password"
-                            placeholder={inpPlaceHolder[props.screenType].password}
-                            data-test="intg_password_inp"
-                        /></>:null}
-                        {(props.screenType=="Zephyr" && props.authType=="token") ? <input
-                            className={"ilm__input"+(error.authtoken ? " ilm_input_error" : "")}
-                            ref={props.authtokenRef}
-                            placeholder={inpPlaceHolder[props.screenType].authtoken}
-                            data-test="intg_authtoken_inp"
-                        />:null}
-                        {
-                            // isEmpty && <><p style={{marginTop: '1.5rem'}} ><img src={"static/imgs/info.png"} style={{width: '4%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</p></>
-                        }
-                    </div>
-                    
+                        :null
+                         
+                        } */}
+
+                            {
+                                // isEmpty && <><p style={{marginTop: '1.5rem'}} ><img src={"static/imgs/info.png"} style={{width: '4%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</p></>
+                            }
+
+
+                            {(props.screenType == "Azure") ?
+                                <>
+                                <input
+                                        className={".ilm_input" + (error.url ? " ilm_input_error" : "")}
+                                        ref={props.urlRef}
+                                        type='URL'
+                                        placeholder={inpPlaceHolder[props.screenType].url}
+                                        data-test="intg_url_inp"
+                                    />
+                                    <input
+                                        className={".ilm_input" + (error.username ? " ilm_input_error" : "")}
+                                        ref={props.usernameRef}
+                                        placeholder={inpPlaceHolder[props.screenType].username}
+                                        data-test="intg_username_inp"
+                                    />
+                                    <input
+                                        className={".ilm_input" + (error.PAT ? " ilm_input_error" : "")}
+                                        ref={props.passwordRef}
+                                        type="password"
+                                        placeholder={inpPlaceHolder[props.screenType].PAT}
+                                        data-test="intg_pAT_inp"
+                                    /></> : null}
+
+
+                        </div>
+
                     </>
                 }
+
                 footer={<>
                     {
                         // isEmpty && <><span style={{fontSize: '75%', marginTop: '-2rem'}} ><img src={"static/imgs/info.png"} style={{width: '6%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
                     }
-                    <div data-test="intg_log_error_span" className="ilm__error_msg" style={{ marginTop: (error.msg || props.error) ? '0' : '-22px'}}>
+                    <div data-test="intg_log_error_span" className="ilm__error_msg" style={{ marginTop: (error.msg || props.error) ? '0' : '-22px' }}>
                         {
-                            (props.screenType=="Zephyr" || props.screenType ==="Jira")  && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '4%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
+                            (props.screenType == "Zephyr" || props.screenType === "Jira" || props.screenType === "Azure") && isEmpty && <><span style={{ color: '#333' }} ><img src={"static/imgs/info.png"} style={{ width: '4%' }} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
                         }
                         {error.msg || props.error}
                     </div>
                     <button data-test="intg_log_submit_btn" onClick={() => onSubmit(props.authType)}>Submit</button>
                 </>}
-                close={()=>dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null })}
+                close={() => dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null })}
             />
         </div>
     );
 }
 
 const inpPlaceHolder = {
-    ALM : {
-        url : "Enter ALM URL",
-        username : "Enter ALM Username / Client ID",
-        password : "Enter ALM Password / Client Secret Key"
+    ALM: {
+        url: "Enter ALM URL",
+        username: "Enter ALM Username / Client ID",
+        password: "Enter ALM Password / Client Secret Key"
     },
-    Zephyr : {
-        url : "Enter Zephyr URL (Ex. http(s)://SERVER[:PORT])",
-        username : "Enter Zephyr Username",
-        password : "Enter Zephyr Password",
+    Zephyr: {
+        url: "Enter Zephyr URL (Ex. http(s)://SERVER[:PORT])",
+        username: "Enter Zephyr Username",
+        password: "Enter Zephyr Password",
         authtoken: "Enter API Token"
     },
-    Jira : {
-        url : "Enter Jira URL (Ex. http(s)://SERVER[:PORT])",
-        username : "Enter Jira Username",
-        password : "Enter Jira API Key",
+    Jira: {
+        url: "Enter Jira URL (Ex. http(s)://SERVER[:PORT])",
+        username: "Enter Jira Username",
+        password: "Enter Jira API Key",
         // authtoken: "Enter API Token"
     },
-    qTest : {
-        url : "Enter qTest URL",
-        username : "Enter qTest Username",
-        password : "Enter qTest Password"
+    qTest: {
+        url: "Enter qTest URL",
+        username: "Enter qTest Username",
+        password: "Enter qTest Password"
+    },
+    Azure: {
+        url:"enter the Azure DevOps URL",
+        username: "enter the Azure DevOps username",
+        PAT: "enter Azure DevOps PAT"
     }
 }
 

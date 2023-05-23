@@ -34,7 +34,7 @@ const ModuleListDrop = (props) =>{
     const [modE2Elist, setModE2EList] = useState(moduleList)
     const [searchForNormal, setSearchForNormal] = useState(false)
     const [importPop,setImportPop] = useState(false)
-    const [blockui,setBlockui] = useState({show:false})
+    const setBlockui=props.setBlockui
     const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
     const [selectedSc,setSelctedSc] = useState([])

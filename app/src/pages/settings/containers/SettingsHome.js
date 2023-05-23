@@ -9,6 +9,7 @@ import UserProject from './UserProject'
 import UserGitConfig from './UserGitConfig'
 import UserJiraConfig from './UserJiraConfig'
 import UserZephyrConfig from './UserZephyrConfig'
+import UserAzureconfig from './UserAzureConfig'
 
 import '../styles/SettingsHome.scss'
 
@@ -35,6 +36,7 @@ const SettingsHome = () => {
                     {(middleScreen==="gitConfigure") && <UserGitConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>}
                     {(middleScreen==="jiraConfigure") && <UserJiraConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>}
                     {(middleScreen==="zephyrConfigure") && <UserZephyrConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>}
+                    {(middleScreen==="AzureConfigure") &&<UserAzureconfig resetMiddleScreen={resetMiddleScreen}setMiddleScreen={setMiddleScreen}/>}
                 </div>
                 <ReferenceBar hideTask={true}  hideInfo={true}/>
             </div>

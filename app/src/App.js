@@ -18,7 +18,7 @@ import Utility from './pages/utility';
 import Integration from './pages/integration';
 import Settings from './pages/settings';
 import GeniusDialog from './pages/global/components/GeniusDialog';
-import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
+import ShowTrialVideo from './pages/global/components/showTrialVideo';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';

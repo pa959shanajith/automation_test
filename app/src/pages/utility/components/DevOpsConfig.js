@@ -289,6 +289,9 @@ const DevOpsConfig = props => {
             }
         });
         if (dataUpdated !== isUpdated) setDataUpdated(isUpdated);
+        if(!icepoollist.some(item=>item.key===integrationConfig.avoAgentGrid)){
+            setMsg(MSG.CUSTOM('Moved to Any Agent as selected agent is inactive',VARIANT.WARNING ))
+        }
     }, [integrationConfig]);
 
     const copyKeyUrlFunc = (id) => {
@@ -594,7 +597,7 @@ const DevOpsConfig = props => {
                             onChange={(selectedIce) => setIntegrationConfig({...integrationConfig, avoAgentGrid: selectedIce.key})}
                             options={icepoollist}
                             placeholder="Select Avo Agent or Avo Grid"
-                            selectedKey={integrationConfig.avoAgentGrid}
+                            selectedKey={(integrationConfig.avoAgentGrid && icepoollist.some(item=>item.key === integrationConfig.avoAgentGrid))?integrationConfig.avoAgentGrid:'cicdanyagentcanbeselected' }
                             width='54%'
                         />
                     </div>

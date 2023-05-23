@@ -8,8 +8,9 @@ import ALM from './ALM';
 import QTest from './QTest';
 import Zephyr from './Zephyr';
 import Jira from './Jira';
+import Azure from './Azure';
 import * as actionTypes from '../state/action';
-import '../styles/IntegrationHome.scss'
+import '../styles/IntegrationHome.scss';
 
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
@@ -35,6 +36,7 @@ const Integrations = () => {
 
     return(
         <>
+       
         { showOverlay && <ScreenOverlay content={showOverlay} /> }
         {importPop?<ImportMappings displayError={displayError} setImportPop={setImportPop}/>:null}
         <div className="parent">
@@ -46,7 +48,8 @@ const Integrations = () => {
                     { screenType === 'ALM' && <ALM /> }
                     { screenType === "Zephyr" && <Zephyr /> }
                     { screenType === "qTest" && <QTest /> }
-                    { screenType === "Jira" && <Jira /> }
+                    { screenType === "Jira" && <Jira /> }  
+                    { screenType === "Azure" && <Azure/>}
                 </div>
 
                 <Rightbar />

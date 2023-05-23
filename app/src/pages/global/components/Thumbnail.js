@@ -13,8 +13,8 @@ import "../styles/Thumbnail.scss";
 const Thumbnail = (props) => {
 
     return (
-        <div className={"thumbnail" + (props.disable ? " disable-thumbnail" : "")}  title={props.tooltip} onClick={props.action}>
-            <img className={"thumbnail__img " + (props.svg ? "svg_ic" : "" )} src={props.img || props.svg} alt={props.title}/>
+        <div style={props.idx===4?{borderBottom:'1px solid grey',marginBottom:'2px'}:null}className={"thumbnail" + (props.disable ? " disable-thumbnail" : "")}  title={props.tooltip} onClick={props.action}>
+            <img style={props.idx===5?{height:'39px'}:null}className={"thumbnail__img " + (props.svg ? "svg_ic" : "" )} src={props.img || props.svg} alt={props.title}/>
             <span className="thumbnail__title">{props.title}</span>
         </div>
     );

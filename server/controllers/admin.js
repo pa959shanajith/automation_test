@@ -2393,6 +2393,8 @@ exports.getDetails_JIRA = async (req, res) => {
 
 };
 
+
+
 /* manageJiraDetails */
 exports.manageJiraDetails = async (req, res) => {
 	const actionName = "manageJiraDetails";
@@ -2457,6 +2459,33 @@ exports.getDetails_Zephyr = async (req, res) => {
 	}
 
 };
+exports.getDetails_Azure= async (req, res) => {
+	const actionName = "getDetails_Azure";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_Azure", actionName);
+
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				AzureURL: result['url'],
+				AzureUsername: result['username'],
+				AzurePAT: result['PAT']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_Azure: %s", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
 
 /* manageZephyrDetails */
 exports.manageZephyrDetails = async (req, res) => {
@@ -2490,6 +2519,43 @@ exports.manageZephyrDetails = async (req, res) => {
 			};
 		}
 		result = await utils.fetchData(inputs, "admin/manageZephyrDetails", actionName);
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.manageAzureDetails = async (req, res) => {
+	const actionName = "manageAzureDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		let inputs;
+		if(action==='delete'){
+			inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
+
+		}else{
+			const AzureUrl = data.user.AzureURL;
+			const AzureUsername = data.user.AzureUsername;
+			const AzurePAT = data.user.AzurePAT;
+			
+			inputs = {
+				"AzureUrl": AzureUrl,
+				"AzureUsername": AzureUsername,
+				"AzurePAT":AzurePAT,
+				"action": action,
+				"userId": userId,
+			};
+		
+		result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
+		}
 		return res.send(result);
 	} catch (exception) {
 		logger.error("Exception in the service gitSaveConfig: %s", exception);

@@ -1,6 +1,9 @@
 //load environment variables
 var env = require('node-env-file');
 var fs = require('fs');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 var envFilePath = __dirname + '/.env';
 try {
 	if (fs.existsSync(envFilePath)) {
@@ -235,6 +238,8 @@ if (cluster.isMaster) {
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
     var plugin = require('./server/controllers/plugin');
+    var azure = require('./server/controllers/azure');
+
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -247,7 +252,8 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getGeniusData',plugin.getGeniusData);		
+
 		app.use(csrf({
 			cookie: true
 		}));
@@ -354,6 +360,38 @@ if (cluster.isMaster) {
 			}
 		});
 
+		app.get('/downloadExportfile', async (req, res) => {
+			let projName = req.query.projName	
+			projName = projName.replace(/\s+/g, '');											
+			let clientVer = String(req.query.ver);
+			let exportfile = uiConfig.exportedmindmap.ExportedMindmapFilePath;
+			let username = req.user.username;
+			username = username.split('.').join("");
+			exportfile=exportfile+"/"+username+".zip";
+			var dateObj = new Date();
+			var month = dateObj.getUTCMonth() + 1;
+			var day = dateObj.getUTCDate();
+			var year = dateObj.getUTCFullYear();
+			var newdate = year + "-" + month + "-" + day;			
+			if (req.query.file == "getExportFile") {
+			  return res.download(path.resolve(exportfile),projName+"_"+(newdate?(newdate):"")+".zip")
+			} else {
+				let status = "na";
+				try {
+					let stats = await fs.promises.stat(path.resolve(exportfile))
+					
+					if(stats.isFile()){
+						status = "available";
+					}else {
+						console.error("Error Occurred while downloading the exported file")
+					}
+				} catch (error) {
+					console.error("Catch: Error Occurred while downloading the exported file")
+				}
+				return res.send({status});
+			}
+		});
+
 		app.get('/downloadAgent', async (req, res) => {
 			try {
 				let agentFile = uiConfig.avoAgentConfig;
@@ -410,6 +448,8 @@ if (cluster.isMaster) {
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
 		var devOps = require('./server/controllers/devOps');
+		var azure = require('./server/controllers/azure');
+
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
@@ -434,6 +474,10 @@ if (cluster.isMaster) {
 		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		app.post('/deleteScenarioETE', auth.protect, mindmap.deleteScenarioETE);
 		app.post('/exportToProject', auth.protect, mindmap.exportToProject);
+		app.post('/writeFileServer', auth.protect, mindmap.writeFileServer);
+		app.post('/writeZipFileServer', auth.protect,upload.single('file'),mindmap.writeZipFileServer);
+		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
+		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -490,7 +534,9 @@ if (cluster.isMaster) {
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/getDetails_Azure',auth.protect,admin.getDetails_Azure);
 		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
+		app.post('/manageAzureDetails',auth.protect,admin.manageAzureDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
@@ -625,7 +671,12 @@ if (cluster.isMaster) {
 		app.post('/hooks/validateExecutionSteps', devOps.executionSteps);
 		app.post('/hooks/validateParallelExecutions', devOps.executionParallel);
 
+		// Azure integeration API's
+		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
+		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
+		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
 
+		
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

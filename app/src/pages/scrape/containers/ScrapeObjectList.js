@@ -54,7 +54,7 @@ const ScrapeObjectList = (props) => {
   const [disable, setDisable] = useState(false);
   const disableAppend = useSelector((state) => state.scrape.disableAppend);
   const { appType, subTaskId } = useSelector((state) => state.plugin.CT);
-
+const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems);
 
   useEffect(() => {
     setIsMac(navigator.appVersion.toLowerCase().indexOf("mac") !== -1);
@@ -157,6 +157,8 @@ const ScrapeObjectList = (props) => {
             else localItems.forEach(item => { if (!item.hide) {
                 item.checked = false;
             }})
+            dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:localItems.some(((element) => element.checked  === true))})
+
         }
         else {
             localItems.forEach(item => { 
@@ -164,7 +166,21 @@ const ScrapeObjectList = (props) => {
             })
         }
 
+        let listOfCheckedItems=localItems.map(object=>{
+            return object.checked
+        })
+        const checkForOnlyOneCheckedItems=localItems.filter(item=>item.checked)
+        if(checkForOnlyOneCheckedItems.length===1) {
+            const defaultNames={xpath:'Absolute X-Path',id:'ID Attribute',rxpath:'Relative X path',name:'Name Attribute',classname:'Classname Attribute'}
+            const currentIdentifier=checkForOnlyOneCheckedItems[0].identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
+            props.setIdentifierList(currentIdentifier)
+        }
+        else{
+            props.setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+        }
         setScrapeItems(localItems)
+        dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: listOfCheckedItems})
+        
     }
     
     const modifyScrapeItem = (value, newProperties, customFlag) => {
@@ -603,7 +619,7 @@ const ScrapeObjectList = (props) => {
                         scrapeItems.map((object, index) =><Fragment key={`${object.val}`}> 
                                                         { !object.hide && 
                                                             <ScrapeObject idx={index} object={object} updateChecklist={updateChecklist}
-                                                                modifyScrapeItem={modifyScrapeItem} hide={object.hide} dnd={dnd} />}
+                                                                modifyScrapeItem={modifyScrapeItem} hide={object.hide} dnd={dnd} listOfCheckedItems={listOfCheckedItems} scrapeItems={scrapeItems} />}
                                                         </Fragment>)
                     }
                     </ReactSortable>
