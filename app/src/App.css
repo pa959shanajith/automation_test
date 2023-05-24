@@ -4,12 +4,3 @@
     text-decoration: none;
   }
 
-  .main_content{
-    top: 0vh;
-    left: 0vh;
-  }
-
-  .sidebar_sidepanel_homepage{    
-    display: inline-flex;
-    flex-direction: row;
-  }

@@ -1,8 +1,8 @@
 import React from 'react';
-const execute = () => {
+const Execute = () => {
     return(
         <h1>Execute.....</h1>
     )
 }
 
-export default execute;
+export default Execute;

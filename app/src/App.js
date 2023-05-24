@@ -1,7 +1,6 @@
 import React, { useEffect, useState} from 'react';
 import {v4 as uuid} from 'uuid';
-import {Provider, useSelector} from 'react-redux';
-import { createBrowserRouter, RouterProvider, Route, Router, Routes, BrowserRouter, Outlet,useLocation} from 'react-router-dom';
+import { Route, Routes} from 'react-router-dom';
 import ServiceBell from "@servicebell/widget";
 // import {store} from './reducer';
 import store from './store';
@@ -14,7 +13,7 @@ import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
 import {ErrorPage} from './pages/global';
 import Login from './pages/login/containers/LoginPage';
-import MenubarDemo from './pages/landing/components/Topbar';
+import BasePage from './pages/login/containers/BasePage';
 // import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
 // import SocketFactory from './SocketFactory';
 import 'primeicons/primeicons.css';
@@ -23,7 +22,6 @@ import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
 import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
 import './App.css';
-
 import Topbar from './pages/landing/components/Topbar';
 import SideNavBar from './pages/landing/components/SideNav';
 import Overview from './pages/landing/components/ProjectCreation';
@@ -42,8 +40,9 @@ const { REACT_APP_DEV } = process.env
 export const url =  REACT_APP_DEV  ? "https://"+window.location.hostname+":8443" : window.location.origin;
 
 const App = () => {
-  const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
+  // const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
   const [blockui,setBlockui] = useState({show:false});
+
   useEffect(()=>{
     TabCheck(setBlockui);
     (async()=>{
@@ -52,35 +51,12 @@ const App = () => {
       if(enableServiceBell) ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
     })();
   },[])
-  const location = useLocation();
-    useEffect(() => {
-     if (["/design", "/execute", "/reports"].includes(location.pathname))
-       {
-          setShowExtraItem(false);
-        }
-         else {
-          setShowExtraItem(true);
-        }
-      }, [location]);
-      const [showExtraItem, setShowExtraItem] = useState(true);
- 
-  return (<>
+    
+  return (<> 
       {/* {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null} */}
       {/* <ProgressBar /> */}
       {/* <ErrorBoundary> */}
-      <div className="main_content">
-      { !isLoggedIn && <Login/> }
-      { isLoggedIn && <>
-        <Topbar/>
-        <div className="sidebar_sidepanel_homepage">
-          {/* {}['integrations'] */}
-
-          {showExtraItem && <SideNavBar/>}
           <RouteApp/>
-        </div>
-      </>
-      }
-      </div>
       {/* </ErrorBoundary> */}
     </>
   );
@@ -90,10 +66,12 @@ const RouteApp = () => {
   return(
     <>
       <Routes>
-        <Route exact path="/" element={<HomePage/>} />
+        <Route path="/login" element={<Login/>} />
+        <Route path="/" element={<BasePage/>} />
+        <Route path="/landing" element={<HomePage/>} />
         <Route path="/integration" element={<Integration/>} />
         <Route path="/reports" element={<Report/>} />
-        <Route path="/settings" element={<Settings/>} />
+        <Route path="/settings" element={<Settings/> }/>
         <Route path="/itdm" element={<itdm/>} />
         <Route path="/design" element={<MindmapHome/>}/>
         <Route path="/execute" element={<Execute/>}/>

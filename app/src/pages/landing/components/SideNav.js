@@ -16,16 +16,16 @@ import '../styles/SideNav.scss';
 
 const SideNav = () =>{
     PrimeReact.ripple = true;
-    const [tabSelected, setTabSelected] = useState("/")
+    const [tabSelected, setTabSelected] = useState("/landing");
     const [disableIconDialogVisible, setDisableIconDialogVisible] = useState(false);
     const [ITDM_images, setITDM_images] = useState([{image:"ITDM_disabled_popup_img1.png"},
                                                     {image:"ITDM_disabled_ipopup_img2.png"},
                                                     {image:"ITDM_disabled_ipopup_img3.png"}])
     const menuItem = [
         {
-            path: "/",
+            path: "/landing",
             name: "My Project(s)",
-            icon: <img src={tabSelected==="/" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="My Project(s)"  data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="My Project(s)"  data-pr-position="right" height="25px" />,
             disabled: false
         },
         {

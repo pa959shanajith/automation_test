@@ -1,4 +1,5 @@
 import { logoutUser } from '../api';
+// import { persistor } from '../../../reducer'
 
     /* 
         Method : RedirectPage
@@ -17,6 +18,7 @@ import { logoutUser } from '../api';
 
 const RedirectPage = (navigate, args = { reason: "invalidSession" }) => {
 
+    // persistor.purge();
     window.localStorage.clear();
     window.sessionStorage.clear();
 
@@ -24,7 +26,7 @@ const RedirectPage = (navigate, args = { reason: "invalidSession" }) => {
 
     logoutUser()
     .then(data=>{
-        navigate('/')
+        navigate('/');
     })
     .catch(error => {
         console.error("Failed to logout user\nCause:", error);
