@@ -14,15 +14,18 @@ import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
 import { useDispatch } from "react-redux";
 import { loginSliceActions } from '../../login/loginSlice'
-
+import { useNavigate } from "react-router-dom";
+import { logoutUser } from '../../global/api';
+import RedirectPage from '../../global/components/RedirectPage';
 
 
 const UserDemo = (props) => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showMenu, setShowMenu] = useState(false);
     const [editvisible, seteditVisible] = useState(true);
     const [visible, setVisible] = useState(false);
-    const [logoutClicked, setLogoutClicked] = useState(true);
+    const [logoutClicked, setLogoutClicked] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
     const toast = useRef(null);
@@ -32,7 +35,7 @@ const UserDemo = (props) => {
         firstName: "Demo",
         lastName: "User",
         userRole: "TestLead",
-        profilePictureUrl: "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png",
+        profilePictureUrl: "",
         userId: "Demouser@123.com"
     }
     const handleChipClick = () => {
@@ -108,6 +111,10 @@ const UserDemo = (props) => {
         {
             label: 'Log Out',
             icon: 'pi pi-fw pi-sign-out',
+            command: () => {
+                Logout();
+                setShowMenu(false);
+            }
         }
     ]);
 
@@ -120,22 +127,22 @@ const UserDemo = (props) => {
     };
 
 
-const accept = () => {
-    dispatch(loginSliceActions.logout());
-    toast.current.show({ severity: 'info', detail: 'User successfully logged out from Avo Assure'});
-   
-};
+    const accept = () => {
+        RedirectPage(navigate, { reason: "logout" });
+        toast.current.show({ severity: 'info', detail: 'User successfully logged out from Avo Assure' });
 
-const reject = () => {
-    toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-};
-const Logout=()=>{
-    setVisible(true);
-    return(
-    <>
-        <Toast ref={toast} />
-    </>)
-};
+    };
+
+    const reject = () => {
+        toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    };
+    const Logout = () => {
+        setLogoutClicked(true);
+        return (
+            <>
+                <Toast ref={toast} />
+            </>)
+    };
     const chooseOptions = { icon: 'pi pi-camera', label: ' ' };
 
 
@@ -148,6 +155,12 @@ const Logout=()=>{
 
     return (
         <>
+            <div>
+                <Toast ref={toast} />
+                <ConfirmPopup target={buttonEl.current} visible={logoutClicked} onHide={() => setLogoutClicked(false)}
+                    message="Are you sure you want to logout?" icon="pi pi-exclamation-triangle" accept={accept} reject={reject} />
+                {/* <Button id="border-0" className='surface-300' ref={buttonEl} onClick={() => setVisible(true)} icon="pi pi-sign-out" /> */}
+            </div>
             <div>
                 {userLoginInfo.profilePictureUrl ? (<Avatar image={userLoginInfo.profilePictureUrl} label={userLoginInfo.username} onClick={handleChipClick} size='small' title="User Profile" />)
                     : (<Avatar className="pl-0 mt-3 mb-3 bg-yellow-100" size='small' label={getInitials()} onClick={handleChipClick} shape="circle" title="User Profile" />)}

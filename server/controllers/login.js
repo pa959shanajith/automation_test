@@ -62,7 +62,7 @@ exports.loadUserInfo = async (req, res) => {
 		req.session.activeRole = rolename;
 		userProfile.rolename = req.session.defaultRole;
 		userProfile.pluginsInfo = permData.pluginresult;
-		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
+		userProfile.page = (userProfile.rolename == "Admin")? "admin":"landing";
 		userProfile.tandc = false;
 		userProfile.isTrial = permData.isTrial;
 		if (userProfile.rolename != "Admin" && configpath.showEULA) {
