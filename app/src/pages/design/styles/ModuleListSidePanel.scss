@@ -1,32 +1,57 @@
 .Whole_container{
     max-height:100vh;
     width: 17vw;
-    border-right: 1px solid rgb(91, 89, 89);
+    border-bottom: 0.5px solid #C7C7C7;
     background-color: rgb(255, 255, 255);
     z-index: 1;
+    overflow: auto;
 }
 .project_name_section{
     height:9% ;
-    border-bottom:1px solid rgb(91, 89, 89);
-    
+    border-bottom: 0.5px solid #C7C7C7;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 
 }
 .project_name_section select{
-    margin: 1rem 2.5rem 1.7rem;
+    // margin: 1rem 2.5rem 1.7rem;
 }
 .normalModule_main_container{
     height:40% ;
-    border-bottom: 1px solid rgb(91, 89, 89);
+    border-bottom: 0.5px solid #C7C7C7;
     
 }
 .E2E_main_container{
-    height:50% ;
+    height:51% ;
     border-bottom: 1px solid rgb(91, 89, 89);
 }
 .moduleLayer_icon{
     display: flex;
     padding-left: 0.5rem;
+    align-items: center;
 
+}
+.normalModHeadLine{
+    font-size: 16px;
+    // margin-left: 11px;
+}
+.moduleLayer_icon_SearchOn{
+display: none;
+}
+.E2EHeadLine{
+    font-size: 16px;
+    // margin-left: 11px;
+}
+.PlusButE2E{
+    display: none;
+}
+.moduleLayer_icon_SearchOff{
+
+}
+.searchIcon_adjust{
+ margin-left: 1rem;
+ cursor: none;
 }
 .moduleLayer_icon img{
     // border: 1px solid black;
@@ -40,7 +65,7 @@
     
 }
 .moduleLayer_plusIcon img{
-    padding-right: 0.5rem;
+    padding-right: 0.1rem;
 
 }
 .BasicDemo_primeReactTree{
@@ -48,4 +73,62 @@
     align-items: center;
     margin-right: 10rem;
     
+}
+.SearchIconForModules{
+    display: flex;
+    padding-top: 0.1rem;
+    align-items: center;
+    padding-left: 1.8rem;
+}
+.SearchIconForModulesE2E{
+    display: flex;
+    padding-top: 0.1rem;
+    align-items: center;
+    padding-left: 1rem;
+}
+.inputOfSearch{
+    width:10rem;
+    height: 1.6875rem;
+    // margin-left: 26px;
+}
+.hidingPlusButE2E{
+    display: none;
+}
+.NorModuleList{
+    max-height: 85%;
+    // border: 1px solid black;
+    overflow-y: auto;
+}
+
+.EachModNameBox{
+    // border: 1px solid rgb(213, 30, 30);
+    max-width: 100%;
+    max-height: 10%;
+    justify-content: center;
+    // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 6px;
+    cursor: pointer;
+    
+}
+.EachModNameBox:hover{
+    background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
+}
+.moduleName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 91%;
+    max-height: 100%;
+    // border: 1px solid rgb(19, 225, 126);
+
+}
+.moduleName h4{
+      font-size: 13px;
+      font-family: "open sans";
+      font-weight: 400;
+      color:rgb(8, 8, 8,1);
+      padding-left: 1.5rem;
+      overflow: hidden;
+    text-overflow: ellipsis;
 }
