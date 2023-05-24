@@ -7,7 +7,8 @@ import MappingPage from '../containers/MappingPage';
 import { Messages as MSG, setMsg, RedirectPage } from '../../global';
 // import CycleNode from './ZephyrTree';
 import * as actionTypes from '../state/action';
-import "../styles/TestList.scss"
+import "../styles/TestList.scss";
+import { Paginator } from 'primereact/paginator';
 
 
 const AzureContent = props => {
@@ -50,8 +51,19 @@ const AzureContent = props => {
     const [testPlansDropdown ,setTestPlansDropdown] = useState([]);
     const azureLogin = useSelector(state=>state.integration.projectLogin);
     const [azureapiKeys,setAzureApiKeys] = useState({'stories':'azureUserStories','testplans':'azureTestPlans','testsuites':'azureTestSuites'})
-
-    // const[summary1,setSummary1]=useState('');
+    const [currentPage, setCurrentPage] = useState(0);
+    const [recordsPerPage,setRecordsPerPage] = useState(10);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [storiesToDisplay,setStoriesToDisplay] = useState([])
+    const [testsToDisplay,setTestsToDisplay] = useState([])
+    const [skipItem,setSkipItem] = useState(0)
+    const [showNextButton,setShowNextButton] = useState(false)
+    const [isLastPage,setIsLastPage] = useState(false);
+    const [isShowPagination,setIsShowPagination] = useState(false)
+    const [skipRecord,setSkipRecord] = useState(0)
+    const [totalStoriesCount, setTotalStoriesCount] = useState(0)
+    const [pageSize, setPageSize] = useState(100);
+    const [showCustmBtn,setShowCustmBtn] = useState(true);
  
 
     // const callProjectDetails_ICE=async(e)=>{
@@ -105,9 +117,16 @@ const AzureContent = props => {
 
     const getWorkItems = async (e) => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
-        let apiObj = Object.assign({"action": azureapiKeys.stories},azureLogin,selectedProject);
+        setShowCustmBtn(true);
+        let apiObj = Object.assign({"action": azureapiKeys.stories},azureLogin,selectedProject,{'skip':e.skip || 0});
         const workItemsDetails = await api.connectAzure_ICE(apiObj);
-        setUserStories(workItemsDetails.userStories);
+        if(workItemsDetails && workItemsDetails.userStories){
+            setUserStories(workItemsDetails.userStories);
+            setStoriesToDisplay(workItemsDetails.userStories.slice(0,9));
+            setTotalRecords(workItemsDetails.userStories.length);
+            setIsShowPagination(true);
+            setTotalStoriesCount(workItemsDetails.total_count)
+        }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
 
@@ -294,8 +313,12 @@ const AzureContent = props => {
    return;
   };
   const handleSecondOptionChange = async (event) => {
-    setSecondOption(event.target.value);
-    setTestSuites([]);
+        setSecondOption(event.target.value);
+        setTestSuites([]);
+        setStoriesToDisplay([]);
+        setTestsToDisplay([]);
+        setCurrentPage(0);
+        setTotalRecords(0)
       if (event.target.value === 'TestPlans') {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});  
           setUserStories([]);
@@ -305,6 +328,7 @@ const AzureContent = props => {
             setTestPlansDropdown(getTestplans.testplans);
           }
           setIsShowTestplan(true);
+          setShowCustmBtn(false);
           dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
       }
       else if (event.target.value === 'Story') {
@@ -323,11 +347,35 @@ const AzureContent = props => {
             const getTestSuites = await api.connectAzure_ICE(apiObj);
             if(getTestSuites && getTestSuites.testsuites && getTestSuites.testsuites.length){
                 setTestSuites(getTestSuites.testsuites);
+                setTestsToDisplay(getTestSuites.testsuites);
+                setTotalRecords(getTestSuites.testsuites.length);
+                setIsShowPagination(true);
             }
-            
-            console.log(getTestSuites,' its getTestplans');
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         }
+  }
+  const onPageChange = (e) =>{
+    setCurrentPage(e.page);
+    setSkipItem(e.first);
+    const isLastPage = e.page === Math.ceil(totalRecords / recordsPerPage) - 1;
+    setIsLastPage(isLastPage);
+    const startIndex = e.page * recordsPerPage;
+    const endIndex = startIndex + recordsPerPage;
+    let keyName = secondOption === 'Story' ? setStoriesToDisplay(userStories.slice(startIndex, endIndex)) : setTestsToDisplay(testSuites.slice(startIndex, endIndex));
+    
+  }
+
+  const handlePrevNext = (btnType) => {
+    setCurrentPage(0);setIsLastPage(false);
+    if(btnType === 'prev'){
+        setSkipRecord(skipRecord-pageSize);
+        getWorkItems({skip:skipRecord-pageSize});
+    }
+    if(btnType === 'next'){
+        setSkipRecord(skipRecord+pageSize);
+        getWorkItems({skip:skipRecord+pageSize});
+    }
+
   }
 
     return(
@@ -335,6 +383,7 @@ const AzureContent = props => {
         <Fragment>
             <MappingPage 
                 pageTitle="Azure DevOps Integration"
+                pageType="Azure"
                 onSave={()=>callSaveButton()}
                 onViewMap={()=>props.callViewMappedFiles()}
                 // onUpdateMap={()=>props.callUpdateMappedFiles()}
@@ -404,7 +453,7 @@ const AzureContent = props => {
                     <div data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn1} onChange={(e)=>{handleSecondOptionChange(e)}} className="qtestAvoAssureSelectProject">
                     {
                         userStories && userStories.length ?
-                        userStories.map((e,i)=>(
+                        storiesToDisplay.map((e,i)=>(
                             <div className={"test_tree_leaves"+ ( selected===e.id ? " test__selectedTC" : "")}>
                             <label className="test__leaf" title={e.id} onClick={()=>handleClick(e.id,e.fields['System.Title'])}>
                                 <span className="leafId">{e.id}</span>    
@@ -419,7 +468,7 @@ const AzureContent = props => {
                         </div>
                             ))
                             : 
-                            testSuites.map((e,i)=>(
+                            testsToDisplay.map((e,i)=>(
                                 <div className={"test_tree_leaves"+ ( selected===e.id ? " test__selectedTC" : "")}>
                                 <label className="test__leaf" title={e.id} onClick={()=>handleClick(e.id,e.name)}>
                                     <span className="leafId">{e.id}</span>    
@@ -464,6 +513,31 @@ const AzureContent = props => {
                             >
                                 {e.name}
                             </div>))
+                }
+                Pagination={ isShowPagination &&
+                    <div className="pagination-controls-container"><div className="pagination-controls" 
+                    style={{display: (secondOption === 'Story' && userStories && !userStories.length ) || (secondOption === 'TestPlans' && testSuites && !testSuites.length ) ?'none':''}}>
+                            <div className="cstm-prevbtn" style={{display:showCustmBtn?'':'none'}}>
+                            <button style={!skipRecord ?{ pointerEvents: 'none' } : null} disabled={!skipRecord ?true:false} className="custom-button previous-btn round" onClick={(e) => handlePrevNext('prev')} >
+                                <span class="p-paginator-icon pi pi-angle-double-left"></span>
+                            </button>
+                            </div>
+                        
+                            <Paginator
+                                className='custom-paginator'
+                                first={currentPage * recordsPerPage}
+                                rows={recordsPerPage}
+                                totalRecords={totalRecords}
+                                rowsPerPageOptions={[10, 20, 30]}
+                                onPageChange={onPageChange}
+                                
+                            />
+                        <div className="cstm-nxtbtn" style={{display:showCustmBtn?'':'none'}}>
+                            <button style={!isLastPage || ((skipRecord+totalRecords) === totalStoriesCount) ? { pointerEvents: 'none' } : null} disabled={!isLastPage || ((skipRecord+totalRecords) === totalStoriesCount) ? true: false} className="custom-button next-btn round" onClick={(e) => handlePrevNext('next')} >
+                                <span class="p-paginator-icon pi pi-angle-double-right"></span>
+                            </button>
+                        </div>
+                        </div></div>
                 }
                
             />

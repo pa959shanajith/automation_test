@@ -308,7 +308,8 @@ exports.connectAzure_ICE = function(req, res) {
                     "azureBaseUrl": azureurl,
                     "azure_uname": azureusername,
                     "azurepat": azurepat,
-                    "projectDetails":azureprojectdetails
+                    "projectDetails":azureprojectdetails,
+                    "skip": req.body.skip || 0
                 };
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());

@@ -116,8 +116,8 @@ const ScrollBar = (props) => {
                     : ''
                 }
                 `}
-            </style> 
-            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength || 20,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={{maxHeight:'inherit',height:'inherit'}} onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
+            </style>
+            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength || 20,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}}  onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
                 {props.children}
             </PerfectScrollbar>
         </Fragment>
