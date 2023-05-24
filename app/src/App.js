@@ -28,6 +28,7 @@ import Topbar from './pages/landing/components/Topbar';
 import SideNavBar from './pages/landing/components/SideNav';
 import Overview from './pages/landing/components/ProjectCreation';
 import Analysis from './pages/landing/components/Analysis';
+import MindmapHome from './pages/design/containers/MindmapHome';
 
 
 
@@ -94,7 +95,7 @@ const RouteApp = () => {
         <Route path="/reports" element={<Report/>} />
         <Route path="/settings" element={<Settings/>} />
         <Route path="/itdm" element={<itdm/>} />
-        <Route path="/design" element={<StaticDataForMindMap/>}/>
+        <Route path="/design" element={<MindmapHome/>}/>
         <Route path="/execute" element={<Execute/>}/>
       </Routes>
     </>

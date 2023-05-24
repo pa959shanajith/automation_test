@@ -29,8 +29,8 @@ const recurseTogChild = (nodeDisplay, linkDisplay, d, v, dLinks) => {
         recurseTogChild(nodeDisplay, linkDisplay, e, v, dLinks);
         nodeDisplay[e.id].hidden = v;
         for (var j = dLinks.length - 1; j >= 0; j--) {
-            var lid = 'link-' + dLinks[j].source.data.id + '-' + dLinks[j].target.data.id
-            if (linkDisplay[lid] && dLinks[j].source.data.id === d.id) {
+            var lid = 'link-' + dLinks[j].source.id + '-' + dLinks[j].target.id
+            if (linkDisplay[lid] && dLinks[j].source.id === d.id) {
                 linkDisplay[lid].hidden = v
             } 
         }
@@ -39,8 +39,8 @@ const recurseTogChild = (nodeDisplay, linkDisplay, d, v, dLinks) => {
         recurseTogChild(nodeDisplay, linkDisplay, e, !0, dLinks);
         nodeDisplay[e.id].hidden = !0;
         for (var j = dLinks.length - 1; j >= 0; j--) {
-            var lid = 'link-' + dLinks[j].source.data.id + '-' + dLinks[j].target.data.id
-            if (linkDisplay[lid] && dLinks[j].source.data.id === d.id) {
+            var lid = 'link-' + dLinks[j].source.id + '-' + dLinks[j].target.id
+            if (linkDisplay[lid] && dLinks[j].source.id === d.id) {
                 linkDisplay[lid].hidden = !0
             }
         }
@@ -203,9 +203,68 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
     const d3Tree = d3.tree().size([newHeight * 2, cSize[0]]);
     const hierarchyLayout = d3.hierarchy(tree);
     const data = d3Tree(hierarchyLayout);
+    data.each((node, idx) => {
+        node.id = idx;
+      });
     const dNodesArray = data.descendants();
     const dLinks = data.links();
-    const dNodes = dNodesArray.map((d)=>d.data);
+    // .map((link, index) => {
+    //     const newLink = {
+    //       ...link,
+    //       source: {
+    //         ...link.source.data,
+    //         x: link.source.x,
+    //         y: link.source.y,
+    //         id: index // Generate a unique id for the source node
+    //       },
+    //       target: {
+    //         ...link.target.data,
+    //         x: link.target.x,
+    //         y: link.target.y,
+    //         id: index+1 // Generate a unique id for the target node
+    //       }
+    //     };
+    //     return newLink;
+    //   });;
+    // const dNodes = dNodesArray.map((d)=>d.data)
+    const dNodes = dNodesArray.map((d, idx) => {
+        const generateId = (index) => index;
+        
+        const mapChildren = (children) => {
+          return children.map((child, childIdx) => {
+            const newChild = {
+              ...child.data,
+              x: child.x,
+              y: child.y,
+              id: child.id?child.id:generateId(childIdx+1),
+              parent: {
+                ...child.parent.data,
+                id: child.parent.data.id ? child.parent.data.id : generateId(idx) // Generate a unique id for the parent node
+              } // Generate a unique id for the child node
+            };
+            
+            if (child.children) {
+              newChild.children = mapChildren(child.children);
+            }
+            
+            return newChild;
+          });
+        };
+        
+        const newData = {
+          ...d.data,
+          x: d.x,
+          y: d.y,
+          id: idx,
+          parent: d.parent ? { ...d.parent.data, id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1) } : null  // Generate a unique id for the node
+        };
+        
+        if (d.children) {
+          newData.children = mapChildren(d.children);
+        }
+        
+        return newData;
+      });
     dNodes.sort(function(a, b) {
         return a.childIndex - b.childIndex;
     });  
@@ -220,7 +279,10 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         }
         d.id = ind
         count[d.type] += 1; 
-        var node = addNode(d,dNodesArray);
+        d.x = dNodesArray[ind].x
+        d.y = dNodesArray[ind].y
+        d.parent = dNodesArray[ind].parent?dNodesArray[ind].parent.data:null
+        var node = addNode(d);
         nodeDisplay[d.id] = node
         nodeDisplay[d.id].task = false;
         nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
@@ -256,13 +318,13 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         })
     dLinks.forEach(function(d) {
         d.id = uuid();
-        var lid = 'link-' + d.source.data.id + '-' + d.target.data.id
+        var lid = 'link-' + d.source.id + '-' + d.target.id
         var link = addLink(d.source, d.target,verticalLayout);
         linkDisplay[lid] = link
         linkDisplay[lid].hidden = (d.source.revertChild || d.source.revertChild1) || false;
     });
     if (verticalLayout){
-        translate = [(cSize[0] / 2) - dNodesArray[0].x, (cSize[1] / 5) - dNodes[0].y]
+        translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
     } else{
         translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
     }
@@ -305,7 +367,7 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
     return{nodes:nodeDisplay,dNodes,translate,sections}
 }
 
-export const addNode = (n,nodes) =>{
+export const addNode = (n) =>{
     n.display_name = n.name;
     var ch = 15;
     if (n.display_name.length > 15) {
@@ -322,7 +384,7 @@ export const addNode = (n,nodes) =>{
     else if(n.task && n.task.tasktype == 'Execute Scenario with Accessibility') accessibility = 'Enable'
     var nodeDisplay= {
         'type': n.type,
-        'transform': "translate(" + (nodes[n.id].x) + "," + (nodes[n.id].y) + ")",
+        'transform': "translate(" + (n.x) + "," + (n.y) + ")",
         'opacity': !( n._id === null || n._id === undefined) ? 1 : 0.5,
         'title': n.name,
         'ac': accessibility,
@@ -331,7 +393,8 @@ export const addNode = (n,nodes) =>{
         'img_src': img_src,
         '_id': n._id || null,
         'state':n.state || "created",
-        'reuse':n.reuse || false
+        'reuse':n.reuse || false,
+        'id':n.id
     };
     return nodeDisplay;
 }
@@ -378,7 +441,7 @@ export const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos,verticalLayout,Can
         svg.on('mousemove.nodemove', (event)=>{
                 event.stopImmediatePropagation();
                 var t = {} ;
-                if(CanvasFlag==='createnew')pos=readCtScale();
+                // if(CanvasFlag==='createnew')pos=readCtScale();
                 // else if(CanvasFlag==='assign')pos=readCtScaleAssign();
                 // else if(CanvasFlag==='endtoend')pos=readCtScaleEnE();
                 const cSpan = [pos.x, pos.y];

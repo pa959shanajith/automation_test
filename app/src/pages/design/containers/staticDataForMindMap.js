@@ -3,7 +3,7 @@ import '../styles/MindmapHome.scss';
 import Canvas from './Canvas';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
-import ControlBox from '../components/ControlBox';
+// import ControlBox from '../components/ControlBox';
 
 
 const data ={
@@ -88,7 +88,7 @@ function StaticDataForMindMap() {
       </Card>
     </div>}
     {showMindmap && <Canvas selectedModule={data}/>}
-    {showMindmap && <ControlBox />}
+    {/* {showMindmap && <ControlBox />} */}
     {showGenius && <div style={{background:'#F5F5F5'}}><Card className='avoGeniusCard' title='Welcome to Avo Genius'>
             <img className='avoGeniuscardImg' src='static\imgs\AGS.svg' alt='Avo Genius Logo'/>
           </Card></div>}

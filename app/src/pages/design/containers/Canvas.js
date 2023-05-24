@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, Fragment } from 'react';
 import * as d3 from 'd3';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,createNewMap} from './MindmapUtils'
-import { ContextMenu } from 'primereact/contextmenu';
+// import { ContextMenu } from 'primereact/contextmenu';
 import CaptureModal from '../containers/CaptureScreen';
 import DesignModal from '../containers/DesignTestStep';
 
@@ -37,7 +37,7 @@ const Canvas = (module) => {
     const [createnew,setCreateNew] = useState(false);
     const [verticalLayout,setVerticalLayout] = useState(true);
     const [selectedNode, setSelectedNode] = useState(null);
-    const [name, setName] = useState(nodes.name);
+      const [name, setName] = useState(nodes.name);
     const CanvasRef = useRef();
     readCtScale = () => ctScale
     const menuRef_module= useRef(null);
@@ -126,18 +126,18 @@ const Canvas = (module) => {
        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[createnew])
     const nodeClick=(e)=>{
-        // e.stopPropagation()
-        // if(d3.select('#pasteImg').classed('active-map')){
-        //     // eslint-disable-next-line no-undef
-        //     var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
-        //     if(res){
-        //         setNodes(res.cnodes)
-        //         setLinks(res.clinks)
-        //         setdLinks(res.cdLinks)
-        //         setdNodes(res.cdNodes)
-        //         count = res.count
-        //     }
-        // }
+        e.stopPropagation()
+        if(d3.select('#pasteImg').classed('active-map')){
+            // eslint-disable-next-line no-undef
+            var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
+            if(res){
+                setNodes(res.cnodes)
+                setLinks(res.clinks)
+                setdLinks(res.cdLinks)
+                setdNodes(res.cdNodes)
+                count = res.count
+            }
+        }
     }
 
 
@@ -229,31 +229,14 @@ const Canvas = (module) => {
 
     ];
 
-    const menuItemsTestSteps = [
-        { label: 'Design Test steps',command: ()=>setVisibleDesignStep(true) },
-        { label: 'Rename' },
-        { label: 'Delete' }
 
-    ];
 
-    const handleContext=(e,type)=>{
-        if(type==="modules") menuRef_module.current.show(e)
-        else if(type==="scenarios")menuRef_scenario.current.show(e)
-        else if(type==="screens")menuRef_screen.current.show(e)
-        else menuRef_Teststep.current.show(e)
-       }
   
 
 
 
     return (
         <Fragment>
-            {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} />}
-        {visibleDesignStep && <DesignModal visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
-            <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
-            <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
-            <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />
-            <ContextMenu model={menuItemsTestSteps} ref={menuRef_Teststep}/> 
        <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
             <g className='ct-container'>
             {Object.entries(links).map((link)=>{
@@ -261,7 +244,7 @@ const Canvas = (module) => {
             })}
             {Object.entries(nodes).map((node)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                   <image  onClick={(e)=>nodeClick(e)} onContextMenu={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                   <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                    {selectedNode === node[0] ?
                         <foreignObject x="10" y="25" width="100" height="20">
                           <input type="text" value={name} onChange={(e)=>handleNameChange(e, node[0])} onKeyDown={(e) => handleKeyDown(e, node[0])} autoFocus />
@@ -286,9 +269,9 @@ const Canvas = (module) => {
         </Fragment>
     );
 }
-const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,verticalLayout) => {
-    var dNodes_c = copyNodes.nodes
-    var dLinks_c = copyNodes.links
+const pasteNode = (activeNode,nodes, links,cnodes,clinks,cdNodes,cdLinks,csections,count,verticalLayout) => {
+    var dNodes_c = nodes
+    var dLinks_c = links
     var nodetype =  d3.select('.node-selected').attr('data-nodetype');
     if (d3.select('#'+activeNode).attr('data-nodetype') === nodetype) {
         if (nodetype === 'scenarios') {
