@@ -424,7 +424,8 @@ if (cluster.isMaster) {
 
 	app.get('/getServiceBell', (req,res) => {
 		const enableServiceBell = uiConfig.enableServiceBell;
-		return res.send({enableServiceBell})
+		const {gtmToken, enableGTM} = uiConfig;
+		return res.send({enableServiceBell, enableGTM, gtmToken})
     })
 
 	app.get('/getServiceBellSecretKey', (req,res) => {
