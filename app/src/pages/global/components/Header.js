@@ -12,7 +12,6 @@ import { RedirectPage, ModalContainer, ScreenOverlay, WelcomePopover, Messages a
 import ServiceBell from "@servicebell/widget";
 import "../styles/Header.scss";
 import * as crypto from "crypto";
-import axios from "axios";
 
 /*
     Component: Header Bar
@@ -44,10 +43,6 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     const [OS,setOS] = useState("Windows");
     const [WP_STEPNO, set_WP_STEPNO] = useState(0);
     const [trainLinks, setTrainLinks] = useState({videos:"#", docs:"#"});
-    const [showIndicator, setShowIndicator] = useState(false);
-    const [percentComplete,setPercentComplete] = useState(0);
-    const [showMacOSSelection, setShowMacOSSelection] = useState(false);
-    const [showLinuxOSSelection, setShowLinuxOSSelection] = useState(false);
 
     useEffect(()=>{
         //on Click back button on browser
@@ -110,69 +105,31 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     if (/windows nt/.test(userAgent))
         setOS("Windows");
 
-    else if (/mac os x/.test(userAgent)){
-        setShowMacOSSelection(true);  
+    else if (/mac os x/.test(userAgent))
         setOS("MacOS");
-    }
-    else if (/linux x86_64/.test(userAgent)){
-        setShowLinuxOSSelection(true);
+
+    else if (/linux x86_64/.test(userAgent))
         setOS("Linux")
-    }else
+    else
         setOS("Not Supported");
   }
     
-    const getIce = async (clientVer) => {
-		try {
-      setShowUD(false);
-      setShowOverlay(`Loading...`);
-			const res = await fetch("/downloadICE?ver="+clientVer);
-      const {status} = await res.json();
-      // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
-			if (status === "available"){
-        // const link = document.createElement('a');
-        // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
-        // link.setAttribute('download', "avoURL.txt");
-        // document.body.appendChild(link);
-        // link.click();
-        // document.body.removeChild(link);
-        // window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
-        setShowMacOSSelection(false);
-        setShowIndicator(true);
-        // const link = document.createElement('a');
-        // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
-        // link.setAttribute('download', "avoURL.txt");
-        // document.body.appendChild(link);
-        // link.click();
-        // document.body.removeChild(link);
-        axios({
-            url: window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE",
-            method: "GET",
-            responseType: "blob", 
-            onDownloadProgress(progress) {
-                setPercentComplete(progress.loaded/progress.total)
-            }
-        }).then(response => {
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-             
-            link.setAttribute('download',  "AvoAssureClient"+(userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
-//                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }).catch((err)=>{
-            console.log(err);
-            setShowIndicator(false);
-        });
-      } 
-			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
-      setShowOverlay(false)
-		} catch (ex) {
-			console.error("Error while downloading ICE package. Error:", ex);
-			setMsg(MSG.GLOBAL.ERR_PACKAGE);
-		}
-	}
+  const getIce = async (clientVer) => {
+    try {
+  setShowUD(false);
+  setShowOverlay(`Loading...`);
+        const res = await fetch("/downloadICE?ver="+clientVer);
+    const {status} = await res.json();
+    if (status === "available"){
+    window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+"&fileName="+((userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
+  } 
+        else setMsg(MSG.GLOBAL.ERR_PACKAGE);
+  setShowOverlay(false)
+    } catch (ex) {
+        console.error("Error while downloading ICE package. Error:", ex);
+        setMsg(MSG.GLOBAL.ERR_PACKAGE);
+    }
+}
 
     const switchRole = () => {
     if(userInfo.isTrial) return;
