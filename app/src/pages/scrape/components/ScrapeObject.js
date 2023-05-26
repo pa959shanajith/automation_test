@@ -98,7 +98,7 @@ const showIdentifierCard=(e)=>{
             }
         </div>
         {isIdentifierVisible?(props.object.identifier!==undefined)?
-        <div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Object Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:<div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Object Identifier Order:</span><br></br>{defaultIdentifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:null}
+        <div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:<div className='arrow-top'style={{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{defaultIdentifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:null}
         </>
     )
 }

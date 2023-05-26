@@ -525,7 +525,7 @@ const footerContent = (
 )
 const Header = () => {
     return (
-        <div>Object Identifier Order<span style={{color:'red'}}>*</span></div>
+        <div>Element Identifier Order<span style={{color:'red'}}>*</span></div>
     );
 };
     return (

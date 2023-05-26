@@ -304,7 +304,7 @@ const BottomContent = (props) => {
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>setShowObjModal("exportObject"), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType==="Web", show: (appType==="Web")},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (props.appType!=="Web"), disable: compareFlag && props.appType!=="Webservice"},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>setShowObjModal("importObject"), show: (props.appType==="Web"), disable: compareFlag && props.appType==="Web"}, 
-        {'title':'Object Identifier Order','img': 'static/imgs/identifier-enabled.png','action':listOfCheckedItems.some(element=>element==true)?(enableIdentifier?()=>setShowObjModal("identifierlis"):()=>setMsg(MSG.SCRAPE.ERR_OBJ_SAVE)):()=>setMsg(MSG.SCRAPE.ERR_CHECKBOX_SELECT) ,'show': ((appType === 'Web' || appType === "MobileWeb"))}
+        {'title':'Element Identifier Order','img': 'static/imgs/identifier-enabled.png','action':listOfCheckedItems.some(element=>element==true)?(enableIdentifier?()=>setShowObjModal("identifierlis"):()=>setMsg(MSG.SCRAPE.ERR_OBJ_SAVE)):()=>setMsg(MSG.SCRAPE.ERR_CHECKBOX_SELECT) ,'show': ((appType === 'Web' || appType === "MobileWeb"))}
     ]
 
     return (
