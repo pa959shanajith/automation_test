@@ -424,7 +424,13 @@ if (cluster.isMaster) {
 
 	//To get GA configs
 	app.get('/getGTM', (req,res) => {
-		const { enableGTM, gtmToken } = uiConfig;
+		let enableGTM = false;
+		let gtmToken = "";
+		const getUiConfig = Object.keys(uiConfig);
+		if(getUiConfig.includes("enableGTM") && getUiConfig.includes("gtmToken")){
+			enableGTM = uiConfig.enableGTM;;
+			gtmToken = uiConfig.gtmToken;
+		}
 		return res.send({enableGTM, gtmToken})
 	})
 

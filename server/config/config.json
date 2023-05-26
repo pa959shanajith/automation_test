@@ -5,9 +5,9 @@
     "strictTaskWorkflow": false,
     "dateFormat": "YYYY-MM-DD",
     "benchmarkRuntimes": ["00:05","08:00","13:00","18:55"],
-    "enableServiceBell":false,
     "enableGTM":true,
     "gtmToken": "GTM-M2M6XXM",
+    "enableServiceBell":false,
     "SERVICEBELL_IDENTITY_SECRET_KEY":"cfb418525a6247d3b101d95c1c3b8299",
     "certificate": {
         "key": "./server/https/server.key",
