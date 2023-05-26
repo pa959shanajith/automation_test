@@ -426,6 +426,18 @@ if (cluster.isMaster) {
       return res.send({isTrialUser})
     })
 
+	//To get GA configs
+	app.get('/getGTM', (req,res) => {
+		let enableGTM = false;
+		let gtmToken = "";
+		const getUiConfig = Object.keys(uiConfig);
+		if(getUiConfig.includes("enableGTM") && getUiConfig.includes("gtmToken")){
+			enableGTM = uiConfig.enableGTM;;
+			gtmToken = uiConfig.gtmToken;
+		}
+		return res.send({enableGTM, gtmToken})
+	})
+
 	app.get('/getServiceBell', (req,res) => {
 		const enableServiceBell = uiConfig.enableServiceBell;
 		return res.send({enableServiceBell})
