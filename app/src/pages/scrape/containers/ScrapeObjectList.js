@@ -157,7 +157,7 @@ const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems)
             else localItems.forEach(item => { if (!item.hide) {
                 item.checked = false;
             }})
-            dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:localItems.some(((element) => element.checked  === true))})
+            
 
         }
         else {
@@ -167,10 +167,10 @@ const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems)
         }
 
         let listOfCheckedItems=localItems.map(object=>{
-            return object.checked
+            return object.checked 
         })
         const checkForOnlyOneCheckedItems=localItems.filter(item=>item.checked)
-        if(checkForOnlyOneCheckedItems.length===1) {
+        if(checkForOnlyOneCheckedItems.length===1 && checkForOnlyOneCheckedItems[0].identifier!==undefined) {
             const defaultNames={xpath:'Absolute X-Path',id:'ID Attribute',rxpath:'Relative X path',name:'Name Attribute',classname:'Classname Attribute'}
             const currentIdentifier=checkForOnlyOneCheckedItems[0].identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
             props.setIdentifierList(currentIdentifier)
@@ -180,7 +180,7 @@ const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems)
         }
         setScrapeItems(localItems)
         dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: listOfCheckedItems})
-        
+        dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:(localItems.some(((element) => element.checked  === true)) && localItems.every((element=>(("objId" in element)&& (("objId" in element)?element.objId!==undefined:false))))) })
     }
     
     const modifyScrapeItem = (value, newProperties, customFlag) => {
@@ -394,6 +394,10 @@ const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems)
             }
             else orderList.push(scrapeItem.objId);
         }
+        let listOfCheckedItems=scrapeItemsL.map(object=>{
+            return (object.checked && object.objId!==undefined)?true:false
+        })
+        dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: listOfCheckedItems})
         
         let params = {
             'deletedObj': deleted,
@@ -619,7 +623,7 @@ const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems)
                         scrapeItems.map((object, index) =><Fragment key={`${object.val}`}> 
                                                         { !object.hide && 
                                                             <ScrapeObject idx={index} object={object} updateChecklist={updateChecklist}
-                                                                modifyScrapeItem={modifyScrapeItem} hide={object.hide} dnd={dnd} listOfCheckedItems={listOfCheckedItems} scrapeItems={scrapeItems} />}
+                                                                modifyScrapeItem={modifyScrapeItem} hide={object.hide} dnd={dnd} listOfCheckedItems={listOfCheckedItems} scrapeItems={scrapeItems} newScrapedData={newScrapedData} />}
                                                         </Fragment>)
                     }
                     </ReactSortable>

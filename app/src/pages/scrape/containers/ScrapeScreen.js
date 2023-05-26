@@ -67,6 +67,7 @@ const ScrapeScreen = (props)=>{
         // }
         //eslint-disable-next-line
         dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
+        dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: []})
 
     }, [current_task])
     useEffect(()=>{
@@ -80,6 +81,7 @@ const ScrapeScreen = (props)=>{
     //eslint-disable-next-line
     dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
     setIdentifierModiefied(false)
+    dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: []})
         }
     },[identifierModified])
     useEffect(()=>{
@@ -494,9 +496,11 @@ const saveIdentifier=()=>{
         .then(response => {
             console.log(response)
             if(response == "Success"){
+                setIdentifierModiefied(true)
                 setShowObjModal('')
                 setMsg(MSG.SCRAPE.SUCC_OBJ_IDENTIFIER_LIST);
                 setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+                
             }
         })
         .catch(error => {
@@ -506,7 +510,7 @@ const saveIdentifier=()=>{
                 setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
         }
         )
-        setIdentifierModiefied(true)
+        
 }
 const dynamicColumns = columns.map((col, i) => {
                     return <Column key={col.field} columnKey={col.field} field={col.field} header={col.header} />;

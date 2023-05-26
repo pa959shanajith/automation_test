@@ -22,8 +22,8 @@ const ScrapeObject = props => {
     const handleObjName = event => setObjName(event.target.value);
     const handleCheckbox = event => {
         props.updateChecklist(props.object.val);
-        setChecked(event.target.checked);
-        dispatch({type: actions.SET_ISENABLEIDENTIFIER, payload:props.scrapeItems.some(((element) => element.checked  === true))})
+        setChecked(event.target.checked)
+        // dispatch({type: actions.SET_ISENABLEIDENTIFIER, payload:(props.scrapeItems.some(((element) => element.checked  === true))&& props.scrapeItems.every((element=>(("objId" in element)&& (("objId" in element)?element.objId!==undefined:false))))) })
         
     }
 

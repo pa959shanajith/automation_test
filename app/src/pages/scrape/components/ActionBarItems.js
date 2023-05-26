@@ -146,6 +146,7 @@ const BottomContent = (props) => {
 
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
+    const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems);
 
     const { setShowObjModal, scrapeItems, fetchScrapeData, setOverlay, saved, startScrape } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
@@ -303,7 +304,7 @@ const BottomContent = (props) => {
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>setShowObjModal("exportObject"), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType==="Web", show: (appType==="Web")},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (props.appType!=="Web"), disable: compareFlag && props.appType!=="Webservice"},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>setShowObjModal("importObject"), show: (props.appType==="Web"), disable: compareFlag && props.appType==="Web"}, 
-        {'title':'Object Identifier Order','img': enableIdentifier?'static/imgs/identifier-enabled.png':'static/imgs/identifier-disabled.png','action':()=>setShowObjModal("identifierlis"),'show': ((appType === 'Web' || appType === "MobileWeb")),disable:enableIdentifier?false:true}
+        {'title':'Object Identifier Order','img': 'static/imgs/identifier-enabled.png','action':listOfCheckedItems.some(element=>element==true)?(enableIdentifier?()=>setShowObjModal("identifierlis"):()=>setMsg(MSG.SCRAPE.ERR_OBJ_SAVE)):()=>setMsg(MSG.SCRAPE.ERR_CHECKBOX_SELECT) ,'show': ((appType === 'Web' || appType === "MobileWeb"))}
     ]
 
     return (
