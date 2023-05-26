@@ -51,17 +51,20 @@ const App = () => {
     TagManager.initialize(tagManagerArgs)
   }
 
-  useEffect(() => {
-    console.log(gtmToken, gtmEnable);
-  }, [gtmToken, gtmEnable]);
+  useEffect(()=>{
+    (async()=>{
+      const response = await fetch("/getGTM")
+      let { enableGTM, gtmToken } = await response.json();
+      setGtmToken(gtmToken);
+      setGtmEnable(enableGTM);
+    })();
+  },[])
 
   useEffect(()=>{
     TabCheck(setBlockui);
     (async()=>{
       const response = await fetch("/getServiceBell")
-      let { enableServiceBell, enableGTM, gtmToken } = await response.json();
-      setGtmToken(gtmToken);
-      setGtmEnable(enableGTM);
+      let { enableServiceBell } = await response.json();
       if(enableServiceBell) ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
     })();
   },[])
