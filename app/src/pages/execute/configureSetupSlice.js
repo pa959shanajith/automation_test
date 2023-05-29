@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { url } from "../../App";
 
 const initialState = {
   loading: false,
@@ -171,7 +172,7 @@ const initialState = {
 };
 
 const getProjects = createAsyncThunk("config/fetchProjects", async (args) => {
-  return await axios("https://localhost:8443/fetchProjects", {
+  return await axios(`${url}/fetchProjects`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -184,7 +185,7 @@ const getProjects = createAsyncThunk("config/fetchProjects", async (args) => {
 });
 
 const getModules = createAsyncThunk("config/fetchModules", async (args) => {
-  return await axios("https://localhost:8443/fetchModules", {
+  return await axios(`${url}/fetchModules`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -203,7 +204,7 @@ const getModules = createAsyncThunk("config/fetchModules", async (args) => {
 const getAvoAgentAndAvoGrid = createAsyncThunk(
   "config/avoAgentAndAvoGrid",
   async () => {
-    return await axios("https://localhost:8443/getAvoAgentAndAvoGridList", {
+    return await axios(`${url}/getAvoAgentAndAvoGridList`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -218,7 +219,7 @@ const getAvoAgentAndAvoGrid = createAsyncThunk(
 const storeConfigureKey = createAsyncThunk(
   "config/storeConfigureKey",
   async () => {
-    return await axios("https://localhost:8443/storeConfigureKey", {
+    return await axios(`${url}/storeConfigureKey`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
