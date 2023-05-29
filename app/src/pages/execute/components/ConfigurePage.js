@@ -12,6 +12,8 @@ import { BreadCrumb } from 'primereact/breadcrumb';
 import { Link } from 'react-router-dom';
 import AvoModal from '../../../globalComponents/AvoModal';
 import ConfigureSetup from './ConfigureSetup';
+import { getAvoAgentAndAvoGrid, getModules, getProjects, storeConfigureKey } from '../configureSetupSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ConfigurePage =({})=>{
   const [visible, setVisible] = useState(false);
@@ -21,7 +23,27 @@ const ConfigurePage =({})=>{
       
     ];
     const items1 = [{ label: 'Home'  },{ label: 'ConfigurePage' }];
-    
+  
+  const getConfigData = useSelector((store) => store.configsetup);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getProjects());
+    dispatch(getAvoAgentAndAvoGrid());
+  }, []);
+
+  useEffect(() => {
+    if (!!getConfigData?.projects.length)
+      dispatch(getModules(getConfigData?.projects));
+  }, [getConfigData?.projects]);
+
+  const onModalBtnClick = (getBtnType) => {
+    if(getBtnType === "Next"){
+      dispatch(storeConfigureKey());
+    }
+    else setVisible(false);
+  };
+
 const Breadcrumbs = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleDropdown = () => {
@@ -179,7 +201,8 @@ return(
     <AvoModal
         visible={visible}
         setVisible={setVisible}
-        content={<ConfigureSetup />}
+        onModalBtnClick={onModalBtnClick}
+        content={<ConfigureSetup configData={getConfigData} />}
         headerTxt="Execution Configuration set up"
         footerType="CancelNext"
         modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}

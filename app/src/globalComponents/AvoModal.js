@@ -9,8 +9,10 @@ const AvoModal = ({
   headerClass = null,
   footerType = null,
   headerTxt,
-  modalSytle
+  modalSytle,
+  onModalBtnClick = () => {}
 }) => {
+
   const footerValues = {
     CancelNext: [
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "close" },
@@ -23,7 +25,7 @@ const AvoModal = ({
         className={`${el?.key}_button`}
         label={el?.btnTxt}
         {...(el?.btnType && { [el?.btnType]: true })}
-        onClick={() => setVisible(false)}
+        onClick={() => onModalBtnClick(el?.btnTxt)}
         autoFocus={el?.autoFocus}
       />
     </div>

@@ -17,11 +17,9 @@
   .config_container {
     padding: 0 1.875rem;
     .config_subcontainer {
-      display: flex;
-      flex-direction: row;
+
 
       .table_section {
-        width: 75%;
         min-width: 31.25rem;
         .p-treetable-header {
           padding: 0.5rem 0.9375rem 0.5rem 0.9375rem;
@@ -84,7 +82,7 @@
             text-overflow: ellipsis;
             position: sticky;
             top: 0;
-            z-index: 9;
+            z-index: 1;
           }
 
           .p-treetable-tbody>tr>td {
@@ -155,7 +153,6 @@
       }
 
       .avogrid_section {
-        width: 25%;
         min-width: 14.375rem;
         padding-left: 0.9375rem;
         .avogrid_container {

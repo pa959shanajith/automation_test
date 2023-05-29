@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { RadioButton } from "primereact/radiobutton";
@@ -18,16 +18,76 @@ import "../styles/ConfigureSetup.scss";
 import GridBrowser from "./GridBrowser";
 import AvoInput from "../../../globalComponents/AvoInput";
 
-const ConfigureSetup = () => {
+const ConfigureSetup = ({ configData }) => {
   const [dataparam, setDataparam] = useState({});
   const [condition, setCondition] = useState({});
   const [accessibility, setAccessibility] = useState({});
   const [avodropdown, setAvodropdown] = useState({});
   const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
   const [mode, setMode] = useState(selections[0]);
-  const [modules, setModules] = useState("");
+  const [configTable, setConfigTable] = useState([]);
+  const [modules, setModules] = useState("normalExecution");
   const [configTxt, setConfigTxt] = useState("");
   const [tableFilter, setTableFilter] = useState("");
+
+  useEffect(() => {
+    const mainTree = [];
+    configData?.configureData[modules].map((el, index) => {
+      const childTree = [];
+      if (!!el?.scenarios.length) {
+        el?.scenarios.forEach((e, ind) => {
+          const dataParamName = `dataParamName${ind}${index}`;
+          const conditionName = `conditionName${ind}${index}`;
+          const accessibilityName = `accessibilityName${ind}${index}`;
+          childTree.push({
+            key: `0-${ind}`,
+            data: {
+              name: e?.name,
+              dataParameterization: (
+                <InputText
+                  value={dataparam[dataParamName]}
+                  placeholder="Enter Text"
+                  name={dataParamName}
+                  className="p-inputtext-sm"
+                  onChange={(e) => onDataparamChange(e)}
+                />
+              ),
+              condition: (
+                <Dropdown
+                  value={condition[conditionName]}
+                  options={conditions}
+                  optionLabel="name"
+                  name={conditionName}
+                  placeholder="Select a Condition"
+                  onChange={(e) => onConditionChange(e)}
+                  className="condition_dropdown"
+                />
+              ),
+              accessibility: (
+                <MultiSelect
+                  value={accessibility[accessibilityName]}
+                  onChange={(e) => onAccessibilityChange(e)}
+                  name={accessibilityName}
+                  options={accessibilities}
+                  placeholder="Select a Accessibility"
+                  optionLabel="name"
+                />
+              ),
+            },
+          });
+        });
+      }
+      mainTree.push({
+        key: `${index}`,
+        id: el?.moduleid,
+        data: {
+          name: el?.name,
+        },
+        children: childTree,
+      });
+    });
+    setConfigTable(mainTree);
+  }, [configData?.configureData, modules, dataparam, condition, accessibility]);
 
   const onDataparamChange = (e) => {
     setDataparam({
@@ -57,736 +117,15 @@ const ConfigureSetup = () => {
     });
   };
 
-  const configTableData = [
-    {
-      key: "0",
-      data: {
-        name: "Sign-up Module",
-      },
-      children: [
-        {
-          key: "0-0",
-          data: {
-            name: "Sign Up Scenario1",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup0}
-                placeholder="Enter Text"
-                name="singup0"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition0}
-                options={conditions}
-                optionLabel="name"
-                name="condition0"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-                className="condition_dropdown"
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access0}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access0"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-1",
-          data: {
-            name: "Sign Up Scenario2",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup1}
-                placeholder="Enter Text"
-                name="singup1"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition1}
-                options={conditions}
-                optionLabel="name"
-                name="condition1"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access1}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access1"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-2",
-          data: {
-            name: "Sign Up Scenario3",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup2}
-                placeholder="Enter Text"
-                name="singup2"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition2}
-                options={conditions}
-                optionLabel="name"
-                name="condition2"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access2}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access2"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-3",
-          data: {
-            name: "Sign Up Scenario4",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup3}
-                placeholder="Enter Text"
-                name="singup3"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition3}
-                options={conditions}
-                optionLabel="name"
-                name="condition3"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access3}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access3"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-4",
-          data: {
-            name: "Sign Up Scenario5",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup4}
-                placeholder="Enter Text"
-                name="singup4"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition4}
-                options={conditions}
-                optionLabel="name"
-                name="condition4"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access4}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access4"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-5",
-          data: {
-            name: "Sign Up Scenario6",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup5}
-                placeholder="Enter Text"
-                name="singup5"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition5}
-                options={conditions}
-                optionLabel="name"
-                name="condition5"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access5}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access5"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-6",
-          data: {
-            name: "Sign Up Scenario7",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup6}
-                placeholder="Enter Text"
-                name="singup6"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition6}
-                options={conditions}
-                optionLabel="name"
-                name="condition6"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access6}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access6"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-7",
-          data: {
-            name: "Sign Up Scenario8",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup7}
-                placeholder="Enter Text"
-                name="singup7"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition7}
-                options={conditions}
-                optionLabel="name"
-                name="condition7"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access7}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access7"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-8",
-          data: {
-            name: "Sign Up Scenario9",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup8}
-                placeholder="Enter Text"
-                name="singup8"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition8}
-                options={conditions}
-                optionLabel="name"
-                name="condition8"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access8}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access8"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-9",
-          data: {
-            name: "Sign Up Scenario10",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup9}
-                placeholder="Enter Text"
-                name="singup9"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition9}
-                options={conditions}
-                optionLabel="name"
-                name="condition9"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access9}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access9"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-      ],
-    },
-    {
-      key: "1",
-      data: {
-        name: "Login Module",
-      },
-      children: [
-        {
-          key: "0-0",
-          data: {
-            name: "Login Scenario zero",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup0}
-                placeholder="Enter Text"
-                name="singup0"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition0}
-                options={conditions}
-                optionLabel="name"
-                name="condition0"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-                className="condition_dropdown"
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access0}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access0"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-1",
-          data: {
-            name: "Login Scenario one",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup1}
-                placeholder="Enter Text"
-                name="singup1"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition1}
-                options={conditions}
-                optionLabel="name"
-                name="condition1"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access1}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access1"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-2",
-          data: {
-            name: "Login Scenario two",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup2}
-                placeholder="Enter Text"
-                name="singup2"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition2}
-                options={conditions}
-                optionLabel="name"
-                name="condition2"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access2}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access2"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-3",
-          data: {
-            name: "Login Scenario three",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup3}
-                placeholder="Enter Text"
-                name="singup3"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition3}
-                options={conditions}
-                optionLabel="name"
-                name="condition3"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access3}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access3"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-4",
-          data: {
-            name: "Login Scenario four",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup4}
-                placeholder="Enter Text"
-                name="singup4"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition4}
-                options={conditions}
-                optionLabel="name"
-                name="condition4"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access4}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access4"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-5",
-          data: {
-            name: "Login Scenario Five",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup5}
-                placeholder="Enter Text"
-                name="singup5"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition5}
-                options={conditions}
-                optionLabel="name"
-                name="condition5"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access5}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access5"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-6",
-          data: {
-            name: "Login Scenario six",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup6}
-                placeholder="Enter Text"
-                name="singup6"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition6}
-                options={conditions}
-                optionLabel="name"
-                name="condition6"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access6}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access6"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-7",
-          data: {
-            name: "Login Scenario seven",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup7}
-                placeholder="Enter Text"
-                name="singup7"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition7}
-                options={conditions}
-                optionLabel="name"
-                name="condition7"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access7}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access7"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-8",
-          data: {
-            name: "Login Scenario eight",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup8}
-                placeholder="Enter Text"
-                name="singup8"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition8}
-                options={conditions}
-                optionLabel="name"
-                name="condition8"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access8}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access8"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-        {
-          key: "0-9",
-          data: {
-            name: "Login Scenario nine",
-            dataParameterization: (
-              <InputText
-                value={dataparam.singup9}
-                placeholder="Enter Text"
-                name="singup9"
-                className="p-inputtext-sm"
-                onChange={(e) => onDataparamChange(e)}
-              />
-            ),
-            condition: (
-              <Dropdown
-                value={condition.condition9}
-                options={conditions}
-                optionLabel="name"
-                name="condition9"
-                placeholder="Select a Condition"
-                onChange={(e) => onConditionChange(e)}
-              />
-            ),
-            accessibility: (
-              <MultiSelect
-                value={accessibility.access9}
-                onChange={(e) => onAccessibilityChange(e)}
-                name="access9"
-                options={accessibilities}
-                placeholder="Select a Accessibility"
-                optionLabel="name"
-              />
-            ),
-          },
-        },
-      ],
-    },
-  ];
-
   const tableTreeHeader = (
     <div className="flex align-items-center justify-content-between">
       <div className="flex align-items-center">
         <RadioButton
           inputId="module1"
           name="module"
-          value="End to End Modules"
+          value="e2eExecution"
           onChange={(e) => setModules(e.value)}
-          checked={modules === "End to End Modules"}
+          checked={modules === "e2eExecution"}
         />
         <label htmlFor="module1" className="ml-2">
           End to End Modules
@@ -796,9 +135,9 @@ const ConfigureSetup = () => {
         <RadioButton
           inputId="module2"
           name="module"
-          value="Normal Modules"
+          value="normalExecution"
           onChange={(e) => setModules(e.value)}
-          checked={modules === "Normal Modules"}
+          checked={modules === "normalExecution"}
         />
         <label htmlFor="module2" className="ml-2">
           Normal Modules
@@ -817,7 +156,7 @@ const ConfigureSetup = () => {
   );
 
   const rowClassName = (node) => {
-    if (node.key.length === 1) {
+    if (node?.key?.length === 1) {
       return { customRow: true };
     } else {
       return { genaralRow: true };
@@ -1006,7 +345,7 @@ const ConfigureSetup = () => {
                 </span>
               ),
               data: "Documents Folder",
-            }
+            },
           ],
         },
       ],
@@ -1019,7 +358,7 @@ const ConfigureSetup = () => {
         <TabPanel header="Configuration Information">
           <div className="config_container">
             <div className="grid">
-              <div class="col-5 flex flex-column">
+              <div class="col-12 lg:col-12 xl:col-5 md:col-12 sm:col-12 flex flex-column">
                 <AvoInput
                   htmlFor="username"
                   labelTxt="Configuration Name"
@@ -1033,13 +372,14 @@ const ConfigureSetup = () => {
                 />
               </div>
             </div>
-            <div className="config_subcontainer">
-              <div className="table_section">
+            <div className="grid config_subcontainer">
+              <div className="table_section col-12 lg:col-12 xl:col-9 md:col-12 sm:col-12">
                 <TreeTable
                   header={tableTreeHeader}
-                  value={configTableData}
+                  value={configTable}
                   selectionMode="checkbox"
                   selectionKeys={selectedNodeKeys}
+                  loading={configData.loading}
                   onSelectionChange={(e) => setSelectedNodeKeys(e.value)}
                   className="tabletree_class"
                   rowClassName={rowClassName}
@@ -1065,6 +405,10 @@ const ConfigureSetup = () => {
                 setMode={setMode}
                 avodropdown={avodropdown}
                 onAvoSelectChange={onAvoSelectChange}
+                avogrids={[
+                  ...configData?.avoAgentAndGrid?.avoagents,
+                  ...configData?.avoAgentAndGrid?.avogrids,
+                ]}
               />
             </div>
           </div>

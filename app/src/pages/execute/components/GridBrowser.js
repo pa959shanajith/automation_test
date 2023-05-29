@@ -1,15 +1,21 @@
 import { SelectButton } from "primereact/selectbutton";
 import { Dropdown } from "primereact/dropdown";
-import { avogrids, browsers, selections } from "../../utility/mockData";
+import { browsers, selections } from "../../utility/mockData";
 import { MultiSelect } from "primereact/multiselect";
 
-const GridBrowser = ({ mode, setMode, avodropdown, onAvoSelectChange }) => {
+const GridBrowser = ({ mode, setMode, avodropdown, onAvoSelectChange, avogrids }) => {
+  avogrids.forEach((el, index, arr) => {
+    if(Object.keys(el).includes('Hostname')){
+      avogrids[index] = { ...el, name: el.Hostname }
+    }
+  });
+
   return (
-    <div className="avogrid_section">
+    <div className="avogrid_section col-12 lg:col-12 xl:col-3 md:col-12 sm:col-12">
       <div className="avogrid_container">
         <div className="avogrid_fields">
           <label>
-            <span>Avo Agent / Avo Grid</span>
+            <span>Avo Agent / Avo Grids</span>
             <span className="icon_required">*</span>
           </label>
           <Dropdown

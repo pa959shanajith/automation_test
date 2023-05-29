@@ -5,8 +5,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import loginReducer from './pages/login/loginSlice'
 import designSlice from "./pages/design/designSlice";
-
-
+import configureSetupSlice from "./pages/execute/configureSetupSlice";
 
 export default configureStore({
     reducer:{
@@ -14,7 +13,8 @@ export default configureStore({
         login: loginReducer,
         // plugin:pluginReducer,
         // admin:adminReducer
-        design: designSlice
+        design: designSlice,
+        configsetup: configureSetupSlice
         
     }
 })

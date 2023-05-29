@@ -22,28 +22,53 @@ export const configTableHead = [
 ];
 
 export const conditions = [
-    { name: 'True', code: 'T' },
-    { name: 'False', code: 'F' }
+  { name: "True", code: "T" },
+  { name: "False", code: "F" },
 ];
 
 export const accessibilities = [
-    { name: 'AA', code: 'A' },
-    { name: 'BB', code: 'B' },
-    { name: 'CC', code: 'C' },
-    { name: 'DD', code: 'D' }
-];
-
-export const avogrids = [
-  { name: 'Avogrid1', code: 'one' },
-  { name: 'Avogrid2', code: 'two' },
-  { name: 'Avogrid3', code: 'three' },
-  { name: 'Avogrid4', code: 'four' }
+  { title: "method A", value: "A", name: "A" },
+  { title: "method AA", value: "AA", name: "AA" },
+  { title: "method AAA", value: "AAA", name: "AAA" },
+  { title: "Aria", value: "aria", name: "Aria" },
+  { title: "method 508", value: "508", name: "Section 508" },
+  {
+    title: "method Best Practice",
+    value: "Best Practice",
+    name: "Best Practice",
+  },
 ];
 
 export const browsers = [
-  { name: 'Chrome', code: 'C' },
-  { name: 'Edge', code: 'E' },
-  { name: 'Opera', code: 'O' }
+  {
+    data: {
+      icon: "chrome",
+    },
+    key: "1",
+    name: "Google Chrome",
+  },
+  {
+    data: {
+      icon: "safari",
+    },
+    key: "safari",
+    name: "Safari",
+    disabled: true,
+  },
+  {
+    data: {
+      icon: "firefox",
+    },
+    key: "2",
+    name: "Mozilla Firefox",
+  },
+  {
+    data: {
+    icon: "edge",
+    },
+    key: "8",
+    name: "Microsoft Edge",
+  },
 ];
 
-export const selections = ['Non-Headless', 'Headless'];
+export const selections = ["Non-Headless", "Headless"];

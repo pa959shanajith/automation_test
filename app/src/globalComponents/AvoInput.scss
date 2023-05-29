@@ -15,6 +15,16 @@
         }
     }
 
+    .input_container.inputRow {
+        margin: 1.25rem 0 1.25rem 0;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        .p-inputtext {
+            padding: 0.4rem 0.4rem;
+        }
+    }
+
     .p-inputtext {
         padding: 0.4rem 0.4rem;
     }
