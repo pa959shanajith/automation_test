@@ -30,17 +30,21 @@
         float: right;
         position: relative;
         top: -1rem;
-        right: 3rem;
+        right: 1rem;
     }
     .proj-input{
         position: relative;
         top: 0.5rem;
+        height: 2.25rem;
+        width: 51% !important;
+       min-width: 30% !important;
        
     }
 
     .app-dropdown{
         position: relative;
-        bottom: -0.3rem;
+        top: 0.5rem;
+        height: 2.25rem;
     }
     
     .proj-input::placeholder{
@@ -64,27 +68,31 @@
         .p-card-body{
             margin: 0rem;
             overflow-y: auto;
-            height: 17rem;
+            height: auto;
+            min-height: 25rem;
             overflow-x: hidden;
         }
     }  
     .card11{
         position: relative;
        top:0.5rem;
-        width: 36rem;
+       width: 51%;
+       min-width: 27%;
     }
     .card22{
-        width: 30rem;
-        float: right;
-        position: relative;
-        bottom:17rem;
+    position: relative;
+    bottom: 25.4rem;
+    float: right;
+    width: 43%;
+    min-width: 43%;
     }
     .card22{
         .p-card-body{
             margin: 0rem;
             overflow-x: hidden;
             overflow-y: auto;
-            height: 17rem;
+            height: auto;
+            min-height: 25rem;
         }
     
     }
@@ -149,29 +157,28 @@
         bottom: 1rem;
         position: relative;
         font-size: 14px;
-        font-family: 'open-sans';
+        font-family: 'Open Sans';
         font-weight: 400;
     }
 
     .selected-users{
         font-size: 14px;
-        font-family: 'open-sans';
+        font-family: 'Open Sans';
         font-weight: 400;
         position: relative;
         bottom: 1rem;
     }
      .gtbtn {
         color: blue !important;
-        right: -37.6rem !important;
-        top: -10rem !important;
+        left: 37.6rem !important;
+        bottom: 15rem !important;
         height: 2rem !important;
         width: 0rem !important;
         align-items: center !important;
         background: white !important;
      }
      .ltbtn{
-        right: -40rem !important;
-        top: -7rem !important;
+        bottom: 11.5rem !important;
         left: 35rem !important;
         color: blue !important;
         height: 2rem !important;
@@ -182,12 +189,19 @@
      }
     .role-dropdown{
         float: right;
-        width: 11rem;
+        width: 16.18rem;
         height: 2em;
         position: relative;
         left: 1rem;
         bottom: 7rem;
         margin-bottom: 0.5rem;
+    }
+    .role-dropdown{
+        .p-dropdown-label{
+            display: flex !important;
+            align-items: center !important;
+  
+      }
     }
     .checkbox1{
         .label1{
@@ -206,18 +220,20 @@
     .selectallbtn{
         position: relative;
         bottom: 0.5rem;
+        height: 2.25rem;
     }
     .usersearch{
-        width: 23rem;
-        height: 2rem;
+        width: 31rem;
+        height: 2.25rem;
+    
     }
     .user-select-checkbox {
         position: relative;
         top: 0.5rem;
     }
     .selecteduser{
-        width: 23rem;
-        height: 2rem;
+        width: 28rem;
+        height: 2.25rem;
     }
     .Project-Dialog{
         .p-dialog-header {
@@ -242,8 +258,8 @@
     }
     .dropdown_role{
         position: relative;
-        top: -5rem;
-        left: 23rem;
+        bottom: 5.2rem;
+        left: 19rem;
         color: #9E9E9E;
         font-size: 14px;
         font-family: 'Open sans' !important;
@@ -380,8 +396,19 @@
     .gtbtn , .ltbtn{
         .p-button-label{
             position: relative;
-            right: 0.2rem;
+            right: 0.3rem;
         }
+    }
+    .p-multiselect-item{
+        font-family: 'Open Sans' !important;
+        font-size: 12px !important;
+    }
+    .p-multiselect.p-multiselect-chip .p-multiselect-token{
+     padding: 0.2rem 0.2rem !important;
+    margin-right: 0.2rem !important;
+    font-size: 7px !important;
+    height: 1rem !important;
+    width: 3rem !important;
     }
     
     
