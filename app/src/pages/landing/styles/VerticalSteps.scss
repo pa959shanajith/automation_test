@@ -1,29 +1,78 @@
 .verticalcard{
-    padding: 1% ;
     width: 70%;
-    height: 60%;
-    margin-bottom: 1rem;
+    height: 50% ;
+
+    
+
 }
 
-.verticalbutton{
-    margin-left: 29em !important;
-}
-.verticalbuttonE{
-    margin-left: 31em !important;
-}
-.verticalbuttonR{
-    margin-left: 38em !important;
+
+.stepLabel{
+    height:2.3rem;
 }
 
+.GetStd{
+    font-size: 1.4rem;
+    margin-left: 3%;
+    padding-top: 1rem;
+    padding-bottom: 2%;
+}
 .verticalicon{
     position: relative;
     top: 0.35em;
     right: 0.5em;
 }
+.label{
+    font-size: 0.97rem;
+    font-weight: 600;
+}
+.titleDescBut{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 2%;
+    padding-right: 3%;
 
+}
+.labelDescription{
+    height: 100%;
+}
+.description{
+    font-size: 13px !important;
+    // padding: 0.1rem 0;
+    
+}
 .Stepper{
-  margin-left: 0.5em;
+    padding-left: 3.5%;
+    padding-bottom: 2%;
+}
+.buttonNav{
+    align-items: center;
 }
 .HeaderName{
     margin-bottom: 0em !important;
 }
+.MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiStepIcon-root Mui-active css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root{
+    margin-left: 1%;
+}
+// .MuiStepLabel-root .MuiStepLabel-vertical .css-14sza3e-MuiStepLabel-root{
+//     margin-left: 1%;
+//     height: 30%;
+// }
+// .css-8t49rw-MuiStepConnector-line {
+// height: 0px !important;
+
+// }
+// .css-ahj2mt-MuiTypography-root{
+//     line-height: 0px !important;
+//     letter-spacing:0px !important;
+// }
+// .MuiBox-root .css-1bxarir{
+//     margin-bottom: 10% !important;
+//     height: 1% !important;
+   
+// }
+
+// .MuiStepper-root .MuiStepper-vertical  .css-9tmuzo-MuiStepper-root{
+//     border-width: 1px solid black;
+// }

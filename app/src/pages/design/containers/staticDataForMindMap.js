@@ -3,7 +3,8 @@ import '../styles/MindmapHome.scss';
 import Canvas from './Canvas';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
-// import ControlBox from '../components/ControlBox';
+import ControlBox from '../components/ControlBox';
+import ModuleListSidePanel from '../components/ModuleListSidePanel';
 
 
 const data ={
@@ -66,8 +67,9 @@ function StaticDataForMindMap() {
     setShowCard(false);
    }
   return (
-    <>
-    <Card style={{width: '25rem',height: '45rem'}}/>
+    <div style={{display:'flex',flexDirection:'row'}}>
+    {/* <Card style={{width: '25rem',height: '45rem'}}/> */}
+    <ModuleListSidePanel/>
     {showCard && <div className='cardMindmap'>
       <Card  id='p_card' className='Module'>
         <span className='cardText'>
@@ -92,7 +94,7 @@ function StaticDataForMindMap() {
     {showGenius && <div style={{background:'#F5F5F5'}}><Card className='avoGeniusCard' title='Welcome to Avo Genius'>
             <img className='avoGeniuscardImg' src='static\imgs\AGS.svg' alt='Avo Genius Logo'/>
           </Card></div>}
-    </>
+    </div>
   );
 }
 
