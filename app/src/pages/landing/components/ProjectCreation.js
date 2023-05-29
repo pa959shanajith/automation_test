@@ -30,8 +30,9 @@ const  ProjectCreation=() =>{
     <>
         {/* {visible && <CreateProject setVisible={setVisible} />} */}
         <div className='p-4 surface-100 flex flex-column'>
+          <div className='VerticalStepBox'>
           <VerticalSteps/>
-
+          </div>
           {/* <div className=" CreateProj-card"> */}
             <Card className="CreateProj-card"  id='Createproj-title' title="Do you want to create a new project?" >
               <Button  size="small"  onClick={handleOpenDialog} >Create Project</Button> 

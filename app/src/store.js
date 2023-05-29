@@ -5,12 +5,16 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import loginReducer from './pages/login/loginSlice'
 import designSlice from "./pages/design/designSlice";
+
+
+import stepsSlice from './pages/landing/components/VerticalComponentsSlice';
 import landingReducer from './pages/landing/LandingSlice';
 
 export default configureStore({
     reducer:{
         // All the reducer from the slices needs to be combined here ex
-        login: loginReducer,
+        login:loginReducer,
+        steps:stepsSlice,
         landing:landingReducer,
         // plugin:pluginReducer,
         // admin:adminReducer
