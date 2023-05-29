@@ -67,7 +67,7 @@ function StaticDataForMindMap() {
     setShowCard(false);
    }
   return (
-    <>
+    <div style={{display:'flex',flexDirection:'row'}}>
     {/* <Card style={{width: '25rem',height: '45rem'}}/> */}
     <ModuleListSidePanel/>
     {showCard && <div className='cardMindmap'>
@@ -94,7 +94,7 @@ function StaticDataForMindMap() {
     {showGenius && <div style={{background:'#F5F5F5'}}><Card className='avoGeniusCard' title='Welcome to Avo Genius'>
             <img className='avoGeniuscardImg' src='static\imgs\AGS.svg' alt='Avo Genius Logo'/>
           </Card></div>}
-    </>
+    </div>
   );
 }
 
