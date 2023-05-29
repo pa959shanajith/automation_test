@@ -43,7 +43,13 @@ const ActionPanel = (props) => {
             <button className='add_object_save'>Save</button>
         </div>
     )
-
+    
+    const footerCompare = (
+      <div className='footer_compare'>
+        <button className='clear__btn__cmp'>Clear</button>
+        <button className='save__btn__cmp'>Compare</button>
+      </div>
+    )
 
 
     const handleSpanClick = (index) => {
@@ -152,7 +158,7 @@ const ActionPanel = (props) => {
     </div>
     </Dialog>
    
-   <Dialog className='compare__object__modal' header="Compare Object:Sign up screen 1" style={{height: "21.06rem",width: "24.06rem"}} visible={props.isOpen==='compareObject'} onHide={props.OnClose}>
+   <Dialog className='compare__object__modal' header="Compare Object:Sign up screen 1" style={{height: "21.06rem",width: "24.06rem"}} visible={props.isOpen==='compareObject'} onHide={props.OnClose} footer={footerCompare}>
     <div className='compare__object'>
       <span className='compare__btn'>
         <p className='compare__text'>All Browsers</p>
