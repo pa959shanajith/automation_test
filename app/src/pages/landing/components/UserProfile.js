@@ -13,11 +13,10 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
 import { useDispatch } from "react-redux";
-import { loginSliceActions } from '../../login/loginSlice'
+import { loadUserInfoActions } from '../LandingSlice';
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from '../../global/api';
 import RedirectPage from '../../global/components/RedirectPage';
-
+import ChangePassword from '../../global/components/ChangePassword';
 
 const UserDemo = (props) => {
     const navigate = useNavigate();
@@ -28,6 +27,7 @@ const UserDemo = (props) => {
     const [logoutClicked, setLogoutClicked] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
     const [profileImage, setProfileImage] = useState(null);
+    const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
     const toast = useRef(null);
     const buttonEl = useRef(null);
     const userLoginInfo = {
@@ -90,6 +90,7 @@ const UserDemo = (props) => {
         {
             label: 'Change Password',
             icon: 'pi pi-fw pi-key',
+            command: () => changePasswordDialog()
         },
         {
             label: 'Download',
@@ -118,6 +119,11 @@ const UserDemo = (props) => {
         }
     ]);
 
+    const changePasswordDialog = () => {
+        setShowChangePasswordDialog(true);
+        dispatch(loadUserInfoActions.showChangePasswordDialog());
+    }
+
     const onUpload = (event) => {
         // Get the uploaded file
         const uploadedFile = event.files[0];
@@ -129,8 +135,6 @@ const UserDemo = (props) => {
 
     const accept = () => {
         RedirectPage(navigate, { reason: "logout" });
-        toast.current.show({ severity: 'info', detail: 'User successfully logged out from Avo Assure' });
-
     };
 
     const reject = () => {
@@ -155,6 +159,7 @@ const UserDemo = (props) => {
 
     return (
         <>
+            { showChangePasswordDialog && < ChangePassword showDialogBox = {showChangePasswordDialog} setShowDialogBox= {setShowChangePasswordDialog}/>}
             <div>
                 <Toast ref={toast} />
                 <ConfirmPopup target={buttonEl.current} visible={logoutClicked} onHide={() => setLogoutClicked(false)}
