@@ -5,13 +5,13 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import loginReducer from './pages/login/loginSlice'
 import designSlice from "./pages/design/designSlice";
-
-
+import landingReducer from './pages/landing/LandingSlice';
 
 export default configureStore({
     reducer:{
         // All the reducer from the slices needs to be combined here ex
         login: loginReducer,
+        landing:landingReducer,
         // plugin:pluginReducer,
         // admin:adminReducer
         design: designSlice
