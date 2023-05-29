@@ -622,11 +622,11 @@ exports.excelToMindmap = function (req, res){
 			var cSheetRow = cSheet.split('\n');
 			excelrows=[]
 			cSheetRow[0].split(',').forEach(function (e, i) {
-				if(i== 0 && e.toLowerCase()!="module") {return res.status(500).send("fail");}
-				if(i== 1 && e.toLowerCase()!="scenario"){return res.status(500).send("fail");}
-				if(i== 2 && e.toLowerCase()!="screen"){return res.status(500).send("fail");}
-				if(i== 3 && e.toLowerCase()!="script"){return res.status(500).send("fail");}
-				if (i==4){return res.status(500).send("fail");}
+				if(i== 0 && e.toLowerCase()!="module") {return res.status(200).send("fail");}
+				if(i== 1 && e.toLowerCase()!="scenario"){return res.status(200).send("fail");}
+				if(i== 2 && e.toLowerCase()!="screen"){return res.status(200).send("fail");}
+				if(i== 3 && e.toLowerCase()!="script"){return res.status(200).send("fail");}
+				if (i==4){return res.status(200).send("fail");}
 			});
 			for (var i = 0; i < cSheetRow.length; i++) {				
 				row=cSheetRow[i].split(",")
@@ -1138,30 +1138,40 @@ exports.writeZipFileServer = async(req,res) => {
 				if (fs.existsSync(jsonModpath) && fs.existsSync(jsontscpath) && fs.existsSync(jsonscrpath) && fs.existsSync(jsontcpath) ) {
 					fs.readFile(jsontscpath, 'utf8', (err, data) => {
 						if (err) throw err;
+						if (data === ""){data = []}
+						else{
 						let jsonTscData = JSON.parse(data);
 						if(!Array.isArray(jsonTscData)){
-							return res.status(400).send('Invalid file format');}
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsondobpath, 'utf8', (err, data) => {
-						if (err) throw err;
+						 if (err) throw err;
+						 if (data === ""){data = []}
+						 else{
 						let jsonDobData = JSON.parse(data);
-						if(!Array.isArray(jsonDobData)){
-							return res.status(400).send('Invalid file format');}
+						if(!Array.isArray(jsonDobData) && !""){
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsonscrpath, 'utf8', (err, data) => {
 						if (err) throw err;
+						if (data === ""){data = []}
+						else{
 						let jsonScrData =JSON.parse(data);
 						if(!Array.isArray(jsonScrData)){
-							return res.status(400).send('Invalid file format');}
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsontcpath, 'utf8', (err, data) => {
-						if (err) throw err;
+						 if (err) throw err;
+						 if (data === ""){data = []}
+						 else{
 						let jsonTcData = JSON.parse(data);
 						if(!Array.isArray(jsonTcData)){
-							return res.status(400).send('Invalid file format');}
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsonModpath, 'utf8', (err, data) => {
 						if (err) throw err;
+						if (data === ""){return res.status(400).send('No ModuleData');}
+						else{
 						let jsonData = JSON.parse(data);
 						if(Array.isArray(jsonData) && jsonData.length>0){
 							jsonResponse.msg = 'Files extracted successfully';
@@ -1170,7 +1180,7 @@ exports.writeZipFileServer = async(req,res) => {
 						}
 						else{
 							return res.status(400).send('Invalid file format');
-						}
+						}}
 						
 					});
 				
