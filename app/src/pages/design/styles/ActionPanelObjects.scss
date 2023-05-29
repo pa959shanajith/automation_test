@@ -38,6 +38,7 @@
         border-bottom: 1px solid #C7C7C7;
         color: #030229;
         padding: 0.7rem;
+        margin-left: 1.7%;
     }
 
     .p-card-body {
@@ -356,15 +357,46 @@
     position: relative;
     top: 10%;
     border: 1px solid lightgray;
-    height: 77%;
+    height: 90%;
     border-radius: 3px;
+}
+
+.footer__compare{
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.clear__btn__cmp{
+  position: relative;
+  top: 0.7rem;
+  width: 24%!important;
+  height: 1.7rem;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-family: 'Open Sans';
+  cursor: pointer;
+}
+.save__btn__cmp{
+    position: relative;
+    top: 0.7rem;
+    width: 24%!important;
+    height: 1.7rem;
+    background: #605BFF;
+    border: none;
+    color: white;
+    font-size: 12px;
+    font-family: 'Open Sans';
+    border-radius: 2px;
+    cursor: pointer;
 }
 
 .browser__col {
     display: flex;
     flex-direction: column;
     position: relative;
-    top: 9%;
+    top: 4%;
     left: 4%;
     padding: 0.3rem;
 
@@ -387,6 +419,7 @@
         font-style: normal;
         font-weight: 400;
         font-size: 14px;
+        width: 92%;
     }
 
     .sel__tick {

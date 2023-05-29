@@ -1,0 +1,81 @@
+.design_dialog_box {
+    .p-dialog-header {
+        background: #E2E2ED !important;
+        border-top-right-radius: 4px;
+        padding: 0.3rem 0 !important;
+        height: 5rem !important;
+
+        .p-dialog-header-icons {
+            position: relative;
+            right: 96%;
+        }
+
+        .p-dialog-title {
+            .dailog_header1 {
+                color: rgba(3, 2, 41, .6);
+                font-family: Open Sans;
+                font-weight: 500;
+                left: 3rem !important;
+                position: absolute;
+                top: 0.5rem;
+            }
+
+            .dailog_header2 {
+                color: #030229;
+                font-family: Open Sans;
+                font-size: 20px;
+                font-weight: 500;
+                left: 3rem !important;
+                position: absolute;
+                top: 2.5rem;
+            }
+        }
+    }
+}
+.toggle__tab {
+    margin-top: 2rem !important;
+
+    .p-accordion-header-link {
+        padding: 0.7rem !important;
+    }
+
+    .p-accordion .p-accordion-content {
+        padding: 0rem !important;
+        height: 40rem;
+    }
+
+}
+
+.btn__grp {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.add__step__btn {
+    color: white;
+    background: #605BFF;
+    border: none;
+    width: 7rem;
+    height: 2rem;
+    border-radius: 4px;
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.debug__btn {
+    width: 5rem;
+    border: ipx solid #ACA9FF;
+    background: #FFFFFF;
+    border: 1px solid #ACA9FF;
+    color: #605BFF;
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
