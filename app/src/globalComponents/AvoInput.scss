@@ -1,12 +1,20 @@
 .avo_input {
     width: 100%;
-
     .input_container {
         width: 100%;
+        .validation_container {
+            height: 1rem;
+            .txt_valid {
+                visibility: hidden;
+            }
+            .txt_invalid {
+                visibility: visible;
+                color: #D1272C;
+            }
+        }
     }
-
     .input_container.inputColumn {
-        margin: 1.25rem 0 1.25rem 0;
+        margin: 1.25rem 0 0.5rem 0;
         display: flex;
         flex-direction: column;
         .p-inputtext {
@@ -14,7 +22,6 @@
             margin-top: 10px;
         }
     }
-
     .input_container.inputRow {
         margin: 1.25rem 0 1.25rem 0;
         display: flex;
@@ -24,7 +31,6 @@
             padding: 0.4rem 0.4rem;
         }
     }
-
     .p-inputtext {
         padding: 0.4rem 0.4rem;
     }

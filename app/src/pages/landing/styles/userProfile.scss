@@ -85,15 +85,7 @@
     font-weight: 100 !important;
 
    }
-
 }
-
-// label {
-//   display: block;
-//   font-weight: 300;
-//   margin-bottom: 8px;
-//   color: #37404C;
-// }
 
 input[type="text"],
 input[type="email"] {
@@ -125,6 +117,12 @@ input[readOnly] {
 .input_field {
   position: relative;
   bottom: 1.8rem;
+  label {
+  display: block;
+  font-weight: 300;
+  margin-bottom: 8px;
+  color: #37404C;
+}
 }
 
 .userImage {

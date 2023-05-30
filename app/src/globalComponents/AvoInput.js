@@ -1,4 +1,5 @@
 import { InputText } from "primereact/inputtext";
+import { useState } from "react";
 import "./AvoInput.scss";
 
 const AvoInput = ({
@@ -12,6 +13,7 @@ const AvoInput = ({
   customClass = "",
   icon = null,
 }) => {
+  const [touched, setTouched] = useState(false);
   const inputJsx = (
     <div className={`input_container ${customClass}`}>
       {(labelTxt || infoIcon || required) && (
@@ -29,12 +31,23 @@ const AvoInput = ({
           </div>
         </div>
       )}
-      <InputText
-        {...(htmlFor && { id: htmlFor })}
-        placeholder={placeholder}
-        value={inputTxt}
-        onInput={(e) => setInputTxt(e.target.value)}
-      />
+      <>
+        <InputText
+          {...(htmlFor && { id: htmlFor })}
+          placeholder={placeholder}
+          value={inputTxt}
+          onInput={(e) => setInputTxt(e.target.value)}
+          onBlur={() => setTouched(true)}
+          {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}
+        />
+        {required && (
+          <div className="validation_container">
+              <small className={(touched && !inputTxt) ? 'txt_invalid' : 'txt_valid'}>
+                {labelTxt} is required.
+              </small>
+          </div>
+        )}
+      </>
     </div>
   );
 
