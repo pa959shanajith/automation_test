@@ -7,7 +7,6 @@ import store from './store';
 // import HomePage from './pages/landing/containers/HomePage';
 import HomePage from './pages/landing/containers/HomePage';
 import Report from './pages/report/components/reports';
-import Execute from './pages/execute/Components/Execute';
 import More from './pages/more/more';
 import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
@@ -20,7 +19,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
-import StaticDataForMindMap from './pages/design/staticDataForMindMap';
+import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
 
 import ConfigurePage from './pages/execute/components/ConfigurePage';
 import './App.css';
