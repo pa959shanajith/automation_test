@@ -38,6 +38,7 @@ const ScrollBar = (props) => {
     
     const [temp] = useUpdateScrollBar();
     const scrollRef = useRef();
+    const scrnType = localStorage.getItem('integrationScreenType');
 
     useEffect(()=>{
         if (scrollRef.current) 
@@ -117,7 +118,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style>
-            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength || 20,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}}  onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
+            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength || 20,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={scrnType !== 'Azure' ? {maxHeight:'inherit',height:'inherit'}:null}  onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
                 {props.children}
             </PerfectScrollbar>
         </Fragment>
