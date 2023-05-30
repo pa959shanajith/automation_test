@@ -1,0 +1,262 @@
+.ConfigurePage_container{
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+    padding-bottom: 10rem;
+    padding-top: 0rem;
+    font-family: 'Open Sans';
+    font-weight: normal;
+    // width: 125%;
+
+    .p-panel .p-panel-header {
+      border: 1px solid #dee2e6;
+      padding: 1.25rem;
+      background: #f8f9fa;
+      color: #343a40;
+      border-top-right-radius: 6px;
+      border-top-left-radius: 6px;
+      background: rgba(96, 91, 255, 0.08);
+      box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+    }
+    .p-datatable .p-datatable-thead > tr > th {
+      text-align: left;
+          padding: 1rem 1rem;
+          border: 1px solid #dee2e6;
+          border-width: 0 0 1px 0;
+          font-weight: 700;
+          color: #343a40;
+          background: #f8f9fa;
+          transition: box-shadow 0.2s;
+          background: rgba(96, 91, 255, 0.08);
+      box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);}
+}
+    .config_header{
+//         border: 2.5px solid #dee2e6;
+//         // padding: 10rem 20rem 20rem 1rem;
+//         background: #f8f9fa;
+//         color: #343a40;
+//         border-top-right-radius: 6px;
+//         border-top-left-radius: 6px;
+//         font-family: 'Open Sans';
+//         width:100% !important ;
+//         // width: 84rem !important;
+//         background-color: lawngreen;
+//         background: rgba(96, 91, 255, 0.08);
+// box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+border: 1px solid #dee2e6 !important;
+    padding: 1.25rem !important;
+    background: #f8f9fa !important;
+    color: #343a40 !important;
+    border-top-right-radius: 6px !important ;
+    border-top-left-radius: 6px !important;
+    background: rgba(96, 91, 255, 0.08);
+box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+
+
+    }
+
+    .config_content {
+            padding:0 !important;
+            border: 1px solid #dee2e6 !important;
+            background: #ffffff !important;
+            color: #495057 !important;
+            // border-bottom-right-radius: 6px;
+            // border-bottom-left-radius: 6px;
+            border-top: 0 none !important;
+            width: 100% !important;
+            background: rgba(96, 91, 255, 0.08);
+box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+        }
+    
+    
+.no_card_content1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 16rem;
+    width: 100%;
+  
+    .image-container1 {
+        display: flex;
+        align-items: center;
+        position: relative;
+        bottom: 9rem;
+        margin-left: -2rem;
+  
+      .img1 {
+        height: 10rem;
+        width: 15rem;
+       
+      }
+  
+      .text1 {
+        margin-left: 1rem;
+      }
+    }
+  }
+  .datatable_config{
+    margin-right: '13rem';
+    font-weight: "normal";
+    font-family:"open Sans";
+    background: rgba(96, 91, 255, 0.08);
+box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+  }
+.tab-menu-config{
+    display: flex;
+    margin: -2px;
+    padding: 0;
+    list-style-type: none;
+    flex-wrap: nowrap;
+    margin: -4px;
+    padding: 0;
+    outline: 0;
+    text-decoration: none;
+    font-size: 100%;
+    list-style: none;
+
+}
+
+.configure_button{
+    
+
+top: 31rem;
+left: 42rem;
+position: absolute;
+width: 172px;
+height: 45px;
+left: calc(50% - 119px);
+background: #605BFF;
+border-radius: 10px;
+
+font-family: 'Open Sans';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 19px;
+width: 13rem;
+height: 2rem;
+
+/* identical to box height */
+
+display: flex;
+align-items: center;
+text-align: revert;
+flex-direction: row;
+font-family: 'open Sans';
+
+
+
+
+
+justify-content: center;
+
+/* white */
+
+color: 
+#FFFFFF;
+}
+.datatable-container {
+    width: 100%;
+    height: 100%;
+  }
+.Buttons_config{
+    margin: 0;
+    display: inline-flex;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    vertical-align: bottom;
+    text-align: center;
+    overflow: hidden;
+    // position: relative;
+    // position: absolute;
+width:  481px;
+height: 56px;
+left: -22px;
+top: 0px;
+
+/* White */
+
+background: #FFFFFF;
+// box-shadow: inset 0px -1px 0px #E5E5E5;
+button {
+    margin-right: 10px; /* Adjust the value to control the spacing */
+    background: #FFFFFF;
+    width: 90px;
+height: 17px;
+
+/* h6/bold-700/line-height-1.2 */
+
+font-family: 'OPen Sans';
+font-style: normal;
+font-weight: 700;
+font-size: 14px;
+line-height: 17px;
+/* identical to box height, or 121% */
+
+
+/* pruple */
+
+color: #605BFF;
+
+
+/* Inside auto layout */
+
+flex: none;
+order: 0;
+flex-grow: 0;
+  }
+}  
+.trash_button{
+    background: white;
+    // color: #5a199f;
+    border-color: #4F46E5;
+    width: 3rem;
+    padding: 0.75rem 0;
+    justify-content: center;
+    margin: 0;
+    display: inline-flex;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    vertical-align: bottom;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+}
+.addConfig_button{
+    margin: 0;
+    display: inline-flex;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    vertical-align: bottom;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    height: 1rem;
+}
+.p-button-edit{
+  margin: 0;
+    display: inline-flex;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    vertical-align: bottom;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    // background: #DADADA;
+    background: none;
+    border: none;
+    color: grey;
+}
+.p-button-edit:hover {
+  color: grey; /* Set the same color as the default color to remove the hover effect */
+  background: grey;
+}

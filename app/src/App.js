@@ -21,6 +21,7 @@ import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
 import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
+import ConfigurePage from './pages/execute/components/ConfigurePage';
 import './App.css';
 import Topbar from './pages/landing/components/Topbar';
 import SideNavBar from './pages/landing/components/SideNav';
@@ -74,7 +75,7 @@ const RouteApp = () => {
         <Route path="/settings" element={<Settings/> }/>
         <Route path="/itdm" element={<itdm/>} />
         <Route path="/design" element={<MindmapHome/>}/>
-        <Route path="/execute" element={<Execute/>}/>
+        <Route path="/execute" element={<ConfigurePage/>}/>
       </Routes>
     </>
   )
