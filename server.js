@@ -414,11 +414,11 @@ if (cluster.isMaster) {
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
 		app.post('/getProjectsNeo', (req, res) => (res.send("false")));
-		app.post('/populateProjects', auth.protect, mindmap.populateProjects);
+		app.post('/populateProjects',auth.protect, mindmap.populateProjects);
 		app.post('/populateUsers', auth.protect, mindmap.populateUsers);
 		app.post('/getProjectTypeMM', auth.protect, mindmap.getProjectTypeMM);
 		app.post('/populateScenarios', auth.protect, mindmap.populateScenarios);
-		app.post('/getModules', auth.protect, mindmap.getModules);
+		app.post('/getModules',auth.protect, mindmap.getModules);
 		app.post('/reviewTask', auth.protect, mindmap.reviewTask);
 		app.post('/saveData', auth.protect, mindmap.saveData);
 		app.post('/saveEndtoEndData', auth.protect, mindmap.saveEndtoEndData);

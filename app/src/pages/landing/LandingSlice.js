@@ -1,13 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 export const loadUserInfo = createSlice({
-    name: 'login',
+    name: 'loadUserInfo',
     initialState: {
         userRole: "",
         userinfo: {},
         socket: undefined,
         notify: { data: [], unread: 0 },
-        dateformat: "DD-MM-YYYY"
+        dateformat: "DD-MM-YYYY",
+        showChangePasswordDialog: false,
     },
     reducers: {
         setUserInfo: (state, payload) => {
@@ -21,6 +22,9 @@ export const loadUserInfo = createSlice({
         setSocket: (state, payload) => {
             state.socket = payload;
         },
+        showChangePasswordDialog:(state) => {
+            state.showChangePasswordDialog = !state.showChangePasswordDialog;
+        }, 
         // case actionTypes.UPDATE_NOTIFY:
         // var value = action.payload
         //     value.dateTime = new Date().toLocaleString();

@@ -1,4 +1,4 @@
-import React, { useState, useRef} from 'react';
+import React, { useState, useRef, useEffect} from 'react';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import '../styles/CreateProject.scss';
@@ -9,6 +9,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
+import { getUserDetails, userCreateProject_ICE } from '../api';
 
 
 
@@ -17,7 +18,7 @@ const  CreateProject=({ visible, onHide  }) =>{
     const [value, setValue] = useState('');
     const [selectedApp, setSelectedApp] = useState(null);
     const toast = useRef(null);
-    const [ selectedRole, setSelectedRole]=useState("");
+    const [ selectedRole, setSelectedRole]=useState({ Admin: '' });
     const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
     const [displayUser, setDisplayUser]=useState([]);
     const [selectAll, setSelectAll] = useState(false);
@@ -26,34 +27,60 @@ const  CreateProject=({ visible, onHide  }) =>{
     const [selectedAssignedCheckboxes, setSelectedAssignedCheckboxes] = useState([]);
     const[selectallAssaigned,setSelectallAssaigned]= useState(false);
     const [queryDisplayUser, setQueryDisplayUser] = useState('');
+    const [items , setItems]= useState([])
+    const [projectData , setProjectData] = useState([]);
+
+ 
+    const userDetails = async () => {
+      try {
+        const userData = await getUserDetails("user");
+        const formattedData = userData.map((user) => {
+          const [name, id, , primaryRole, , , email] = user;
+          return { id, name, primaryRole, email };
+        });
+
+        setItems(formattedData
+          .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+          .filter(item => item.primaryRole !== "Admin")
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(item => ({...item, selectedRole: ''})));
+      } catch (error) {
+        console.error(error);
+      }
+    };  
+
+    useEffect (()=>{
+      userDetails()
+    },[])
   
+
 
  
 
 
     const apps = [
-        { name: 'Web', code: 'NY', image:'/static/imgs/web.png'},
-        { name: 'Sap', code: 'RM' , image:'/static/imgs/SAP.png'},
-        { name: 'Oebs', code: 'LDN',image:'/static/imgs/OEBS.png'  },
-        { name: 'DeskTop', code: 'IST',image:'/static/imgs/ic-desktop.png'  },
-        { name: 'Webservices', code: 'PRS', image:'/static/imgs/webservice.png' },
+        { name: 'Web', code: 'NY', image:'static/imgs/web.png'},
+        { name: 'Sap', code: 'RM' , image:'static/imgs/SAP.png'},
+        { name: 'Oebs', code: 'LDN',image:'static/imgs/OEBS.png'  },
+        { name: 'DeskTop', code: 'IST',image:'static/imgs/desktop.png'  },
+        { name: 'Webservices', code: 'PRS', image:'static/imgs/webService.png' },
         { name: 'Mainframe', code: 'PRS', image:'/static/imgs/mainframe.png' },
-        { name: 'Mobile Web', code: 'PRS', image:'/static/imgs/mobileWeb.png' },
+        { name: 'Mobile Web', code: 'PRS', image:'static/imgs/mobileWeb.png' },
         { name: 'Mobile Apps', code: 'PRS', image:'/static/imgs/mobileApps.png' }, 
     ];
-    const [items , setItems]= useState ([
-        { id: 1,name: 'Virat Kohli', primaryRole:'Team Lead', email:'virat@gmail.com' },
-        { id: 2, name: 'Glenn Maxwell', primaryRole:'QA Engineer' ,  email:'glenn@gmail.com' },
-        { id: 3, name: 'Fafdu Plesisi',primaryRole:'Test Manager',  email:'faf@gmail.com'  },
-        { id: 4, name: 'Rajat Patidar',primaryRole:'Test Manager',  email:'rajat@gmail.com'  },
-        { id: 5, name: 'Mohammed  Siraj', primaryRole:'Test Manager',  email:'siraj@gmail.com'  },
+    // const [items , setItems]= useState ([
+    //     { id: 1,name: 'Virat Kohli', primaryRole:'Team Lead', email:'virat@gmail.com' },
+    //     { id: 2, name: 'Glenn Maxwell', primaryRole:'QA Engineer' ,  email:'glenn@gmail.com' },
+    //     { id: 3, name: 'Fafdu Plesisi',primaryRole:'Test Manager',  email:'faf@gmail.com'  },
+    //     { id: 4, name: 'Rajat Patidar',primaryRole:'Test Manager',  email:'rajat@gmail.com'  },
+    //     { id: 5, name: 'Mohammed  Siraj', primaryRole:'Test Manager',  email:'siraj@gmail.com'  },
  
-      ]);
+    //   ]);
 
     const roles=[
-        {name:'Team Lead',code:'T'},
-        {name:'Test Manager',code:'M'},
-        {name:'QA Engineer',code:'Q'},
+        {name:'Team Lead'},
+        {name:'Test Manager'},
+        {name:'QA'},
     ];
 
     const handleCheckboxChange = (event) => {
@@ -97,7 +124,9 @@ const  CreateProject=({ visible, onHide  }) =>{
       function getFilteredItems() {
         return items
           .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-          .sort((a, b) => a.name.localeCompare(b.name));
+          .filter(item => item.primaryRole !== "Admin")
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map(item => ({...item, selectedRole: ''}));
       }
 
       
@@ -133,7 +162,9 @@ const  CreateProject=({ visible, onHide  }) =>{
         setDisplayUser((prevAssignedUsers) => [
         ...prevAssignedUsers,
         ...assignedUsers
+      
   ]);
+  console.log(assignedUsers)
        setSelectedCheckboxes([]);
        setSelectAll(false);
    };
@@ -190,13 +221,44 @@ const  CreateProject=({ visible, onHide  }) =>{
 };
 
 
-const handleRoleChange = (e) => {
-  setSelectedRole(e.value);
+const handleRoleChange = (e, id) => {
+  const newItems = [...items];
+  for(let thisItem of newItems){
+    if(thisItem.id === id) {
+      thisItem.selectedRole = e.value
+    }
+  }
+  setItems(newItems);
+  // setSelectedRole({
+  //   ...selectedRole,
+  //   Admin: e.value
+  // });
+  console.log(id)
 };
 
 
 
-   const handleCreate = () => {
+   const handleCreate = async() => {
+
+    const filteredUserDetails = displayUser.map((user) => ({
+      id: user.id,
+      name: user.name,
+      role: user.selectedRole ? user.selectedRole.name : user.primaryRole,
+    }));
+    console.log(filteredUserDetails)
+
+    var projData = {
+      projectName : value,
+      projectApptype : selectedApp.name,
+      userDetails : filteredUserDetails,
+
+    }
+    console.log(projData)
+    const project = await userCreateProject_ICE(projData)
+    if(project.error){
+
+    }
+   else{
     toast.current.show({
       severity: "success",
       summary: "Project Created Successfully..",
@@ -204,6 +266,8 @@ const handleRoleChange = (e) => {
       life: 1000 ,
     });
     onHide(); 
+  }
+
   };
     
 
@@ -235,22 +299,22 @@ const handleRoleChange = (e) => {
         <Card className='project-name-1'>
         <div className='pro-name1'>
         < h5 className='proj__name'>Project Name</h5>
-            <InputText className="proj-input md:w-30rem text-400"value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter Project Name" />
+            <InputText className="proj-input"value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter Project Name" />
             <div className='dropdown-1'>
                 <h5 className='application__name'>Application Type</h5>
             <Dropdown  value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name" 
-                placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-26rem app-dropdown vertical-align-middle text-400 " />
+                placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " />
                 </div>
         </div>
         
         </Card>
-        <Card className='card11' style={{height:'17rem'}}>
+        <Card className='card11' style={{height:'auto', minHeight:'25rem'}}>
             <div className="card-input1">
             <h5 className='select-users'>Select Users</h5>
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
-        <InputText placeholder="Search users by name or email address" className='usersearch md:w-24rem ' onChange={handleSearch} value={query}   />    
+        <InputText placeholder="Search users by name or email address" className='usersearch md:w-31rem ' onChange={handleSearch} value={query}   />    
 </span>
 </div>
 </div>
@@ -264,7 +328,7 @@ const handleRoleChange = (e) => {
     <h5>Project level role(optional)</h5>
 </div>
 <div className="check2">
-{getFilteredItems().map(item => (
+{items.map(item => (
                     
 <div key={item.id} className="users-list">
                             <Checkbox  className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id}  title={item.email} checked={selectedCheckboxes.some((cb) => cb.id === item.id)}  onChange={handleCheckboxChange}/>
@@ -278,11 +342,9 @@ const handleRoleChange = (e) => {
                                 <span className='tooltip'></span>
                     
                                 </h5>
-
-                                <MultiSelect   value={selectedRole} onChange={handleRoleChange} options={roles} optionLabel="name"  display="chip" 
-                                placeholder="Select a Role" maxSelectedLabels={3} className="role-dropdown" />
-                            
-              
+                                <Dropdown value={(item.selectedRole) ? item.selectedRole : ''} onChange={(e)=>handleRoleChange(e, item.id)} options={roles} optionLabel="name" 
+                                placeholder="Select a Role" className="role-dropdown"  />
+                                
                         </div>
                        
                        
@@ -297,13 +359,13 @@ const handleRoleChange = (e) => {
         <Button className="ltbtn" label='<' onClick={handleMoveBack} >   </Button>
 
 
-        <Card className='card22' style={{height:'17rem'}}>
+        <Card className='card22' style={{height:'auto', minHeight:'25rem'}}>
             <div className='card-input2'>
             <h5 className='selected-users'>Selected Users</h5>
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
-        <InputText placeholder="Search users by name or email address"  className='selecteduser md:w-24rem'  onChange={handleSearchDisplayUser} value={queryDisplayUser} />
+        <InputText placeholder="Search users by name or email address"  className='selecteduser'  onChange={handleSearchDisplayUser} value={queryDisplayUser} />
 </span>
 </div>
 
@@ -315,7 +377,7 @@ const handleRoleChange = (e) => {
   
 <div className='check-bx3'>
     <ul>  
-{getFilteredDisplayUser().map((checkboxId) => (
+{displayUser.map((checkboxId) => (
     <>
          <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id}  value={checkboxId.id} checked={selectedAssignedCheckboxes.some((ab)=> ab.id === checkboxId.id)}
             onChange={handleAssignedCheckboxChange}
@@ -323,7 +385,7 @@ const handleRoleChange = (e) => {
          <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 ">
          <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width:'27px', height:'26px' }} >{getInitials(checkboxId.name)}</Avatar></span>
                                <span className='asgnd-name'> {checkboxId.name} </span>
-                               <span className='asgnd-role'>{checkboxId.primaryRole}</span>
+                               <span className='asgnd-role'>{!checkboxId.selectedRole.name ? checkboxId.primaryRole:checkboxId.selectedRole.name}</span>
                                
                                 </h5>
                                 </>
