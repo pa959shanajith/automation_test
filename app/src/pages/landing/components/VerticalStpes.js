@@ -59,43 +59,35 @@ function VerticalSteps(params) {
 
   };
 
-  // const handleBack = () => {
-  //   // setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  // };
-
-  // const handleReset = () => {
-  //   setActiveStep(0);
-  // };
-
-
   return (
     <Card className='verticalcard' >
       <h2 className= "GetStd">Get Started</h2>
-      <Box >
-        <Stepper  className='Stepper' activeStep = {activeStep.value} orientation="vertical">
-          {steps.map((step, index) => 
-          <Step key={step.label}>
-            <StepLabel className='stepLabel'>
-              <Box className='titleDescBut' >
-                <Box>
-                  <Box className='label'>
-                    {step.label}
+      <Box > 
+        <Stepper  className='Stepper' activeStep = {activeStep.value} orientation="vertical">
+          {steps.map((step, index) => ( 
+            <Step key={step.label}>
+              <StepLabel  className='stepLabel'>
+                <Box className='titleDescBut' >
+                     <Box>
+                        <Box className='label'>
+                          {step.label}
+                        </Box>
+                        <Typography className='description'>{step.description}</Typography>
+                     </Box>
+                     <Box className='buttonNav'>
+                        <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'}
+                           value={step.title}
+                             onClick={(e)=>handleNext(e.target.value)}>{step.title}</Button>
+                        <NavigateNextIcon className='verticalicon'/>
+                     </Box>
                 </Box>
-                <Typography className='description'>{step.description}</Typography>
-              </Box>
-             <Box className='buttonNav'>
-              <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'}
-              value={step.title}
-              onClick={(e)=>handleNext(e.target.value)}>{step.title}</Button>
-              <NavigateNextIcon className='verticalicon'/>
-            </Box>
-            </StepLabel>
-          </Step> )}
+               
+              </StepLabel>
+            </Step>
+          ))}
         </Stepper>
         </Box>
      </Card>
   );
 }
 export default VerticalSteps;
-
-

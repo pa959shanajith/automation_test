@@ -1,0 +1,55 @@
+.avo_input {
+    width: 100%;
+    .input_container {
+        width: 100%;
+        .validation_container {
+            height: 1rem;
+            .txt_valid {
+                visibility: hidden;
+            }
+            .txt_invalid {
+                visibility: visible;
+                color: #D1272C;
+            }
+        }
+    }
+    .input_container.inputColumn {
+        margin: 1.25rem 0 0.5rem 0;
+        display: flex;
+        flex-direction: column;
+        .p-inputtext {
+            padding: 0.4rem 0.4rem;
+            margin-top: 10px;
+        }
+    }
+    .input_container.inputRow {
+        margin: 1.25rem 0 1.25rem 0;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        .p-inputtext {
+            padding: 0.4rem 0.4rem;
+        }
+    }
+    .p-inputtext {
+        padding: 0.4rem 0.4rem;
+    }
+
+    .p-input-icon-left {
+        .p-inputtext {
+            padding-left: 2.2rem;
+        }
+    }
+
+    .icons_container {
+        display: flex;
+    }
+
+    .configinfo_icon {
+        padding: 0 0 0 0.3rem;
+    }
+
+    .required_icon {
+        padding: 0.3rem;
+    }
+}

@@ -1,0 +1,49 @@
+
+.modalClass {
+    .p-dialog-header {
+      height: 5rem;
+      background: rgba(96, 91, 255, 0.08);
+      .p-dialog-title {
+          font-size: 1.25rem;
+          font-weight: 600;
+          font-family: 'Open Sans';
+      }
+    }
+    .p-dialog-content {
+      padding: 0;
+    }
+    .p-dialog-footer {
+      height: 4.25rem;
+      padding: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .p-button.save_button {
+      background: #605BFF;
+      margin-right: 1.6rem;
+      opacity: 0.6;
+      border-radius: 0.25rem;
+      width: 7.125rem;
+      height: 2.25rem;
+      .p-button-label {
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #FFFFFF;
+      }
+    }
+    .p-button.close_button {
+      border-radius: 0.25rem;
+      width: 7.125rem;
+      height: 2.25rem;
+      .p-button-label {
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #030229;
+      }
+    }
+  }

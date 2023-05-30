@@ -142,9 +142,6 @@
          position: relative;
          bottom: 5rem;
      }
-     .p-dialog-content{
-    overflow: hidden !important;
-     }
      
     .card{
         background: none !important;
@@ -243,6 +240,9 @@
       font-style: normal !important;
       font-weight: 600 !important; 
       font-size: 20px !important;
+        }
+        .p-dialog-content{
+            overflow: hidden;
         }
     }
     
@@ -389,8 +389,8 @@
       }
 
       .p-multiselect .p-multiselect-label.p-placeholder{
-      text-align: center !important;
-      line-height: 0.5rem !important; 
+      text-align: center;
+      line-height: 0.5rem;
       }
    
     .gtbtn , .ltbtn{

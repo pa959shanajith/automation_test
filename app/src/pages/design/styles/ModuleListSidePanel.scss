@@ -7,521 +7,518 @@
     z-index: 1;
     overflow: auto;
     overflow-x: visible;
-}
-.project_name_section{
-    height:9% ;
-    border-bottom: 0.5px solid #C7C7C7;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-
-}
-.project_name_section select{
-    // margin: 1rem 2.5rem 1.7rem;
-}
-.normalModule_main_container{
-    height:40% ;
-    border-bottom: 0.5px solid #C7C7C7;
+    .project_name_section{
+        height:9% ;
+        border-bottom: 0.5px solid #C7C7C7;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
     
-}
-.E2E_main_container{
-    height:51% ;
-    border-bottom: 1px solid rgb(91, 89, 89);
-}
-.moduleLayer_icon{
-    display: flex;
-    padding-left: 0.5rem;
-    align-items: center;
-
-}
-.normalModHeadLine{
-    font-size: 16px;
-    // margin-left: 11px;
-}
-.moduleLayer_icon_SearchOn{
-display: none;
-}
-.E2EHeadLine{
-    font-size: 16px;
-    // margin-left: 11px;
-}
-.PlusButE2E{
+    }
+    .project_name_section select{
+        // margin: 1rem 2.5rem 1.7rem;
+    }
+    .normalModule_main_container{
+        height:40% ;
+        border-bottom: 0.5px solid #C7C7C7;
+        
+    }
+    .E2E_main_container{
+        height:51% ;
+        border-bottom: 1px solid rgb(91, 89, 89);
+    }
+    .moduleLayer_icon{
+        display: flex;
+        padding-left: 0.5rem;
+        align-items: center;
+    
+    }
+    .normalModHeadLine{
+        font-size: 16px;
+        // margin-left: 11px;
+    }
+    .moduleLayer_icon_SearchOn{
     display: none;
-}
-.moduleLayer_icon_SearchOff{
-
-}
-.searchIcon_adjust{
- margin-left: 1rem;
- cursor: none;
-}
-.moduleLayer_icon img{
-    // border: 1px solid black;
-    height: 27px;
-    width: 27px;
-}
-.moduleLayer_plusIcon{
-    display: flex;
-    justify-content: space-between;
-    padding-top: 0.5rem;
-    
-}
-.moduleLayer_plusIcon img{
-    padding-right: 0.1rem;
-
-}
-.BasicDemo_primeReactTree{
-    justify-content: center;
-    align-items: center;
-    margin-right: 10rem;
-    
-}
-.SearchIconForModules{
-    display: flex;
-    padding-top: 0.1rem;
-    align-items: center;
-    padding-left: 1.8rem;
-}
-.SearchIconForModulesE2E{
-    display: flex;
-    padding-top: 0.1rem;
-    align-items: center;
-    padding-left: 1rem;
-}
-.inputOfSearch{
-    width:10rem;
-    height: 1.6875rem;
-    // margin-left: 26px;
-}
-.hidingPlusButE2E{
-    display: none;
-}
-.NorModuleList{
-    max-height: 85%;
-    // border: 1px solid black;
-    overflow-y: auto;
-}
-
-.EachModNameBox{
-    // border: 1px solid rgb(213, 30, 30);
-    max-width: 100%;
-    max-height: 10%;
-    justify-content: center;
-    // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 6px;
-    cursor: pointer;
-    
-}
-.EachModNameBox:hover{
-    background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
-}
-.moduleName {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 91%;
-    max-height: 100%;
-    // border: 1px solid rgb(19, 225, 126);
-
-}
-.moduleName h4{
-      font-size: 13px;
-      font-family: "open sans";
-      font-weight: 400;
-      color:rgb(8, 8, 8,1);
-      padding-left: 1.5rem;
-      overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-//  E2E Work flow css
-
- 
-.list1{
-    margin: 1em 1em 1em 1em;
-}
-.project-name-1{
-    .p-card-body{
-// background: white;
-margin: 0rem;
-height: 6.5rem;
     }
-}
-.project-name-1 , .card11 , .card22{
-    border:0.5px solid #ced4da;
-    margin-top: 0.7rem;
-    box-shadow: none !important;
-}
-.pro-name1{
-    position: relative;
-    bottom: 1.7rem;
-}
-
-
-.proj__name , .application__name{
-    font-family: 'Open Sans' !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-}
-.dropdown-1{
-    float: right;
-    position: relative;
-    top: -1rem;
-    right: 3rem;
-}
-.proj-input{
-    position: relative;
-    top: 0.5rem;
-   
-}
-
-.app-dropdown{
-    position: relative;
-    bottom: -0.3rem;
-}
-
-.proj-input::placeholder{
-    color: #C7C7C7;
-    font-size: 14px;
-}
-.usersearch::placeholder{
-    color: #C7C7C7;
-    font-size: 14px;
-}
-.selecteduser::placeholder{
-    color: #C7C7C7;
-    font-size: 14px;  
-}
-.p-placeholder{
-    color: #C7C7C7 !important;
-    font-size: 14px !important;  
-}
-
-.card11{
-    .p-card-body{
-        margin: 0rem;
+    .E2EHeadLine{
+        font-size: 16px;
+        // margin-left: 11px;
+    }
+    .PlusButE2E{
+        display: none;
+    }
+    .moduleLayer_icon_SearchOff{
+    
+    }
+    .searchIcon_adjust{
+     margin-left: 1rem;
+     cursor: none;
+    }
+    .moduleLayer_icon img{
+        // border: 1px solid black;
+        height: 27px;
+        width: 27px;
+    }
+    .moduleLayer_plusIcon{
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.5rem;
+        
+    }
+    .moduleLayer_plusIcon img{
+        padding-right: 0.1rem;
+    
+    }
+    .BasicDemo_primeReactTree{
+        justify-content: center;
+        align-items: center;
+        margin-right: 10rem;
+        
+    }
+    .SearchIconForModules{
+        display: flex;
+        padding-top: 0.1rem;
+        align-items: center;
+        padding-left: 1.8rem;
+    }
+    .SearchIconForModulesE2E{
+        display: flex;
+        padding-top: 0.1rem;
+        align-items: center;
+        padding-left: 1rem;
+    }
+    .inputOfSearch{
+        width:10rem;
+        height: 1.6875rem;
+        // margin-left: 26px;
+    }
+    .hidingPlusButE2E{
+        display: none;
+    }
+    .NorModuleList{
+        max-height: 85%;
+        // border: 1px solid black;
         overflow-y: auto;
-        height: 17rem;
-        overflow-x: hidden;
     }
-}  
-.card11{
-    position: relative;
-   top:0.5rem;
-    width: 36rem;
-}
-.card22{
-    width: 30rem;
-    float: right;
-    position: relative;
-    bottom:17rem;
-}
-.card22{
-    .p-card-body{
-        margin: 0rem;
-        overflow-x: hidden;
-        overflow-y: auto;
-        height: 17rem;
+    
+    .EachModNameBox{
+        // border: 1px solid rgb(213, 30, 30);
+        max-width: 100%;
+        max-height: 10%;
+        justify-content: center;
+        // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 6px;
+        cursor: pointer;
+        
     }
-
-}
-.card-input1{
-    position: relative;
-    bottom: 1rem;
-}
-
-.card-input2{
-    position: relative;
-    bottom: 1rem;
-}
- .p.button{
-    margin: 2px !important;
- }
- .btn-11{
-    position: relative;
-    top: 1rem;
- }
-
- .btn1{
-    margin-right: 1rem !important;
-    height: 2.5rem;
-    font-family: 'Open Sans'!important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-
- }
- .btn2{
-    height: 2.5rem;
-    font-family:'Open sans' !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
- }
-
- .label1{
-    margin: -1.3rem 6rem 3rem 2rem;
-    color: #9E9E9E;
-    font-size: 12px;
-    font-family: 'Open sans' !important;
- }
- .check1{
-    position: relative;
-    bottom: 1rem;
- }
- .check2{
-     position: relative;
-     bottom: 5rem;
- }
- .p-dialog-content{
-overflow: hidden !important;
- }
- 
-.card{
-    background: none !important;
-}
-//  .projbtn{
-//     position: relative;
-//     left:28rem;
-//  }
-.select-users{
-    bottom: 1rem;
-    position: relative;
-    font-size: 14px;
-    font-family: 'open-sans';
-    font-weight: 400;
-}
-
-.selected-users{
-    font-size: 14px;
-    font-family: 'open-sans';
-    font-weight: 400;
-    position: relative;
-    bottom: 1rem;
-}
- .gtbtn {
-    color: blue !important;
-    right: -37.6rem !important;
-    top: -10rem !important;
-    height: 2rem !important;
-    width: 0rem !important;
-    align-items: center !important;
-    background: white !important;
- }
- .ltbtn{
-    right: -40rem !important;
-    top: -7rem !important;
-    left: 35rem !important;
-    color: blue !important;
-    height: 2rem !important;
-    width: 0rem !important;
-    align-items: center !important;
-    background: white !important;
-
- }
-.role-dropdown{
-    float: right;
-    width: 11rem;
-    height: 2em;
-    position: relative;
-    left: 1rem;
-    bottom: 7rem;
-    margin-bottom: 0.5rem;
-}
-.checkbox1{
-    .label1{
-        margin-left: 1rem !important;
+    .EachModNameBox:hover{
+        background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
     }
-}
-
-.label-2{
-    display: flex;
-    flex-direction: column;
-    width: 5rem;
-    bottom: 3rem;
-    left: 1rem;
-    position: relative;
-}
-.selectallbtn{
-    position: relative;
-    bottom: 0.5rem;
-}
-.usersearch{
-    width: 23rem;
-    height: 2rem;
-}
-.user-select-checkbox {
-    position: relative;
-    top: 0.5rem;
-}
-.selecteduser{
-    width: 23rem;
-    height: 2rem;
-}
-.Project-Dialog{
-    .p-dialog-header {
-   background: #e9ecef !important;
-   padding: 1rem !important;
-   font-family: 'Open Sans' !important;
-  font-style: normal !important;
-  font-weight: 600 !important; 
-  font-size: 20px !important;
+    .moduleName {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 91%;
+        max-height: 100%;
+        // border: 1px solid rgb(19, 225, 126);
+    
     }
-}
-
-.p-dialog { 
-    max-height: 94% !important;
-}
-.p-dialog-footer{
-    background:#f8f9fa !important;
-}
-.checkbox-2{
+    .moduleName h4{
+          font-size: 13px;
+          font-family: "open sans";
+          font-weight: 400;
+          color:rgb(8, 8, 8,1);
+          padding-left: 1.5rem;
+          overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    //  E2E Work flow css
+    
+     
+    .list1{
+        margin: 1em 1em 1em 1em;
+    }
+    .project-name-1{
+        .p-card-body{
+    // background: white;
+    margin: 0rem;
+    height: 6.5rem;
+        }
+    }
+    .project-name-1 , .card11 , .card22{
+        border:0.5px solid #ced4da;
+        margin-top: 0.7rem;
+        box-shadow: none !important;
+    }
+    .pro-name1{
+        position: relative;
+        bottom: 1.7rem;
+    }
+    
+    
+    .proj__name , .application__name{
+        font-family: 'Open Sans' !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+    }
+    .dropdown-1{
+        float: right;
+        position: relative;
+        top: -1rem;
+        right: 3rem;
+    }
+    .proj-input{
+        position: relative;
+        top: 0.5rem;
+       
+    }
+    
+    .app-dropdown{
+        position: relative;
+        bottom: -0.3rem;
+    }
+    
+    .proj-input::placeholder{
+        color: #C7C7C7;
+        font-size: 14px;
+    }
+    .usersearch::placeholder{
+        color: #C7C7C7;
+        font-size: 14px;
+    }
+    .selecteduser::placeholder{
+        color: #C7C7C7;
+        font-size: 14px;  
+    }
+    .p-placeholder{
+        color: #C7C7C7 !important;
+        font-size: 14px !important;  
+    }
+    
+    .card11{
+        .p-card-body{
+            margin: 0rem;
+            overflow-y: auto;
+            height: 17rem;
+            overflow-x: hidden;
+        }
+    }  
+    .card11{
+        position: relative;
+       top:0.5rem;
+        width: 36rem;
+    }
+    .card22{
+        width: 30rem;
+        float: right;
+        position: relative;
+        bottom:17rem;
+    }
+    .card22{
+        .p-card-body{
+            margin: 0rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 17rem;
+        }
+    
+    }
+    .card-input1{
+        position: relative;
+        bottom: 1rem;
+    }
+    
+    .card-input2{
+        position: relative;
+        bottom: 1rem;
+    }
+     .p.button{
+        margin: 2px !important;
+     }
+     .btn-11{
+        position: relative;
+        top: 1rem;
+     }
+    
+     .btn1{
+        margin-right: 1rem !important;
+        height: 2.5rem;
+        font-family: 'Open Sans'!important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+    
+     }
+     .btn2{
+        height: 2.5rem;
+        font-family:'Open sans' !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+     }
+    
+     .label1{
+        margin: -1.3rem 6rem 3rem 2rem;
+        color: #9E9E9E;
+        font-size: 12px;
+        font-family: 'Open sans' !important;
+     }
+     .check1{
+        position: relative;
+        bottom: 1rem;
+     }
+     .check2{
+         position: relative;
+         bottom: 5rem;
+     }
+     .p-dialog-content{
+    overflow: hidden !important;
+     }
+     
+    .card{
+        background: none !important;
+    }
+    //  .projbtn{
+    //     position: relative;
+    //     left:28rem;
+    //  }
+    .select-users{
+        bottom: 1rem;
+        position: relative;
+        font-size: 14px;
+        font-family: 'open-sans';
+        font-weight: 400;
+    }
+    
+    .selected-users{
+        font-size: 14px;
+        font-family: 'open-sans';
+        font-weight: 400;
+        position: relative;
+        bottom: 1rem;
+    }
+     .gtbtn {
+        color: blue !important;
+        right: -37.6rem !important;
+        top: -10rem !important;
+        height: 2rem !important;
+        width: 0rem !important;
+        align-items: center !important;
+        background: white !important;
+     }
+     .ltbtn{
+        right: -40rem !important;
+        top: -7rem !important;
+        left: 35rem !important;
+        color: blue !important;
+        height: 2rem !important;
+        width: 0rem !important;
+        align-items: center !important;
+        background: white !important;
+    
+     }
+    .role-dropdown{
+        float: right;
+        width: 11rem;
+        height: 2em;
+        position: relative;
+        left: 1rem;
+        bottom: 7rem;
+        margin-bottom: 0.5rem;
+    }
+    .checkbox1{
+        .label1{
+            margin-left: 1rem !important;
+        }
+    }
+    
+    .label-2{
+        display: flex;
+        flex-direction: column;
+        width: 5rem;
+        bottom: 3rem;
+        left: 1rem;
+        position: relative;
+    }
+    .selectallbtn{
+        position: relative;
+        bottom: 0.5rem;
+    }
+    .usersearch{
+        width: 23rem;
+        height: 2rem;
+    }
+    .user-select-checkbox {
+        position: relative;
+        top: 0.5rem;
+    }
+    .selecteduser{
+        width: 23rem;
+        height: 2rem;
+    }
+    .Project-Dialog{
+        .p-dialog-header {
+       background: #e9ecef !important;
+       padding: 1rem !important;
+       font-family: 'Open Sans' !important;
+      font-style: normal !important;
+      font-weight: 600 !important; 
+      font-size: 20px !important;
+        }
+    }
+    
+    .p-dialog { 
+        max-height: 94% !important;
+    }
+    .p-dialog-footer{
+        background:#f8f9fa !important;
+    }
+    .checkbox-2{
+        position: relative;
+        bottom: 1rem;
+    }
+    .dropdown_role{
+        position: relative;
+        top: -5rem;
+        left: 23rem;
+        color: #9E9E9E;
+        font-size: 14px;
+        font-family: 'Open sans' !important;
+    }
+    .check-bx3{
+        position: relative;
+        bottom: 1rem;
+    
+    }
+    .user-role{
+        color: darkgrey;
+        font-size: 12px;
+        position: relative;
+        left: 2.2rem;
+        bottom: 1rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        width: 7rem;
+    }
+    
+    .assigned-checkbox{
+        position: relative;
+        bottom: 2rem;
+    }
+    .asgnd-name{
+        position: relative;
+        bottom: 6rem;
+        left: 3.4rem;
+        width: 12rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+    }
+    .asgnd-role{
     position: relative;
-    bottom: 1rem;
-}
-.dropdown_role{
-    position: relative;
-    top: -5rem;
-    left: 23rem;
-    color: #9E9E9E;
-    font-size: 14px;
-    font-family: 'Open sans' !important;
-}
-.check-bx3{
-    position: relative;
-    bottom: 1rem;
-
-}
-.user-role{
+    bottom: 6.1rem;
+    left: 3.4rem;
     color: darkgrey;
     font-size: 12px;
-    position: relative;
-    left: 2.2rem;
-    bottom: 1rem;
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
     width: 7rem;
-}
-
-.assigned-checkbox{
-    position: relative;
-    bottom: 2rem;
-}
-.asgnd-name{
-    position: relative;
-    bottom: 6rem;
-    left: 3.4rem;
-    width: 12rem;
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-}
-.asgnd-role{
-position: relative;
-bottom: 6.1rem;
-left: 3.4rem;
-color: darkgrey;
-font-size: 12px;
-font-family: 'Open Sans';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-width: 7rem;
-}
-.label-3{
-    display: flex;
-    flex-direction: column;
-    width: 5rem;
-    margin-bottom: -3rem;
-}
-.tooltip {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .tooltip::before,
-  .tooltip::after {
-    position: absolute;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-  }
-  
-  .tooltip::before {
-    content: attr(title);
-    background-color: #333;
-    color: #fff;
-    padding: 5px;
-    font-size: 14px;
-    border-radius: 5px;
-    z-index: 1;
-  }
-  
-  .tooltip::after {
-    content: "";
-    border: 5px solid transparent;
-    border-top-color: #333;
-    z-index: 2;
-  }
-  
-  .tooltip:hover::before,
-  .tooltip:hover::after {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  .user-name{
-    width: 16rem;
-    position: relative;
-    left: 2.2rem;
-    bottom: 1rem;
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-  }
-  .user-av{
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    font-size: 0.85rem !important;
-    position: relative !important;
-    left: 0.3rem !important;
-  }
-  .user-avatar{
-    position: relative;
-    top: 1rem;
-    left: 0rem;
-  }
-
-  .asgnd-avatar{
-    position: relative;
-    bottom: 4rem !important;
-    left: 1.2rem !important;
-    right: 0rem !important;
-    font-size: 0.85rem !important;
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-  }
-  .users-list{
-    position: relative;
-    top: 1rem;
-    margin-bottom: -3.5rem;
-  }
-
-  .p-multiselect .p-multiselect-label.p-placeholder{
-  text-align: center !important;
-  line-height: 0.5rem !important; 
-  }
-
-.gtbtn , .ltbtn{
-    .p-button-label{
-        position: relative;
-        right: 0.2rem;
     }
+    .label-3{
+        display: flex;
+        flex-direction: column;
+        width: 5rem;
+        margin-bottom: -3rem;
+    }
+    .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+      
+      .tooltip::before,
+      .tooltip::after {
+        position: absolute;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      
+      .tooltip::before {
+        content: attr(title);
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        font-size: 14px;
+        border-radius: 5px;
+        z-index: 1;
+      }
+      
+      .tooltip::after {
+        content: "";
+        border: 5px solid transparent;
+        border-top-color: #333;
+        z-index: 2;
+      }
+      
+      .tooltip:hover::before,
+      .tooltip:hover::after {
+        visibility: visible;
+        opacity: 1;
+      }
+    
+      .user-name{
+        width: 16rem;
+        position: relative;
+        left: 2.2rem;
+        bottom: 1rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+      }
+      .user-av{
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        font-size: 0.85rem !important;
+        position: relative !important;
+        left: 0.3rem !important;
+      }
+      .user-avatar{
+        position: relative;
+        top: 1rem;
+        left: 0rem;
+      }
+    
+      .asgnd-avatar{
+        position: relative;
+        bottom: 4rem !important;
+        left: 1.2rem !important;
+        right: 0rem !important;
+        font-size: 0.85rem !important;
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+      }
+      .users-list{
+        position: relative;
+        top: 1rem;
+        margin-bottom: -3.5rem;
+      }
+    
+      .p-multiselect .p-multiselect-label.p-placeholder{
+      text-align: center !important;
+      line-height: 0.5rem !important; 
+      }
+    
+    .gtbtn , .ltbtn{
+        .p-button-label{
+            position: relative;
+            right: 0.2rem;
+        }
+    }    
 }
-
-
-

@@ -20,7 +20,6 @@ import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
 import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
-
 import ConfigurePage from './pages/execute/components/ConfigurePage';
 import './App.css';
 

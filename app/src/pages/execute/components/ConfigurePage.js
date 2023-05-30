@@ -21,8 +21,10 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from 'primereact/toast';
 import {fetchConfigureList} from '../api';
 // import { Messages as MSG,VARIANT} from '../../global';
-
-
+import AvoModal from '../../../globalComponents/AvoModal';
+import ConfigureSetup from './ConfigureSetup';
+import { getAvoAgentAndAvoGrid, getModules, getProjects, storeConfigureKey } from '../configureSetupSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ConfigurePage = ({setLoading}) => {
   const [visible, setVisible] = useState(false);
@@ -62,6 +64,27 @@ const ConfigurePage = ({setLoading}) => {
 
   const items = [ { label: "Configurations" }, { label: "Scheduled Executions" }];
   
+  
+  const getConfigData = useSelector((store) => store.configsetup);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getProjects());
+    dispatch(getAvoAgentAndAvoGrid());
+  }, []);
+
+  useEffect(() => {
+    if (!!getConfigData?.projects.length)
+      dispatch(getModules(getConfigData?.projects));
+  }, [getConfigData?.projects]);
+
+  const onModalBtnClick = (getBtnType) => {
+    if(getBtnType === "Next"){
+      dispatch(storeConfigureKey());
+    }
+    else setVisible(false);
+  };
+
   const [recurrenceType, setRecurrenceType] = useState("");
   const [monthlyRecurrenceWeekValue, setMonthlyRecurrenceWeekValue] = useState('')
   
@@ -81,7 +104,10 @@ const showSuccess_Schedule = () => {
 
   const handleWeekInputChange = (event) => {
     setMonthlyRecurrenceWeekValue(event.target.value);
-  };
+  }
+  // const toggleDropdown = () => {
+  //   setIsOpen(!isOpen);
+  // };
   const getRecurrenceType = (event) => {
     setRecurrenceType(event.target.value);
   };
@@ -509,10 +535,10 @@ const showSuccess_Schedule = () => {
     
   };
   const Breadcrumbs = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const toggleDropdown = () => {
-      setIsOpen(!isOpen);
-    };
+    // const [isOpen, setIsOpen] = useState(false);
+    // const toggleDropdown = () => {
+    //   setIsOpen(!isOpen);
+    // };
     return (
       <nav>
         <ul
@@ -983,7 +1009,7 @@ const showSuccess_Schedule = () => {
               <span className="text1 ">No Configuration's yet</span>
             </div>
           </div>
-          <Button className="configure_button"> Configure </Button>
+          <Button className='configure_button' onClick={() => setVisible(true)}> configure </Button>
         </Panel>
       );
     }
@@ -1009,10 +1035,18 @@ const showSuccess_Schedule = () => {
       )}
     </div>
         <div className="ConfigurePage_container  m-2">{renderTable()}</div>
+        <AvoModal
+        visible={visible}
+        setVisible={setVisible}
+        onModalBtnClick={onModalBtnClick}
+        content={<ConfigureSetup configData={getConfigData} />}
+        headerTxt="Execution Configuration set up"
+        footerType="CancelNext"
+        modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
+      />
       </div>
       <Toast ref={toast} position="bottom-center" />
     </>
-  );
-};
+  )}
 
 export default ConfigurePage;
