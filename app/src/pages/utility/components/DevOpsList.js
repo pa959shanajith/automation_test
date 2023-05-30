@@ -19,6 +19,9 @@ import "../styles/DevOps.scss";
 import DropDownList from '../../global/components/DropDownList';
 import { getPools, getICE_list } from '../../execute/api';
 import {getProjectList} from '../../mindmap/api';
+import { FormInput } from '../../admin/components/FormComp';
+import {getDetails_SAUCELABS} from '../../settings/api';
+import {saveSauceLabData} from '../../utility/api';
 
 
 
@@ -35,6 +38,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [displayBasic1, setDisplayBasic1] = useState(false);
     const [displayBasic2, setDisplayBasic2] = useState(false);
     const [displayBasic3, setDisplayBasic3] = useState(false);
+    const [displayBasic4, setDisplayBasic4] = useState(false);
+    const [displayBasic5, setDisplayBasic5] = useState(false);
     const [position, setPosition] = useState('center');
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
     const [getProjectLists,setProjectList]=useState([]);
@@ -86,6 +91,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [showIcePopup,setShowIcePopup] = useState(false);
     const [accessibilityParameters, setAccessibilityParameters] = useState([]);
     const [changeLable, setChangeLable] = useState(false);
+    const [isEmpty, setIsEmpty] = useState(false);
+    const [defaultValues, setDefaultValues] = useState({});
+    const [osNames, setOsNames] = useState([]);
+    const [browsers, setBrowsers] = useState({});
+    const [browserVersions, setBrowserVersions] = useState([]);
 
 
     useEffect(()=>{
@@ -211,7 +221,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         'displayBasic': setDisplayBasic,
         'displayBasic1': setDisplayBasic1,
         'displayBasic2': setDisplayBasic2,
-        'displayBasic3' : setDisplayBasic3
+        'displayBasic3' : setDisplayBasic3,
+        'displayBasic4' : setDisplayBasic4,
+        'displayBasic5' : setDisplayBasic5
     }
     const [selectedItem, setSelectedItem] = useState({});
 
@@ -277,6 +289,37 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setCopyToolTip("Click to Copy");
         }, 1500);
     }
+
+    const getSaucelabsDetails = async () =>{
+        try {
+            setLoading("Loading...")
+            const data = await getDetails_SAUCELABS()
+            if (data.error) { setMsg(data.error); return; }
+            if(data !=="empty"){
+                setIsEmpty(false);
+                setDefaultValues(data);
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+        }
+    }
+
+    useEffect(() => {
+        getSaucelabsDetails();
+    }, [])
+
+    const handleSubmit = async (SauceLabPayload) => {
+        // close the existing dialog
+        setDisplayBasic4(false);
+        // open the new dialog
+        setDisplayBasic5(true);
+
+        let data = await saveSauceLabData({
+            SauceLabPayload
+        });
+      };
 
     const copyConfigKey = (title) => {
         if (navigator.clipboard.writeText(title)) {
@@ -815,7 +858,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`} className="action_icons" alt="Edit Icon" title='Schedule'/>&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
-                                    {showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""} src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} className="action_icons" alt="Edit Icon" title='CI/CD'/>}
+                                     { showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" title="CI/CD" className="action_icons" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
+                                     { showCICD && <img onClick={() =>{onClick('displayBasic4');setCurrentKey(item)}} src="static/imgs/Saucelabs-3.png" title="Saucelabs" className="action_icons" />}
+                                    {/* {showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""} src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} className="action_icons" alt="Edit Icon" title='CI/CD'/>} */}
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                    {userRole !== "Test Engineer"? <td className="tkn-table__button" >
@@ -877,7 +922,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`}  className="action_icons" title="Schedule" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
-                                     { showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""}  src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} title="CI/CD" className="action_icons" alt="Edit Icon"/>}
+                                     {showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon" title='CI/CD'/>}&nbsp;&nbsp;&nbsp;
+                                    { showCICD && <img onClick={() =>{onClick('displayBasic4');setCurrentKey(item)}} src="static/imgs/Saucelabs-3.png" title="Saucelabs" className="action_icons" />}
+                                     {/* { showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""}  src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} title="CI/CD" className="action_icons" alt="Edit Icon"/>} */}
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                    {userRole !== "Test Engineer"? <td className="tkn-table__button" >
@@ -954,6 +1001,87 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 {/* Dialog for Schedule */}
                 <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}}   onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
                 {/* Dialog for Schedule */} 
+                <Dialog id='Saucelabs_dialog' header='Saucelabs login' visible={displayBasic4} onDismiss={() => {displayBasic4(false)}} onHide={() => onHide('displayBasic4')} >
+                        <form id='Saucelabs-form'>
+                            <div  className='Saucelabs_input'>
+                                <div className="flex flex-row">
+                                    <FormInput textValue={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL" name="Saucelabs-URL" placeholder="Enter Saucelabs Remote URL"/> 
+                                </div>
+                                <div className="flex flex-row">
+                                    <FormInput textValue={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"/>
+                                </div>
+                                <div className="flex flex-row">
+                                    <FormInput textValue={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"/>
+                                </div>
+                                <div>
+                                {defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
+                                </div>
+                            </div>
+                        </form>
+                        <Button id='Saucelabs_submit' label="Submit" onClick={()=>handleSubmit(defaultValues)} />
+                </Dialog>                 
+
+                <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onDismiss={() => {setDisplayBasic5(false)}} onHide={() => onHide('displayBasic5')}>
+                     <div>
+                        <div>
+                            <div className='adminControl-ice popup-content'>
+                                <div className='adminControl-ice popup-content popup-content-status'>
+                                    <ul className={changeLable?"e__IceStatusExecute":"e__IceStatusSchedule"}>
+                                        <li className="popup-li">
+                                            <label title='available' className="legends legends-margin">
+                                                <span id='status' className="status-available"></span>
+                                                Available
+                                            </label>
+                                            <label title='unavailable' className="legends legends-margin">
+                                                <span id='status' className="status-unavailable" ></span>
+                                                Unavailable
+                                            </label>
+                                            <label title='do not disturb' className="legends legends-margin">
+                                                <span id='status' className="status-dnd"></span>
+                                                Do Not Disturb
+                                            </label>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='adminControl-ice popup-content'>
+                            <div>
+                                <span className="leftControl" title="Token Name">{"Execute on"}</span>
+                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Search'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                            </div>
+                        </div>
+                    </div> 
+
+                    <div><h6>Operating System</h6></div>
+                    <SearchDropdown
+                    noItemsText={[]}
+                    onChange={onProjectChange}
+                    options={getProjectLists}
+                    selectedKey={selectedProject}
+                    width='15rem'
+                    />
+                    <div><h6>Browser</h6></div>
+                    <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={onProjectChange}
+                    options={getProjectLists}
+                    selectedKey={selectedProject}
+                    width='15rem'
+                    />
+                    <div><h6>Versions</h6></div>
+                    <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={onProjectChange}
+                    options={getProjectLists}
+                    selectedKey={selectedProject}
+                    width='15rem'
+                    />
+                    <Button label="Execute" title="Execute" className="p-button-rounded"/>
+
+                    </Dialog>
 
                 {/* Dialog for CI /CD  */}
 

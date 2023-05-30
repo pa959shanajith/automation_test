@@ -153,6 +153,10 @@ default_sub.on("message", (channel, message) => {
 		mySocket.emit("irisOperations", data.image_data, data.param);
 		break
 
+	case "SauceLablogin":
+		mySocket.emit("SauceLablogin", data.responsedata);
+		break;
+
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);

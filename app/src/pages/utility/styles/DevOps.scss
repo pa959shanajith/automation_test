@@ -635,3 +635,40 @@
 .rct-text{
     width: 36em !important;
 }
+#Saucelabs_dialog{
+    // max-height: 95% !important;
+    width: 39rem !important;
+}
+#Saucelabs-form{
+    .input-label .left-opt {
+        display: inline-block;
+        width: 125%;
+        margin-left: 27px;
+    }
+}
+
+#Saucelabs_submit{
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    vertical-align: bottom;
+    text-align: center;
+    left: 30rem;
+    background-color: #633693;
+    border-radius: 20px;
+    outline: auto;
+    width: 6rem;
+    }
+
+.Saucelabs_input{
+    display: flex;
+    flex-direction: column;
+}
+.saucelabs_ilm__error_msg{
+    font-family: "LatoWeb";
+    font-size: 14px;
+    color: red;
+    position: absolute;
+    right: 19rem;
+    bottom: 3rem;
+}

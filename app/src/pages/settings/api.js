@@ -112,6 +112,29 @@ export const getDetails_Azure = async() => {
     }
 }
 
+export const getDetails_SAUCELABS = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_SAUCELABS', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
+
 /*  manageZephyrDetails
   api returns string "success" , "fail"
 */
@@ -163,5 +186,30 @@ export const manageAzureDetails = async(action, userObj) => {
     }catch(err){
         console.error(err)
         return {error:{content: "Failed to "+action+" Azure Configuration.", variant: VARIANT.ERROR}}
+    }
+}
+
+export const manageSaucelabsDetails = async(action, userObj) => {
+    try{
+        const res = await axios(url+'/manageSaucelabsDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,user: userObj},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error: {content: "Failed to "+action+" Saucelab Configuration.", variant: VARIANT.ERROR}}
+    }catch(err){
+        console.error(err)
+        return {error:{content: "Failed to "+action+" Saucelab Configuration.", variant: VARIANT.ERROR}}
     }
 }

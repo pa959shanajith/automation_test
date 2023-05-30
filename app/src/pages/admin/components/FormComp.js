@@ -15,6 +15,7 @@ const FormInput = (props) => {
     const placeholder = props.placeholder
     const inpRef = props.inpRef
     const validExp = props.validExp
+    const textValue = props.textValue;
     const upateInput=()=>{
         inpRef.current.value = ValidationExpression(inpRef.current.value,validExp);
     }
@@ -22,7 +23,7 @@ const FormInput = (props) => {
         <Fragment>
             <div className='col-xs-9 form-group input-label'>
                 <label>{name}</label>
-                <input type={type} ref={inpRef} onChange={()=>{upateInput()}} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp==="poolName" || validExp=== "emailServerName"?"100":""}></input>
+                <input value={textValue} type={type} ref={inpRef} onChange={()=>{upateInput()}} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp==="poolName" || validExp=== "emailServerName"?"100":""}></input>
             </div>
         </Fragment>
     )

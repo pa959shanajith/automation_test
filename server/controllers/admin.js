@@ -2486,7 +2486,32 @@ exports.getDetails_Azure= async (req, res) => {
 
 };
 
+exports.getDetails_SAUCELABS= async (req, res) => {
+	const actionName = "getDetails_SAUCELABS";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_SAUCELABS", actionName);
 
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				SaucelabsURL: result['url'],
+				SaucelabsUsername: result['username'],
+				Saucelabskey: result['api']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_SAUCELABS: %s", exception);
+		return res.status(500).send("fail");
+	}
+
+};
 /* manageZephyrDetails */
 exports.manageZephyrDetails = async (req, res) => {
 	const actionName = "manageZephyrDetails";
@@ -2563,6 +2588,42 @@ exports.manageAzureDetails = async (req, res) => {
 	}
 };
 
+exports.manageSaucelabsDetails = async (req, res) => {
+	const actionName = "manageSaucelabsDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		let inputs;
+		if(action==='delete'){
+			inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageSaucelabsDetails", actionName);
+
+		}else{
+			const SaucelabsURL = data.user.SaucelabsURL;
+			const SaucelabsUsername = data.user.SaucelabsUsername;
+			const SaucelabsAPI = data.user.SaucelabsAPI;
+			let inputs = {
+				"userId": userId,
+				"SaucelabsUrl": SaucelabsURL,
+				"SaucelabsUsername": SaucelabsUsername,
+				"SaucelabsAPI": SaucelabsAPI,
+				"action": action
+			};
+		
+		result = await utils.fetchData(inputs, "admin/manageSaucelabsDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
 exports.getNotificationGroups = async(req,res) => {
 	const fnName = "getNotificationGroups"
 	logger.info("Inside UI service: " + fnName)
