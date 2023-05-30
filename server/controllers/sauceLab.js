@@ -22,20 +22,20 @@ exports.saveSauceLabData = function (req, res) {
 	try {
 		logger.info("Inside UI service: saveSauceLabData");
 		var username = req.session.username;
-		var name = undefined;
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + name);
-		logger.debug("ICE Socket requesting Address: %s" , name);
+		var icename = undefined;
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		logger.debug("ICE Socket requesting Address: %s" , icename);
 		const reqData = req.body;
 		var check_SauceLabURL =(req.body.SauceLabPayload.SaucelabsURL);
 		var check_SauceLabusername =(req.body.SauceLabPayload.SaucelabsUsername);
-		var check_SauceLabAccessKey =(req.body.SauceLabPayload.Saucelabskey); 	
+		var check_SauceLabAccessKey =(req.body.SauceLabPayload.Saucelabskey);
 		if(!check_SauceLabURL) {
 			logger.info("Error occurred in saveSauceLabData: Invalid SauceLab URL");
 			return res.send("invalidurl");
 		}
 		if(check_SauceLabURL) {
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					var SauceLabDetails = {
 						"SauceLabURL": check_SauceLabURL,
@@ -43,16 +43,16 @@ exports.saveSauceLabData = function (req, res) {
 						"SauceLabAccessKey": check_SauceLabAccessKey
 					};
 					logger.info("Sending socket request for SauceLablogin to redis");
-					dataToIce = {"emitAction" : "SauceLablogin","username" : name, "responsedata":SauceLabDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					dataToIce = {"emitAction" : "SauceLablogin","username" : icename, "responsedata":SauceLabDetails};
+					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function SauceLablogin_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+						if(icename == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 							redisServer.redisSubServer.removeListener('message',SauceLablogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in loginSauceLabServer_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
+								if('socketMapNotify' in myserver &&  icename in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[icename];
 									soc.emit("ICEnotAvailable");
 								}
 							} else if (data.onAction == "qcresponse") {
@@ -63,7 +63,7 @@ exports.saveSauceLabData = function (req, res) {
 					}
 					redisServer.redisSubServer.on("message",SauceLablogin_listener);
 				} else {
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
 						var flag="";
 						if (found) flag = "scheduleModeOn";
 						else {

@@ -154,7 +154,7 @@ default_sub.on("message", (channel, message) => {
 		break
 
 	case "SauceLablogin":
-		mySocket.emit("SauceLablogin", data.responsedata);
+		mySocket.emit("saucelablogin", data.responsedata);
 		break;
 
 	default:
