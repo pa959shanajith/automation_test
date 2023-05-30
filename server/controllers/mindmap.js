@@ -621,7 +621,14 @@ exports.excelToMindmap = function (req, res){
 			var cSheet = myCSV[0 * 2 + 1];
 			var cSheetRow = cSheet.split('\n');
 			excelrows=[]
-			for (var i = 0; i < cSheetRow.length; i++) {
+			cSheetRow[0].split(',').forEach(function (e, i) {
+				if(i== 0 && e.toLowerCase()!="module") {return res.status(200).send("fail");}
+				if(i== 1 && e.toLowerCase()!="scenario"){return res.status(200).send("fail");}
+				if(i== 2 && e.toLowerCase()!="screen"){return res.status(200).send("fail");}
+				if(i== 3 && e.toLowerCase()!="script"){return res.status(200).send("fail");}
+				if (i==4){return res.status(200).send("fail");}
+			});
+			for (var i = 0; i < cSheetRow.length; i++) {				
 				row=cSheetRow[i].split(",")
 				excelrows.push(row)
 
@@ -795,11 +802,10 @@ exports.excelToMindmap = function (req, res){
 				}
 			
 			}
-		var importProj = req.body.importProj
 		let user =  req.session.username;
-		let path = configpath.importMindmap;
+		let impPath = path.join(__dirname,'../../assets/ImportMindmap')
 		user = user.split('.').join("");
-		importFolderPath= path+"/"+"excel"
+		importFolderPath= impPath+"/"+"excel"
 		if (!fs.existsSync(importFolderPath)) {
 			fs.mkdirSync(importFolderPath);
 		  }
@@ -1033,45 +1039,32 @@ exports.exportMindmap = async (req, res) => {
 	try {
 		
 		const mindmapId = req.body.mindmapId["moduleid"];
-		const projectName=req.body.mindmapId["projectName"];
-		const exportProjId=req.body.mindmapId["exportProjId"];
 		const exportProjAppType=req.body.mindmapId["exportProjAppType"];
-		var exportedfilepath=path.join(process.cwd(),configpath.exportedmindmap.ExportedMindmapFilePath);
+		const exportedFilePath = path.join(__dirname,'../../assets/ExportMindmap');
 		var username=req.session.username;
 		username = username.split('.').join("");
 		const inputs= {
 			"mindmapId": mindmapId,
-			"projectName":projectName,
 			"query":"exportMindmap",
-			"exportedfilepath":exportedfilepath,
-			"exportquery":path.join(process.cwd(),configpath.exportedmindmap.Exportquery),
-			"exportbatfile":path.join(process.cwd(),configpath.exportedmindmap.ExportMindmapBatch),
-			"ip":configpath.ip,
-			"password":configpath.password,
-			"mongopath": configpath.mongopath,
-			"mongoexportpath":configpath.mongoexportpath,
 			"username":username,
-			"exportProjId":exportProjId,
-			"exportProjAppType":exportProjAppType,
-			"mongodumpbat":path.join(process.cwd(),configpath.exportedmindmap.mongodumpbat)
-
+			"exportProjAppType":exportProjAppType
 		}
 		const result = await utils.fetchData(inputs, "mindmap/exportMindmap", fnName);
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
-			let zip_path = exportedfilepath+'/'+username+'.zip'
+			let zip_path = exportedFilePath+'/'+username+'.zip'
 			const archive = archiver('zip', { zlib: { level: 9 }});
 			const stream = fs.createWriteStream(zip_path);
 			stream.on('close', ()=>{
-				removeDir(exportedfilepath+'/'+username);
+				removeDir(exportedFilePath+'/'+username);
 				// res.writeHead(200, {
 				// 	'Content-Type' : 'application/zip',
 				// });
 				var filestream = fs.createReadStream(zip_path);
 				filestream.pipe(res);
 			})
-			archive.directory(exportedfilepath+'/'+username, false).pipe(stream);
+			archive.directory(exportedFilePath+'/'+username, false).pipe(stream);
 			archive.finalize();
 			return res.send(result);
 		}
@@ -1089,15 +1082,9 @@ exports.importMindmap = async (req, res) => {
 		var userid = req.session.userid;
 		var userroleid = req.session.activeRoleId;
 		const inputs= {
-			"projectid": content["projid"],
-			"apptype": content["apptype"],
-			"query":"importMindmap",
-			"ip":configpath.ip,
-			"password":configpath.password,
-			"user":req.session.username,
-			"importpath":path.join(process.cwd(),configpath.importMindmap),
-			"importquerypath":path.join(process.cwd(),configpath.importquerypath),
-			"mongoimportpath":configpath.mongoimportpath,
+			"projectid": content["projid"],			
+			"query":"importMindmap",			
+			"user":req.session.username,			
 			"userid":userid,
 			"role":userroleid
 		}
@@ -1110,8 +1097,9 @@ exports.importMindmap = async (req, res) => {
 };
 
 exports.writeZipFileServer = async(req,res) => {
+	const fnName = "writeZipFileServer";
+	logger.info("Inside UI service: " + fnName);
 	try {
-		const fnName = "writeZipFileServer";
 		let user =  req.session.username;
 		let filepath = configpath.importMindmap;
 		user = user.split('.').join("");
@@ -1121,7 +1109,10 @@ exports.writeZipFileServer = async(req,res) => {
 		if (req.file && path.extname(req.file.originalname) === '.zip') {
 			// Create target directory for extracted files
 			const targetDir = path.join(__dirname, '../../assets/ImportMindmap/'+user);
-			if (!fs.existsSync(targetDir)) {
+			if (fs.existsSync(targetDir)) {				
+				await fs.rmSync(targetDir, { recursive: true, force: true });
+			  }
+			if (!fs.existsSync(targetDir)) {				
 			  fs.mkdirSync(targetDir);
 			}
 			const bufferStream = new Readable();
@@ -1147,30 +1138,40 @@ exports.writeZipFileServer = async(req,res) => {
 				if (fs.existsSync(jsonModpath) && fs.existsSync(jsontscpath) && fs.existsSync(jsonscrpath) && fs.existsSync(jsontcpath) ) {
 					fs.readFile(jsontscpath, 'utf8', (err, data) => {
 						if (err) throw err;
+						if (data === ""){data = []}
+						else{
 						let jsonTscData = JSON.parse(data);
 						if(!Array.isArray(jsonTscData)){
-							return res.status(400).send('Invalid file format');}
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsondobpath, 'utf8', (err, data) => {
-						if (err) throw err;
+						 if (err) throw err;
+						 if (data === ""){data = []}
+						 else{
 						let jsonDobData = JSON.parse(data);
-						if(!Array.isArray(jsonDobData)){
-							return res.status(400).send('Invalid file format');}
+						if(!Array.isArray(jsonDobData) && !""){
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsonscrpath, 'utf8', (err, data) => {
 						if (err) throw err;
+						if (data === ""){data = []}
+						else{
 						let jsonScrData =JSON.parse(data);
 						if(!Array.isArray(jsonScrData)){
-							return res.status(400).send('Invalid file format');}
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsontcpath, 'utf8', (err, data) => {
-						if (err) throw err;
+						 if (err) throw err;
+						 if (data === ""){data = []}
+						 else{
 						let jsonTcData = JSON.parse(data);
 						if(!Array.isArray(jsonTcData)){
-							return res.status(400).send('Invalid file format');}
+							return res.status(400).send('Invalid file format');}}
 					});
 					fs.readFile(jsonModpath, 'utf8', (err, data) => {
 						if (err) throw err;
+						if (data === ""){return res.status(400).send('No ModuleData');}
+						else{
 						let jsonData = JSON.parse(data);
 						if(Array.isArray(jsonData) && jsonData.length>0){
 							jsonResponse.msg = 'Files extracted successfully';
@@ -1179,7 +1180,7 @@ exports.writeZipFileServer = async(req,res) => {
 						}
 						else{
 							return res.status(400).send('Invalid file format');
-						}
+						}}
 						
 					});
 				
@@ -1208,19 +1209,14 @@ exports.writeFileServer = async (req, res) => {
 	try {
 		let data = req.body;
 		let user =  req.session.username;
-		let path = configpath.importMindmap;
 		user = user.split('.').join("");
-		if (data.type=="json"){
-			importFolderJPath= path+"/"+"json"
+		let importFolderJPath = path.join(__dirname,'../../assets/ImportMindmap')+"/"+"json";
+		let importPath=importFolderJPath +"/"+user+".json"
+		
+		if (data.status=="start" && data.type=="json"){			
 			if (!fs.existsSync(importFolderJPath)) {
 				fs.mkdirSync(importFolderJPath);
 			}
-			var importPath=importFolderJPath +"/"+user+".json"
-		}
-		else{
-			var importPath=path+"/"+user+".json"
-		}
-		if (data.status=="start"){
 			if (fs.existsSync(importPath)) {
 				fs.unlinkSync(importPath)
 			  }
@@ -1478,28 +1474,15 @@ exports.jsonToMindmap = async (req, res) => {
 	try {
 		var username = req.session.username;
 		var importproj = req.body["mindmapId"]["importproj"]
-		var importtype=req.body["mindmapId"]["type"]
-		if (req.body["mindmapId"]["type"] ==="importjson"){
-			 
-			var importpath =path.join(process.cwd(),configpath.importjsonfile) 
-		}
-		else{
-			var importpath =path.join(process.cwd(),configpath.importexceljsonfile)
-		}
+		var importtype=req.body["mindmapId"]["type"]		
 		var userid = req.session.userid;
 		var userroleid = req.session.activeRoleId;
 		const inputs= {
 			"username": username,
 			"importproj":importproj,
-			"importpath":importpath,			
-			"ip":configpath.ip,
-			"password":configpath.password,
-			"mongoimportpath":configpath.mongoimportpath,
 			"userid":userid,
 			"role":userroleid,
 			"importtype":importtype,
-			"importJsonQuery":path.join(process.cwd(),configpath.importJsonQuery),
-
 		}
 		const result = await utils.fetchData(inputs, "mindmap/jsonToMindmap", fnName);
 		if (result == "fail") {
@@ -1512,3 +1495,11 @@ exports.jsonToMindmap = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+exports.dropTempExpImpColl = async () => {
+	logger.info("Inside UI service dropTempExpImpColl");
+    const fnName= "dropTempExpImpColl"
+	const inputs = { "query": "dropTempExpImpColl" };
+	const result = await utils.fetchData(inputs, "mindmap/dropTempExpImpColl");
+    if (result == "fail") logger.error( fnName + " : Error occured while deleting Temporary collections");
+    else logger.info( fnName + " :Temporary collections got deleted successfully");
+}

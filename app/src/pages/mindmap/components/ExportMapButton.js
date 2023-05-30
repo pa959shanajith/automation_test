@@ -1,5 +1,5 @@
 import React, { Fragment, useRef, useState ,useEffect,useMemo} from 'react';
-import {ModalContainer, Messages as MSG, setMsg,ResetSession} from '../../global';
+import {ModalContainer, Messages as MSG, setMsg,ResetSession,VARIANT} from '../../global';
 import * as actionTypes from '../state/action';
 import {useSelector,useDispatch} from 'react-redux';
 import {Link} from 'react-router-dom';
@@ -37,43 +37,16 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const userInfo = useSelector(state=>state.login.userinfo);   
     const [showMessage, setShowMessage] = useState(false);    
     const dispatchAction=useDispatch()
-    const [OS,setOS] = useState("Windows");
-
      
-   useEffect(()=>{
-    (() => {
-        let userAgent = navigator.userAgent.toLowerCase();
-        if (/windows nt/.test(userAgent))
-            setOS("Windows");
-
-        else if (/mac os x/.test(userAgent))
-            setOS("MacOS");
-
-        else if (/linux x86_64/.test(userAgent))
-            setOS("Linux")
-        else
-            setOS("Not Supported");
-    })()
-   },[])
-    const getExportFile = async () => {
-        let clientVer
-        if(OS==='Windows'){
-            clientVer="avoclientpath_Windows"
-        }
-        if(OS==="MacOS"){
-            clientVer="avoclientpath_Mac"
-        }
-        if(OS==='Linux'){
-            clientVer="avoclientpath_Linux"
-        }
+    const getExportFile = async () => {        
         try {
             
             dispatchAction({type:actionTypes.ENABLE_EXPORT_BUTTON,payload:false})
-            const res = await fetch("/downloadExportfile?ver="+clientVer+"&projName="+exportprojname);            
+            const res = await fetch("/downloadExportfile?projName="+exportprojname);            
             await res.json().then(({status})=>{
               
                 if (status === "available"){ 
-                    window.location.href = window.location.origin+"/downloadExportfile?ver="+clientVer+"&projName="+exportprojname+"&file=getExportFile"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
+                    window.location.href = window.location.origin+"/downloadExportfile?projName="+exportprojname+"&file=getExportFile"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
                      setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED);                     
                      setExportBox(false);
                      dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
@@ -102,7 +75,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     }
     
     const clickExportProj = ()=>{
-        if (currProjId===null || currProjId===""){return;}
+        if (currProjId===null || currProjId==="" || currProjId ==="def-val-project"){displayError({CONTENT:"Please select project",VARIANT:VARIANT.ERROR});return;}
         else{let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
         setExportBox(false)
         setExpType(null) ;setCurrProjId(null);setError(false); setExportProject(true);
@@ -276,7 +249,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
 }
 const Footer = ({clickExport,clickExportProj,error,exportProject,enableExportMindmapButton}) => {
     return ((exportProject)? <div>
-       {error && <span>Please select a project which has no modules</span>}
+       {error && <span style={{color:"red"}}>Please select a project which has no modules</span>}
        <button disabled={ error} onClick={clickExportProj} >Export Project</button>
        </div>:(!exportProject && enableExportMindmapButton)? <div><button onClick={clickExport}>Export</button> </div>:null
        

@@ -366,9 +366,8 @@ if (cluster.isMaster) {
 
 		app.get('/downloadExportfile', async (req, res) => {
 			let projName = req.query.projName	
-			projName = projName.replace(/\s+/g, '');											
-			let clientVer = String(req.query.ver);
-			let exportfile = uiConfig.exportedmindmap.ExportedMindmapFilePath;
+			projName = projName.replace(/\s+/g, '');
+			let exportfile =path.join(__dirname,'./assets/ExportMindmap')
 			let username = req.user.username;
 			username = username.split('.').join("");
 			exportfile=exportfile+"/"+username+".zip";
@@ -740,6 +739,7 @@ if (cluster.isMaster) {
             isTrialUser = JSON.parse(data.toString()).isTrial
 						scheduler.reScheduleTestsuite();
 						scheduler.reScheduleRecurringTestsuite();
+						mindmap.dropTempExpImpColl();
 						console.info("Avo Assure Server Ready...\n");
 					}
 				} catch (exception) {
