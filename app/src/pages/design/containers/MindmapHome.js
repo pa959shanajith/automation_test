@@ -71,6 +71,7 @@ const MindmapHome = () => {
     <div className='mp__container'>
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       <div className='mp__body'>
+        
         <Fragment>
         {showCard && <div className='cardMindmap'>
             <Card  id='p_card' className='Module'>

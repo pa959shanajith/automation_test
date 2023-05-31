@@ -1,77 +1,113 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState } from 'react';
-import { TabView, TabPanel } from 'primereact/tabview';
+import React, { useState, useEffect } from 'react';
 import { Button } from 'primereact/button';
-import { SplitButton } from 'primereact/splitbutton';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import {Card} from 'primereact/card';
-
+import { Dropdown } from 'primereact/dropdown';
+import '../styles/reports.scss';
 
 const reports = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [reportData, setReportData] = useState([{
-        key: "Execute 1",
-        value: ""
-    },{
-        key: "Execute 2",
-        value:""
+    const [activeIndex, setActiveIndex] = useState("Functional Test");
+    const [testSteps, setTestSteps] = useState(false);
+    const [testStep, setTestStep] = useState(true);
+    const [testSteped, setTestSteped] = useState(false);
+    const [actionDropDown, setActionDropDown] = useState(false);
+    const [actionedDropDown, setActionedDropDown] = useState(false);
+    const [dropdownData, setDropdownData] = useState([]);
+    const [reportData, setReportData] = useState([
+        {
+            key: "Execute 1",
+            value: ""
+        },{
+            key: "Execute 2",
+            value:""
+        },{
+            key: "Execute 3",
+            value:""
+        },{
+            key: "Execute 4",
+            value:""
+        }
+    ])
+    const [selectedItem, setSelectedItem] = useState(null);
+    const sort = [
+        { name: 'Last modifird', code: '0' },
+        { name: 'Report Generation Date', code: '1' },
+        { name: 'Aldhabetical', code: '2' },
+    ];
+    const project = [
+        {name: 'Project1', code: '0'},
+        {name: 'Project2', code: '1'},
+        {name: 'Project3', code: '2'},
+        {name: 'Project4', code: '3'},
+    ];
+    const [selectedProject, setSelectedProject] = useState(null);
+    function handleTest(options){
+        if(options === "Functional Test"){
+            setActiveIndex(options)
+            setTestStep(true)
+            setTestSteped(false)
+            setTestSteps(false)
+        }
+        else if (options === "Accessibility Test"){
+            setActiveIndex(options)
+           setTestSteps(true)
+           setTestStep(false)
+           setTestSteped(false)
+        }
+        else {
+            setActiveIndex(options)
+            setTestSteped(true)
+            setTestSteps(false)
+            setTestStep(false)
+        }
     }
-])
-    const tab3HeaderTemplate = (options) => {
-        const items = [
-            { label: 'Update', icon: 'pi pi-refresh' },
-            { label: 'Delete', icon: 'pi pi-times' },
-            { label: 'Upload', icon: 'pi pi-upload' }
-        ];
 
-        return (
-            <SplitButton label="Reports" icon="pi pi-plus" onClick={options.onClick} className="px-2" model={items}></SplitButton>
-        )
-    };
+    const handleClicked = (e) => {
+        setSelectedItem(e.value);
+    }
+    const handleToggle = (e) => {
+        setSelectedProject(e.value)
+        
+    }
     function handleClick(event) {
         event.preventDefault();
         console.info('You clicked a breadcrumb.');
-      }
+    }
 
     return(
-        <div>
+        <div className='report'>
             <div role="presentation" onClick={handleClick}>
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link underline="hover" color="inherit" href="/">
-          Home
-        </Link>
-        <Link
-          underline="hover"
-          color="inherit"
-          href="/material-ui/getting-started/installation/"
-        >
-          Reports
-        </Link>
-        {/* <Typography color="text.primary"></Typography> */}
-      </Breadcrumbs>
-    </div>
-            <TabView>
-                <TabPanel headerTemplate={tab3HeaderTemplate} headerClassName="flex align-items-center"></TabPanel>
-            </TabView>
-            <div className="card">
-                <div className="flex flex-wrap gap-2 mb-3">
-                    <Button onClick={() => setActiveIndex(0)} className="p-button-text" label="Activate 1st" />
-                    <Button onClick={() => setActiveIndex(1)} className="p-button-text" label="Activate 2nd" />
-                    <Button onClick={() => setActiveIndex(2)} className="p-button-text" label="Activate 3rd" />
+                <Breadcrumbs aria-label="breadcrumb">
+                    <Link underline="hover" color="inherit" href="/landing">
+                    Home
+                    </Link>
+                    <Link underline="hover" color="inherit" href="/reports">
+                    Reports
+                    </Link>
+                    <Typography color="text.primary">Functional Test</Typography>
+                </Breadcrumbs>
+            </div>
+            <div style={{display:"inline-flex"}}><h2 className='projectDropDown'>Reports: </h2><Dropdown value={selectedProject} onChange={handleToggle} options={project} optionLabel="name" placeholder='Select a Project' className="w-full md:w-10rem" />
+        </div>
+            <div id="reports" className="cards">
+                <div className="buttonReports">
+                    <Button onClick={(e) => handleTest(e.target.value)} icon={<img alt="function" style={{height: "1.2rem"}} src="static/imgs/Functional.png"/>} id="buttonF" className={testStep !== false?"textf":"textF"} label="Functional Test" value="Functional Test" />
+                    <Button onClick={(e) => handleTest(e.target.value)}  icon={<img alt="function" style={{height: "1.2rem"}} src="static/imgs/Accessibility.png"/>} id="buttonA" className={testSteps !== false?"texta":"textA"} label="Accessibility Test" value="Accessibility Test"/>
+                    <Button onClick={(e) => handleTest(e.target.value)}  icon={<img alt="function" style={{height: "1.2rem"}} src="static/imgs/Functional&Accessibility.png"/>} id="buttonFA" className={testSteped !== false?"textFA":"textfa"} label="Functional and Accessibility" value="Functional and Accessibility" />
                 </div>
-                <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
-                    <TabPanel>
-                       {reportData.map((data)=><Card key={data.key}></Card>)}
-                    </TabPanel>
-                    <TabPanel>
-                       {reportData.map((data)=><Card key={data.key}></Card>)}
-                    </TabPanel>
-                    <TabPanel>
-                       {reportData.map((data)=><Card key={data.key}></Card>)}
-                    </TabPanel>
-                </TabView>
+                <div className='sort' ><h2 className='projectDropDown'>Sort: </h2><Dropdown value={selectedItem} onChange={handleClicked} options={sort}  optionLabel="name" className="w-full md:w-14rem" placeholder='Select a Sort' /></div>
+                {activeIndex === "Functional Test" && <div className="tabview" >
+                    {reportData.map((data)=><Card key={data.key} className='testCards' ><p>Functional Test</p></Card>)}
+                </div>}
+                {activeIndex === "Accessibility Test" && <div className="tabview" >
+                    {reportData.map((data)=><Card key={data.key} className='testCards' ><p>Accessibility Test</p></Card>)}
+                </div>}
+                {activeIndex === "Functional and Accessibility" && <div className="tabview" >
+                    {reportData.map((data)=><Card key={data.key} className='testCards' ><p>Functional and Accessibility</p></Card>)}
+                </div>}
             </div>
         </div>
     )

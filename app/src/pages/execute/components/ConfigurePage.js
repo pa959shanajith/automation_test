@@ -6,7 +6,7 @@ import { Panel } from 'primereact/panel';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Breadcrumbs, Checkbox } from '@mui/material';
-import { products } from './products';
+// import { products } from './products';
 import { Button } from 'primereact/button';
 import { BreadCrumb } from 'primereact/breadcrumb';
 import { Link } from 'react-router-dom';

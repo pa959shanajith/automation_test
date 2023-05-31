@@ -208,66 +208,18 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
       });
     const dNodesArray = data.descendants();
     const dLinks = data.links();
-    // .map((link, index) => {
-    //     const newLink = {
-    //       ...link,
-    //       source: {
-    //         ...link.source.data,
-    //         x: link.source.x,
-    //         y: link.source.y,
-    //         id: index // Generate a unique id for the source node
-    //       },
-    //       target: {
-    //         ...link.target.data,
-    //         x: link.target.x,
-    //         y: link.target.y,
-    //         id: index+1 // Generate a unique id for the target node
-    //       }
-    //     };
-    //     return newLink;
-    //   });;
-    // const dNodes = dNodesArray.map((d)=>d.data)
-    const dNodes = dNodesArray.map((d, idx) => {
-        const generateId = (index) => index;
-        
-        const mapChildren = (children) => {
-          return children.map((child, childIdx) => {
-            const newChild = {
-              ...child.data,
-              x: child.x,
-              y: child.y,
-              id: child.id?child.id:generateId(childIdx+1),
-              parent: {
-                ...child.parent.data,
-                id: child.parent.data.id ? child.parent.data.id : generateId(idx) // Generate a unique id for the parent node
-              } // Generate a unique id for the child node
-            };
-            
-            if (child.children) {
-              newChild.children = mapChildren(child.children);
-            }
-            
-            return newChild;
-          });
-        };
-        
-        const newData = {
+    const dNodes = dNodesArray.map((d) => {
+      const newData = {
           ...d.data,
           x: d.x,
           y: d.y,
-          id: idx,
-          parent: d.parent ? { ...d.parent.data, id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1) } : null  // Generate a unique id for the node
+          id: d.id,
         };
-        
-        if (d.children) {
-          newData.children = mapChildren(d.children);
-        }
-        
         return newData;
       });
-    dNodes.sort(function(a, b) {
-        return a.childIndex - b.childIndex;
-    });  
+    // dNodes.sort(function(a, b) {
+    //     return a.childIndex - b.childIndex;
+    // });  
     dNodes.forEach((d,ind)=>{
         if (verticalLayout) {
                 d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
@@ -394,7 +346,6 @@ export const addNode = (n) =>{
         '_id': n._id || null,
         'state':n.state || "created",
         'reuse':n.reuse || false,
-        'id':n.id
     };
     return nodeDisplay;
 }

@@ -8,7 +8,9 @@ import InputBox from '../components/InputBox'
 import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
-import ExportMapButton from '../components/ExportMapButton'
+import ExportMapButton from '../components/ExportMapButton';
+import CaptureModal from '../containers/CaptureScreen';
+import DesignModal from '../containers/DesignTestStep';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global'
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
@@ -95,7 +97,12 @@ const CanvasNew = (props) => {
     const [selectedRowsScreen, setSelectedRowsScreen] = useState([]);
     const [selectedRowsTeststep, setSelectedRowsTeststep] = useState([]);
     const [hoveredRow, setHoveredRow] = useState(null);
-   
+    const [editingRows, setEditingRows] = useState({});
+    const [editValue, setEditValue] = useState("");
+    const [editingRowsScreens, setEditingRowsScreens] = useState({});
+    const [editingRowsTestCases, setEditingRowsTestCases] = useState({});
+    const [visibleCaptureElement, setVisibleCaptureElement] = useState(false);
+    const [visibleDesignStep, setVisibleDesignStep] = useState(false);
     
     useEffect(() => {
         var tree;
@@ -147,24 +154,15 @@ const CanvasNew = (props) => {
                 tree.links = {}
                 tree.dLinks = []
                 if(zoom){
-                    if(!props.gen){
-                        const zoom = d3.zoom();
-                        const svg = d3.select(`.mp__canvas_svg`);
-                        
-                        zoom.scaleTo(svg, 1);
-                        zoom.translateTo(svg, 0, 0);
-                        svg.node().dispatchEvent(new Event("zoom"));   
-                    }
-                    else{
-                        const zoom = d3.zoom();
-                        const svg = d3.select(`.mp__canvas_svg_genius`);
-                        
-                        zoom.scaleTo(svg, 1);
-                        zoom.translateTo(svg, 0, 0);
-                        svg.node().dispatchEvent(new Event("zoom"));
-                    }
-                    zoom.on("zoom",null)
-                }
+                  if(!props.gen){
+                  d3.zoomIdentity.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg`))
+                  }
+                  else{
+                      d3.zoomIdentity.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg_genius`))
+
+                  }
+                  zoom.on("zoom",null)
+              }
                 count['modules'] = 1
                 setCreateNew(0)
             }
@@ -229,14 +227,14 @@ const CanvasNew = (props) => {
         { label: 'Add Test step', command:()=>clickAddNode(box.split("node_")[1]) },
         { label: 'Add Multiple Test step',command: () =>setVisibleTestStep(true)},
         { label: 'Rename', command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)} },
-        { label: 'Capture Elements' },
+        { label: 'Capture Elements', command:()=>setVisibleCaptureElement(true) },
         { label: 'Delete' },
         { label: 'Debug' }
 
     ];
 
     const menuItemsTestSteps = [
-        { label: 'Design Test steps' },
+        { label: 'Design Test steps', command: ()=>setVisibleDesignStep(true) },
         { label: 'Rename' ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)}},
         { label: 'Delete' }
 
@@ -298,7 +296,14 @@ const CanvasNew = (props) => {
         setdLinks(res.dLinks)
         setdNodes(res.dNodes)
         count= {...count,...res.count}
-        // setCreateNew('autosave')
+        var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
+            if(res){
+                setNodes(res.cnodes)
+                setLinks(res.clinks)
+                setdLinks(res.cdLinks)
+                setdNodes(res.cdNodes)
+                count = res.count
+            }
     }
     const clickDeleteNode=(id)=>{
         var sid = parseFloat(id.split('node_')[1]);
@@ -555,32 +560,160 @@ const footerContentScreen =(
                 <Button label="Add Test Step"  onClick={() => setVisibleTestStep(false)} className="add_scenario_btn" /> 
             </div>
       )
-const addRowScenario = () => {
-    const newRow = { id: addScenario.length + 1, value : inputValue };
-    setAddScenario([...addScenario, newRow]);
-    setInputValue("");
-    setShowInput(true);
-  };
-
-  const addRowScreen = () => {
-    const newRowScreen = { id: addScreen.length + 1, value : inputValScreen };
-    setAddScreen([...addScreen, newRowScreen]);
-    setinputValScreen("");
-    setShowInputScreen(true);
-  };
-
+      const addRowScenario = () => {
+        const newRow = { id: addScenario.length + 1, value: inputValue, isEditing: false };
+        setAddScenario((prevData) => [...prevData, newRow]);
+        setInputValue("");
+        setShowInput(true);
+      };
   
-  const addRowTestStep = () => {
-    const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep };
-    setAddTestStep([...addTestStep, newRowTestStep]);
-    setinputValTestStep("");
-    setShowInputTestStep(true);
-  };
+        const addRowScreen = () => {
+          const newRowScreen = { id: addScreen.length + 1, value : inputValScreen , isEditing:false};
+          setAddScreen((prevData) => [...prevData, newRowScreen]);
+          setinputValScreen("");
+          setShowInputScreen(true);
+        };
+  
+        
+        const addRowTestStep = () => {
+          const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep };
+          setAddTestStep([...addTestStep, newRowTestStep]);
+          setinputValTestStep("");
+          setShowInputTestStep(true);
+        };
 
-  const updateRow = (rowData, updatedValue) => {
-    const updatedData = addScenario.map((row) => (row.id === rowData.id ? { ...row, value: updatedValue, isHovered:false } : row));
-    setAddScenario(updatedData);
-  };
+        const updateRow = (rowData, updatedValue) => {
+            const updatedData = addScenario.map((row) => (row.id === rowData.id ? { ...row, value: updatedValue, isHovered:false } : row));
+            setAddScenario(updatedData);
+          };
+          const updateRowScreen = (rowDataScreen, updatedValueScreen) => {
+            const updatedDataScreen = addScreen.map((row) => (row.id === rowDataScreen.id ? { ...row, value: updatedValueScreen, isHovered:false } : row));
+            setAddScreen(updatedDataScreen);
+          };
+    
+          
+          const updateRowTestStep = (rowDataTestStep, updatedValueTestStep) => {
+            const updatedDataTestStep = addTestStep.map((row) => (row.id === rowDataTestStep.id ? { ...row, value: updatedValueTestStep ,  isHovered:false } : row));
+            setAddTestStep(updatedDataTestStep);
+          };
+    
+    
+          const handleEdit = (rowData) => {
+            setAddScenario((prevData) => {
+              const updatedData = prevData.map((row) => {
+                if (row.id === rowData.id) {
+                  return { ...row, isEditing: true };
+                }
+                return row;
+              });
+              return updatedData;
+            });
+          };
+          const handleEditScreens = (rowDataScreen) => {
+            setAddScreen((prevData) => {
+              const updatedData = prevData.map((row) => {
+                if (row.id === rowDataScreen.id) {
+                  return { ...row, isEditing: true };
+                }
+                return row;
+              });
+              return updatedData;
+            });
+          };
+    
+          const handleEditTestCases = (rowDataTestStep) => {
+            setAddTestStep((prevData) => {
+              const updatedDataTestStep = prevData.map((row) => {
+                if (row.id === rowDataTestStep.id) {
+                  return { ...row, isEditing: true };
+                }
+                return row;
+              });
+              return updatedDataTestStep;
+            });
+          };
+          
+    
+          const handleRowInputChange = (rowId, value) => {
+            setAddScenario((prevData) =>
+              prevData.map((row) => {
+                if (row.id === rowId) {
+                  return { ...row, value };
+                }
+                return row;
+              })
+            );
+          };
+    
+          const handleRowInputChangeScreens = (rowId, value) => {
+            setAddScreen((prevData) =>
+              prevData.map((row) => {
+                if (row.id === rowId) {
+                  return { ...row, value };
+                }
+                return row;
+              })
+            );
+          };
+    
+          const handleRowInputChangeTestCases = (rowId, value) => {
+            setAddTestStep((prevData) =>
+              prevData.map((row) => {
+                if (row.id === rowId) {
+                  return { ...row, value };
+                }
+                return row;
+              })
+            );
+          };
+    
+          const handleSave = (rowData) => {
+            setAddScenario((prevData) =>
+              prevData.map((row) => {
+                if (row.id === rowData.id) {
+                  return { ...row, value: rowData.value, isEditing: false };
+                }
+                return row;
+              })
+            );
+            setEditingRows((prevState) => ({
+              ...prevState,
+              [rowData.id]: false,
+            }));
+            // setShowInput(false); // Hide the input box after saving
+          };
+    
+          const handleSaveScreens = (rowDataScreen) => {
+            setAddScreen((prevData) =>
+              prevData.map((row) => {
+                if (row.id === rowDataScreen.id) {
+                  return { ...row, value: rowDataScreen.value, isEditing: false };
+                }
+                return row;
+              })
+            );
+            setEditingRowsScreens((prevState) => ({
+              ...prevState,
+              [rowDataScreen.id]: false,
+            }));
+          };
+    
+          const handleSaveTestCases = (rowDataTestStep) => {
+            setAddTestStep((prevData) =>
+              prevData.map((row) => {
+                if (row.id === rowDataTestStep.id) {
+                  return { ...row, value: rowDataTestStep.value, isEditing: false };
+                }
+                return row;
+              })
+            );
+            setEditingRowsTestCases((prevState) => ({
+              ...prevState,
+              [rowDataTestStep.id]: false,
+            }));
+          };
+          
+    
   const headerCheckboxClicked = (event) => {
     if (event.checked) {
       setSelectedRowsScenario(addScenario.map(row => row.id));
@@ -621,18 +754,6 @@ const addRowScenario = () => {
     }
   };
 
-   const updateRowScreen = (rowDataScreen, updatedValueScreen) => {
-    const updatedDataScreen = addScreen.map((row) => (row.id === rowDataScreen.id ? { ...row, value: updatedValueScreen } : row));
-    setAddScreen(updatedDataScreen);
-  };
-
-  const updateRowTestStep = (rowDataTestStep, updatedValueTestStep) => {
-    const updatedDataTestStep = addTestStep.map((row) => (row.id === rowDataTestStep.id ? { ...row, value: updatedValueTestStep } : row));
-    setAddTestStep(updatedDataTestStep);
-  };
-
-
-
   const rowCheckboxClicked = (event, rowData) => {
     if (event.checked) {
       setSelectedRowsScenario([...selectedRowsScenario, rowData.id]);
@@ -649,12 +770,44 @@ const addRowScenario = () => {
     setHoveredRow(null);
   };
 
+  const handleDelete = (rowData) => {
+    setAddScenario((prevData) => {
+      const updatedData = prevData.filter((row) => row.id !== rowData.id);
+      const updatedDataWithIndex = updatedData.map((row, index) => ({
+        ...row,
+        id: index + 1,
+      }));
+      return updatedDataWithIndex;
+    });
+  };
+  const handleDeleteScreen = (rowDataScreen) => {
+    setAddScreen((prevData) => {
+      const updatedDataScreen = prevData.filter((row) => row.id !== rowDataScreen.id);
+      const updatedDataWithIndexScreen = updatedDataScreen.map((row, index) => ({
+        ...row,
+        id: index + 1,
+      }));
+      return updatedDataWithIndexScreen;
+    });
+  };
+  const handleDeleteTestStep = (rowDataTestStep) => {
+    setAddTestStep((prevData) => {
+      const updatedDataTestStep = prevData.filter((row) => row.id !== rowDataTestStep.id);
+      const updatedDataWithIndexTestStep = updatedDataTestStep.map((row, index) => ({
+        ...row,
+        id: index + 1,
+      }));
+      return updatedDataWithIndexTestStep;
+    });
+  };
+
   const columns = [
     {
       field: "checkbox",
       header: <Checkbox className='scenario-check' onChange={headerCheckboxClicked} checked={selectedRowsScenario.length === addScenario.length && addScenario.length !== 0} />,
       body: (rowData) => <Checkbox className='rowdata_check' onChange={(event) => rowCheckboxClicked(event, rowData)} checked={selectedRowsScenario.includes(rowData.id)} />,
-      style: { width: '50px' },
+      headerStyle: { width: '50px' },
+      bodyStyle: { width: '50px' },
     },
     {
       field: "addScenario",
@@ -663,21 +816,49 @@ const addRowScenario = () => {
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Add Scenario Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)} onBlur={() => updateRow(rowData, inputValue)} />
+            <InputText className='scenario_inp' placeholder='Add Scenario Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
+            onBlur={() => {
+              updateRow(rowData, inputValue);
+              setShowInput(false);
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                updateRow(rowData, inputValue);
+                setShowInput(false);
+              }
+            }}
+            />
           );
         } 
+        else if (rowData.isEditing !== false) {
+            return (
+             <InputText
+             className='scenario_inp'
+                value={rowData.value}
+                onChange={(e) => handleRowInputChange(rowData.id, e.target.value)}
+                onBlur={() => handleSave(rowData)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.target.blur();
+                    handleSave(rowData);
+                  }
+                }}
+              />
+            );
+          } 
+       
         else {
           return(
-            <div 
+            <div className='row_data'
             onClick={() => setShowInput(rowData.id === addScenario.length)}
             onMouseEnter={(event) => handleRowHover(event,rowData)}
-            // onMouseLeave={() => handleRowHoverExit()}
+            onMouseLeave={() => handleRowHoverExit()}
           >
            <div className='row_data_align'> {rowData.value}</div>
             {hoveredRow === rowData.id && (
-              <div>
-                <i className="pi pi-pencil" style={{position:'relative', left:'16rem', bottom:'1rem'}} />
-                <i className="pi pi-trash" style={{position:'relative', left:'17rem',bottom:'1rem' }}/>
+              <div className='icons_class'>
+                <i className="pi pi-pencil" onClick={()=>handleEdit(rowData)} style={{position:'relative', left:'10rem', bottom:'1rem',cursor:'pointer'}} />
+                <i className="pi pi-trash"  onClick={() => handleDelete(rowData)} style={{position:'relative', left:'11rem',bottom:'1rem',cursor:'pointer' }}/>
               </div>
             )}
           </div>
@@ -688,7 +869,7 @@ const addRowScenario = () => {
       
     },
   ];
-
+   
   const columnsScreen = [
     {
       field: "checkbox",
@@ -702,26 +883,56 @@ const addRowScenario = () => {
       body: (rowDataScreen) => {
         if (showInputScreen && rowDataScreen.id === addScreen.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)} onBlur={() => updateRowScreen(rowDataScreen, inputValScreen)} />
+            // <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)} onBlur={() => updateRowScreen(rowDataScreen, inputValScreen)} />
+            <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)}
+            onBlur={() => {
+              updateRowScreen(rowDataScreen, inputValScreen);
+              setShowInputScreen(false);
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                updateRowScreen(rowDataScreen, inputValScreen);
+                setShowInputScreen(false);
+              }
+            }}
+            />
           );
-        } else {
+        } 
+        else if (rowDataScreen.isEditing !== false) {
+          return (
+           <InputText
+           className='scenario_inp'
+              value={rowDataScreen.value}
+              onChange={(e) => handleRowInputChangeScreens(rowDataScreen.id, e.target.value)}
+              onBlur={() => handleSaveScreens(rowDataScreen)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  e.target.blur();
+                  handleSaveScreens(rowDataScreen);
+                }
+              }}
+            />
+          );
+        } 
+        else {
           return(
-            <div 
-            onClick={() => setShowInput(rowDataScreen.id === addScreen.length)}
+            <div className='row_data'
+            onClick={() => setShowInputScreen(rowDataScreen.id === addScreen.length)}
             onMouseEnter={(event) => handleRowHover(event,rowDataScreen)}
-            // onMouseLeave={() => handleRowHoverExit()}
+            onMouseLeave={() => handleRowHoverExit()}
+            
           >
            <div className='row_data_align'> {rowDataScreen.value}</div>
             {hoveredRow === rowDataScreen.id && (
-              <div>
-                <i className="pi pi-pencil" style={{position:'relative', left:'16rem', bottom:'1rem'}} />
-                <i className="pi pi-trash" style={{position:'relative', left:'17rem',bottom:'1rem' }}/>
+              <div className='icons_class'>
+                <i className="pi pi-pencil" onClick={()=>handleEditScreens(rowDataScreen)} style={{position:'relative', left:'10rem', bottom:'1rem',cursor:'pointer'}} />
+                <i className="pi pi-trash"  onClick={() => handleDeleteScreen(rowDataScreen)} style={{position:'relative', left:'11rem',bottom:'1rem',cursor:'pointer' }}/>
               </div>
             )}
           </div>
-          )
-          // return <div onClick={() => setShowInputScreen(rowDataScreen.id === addScreen.length)}>{rowDataScreen.value}</div>;
-        }
+    
+        )
+          }
       },
     },
   ];
@@ -739,38 +950,73 @@ const addRowScenario = () => {
       body: (rowDataTestStep) => {
         if (showInputTestStep && rowDataTestStep.id === addTestStep.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Add Test Step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)} onBlur={() => updateRowTestStep(rowDataTestStep, inputValTestStep)} />
-          );
-        } else {
-          // return <div onClick={() => setShowInputTestStep(rowDataTestStep.id === addTestStep.length)}>{rowDataTestStep.value}</div>;
-          <div 
-          onClick={() => setShowInput(rowDataTestStep.id === addTestStep.length)}
-          onMouseEnter={(event) => handleRowHover(event,rowDataTestStep)}
-          // onMouseLeave={() => handleRowHoverExit()}
-        >
-         <div className='row_data_align'> {rowDataTestStep.value}</div>
-          {hoveredRow === rowDataTestStep.id && (
-            <div>
-              <i className="pi pi-pencil" style={{position:'relative', left:'16rem', bottom:'1rem'}} />
-              <i className="pi pi-trash" style={{position:'relative', left:'17rem',bottom:'1rem' }}/>
-            </div>
-          )}
-        </div>
-        }
+            // <InputText className='scenario_inp' placeholder='Add Test Step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)} onBlur={() => updateRowTestStep(rowDataTestStep, inputValTestStep)} />
+    <InputText className='scenario_inp' placeholder='Add Test step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)}
+    onBlur={() => {
+      updateRowTestStep(rowDataTestStep, inputValTestStep);
+      setShowInputTestStep(false);
+    }}
+    onKeyPress={(e) => {
+      if (e.key === 'Enter') {
+        updateRowTestStep(rowDataTestStep, inputValTestStep);
+        setShowInputTestStep(false);
+      }
+    }}
+    />
+    );
+     } 
+     else if (rowDataTestStep.isEditing !== false) {
+      return (
+       <InputText
+       className='scenario_inp'
+          value={rowDataTestStep.value}
+          onChange={(e) => handleRowInputChangeTestCases(rowDataTestStep.id, e.target.value)}
+          onBlur={() => handleSaveTestCases(rowDataTestStep)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              e.target.blur();
+              handleSaveTestCases(rowDataTestStep);
+            }
+          }}
+        />
+      );
+    } 
+    else {
+      return(
+        <div className='row_data'
+        onClick={() => setShowInputTestStep(rowDataTestStep.id === addTestStep.length)}
+        onMouseEnter={(event) => handleRowHover(event,rowDataTestStep)}
+        onMouseLeave={() => handleRowHoverExit()}
+      >
+       <div className='row_data_align'> {rowDataTestStep.value}</div>
+        {hoveredRow === rowDataTestStep.id && (
+          <div className='icons_class'>
+            <i className="pi pi-pencil" onClick={()=>handleEditTestCases(rowDataTestStep)} style={{position:'relative', left:'10rem', bottom:'1rem'}} />
+            <i className="pi pi-trash"  onClick={() => handleDeleteTestStep(rowDataTestStep)} style={{position:'relative', left:'11rem',bottom:'1rem' }}/>
+          </div>
+        )}
+      </div>
+
+    )
+      }
       },
     },
   ];
 
+
     return (
         <Fragment>
-            
-            <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Scenario" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
+                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} />}
+        {visibleDesignStep && <DesignModal visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
+            <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
+
+             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Scenario" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
         {/* <Toolbar  className="toolbar_scenario" start={startContent}  /> */}
        
         <div style={{ height: '100%', overflow: 'auto' }}>
-            <DataTable value={addScenario} tableStyle={{ minWidth: '20rem' }}  headerCheckboxSelection={true} scrollable scrollHeight="calc(100% - 38px)" > 
+            <DataTable value={addScenario} tableStyle={{ minWidth: '20rem' }} headerCheckboxSelection={true} scrollable scrollHeight="calc(100% - 38px)" > 
               {columns.map((col)=>(
-              <Column field={col.field} header={col.header} body={col.body} headerClassName={col.headerClassName} ></Column>
+              <Column field={col.field} header={col.header} body={col.body} headerClassName={col.headerClassName}></Column>
               ))}   
           
             </DataTable>
@@ -802,11 +1048,11 @@ const addRowScenario = () => {
             </div>
             </Dialog>
              <ConfirmDialog />
-            {(ctrlBox !== false)?<ControlBox  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode}  setCtrlBox={setCtrlBox} setInpBox={setInpBox} Avodialog={confirm1} ctScale={ctScale} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} CanvasRef={CanvasRef}/>:null}
+            {/* {(ctrlBox !== false)?<ControlBox  nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode}  setCtrlBox={setCtrlBox} setInpBox={setInpBox} Avodialog={confirm1} ctScale={ctScale} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} CanvasRef={CanvasRef}/>:null} */}
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
-            <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
+            <ContextMenu className='menu_items' model={menuItemsModule} ref={menuRef_module}/>
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
             <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />
             <ContextMenu model={menuItemsTestSteps} ref={menuRef_Teststep}/>

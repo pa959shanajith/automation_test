@@ -3,7 +3,7 @@ import {getProjectList, getModules, getScreens} from '../api';
 import {useDispatch, useSelector} from 'react-redux';
 import SaveMapButton from '../components/SaveMapButton';
 import Toolbarmenu from '../components/ToolbarMenu';
-import ModuleListDrop from '../components/ModuleListDrop';
+import ModuleListSidePanel from '../components/ModuleListSidePanel';
 import CanvasNew from './CanvasNew';
 import ExportMapButton from '../components/ExportMapButton';
 import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils';
@@ -13,6 +13,7 @@ import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 import CanvasEnE from './CanvasEnE';
 import { Navigate } from 'react-router-dom';
 import { projectList, selectedProj, screenData, moduleList } from '../designSlice';
+import ModuleListDrop from '../components/ModuleListDrop';
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -97,7 +98,7 @@ const CreateNew = ({importRedirect}) => {
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
-        {(!loading)? <ModuleListDrop />:null}
+        {(!loading)? <ModuleListDrop/>:<ModuleListSidePanel/>}
         {(!loading)?
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>

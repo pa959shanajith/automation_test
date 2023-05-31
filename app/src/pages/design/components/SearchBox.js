@@ -50,7 +50,7 @@ const SearchBox = (props) => {
         var ccord = [x_mptf + (x_nodetf / scale_mptf), y_mptf + (y_nodetf / scale_mptf)];
         var x = x_mptf - ccord[0] + center[0] - 40
         var y = y_mptf - ccord[1] + center[1] - 20
-        props.zoom.scale(scale_mptf).translate([x,y])
+        d3.zoomIdentity.scale(scale_mptf).translate([x,y])
         // props.zoom.event(d3.select('#ct-mindMap'));
         d3.select('.ct-container').attr("transform", "translate(" +x+','+y+ ")scale(" + 1 + ")");
         d3.select('#'+nodeID).classed('searched-node',!0)

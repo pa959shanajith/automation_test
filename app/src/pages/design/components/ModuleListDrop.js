@@ -57,7 +57,7 @@ const ModuleListDrop = (props) =>{
         else{dispatch(savedList(true))}
         setWarning(false); 
         
-     }, [ moduleList,initProj])
+     }, [moduleList, initProj, searchForNormal, isCreateE2E, dispatch])
      useEffect(()=> {
         return () => {
             dispatch(isEnELoad(false));

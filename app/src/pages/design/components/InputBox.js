@@ -92,7 +92,7 @@ const InputBox = (props) => {
         if(Svgwidth){
             x = (x_mptf*2) - ccord[0] + Svgwidth - 80
         }
-        props.zoom.scaleTo(ctScale.k).translateTo([x,y])
+        d3.zoomIdentity.scale(ctScale.k).translate([x,y])
         d3.select('.ct-container').attr("transform", "translate(" +x+','+y+ ")scale(" + ctScale.k + ")");
         props.setCtScale({x:x,y:y,k:ctScale.k})
         SetFocus(false)
