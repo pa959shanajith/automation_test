@@ -104,6 +104,32 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [browserVersions, setBrowserVersions] = useState([]);
     const [browserDetails,setBrowserDetails] = useState([])
 
+    const [browserlist, setBrowserlist] = useState([
+        {
+            key: '3',
+            text: 'Internet Explorer'
+        },
+        {
+            key: '1',
+            text: 'Google Chrome'
+        },{
+            key: '2',
+            text: 'Mozilla Firefox'
+        },
+        // {
+        //     key: '7',
+        //     text: 'Microsoft Edge'
+        // },
+        {
+            key: "safari",
+            text: "Safari",
+            disabled:true,
+        },
+        {
+            key: '8',
+            text: 'Microsoft Edge'
+        }
+    ]);
 
     useEffect(()=>{
         projectIdTypesDicts[selectedProject] === "Web" ? setShowCICD(true) : setShowCICD(false)
@@ -265,6 +291,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     }
 
     const onSaucelabBrowserChange = async (option) => {
+        setBrowserVersions([]);
+        setSelectedVersion('');
         setSelectedSaucelabBrowser(option.key);
         console.log(browserDetails.browser[option.key][selectedOS]);
         if(browserDetails && Object.keys(browserDetails).length){
@@ -630,15 +658,18 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
 
     const ExecuteTestSuite = async (executionData) => {
        
+
         if(executionData === undefined) executionData = dataExecution;
+        if(executionData["executionEnv"] != 'saucelabs') {
+            executionData["executionEnv"]=execEnv;
+            executionData["browserType"]=browserTypeExe;
+        }
         setAllocateICE(false);
         const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, accessibilityParameters, '');
         if(modul_Info === false) return;
         setLoading("Sending Execution Request");
         executionData["source"]="task";
         executionData["exectionMode"]=execAction;
-        executionData["executionEnv"]=execEnv;
-        executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
@@ -934,7 +965,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      { showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" title="CI/CD" className="action_icons" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      { showCICD && <img onClick={() =>{
                                     onClick('displayBasic4');
-                                    setExecEnv('saucelabs');
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
@@ -1228,6 +1258,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                          dataExecution.poolid = ""
                          if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
                          else dataExecution.targetUser = selectedICE
+
+                         dataExecution['executionEnv'] = 'saucelabs'
+                         dataExecution['platform'] = selectedOS;
+                         dataExecution['version'] = selectedVersion; 
+                         dataExecution["browserType"] = [browserlist.filter((element,index) => element.text == selectedSaucelabBrowser )[0].key]
+                         console.log(dataExecution['browserType']);
                          CheckStatusAndExecute(dataExecution, iceNameIdMap);
                          onHide();
                      }
