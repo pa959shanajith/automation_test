@@ -24,17 +24,17 @@ function VerticalSteps(params) {
     const steps = [
     {
         label: 'Create Test Flow(s) using Design Studio',
-        description: ` Quisque rutrum. Aenean imperdi. Etiam ultricies nisi vel augue. Curabitur ullamcorper`,
+        description: `Create test flow of your software and Design your test cases. `,
         title:'Design'
     },
     {
         label: 'Configure & Execute Test Flow(s)                                        ',
-        description:' Quisque rutrum. Aenean imperdi. Etiam ultricies nisi vel augue. Curabitur ',
+        description:' Create execution profiles for executing your test flows.',
         title:'Execute'
     },
     {
         label: 'View Test Reports                                                                 ',
-        description: ` Quisque rutrum. Aenean imperdi. Etiam ultricies nisi vel augue. Curabitur ullamcorper`,
+        description: ` Analyze the results of test flows execution.`,
         title:'Report'
     },
     ];
@@ -93,3 +93,5 @@ function VerticalSteps(params) {
   );
 }
 export default VerticalSteps;
+
+
