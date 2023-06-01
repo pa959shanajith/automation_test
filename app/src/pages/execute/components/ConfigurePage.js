@@ -28,6 +28,14 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const ConfigurePage = ({setLoading}) => {
   const [visible, setVisible] = useState(false);
+  const [footerType, setFooterType] = useState("CancelNext");
+  const [tabIndex, setTabIndex] = useState(0);
+    const items = [
+        {label: 'Configure'},
+        {label: 'Scheduled Executions' },
+      
+    ];
+    const items1 = [{ label: 'Home'  },{ label: 'ConfigurePage' }];
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
@@ -80,10 +88,8 @@ const ConfigurePage = ({setLoading}) => {
     // setMsg(error)
 }
 
-  const items = [ { label: "Configurations" }, { label: "Scheduled Executions" }];
-  
-  
   const getConfigData = useSelector((store) => store.configsetup);
+  const getRequired = getConfigData.requiredFeilds;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -92,12 +98,19 @@ const ConfigurePage = ({setLoading}) => {
   }, []);
 
   useEffect(() => {
+    setFooterType(tabIndex ? "CancelSave" : "CancelNext");
+  }, [tabIndex]);
+
+  useEffect(() => {
     if (!!getConfigData?.projects.length)
       dispatch(getModules(getConfigData?.projects));
   }, [getConfigData?.projects]);
 
   const onModalBtnClick = (getBtnType) => {
     if(getBtnType === "Next"){
+      setTabIndex(1);
+    }
+    else if(getBtnType === "Save"){
       dispatch(storeConfigureKey());
     }
     else setVisible(false);
@@ -818,9 +831,9 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
         visible={visible}
         setVisible={setVisible}
         onModalBtnClick={onModalBtnClick}
-        content={<ConfigureSetup configData={getConfigData} />}
+        content={<ConfigureSetup configData={getConfigData} tabIndex={tabIndex} setTabIndex={setTabIndex} />}
         headerTxt="Execution Configuration set up"
-        footerType="CancelNext"
+        footerType={footerType}
         modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
       />
       </div>

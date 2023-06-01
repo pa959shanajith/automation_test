@@ -6,6 +6,7 @@ const initialState = {
   loading: false,
   projects: [],
   configureData: {},
+  requiredFeilds: {},
   avoAgentAndGrid: {
     avoagents: [
       {
@@ -288,6 +289,11 @@ export { getProjects, getModules, getAvoAgentAndAvoGrid, storeConfigureKey };
 const configureSetupSlice = createSlice({
   name: "configureSetup",
   initialState,
+  reducers: {
+    checkRequired: (state, action) => {
+      state.requiredFeilds = { ...state.requiredFeilds, ...action.payload }
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(getProjects.pending, (state) => {
       state.loading = true;
@@ -349,3 +355,4 @@ const configureSetupSlice = createSlice({
 });
 
 export default configureSetupSlice.reducer;
+export const { checkRequired } = configureSetupSlice.actions;
