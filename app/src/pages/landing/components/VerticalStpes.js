@@ -86,6 +86,8 @@ function VerticalSteps(params) {
             </Step>
           ))}
         </Stepper>
+        <StepContent TransitionProps={{ unmountOnExit: false }} />
+
         </Box>
      </Card>
   );
