@@ -10,6 +10,7 @@ import {parseProjList} from './MindmapUtils';
 import {useDispatch, useSelector} from 'react-redux';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
+import ModuleListSidePanel from '../components/ModuleListSidePanel';
 
 
 /*Component MindmapHome
@@ -71,7 +72,7 @@ const MindmapHome = () => {
     <div className='mp__container'>
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       <div className='mp__body'>
-        
+        {!show && <ModuleListSidePanel/>}
         <Fragment>
         {showCard && <div className='cardMindmap'>
             <Card  id='p_card' className='Module'>
