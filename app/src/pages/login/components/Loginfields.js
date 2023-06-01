@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import{ Messages as MSG, setMsg}  from '../../global';
 import * as api from '../api';
 import { Navigate } from 'react-router-dom';
 import { InputText } from 'primereact/inputtext';
@@ -93,7 +94,7 @@ const Login = () => {
                         console.log("Failed to fetch services. Error::", error);
                     });
             }
-            else if (userValidate === 'validCredential') setRedirectTo('/'); 
+            else if (userValidate === 'validCredential') setRedirectTo('/');
             else if (userValidate === 'inValidCredential' || userValidate === "invalid_username_password") {
                 toastError("Please enter a valid Username and Password ");
             } else if (userValidate === "changePwd") {
@@ -122,105 +123,123 @@ const Login = () => {
     }
 
     const forgotUsernameOrPasswordSubmitHandler = async (event) => {
-        console.log(event);
         event.preventDefault();
-        if (email === "" || !("/\S+@\S+\.\S+/".test(email))) {
+        if (email === "" || !regEx_email.test(email)) {
             toastError("Please enter a valid email address")
         }
         else {
             toastError("Hurrayyyyy you enter a valid email address")
+            api.forgotPasswordEmail({ "email": email.toLowerCase(), "username": '' })
+                .then(data => {
+                    if (data.status && data.status === "duplicates_found") {
+                        toastError(MSG.LOGIN.DUP_ACC_EXISTS);
+                    }
+                    else if (data === 'success' || data === "invalid_username_password" || data === "fail") {
+                        toastError(MSG.LOGIN.SUCC_REC_MAIL);
+                    }
+                    else if (data === "userLocked") {
+                        toastError("User account is locked!");
+                    }
+                    else {
+                        toastError(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                    };
+                })
+                .catch(err => {
+                    toastError(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                    console.error("Error", err)
+                });
         }
     }
 
     return (
         <>
             <Toast ref={toast} position="bottom-center" />
-            {redirectTo && <Navigate to={redirectTo} />} 
-                <>
-                    {showloginScreen &&
-                        <>
-                            <h2>Avo Assure-Login</h2>
-                            <form onSubmit={loginSubmitHandler}>
-                                <div className="p-input-icon-left mb-5">
-                                    <i className='pi pi-user' />
-                                    <InputText
-                                        id="username"
-                                        className='user_input'
-                                        value={username}
-                                        onChange={handleUsername}
-                                        placeholder='Enter your username'
-                                        type="text"
-                                        required
-                                    />
-                                </div>
-                                <div className="p-input-icon-left mb-5">
-                                    <i className='pi pi-lock' />
-                                    <InputText
-                                        id="password"
-                                        value={password}
-                                        className={`user_input `}
-                                        onChange={handlePassword}
-                                        placeholder='Password'
-                                        type={showPassword ? "type" : "password"}
-                                        required
-                                    />
-                                    {password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={() => { setShowPassword(!showPassword) }}>
-                                        <i className={`${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
-                                    </div>
-                                    }
-                                </div>
-
-                                <div className='forget_password_link mb-5'>
-                                    <a onClick={forgotPasswordLinkHandler} >Forgot Username & Password </a>
-                                </div>
-                                <div className='login_btn mb-5'>
-                                    <Button id="login" label='Login' disabled={disableLoginButton} text raised></Button>
-                                </div>
-                                <div className='single_sign-on_link mb-3'>
-                                    <a onClick={singleSignOnHandler} >Use Single Sign-On </a>
-                                </div>
-                                <p>Don't have an account? <span className='create-on_link'> <Button label='Create one' tooltip='Contact your admin for creating an account' tooltipOptions={{ position: 'bottom' }} link /></span></p>
-                            </form>
-                        </>}
-
-                    {showForgotPasswordScreen && <>
-                        <h2>Forgot Username or Password</h2>
-                        <span>Provide your registered e-mail to send a link to reset your Password or to know Username  </span>
-                        <form onSubmit={forgotUsernameOrPasswordSubmitHandler}>
+            {redirectTo && <Navigate to={redirectTo} />}
+            <>
+                {showloginScreen &&
+                    <>
+                        <h2>Avo Assure-Login</h2>
+                        <form onSubmit={loginSubmitHandler}>
                             <div className="p-input-icon-left mb-5">
-                                <i className='pi pi-user'></i>
+                                <i className='pi pi-user' />
                                 <InputText
-                                    type="email"
                                     id="username"
-                                    value={email}
-                                    onChange={emailHandler}
+                                    className='user_input'
+                                    value={username}
+                                    onChange={handleUsername}
                                     placeholder='Enter your username'
-                                    className='forgetPassword_user_input'
+                                    type="text"
                                     required
                                 />
                             </div>
-                            <div className='login_btn mb-5'>
-                                <Button id="submit" label='Submit' disabled={!email} text raised></Button>
+                            <div className="p-input-icon-left mb-5">
+                                <i className='pi pi-lock' />
+                                <InputText
+                                    id="password"
+                                    value={password}
+                                    className={`user_input `}
+                                    onChange={handlePassword}
+                                    placeholder='Password'
+                                    type={showPassword ? "type" : "password"}
+                                    required
+                                />
+                                {password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={() => { setShowPassword(!showPassword) }}>
+                                    <i className={`${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
+                                </div>
+                                }
                             </div>
+
+                            <div className='forget_password_link mb-5'>
+                                <a onClick={forgotPasswordLinkHandler} >Forgot Username & Password </a>
+                            </div>
+                            <div className='login_btn mb-5'>
+                                <Button id="login" label='Login' disabled={disableLoginButton} text raised></Button>
+                            </div>
+                            <div className='single_sign-on_link mb-3'>
+                                <a onClick={singleSignOnHandler} >Use Single Sign-On </a>
+                            </div>
+                            <p>Don't have an account? <span className='create-on_link'> <Button label='Create one' tooltip='Contact your admin for creating an account' tooltipOptions={{ position: 'bottom' }} link /></span></p>
                         </form>
                     </>}
 
-                    {singleSignOnScreen && <>
-                        <h2>Avo Assure - login with SAML SSO</h2>
-                        <form>
-                            <div className="p-input-icon-left mb-5">
-                                <i className='pi pi-user'></i>
-                                <InputText id="username" className='forgetPassword_user_input' placeholder='Enter your username' type="email" required />
-                            </div>
-                            <div className='login_btn mb-5'>
-                                <Button id="submit" label='Submit' disabled={false} text raised></Button>
-                            </div>
-                            <div className='mb-5'>
-                                <Button id="back" label='Back' onClick={backButtonHandler} disabled={false} text raised></Button>
-                            </div>
-                        </form>
-                    </>}
-                </>
+                {showForgotPasswordScreen && <>
+                    <h2>Forgot Username or Password</h2>
+                    <span>Provide your registered e-mail to send a link to reset your Password or to know Username  </span>
+                    <form onSubmit={forgotUsernameOrPasswordSubmitHandler}>
+                        <div className="p-input-icon-left mb-5">
+                            <i className='pi pi-user'></i>
+                            <InputText
+                                type="email"
+                                id="username"
+                                value={email}
+                                onChange={emailHandler}
+                                placeholder='Enter your username'
+                                className='forgetPassword_user_input'
+                                required
+                            />
+                        </div>
+                        <div className='login_btn mb-5'>
+                            <Button id="submit" label='Submit' disabled={!email} text raised></Button>
+                        </div>
+                    </form>
+                </>}
+
+                {singleSignOnScreen && <>
+                    <h2>Avo Assure - login with SAML SSO</h2>
+                    <form>
+                        <div className="p-input-icon-left mb-5">
+                            <i className='pi pi-user'></i>
+                            <InputText id="username" className='forgetPassword_user_input' placeholder='Enter your username' type="email" required />
+                        </div>
+                        <div className='login_btn mb-5'>
+                            <Button id="submit" label='Submit' disabled={false} text raised></Button>
+                        </div>
+                        <div className='mb-5'>
+                            <Button id="back" label='Back' onClick={backButtonHandler} disabled={false} text raised></Button>
+                        </div>
+                    </form>
+                </>}
+            </>
         </>
     );
 }
