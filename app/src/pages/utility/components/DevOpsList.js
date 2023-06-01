@@ -24,6 +24,7 @@ import {getDetails_SAUCELABS} from '../../settings/api';
 import {saveSauceLabData} from '../../utility/api';
 import index from 'uuid-random';
 import async from 'async';
+import { name } from 'agenda/dist/agenda/name';
 
 
 
@@ -371,56 +372,60 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         getSaucelabsDetails();
     }, [])
 
+    const onCancelSauce = () => {
+        setDisplayBasic5(false)
+    }
+
     const handleSubmit = async (SauceLabPayload) => {
         // close the existing dialog
         setDisplayBasic4(false);
         // open the new dialog
-        setLoading('Please Wait... dude')
+        setLoading('Fetching details...') 
         let data = await saveSauceLabData({
             SauceLabPayload
         });
-        // setDisplayBasic4(false);
-        setLoading(false)
-        setDisplayBasic5(true);
-        
-        console.log(data);
-        const arrayOS = data.os_names.map((element, index) => {
-            console.log(element,index);
-            return (
-                {
-                    key: element,
-                    text: element,
-                    title: element,
-                    index: index
-                }
-            )})
-        setOsNames(arrayOS)
+        if (data && data.os_names && data.browser) {
+            // Data exists and has the expected properties
+            
+            setLoading(false);
+            setDisplayBasic5(true);
+            
+            console.log(data);
+            const arrayOS = data.os_names.map((element, index) => {
+              console.log(element, index);
+              return {
+                key: element,
+                text: element,
+                title: element,
+                index: index
+              };
+            });
+            setOsNames(arrayOS);
+          
+            const arrayBrowser = Object.keys(data.browser).map((element, index) => {
+              console.log(element, index);
+              return {
+                key: element,
+                text: element,
+                title: element,
+                index: index
+              };
+            });
+            setSaucelabBrowsers(arrayBrowser);
+            setBrowserDetails(data);
+          } else {
+            setLoading(false);
+            // Data is empty or doesn't have expected properties
+            console.log(data);
+            if (data == "unavailableLocalServer"){
+                setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);  
 
-        const arrayBrowser = Object.keys(data.browser).map((element, index) => {
-            console.log(element,index )
-            return(
-                {
-                    key: element,
-                    text: element,
-                    title: element,
-                    index: index  
-                }
-            )
-        })
-        setSaucelabBrowsers(arrayBrowser)
-        setBrowserDetails(data);
-        // const arrayVersion = data.browser.setSelectedSaucelabBrowser.selectedOS.map((element, index) => {
-        //     return(
-        //         {
-        //             key: element,
-        //             text: element,
-        //             title: element,
-        //             index: index  
-        //         }
-        //     )    
-        // })
-        // setBrowserVersions(arrayVersion)
-      };
+            }else{
+                setMsg("error while fetching data")
+                console.log(data);
+            }  
+          }
+        }
 
     const copyConfigKey = (title) => {
         if (navigator.clipboard.writeText(title)) {
@@ -1252,25 +1257,28 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectedKey={selectedVersion}
                     width='15rem'
                     />
-                    <Button label="Execute" title="Execute" className="Sacuelab_execute_button" onClick={async () => {
-                         
-                         dataExecution.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):"")
-                         dataExecution.poolid = ""
-                         if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
-                         else dataExecution.targetUser = selectedICE
+                    
+                        
+                        <Button label="Execute" title="Execute" className="Sacuelab_execute_button" onClick={async () => {
 
-                         dataExecution['executionEnv'] = 'saucelabs'
-                         dataExecution['platform'] = selectedOS;
-                         dataExecution['version'] = selectedVersion; 
-                         dataExecution["browserType"] = [browserlist.filter((element,index) => element.text == selectedSaucelabBrowser )[0].key]
-                         console.log(dataExecution['browserType']);
-                         CheckStatusAndExecute(dataExecution, iceNameIdMap);
-                         onHide();
-                     }
-                 }   
-                 
-              autoFocus />
-               <Button id='Saucelabs_cancel' className='Saucelabs_cancel'label="cancel"/>
+                            dataExecution.type = (ExeScreen === true ? ((smartMode === "normal") ? "" : smartMode) : "")
+                            dataExecution.poolid = ""
+                            if ((ExeScreen === true ? smartMode : "") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename) => selectedICE[icename]);
+                            else dataExecution.targetUser = selectedICE
+
+                            dataExecution['executionEnv'] = 'saucelabs'
+                            dataExecution['platform'] = selectedOS;
+                            dataExecution['version'] = selectedVersion;
+                            dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedSaucelabBrowser)[0].key]
+                            console.log(dataExecution['browserType']);
+                            CheckStatusAndExecute(dataExecution, iceNameIdMap);
+                            onHide('displayBasic5');
+                        }
+                        }
+                        autoFocus />
+                            
+            
+            <Button id='Saucelabs_cancel' className='Saucelabs_cancel'label="cancel"  onClick={onCancelSauce}/>
 
                     </Dialog>
 
