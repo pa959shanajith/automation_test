@@ -19,7 +19,7 @@ import { SelectButton } from "primereact/selectbutton";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from 'primereact/toast';
-import {fetchConfigureList} from '../api';
+import {fetchConfigureList,getPools,getICE_list} from '../api';
 // import { Messages as MSG,VARIANT} from '../../global';
 import AvoModal from '../../../globalComponents/AvoModal';
 import ConfigureSetup from './ConfigureSetup';
@@ -30,6 +30,7 @@ const ConfigurePage = ({setLoading}) => {
   const [visible, setVisible] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
+  const [visible_execute, setVisible_execute] = useState(false);
   const [ingredient, setIngredient] = useState("");
   const [showLegend, setShowLegend] = useState(false);
   const [showIcePopup, setShowIcePopup] = useState(false);
@@ -61,6 +62,23 @@ const ConfigurePage = ({setLoading}) => {
   const [selectedProject, setSelectedProject] = useState('');
   const [configList, setConfigList] = useState([]);
   // const dispatch = useDispatch();
+// 
+  const [smartMode,setSmartMode] = useState('normal')
+  const [selectedICE,setSelectedICE] = useState("")
+  // const current_task = useSelector(state=>state.plugin.CT)
+  // const [loading,setLoading] = useState(false)
+  const [poolList,setPoolList] = useState({})
+  const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([])
+  const [iceStatus,setIceStatus] = useState([])
+  const [poolType,setPoolType] = useState("unallocated");
+  const [iceNameIdMap,setIceNameIdMap] = useState({});
+  const [availableICE,setAvailableICE] = useState([])
+
+
+  const displayError = (error) =>{
+    setLoading(false)
+    // setMsg(error)
+}
 
   const items = [ { label: "Configurations" }, { label: "Scheduled Executions" }];
   
@@ -101,6 +119,81 @@ const showSuccess_execute = () => {
 const showSuccess_Schedule = () => {
   toast.current.show({severity:'success', summary: 'Success', detail:'Execution has been scheduled', life: 1000});
 }
+useEffect(()=>{
+  fetchData();
+  // eslint-disable-next-line
+}, []);
+const fetchData = async () => {
+  setSmartMode('normal');
+setSelectedICE("");
+// var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
+
+var dataforApi = {poolid:"",projectids: ["642d4a250934a8c996e598a0"]}
+setLoading('Fetching ICE ...')
+  const data = await getPools(dataforApi);
+  if(data.error){displayError(data.error);return;}
+  setPoolList(data);
+  var arr = Object.entries(data);
+  arr.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
+  setChooseICEPoolOptions(arr);
+  const data1 = await getICE_list({"projectid":"642d4a250934a8c996e598a0"});
+  if(data1.error){displayError(data1.error);return;}
+  setIceStatus(data1)
+  populateICElist(arr,true,data1)
+  setLoading(false);
+}
+
+const populateICElist =(arr,unallocated,iceStatusdata)=>{
+  var ice=[]
+      var iceStatusValue = {};
+      if( iceStatusdata !== undefined) iceStatusValue = iceStatusdata.ice_ids;
+      else if( iceStatusdata === undefined) iceStatusValue= iceStatus.ice_ids;
+  const statusUpdate = (ice) => {
+    var color = '#fdc010' ;
+    var status = 'Offline';
+    if(ice.connected){
+      color = '#95c353';
+      status = 'Online'
+    }
+    if(ice.mode){
+      color = 'red';
+      status = 'DND mode'
+    }
+    return {color,status}
+  }
+  if(unallocated){
+    setPoolType("unallocated")
+    if(arr===undefined) iceStatusdata = iceStatus;
+    arr = Object.entries(iceStatusdata.unallocatedICE)
+    arr.forEach((e)=>{
+      var res = statusUpdate(e[1])
+      e[1].color = res.color;
+      e[1].statusCode = res.status;
+      ice.push(e[1])
+    })
+  }else{
+    setPoolType("allocated")
+    var iceNameIdMapData = {...iceNameIdMap};
+    arr.forEach((e)=>{
+      if(e[1].ice_list){
+        Object.entries(e[1].ice_list).forEach((k)=>{
+          if(k[0] in iceStatusValue){
+            var res = statusUpdate(iceStatusValue[k[0]])
+            iceNameIdMapData[k[1].icename] = {}
+            iceNameIdMapData[k[1].icename].id = k[0];
+            iceNameIdMapData[k[1].icename].status = iceStatusValue[k[0]].status;
+            k[1].color = res.color;
+            k[1].statusCode = res.status;
+            ice.push(k[1])
+          }
+        })
+      }
+    })
+    setIceNameIdMap(iceNameIdMapData);
+  }
+  ice.sort((a,b) => a.icename.localeCompare(b.icename))
+      setAvailableICE(ice);
+  }
 
   const handleWeekInputChange = (event) => {
     setMonthlyRecurrenceWeekValue(event.target.value);
@@ -298,21 +391,21 @@ const showSuccess_Schedule = () => {
                   value="End Date "
                   checked={time_limit === "End Date "}
                 />
-                <label className="ml-2">End Date </label>
+                <label className=" end_lable ml-2">End Date </label>
               </div>
               <div>
                 <RadioButton
                   value="End After "
                   checked={time_limit === "End After"}
                 />
-                <label className="ml-2">End After </label>
+                <label className=" endAfter_lable ml-2">End After </label>
               </div>
               <div>
                 <RadioButton
                   value="No end date "
                   checked={time_limit === "No end date"}
                 />
-                <label className="ml-2">No end date</label>
+                <label className=" noEndDate_lable ml-2">No end date</label>
               </div>
             </div>
           ),
@@ -320,6 +413,8 @@ const showSuccess_Schedule = () => {
       ],
     },
   ];
+  
+  
 
   useEffect(()=>{
     (async() => {
@@ -345,10 +440,7 @@ const showSuccess_Schedule = () => {
                       marginLeft:'9.5rem',
                       height:"2.5rem"
                     }}
-                    onClick={() => {setVisible(true);
-                      console.log("visible state:", visible);
-                    }}
-                    
+                    onClick={() => setVisible_execute(true)}
                     size="small"
                   >
                     {" "}
@@ -357,9 +449,9 @@ const showSuccess_Schedule = () => {
                   <Dialog
                     className="dialog_execute "
                     header="Execute : Regression"
-                    visible={visible}
+                    visible={visible_execute}
                     style={{ width: "50vw" }}
-                    onHide={() => setVisible(false)}
+                    onHide={() => setVisible_execute(false)}
                     footer={footerContent_config}
                   >
                     
@@ -519,7 +611,7 @@ const showSuccess_Schedule = () => {
           })   );
     }
   )();
-  },[visible,visible_schedule,visible_CICD]);
+  },[visible_execute,visible_schedule,visible_CICD]);
   
   
  
@@ -582,319 +674,6 @@ const showSuccess_Schedule = () => {
     setRadioButton_grid(value);
     setSelectedRadio(value);
   };
-  
- 
-  
-  // const staticData = [];
-  // const staticData = [
-  //   {
-  //     sno: 1,
-  //     profileName: (
-  //       <div>
-  //         <Checkbox  className="checkbox_header"/>
-  //         <span>Regression</span>
-  //       </div>
-  //     ),
-  //     executionOptions: (
-  //       <div className="Buttons_config">
-  //         <Button 
-  //           style={{
-  //             width: "8.5rem",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             marginLeft:'9.5rem',
-  //             height:"2.5rem"
-  //           }}
-  //           onClick={() => setVisible(true)}
-  //           size="small"
-  //         >
-  //           {" "}
-  //           Execute Now
-  //         </Button>
-  //         <Dialog
-  //           className="dialog_execute "
-  //           header="Execute : Regression"
-  //           visible={visible}
-  //           style={{ width: "50vw" }}
-  //           onHide={() => setVisible(false)}
-  //           footer={footerContent_config}
-  //         >
-            
-  //           <Card className="execute_card p-card p-card-body ">
-  //             <p className="m-0 ">
-  //               <div>Avo Agent:SBLTQAFFF Execution Mode : Headless</div>
-  //               <div>Select Browsers : Google Chrome</div>
-  //               <div>Execution Mode : Headless</div>
-  //             </p>
-  //           </Card>
-
-  //           <div  className="radioButtonContainer">
-  //             <RadioButton 
-  //               value="Execute with Avo Assure Agent/ Grid"
-  //               onChange={(e) => handleRadioButtonChange(e.value)}
-  //               checked={
-  //                 radioButton_grid === "Execute with Avo Assure Agent/ Grid"
-  //               }
-  //             />
-  //             <label className="executeRadio_label_grid ml-2">
-  //               Execute with Avo Assure Agent/ Grid
-  //             </label>
-  //             <div className="radioButtonContainer1">
-  //             <RadioButton
-  //               value="Execute with Avo Assure Client"
-  //               onChange={(e) => handleRadioButtonChange(e.value)}
-  //               checked={ingredient === "Execute with Avo Assure Client"}
-  //             />
-  //             </div>
-  //             <label className=" executeRadio_label_clint ml-2">Execute with Avo Assure Client</label>
-  //           </div>
-  //           {/* <div className='adminControl-ice popup-content popup-content-status'> */}
-  //           {/* <div> */}
-  //           {selectedRadio === "Execute with Avo Assure Client" && (
-  //             <div>
-  //               <div className="legends-container">
-  //                 <span className="legend_Status" title="Token Name">
-  //                   Status:
-  //                 </span>
-  //                 <div className="legend">
-  //                   <span id="status" className="status-available"></span>
-  //                   <span className="legend-text">Available</span>
-  //                 </div>
-  //                 <div className="legend">
-  //                   <span id="status" className="status-unavailable"></span>
-  //                   <span className="legend-text">Unavailable</span>
-  //                 </div>
-  //                 <div className="legend">
-  //                   <span id="status" className="status-dnd"></span>
-  //                   <span className="legend-text">Do Not Disturb</span>
-  //                 </div>
-  //               </div>
-  //               <div>
-  //                 <span
-  //                   className="execute_dropdown .p-dropdown-label "
-  //                   title="Token Name"
-  //                 >
-  //                   Execute on
-  //                 </span>
-  //                 <Dropdown
-  //                   className="dropdown_execute .p-inputtext"
-  //                   placeholder="Search"
-  //                 ></Dropdown>
-  //               </div>
-  //             </div>
-  //           )}
-  //           {/* </div> */}
-  //           {/* </div> */}
-  //         </Dialog>
-
-  //         <Button 
-  //           style={{
-  //             width: "6rem",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             height:'2.5rem'
-  //           }}
-  //           onClick={() => setVisible_schedule(true)}
-  //           size="small"
-  //         >
-  //           {" "}
-  //           Schedule
-  //         </Button>
-  //         <Dialog
-  //           className="dialog_Schedule"
-  //           header="Schedule : Regression"
-  //           visible={visible_schedule}
-  //           style={{ width: "60vw" }}
-  //           onHide={() => setVisible_schedule(false)}
-  //           footer={footerContent_Schedule}
-  //         >
-  //           <Card className="Schedule_card  .p-card .p-card-content ">
-  //             <p className="m-0 ">
-  //               <div>Avo Agent:SBLTQAFFF Execution Mode : Headless</div>
-  //               <div>Select Browsers : Google Chrome</div>
-  //               <div>Execution Mode : Headless</div>
-  //             </p>
-  //           </Card>
-
-  //           <Tree
-  //             className="schedule_tree"
-  //             value={treeData}
-  //             selectionMode="single"
-  //             selectionKeys={selectedNodeKey}
-  //             onSelectionChange={onNodeSelect}
-  //             // onToggle={onToggleNode}
-  //           />
-  //         </Dialog>
-  //         <Button 
-  //         style={{
-  //           width: "4.5rem",
-  //           fontFamily: "Open Sans",
-  //           fontStyle: "normal",
-  //           height:"2.5rem"
-            
-  //         }}
-  //         size="small"
-  //           onClick={() => setVisible_CICD(true)}
-  //         >
-  //           CI/CD
-  //         </Button>
-          
-  //         <Dialog
-  //           className="dialog_CICD"
-  //           header="Execute : Regression"
-  //           visible={visible_CICD}
-  //           style={{ width: "50vw" }}
-  //           onHide={() => setVisible_CICD(false)}
-  //           footer={footerContent_CICD}
-  //         >
-  //           <Card className="Schedule_card  .p-card .p-card-content ">
-  //             <p className="m-0 ">
-  //               <div>Avo Agent:SBLTQAFFF Execution Mode : Headless</div>
-  //               <div>Select Browsers : Google Chrome</div>
-  //               <div>Execution Mode : Headless</div>
-  //             </p>
-  //           </Card>
-
-  //           <Tree
-  //             className="CICD_tree"
-  //             value={tree_CICD}
-  //             selectionMode="single"
-  //             selectionKeys={selectedNodeKey}
-  //             onSelectionChange={onNodeSelect}
-              
-  //           />
-  //         </Dialog>
-  //       </div>
-  //     ),
-  //     actions: (
-  //       <div>
-  //         <Button icon="pi pi-pencil" className=" pencil_button p-button-edit"></Button>
-  //         <Button icon="pi pi-trash" className="p-button-edit"></Button>
-  //       </div>
-  //     ),
-  //   },
-
-  //   {
-  //     sno: 2,
-  //     profileName: (
-  //       <div>
-  //         <Checkbox  className="checkbox_header"/>
-  //         <span>Performance</span>
-  //       </div>
-  //     ),
-  //     executionOptions: (
-  //       <div className="Buttons_config">
-  //         <Button
-  //           style={{
-  //             width: "8.5rem",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             marginLeft:'9.5rem',
-  //             height:'2.5rem'
-  //           }}
-  //           onClick={() => setVisible(true)}
-  //           size="small"
-  //         >
-  //           {" "}
-  //           Execute Now
-  //         </Button>
-
-  //         <Button
-  //           style={{
-  //             width: "6rem",
-  //             height: "17px",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             height:"2.5rem"
-  //           }}
-  //           onClick={() => setVisible_schedule(true)}
-  //           size="small"
-  //         >
-  //           Schedule
-  //         </Button>
-  //         <Button
-  //           style={{
-  //             width: "4.5rem",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             height:'2.5rem'
-  //           }}
-  //           onClick={() => setVisible_CICD(true)}
-  //           size="small"
-            
-  //         >
-  //           CI/CD
-  //         </Button>
-  //       </div>
-  //     ),
-  //     actions: (
-  //       <div>
-  //         <Button icon="pi pi-pencil" className=" pencil_button p-button-edit"></Button>
-  //         <Button icon="pi pi-trash" className="p-button-edit"></Button>
-  //       </div>
-       
-  //     ),
-  //   },
-  //   {
-  //     sno: 3,
-  //     profileName: (
-  //       <div>
-  //         <Checkbox className="checkbox_header" />
-  //         <span>Regression</span>
-  //       </div>
-  //     ),
-  //     executionOptions: (
-  //       <div className="Buttons_config">
-  //         <Button
-  //           style={{
-  //             width: "8.5rem",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             marginLeft:'9.5rem',
-  //             height:"2.5rem"
-  //           }}
-  //           onClick={() => setVisible(true)}
-  //           size="small"
-  //         >
-  //           {" "}
-  //           Execute Now
-  //         </Button>
-
-  //         <Button
-  //           style={{
-  //             width: "6rem",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             height:'2.5rem'
-  //           }}
-  //           onClick={() => setVisible_schedule(true)}
-  //           size="small"
-  //         >
-  //           Schedule
-  //         </Button>
-  //         <Button
-  //           style={{
-  //             width: "4.5rem",
-  //             fontFamily: "Open Sans",
-  //             fontStyle: "normal",
-  //             height:"2.5rem"
-  //           }}
-  //           onClick={() => setVisible_CICD(true)}
-  //           size="small"
-  //         >
-  //           CI/CD
-  //         </Button>
-  //       </div>
-  //     ),
-  //     actions: ( 
-  //       <div>
-  //         <Button icon="pi pi-pencil" className=" pencil_button p-button-edit"></Button>
-  //         <Button icon="pi pi-trash" className="p-button-edit"></Button>
-  //       </div>
-       
-  //     ),
-  //   },
-  // ];
   const tabMenuItems = configList.length > 0
   ? [...items, { label: <Button className="delete_button" size="small"> Delete</Button> }, { label:<Button className="addConfi_button" size="small"> Add Configuration</Button> }]
   : items;

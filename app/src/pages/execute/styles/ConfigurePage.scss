@@ -643,7 +643,7 @@ left:3rem;
   align-items: flex-end;
   display: flex;
   // margin-bottom: .rem;
-  margin-top: 1rem;
+  margin-top: 2rem;
 
 }
 .radioButtonContainer1{
@@ -691,22 +691,22 @@ left:3rem;
   font-family: "Open Sans";
 }
 .Daily_lable {
-  position: absolute;
+  // position: absolute;
   top: 24rem;
   left: 9rem;
 }
 .Weekly_lable {
-  position: absolute;
+  // position: absolute;
   top: 26rem;
   left: 9rem;
 }
 .Monthly_lable {
-  position: absolute;
+  // position: absolute;
   top: 27.8rem;
   left: 9rem;
 }
 .yearly_lable {
-  position: absolute;
+  // position: absolute;
   top: 29.8rem;
   left: 9rem;
 }
@@ -768,4 +768,13 @@ left:3rem;
 }
 .tabs {
   line-height: 1rem;
+}
+.endAfter_lable{
+  margin-top: 2rem;
+}
+.end_lable{
+  margin-top: 0rem;
+}
+.noEndDate_lable{
+  margin-top: 1rem;
 }
