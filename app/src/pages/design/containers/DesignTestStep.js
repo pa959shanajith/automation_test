@@ -32,10 +32,8 @@ const DesignModal = (props) => {
         setShowTable(true);
     };
     const handleAdd = () => {
-        // const newValues = [...addedTestCase, testCases];
         setAddedTestCase([...addedTestCase, testCases]);
         setTestCases('');
-        // selectObjectType('');
     };
 
 
