@@ -5,6 +5,7 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import loginReducer from './pages/login/loginSlice'
 import designSlice from "./pages/design/designSlice";
+import configureSetupSlice from "./pages/execute/configureSetupSlice";
 
 
 import stepsSlice from './pages/landing/components/VerticalComponentsSlice';
@@ -18,7 +19,8 @@ export default configureStore({
         landing:landingReducer,
         // plugin:pluginReducer,
         // admin:adminReducer
-        design: designSlice
+        design: designSlice,
+        configsetup: configureSetupSlice
         
     }
 })

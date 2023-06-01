@@ -1,6 +1,6 @@
 import React from 'react';
-import MindMapAccess from './mindMapAccessPage';
-import TreeGraph from './TreeGraph';
+import MindmapHome from './containers/MindmapHome';
+export var history
 
 /*Component App
   use: defines components for each url
@@ -8,13 +8,13 @@ import TreeGraph from './TreeGraph';
 
 const design = () => {
   return (
-      <MindMapAccess/>
+      <MindmapHome/>
   );
 }
 
 const Base = () => {
   return (
-      <MindMapAccess/>
+    <MindmapHome/>
   );
 }
 

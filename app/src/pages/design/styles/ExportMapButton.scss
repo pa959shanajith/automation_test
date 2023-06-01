@@ -1,0 +1,68 @@
+@import "../../global/styles/ColorVariables.scss";
+.ct-exportBtn{
+    position: absolute;
+    height: 25px;
+    width: 180px;
+    top: calc(100% - 63px);
+    right: -82px;
+}
+.disableButton {
+    cursor: default;
+    opacity: 0.6;
+}
+.export-row{
+    margin: 20px 5%;
+    label{
+        width: 28%;
+        font-weight: 600;
+    }
+    input{
+        border: 1px solid $black;
+        width: 70%;
+    }
+    input:focus{
+        outline: none;
+    }
+    select{
+        border: 1px solid $black;
+        width: 70%;
+        height: 25px;
+    }
+    select:focus{
+        outline: none;
+    }
+}
+.export-rec-row{
+    margin: 20px 2%;
+    label{
+        font-weight: 600;
+        margin-left: 3px;
+    }
+    input{
+        border: 1px solid $black;
+    }
+    input:focus{
+        outline: none;
+    }
+    select{
+        border: 1px solid $black;
+        width: 70%;
+        height: 25px;
+        margin-left: 5px;
+    }
+    select:focus{
+        outline: none;
+    }
+}
+.export-file-row{
+    
+    label{
+        font-weight: 600;
+        margin-left: 24px;
+    }
+    input{
+        border: 1px solid $black;
+        margin-left: 5px;
+    }
+    
+}

@@ -13,6 +13,7 @@ import Execute from '../../execute/Components/Execute';
 const MenubarDemo = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const location = useLocation();
+    const navigate = useNavigate();
     useEffect(() => {
      if (["/design", "/execute", "/reports"].includes(location.pathname)) 
        {
@@ -26,10 +27,13 @@ const MenubarDemo = (props) => {
       const handleTabChange = (event) => {
         setActiveIndex(event.value);
       };
+      const navigateToPages =(path)=>{
+        navigate(path)
+      }
       const Tabitems = [
-        {label: 'Design Studio',url: '/design'},
-        {label: 'Configure & Execute' ,url: '/execute'},
-        {label: 'Reports',url: '/reports'},
+        {label: 'Design Studio',url: '/design',command: ()=>navigateToPages('/design')},
+        {label: 'Configure & Execute' ,url: '/execute',command: ()=>navigateToPages('/execute')},
+        {label: 'Reports',url: '/reports', command: ()=>navigateToPages('/reports')},
     ];
     const start = <img alt="logo" src="static/imgs/logo.png" onError={(e) => e.target.src='https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png'} height="30" className="mr-2"></img>;
     const end = (
