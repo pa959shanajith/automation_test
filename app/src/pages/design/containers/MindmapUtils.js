@@ -1,7 +1,7 @@
 /*eslint eqeqeq: "off"*/
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
-import { readCtScale } from './Canvas';
+// import { readCtScale } from './Canvas';
 
 function unfoldtree(d){
     // d3.select('#node_' + d.id).classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
