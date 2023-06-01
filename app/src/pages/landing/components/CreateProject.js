@@ -308,7 +308,7 @@ const handleRoleChange = (e, id) => {
         </div>
         
         </Card>
-        <Card className='card11' style={{height:'auto', minHeight:'25rem'}}>
+        <Card className='card11' style={{height:'25rem'}}>
             <div className="card-input1">
             <h5 className='select-users'>Select Users</h5>
             <div className='selectallbtn'>
@@ -359,7 +359,7 @@ const handleRoleChange = (e, id) => {
         <Button className="ltbtn" label='<' onClick={handleMoveBack} >   </Button>
 
 
-        <Card className='card22' style={{height:'auto', minHeight:'25rem'}}>
+        <Card className='card22' style={{height:'25rem'}}>
             <div className='card-input2'>
             <h5 className='selected-users'>Selected Users</h5>
             <div className='selectallbtn'>

@@ -643,6 +643,7 @@ export const deleteScenarioETE = async(data) => {
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
+
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }

@@ -2,6 +2,8 @@ import "../styles/ModuleListSidePanel.scss";
 import 'primeicons/primeicons.css';
 import { getModules,getProjectList } from "../api";
 import  React, { useState, useEffect } from 'react';
+import * as d3 from  'd3';
+import { useSelector, useDispatch} from 'react-redux';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Dialog } from 'primereact/dialog';
@@ -14,6 +16,7 @@ import { Avatar } from 'primereact/avatar';
 import AvoInput from "../../../globalComponents/AvoInput";
 import 'primeicons/primeicons.css';
 
+import { selectedProj, selectedModule, isEnELoad } from '../designSlice';
 
 // this component shows side panel of module containers in design screen
 
@@ -48,6 +51,9 @@ export  function MultiSelectTreeView() {
 }
 
 const ModuleListSidePanel =()=>{
+      const dispatch = useDispatch();
+      const proj = useSelector(state=>state.design.selectedProj);
+      const moduleSelect = useSelector(state=>state.design.selectedModule);
       const [showInput, setShowInput] = useState(false);
       const [moduleList, setModuleList] = useState(null);
       const [showInputE2E, setShowInputE2E] = useState(false);
@@ -58,10 +64,11 @@ const ModuleListSidePanel =()=>{
       // the below API call is hard coded and I should take required actions on it in future 
       useEffect(()=>{
         (async()=>{
+          dispatch(selectedProj(projectId?projectId:proj))
            const modules = await getModules(
             {
               "tab": "endToend",
-              "projectid": projectId,
+              "projectid": projectId?projectId:proj,
               "version": 0,
               "cycId": null,
               "modName": "",
@@ -69,8 +76,9 @@ const ModuleListSidePanel =()=>{
             }
            )
           setModuleList(modules)
+          // dispatch(selectedModule(modules))
         })()
-      }, [projectId])
+      }, [dispatch, projectId])
 
       useEffect(()=>{
         (async()=>{
@@ -87,7 +95,48 @@ const ModuleListSidePanel =()=>{
           setProjectList(data)
         })()
       },[projectId])
+      const loadModule = async(modID) =>{
+        dispatch(selectedModule({}))
+        dispatch(isEnELoad(false));
+        dispatch(selectedModule({}))
+        var req={
+            tab:"createTab",
+            projectid:proj,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:modID
+        }
+        
+        var res = await getModules(req)
+        if(res.error){console.log(res.error);return}
+        dispatch(selectedModule(res))
+    }
 
+    // normal module selection
+            const selectModule = async (id,name,type,checked, firstRender) => {
+                var modID = id
+                var type = name
+                var name = type
+                // below code about scenarios fetching
+                if(Object.keys(moduleSelect).length===0 || firstRender){
+                            loadModule(modID)
+                            return;
+                        }else{
+                            console.log(modID)
+                        }
+        d3.selectAll('.ct-node').classed('node-selected',false)
+        d3.select('#pasteImg').classed('active-map',false)
+        d3.select('#copyImg').classed('active-map',false)
+        d3.selectAll('.ct-node').classed('node-selected',false)
+        if(Object.keys(moduleSelect).length===0){
+            loadModule(modID)
+    
+        }else{
+            console.log({modID, type: name})
+        }
+        return;
+    }
       const clickForSearch = ()=>{
                setShowInput(true) }
       const click_X_Button = ()=>{
@@ -223,7 +272,7 @@ const ModuleListSidePanel =()=>{
                               return(
                               <>
                                 <div className="EachModNameBox" title={module.name}>
-                                   <div key={module.id} className="moduleName" ><img src="static/imgs/moduleIcon.png" alt="modules" /><h4>{module.name}</h4></div>
+                                   <div key={module.id} className="moduleName"  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)}><img src="static/imgs/moduleIcon.png" alt="modules" /><h4>{module.name}</h4></div>
                                    
                                 </div>
                               </>
