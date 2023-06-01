@@ -13,9 +13,42 @@ import { Checkbox } from "primereact/checkbox";
 import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
+import AvoInput from "../../../globalComponents/AvoInput";
+import 'primeicons/primeicons.css';
+
 import { selectedProj, selectedModule, isEnELoad } from '../designSlice';
 
 // this component shows side panel of module containers in design screen
+
+import TreeView from '@mui/lab/TreeView';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import TreeItem from '@mui/lab/TreeItem';
+
+export  function MultiSelectTreeView() {
+    // const icons =()=>{
+    //     return(
+    //         // <img src={moduleIcon}/>
+    //         <img src={moduleIcon} alt="Custom Icon" style={{ marginRight: 8, width: 16, height: 16 }} />
+    //     )
+    // }
+  return (
+    <TreeView
+      aria-label="multi-select"
+      defaultCollapseIcon={<ExpandMoreIcon />}
+      defaultExpandIcon={<ChevronRightIcon />}
+      multiSelect
+      sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+    >
+      <TreeItem nodeId="5" label="projectAvoAssure">
+        <TreeItem nodeId="6" label="moduleLogIn">
+            <TreeItem nodeId="8" label="AVATARLog" />
+            <TreeItem nodeId="9" label="Password" />
+        </TreeItem>
+      </TreeItem>
+    </TreeView>
+  );
+}
 
 const ModuleListSidePanel =()=>{
       const dispatch = useDispatch();
@@ -27,6 +60,7 @@ const ModuleListSidePanel =()=>{
       const [projectList, setProjectList] = useState([]);
       const [projectId, setprojectId] = useState("");
       const [showE2EPopup, setShowE2EPopup] = useState(false);
+      const [configTxt, setConfigTxt] = useState("");
       // the below API call is hard coded and I should take required actions on it in future 
       useEffect(()=>{
         (async()=>{
@@ -123,119 +157,77 @@ const ModuleListSidePanel =()=>{
       // const [visible, setVisible] = useState(showE2EPopup);
     const footerContent = (
         <div>
-            <Button label="No" icon="pi pi-times" onClick={() => setShowE2EPopup(false)} className="p-button-text" />
-            <Button label="Yes" icon="pi pi-check" onClick={() => setShowE2EPopup(false)} autoFocus />
+            <Button label="Cancel"  onClick={() => setShowE2EPopup(false)} className="p-button-text" />
+            <Button label="Save"  onClick={() => setShowE2EPopup(false)} autoFocus />
         </div>
     );
 
       return (
+      <div className="E2E_container">
         <div className="card flex justify-content-center">
             {/* <Dialog header="Header" visible={showE2EPopup} style={{ width: '50vw' }} onHide={() => setShowE2EPopup(false)} footer={footerContent}>
             </Dialog> */}
 
-             <Dialog className='Project-Dialog' header="Create End to End Flow" visible={showE2EPopup} style={{ width: "74.875rem" }} onHide={() => setShowE2EPopup(false)} footer={footerContent}>  
-        <Card className='project-name-1'>
-        <div className='pro-name1'>
-        < h5 className='proj__name'>Name</h5>
-            <InputText className="proj-input md:w-30rem text-400"  placeholder="Enter End to End module Name" />
-            <div className='dropdown-1'>
-                {/* <h5 className='application__name'>Application Type</h5> */}
-            {/* <Dropdown  value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name" 
-                placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-26rem app-dropdown vertical-align-middle text-400 " /> */}
-                </div>
+             
+             <Dialog className='Project-Dialog' header="Create End to End Flow" visible={showE2EPopup} style={{ width: "74.875rem",height:'100%',backgroundColor:'#605BFF' }} onHide={() => setShowE2EPopup(false)} footer={footerContent}>  
+                 <div className="mainCentralContainer">
+                  <div className="nameTopSection">
+                  <div class="col-12 lg:col-12 xl:col-5 md:col-12 sm:col-12 flex flex-column">
+                    <AvoInput
+                    htmlFor="username"
+                    labelTxt="Name"
+                    infoIcon="static/imgs/Info_icon.svg"
+                    required={true}
+                    placeholder="Enter End to End Module Name"
+                    // inputTxt={configTxt}
+                    customClass="inputRow_for_E2E_popUp"
+                    // setInputTxt={setConfigTxt}
+                    inputType="lablelRowReqInfo"/>
+                  </div>
+                  </div>
+                  <div className="cenralTwinBox">
+                    <div className="leftBox">
+                    <Card className="leftCard"  >
+                      <div className='headlineSearchInput'>
+                        <div className='headlineRequired'>
+                           <h5 style={{fontSize:'14px'}}>Select Scenarios</h5>
+                           <img src="static/imgs/Required.svg" className="required_icon" />
+                         </div>
+                         <span className="p-input-icon-left">
+                         <i className="pi pi-search" />
+                         <InputText placeholder="Search Scenarios by name" style={{width:'32rem',height:'2.2rem'}} className='inputContainer'    />    
+                        </span>
+                     </div>
+                     <MultiSelectTreeView/>
+                         {/* <p className="m-0">
+                         </p> */}
+
+                    </Card>
+                    </div>
+                    <div className="centerButtons">
+                      <div className="centerButtonsIndiVisual">
+                        <Button   label='>'outlined />
+                        <Button  label='<' outlined />
+                      </div>
+                    </div>
+                    <div className="rightBox">
+                    <Card className="rightCard" >
+                         <div className="initialText">
+                          <div className="initial1StText">
+                              <h3 className="textClass"> No Scenarios Yet</h3>
+                          </div>
+                          <div className="initial2NdText">
+                          <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" /> 
+                          <h3 className="textClass">Select Module</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" /> 
+                          <h3 >Select Scenarios</h3>
+                          </div> 
+                         </div>
+                    </Card>
+                    </div>
+                  </div>
+                 </div>
+            </Dialog>
         </div>
-        
-        </Card>
-        <Card className='card11' style={{height:'17rem'}}>
-            <div className="card-input1">
-            <h5 className='select-users'>Select Scenarios</h5>
-            <div className='selectallbtn'>
-        <span className="p-input-icon-left">
-        <i className="pi pi-search" />
-        <InputText placeholder="Search Scenarios by name" className='usersearch md:w-24rem ' />    
-</span>
-</div>
-</div>
-
-<div className='user-select-checkbox '>
-{/* <div className='check1'>
-<Checkbox   ></Checkbox>
-<h5 className='label1'> Select All</h5>
-</div> */}
-{/* <div className='dropdown_role'>
-    <h5>Project level role(optional)</h5>
-</div> */}
-<div className="check2">
-
-                    
-<div  className="users-list">
-                            <Checkbox  className=" checkbox1" name="item" />
-                            <h5 className="label-2 ml-2 mr-2 mt-2 mb-2">
-                              
-                              <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff',width:'27px', height:'26px' }} ></Avatar></span>
-            
-                              <span className='user-name'></span>
-                                <span className='user-role'></span>
-                               
-                                <span className='tooltip'></span>
-                    
-                                </h5>
-
-                                {/* <MultiSelect    optionLabel="name"  display="chip" 
-                                placeholder="Select a Role"  className="role-dropdown" /> */}
-                            
-              
-                        </div>
-                       
-                       
-                    
-                     </div>
-                     </div>
-                
-
-        </Card>
-
-        <Button  className="gtbtn" label='>'>  </Button>
-        <Button className="ltbtn" label='<' >   </Button>
-
-
-        <Card className='card22' style={{height:'17rem'}}>
-            <div className='card-input2'>
-            <h5 className='selected-users'>Selected Scenarios</h5>
-            <div className='selectallbtn'>
-        <span className="p-input-icon-left">
-        <i className="pi pi-search" />
-        <InputText placeholder="Search Scenarios by name"  className='selecteduser md:w-24rem'    />
-</span>
-</div>
-
-</div>
-{/* <div className='checkbox-2'>
-<Checkbox  ></Checkbox>
-<h5 className='label1'> Select All</h5>
-</div> */}
-  
-{/* <div className='check-bx3'>
-    <ul>  
-
-    <>
-         <Checkbox  className="assigned-checkbox">{} </Checkbox>
-         <h5  className="label-3 ml-2 mr-2 mt-2 ">
-         <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width:'27px', height:'26px' }} ></Avatar></span>
-                               <span className='asgnd-name'> </span>
-                               <span className='asgnd-role'></span>
-                               
-                                </h5>
-                                </>
-       
-        
-        </ul>
-     
-    </div> */}
-
-
- </Card> 
-</Dialog>
         </div>
          )
       }
@@ -262,7 +254,7 @@ const ModuleListSidePanel =()=>{
                <div className="moduleLayer_plusIcon">
                   <div className={`moduleLayer_icon ${showInput? 'moduleLayer_icon_SearchOn' 
                   : 'moduleLayer_icon_SearchOff'}` } >  
-                     <img src="static/imgs/moduleIcon.png" alt="modules" /> <h3 className="normalModHeadLine">Module Layers</h3> 
+                     <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" /> <h3 className="normalModHeadLine">Module Layers</h3> 
                   </div>
                   <div className="SearchIconForModules">
                     <span className={`pi pi-search ${showInput? 'searchIcon_adjust' :''}` } style={{fontSize:'1.1rem',cursor:'pointer'}} onClick={clickForSearch}></span>
@@ -279,8 +271,8 @@ const ModuleListSidePanel =()=>{
                         {moduleList && moduleList.map((module)=>{
                               return(
                               <>
-                                <div className="EachModNameBox">
-                                   <div key={module.id} className="moduleName"  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)}><h4>{module.name}</h4></div>
+                                <div className="EachModNameBox" title={module.name}>
+                                   <div key={module.id} className="moduleName"  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)}><img src="static/imgs/moduleIcon.png" alt="modules" /><h4>{module.name}</h4></div>
                                    
                                 </div>
                               </>
@@ -292,7 +284,7 @@ const ModuleListSidePanel =()=>{
                <div className="moduleLayer_plusIcon">
                       <div className={`moduleLayer_icon ${showInputE2E? 'moduleLayer_icon_SearchOn' 
                                 : 'moduleLayer_icon_SearchOff'}` }>  
-                         <img src="static/imgs/E2EModuleSideIcon.png" alt="modules" /> <h3 className="E2EHeadLine">End To End Flow</h3> 
+                         <img src="static/imgs/E2ESideIcon.png" alt="modules" /> <h3 className="E2EHeadLine">End To End Flow</h3> 
                       </div>
                       <div className="SearchIconForModulesE2E">
                        <span className={`pi pi-search ${showInputE2E? 'searchIcon_adjust' :''}` } style={{fontSize:'1.1rem',cursor:'pointer'}} onClick={clickForSearchE2E}></span>
@@ -310,7 +302,7 @@ const ModuleListSidePanel =()=>{
                               return(
                               <>
                                 <div className="EachModNameBox">
-                                   <div key={module.id} className="moduleName" ><h4>{module.name}</h4></div>
+                                   <div key={module.id} className="moduleName" ><img src="static/imgs/E2EModuleSideIcon.png" alt="modules" /><h4 title={module.name}>{module.name}</h4></div>
                                    
                                 </div>
                               </>
