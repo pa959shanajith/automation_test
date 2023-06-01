@@ -7,7 +7,6 @@ import store from './store';
 // import HomePage from './pages/landing/containers/HomePage';
 import HomePage from './pages/landing/containers/HomePage';
 import Report from './pages/report/components/reports';
-import Execute from './pages/execute/Components/Execute';
 import More from './pages/more/more';
 import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
