@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const ConfigurePage =({})=>{
   const [visible, setVisible] = useState(false);
+  const [footerType, setFooterType] = useState("CancelNext");
+  const [tabIndex, setTabIndex] = useState(0);
     const items = [
         {label: 'Configure'},
         {label: 'Scheduled Executions' },
@@ -25,6 +27,7 @@ const ConfigurePage =({})=>{
     const items1 = [{ label: 'Home'  },{ label: 'ConfigurePage' }];
   
   const getConfigData = useSelector((store) => store.configsetup);
+  const getRequired = getConfigData.requiredFeilds;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -39,10 +42,17 @@ const ConfigurePage =({})=>{
 
   const onModalBtnClick = (getBtnType) => {
     if(getBtnType === "Next"){
+      setTabIndex(1);
+    }
+    else if(getBtnType === "Save"){
       dispatch(storeConfigureKey());
     }
     else setVisible(false);
   };
+
+  useEffect(() => {
+    setFooterType(tabIndex ? "CancelSave" : "CancelNext");
+  }, [tabIndex]);
 
 const Breadcrumbs = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -202,9 +212,9 @@ return(
         visible={visible}
         setVisible={setVisible}
         onModalBtnClick={onModalBtnClick}
-        content={<ConfigureSetup configData={getConfigData} />}
+        content={<ConfigureSetup configData={getConfigData} tabIndex={tabIndex} setTabIndex={setTabIndex} />}
         headerTxt="Execution Configuration set up"
-        footerType="CancelNext"
+        footerType={footerType}
         modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
       />
   </div>
