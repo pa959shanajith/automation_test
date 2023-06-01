@@ -20,13 +20,10 @@ const StaticElements = ({children}) => {
     }, [location]);
 
     return(
-        <div className="main_content">
-            <Topbar />
             <div className="sidebar_sidepanel_homepage">
                 { showSideNavBar && <SideNavBar />}
                 {children}
             </div>
-        </div>
     )
 }
 export default StaticElements;

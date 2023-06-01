@@ -1,6 +1,6 @@
-import React, { useEffect, useState} from 'react';
-import {v4 as uuid} from 'uuid';
-import { Route, Routes} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import ServiceBell from "@servicebell/widget";
 // import {store} from './reducer';
 import store from './store';
@@ -10,7 +10,7 @@ import Report from './pages/report/components/reports';
 import More from './pages/more/more';
 import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
-import {ErrorPage} from './pages/global';
+import { ErrorPage } from './pages/global';
 import Login from './pages/login/containers/LoginPage';
 import BasePage from './pages/login/containers/BasePage';
 // import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
@@ -19,7 +19,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
-import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
+// import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
 import ConfigurePage from './pages/execute/components/ConfigurePage';
 import './App.css';
 import Topbar from './pages/landing/components/Topbar';
@@ -31,50 +31,53 @@ import MindmapHome from './pages/design/containers/MindmapHome';
 
 
 
-
 const { REACT_APP_DEV } = process.env
 /*Component App
   use: defines components for each url
 */
 
-export const url =  REACT_APP_DEV  ? "https://"+window.location.hostname+":8443" : window.location.origin;
+export const url = REACT_APP_DEV ? "https://" + window.location.hostname + ":8443" : window.location.origin;
 
 const App = () => {
   // const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
-  const [blockui,setBlockui] = useState({show:false});
+  const [blockui, setBlockui] = useState({ show: false });
+  const location = useLocation();
 
-  useEffect(()=>{
+  useEffect(() => {
     TabCheck(setBlockui);
-    (async()=>{
+    (async () => {
       const response = await fetch("/getServiceBell")
       let { enableServiceBell } = await response.json();
-      if(enableServiceBell) ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
+      if (enableServiceBell) ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
     })();
-  },[])
-    
-  return (<> 
-      {/* {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null} */}
-      {/* <ProgressBar /> */}
-      {/* <ErrorBoundary> */}
-          <RouteApp/>
-      {/* </ErrorBoundary> */}
-    </>
+  }, [])
+
+  return (<>
+    {/* {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null} */}
+    {/* <ProgressBar /> */}
+    {/* <ErrorBoundary> */}
+    <div className="main_content">
+      {location.pathname !== '/login' && <Topbar />}
+      <RouteApp/>
+    </div>
+    {/* </ErrorBoundary> */}
+  </>
   );
 }
 
 const RouteApp = () => {
-  return(
+  return (
     <>
       <Routes>
-        <Route path="/login" element={<Login/>} />
-        <Route path="/" element={<BasePage/>} />
-        <Route path="/landing" element={<HomePage/>} />
-        <Route path="/integration" element={<Integration/>} />
-        <Route path="/reports" element={<Report/>} />
-        <Route path="/settings" element={<Settings/> }/>
-        <Route path="/itdm" element={<itdm/>} />
-        <Route path="/design" element={<MindmapHome/>}/>
-        <Route path="/execute" element={<ConfigurePage/>}/>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<BasePage />} />
+        <Route path="/landing" element={<HomePage />} />
+        <Route path="/integration" element={<Integration />} />
+        <Route path="/reports" element={<Report />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/itdm" element={<itdm />} />
+        <Route path="/design" element={<MindmapHome />} />
+        <Route path="/execute" element={<ConfigurePage />} />
       </Routes>
     </>
   )
@@ -85,20 +88,20 @@ const RouteApp = () => {
 const TabCheck = (setBlockui) => {
   const storage_Handler = (e) => {
     if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport')) return false;
-      // if tabGUID does not match then more than one tab and GUID
-      if (e.key === 'tabUUID' && e.oldValue !== '') {
-          if (e.oldValue !== e.newValue) {
-            window.localStorage.clear();
-            localStorage["tabValidity"] = "invalid";
-            setBlockui({show:true,content:'Duplicate Tabs not allowed, Please Close this Tab and refresh.'})
-            window.sessionStorage.clear();
-          }
-      }else if(e.key === "tabValidity"){
+    // if tabGUID does not match then more than one tab and GUID
+    if (e.key === 'tabUUID' && e.oldValue !== '') {
+      if (e.oldValue !== e.newValue) {
+        window.localStorage.clear();
+        localStorage["tabValidity"] = "invalid";
+        setBlockui({ show: true, content: 'Duplicate Tabs not allowed, Please Close this Tab and refresh.' })
         window.sessionStorage.clear();
+      }
+    } else if (e.key === "tabValidity") {
+      window.sessionStorage.clear();
       // history.pushState(null, null, document.URL);
-      setBlockui({show:true,content:"Duplicate Tabs not allowed, Please Close this Tab and refresh."})
+      setBlockui({ show: true, content: "Duplicate Tabs not allowed, Please Close this Tab and refresh." })
     }
-  } 
+  }
   // detect local storage available
   if (typeof (Storage) === "undefined") return;
   // get (set if not) tab uuid and store in tab session

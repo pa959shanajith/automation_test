@@ -4,7 +4,7 @@ import ScreenOverlay from './components/ScreenOverlay';
 import PopupMsg, {setMsg} from './components/PopupMsg';
 import {Messages, VARIANT} from './components/Messages';
 import ModalContainer from './components/ModalContainer';
-
+import ChangePassword from './components/ChangePassword';
 
 export { 
         ProgressBar,
@@ -15,4 +15,5 @@ export {
         VARIANT,
         setMsg,
         ModalContainer,
+        ChangePassword,
     };
