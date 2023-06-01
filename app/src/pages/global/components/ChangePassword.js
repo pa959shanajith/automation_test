@@ -1,21 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { resetPassword } from '../api';
-// import ToastWrapper from './ToastWrapper';
+import ToastWrapper from './ToastWrapper';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { useDispatch } from 'react-redux';
-
 import '../styles//ChangePassword.scss';
 
 
 const ChangePassword = (props) => {
     const dispatch = useDispatch();
     const { showDialogBox, setShowDialogBox } = props;
-    const toast = useRef(null);
+    const toastWrapperRef = useRef(null);
     const [showDialog, setShowDialog] = useState(showDialogBox);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -26,14 +25,20 @@ const ChangePassword = (props) => {
     const [upperCasePresent, setUpperCasePresent] = useState(false);
     const [specialCharPresent, setSpecialCharPresent] = useState(false);
     const [digitPresent, setDigitPresent] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
 
-    const toastError = (erroMessage) => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 3000 });
-    }
+    useEffect(() => {
+        if (errorMsg) {
+            toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 3000 });
+        }
+    }, [errorMsg]);
 
-    const toastSuccess = (successMessage) => {
-        toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 3000 });
-    }
+    useEffect(() => {
+        if (successMsg) {
+            toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 3000 });
+        }
+    }, [successMsg]);
 
     // validating the Input password
     const newPasswordOnChangeHandler = (event) => {
@@ -63,34 +68,52 @@ const ChangePassword = (props) => {
         setSpecialCharPresent(false);
         setShowDialog(false);
         setShowDialogBox(false);
-        // dispatch(loadUserInfoActions.showChangePasswordDialog());
     };
 
     const saveButtonHandler = () => {
-        resetPassword(newpassword, null, null)
-            .then(data => {
-                if (data === "Invalid Session") { toastError('Invalid Session')}
-                else if (data === "success") {
-                    toastSuccess('Password changed successfully');
-                } else if (data === "same") {
-                    toastError("Sorry! You can't use the existing password again");
-                } else if (data === "incorrect") {
-                    toastError('Current Password is incorrect');
-                } else if (data === "reusedPass" || data === "insuff" || data === "same") {
-                    if (data === "same") toastError('New Password provided is same as old password');
-                    else if (data === "insuff") toastError( "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
-                    else toastError("Password provided does not meet length, complexity or history requirements of application.");
-                } else if (data === "fail") toastError('Failed to Change Password');
-                else if (/^2[0-4]{10}$/.test(data)) toastError('Invalid Request');
-            })
-            .catch(error => {
-                toastError('Failed to Authenticate Current Password.');
-            });
+        try {
+            setErrorMsg('');
+            setSuccessMsg('');
+            let errorMsg = "";
+            let successMsg = "";
+            resetPassword(newpassword, null, null)
+                .then(data => {
+                    if (data === "Invalid Session") { errorMsg = 'Invalid Session'; }
+                    else if (data === "success") {
+                        successMsg = 'Password changed successfully';
+                    } else if (data === "same") {
+                        errorMsg = "Sorry! You can't use the existing password again";
+                    } else if (data === "incorrect") {
+                        errorMsg = 'Current Password is incorrect';
+                    } else if (data === "reusedPass" || data === "insuff" || data === "same") {
+                        if (data === "same") errorMsg = 'New Password provided is same as old password';
+                        else if (data === "insuff") errorMsg = "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+                        else errorMsg = "Password provided does not meet length, complexity or history requirements of application.";
+                    } else if (data === "fail")
+                        errorMsg = 'Failed to Change Password';
+                    else if (/^2[0-4]{10}$/.test(data))
+                        errorMsg = 'Invalid Request';
+
+                    if (errorMsg) setErrorMsg(errorMsg);
+                    if (successMsg) {
+                        setSuccessMsg(successMsg);
+                        resetFields();
+                    }
+
+                })
+                .catch(error => {
+                    errorMsg = 'Failed to Authenticate Current Password.';
+                });
+
+        }
+        catch (error) {
+            setErrorMsg("Error while updating the password: ERROR: ", error);
+        }
     }
 
     // Footer elements to the Dialog Box
-    const changePasswordFooter = () => (
-        <>
+    const changePasswordFooter = () =>
+        <ToastWrapper>
             <Button
                 label="Cancel"
                 size='small'
@@ -101,12 +124,12 @@ const ChangePassword = (props) => {
                 size='small'
                 onClick={saveButtonHandler}
                 disabled={(newpassword != '' && confirmNewpassword != '') && (newpassword === confirmNewpassword) ? false : true} />
-        </>
-    )
+        </ToastWrapper>
 
     return (
         <>
             <div className='surface-card m-6'>
+                <Toast ref={toastWrapperRef} position="bottom-center" />
                 <Dialog header="Change Password" className="changePassword_dialog" visible={showDialog} style={{ width: '30vw' }} onHide={resetFields} footer={changePasswordFooter}>
                     <div className='pt-3'>
 
