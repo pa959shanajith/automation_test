@@ -1,7 +1,7 @@
 import "../styles/ModuleListSidePanel.scss";
 import 'primeicons/primeicons.css';
-import { getModules,getProjectList } from "../api";
-import  React, { useState, useEffect } from 'react';
+import { getModules,getProjectList,populateScenarios } from "../api";
+import  React, { useState, useEffect, useRef } from 'react';
 import * as d3 from  'd3';
 import { useSelector, useDispatch} from 'react-redux';
 import { Button } from 'primereact/button';
@@ -13,20 +13,300 @@ import { Checkbox } from "primereact/checkbox";
 import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
-import { selectedProj, selectedModule, isEnELoad } from '../designSlice';
+import { selectedProj, selectedModule, isEnELoad, initEnEProj,savedList } from '../designSlice';
 
 // this component shows side panel of module containers in design screen
 
 const ModuleListSidePanel =()=>{
-      const dispatch = useDispatch();
-      const proj = useSelector(state=>state.design.selectedProj);
-      const moduleSelect = useSelector(state=>state.design.selectedModule);
-      const [showInput, setShowInput] = useState(false);
-      const [moduleList, setModuleList] = useState(null);
-      const [showInputE2E, setShowInputE2E] = useState(false);
-      const [projectList, setProjectList] = useState([]);
-      const [projectId, setprojectId] = useState("");
-      const [showE2EPopup, setShowE2EPopup] = useState(false);
+  const dispatch = useDispatch()
+    const moduleList = useSelector(state=>state.design.moduleList)
+    const proj = useSelector(state=>state.design.selectedProj)
+    const initProj = useSelector(state=>state.design.selectedProj)
+    const moduleSelect = useSelector(state=>state.design.selectedModule)
+    const moduleSelectlist = useSelector(state=>state.design.selectedModulelist)
+    const initEnEProjt = useSelector(state=>state.design.initEnEProj)
+    const [moddrop,setModdrop]=useState(true)
+    const [warning,setWarning]=useState(false)
+    const [loading,setLoading] = useState(false)
+    // const isAssign = props.isAssign
+    const [options,setOptions] = useState(undefined)
+    const [showInput, setShowInput] = useState(false);
+    const [moduleLists, setModuleLists] = useState(null);
+    const [showInputE2E, setShowInputE2E] = useState(false);
+    const [projectList, setProjectList] = useState([]);
+    const [projectId, setprojectId] = useState("");
+    const [showE2EPopup, setShowE2EPopup] = useState(false);
+    const [modlist,setModList] = useState(moduleList)
+    const SearchInp = useRef();
+    const [searchInpText,setSearchInpText] = useState('');
+    const [searchInpTextEnE,setSearchInpTextEnE] = useState('');
+    const SearchInpEnE = useRef();
+    const SearchMdInp = useRef()
+    const [modE2Elist, setModE2EList] = useState(moduleList)
+    const [searchForNormal, setSearchForNormal] = useState(false)
+    const [importPop,setImportPop] = useState(false)
+    const [blockui,setBlockui] = useState({show:false})
+    const [scenarioList,setScenarioList] = useState([])
+    const [initScList,setInitScList] = useState([]) 
+    const [selectedSc,setSelctedSc] = useState([])
+    const [isE2EOpen, setIsE2EOpen] = useState(false);
+    const [collapse, setCollapse] = useState(false);
+    const [collapseForModules, setCollapseForModules] = useState(true);
+    const SearchScInp = useRef()
+    const [filterSc,setFilterSc] = useState('');
+    const userRole = useSelector(state=>state.login.SR);
+    const [firstRender, setFirstRender] = useState(true);
+    const [showNote, setShowNote] = useState(false);
+    const [allModSelected, setAllModSelected] = useState(false);
+    const isEnELoaded = useSelector(state=>state.design.isEnELoad);
+
+    const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
+    useEffect(()=> {
+        if(!searchForNormal && !isCreateE2E ) {
+            if(moduleList.length > 0) {
+                const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
+                selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
+        }}
+        else{dispatch(savedList(true))}
+        setWarning(false); 
+        
+     }, [moduleList, initProj, searchForNormal, isCreateE2E, dispatch])
+     useEffect(()=> {
+        return () => {
+            dispatch(isEnELoad(false));
+            // dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
+        }
+     },[]);
+    //  useEffect (()=>{
+    //     {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
+    //  },[isCreateE2E])
+
+    //  useEffect(()=>{
+    //      setSearchForNormal(false);
+    //      if(!isE2EOpen){
+    //     // setIsCreateE2E(false);
+    //     }
+        
+    //  },[initProj])
+    //  useEffect(() => {
+    //     setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
+        
+    //   },[initEnEProj]);
+
+    //  useEffect(()=>{
+    //     // if(moduleSelect.type === 'endtoend') {
+            
+    //     // }
+    //     searchModule("");
+    //     searchModule_E2E("");
+    //     setSearchInpTextEnE("");
+    //     setSearchInpText("");
+    //     setWarning(false);
+    //     setScenarioList([]);
+    //  }, [proj])
+    
+     useEffect(()=>{
+        var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
+        setScenarioList(filter)
+    },[filterSc,setScenarioList,initScList])
+    // about select all check box
+    // useEffect(()=>{
+    //     if(moduleSelectlist.length===moduleList.filter(module=> module.type=='basic').length && moduleSelectlist.length>0  ){
+    //       setAllModSelected(true);
+    //     }
+    //     else{
+    //       setAllModSelected(false);
+    //     }
+    //   },[moduleSelectlist, moduleList])
+    const displayError = (error) =>{
+        setLoading(false)
+        // setMsg(error)
+    }
+    // const collapsed =()=> setCollapse(!collapse)
+    // const collapsedForModules =()=> setCollapseForModules (!collapseForModules )
+    const CreateNew = () =>{
+        setIsE2EOpen(false);
+        setCollapse(false);
+        dispatch(selectedModule({createnew:true}))
+        dispatch(initEnEProj({proj, isE2ECreate: false}));
+        dispatch(isEnELoad(false));
+        setFirstRender(false);
+    }
+    // const clickCreateNew = () =>{
+    //     dispatch(selectedModule({createnew:true}))
+    //     dispatch(initEnEProj({proj, isE2ECreate: false}));
+    //     dispatch(isEnELoad(false));
+    //     setFirstRender(false);
+    // }
+    // const searchModule = (val) =>{
+    //     if(SearchInp && SearchInp.current) {
+    //         if (val === "") setSearchForNormal(false)
+    //         else setSearchForNormal(true);
+    //         SearchInp.current.value = val;
+    //         setSearchInpText(val);
+    //     }
+        
+    // }
+    // const searchScenario = (val) =>{
+    //     setFilterSc(val)
+    // }
+     const loadModule = async(modID) =>{
+        dispatch(selectedModule({}))
+        dispatch(isEnELoad(false));
+        setWarning(false)
+        setBlockui({show:true,content:"Loading Module ..."}) 
+        // if(moduleSelect._id === modID){
+           
+        // }
+        dispatch(selectedModule({}))
+        var req={
+            tab:"createTab",
+            projectid:proj,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:modID
+        }
+        
+        var res = await getModules(req)
+        if(res.error){displayError(res.error);return}
+        dispatch(selectedModule(res))
+        setBlockui({show:false})
+    }
+    const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
+
+    // normal module selection
+            const selectModule = async (id,name,type,checked, firstRender) => {
+                var modID = id
+                var type = name
+                var name = type
+                // below code about scenarios fetching
+        // SearchScInp.current.value = ""
+                setSelctedSc([])
+                    if (isE2EOpen){
+                        setBlockui({content:'loading scenarios',show:true})
+                        //loading screen
+                        var res = await populateScenarios(modID)
+                        if(res.error){displayError(res.error);return}
+                        // props.setModName(name)
+                        setIsModuleSelectedForE2E(id);
+                        setScenarioList(res)
+                        setInitScList(res)
+                        setBlockui({show:false})
+                        setShowNote(true)
+                        return;}
+                        if(Object.keys(moduleSelect).length===0 || firstRender){
+                            loadModule(modID)
+                            return;
+                        }else{
+                            setWarning(modID)
+                        }
+        d3.selectAll('.ct-node').classed('node-selected',false)
+        //     return;
+        // }
+        d3.select('#pasteImg').classed('active-map',false)
+        d3.select('#copyImg').classed('active-map',false)
+        d3.selectAll('.ct-node').classed('node-selected',false)
+        if(Object.keys(moduleSelect).length===0){
+            loadModule(modID)
+    
+        }else{
+            setWarning({modID, type: name})
+        }
+        return;
+    }
+    
+    //E2E properties
+    const selectModules= async(e) => {
+        dispatch(isEnELoad(true));
+        var modID = e.currentTarget.getAttribute("value")
+        var type = e.currentTarget.getAttribute("type")
+        var name = e.currentTarget.getAttribute("name")
+        if(Object.keys(moduleSelect).length===0 || firstRender){
+            loadModuleE2E(modID)
+
+        }else{
+            setWarning({modID, type});
+        }
+        setFirstRender(false);
+
+        return; 
+    }    
+    const loadModuleE2E = async(modID) =>{
+        setWarning(false)
+        setIsE2EOpen(true)
+        setCollapse(true)
+        setBlockui({show:true,content:"Loading Module ..."})   
+        // if(moduleSelect._id === modID){
+            
+            
+        // }
+        dispatch(selectedModule({}))
+        var req={
+            tab:"endToend",
+            projectid:proj,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:modID
+        }
+        var res = await getModules(req)
+        if(res.error){displayError(res.error);return}
+        dispatch(selectedModule(res))
+        setBlockui({show:false})
+    }
+    const addScenario = (e) => {	
+        var sceId = e.currentTarget.getAttribute("value")	
+        var sceName = e.currentTarget.getAttribute("title")	
+        var scArr = {...selectedSc}	
+        if(scArr[sceId]){	
+            delete scArr[sceId] 
+        }else{	
+            scArr[sceId] = sceName	
+        }       
+        setSelctedSc(scArr)	
+    }	
+    const clickAdd = () =>{	
+        if(Object.keys(selectedSc).length<1)return;	
+        // dispatch({type:actionTypes.UPDATE_SCENARIOLIST,payload:selectedSc})	
+    }
+    // E2E search button
+    const searchModule_E2E = (val) =>{
+        // var initmodule = modE2Elist
+        // if(!initmodule){
+        //     initmodule = moduleList
+        //     setModE2EList(moduleList)
+        // }
+        if(SearchInpEnE && SearchInpEnE.current) {
+            SearchInpEnE.current.value = val;
+            setSearchInpTextEnE(val);
+        }
+        // var filter = moduleList.filter((e)=>(e.type==='endtoend'&&(e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)||e.type==='basic'))
+        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter && filter.length ? filter : moduleList})
+    }
+    const setOptions1 = (data) =>{
+        setOptions(data)
+      }
+    const createType = {
+        'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))
+    }
+    const selectedCheckbox=(e,arg="checkbox")=>{
+        let modID = e.target.getAttribute("value")
+        if(arg==='checkbox'){
+
+            let selectedModList = [];
+            // if(moduleSelectlist.length>0){
+            //     selectedModList=moduleSelectlist;              
+            // }
+            if(selectedModList.indexOf(modID)===-1){
+                selectedModList.push(modID);
+            }else{
+                selectedModList = selectedModList.filter(item => item !== modID)
+            }              
+            // dispatch({type:actionTypes.SELECT_MODULELIST,payload:[...selectedModList]})         
+            return;
+        }
+    }
       // the below API call is hard coded and I should take required actions on it in future 
       useEffect(()=>{
         (async()=>{
@@ -41,8 +321,8 @@ const ModuleListSidePanel =()=>{
               "moduleid": null
             }
            )
-          setModuleList(modules)
-          // dispatch(selectedModule(modules))
+          setModuleLists(modules)
+          // dispatch(selectedModule(modules[0]))
         })()
       }, [dispatch, projectId])
 
@@ -61,48 +341,7 @@ const ModuleListSidePanel =()=>{
           setProjectList(data)
         })()
       },[projectId])
-      const loadModule = async(modID) =>{
-        dispatch(selectedModule({}))
-        dispatch(isEnELoad(false));
-        dispatch(selectedModule({}))
-        var req={
-            tab:"createTab",
-            projectid:proj,
-            version:0,
-            cycId: null,
-            modName:"",
-            moduleid:modID
-        }
-        
-        var res = await getModules(req)
-        if(res.error){console.log(res.error);return}
-        dispatch(selectedModule(res))
-    }
 
-    // normal module selection
-            const selectModule = async (id,name,type,checked, firstRender) => {
-                var modID = id
-                var type = name
-                var name = type
-                // below code about scenarios fetching
-                if(Object.keys(moduleSelect).length===0 || firstRender){
-                            loadModule(modID)
-                            return;
-                        }else{
-                            console.log(modID)
-                        }
-        d3.selectAll('.ct-node').classed('node-selected',false)
-        d3.select('#pasteImg').classed('active-map',false)
-        d3.select('#copyImg').classed('active-map',false)
-        d3.selectAll('.ct-node').classed('node-selected',false)
-        if(Object.keys(moduleSelect).length===0){
-            loadModule(modID)
-    
-        }else{
-            console.log({modID, type: name})
-        }
-        return;
-    }
       const clickForSearch = ()=>{
                setShowInput(true) }
       const click_X_Button = ()=>{
@@ -115,8 +354,6 @@ const ModuleListSidePanel =()=>{
       const click_X_ButtonE2E = ()=>{
         setShowInputE2E(false)
       }
-     
-     
 
     function LongContentDemo() {
     
@@ -273,14 +510,14 @@ const ModuleListSidePanel =()=>{
                     </div>)}
                   </div>
                   <img className={` ${showInput? 'moduleLayer_icon_SearchOn' :
-                    'moduleLayer_icon_SearchOff'}` }  src="static/imgs/plusNew.png" alt="NewModules" /> 
+                    'moduleLayer_icon_SearchOff'}` }  src="static/imgs/plusNew.png" alt="NewModules" onClick={()=>{ CreateNew()}} /> 
                 </div>
                 <div className="NorModuleList">
-                        {moduleList && moduleList.map((module)=>{
+                        {moduleLists && moduleLists.map((module, idx)=>{
                               return(
                               <>
                                 <div className="EachModNameBox">
-                                   <div key={module.id} className="moduleName"  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)}><h4>{module.name}</h4></div>
+                                   <div key={module.id} className="moduleName"  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked, idx)}><h4>{module.name}</h4></div>
                                    
                                 </div>
                               </>

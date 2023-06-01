@@ -154,15 +154,24 @@ const CanvasNew = (props) => {
                 tree.links = {}
                 tree.dLinks = []
                 if(zoom){
-                  if(!props.gen){
-                  d3.zoomIdentity.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg`))
-                  }
-                  else{
-                      d3.zoomIdentity.scale(1).translate([0,0]).event(d3.select(`.mp__canvas_svg_genius`))
-
-                  }
-                  zoom.on("zoom",null)
-              }
+                    if(!props.gen){
+                        const zoom = d3.zoom();
+                        const svg = d3.select(`.mp__canvas_svg`);
+                        
+                        zoom.scaleTo(svg, 1);
+                        zoom.translateTo(svg, 0, 0);
+                        svg.node().dispatchEvent(new Event("zoom"));   
+                    }
+                    else{
+                        const zoom = d3.zoom();
+                        const svg = d3.select(`.mp__canvas_svg_genius`);
+                        
+                        zoom.scaleTo(svg, 1);
+                        zoom.translateTo(svg, 0, 0);
+                        svg.node().dispatchEvent(new Event("zoom"));
+                    }
+                    zoom.on("zoom",null)
+                }
                 count['modules'] = 1
                 setCreateNew(0)
             }
@@ -206,37 +215,44 @@ const CanvasNew = (props) => {
     },[createnew])
     
     const menuItemsModule = [
-        { label: 'Add Scenario' , command:()=>clickAddNode(box.split("node_")[1])},
-        { label: 'Add Multiple Scenarios',command: () =>setVisibleScenario(true)},
-        { label: 'Rename',command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)}  },
-        { label: 'Delete' },
-        { label: 'Start Genius'},
-        { label: 'Debug' }
+        { label: 'Add Scenario',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>clickAddNode(box.split("node_")[1])},
+        { label: 'Add Multiple Scenarios',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"21px", width:"21px",marginRight:"0.5rem" }}/>,command: () =>setVisibleScenario(true)},
+        {separator: true},
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)}  },
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> },
+        {separator: true},
+        { label: 'Start Genius',icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"20px", width:"20px",marginRight:"0.5rem" }}/>},
+        { label: 'Debug',icon:<img src="static/imgs/execute-icon.png" alt="execute" style={{height:"25px", width:"30px",marginRight:"0.5rem" }}/> }
 
     ];
     const menuItemsScenario = [
-        { label: 'Add Screen', command:()=>clickAddNode(box.split("node_")[1])},
-        { label: 'Add Multiple Screens',command: () =>setVisibleScreen(true)},
-        { label: 'Rename', command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)} },
-        { label: 'Delete' },
-        { label: 'Start Genius' },
-        { label: 'Debug' }
+        { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>clickAddNode(box.split("node_")[1])},
+        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"21px", width:"21px",marginRight:"0.5rem" }}/>,command: () =>setVisibleScreen(true)},
+        {separator: true},
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)} },
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />  },
+        {separator: true},
+        { label: 'Start Genius' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"20px", width:"20px",marginRight:"0.5rem" }}/>},
+        { label: 'Debug',icon:<img src="static/imgs/execute-icon.png" alt="execute" style={{height:"25px", width:"30px",marginRight:"0.5rem" }}/> }
 
     ];
     const menuItemsScreen = [
-        { label: 'Add Test step', command:()=>clickAddNode(box.split("node_")[1]) },
-        { label: 'Add Multiple Test step',command: () =>setVisibleTestStep(true)},
-        { label: 'Rename', command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)} },
-        { label: 'Capture Elements', command:()=>setVisibleCaptureElement(true) },
-        { label: 'Delete' },
-        { label: 'Debug' }
+        { label: 'Add Test step',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>clickAddNode(box.split("node_")[1]) },
+        { label: 'Add Multiple Test step',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"21px", width:"21px",marginRight:"0.5rem" }} />,command: () =>setVisibleTestStep(true)},
+        {separator: true},
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)} },
+        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>setVisibleCaptureElement(true) },
+        {separator: true},
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />  },
+        { label: 'Debug',icon:<img src="static/imgs/execute-icon.png" alt="execute" style={{height:"25px", width:"30px",marginRight:"0.5rem" }}/> }
 
     ];
 
     const menuItemsTestSteps = [
-        { label: 'Design Test steps', command: ()=>setVisibleDesignStep(true) },
-        { label: 'Rename' ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)}},
-        { label: 'Delete' }
+        { label: 'Design Test steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>setVisibleDesignStep(true) },
+        {separator: true},
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p)}},
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> }
 
     ];
     const nodeClick=(e)=>{
@@ -296,14 +312,7 @@ const CanvasNew = (props) => {
         setdLinks(res.dLinks)
         setdNodes(res.dNodes)
         count= {...count,...res.count}
-        var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
-            if(res){
-                setNodes(res.cnodes)
-                setLinks(res.clinks)
-                setdLinks(res.cdLinks)
-                setdNodes(res.cdNodes)
-                count = res.count
-            }
+        // setCreateNew('autosave')
     }
     const clickDeleteNode=(id)=>{
         var sid = parseFloat(id.split('node_')[1]);
