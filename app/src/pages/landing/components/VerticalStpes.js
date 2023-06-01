@@ -88,8 +88,8 @@ function VerticalSteps(params) {
           ))}
         </Stepper>
         <StepContent TransitionProps={{ unmountOnExit: false }} />
-      </Box>
-    </Card>
+        </Box>
+     </Card>
   );
 }
 export default VerticalSteps;
