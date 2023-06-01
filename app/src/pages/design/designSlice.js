@@ -20,6 +20,27 @@ const initialState = {
     toDeleteScenarios: [],
     appType:undefined,
     savedList:false,
+  ScrapeData : [],
+    disableAction: false,
+    disableAppend: false,
+    compareFlag: false,
+    compareData: {},
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+    objValue: { val: null },
+    isFiltered: false,
+    cert: {},
+    WsData: {
+        endPointURL: "",
+        method: "0",
+        opInput: "",
+        reqHeader: "",
+        reqBody: "",
+        respHeader: "",
+        respBody: "",
+        paramHeader: "",
+    },
+    wsdlError: [],
+    actionError: []
 }
 
 export const counterSlice = createSlice({
@@ -91,6 +112,12 @@ export const counterSlice = createSlice({
       state.selectedModuleList = [];
       state.scenarioList = [];
       state.unassignTask = [];
+    },
+    ScrapeData:(state, action) =>{
+      state.ScrapeData = action.payload;
+    },
+    disableAction:(state, action)=>{
+      state.disableAction = action.payload;
     }
   },
 })
@@ -112,6 +139,6 @@ importData,
 unassignTask,
 toDeleteScenarios,
 appType,
-savedList,saveMindMap } = counterSlice.actions
+savedList,saveMindMap ,ScrapeData, disableAction} = counterSlice.actions
 
 export default counterSlice.reducer

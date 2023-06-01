@@ -3,8 +3,8 @@ import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 // import { SetProgressBar, RedirectPage, setMsg } from '../../global';
-import BrowserFp  from '../../global/components/BrowserFp';
-import RedirectPage  from '../../global/components/RedirectPage';
+import BrowserFp from '../../global/components/BrowserFp';
+import RedirectPage from '../../global/components/RedirectPage';
 import StaticElements from '../components/StaticElements';
 import TermsAndConditions from '../components/TermsAndConditions';
 import * as api from '../api';
@@ -24,7 +24,7 @@ const BasePage = () => {
 
     const [loginValidation, setLoginValidation] = useState("Loading Profile...");
     const [loginAgain, setLoginAgain] = useState(false);
-    const [redirectTo , setRedirectTo] = useState(null);
+    const [redirectTo, setRedirectTo] = useState(null);
     const [showTCPopup, setShowTCPopup] = useState(null);
     const [userProfile, setUserProfile] = useState(null);
     const [showChangePass, setShowChangePass] = useState(false);
@@ -33,8 +33,8 @@ const BasePage = () => {
     const dispatch = useDispatch();
     const history = useNavigate();
 
-    useEffect(()=>{
-        (async()=>{
+    useEffect(() => {
+        (async () => {
             const checkLogout = JSON.parse(window.sessionStorage.getItem('logoutFlag'));
             window.localStorage.clear();
             window.sessionStorage.clear();
@@ -43,25 +43,25 @@ const BasePage = () => {
             let showLoginAgain = false;
 
             if (checkLogout) {
-                switch(checkLogout.reason) {
+                switch (checkLogout.reason) {
                     case "dereg": reason = `Your session has been terminated by ${checkLogout.by}. Reason: User is deleted from Avo Assure`; break;
                     case "session": reason = `Your session has been terminated by ${checkLogout.by}`; showLoginAgain = true; break;
-                    case "logout":  reason = "You have been successfully logged out."; showLoginAgain = true; break;
+                    case "logout": reason = "You have been successfully logged out."; showLoginAgain = true; break;
                     case "invalidSession": reason = "Your session has expired!"; showLoginAgain = true; break;
                     case "screenMismatch": reason = "You have been logged out due to URL manipulation"; showLoginAgain = true; break;
                     case "duplicatesession": reason = "Looks like a session is already active, you will be logged out from previous session"; showLoginAgain = true; break;
                     default: break;
                 }
-            } 
-            
-            if (reason) {    
+            }
+
+            if (reason) {
                 setLoginValidation(reason);
                 // SetProgressBar("stop");
                 setLoginAgain(showLoginAgain);
-            } 
+            }
             else {
                 setLoginAgain(false);
-                try{
+                try {
                     let data = await api.validateUserState()
                     // SetProgressBar("stop");
                     setLoginValidation("Loading Profile...");
@@ -79,14 +79,14 @@ const BasePage = () => {
                         setLoginValidation("Your session has expired!");
                         setLoginAgain(true);
                     } else {
-                        try{
+                        try {
                             let userinfo = await api.loadUserInfo()
-                            if(userinfo === "Licence Expired") {
-                              setLicenseExpired(true);
-                              logoutUser();
+                            if (userinfo === "Licence Expired") {
+                                setLicenseExpired(true);
+                                logoutUser();
                             }
                             else if (userinfo === "fail") {
-                              setLoginValidation("Failed to Login.");
+                                setLoginValidation("Failed to Login.");
                             }
                             else if (userinfo === "Invalid Session") {
                                 setLoginValidation("Your session has expired!");
@@ -97,20 +97,20 @@ const BasePage = () => {
                                 //     setShowTCPopup(true);
                                 // }
                                 // else 
-                                if(userinfo.firstTimeLogin && userinfo.dbuser && userinfo.isTrial) {
+                                if (userinfo.firstTimeLogin && userinfo.dbuser && userinfo.isTrial) {
                                     setUserProfile(userinfo);
                                 }
                                 else
                                     loadProfile(userinfo)
                             }
                         }
-                        catch(err){
+                        catch (err) {
                             setLoginValidation("Failed to Login.");
-                            console.error("Fail to Load UserInfo. Error::", err);    
+                            console.error("Fail to Load UserInfo. Error::", err);
                         }
-                    }    
+                    }
                 }
-                catch(err){
+                catch (err) {
                     const emsg = "Failed to load user profile. Error::";
                     console.error(emsg, err);
                     setLoginValidation(emsg);
@@ -132,56 +132,57 @@ const BasePage = () => {
 
     const tcAction = action => {
         let fullName = userProfile["firstname"] + " " + userProfile["lastname"];
-		let email = userProfile["email_id"];
-		let timeStamp = new Date().toLocaleString();
-		let bfp = BrowserFp()
-		let userData = {
-			'fullname': fullName,
-			'emailaddress': email,
-			'acceptance': action,
-			'timestamp': timeStamp,
-			'browserfp': bfp
+        let email = userProfile["email_id"];
+        let timeStamp = new Date().toLocaleString();
+        let bfp = BrowserFp()
+        let userData = {
+            'fullname': fullName,
+            'emailaddress': email,
+            'acceptance': action,
+            'timestamp': timeStamp,
+            'browserfp': bfp
         };
         api.storeUserDetails(userData)
-		.then(data => {
-			if(data === "Invalid Session") {
-                setShowTCPopup(false);
-                RedirectPage(history);
-			} else if (data !== "success") {
-                setLoginValidation("Failed to record user preference. Please Try again!");
-                setShowTCPopup(false);
-                RedirectPage(history, { reason: "userPrefHandle" });
-            }
-            else {
-				if (action === "Accept") loadProfile(userProfile);
-				else {
-                    setLoginValidation("Please accept our terms and conditions to continue to use Avo Assure!");
+            .then(data => {
+                if (data === "Invalid Session") {
+                    setShowTCPopup(false);
+                    RedirectPage(history);
+                } else if (data !== "success") {
+                    setLoginValidation("Failed to record user preference. Please Try again!");
                     setShowTCPopup(false);
                     RedirectPage(history, { reason: "userPrefHandle" });
                 }
-			}
-        })
-        .catch(error => {
-			setLoginValidation("Failed to record user preference. Please Try again!");
-			setLoginAgain(false);
-            setShowTCPopup(false);
-			console.error("Error updating user tnc preference", error);
-        });
-        
+                else {
+                    if (action === "Accept") loadProfile(userProfile);
+                    else {
+                        setLoginValidation("Please accept our terms and conditions to continue to use Avo Assure!");
+                        setShowTCPopup(false);
+                        RedirectPage(history, { reason: "userPrefHandle" });
+                    }
+                }
+            })
+            .catch(error => {
+                setLoginValidation("Failed to record user preference. Please Try again!");
+                setLoginAgain(false);
+                setShowTCPopup(false);
+                console.error("Error updating user tnc preference", error);
+            });
+
     }
 
     return (
         <>
-        {redirectTo ? <Navigate to={redirectTo} /> :
-        <>
-        { showTCPopup && <TermsAndConditions tcAction={tcAction}/> }
-        {licenceExpired ? <LicenseExpired/> :
-        < StaticElements> 
-            <div className="error-msg">{loginValidation}</div>
-            {loginAgain && <span className="error-msg">Click <Link to="/login" className="base__redirect">here</Link> to login again.</span>}
-        </ StaticElements>}
-        </>
-        }
+            {redirectTo ? <Navigate to={redirectTo} /> :
+                <>
+                    {showTCPopup && <TermsAndConditions tcAction={tcAction} />}
+                    {licenceExpired ? <LicenseExpired /> :
+                        <StaticElements>
+                            <div className="error-msg">{loginValidation}</div>
+                            {loginAgain && <span className="error-msg">Click <Link to="/login" className="base__redirect">here</Link> to login again.</span>}
+                        </StaticElements>
+                    }
+                </>
+            }
         </>
     );
 }

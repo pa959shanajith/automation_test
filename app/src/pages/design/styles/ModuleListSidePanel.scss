@@ -39,102 +39,219 @@
     }
     .moduleLayer_icon_SearchOn{
     display: none;
-}
-.moduleLayer_icon_SearchOff{
-
-}
-.searchIcon_adjust{
- margin-left: 1rem;
- cursor: none;
-}
-.moduleLayer_icon img{
-    // border: 1px solid black;
-    height: 27px;
-    width: 27px;
-}
-.moduleLayer_plusIcon{
-    display: flex;
-    justify-content: space-between;
-    padding-top: 0.5rem;
+    }
+    .E2EHeadLine{
+        font-size: 16px;
+        // margin-left: 11px;
+    }
+    .PlusButE2E{
+        display: none;
+        cursor: pointer;
+    }
+    .moduleLayer_icon_SearchOff{
     
-}
-.moduleLayer_plusIcon img{
-    padding-right: 0.1rem;
-
-}
-.BasicDemo_primeReactTree{
-    justify-content: center;
-    align-items: center;
-    margin-right: 10rem;
+    }
+    .searchIcon_adjust{
+     margin-left: 1rem;
+     cursor: none;
+    }
+    .moduleLayer_icon img{
+        // border: 1px solid black;
+        height: 27px;
+        width: 27px;
+    }
+    .moduleLayer_plusIcon{
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.5rem;
+        cursor: pointer;
+        
+    }
+    .moduleLayer_plusIcon img{
+        padding-right: 0.1rem;
     
-}
-.SearchIconForModules{
-    display: flex;
-    padding-top: 0.1rem;
-    align-items: center;
-    padding-left: 1.8rem;
-}
-.SearchIconForModulesE2E{
-    display: flex;
-    padding-top: 0.1rem;
-    align-items: center;
-    padding-left: 1rem;
-}
-.inputOfSearch{
-    width:10rem;
-    height: 1.6875rem;
-    // margin-left: 26px;
-}
-.hidingPlusButE2E{
-    display: none;
-}
-.NorModuleList{
-    max-height: 85%;
-    // border: 1px solid black;
-    overflow-y: auto;
-}
-
-.EachModNameBox{
-    // border: 1px solid rgb(213, 30, 30);
-    max-width: 100%;
-    max-height: 10%;
-    justify-content: center;
-    // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 6px;
-    cursor: pointer;
+    }
+    .BasicDemo_primeReactTree{
+        justify-content: center;
+        align-items: center;
+        margin-right: 10rem;
+        
+    }
+    .SearchIconForModules{
+        display: flex;
+        padding-top: 0.1rem;
+        align-items: center;
+        // padding-left: 1.8rem;
+    }
+    .SearchIconForModulesE2E{
+        display: flex;
+        padding-top: 0.1rem;
+        align-items: center;
+        // padding-left: 1rem;
+    }
+    .inputOfSearch{
+        width:10rem;
+        height: 1.6875rem;
+        // margin-left: 26px;
+    }
+    .hidingPlusButE2E{
+        display: none;
+    }
+    .NorModuleList{
+        max-height: 85%;
+        // border: 1px solid black;
+        overflow-y: auto;
+    }
     
+    .EachModNameBox{
+        // border: 1px solid rgb(213, 30, 30);
+        max-width: 100%;
+        max-height: 10%;
+        justify-content: center;
+        // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 6px;
+        cursor: pointer;
+        
+    }
+    .EachModNameBox:hover{
+        background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
+    }
+    .moduleName {
+        display: flex;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 91%;
+        max-height: 100%;
+        // border: 1px solid rgb(19, 225, 126);
+        padding-left: 1rem;
+    }
+    .moduleName img{
+        height: 20px;
+        width: 20px;
+    }
+    .moduleName h4{
+          font-size: 13px;
+          font-family: "open sans";
+          font-weight: 400;
+          color:rgb(8, 8, 8,1);
+          padding-left: 0.8rem;
+          overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
-.EachModNameBox:hover{
-    background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
-}
-.moduleName {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 91%;
-    max-height: 100%;
-    // border: 1px solid rgb(19, 225, 126);
+    ////////////////////E2E Work flow css
+     .Project-Dialog{
+        .modalClass .p-dialog-header{
+            // background: rgba(96,91,255,.08);
+        }
+     }
+    .mainCentralContainer{
+        width:100%;
+        height: 100%;
+       
+        .nameTopSection{
+            width:100%;
+            height: 16%;
+            // border: 1px solid yellow;
 
-}
-.moduleName h4{
-      font-size: 13px;
-      font-family: "open sans";
-      font-weight: 400;
-      color:rgb(8, 8, 8,1);
-      padding-left: 1.5rem;
-      overflow: hidden;
-    text-overflow: ellipsis;
-}
+        }
+        .cenralTwinBox{
+            width:100%;
+            height: 86%;
+            // border: 1px solid red;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
 
-//  E2E Work flow css
+            .leftBox{
+                // border: 1px solid blue;
+                width:45.5%;
+                height:100%;
+                .leftCard{
+                         width: 100%;
+                         height:100%;
+                         .p-card .p-card-content{
+                            padding: 0rem;
+                         }
+                         .p-card-body {
+                            padding: 0.25rem;
+                         }
+                         .headlineSearchInput{
+                           .headlineRequired{
+                            display: flex;
+                            flex-direction: row;
+                            .required_icon{
+                                padding-left: 4px;
+                            }
+                           }
 
+                         }
+                }
+    
+            }
+            .centerButtons{
+                height: 100%;
+                width: 9%;
+                // border: 1px solid red;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                  .centerButtonsIndiVisual{
+                    // border: 1px solid rgb(10, 228, 108);
+                    display: flex;
+                    flex-direction: column;
+                    height: 7rem;
+                    justify-content: space-between;
+                  }
+            }
+            .rightBox{
+                // border: 1px solid rgb(31, 7, 245);
+                width:45.5%;
+                height:100%;
+                .rightCard{
+                         width: 100%;
+                         height:100%;
+                        //  margin-left: 2.8rem;
+                        .p-card .p-card-content{
+                           padding: 0rem;
+                        }
+                        .initialText{
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
+                            margin-top: 29%;
+                            .initial1StText{
+                                .textClass{
+                                    font-weight: 400;
+                                   }
+                            }
+                            .initial2NdText{
+                                   display: flex;
+                                   align-items: center;
+                                  
+                                   .textClass{
+                                    font-weight: 400;
+                                   }
+                                   .ArrowImg{
 
+                                   }
 
+                            }
+                        }
+                }
+    
+    
+            }
+        }
+        
 
+        
 
-
- 
-
-
+    }
 
