@@ -59,6 +59,7 @@ function VerticalSteps(params) {
 
   };
 
+
   return (
     <Card className='verticalcard' >
       <h2 className= "GetStd">Get Started</h2>
@@ -87,7 +88,6 @@ function VerticalSteps(params) {
           ))}
         </Stepper>
         <StepContent TransitionProps={{ unmountOnExit: false }} />
-
         </Box>
      </Card>
   );
