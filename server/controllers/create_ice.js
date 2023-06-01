@@ -82,8 +82,8 @@ exports.getProjectIDs =  async(req) => {
 	if (allflag) allflag = "allflag";
 	else allflag = "emptyflag";
 	var inputs = {
-		"userid": user_id,
-		"userrole": user_role,
+		"userid": "642d1fe9006f0038089831dd",
+		"userrole": 'Test Lead',
 		"query": allflag
 	};
 	return await utils.fetchData(inputs, "create_ice/getProjectIDs", "getProjectIDs");

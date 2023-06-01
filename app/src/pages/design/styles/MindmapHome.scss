@@ -1,66 +1,162 @@
-svg {
-    overflow: visible; 
-    display: block;
+@import "../../global/styles/ColorVariables.scss";
+.mp__container{
+    height: 94vh;
+    width: 100%;
+    min-width: 767px;
+    display: flex;
+    flex-direction: column;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+    font-family: $avoFont;
+    background: rgb(238, 238, 238);
+}
+.mp__body{
+    display: flex;
+    flex: auto;
+    width: 100%;
+    background-color: $whiteColor;
+    margin: 0;
+    padding: 0;
+    /* min-width: 768px; */
+    position: relative;
 }
 
-.mp__canvas_svg{
-    width: 81rem;
-    height: 45rem;
-    background: #F5F5F5;
+.mp__body .action__bar{
+    align-items: center;
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 0 1 100%;
 }
-.ct-link{
-    stroke: darkGray;
-    stroke-width: 1px;
-    fill: none;
+.mp__body .action__wrapper__expand .action__bar{
+    justify-content: center;
 }
-.ct-node .ct-nodeIcon {
-    display: inline-block;
-    height: 45px;
-    width: 45px;
-    cursor: pointer;
-    pointer-events: all!important;
+.mp__footer .main-footer{
+    position: static;
 }
-.ct-node .ct-nodeLabel {
-    display: block;
-    font-size: 12px;
-    cursor: default;
-    word-wrap: break-word;
-    padding-top: 2px;
+.mp__middle_container{
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 0 1 100%;
+    justify-content: center;
+    align-items: center;
 }
-.ct-node .ct-nodeBubble {
-    stroke-width: 1px;
-    fill: thistle;
+.mp__ic_box .ic_box{
+    margin-bottom: 37px;
 }
-.node-highlight{
-    outline : 2px solid rgb(0, 0, 0);
+.mp__ic_box .ic_box img:hover{
+    background: $hovorIcon;
+    border-radius: 5px;
 }
-.ct-actionButton>rect{
-    fill: blueviolet;
-    height: 25px;
-    width: 80px;
+.selected_rb_thumb{
+    background: $primaryColorDarkest;
+    border-radius: 5px;
 }
-.ct-actionButton>text{
-    font-size: 17px;
-    fill: white;
+
+.active-map {
+    color: $primaryColorRich;
 }
-#ct-advanceOptionAction>rect{
-    fill: blueviolet;
-    height: 25px;
-    width: 170px;
-}
-.show-box{
-    display: block!important;
-    opacity: 1 !important;
-}
-.no-disp {
-    display: none!important;
-}
-.node-selected {
-    outline: 1px dashed blue;
-}
-.node-error{
-    outline: 2px dashed red;
-}
+//SCSS for Breadcrumb,s
+// $color_1: $hovorIcon;
+// $color_2: $whiteColor;
+
+
+
+// .breadcrumbs__elements {
+//     padding: 0;
+// }
+// .breadcrumbs__element__inner {
+//     display: inline-block;
+//     position: relative;
+//     color: $color_1;
+//     flex: 1;
+//     .containerSpan {
+//         display: inline-block;
+//         position: relative;
+//         line-height: 2.5;
+//         padding: 0 20px;
+//         z-index: 100;
+//         text-decoration: none;
+//         .styledSpan {
+//             white-space: nowrap;
+//             margin-top: auto;
+//             margin-bottom: 0.5px;
+//             margin-left: 95px;
+//         }
+//     }
+//     &::before {
+//         top: 0px;
+//         transform: skewX(30deg);
+//         border-top: 2px solid gray;
+//         content: "";
+//         position: absolute;
+//         left: 0;
+//         height: 50%;
+//         width: 100%;
+//         background: white;
+//         border-left: 2px solid gray;
+//         border-right: 2px solid gray;
+//         z-index: auto;
+//     }
+//     &::after {
+//         content: "";
+//         position: absolute;
+//         left: 0;
+//         height: 50%;
+//         width: 100%;
+//         background: white;
+//         border-left: 2px solid gray;
+//         border-right: 2px solid gray;
+//         z-index: auto;
+//         bottom: 0px;
+//         transform: skew(-30deg);
+//         border-bottom: 2px solid gray;
+//     }
+// }
+// .breadcrumbs__element__inner[data-selected=true] {
+//     color: $color_2 !important;
+//     &::after {
+//         background: #5f338f !important;
+//         border-left: 2px solid #5f338f;
+//         border-right: 2px solid #5f338f;
+//         border-bottom: 2px solid #5f338f;
+//     }
+//     &::before {
+//         background: #5f338f !important;
+//         border-left: 2px solid #5f338f;
+//         border-right: 2px solid #5f338f;
+//         border-top: 2px solid #5f338f;
+//     }
+// }
+// #bluecolor{
+//      color: $color_2 !important;
+//     &::after { 
+//         color: gray;
+//         border-left: 2px solid #5f338f;
+//         border-right: 2px solid #5f338f;
+//         border-bottom: 2px solid #5f338f;
+//     }
+//     &::before {
+//         color: gray;
+//         border-left: 2px solid #5f338f;
+//         border-right: 2px solid #5f338f;
+//         border-top: 2px solid #5f338f;
+//     }
+// }
+
+// .breadcrumbs__container {
+//     margin: 1rem 1px 1rem 1.5rem;
+//     display: flex;
+//     width: 103vw;
+//     margin-left: -1rem;
+// }
+
+
 
 .cardMindmap{
     width: 71rem;
@@ -154,4 +250,48 @@ svg {
 }
 .Module_Home{
     width: 50%;
+}
+
+@import "../../global/styles/ColorVariables.scss";
+.main-footer{
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    justify-content: flex-end;
+    color: $primaryColor;
+    background-color: transparent;
+    font-family: $avoFont ;
+    z-index: 0;
+    padding: 10px;
+    box-shadow: #00000014 0 -1px 0;
+    margin-top: 1px;
+}
+
+.main-footer-content{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 0 20px;
+}
+
+.footer-logo_two{
+    margin-left:6px;
+    height: 18px; 
+}
+
+.left-text{
+    width: fit-content;
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    font-size: 14px;
+}
+
+.right-text{
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    flex-grow: 2;
 }
