@@ -685,7 +685,6 @@
     width: 6rem;
     left: 9rem;
     top: 0.5rem;
-    background: none;
 }
 .Saucelabs_cancel{
     left: 9.5rem;
@@ -698,15 +697,25 @@
 .available_sauce{
     right: 9rem;
     position: relative;
-    top: 2rem;
+    bottom: 1rem;
 }
 .unavailable_sauce{
     right: 9rem;
     position: relative;
-    top: 2rem;
+    bottom: 1rem;
 }
 .dnd_sauce{
     right: 9rem;
     position: relative;
-    top: 2rem; 
+    bottom: 1rem; 
+}
+.adminControl-ice-saucelabs{
+    position: relative;
+    top: 15px;
+    bottom: 1rem;
+}
+.adminControl-ice-sauce{
+    width: 17rem;
+    top: 0rem;
+    position: relative;
 }

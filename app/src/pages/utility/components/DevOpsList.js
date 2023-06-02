@@ -1200,9 +1200,40 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </Dialog>                 
 
                 <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onDismiss={() => {setDisplayBasic5(false)}} onHide={() => onHide('displayBasic5')}>
-                     <div>
+                     
+
+                    <div><h6>Operating System</h6></div>
+                    <SearchDropdown
+                    noItemsText={[]}
+                    onChange={onOsChange}
+                    options={osNames}
+                    selectedKey={selectedOS}
+                    width='15rem'
+                    placeholder='select OS'
+                    />
+                    <div><h6>Browser</h6></div>
+                    <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={onSaucelabBrowserChange}
+                    options={saucelabBrowsers}
+                    selectedKey={selectedSaucelabBrowser}
+                    width='15rem'
+                    placeholder='select Browser'
+
+                    />
+                    <div><h6>Versions</h6></div>
+                    <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={onVersionChange}
+                    options={browserVersions}
+                    selectedKey={selectedVersion}
+                    width='15rem'
+                    placeholder='select Versions'
+                    
+                    />
+                    <div>
                         <div>
-                            <div className='adminControl-ice popup-content'>
+                            <div className='adminControl-ice-saucelabs'>
                                 <div className='adminControl-ice popup-content popup-content-status'>
                                     <ul className={changeLable?"e__IceStatusExecute":"e__IceStatusSchedule"}>
                                         <li className="popup-li">
@@ -1225,39 +1256,13 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             </div>
                         </div>
 
-                        <div className='adminControl-ice popup-content'>
-                            <div>
+                        <div className='adminControl-ice-sauce'>
+                            <div className='sauce_ICEsearch'>
                                 <span className="leftControl_sauce" title="Token Name"></span>
                                 <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Select Avo Assure Client'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
                             </div>
                         </div>
                     </div> 
-
-                    <div><h6>Operating System</h6></div>
-                    <SearchDropdown
-                    noItemsText={[]}
-                    onChange={onOsChange}
-                    options={osNames}
-                    selectedKey={selectedOS}
-                    width='15rem'
-                    />
-                    <div><h6>Browser</h6></div>
-                    <SearchDropdown
-                    noItemsText={[ ]}
-                    onChange={onSaucelabBrowserChange}
-                    options={saucelabBrowsers}
-                    selectedKey={selectedSaucelabBrowser}
-                    width='15rem'
-                    />
-                    <div><h6>Versions</h6></div>
-                    <SearchDropdown
-                    noItemsText={[ ]}
-                    onChange={onVersionChange}
-                    options={browserVersions}
-                    selectedKey={selectedVersion}
-                    width='15rem'
-                    />
-                    
                         
                         <Button label="Execute" title="Execute" className="Sacuelab_execute_button" onClick={async () => {
 
