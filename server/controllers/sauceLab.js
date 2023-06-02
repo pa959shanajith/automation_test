@@ -58,12 +58,8 @@ exports.saveSauceLabData = function (req, res) {
 							} else if (data.onAction == "qcresponse") {
 								data = data.value;
 								res.send(data);
-							} else {
-								logger.error("Error occurred in loginSauceLabServer_ICE");
-								data = data.value;
-								res.send(data);
 							}
-						}
+							}
 					}
 					redisServer.redisSubServer.on("message",SauceLablogin_listener);
 				} else {

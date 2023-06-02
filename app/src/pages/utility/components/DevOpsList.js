@@ -289,13 +289,30 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     }
     const onOsChange = async (option) => {
         setSelectedOS(option.key)
+        setBrowserVersions([]);
+        setSelectedVersion('');
+        if(selectedSaucelabBrowser != '') {
+            if(browserDetails && Object.keys(browserDetails).length){
+                let findBrowserVersion = browserDetails.browser[selectedSaucelabBrowser][option.key].map((element, index) => {
+                    return (
+                        {
+                            key: element,
+                            text: element,
+                            title: element,
+                            index: index
+                        }
+                    )});
+            setBrowserVersions(findBrowserVersion.sort((a, b) => {
+                return Number(a.key) - Number(b.key);
+            }));
+            }
+        }
     }
 
     const onSaucelabBrowserChange = async (option) => {
         setBrowserVersions([]);
         setSelectedVersion('');
         setSelectedSaucelabBrowser(option.key);
-        console.log(browserDetails.browser[option.key][selectedOS]);
         if(browserDetails && Object.keys(browserDetails).length){
             let findBrowserVersion = browserDetails.browser[option.key][selectedOS].map((element, index) => {
                 return (
@@ -306,7 +323,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         index: index
                     }
                 )});
-        setBrowserVersions(findBrowserVersion);
+        setBrowserVersions(findBrowserVersion.sort((a, b) => {
+            return Number(a.key) - Number(b.key);
+        }));
         }
         
     }
@@ -389,10 +408,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
             setLoading(false);
             setDisplayBasic5(true);
-            
-            console.log(data);
+
             const arrayOS = data.os_names.map((element, index) => {
-              console.log(element, index);
               return {
                 key: element,
                 text: element,
@@ -403,7 +420,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setOsNames(arrayOS);
           
             const arrayBrowser = Object.keys(data.browser).map((element, index) => {
-              console.log(element, index);
               return {
                 key: element,
                 text: element,
@@ -416,13 +432,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
           } else {
             setLoading(false);
             // Data is empty or doesn't have expected properties
-            console.log(data);
             if (data == "unavailableLocalServer"){
-                setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);  
-
+                setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
             }else{
-                setMsg("error while fetching data")
-                console.log(data);
+                setMsg({"CONTENT":"Error while fetching the data from saucelabs", "VARIANT": VARIANT.ERROR})
             }  
           }
         }
