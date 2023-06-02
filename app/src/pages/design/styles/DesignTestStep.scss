@@ -111,7 +111,7 @@
     padding: 0.5rem 0.5rem;
   }
 
-  .compare__btn {
+  .debug__opt {
     padding: 0 1.2rem;
     position: relative;
     top: 3%;
@@ -119,7 +119,7 @@
     width: 100%;
     display: flex;
 
-    .compare__text {
+    .debug__opt__text {
         margin-bottom: 0.6rem;
         color: #030229;
         font-family: 'Open Sans';
@@ -141,7 +141,7 @@
     margin-left: 16rem;
 }
 
-.compare__object {
+.debug__object {
     position: relative;
     top: 10%;
     border: 1px solid lightgray;
