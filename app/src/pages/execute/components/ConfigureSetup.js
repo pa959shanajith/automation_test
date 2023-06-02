@@ -17,8 +17,10 @@ import {
 import "../styles/ConfigureSetup.scss";
 import GridBrowser from "./GridBrowser";
 import AvoInput from "../../../globalComponents/AvoInput";
+import { useDispatch } from "react-redux";
+import { checkRequired } from "../configureSetupSlice";
 
-const ConfigureSetup = ({ configData }) => {
+const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
   const [dataparam, setDataparam] = useState({});
   const [condition, setCondition] = useState({});
   const [accessibility, setAccessibility] = useState({});
@@ -29,6 +31,8 @@ const ConfigureSetup = ({ configData }) => {
   const [modules, setModules] = useState("normalExecution");
   const [configTxt, setConfigTxt] = useState("");
   const [tableFilter, setTableFilter] = useState("");
+  const [useDefault, setUseDefault] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const mainTree = [];
@@ -88,6 +92,10 @@ const ConfigureSetup = ({ configData }) => {
     });
     setConfigTable(mainTree);
   }, [configData?.configureData, modules, dataparam, condition, accessibility]);
+
+  useEffect(() => {
+    dispatch(checkRequired({ configName: configTxt }));
+  }, [configTxt]);
 
   const onDataparamChange = (e) => {
     setDataparam({
@@ -193,11 +201,13 @@ const ConfigureSetup = ({ configData }) => {
               label: (
                 <span>
                   <RadioButton
-                    inputId="ingredient4"
-                    name="pizza"
-                    value="Onion"
+                    inputId="useDefault"
+                    name="timeout"
+                    value="Use default"
+                    onChange={(e) => setUseDefault(e.value)} 
+                    checked={useDefault === 'Use default'}
                   />
-                  <label htmlFor="ingredient4" className="ml-2">
+                  <label htmlFor="useDefault" className="ml-2">
                     Use default
                   </label>
                 </span>
@@ -209,12 +219,14 @@ const ConfigureSetup = ({ configData }) => {
               label: (
                 <span>
                   <RadioButton
-                    inputId="ingredient4"
-                    name="pizza"
-                    value="Onion"
+                    inputId="userdefine"
+                    name="timeout"
+                    value="User define"
+                    onChange={(e) => setUseDefault(e.value)} 
+                    checked={useDefault === 'User define'}
                   />
-                  <label htmlFor="ingredient4" className="ml-2">
-                    Use default
+                  <label htmlFor="userDefine" className="ml-2">
+                    User define
                   </label>
                 </span>
               ),
@@ -354,7 +366,7 @@ const ConfigureSetup = ({ configData }) => {
 
   return (
     <div className="grid config_setup">
-      <TabView>
+      <TabView activeIndex={tabIndex} onTabChange={(e) => setTabIndex(e.index)}>
         <TabPanel header="Configuration Information">
           <div className="config_container">
             <div className="grid">

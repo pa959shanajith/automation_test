@@ -170,3 +170,90 @@
     border-top: 2px solid grey;
 }
 
+.Scenario_dialog{
+    .p-dialog-header {
+    background: #e9ecef !important;
+    padding: 1rem !important;
+    font-family: 'Open Sans' !important;
+   font-style: normal !important;
+   font-weight: 600 !important; 
+   font-size: 20px !important;
+     }
+     .p-dialog-content{
+        padding: 1.5rem !important;
+    }
+    
+}
+
+.add_row_btn{
+    width: 6rem;
+    height: 2rem;
+    font-size: 14px;
+    font-family: 'Open Sans';
+    background: white;
+    color: #605BFF;
+    border: none;
+    font-weight: 600;
+}
+.toolbar_scenario{
+    margin-top: 0.5rem;
+    margin-bottom:0.5rem ;
+}
+.menu_items_ref{
+    position: relative;   
+    right: 37rem;
+}
+
+.p-contextmenu{
+    width: 15rem !important;
+}
+
+.p-column-title{
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    font-family: 'Open Sans' !important;
+    display: flex;
+    align-items: flex-start;
+}
+.scenario_inp{
+    height: 2.5rem;
+    width: 15rem;
+    position: relative;
+    right: 3rem;
+}
+.scenario-header{
+    padding: 0.7rem !important;
+}
+// .scenario-check{
+//     position: relative;
+//     left: 2.9rem;
+// }
+.icons_class{
+    bottom: 0rem;
+    top: 1rem;
+    left: 2rem;
+    position: relative;
+}
+.row_data{
+    display: flex;
+    justify-content: flex-start;
+}
+
+// .row_data_align{
+//     position: relative;
+//     right: 8rem;
+// }
+
+.custom-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+  }
+  
+  .custom-menu-icon {
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 5px;
+  }
