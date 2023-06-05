@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .api-ut__btnGroup {
     width: 100%;
     margin-bottom: 1%;
@@ -729,7 +730,32 @@
     position: relative;
 }
 .dropdown_saucelabs{
-   position: relative;
-   left: 1rem;
-   
+    font-size: 14px;
+    width: calc(70% - -2rem);
+    right: 2.65rem;
+    max-height: 123px;
+    box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+    display: block;
+    background: $whiteColor;
+    margin-top: 2px;
+    z-index: 1;
+    position: absolute;
+    ul{
+        padding-left: 2px;
+        margin: 4px;
+        width: calc(100% - 14px);
+    }
+    .dropdown-list-item:hover{
+        background: $primaryColor;
+        border-radius: 3px;
+        color: $whiteColor;
+        cursor: pointer;
+    }
+}
+#SauceLab_Integration{
+    .p-dialog-content {
+        overflow-x: unset !important;
+        overflow-y: unset !important;
+    }
+
 }
