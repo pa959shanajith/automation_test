@@ -37,7 +37,7 @@ exports.populateProjects =  async(req, res) => {
 	try {
 		logger.info("Inside UI service: " + fnName);
 		var reqData = {
-			"userid":  req.session.userid,
+			"userid": req.session.userid,
 			"allflag": true
 		};
 		const data = await create_ice.getProjectIDs(reqData);

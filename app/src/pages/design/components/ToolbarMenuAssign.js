@@ -1,9 +1,9 @@
 import React, {useEffect, useState, useRef} from 'react';
 import { useDispatch, useSelector} from 'react-redux';
-import { getProjectList, getModules} from '../mindmap/api';
+import { getProjectList, getModules} from '../api';
 import {parseProjList} from '../containers/MindmapUtils';
 import { setMsg } from '../../global'
-import * as actionTypes from '../mindmap/state/action';
+// import * as actionTypes from '../mindmap/state/action';
 import '../styles/ToolbarMenuAssign.scss';
 import PropTypes from 'prop-types';
 
@@ -28,8 +28,8 @@ const ToolbarMenuAssign = (props) => {
                 var res = await getProjectList()
                 if(res.error){displayError(res.error);return;}
                 var data = parseProjList(res)
-                dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
-                dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]})
+                // dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
+                // dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]})
             }else{
                 var rel = prjList[selectProj].releases
                 setRelList(rel)
@@ -49,8 +49,8 @@ const ToolbarMenuAssign = (props) => {
         }
         var moduledata = await getModules(data)
         if(moduledata.error){displayError(moduledata.error);return;}
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
         setModList(moduledata)
         setBlockui({show:false})
     }
@@ -60,9 +60,9 @@ const ToolbarMenuAssign = (props) => {
     }
     const changeProject = (val) => {
         setBlockui({show:true,content:'Loading...'})
-        dispatch({type:actionTypes.SELECT_PROJECT,payload:val})
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        // dispatch({type:actionTypes.SELECT_PROJECT,payload:val})
+        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         setRelIndex(undefined)
         setCycle('')
         SearchInp.current.value = ""
@@ -70,13 +70,13 @@ const ToolbarMenuAssign = (props) => {
     const changeRelease = (val) => {
         setRelIndex(val)
         setCycle('Select')
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         SearchInp.current.value = ""
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
     }
     var projectList = Object.entries(prjList)
     return(
