@@ -1,0 +1,61 @@
+.editProfile_dialog {
+    .p-dialog-header {
+        color: #030229;
+        background-color: #F0EFFF !important;
+    }
+
+    .p-dialog-footer {
+        background: #FAFAFA !important;
+        padding: 1rem !important;
+    }
+
+    .p-dialog-content {
+        overflow: hidden !important;
+    }
+
+    .input_field {
+        position: relative;
+        bottom: 1.8rem;
+
+        label {
+            display: block;
+            color: #030229;
+            font-size: medium;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    .userImage {
+        .p-button {
+            background: white !important;
+            border: none !important;
+            bottom: 2rem !important;
+            left: 5rem;
+            padding: 0.2rem 0.2rem !important;
+
+        }
+
+        .p-button .p-component .p-fileupload-choose {
+            position: relative;
+            bottom: 2rem;
+            left: 1rem;
+        }
+    }
+
+    .pi-camera {
+        color: black;
+    }
+
+    .profileImage {
+        padding: 1rem;
+        position: relative;
+        left: 9rem;
+
+        .p-avatar {
+            width: 6rem !important;
+            height: 6rem !important;
+            font-size: 2rem !important;
+        }
+    }
+}

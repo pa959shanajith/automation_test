@@ -88,3 +88,60 @@ export const userCreateProject_ICE = (details) => {
 
 }
 
+
+/*Component TaskSection
+  api returns {"appType":[""],"appTypeName":[""],"cycles":{"":[""]},"domains":[],"projectId":[],"projectName":[],"projecttypes":{},"releases":[[{"cycles":[{"_id":"","name":""}],"name":""}]]}
+*/
+export const getProjectIDs = () => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/getProjectIDs", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'getProjectIDs', 'allflag': true},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+/* Component
+  api returns string "sucess" , "fail"
+*/
+
+export const manageUserDetails = async(action, userObj) => { 
+    try{
+        const res = await axios(url+'/manageUserDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,user: userObj},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to "+action+" user."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to "+action+" user."}
+    }
+}
+
