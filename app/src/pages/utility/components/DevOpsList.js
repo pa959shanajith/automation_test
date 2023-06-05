@@ -67,6 +67,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [currentName, setCurrentName] = useState('');
     const current_task = useSelector(state=>state.plugin.PN);
     const [showCICD, setShowCICD] = useState(false);
+    const [showSauceLabs, setShowSauceLabs] = useState(false);
     const [currentTask, setCurrentTask] = useState({});
     const userRole = useSelector(state=>state.login.SR);
     const [eachData, setEachData] = useState([]);
@@ -104,7 +105,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [saucelabBrowsers, setSaucelabBrowsers] = useState({});
     const [browserVersions, setBrowserVersions] = useState([]);
     const [browserDetails,setBrowserDetails] = useState([])
-
+    const [sauceLab, setSauceLab] = useState(false);
     const [browserlist, setBrowserlist] = useState([
         {
             key: '3',
@@ -134,6 +135,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
 
     useEffect(()=>{
         projectIdTypesDicts[selectedProject] === "Web" ? setShowCICD(true) : setShowCICD(false)
+        projectIdTypesDicts[selectedProject] === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false)
     },[selectedProject])
 
 
@@ -268,6 +270,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setSelectedCycle(option.index);
         setProjectName(option.text);
         projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
+        projectIdTypesDicts[option.key] === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false)
         const configurationList = await fetchConfigureList({
             'projectid': option.key
         });
@@ -979,6 +982,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`} className="action_icons" alt="Edit Icon" title='Schedule'/>&nbsp;&nbsp;&nbsp;
+                                     {showSauceLabs&&<img onClick={() =>{onClick('displayBasic4')}} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
                                      { showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" title="CI/CD" className="action_icons" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      { showCICD && <img onClick={() =>{
@@ -1067,6 +1071,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     setChangeLable(true);
+                                    setSauceLab(false);
                                     // setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png"  className="action_icons" title="Execute Now"alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
@@ -1077,6 +1082,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`}  className="action_icons" title="Schedule" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+                                     {showSauceLabs&&<img onClick={() =>{onClick('displayBasic4')}} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
                                      {showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon" title='CI/CD'/>}&nbsp;&nbsp;&nbsp;
                                     { showCICD && <img onClick={() =>{
@@ -1113,6 +1119,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     setChangeLable(true);
+                                    setSauceLab(true);
                                     // setShowIcePopup(false);
                                     }} src="static/imgs/Saucelabs-3.png" title="Saucelabs" className="action_icons" />}
                                      {/* { showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""}  src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} title="CI/CD" className="action_icons" alt="Edit Icon"/>} */}
@@ -1167,7 +1174,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <div className='adminControl-ice popup-content'>
                             <div>
                                 <span className="leftControl" title="Token Name">{"Execute on"}</span>
-                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Search'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Search'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} />
                             </div>
                         </div>
                     </div> }
@@ -1272,7 +1279,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <div className='adminControl-ice-sauce'>
                             <div className='sauce_ICEsearch'>
                                 <span className="leftControl_sauce" title="Token Name"></span>
-                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Select Avo Assure Client'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Select Avo Assure Client'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab}/>
                             </div>
                         </div>
                     </div> 
