@@ -628,7 +628,7 @@ exports.excelToMindmap = function (req, res){
 				if(i== 3 && e.toLowerCase()!="script"){return res.status(200).send("fail");}
 				if (i==4){return res.status(200).send("fail");}
 			});
-			for (var i = 0; i < cSheetRow.length; i++) {				
+			for (let i = 0; i < cSheetRow.length; i++) {
 				row=cSheetRow[i].split(",")
 				excelrows.push(row)
 
@@ -639,7 +639,7 @@ exports.excelToMindmap = function (req, res){
 			var dataRows=[]
 			var p_count=[]
 			var q_count=[]
-			for (var p = 0; p < excelrows.length; p++) {
+			for (let p = 0; p < excelrows.length; p++) {
 				if (p==0){continue}
 				if (p == excelrows.length - 1){continue}
 				var data={"name":"","testscenarios":[]}

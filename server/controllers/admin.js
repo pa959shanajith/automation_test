@@ -2558,7 +2558,7 @@ exports.manageAzureDetails = async (req, res) => {
 		}
 		return res.send(result);
 	} catch (exception) {
-		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		logger.error("Exception in the service manageAzureDetails: %s", exception);
 		return res.status(500).send("fail");
 	}
 };
