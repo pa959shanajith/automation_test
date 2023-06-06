@@ -9,22 +9,30 @@ export const loadUserInfo = createSlice({
         notify: { data: [], unread: 0 },
         dateformat: "DD-MM-YYYY",
         showChangePasswordDialog: false,
+        projectDetails:{},
+        // apptype:'',
     },
     reducers: {
-        setUserInfo: (state, payload) => {
-            state.userinfo = payload;
-
-        },
-        setRole: (state, payload) => {
-            state.userRole = payload;
+        setUserInfo: (state, action) => {
+            state.userinfo = action.payload;
         },
 
-        setSocket: (state, payload) => {
-            state.socket = payload;
+        setRole: (state, action) => {
+            state.userRole = action.payload;
+        },
+
+        setSocket: (state, action) => {
+            state.socket = action.payload;
         },
         showChangePasswordDialog:(state) => {
             state.showChangePasswordDialog = !state.showChangePasswordDialog;
         }, 
+        setProjectDetails: (state, action) => {
+            state.project = action.payload;
+        },
+        // setApptype: (state, action) => {
+        //     state.apptype = action.payload;
+        // },
         // case actionTypes.UPDATE_NOTIFY:
         // var value = action.payload
         //     value.dateTime = new Date().toLocaleString();
