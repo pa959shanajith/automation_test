@@ -1,0 +1,30 @@
+.Header_size {
+    position: relative;
+    height: 2.6rem;
+    background: #ffffff !important;
+}
+
+.Headers {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+}
+
+.Tab_Menu_Header {
+    color: #030229;
+    display: flex;
+    font-family: Open Sans;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    gap: 46px;
+    line-height: 2.4rem;
+    position: relative;
+    right: 35rem;
+}
+
+.active {
+    color: #605BFF;
+    border-bottom: 2px solid #605BFF;
+}
