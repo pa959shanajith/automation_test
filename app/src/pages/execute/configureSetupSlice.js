@@ -7,6 +7,8 @@ const initialState = {
   projects: [],
   configureData: {},
   requiredFeilds: {},
+  testsuiteData: {},
+  testsuiteId: "",
   avoAgentAndGrid: {
     avoagents: [
       {
@@ -172,7 +174,7 @@ const initialState = {
   error: "",
 };
 
-const getProjects = createAsyncThunk("config/fetchProjects", async (args) => {
+const getProjects = createAsyncThunk("config/fetchProjects", async () => {
   return await axios(`${url}/fetchProjects`, {
     method: "POST",
     headers: {
@@ -216,6 +218,23 @@ const getAvoAgentAndAvoGrid = createAsyncThunk(
       .catch((err) => console.log(err));
   }
 );
+
+const readTestSuite = createAsyncThunk("config/readTestSuite", async (args) => {
+  return await axios(`${url}/readTestSuite_ICE`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: {
+      param: "readTestSuite_ICE",
+      readTestSuite: args.dataParams,
+      fromFlag: "mindmaps",
+    },
+    credentials: "include",
+  })
+    .then((response) => response.data)
+    .catch((err) => console.log(err));
+});
 
 const storeConfigureKey = createAsyncThunk(
   "config/storeConfigureKey",
@@ -284,15 +303,35 @@ const storeConfigureKey = createAsyncThunk(
   }
 );
 
-export { getProjects, getModules, getAvoAgentAndAvoGrid, storeConfigureKey };
+const updateTestSuite = createAsyncThunk("config/updateTestSuite", async (args) => {
+  return await axios(`${url}/updateTestSuite_ICE`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: args,
+    credentials: "include",
+  })
+    .then((response) => response.data)
+    .catch((err) => console.log(err));
+});
+
+export {
+  getProjects,
+  getModules,
+  getAvoAgentAndAvoGrid,
+  readTestSuite,
+  updateTestSuite,
+  storeConfigureKey,
+};
 
 const configureSetupSlice = createSlice({
   name: "configureSetup",
   initialState,
   reducers: {
     checkRequired: (state, action) => {
-      state.requiredFeilds = { ...state.requiredFeilds, ...action.payload }
-    }
+      state.requiredFeilds = { ...state.requiredFeilds, ...action.payload };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getProjects.pending, (state) => {
@@ -337,6 +376,32 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(getAvoAgentAndAvoGrid.rejected, (state, action) => {
       state.avoAgentAndGrid = {};
+      state.error = action.error.message;
+    });
+    builder.addCase(readTestSuite.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(readTestSuite.fulfilled, (state, action) => {
+      state.loading = false;
+      state.testsuiteData = action.payload;
+      state.testsuiteId = action?.meta?.arg?.dataId;
+      state.error = "";
+    });
+    builder.addCase(readTestSuite.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+    builder.addCase(updateTestSuite.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateTestSuite.fulfilled, (state, action) => {
+      state.loading = false;
+      // state.testsuiteData = action.payload;
+      // state.testsuiteId = action?.meta?.arg?.dataId;
+      state.error = "";
+    });
+    builder.addCase(updateTestSuite.rejected, (state, action) => {
+      state.loading = false;
       state.error = action.error.message;
     });
     builder.addCase(storeConfigureKey.pending, (state) => {

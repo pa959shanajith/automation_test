@@ -17,13 +17,22 @@ import {
 import "../styles/ConfigureSetup.scss";
 import GridBrowser from "./GridBrowser";
 import AvoInput from "../../../globalComponents/AvoInput";
-import { useDispatch } from "react-redux";
-import { checkRequired } from "../configureSetupSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { checkRequired, readTestSuite } from "../configureSetupSlice";
 
-const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
-  const [dataparam, setDataparam] = useState({});
-  const [condition, setCondition] = useState({});
-  const [accessibility, setAccessibility] = useState({});
+const ConfigureSetup = ({
+  configData,
+  tabIndex,
+  setTabIndex,
+  xpanded,
+  setXpanded,
+  dataparam,
+  setDataparam,
+  condition,
+  setCondition,
+  accessibility,
+  setAccessibility,
+}) => {
   const [avodropdown, setAvodropdown] = useState({});
   const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
   const [mode, setMode] = useState(selections[0]);
@@ -33,6 +42,7 @@ const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
   const [tableFilter, setTableFilter] = useState("");
   const [useDefault, setUseDefault] = useState("");
   const dispatch = useDispatch();
+  const getProjectData = useSelector((store) => store.configsetup);
 
   useEffect(() => {
     const mainTree = [];
@@ -49,28 +59,32 @@ const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
               name: e?.name,
               dataParameterization: (
                 <InputText
-                  value={dataparam[dataParamName]}
+                  value={dataparam[dataParamName]?.value}
                   placeholder="Enter Text"
                   name={dataParamName}
                   className="p-inputtext-sm"
-                  onChange={(e) => onDataparamChange(e)}
+                  onChange={(e) => onDataparamChange(e, index)}
                 />
               ),
               condition: (
                 <Dropdown
-                  value={condition[conditionName]}
+                  value={condition[conditionName]?.value}
                   options={conditions}
                   optionLabel="name"
                   name={conditionName}
                   placeholder="Select a Condition"
-                  onChange={(e) => onConditionChange(e)}
+                  onChange={(e) => onConditionChange(e, index)}
                   className="condition_dropdown"
                 />
               ),
               accessibility: (
                 <MultiSelect
-                  value={accessibility[accessibilityName]}
-                  onChange={(e) => onAccessibilityChange(e)}
+                  value={
+                    Array.isArray(accessibility[accessibilityName]?.value)
+                      ? accessibility[accessibilityName]?.value
+                      : []
+                  }
+                  onChange={(e) => onAccessibilityChange(e, index)}
                   name={accessibilityName}
                   options={accessibilities}
                   placeholder="Select a Accessibility"
@@ -97,24 +111,74 @@ const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
     dispatch(checkRequired({ configName: configTxt }));
   }, [configTxt]);
 
-  const onDataparamChange = (e) => {
+  useEffect(() => {
+    const getXpanded = [...xpanded];
+    const getStateOfParam = { ...dataparam };
+    const getStateOfCondition = { ...condition };
+    const getStateOfAccess = { ...accessibility };
+    configTable.forEach((el, ind) => {
+      if (el.id === getProjectData?.testsuiteId) {
+        const getSuiteId =
+          getProjectData?.testsuiteData[getProjectData?.testsuiteId];
+        const duplicate = getXpanded.findIndex(
+          (item) => item?.testsuiteid === getSuiteId?.testsuiteid
+        );
+        if (duplicate === -1)
+          getXpanded.push({
+            testsuiteid: getSuiteId?.testsuiteid,
+            key: el.key,
+            suitescenarios: getSuiteId?.scenarioids,
+            suitename: getSuiteId?.testsuitename,
+          });
+        el.children.forEach((item, index) => {
+          const dataParamValue = `dataParamName${index}${ind}`;
+          const conditionValue = `conditionName${index}${ind}`;
+          const accessibilityValue = `accessibilityName${index}${ind}`;
+          getStateOfParam[dataParamValue] = {
+            value: getSuiteId?.dataparam[index],
+            key: el.key,
+          };
+          const getCondition = getSuiteId?.condition[index];
+          getStateOfCondition[conditionValue] = {
+            value: {
+              name: getCondition ? "True" : "False",
+              code: getCondition ? "T" : "F",
+            },
+            key: el.key,
+          };
+          getStateOfAccess[accessibilityValue] = {
+            value: Array.isArray(getSuiteId?.accessibilityParameters[index])
+              ? getSuiteId?.accessibilityParameters[index]
+              : [],
+            key: el.key,
+          };
+          setDataparam(getStateOfParam);
+          setCondition(getStateOfCondition);
+          setAccessibility(getStateOfAccess);
+        });
+      }
+    });
+    setXpanded(getXpanded);
+  }, [getProjectData]);
+
+  const onDataparamChange = (e, getKey) => {
     setDataparam({
       ...dataparam,
-      [e.target.name]: e.target.value,
+      [e.target.name]: { value: e.target.value, key: getKey },
     });
   };
 
-  const onConditionChange = (e) => {
+  const onConditionChange = (e, getKey) => {
     setCondition({
       ...condition,
-      [e.target.name]: e.target.value,
+      [e.target.name]: { value: e.target.value, key: getKey },
     });
   };
 
-  const onAccessibilityChange = (e) => {
+  const onAccessibilityChange = (e, getKey) => {
     setAccessibility({
       ...accessibility,
-      [e.target.name]: e.target.value,
+      [e.target.name]: { value: e.target.value, key: getKey },
     });
   };
 
@@ -123,6 +187,23 @@ const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
       ...avodropdown,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const onNodeXpand = (e) => {
+    const dataObj = {
+      dataKey: e?.node?.key,
+      dataId: e?.node?.id,
+      dataParams: [
+        {
+          releaseid: getProjectData?.projects[0].releases[0].name,
+          cycleid: getProjectData?.projects[0].releases[0].cycles[0]._id,
+          testsuiteid: e?.node?.id,
+          testsuitename: e?.node?.data?.name,
+          projectidts: getProjectData?.projects[0]._id,
+        },
+      ],
+    };
+    dispatch(readTestSuite(dataObj));
   };
 
   const tableTreeHeader = (
@@ -204,8 +285,8 @@ const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
                     inputId="useDefault"
                     name="timeout"
                     value="Use default"
-                    onChange={(e) => setUseDefault(e.value)} 
-                    checked={useDefault === 'Use default'}
+                    onChange={(e) => setUseDefault(e.value)}
+                    checked={useDefault === "Use default"}
                   />
                   <label htmlFor="useDefault" className="ml-2">
                     Use default
@@ -222,8 +303,8 @@ const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
                     inputId="userdefine"
                     name="timeout"
                     value="User define"
-                    onChange={(e) => setUseDefault(e.value)} 
-                    checked={useDefault === 'User define'}
+                    onChange={(e) => setUseDefault(e.value)}
+                    checked={useDefault === "User define"}
                   />
                   <label htmlFor="userDefine" className="ml-2">
                     User define
@@ -387,6 +468,7 @@ const ConfigureSetup = ({ configData, tabIndex, setTabIndex }) => {
             <div className="grid config_subcontainer">
               <div className="table_section col-12 lg:col-12 xl:col-9 md:col-12 sm:col-12">
                 <TreeTable
+                  onExpand={(e) => onNodeXpand(e)}
                   header={tableTreeHeader}
                   value={configTable}
                   selectionMode="checkbox"
