@@ -47,7 +47,7 @@ exports.saveSauceLabData = function (req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function SauceLablogin_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(icename == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+						if(icename == data.username && ["unavailableLocalServer", "sauceconfresponse"].includes(data.onAction)){
 							redisServer.redisSubServer.removeListener('message',SauceLablogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in loginSauceLabServer_ICE: Socket Disconnected");
@@ -55,7 +55,7 @@ exports.saveSauceLabData = function (req, res) {
 									var soc = myserver.socketMapNotify[icename];
 									soc.emit("ICEnotAvailable");
 								}
-							} else if (data.onAction == "qcresponse") {
+							} else if (data.onAction == "sauceconfresponse") {
 								data = data.value;
 								res.send(data);
 							}

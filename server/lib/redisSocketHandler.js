@@ -349,6 +349,10 @@ module.exports.initListeners = mySocket => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "qcresponse", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
+	mySocket.on("sauceconfresponse", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "sauceconfresponse", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
+	});
 
 	mySocket.on('open_file_in_editor_result', value => {
 		const dataToNode = JSON.stringify({"username" : username,"onAction" : "open_file_in_editor_result","value":JSON.parse(value)});
