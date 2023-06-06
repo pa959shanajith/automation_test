@@ -10,6 +10,7 @@ import configureSetupSlice from "./pages/execute/configureSetupSlice";
 
 import stepsSlice from './pages/landing/components/VerticalComponentsSlice';
 import landingReducer from './pages/landing/LandingSlice';
+import configurePageSlice from "./pages/execute/configurePageSlice";
 
 export default configureStore({
     reducer:{
@@ -20,7 +21,7 @@ export default configureStore({
         // plugin:pluginReducer,
         // admin:adminReducer
         design: designSlice,
-        configsetup: configureSetupSlice
-        
+        configsetup: configureSetupSlice,
+        configpage: configurePageSlice
     }
 })

@@ -19,12 +19,16 @@ import { SelectButton } from "primereact/selectbutton";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from 'primereact/toast';
-import {fetchConfigureList,getPools,getICE_list} from '../api';
+import {fetchConfigureList,getPools,getICE_list,getProjectList} from '../api';
 // import { Messages as MSG,VARIANT} from '../../global';
 import AvoModal from '../../../globalComponents/AvoModal';
 import ConfigureSetup from './ConfigureSetup';
 import { getAvoAgentAndAvoGrid, getModules, getProjects, updateTestSuite, storeConfigureKey } from '../configureSetupSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { getPoolsexe } from "../configurePageSlice";
+import { getICE } from "../configurePageSlice";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+
 
 const ConfigurePage = ({setLoading}) => {
   const [visible, setVisible] = useState(false);
@@ -56,15 +60,19 @@ const ConfigurePage = ({setLoading}) => {
   const [value_input, setValue_input] = useState(null);
   const [checked, setChecked] = useState(false);
   const toast = useRef(null);
-  const [getProjectLists,setProjectList]=useState([]);
   const [projectData1, setProjectData1] = useState([]);
   const [projectData, setProjectData] = useState([]);
-  const [projectId, setPojectId] = useState('');
+  const url = window.location.href.slice(0, -7)+'execAutomation';
   const [projectName, setProjectName] = useState('');
+  const [projectId, setprojectId] = useState("");
   // const current_task = useSelector(state=>state.plugin.PN);
   const [cycleName, setCycleName] = useState('');
   const [selectedProject, setSelectedProject] = useState('');
   const [configList, setConfigList] = useState([]);
+  const [projectList, setProjectList] = useState([]);
+  const buttonEl = useRef(null);
+  // const [visible, setVisible] = useState(false);
+
   // const dispatch = useDispatch();
   //
   const [smartMode,setSmartMode] = useState('normal')
@@ -82,6 +90,10 @@ const ConfigurePage = ({setLoading}) => {
   const [condition, setCondition] = useState({});
   const [accessibility, setAccessibility] = useState({});
 
+  const [currentKey,setCurrentKey] = useState('');
+  const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
+  const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
+  const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
 
   const displayError = (error) =>{
     setLoading(false)
@@ -90,8 +102,10 @@ const ConfigurePage = ({setLoading}) => {
 
   const getConfigData = useSelector((store) => store.configsetup);
   const getRequired = getConfigData.requiredFeilds;
+  const getConfigPage = useSelector((store) => store);
   const dispatch = useDispatch();
 
+  console.log(getConfigPage);
   useEffect(() => {
     dispatch(getProjects());
     dispatch(getAvoAgentAndAvoGrid());
@@ -142,6 +156,22 @@ const ConfigurePage = ({setLoading}) => {
     } else setVisible(false);
   };
 
+  useEffect(()=>{
+    (async()=>{
+      var data=[]
+      const Projects = await getProjectList()
+      for(var i = 0; Projects.projectName.length>i; i++){
+          data.push({name:Projects.projectName[i], id:Projects.projectId[i]})
+        }
+        // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
+    //  const data =[ {
+    //     key: Projects.projectId,
+    //     value:Projects.projectNames
+    //   }]
+      setProjectList(data)
+    })()
+  },[projectId])
+
   const [recurrenceType, setRecurrenceType] = useState("");
   const [monthlyRecurrenceWeekValue, setMonthlyRecurrenceWeekValue] = useState('')
 
@@ -158,6 +188,11 @@ const ConfigurePage = ({setLoading}) => {
   const showSuccess_Schedule = () => {
   toast.current.show({severity:'success', summary: 'Success', detail:'Execution has been scheduled', life: 1000});
 }
+
+var myJsObj = {key: currentKey,
+  'executionType' : executionTypeInRequest}
+var str = JSON.stringify(myJsObj, null, 4);
+
 useEffect(()=>{
     fetchData();
     // eslint-disable-next-line
@@ -252,21 +287,85 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
     setCounter(e.target.value);
   };
 
+ 
+  const confirm_delete = (event, item) => {
+    // event.preventDefault(); // Prevent the default behavior of the button click
+    confirmPopup({
+      target: event.currentTarget,
+      message: (
+        <p>
+          Are you sure you want to delete <b>{item.configurename}</b> Execution Profile?
+        </p>
+      ),
+      icon: 'pi pi-exclamation-triangle',
+    });
+  };
+  const copyKeyUrlFunc = (id) => {
+    const data = document.getElementById(id).title;
+    if (!data) {
+        setApiKeyCopyToolTip("Nothing to Copy!");
+        setTimeout(() => {
+            setApiKeyCopyToolTip("Click to Copy");
+        }, 1500);
+        return;
+    }
+    const x = document.getElementById(id);
+    x.select();
+    document.execCommand('copy');
+    setApiKeyCopyToolTip("Copied!");
+    setTimeout(() => {
+        setApiKeyCopyToolTip("Click to Copy");
+    }, 1500);
+}
+const copyConfigKey = (title) => {
+  if (navigator.clipboard.writeText(title)) {
+      setCopyToolTip("Copied!");
+      setTimeout(() => {
+          setCopyToolTip("Click to Copy");
+      }, 1500);
+  }
+}
   const tree_CICD = [
     {
       key: "0",
       label: "Elastic Execution Grid Information",
       data: "Documents Folder",
       icon: "pi pi-fw pi-calendar",
+      expanded: true,
       children: [
         {
           key: "1",
 
           label: (
-            <div className="input_CICD .p-tree .p-tree-container .p-treenode .p-treenode-content.p-treenode-selectable:not(.p-highlight):hover">
-              <InputText className="inputtext_CICD" />
-              <Button icon="pi pi-copy" className="copy_CICD" />
-              <div className="lable_sync">
+            <div className="input_CICD ">
+             <div class="container_url">
+             {/* <span className="devopsUrl_label" id='api-url' value={url}>DevOps Integration API url : </span> */}
+                       
+  <label for="inputField" class="devopsUrl_label">Devops Integration URL</label>
+  <input type="text" id="inputField" class="inputtext_CICD"  value={url}/>
+  {/* <Tooltip title={copyToolTip}/> */}
+  {/* <Tooltip id="copy" effect="solid" backgroundColor="black" title={copyToolTip} arrow={true}/> */}
+  <Button icon="pi pi-copy" className="copy_CICD" onClick={() => { copyConfigKey(url)}} title={copyToolTip} />
+</div>
+<div  className="executiontype">
+                        
+                        <div className="lable_sync">
+                                <label className="Async_lable" id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
+                                <InputSwitch className="inputSwitch_CICD" label="" inlineLabel={true} onChange = {() => executionTypeInRequest == 'asynchronous' ? setExecutionTypeInRequest('synchronous') : setExecutionTypeInRequest('asynchronous')}
+                                    checked = {executionTypeInRequest === 'synchronous'}/>
+                                <label  className="sync_label" id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
+                        </div>
+                    </div>
+                    <div className="container_devopsLabel" title={str}>
+                        <span className="devops_label" >DevOps Request Body : </span>
+                        <div >
+                       
+                        <InputTextarea className="inputtext_devops" rows={4} cols={30} value={str}  />
+                        <Button icon="pi pi-copy" className="copy_devops" />
+                </div>
+                </div>
+              
+              {/* <div className="lable_sync">
                 <lable className="Async_lable"> Asynchronous</lable>
                 <InputSwitch className="inputSwitch_CICD"
                   checked={checked}
@@ -275,8 +374,9 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
                 <label  className="sync_label" id="sync" htmlFor="synch" value="synchronous">
                   Synchronous{" "}
                 </label>
-              </div>
-              <div>
+              </div> */}
+            
+              {/* <div class="container_devopsLabel">
                 <lable className="devops_label">Devops Request Body</lable>
               </div>
               <div>
@@ -284,8 +384,8 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
                   <InputTextarea rows={4} cols={30} />
                   <Button icon="pi pi-copy" className="copy_devops" />
                 </div>
-              </div>
-            </div>
+              </div> */}
+          </div>
           ),
         },
       ],
@@ -478,30 +578,35 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
                     fontStyle: "normal",
                       marginLeft:'9.5rem',
                       height:"2.5rem"
-                  }}
-                  onClick={() => setVisible_execute(true)}
-                  size="small"
-                >
-                  {" "}
-                  Execute Now
-                </Button>
-                <Dialog
-                  className="dialog_execute "
-                  header="Execute : Regression"
-                  visible={visible_execute}
-                  style={{ width: "50vw" }}
-                  onHide={() => setVisible_execute(false)}
-                  footer={footerContent_config}
-                >
+                    }}
+                    onClick={() => {
+                      dispatch(getPoolsexe());
+                      dispatch(getICE());
+                      setVisible_execute(true)}
+                    }
+                    size="small"
+                  >
+                    {" "}
+                    Execute Now
+                  </Button>
+                  <Dialog
+                    className="dialog_execute "
+                    header="Execute : Regression"
+                    visible={visible_execute}
+                    style={{ width: "50vw" }}
+                    onHide={() => setVisible_execute(false)}
+                    footer={footerContent_config}
+                  >
                     
-                  <Card className="execute_card p-card p-card-body ">
-                    <p className="m-0 ">
-                      <div>Avo Agent:SBLTQAFFF Execution Mode : Headless</div>
-                      <div>Select Browsers : Google Chrome</div>
-                      <div>Execution Mode : Headless</div>
-                    </p>
-                  </Card>
+                    <Card className="execute_card p-card p-card-body ">
+                      <p className="m-0 ">
+                        <div>Avo Agent:SBLTQAFFF </div>
+                        <div>Selected Browsers : Google Chrome</div>
+                        <div>Execution Mode : Headless</div>
 
+                      </p>
+                    </Card>
+        
                     <div  className="radioButtonContainer">
                     <RadioButton
                       value="Execute with Avo Assure Agent/ Grid"
@@ -567,39 +672,39 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
                     fontFamily: "Open Sans",
                     fontStyle: "normal",
                       height:'2.5rem'
-                  }}
-                  onClick={() => setVisible_schedule(true)}
-                  size="small"
-                >
-                  {" "}
-                  Schedule
-                </Button>
-                <Dialog
-                  className="dialog_Schedule"
-                  header="Schedule : Regression"
-                  visible={visible_schedule}
-                  style={{ width: "60vw" }}
-                  onHide={() => setVisible_schedule(false)}
-                  footer={footerContent_Schedule}
-                >
-                  <Card className="Schedule_card  .p-card .p-card-content ">
-                    <p className="m-0 ">
-                      <div>Avo Agent:SBLTQAFFF Execution Mode : Headless</div>
-                      <div>Select Browsers : Google Chrome</div>
-                      <div>Execution Mode : Headless</div>
-                    </p>
-                  </Card>
-
-                  <Tree
-                    className="schedule_tree"
-                    value={treeData}
-                    selectionMode="single"
-                    selectionKeys={selectedNodeKey}
-                    onSelectionChange={onNodeSelect}
-                    // onToggle={onToggleNode}
-                  />
-                </Dialog>
-                <Button
+                    }}
+                    onClick={() => setVisible_schedule(true)}
+                    size="small"
+                  >
+                    {" "}
+                    Schedule
+                  </Button>
+                  <Dialog
+                    className="dialog_Schedule"
+                    header="Schedule : Regression"
+                    visible={visible_schedule}
+                    style={{ width: "60vw" }}
+                    onHide={() => setVisible_schedule(false)}
+                    footer={footerContent_Schedule}
+                  >
+                    <Card className="Schedule_card  .p-card .p-card-content ">
+                      <p className="m-0 ">
+                        <div>Avo Agent:SBLTQAFFF </div>
+                        <div>Selected Browsers : Google Chrome</div>
+                        <div>Execution Mode : Headless</div>
+                      </p>
+                    </Card>
+        
+                    <Tree
+                      className="schedule_tree"
+                      value={treeData}
+                      selectionMode="single"
+                      selectionKeys={selectedNodeKey}
+                      onSelectionChange={onNodeSelect}
+                      // onToggle={onToggleNode}
+                    />
+                  </Dialog>
+                  <Button 
                   style={{
                     width: "4.5rem",
                     fontFamily: "Open Sans",
@@ -608,45 +713,50 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
                     
                   }}
                   size="small"
-                  onClick={() => setVisible_CICD(true)}
-                >
-                  CI/CD
-                </Button>
-
-                <Dialog
-                  className="dialog_CICD"
-                  header="Execute : Regression"
-                  visible={visible_CICD}
-                  style={{ width: "50vw" }}
-                  onHide={() => setVisible_CICD(false)}
-                  footer={footerContent_CICD}
-                >
-                  <Card className="Schedule_card  .p-card .p-card-content ">
-                    <p className="m-0 ">
-                      <div>Avo Agent:SBLTQAFFF Execution Mode : Headless</div>
-                      <div>Select Browsers : Google Chrome</div>
-                      <div>Execution Mode : Headless</div>
-                    </p>
-                  </Card>
-
-                  <Tree
-                    className="CICD_tree"
-                    value={tree_CICD}
-                    selectionMode="single"
-                    selectionKeys={selectedNodeKey}
-                    onSelectionChange={onNodeSelect}
+                    onClick={() => {setVisible_CICD(true);setCurrentKey(item.configurekey)}}
+                  >
+                    CI/CD
+                  </Button>
+                  
+                  <Dialog
+                    className="dialog_CICD"
+                    header="Execute : Regression"
+                    visible={visible_CICD}
+                    style={{ width: "50vw" }}
+                    onHide={() => setVisible_CICD(false)}
+                    footer={footerContent_CICD}
+                  >
+                    <Card className="Schedule_card  .p-card .p-card-content ">
+                      <p className="m-0 ">
+                        <div>Avo Agent:SBLTQAFFF</div>
+                        <div>Selected Browsers : Google Chrome</div>
+                        <div>Execution Mode : Headless</div>
+                      </p>
+                    </Card>
+        
+                    <Tree
+                      className="CICD_tree"
+                      value={tree_CICD}
+                      selectionMode="single"
+                      selectionKeys={selectedNodeKey}
+                      onSelectionChange={onNodeSelect}
                       
-                  />
-                </Dialog>
-              </div>
-            ),
-            actions: (
-              <div>
-                  <Button icon="pi pi-pencil" className=" pencil_button p-button-edit"></Button>
-                <Button icon="pi pi-trash" className="p-button-edit"></Button>
-              </div>
-            ),
-          };
+                    />
+                  </Dialog>
+                </div>
+              ),
+              actions: (
+                <div>
+                       <ConfirmPopup target={buttonEl.current} visible={visible} onHide={() => setVisible(false)}  />
+                  <Button icon="pi pi-pencil" className=" pencil_button p-button-edit" ></Button>
+                  <Button
+  icon="pi pi-trash"
+  className="p-button-edit"
+  onClick={(event) => confirm_delete(event, item)}
+></Button>
+                </div>
+              ),
+              };
           })   );
     }
   )();
@@ -665,6 +775,7 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
     }
     
   };
+
   const Breadcrumbs = () => {
     // const [isOpen, setIsOpen] = useState(false);
     // const toggleDropdown = () => {
@@ -683,7 +794,16 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
           <li>
             <Link to="/landing"> Home </Link>
             <span> / </span>
-            <span>Configure & Execute</span>
+            
+            <select onChange={(e)=>{setprojectId(e.target.value)}} style={{width:'10rem', height:'19px'}}>
+             {projectList.map((project, index) => (
+                      
+                               <option value={project.id} key={index}>{project.name}</option>
+                              
+                    
+                       ))}
+                 
+             </select>
           </li>
         </ul>
       </nav>
@@ -720,7 +840,7 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
     return (
       <>
         <Checkbox classname=" checkbox_header" />
-        <span>Configuration Profile Name</span>
+        <span className="profile_label"> Configuration Profile Name</span>
       </>
     );
   };
@@ -731,7 +851,7 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
         <>
      
           <DataTable
-            className="  datatable_list p-datatable p-datatable-thead > tr > th "
+            className="  datatable_list  "
             value={configList}
             style={{
               width: "100%",
