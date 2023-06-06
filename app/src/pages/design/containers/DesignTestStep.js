@@ -103,9 +103,9 @@ const DesignModal = (props) => {
 
             <Dialog className={"debug__object__modal"} header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visible} onHide={() => setVisible(false)} footer={footerContent}>
                 <div className='debug__btn'>
-                    <div className={"compare__object"}>
-                        <span className='compare__btn'>
-                            <p className='compare__text'>Choose Browsers</p>
+                    <div className={"debug__object"}>
+                        <span className='debug__opt'>
+                            <p className='debug__otp__text'>Choose Browsers</p>
                         </span>
                         <span className='browser__col'>
                             <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
