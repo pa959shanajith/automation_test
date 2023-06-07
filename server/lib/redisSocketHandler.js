@@ -153,6 +153,10 @@ default_sub.on("message", (channel, message) => {
 		mySocket.emit("irisOperations", data.image_data, data.param);
 		break
 
+	case "SauceLablogin":
+		mySocket.emit("saucelablogin", data.responsedata);
+		break;
+
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);
@@ -343,6 +347,10 @@ module.exports.initListeners = mySocket => {
 
 	mySocket.on("qcresponse", value => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "qcresponse", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
+	});
+	mySocket.on("sauceconfresponse", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "sauceconfresponse", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 

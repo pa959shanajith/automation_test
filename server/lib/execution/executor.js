@@ -115,6 +115,13 @@ class TestSuiteExecutor {
             "reportType": "functionalTesting",
             "version":"-"
         };
+        if(batchData.executionEnv == 'saucelabs') {
+            execReq['sauce_username'] = batchData.sauce_username
+            execReq['sauce_access_key'] = batchData.sauce_access_key
+            execReq['remote_url'] = batchData.remote_url
+            execReq['version'] = batchData.version
+            execReq['platform'] = batchData.platform
+        }
         const gitInfo = batchData.gitInfo;
         if(gitflag){
             var folderPath = gitInfo['folderPath'];

@@ -464,6 +464,8 @@ if (cluster.isMaster) {
 		var flowGraph = require('./server/controllers/flowGraph');
 		var devOps = require('./server/controllers/devOps');
 		var azure = require('./server/controllers/azure');
+		var SauceLab = require('./server/controllers/sauceLab');
+
 
 
 		//-------------Route Mapping-------------//
@@ -690,6 +692,13 @@ if (cluster.isMaster) {
 		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
 		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
 		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
+
+		// SauceLab API's
+		app.post('/getDetails_SAUCELABS', auth.protect, admin.getDetails_SAUCELABS);
+		app.post('/manageSaucelabsDetails', auth.protect, admin.manageSaucelabsDetails);
+		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
+
+
 
 		
 

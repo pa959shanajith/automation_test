@@ -35,9 +35,12 @@ const LeftPanelBar = (props) => {
 						<span><img style={{ height: '47px' }} src={"static/imgs/GitIcon.png"} alt={"Create Git Configuration"} className={((props.middleScreen === "gitConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Git Configuration</div></i></li>
 					<li><i id='jiraConfigure' className={`${classes["selectBrowser"]} ${userInfo.isTrial ? classes["disable-thumbnail-settings"]:""}`} title="Manage Jira Configuration" onClick={() => { props.setMiddleScreen("jiraConfigure"); resetScreen("jiraConfigure") }}>
 						<span><img style={{ height: '47px' }} src={"static/imgs/jira.png"} alt={"Create Jira Configuration"} className={((props.middleScreen === "jiraConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Jira Configuration</div></i></li>
+					<li><i id='SauceLabConfigure' className={`${classes["selectBrowser"]} ${userInfo.isTrial ? classes["disable-thumbnail-settings"]:""}`} title="Manage Saucelabs Configuration" onClick={() => { props.setMiddleScreen("SauceLabConfigure"); resetScreen("SauceLabConfigure") }}>
+						<span><img style={{ height: '47px' }} src={"static/imgs/Saucelabs-1.png"} alt={"Create Saucelabs Configuration"} className={((props.middleScreen === "SauceLabConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>SauceLab Configuration</div></i>
+						</li>
 					<li><i id='zephyrConfigure' className={`${classes["selectBrowser"]} ${userInfo.isTrial ? classes["disable-thumbnail-settings"]:""}`} title="Manage Zephyr Configuration" onClick={() => { props.setMiddleScreen("zephyrConfigure"); resetScreen("zephyrConfigure") }}>
 						<span><img style={{ height: '47px' }} src={"static/imgs/zephyr.png"} alt={"Create Zephyr Configuration"} className={((props.middleScreen === "zephyrConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Zephyr Configuration</div></i></li>
-						<li><i id='AzureConfigure' className={`${classes["selectBrowser"]} ${userInfo.isTrial ? classes["disable-thumbnail-settings"]:""}`} title="Manage Azure DevOps Configuration" onClick={() => { props.setMiddleScreen("AzureConfigure"); resetScreen("AzureConfigure") }}>
+					<li><i id='AzureConfigure' className={`${classes["selectBrowser"]} ${userInfo.isTrial ? classes["disable-thumbnail-settings"]:""}`} title="Manage Azure DevOps Configuration" onClick={() => { props.setMiddleScreen("AzureConfigure"); resetScreen("AzureConfigure") }}>
 						<span><img style={{ height: '47px' }} src={"static/imgs/Azure.png"} alt={"Create Azure DevOps Configuration"} className={((props.middleScreen === "AzureConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Azure DevOps Configuration</div></i></li>
 				</ul>
 			</div>
