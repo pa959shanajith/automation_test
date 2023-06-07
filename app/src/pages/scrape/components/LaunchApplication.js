@@ -6,6 +6,7 @@ import {getDeviceSerialNumber_ICE} from "../api";
 const LaunchApplication = props => {
 
     const [error, setError] = useState({});
+    const [serialNumbers, setSerialNumber] = useState([]);
 
     // DESKTOP
 
