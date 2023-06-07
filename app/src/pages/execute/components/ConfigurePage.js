@@ -187,18 +187,22 @@ const ConfigurePage = ({setLoading}) => {
             releaseId: getConfigData?.projects[0]?.releases[0]?.name,
             cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
             cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
-            scenarionIndex: [1],
-            // suiteDetails: [
-            //   {
-            //     condition: 0,
-            //     dataparam: [""],
-            //     scenarioName: "Scenario_check",
-            //     scenarioId: "646efee42d7bb349c1ab2f19",
-            //     accessibilityParameters: [],
-            //   },
-            // ],
+            scenarionIndex: [],
+            suiteDetails: [
+              {
+                condition: 0,
+                dataparam: [""],
+                scenarioName: "",
+                scenarioId: "",
+                accessibilityParameters: [],
+              },
+            ],
         })),
-        // donotexe: { current: { } },
+        donotexe: {
+          current: xpanded?.map((el) => ({
+            [el?.suiteid]: [0],
+          }))
+        },
         scenarioFlag: false,
         isExecuteNow: false,
       };
