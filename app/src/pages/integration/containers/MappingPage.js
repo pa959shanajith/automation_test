@@ -2,7 +2,6 @@ import React  from 'react';
 import { ScrollBar } from '../../global';
 import "../styles/MappingPage.scss";
 
-
 /*
     pageTitle - Top-Left Title Label (ex. ALM Integration)
     onSave - Operation to perform when pressed "Save" Button
@@ -51,10 +50,12 @@ const MappingPage = props =>{
                         {props.selectTestDomain}
                         {props.selectTestProject}
                         {props.selectTestRelease} 
+                        {props.selectWorkitem}
                         </> : 
                         <>
                         {props.selectTestProject}
                         {props.selectTestRelease} 
+                        {/* {props.selectWorkitem} */}
                         </>
                         }
                         </>
@@ -62,7 +63,7 @@ const MappingPage = props =>{
                     <div className="mappingPage__left_tree" >
                         <div className="mappingPage_tree_canvas">
                             <div className="mappingPage_tree_inner">
-                                <div className="mappingPage_tree_contents" id="mappingPage_left_tree">
+                                <div className="mappingPage_tree_contents" style={{'--height': props.pageType === "Azure" ? '85%':''}} id="mappingPage_left_tree">
                                 <ScrollBar scrollId="mappingPage_left_tree" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                     <>
                                     {!updateFlag ?
@@ -76,6 +77,7 @@ const MappingPage = props =>{
                                     </>
                                 </ScrollBar>
                                 </div>
+                                {props.Pagination}
                             </div>
                         </div>
                     </div>

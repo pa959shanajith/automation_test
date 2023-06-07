@@ -158,21 +158,21 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
             if(data !=="empty"){
                 setIsEmpty(false);
                 let credentialsData = {
-                    authtype: 'basic',
-                    url: '',
-                    apitoken: '',
+                    // authtype: 'basic',
+                    // url: '',
+                    // apitoken: '',
                     userName: '',
                     password: ''
                 };
 
-                if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
-                if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
-                if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
+                // if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
+                // if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
+                // if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
                 if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
                 if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
 
                 setDefaultValues(credentialsData);
-                setZephAuthType(credentialsData.authtype);
+                // setZephAuthType(credentialsData.authtype);
                 setCredentials(credentialsData);
                 saveAction(true, credentialsData);
             }
@@ -185,6 +185,7 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
     useEffect(() => {
         type==="Zephyr" && getZephyrDetails();
     }, [])
+    
 
     return(
         <div className="popupWrapRow">

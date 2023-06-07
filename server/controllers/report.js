@@ -162,51 +162,54 @@ const prepareReportData = (reportData, embedImages) => {
     report.overallstatus.EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
     report.overallstatus.video = report.overallstatus.video || '-'
 
-    report.rows.forEach((row, i) => {
-        row.slno = i + 1;
-        if (row["Step "]) row.Step = row["Step "];
-        // if (row.EllapsedTime && row.EllapsedTime.trim() != "") {
-        //     const eT = row.EllapsedTime.split(".");
-        //     elapTime = eT[0].split(":")
-        //     if (!eT[1]) eT[1] = ((eT[1] || "") + "000").slice(0, 3);
-        //     if (eT.length < 3 && eT[0].indexOf(":") === -1) { // Time is x.x not xx:xx:xx.xx
-        //         row.EllapsedTime = "00:00:" + ("0" + elapTime[0]).slice(-2) + ":" + eT[1];
-        //     } else {
-        //         row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
-        //     }
-        // }
-        if (embedImages && row.screenshot_path) {
-            scrShots.idx.push(i);
-            scrShots.paths.push(row.screenshot_path);
-        }
-
-        if (row.testcase_details) {
-            if (typeof(row.testcase_details) == "string" && row.testcase_details != "undefined")
-                row.testcase_details = JSON.parse(row.testcase_details);
-        } else if (row.testcase_details === "") {
-            row.testcase_details = {
-                "actualResult_pass": "",
-                "actualResult_fail": "",
-                "testcaseDetails": ""
+    if(embedImages != 'removeReportItems'){  
+        report.rows.forEach((row, i) => {
+            row.slno = i + 1;
+            if (row["Step "]) row.Step = row["Step "];
+            // if (row.EllapsedTime && row.EllapsedTime.trim() != "") {
+            //     const eT = row.EllapsedTime.split(".");
+            //     elapTime = eT[0].split(":")
+            //     if (!eT[1]) eT[1] = ((eT[1] || "") + "000").slice(0, 3);
+            //     if (eT.length < 3 && eT[0].indexOf(":") === -1) { // Time is x.x not xx:xx:xx.xx
+            //         row.EllapsedTime = "00:00:" + ("0" + elapTime[0]).slice(-2) + ":" + eT[1];
+            //     } else {
+            //         row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
+            //     }
+            // }
+            if (embedImages && row.screenshot_path) {
+                scrShots.idx.push(i);
+                scrShots.paths.push(row.screenshot_path);
             }
-        }
-        if (row.status == "Pass") pass++;
-        else if (row.status == "Fail") fail++;
-        else if (row.Step && row.Step == "Terminated") terminated++
-        if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
-        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
-    });
-    const total = pass+fail+terminated;
-    const passPercent = parseFloat(100 * pass / total).toFixed(2);
-    const otherPercent = (100-passPercent).toFixed(2);
-    const totalRemaining = (fail+terminated) || 1;
-    const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
-    const termPercent = (otherPercent - failPercent).toFixed(2);
-    report.overallstatus.pass = passPercent > 0 ? passPercent : "0.00";
-    report.overallstatus.fail = failPercent > 0 ? failPercent : "0.00";
-    report.overallstatus.terminate = termPercent > 0 ? termPercent : "0.00";
-    report.remarksLength = remarksLength;
-    report.commentsLength = commentsLength;
+
+            if (row.testcase_details) {
+                if (typeof(row.testcase_details) == "string" && row.testcase_details != "undefined")
+                    row.testcase_details = JSON.parse(row.testcase_details);
+            } else if (row.testcase_details === "") {
+                row.testcase_details = {
+                    "actualResult_pass": "",
+                    "actualResult_fail": "",
+                    "testcaseDetails": ""
+                }
+            }
+            if (row.status == "Pass") pass++;
+            else if (row.status == "Fail") fail++;
+            else if (row.Step && row.Step == "Terminated") terminated++
+            if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
+            if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
+        });
+        const total = pass+fail+terminated;
+        const passPercent = parseFloat(100 * pass / total).toFixed(2);
+        const otherPercent = (100-passPercent).toFixed(2);
+        const totalRemaining = (fail+terminated) || 1;
+        const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
+        const termPercent = (otherPercent - failPercent).toFixed(2);
+        report.overallstatus.pass = passPercent > 0 ? passPercent : "0.00";
+        report.overallstatus.fail = failPercent > 0 ? failPercent : "0.00";
+        report.overallstatus.terminate = termPercent > 0 ? termPercent : "0.00";
+        report.remarksLength = remarksLength;
+        report.commentsLength = commentsLength;
+    }
+
     return { report, scrShots };
 };
  
@@ -451,7 +454,7 @@ exports.connectJira_ICE = function(req, res) {
 
                             function jira_login_4_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Jira_Projects"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", jira_login_4_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
@@ -459,7 +462,7 @@ exports.connectJira_ICE = function(req, res) {
                                             var soc = myserver.socketMapNotify[username];
                                             soc.emit("ICEnotAvailable");
                                         }
-                                    } else if (data.onAction == "Jira_Projects") {
+                                    } else if (data.onAction == "Jira_details") {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
@@ -519,7 +522,9 @@ exports.connectJira_ICE = function(req, res) {
                                     "project_selected": {
                                         'project':req.body.project,
                                         'key':req.body.key
-                                    }
+                                    },
+                                    "itemType":req.body.itemType,
+                                    
                                 };
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
@@ -681,7 +686,7 @@ exports.getReport_API = async (req, res) => {
         finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo).report;
+            const report = prepareReportData(reportInfo,'removeReportItems').report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
@@ -723,6 +728,7 @@ exports.getReport_API = async (req, res) => {
 
 
 exports.saveJiraDetails_ICE = async (req, res) => {
+    
 	const fnName = "saveJiraDetails_ICE";
 	logger.info("Inside UI service: " + fnName);
     // console.log(req.body);
@@ -737,8 +743,10 @@ exports.saveJiraDetails_ICE = async (req, res) => {
 				'projectid': itr.projectId,			
 				'projectName': itr.projectName,
 				'projectCode': itr.projectCode,
-				'testId': itr.testId,
-				'testCode': itr.testCode,
+				'itemId': itr.testId,
+				'itemCode': itr.testCode,
+                'itemType': itr.itemType,
+                'itemSummary':itr.itemSummary,
 				"query": "saveJiraDetails_ICE"
 			};
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
@@ -977,7 +985,7 @@ exports.getDevopsReport_API = async (req) => {
         // execResponse.tokenValidation = 'passed';
 
         const inputs = { executionId, scenarioIds, 'query': 'devopsReport' };
-        const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
+        const data = await utils.fetchData(inputs, "reports/getDevopsReport_API", fnName, true);
         let reportResult = data[0];
         let reportStatus = data[2];
         if (reportResult == "fail") {
@@ -990,7 +998,7 @@ exports.getDevopsReport_API = async (req) => {
         // finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo).report;
+            const report = prepareReportData(reportInfo,'removeReportItems').report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
@@ -1161,6 +1169,7 @@ function projectandscenario(projectid, cb) {
 					} else {
 						projectDetails.project_id = projectid;
 						projectDetails.project_name = projectname;
+
 					}
 				}
 				callback1();

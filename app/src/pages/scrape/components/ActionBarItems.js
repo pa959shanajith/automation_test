@@ -6,6 +6,9 @@ import * as actionTypes from '../state/action';
 import { ScrapeContext } from "../components/ScrapeContext";
 import * as scrapeApi from '../api';
 import { RedirectPage, ActionBar, Thumbnail, Messages as MSG, setMsg } from '../../global';
+import MultiSelectDropdown from '../../global/components/MultiSelectDropdown';
+import { Button } from 'primereact/button';
+
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -134,6 +137,7 @@ const BottomContent = (props) => {
     
    // const { screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
     const disableAction = useSelector(state => state.scrape.disableAction);
+    const enableIdentifier = useSelector(state => state.scrape.enableIdentifier);
     // const {screenId, screenName, versionnumber, projectId, testCaseId }=props.fetchingDetails
     const screenId = props.fetchingDetails["_id"]
     const projectId = props.fetchingDetails.projectID
@@ -142,6 +146,7 @@ const BottomContent = (props) => {
 
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
+    const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems);
 
     const { setShowObjModal, scrapeItems, fetchScrapeData, setOverlay, saved, startScrape } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
@@ -299,15 +304,17 @@ const BottomContent = (props) => {
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>setShowObjModal("exportObject"), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType==="Web", show: (appType==="Web")},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (props.appType!=="Web"), disable: compareFlag && props.appType!=="Webservice"},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>setShowObjModal("importObject"), show: (props.appType==="Web"), disable: compareFlag && props.appType==="Web"}, 
+        {'title':'Element Identifier Order','img': 'static/imgs/identifier-enabled.png','action':listOfCheckedItems.some(element=>element==true)?(enableIdentifier?()=>setShowObjModal("identifierlis"):()=>setMsg(MSG.SCRAPE.ERR_OBJ_SAVE)):()=>setMsg(MSG.SCRAPE.ERR_CHECKBOX_SELECT) ,'show': ((appType === 'Web' || appType === "MobileWeb"))}
     ]
 
     return (
         <>
         <div id='Otherapp' data-test="scrapeOnHeading" key="scrapeOn" >Other Actions</div>
-            {lowerList.map((icon, i) => icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
+            {lowerList.map((icon, i) => icon.show && <Thumbnail idx={i} data-test="bottomContent" key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
             {/* {(appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />)} */}
             <input ref={hiddenInput} data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
         </>
+        
     );
 }
 

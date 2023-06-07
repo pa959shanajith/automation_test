@@ -114,29 +114,22 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
         setOS("Not Supported");
   }
     
-    const getIce = async (clientVer) => {
-		try {
-      setShowUD(false);
-      setShowOverlay(`Loading...`);
-			const res = await fetch("/downloadICE?ver="+clientVer);
-      const {status} = await res.json();
-      // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
-			if (status === "available"){
-        // const link = document.createElement('a');
-        // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
-        // link.setAttribute('download', "avoURL.txt");
-        // document.body.appendChild(link);
-        // link.click();
-        // document.body.removeChild(link);
-        window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
-      } 
-			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
-      setShowOverlay(false)
-		} catch (ex) {
-			console.error("Error while downloading ICE package. Error:", ex);
-			setMsg(MSG.GLOBAL.ERR_PACKAGE);
-		}
-	}
+  const getIce = async (clientVer) => {
+    try {
+  setShowUD(false);
+  setShowOverlay(`Loading...`);
+        const res = await fetch("/downloadICE?ver="+clientVer);
+    const {status} = await res.json();
+    if (status === "available"){
+    window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+"&fileName="+((userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
+  } 
+        else setMsg(MSG.GLOBAL.ERR_PACKAGE);
+  setShowOverlay(false)
+    } catch (ex) {
+        console.error("Error while downloading ICE package. Error:", ex);
+        setMsg(MSG.GLOBAL.ERR_PACKAGE);
+    }
+}
 
     const switchRole = () => {
     if(userInfo.isTrial) return;
@@ -230,20 +223,22 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
     const handleWPEvents = (skip = false) => {
         if (typeof skip === 'number') {
             set_WP_STEPNO(skip);
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         if(WP_STEPNO===1 || skip===true) {
             otherProps.setPopover(false);
             if(userInfo.isTrial)
             otherProps.showVideo(true)
+            dispatch({type:actionTypes.HIGHLIGHT_AGS, payload:true})
             return
         }
         set_WP_STEPNO((prevno)=>prevno + 1)
     }
 
     const WP_ITEM_LIST =  useMemo(()=>[
-        {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
-        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Documentation.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch documentation or choose <br/> "Documentation" from "Need Help" button.</>}
+        {imageName:"wp_video_image.svg",content:<>Make your automation journey smoother by viewing our<br/>  <b><a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">training videos</a></b> OR choose <br/> "Training Videos" from the "Need Help" button.</>},
+        {imageName:"wp_docs_image.svg",content:<>Make your automation journey smoother by reading our<br/>  <b><a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">documentation</a></b> OR Choose <br/> “Documentation” from the “Need Help” button.</>}
     ],[trainLinks]);
 
     return(
@@ -254,7 +249,12 @@ const Header = ({show_WP_POPOVER=false,geniusPopup, ...otherProps}) => {
             { show_WP_POPOVER && <div className="tranparentBlocker"></div>}
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/AssureLogo_horizonal.svg" onClick={ !adminDisable ? naviPg : null } /></span>
-                    <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
+                <ClickAwayListener >
+                      <div  title={userInfo.isTrial?"Click here to view your plan":""}  className={"user-name-btn no-border" + (userInfo.isTrial?"fa-enabled":"")} >
+                      <span className="viewPlan"><a className='viewPlan plans a hover' href="https://avoautomation.ai/cloud-pricing/" target="_blank" rel="noopener noreferrer">View Plans</a></span>
+                      </div>
+                </ClickAwayListener>
+                <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(!showHelp)} style={{padding:5}}>
                             {geniusPopup?null:<span className="help">Need Help ?</span>}
                         </div>

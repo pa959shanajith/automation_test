@@ -496,12 +496,18 @@ exports.createProject_ICE = async (req, res) => {
 			modifiedby: userid,
 			modifiedbyrole: roleId
 		};
-		const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
-		if (result == "fail") {
-			return res.send("fail");
-		} else {
-			return res.send(result)
+		const valiproject = await utils.fetchData(inputs, "/hooks/validateProject");
+		if(valiproject.status === 'pass'){
+			const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
+			if (result == "fail") {
+				return res.send("fail");
+			} else {
+				return res.send(result)
+			}
+		}else {
+			return res.send(valiproject);
 		}
+		
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName+":", exception);
 		res.status(500).send("fail");
@@ -2387,6 +2393,8 @@ exports.getDetails_JIRA = async (req, res) => {
 
 };
 
+
+
 /* manageJiraDetails */
 exports.manageJiraDetails = async (req, res) => {
 	const actionName = "manageJiraDetails";
@@ -2451,6 +2459,33 @@ exports.getDetails_Zephyr = async (req, res) => {
 	}
 
 };
+exports.getDetails_Azure= async (req, res) => {
+	const actionName = "getDetails_Azure";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_Azure", actionName);
+
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				AzureURL: result['url'],
+				AzureUsername: result['username'],
+				AzurePAT: result['PAT']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_Azure: %s", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
 
 /* manageZephyrDetails */
 exports.manageZephyrDetails = async (req, res) => {
@@ -2487,6 +2522,43 @@ exports.manageZephyrDetails = async (req, res) => {
 		return res.send(result);
 	} catch (exception) {
 		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.manageAzureDetails = async (req, res) => {
+	const actionName = "manageAzureDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		let inputs;
+		if(action==='delete'){
+			inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
+
+		}else{
+			const AzureUrl = data.user.AzureURL;
+			const AzureUsername = data.user.AzureUsername;
+			const AzurePAT = data.user.AzurePAT;
+			
+			inputs = {
+				"AzureUrl": AzureUrl,
+				"AzureUsername": AzureUsername,
+				"AzurePAT":AzurePAT,
+				"action": action,
+				"userId": userId,
+			};
+		
+		result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service manageAzureDetails: %s", exception);
 		return res.status(500).send("fail");
 	}
 };
@@ -2535,6 +2607,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin") return next();
 		switch (req.path) {
 			case "/manageUserDetails":
+			    if(req.body.action == "stepUpdate") return next();
 				if (req.body.user.userid == userid && req.body.action == 'update') return next();
 				break;
 			case "/manageCIUsers":

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {Provider, useSelector, useDispatch} from 'react-redux';
+import TagManager from 'react-gtm-module';
 import ServiceBell from "@servicebell/widget";
 import {store} from './reducer';
 import {ProgressBar, ErrorPage, PopupMsg, VARIANT} from './pages/global'
@@ -18,7 +19,7 @@ import Utility from './pages/utility';
 import Integration from './pages/integration';
 import Settings from './pages/settings';
 import GeniusDialog from './pages/global/components/GeniusDialog';
-import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
+import ShowTrialVideo from './pages/global/components/showTrialVideo';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';
@@ -39,7 +40,26 @@ const { REACT_APP_DEV } = process.env
 export const url =  REACT_APP_DEV  ? "https://"+window.location.hostname+":8443" : window.location.origin;
 
 const App = () => {
-  const [blockui,setBlockui] = useState({show:false})
+  const [blockui,setBlockui] = useState({show:false});
+  const [gtmToken, setGtmToken] = useState("");
+  const [gtmEnable, setGtmEnable] = useState(false);
+  
+  const tagManagerArgs = {
+    gtmId: gtmToken
+  }
+  if(gtmEnable){
+    TagManager.initialize(tagManagerArgs)
+  }
+
+  useEffect(()=>{
+    (async()=>{
+      const response = await fetch("/getGTM")
+      let { enableGTM, gtmToken } = await response.json();
+      setGtmToken(gtmToken);
+      setGtmEnable(enableGTM);
+    })();
+  },[])
+
   useEffect(()=>{
     TabCheck(setBlockui);
     (async()=>{

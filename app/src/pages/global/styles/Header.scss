@@ -55,7 +55,12 @@
     }
     .help{
         text-transform: capitalize;
-        margin: 0 0.9rem;
+        // margin: 0 0.9rem;
+        color: $primaryColorLight;
+    }
+    .viewPlan{
+        text-transform: capitalize;
+        // margin: 0 0.9rem;
         color: $primaryColorLight;
     }
 }
@@ -264,6 +269,11 @@
 .afterExecution-modal .modal-content{
     max-width: 300px;
 }
+.afterExecution-modal1 .modal-content{
+    width: 625px;
+    max-width: 700px;
+    // max-height: 300px;
+}
 
 #downloadICEMenu {
     position:static !important;
@@ -289,4 +299,41 @@
     z-index: 5;
     height: 100vh;
     background: #000c;
+}
+.viewPlan{
+    .p-button{
+        padding: 0.25rem 1.25rem;
+        background: #633693;
+        color: #764ba2;
+         cursor: pointer;
+         font-size: 15px;
+         font-weight: 400px;
+    }
+    font-size: 15px;
+}
+.hover{
+    .p-button:enabled:hover{
+        background: #633693;
+    }
+}
+
+    .a{
+    color:#764ba2;
+    }
+
+    .plans{
+        .a{
+        color: #764ba2;
+         cursor: pointer;
+         font-size: 15px;
+         font-weight: 400px;
+        
+        }
+    }
+
+.hover{
+   .a, .a:hover {
+        color: #764ba2;
+        font-size: 15px;
+     }
 }

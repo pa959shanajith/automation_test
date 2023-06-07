@@ -69,24 +69,31 @@ export const getScheduledDetails_ICE = async(configKey, configName) => {
 
 export const testSuitesScheduler_ICE = async(executionData) => { 
     try{
-        const res = await axios(url+'/testSuitesScheduler_ICE', {
-            method: 'POST',
-            headers: {
-            'Content-type': 'application/json',
-            },
-            data: {param : 'testSuitesScheduler_ICE',
-            executionData: executionData},
-            credentials: 'include'
+        const parallel = await axios(url+"/hooks/validateParallelExecutions",{
+            method: 'POST'
         });
-        if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
-            return {error:MSG.GENERIC.INVALID_SESSION};
+        if(parallel.status===200 && parallel.data.status==='pass'){
+            const res = await axios(url+'/testSuitesScheduler_ICE', {
+                method: 'POST',
+                headers: {
+                'Content-type': 'application/json',
+                },
+                data: {param : 'testSuitesScheduler_ICE',
+                executionData: executionData},
+                credentials: 'include'
+            });
+            if(res.status === 401 || res.data === "Invalid Session"){
+                RedirectPage(history)
+                return {error:MSG.GENERIC.INVALID_SESSION};
+            }
+            if(res.status===200 && res.data !== "fail"){            
+                return res.data;
+            }
+            console.error(res.data)
+            return {error:MSG.SCHEDULE.ERR_SCHEDULE}
+        }else{
+            return {errorparallel: parallel.data.fail}
         }
-        if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        console.error(res.data)
-        return {error:MSG.SCHEDULE.ERR_SCHEDULE}
     }catch(err){
         console.error(err)
         return {error:MSG.SCHEDULE.ERR_SCHEDULE}

@@ -515,7 +515,7 @@ const CanvasNew = (props) => {
         <Fragment>
              {/* <SearchBox  setCtScale={setCtScale} zoom={zoom}/> */}
              <ConfirmDialog />
-             <Dialog header={props.populateTestcaseDetails?(props.populateTestcaseDetails.name.length > 55) ? props.populateTestcaseDetails.name.slice(0, 55)+"...   : Capture Elements" : props.populateTestcaseDetails.name+" : Capture Elements":(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Capture Elements" : taskname+" : Capture Elements"} visible={props.displayBasic}  maximizable modal style={{width: '69vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
+             <Dialog header={props.populateTestcaseDetails?(props.populateTestcaseDetails.name.length > 55) ? props.populateTestcaseDetails.name.slice(0, 55)+"...   : Capture Elements" : props.populateTestcaseDetails.name+" : Capture Elements":(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Capture Elements" : taskname+" : Capture Elements"} visible={props.displayBasic}  maximizable modal style={{width: '71vw',height: '50vw' }} onHide={() => {props.onHide('displayBasic')}}>
              <div style={{ height: '50vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetails} fetchingDetailsId={props.populateTestcaseDetails?props.populateTestcaseDetails:fetchingDetailsId} appType={appType} openScrapeScreen={props.onClick}/></div>
              </Dialog>
              <Dialog header={props.populateTestcaseDetails?(props.populateTestcaseDetails.name.length > 55) ? props.populateTestcaseDetails.name.slice(0, 55)+"...   : Design Test Steps" : props.populateTestcaseDetails.name+" : Design Test Steps":(taskname.length > 55) ? taskname.slice(0, 55)+"...   : Design Test Steps" : taskname+" : Design Test Steps"} visible={props.displayBasic2}  maximizable modal style={{ width: '69vw', height:'50vw'}} onHide={() => {props.onHide('displayBasic2')}}>
@@ -560,6 +560,7 @@ const CanvasNew = (props) => {
            
             {props.GeniusDialog?null:<NavButton setCtScale={setCtScale} zoom={zoom}/>}
             {/* <Legends/> */}
+            {props.GeniusDialog?<Legends />:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
             {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
             {props.GeniusDialog ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
@@ -570,7 +571,7 @@ const CanvasNew = (props) => {
                 })}
                 {Object.entries(nodes).map((node)=>
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                       <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                       <image  style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='testcases')?

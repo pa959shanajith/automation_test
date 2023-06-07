@@ -6,13 +6,14 @@ import PropTypes from 'prop-types';
 const PluginSection = ({userInfo}) => {
 
     const [pluginList, setPluginList] = useState({
-        "iTDM": {title:"iTDM", show: false},
-        "MR": { title: "Reports", show: false},
-        "MD": {title:"Dashboard", show: false},
-        "DE" : { title: "Utilities", show: false},
-        "ALMDMT": { title: "Integrations", show: false },
-        "AGS":{ title: "Avo Genius", show: false },
-        "STAVO":{ title: "Selenium To Avo", show: false },
+        "AGS":{ title: "Avo Genius", show: "false" },
+        "TV":{title:"Training Videos", show:"false"},
+        "MR": { title: "Reports", show: "false"},
+        "DE" : { title: "Utilities", show: "false"},
+        "ALMDMT": { title: "Integrations", show: "false" },
+        "iTDM": {title:"iTDM", show: "false"},
+        "MD": {title:"Dashboard", show: "false"},
+        "STAVO":{ title: "Selenium To Avo", show: "false" },
         "showList" : false,
     });
 
@@ -21,9 +22,6 @@ const PluginSection = ({userInfo}) => {
             let tempList = { ...pluginList };
             let availablePlugins = userInfo.pluginsInfo;
             let pluginsLength = availablePlugins.length;
-            tempList["AGS"].show = true;
-            tempList["DE"].show = true;
-            tempList["MR"].show = true;
             for(let i=0 ; i < pluginsLength ; i++){
                 // if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
@@ -35,6 +33,11 @@ const PluginSection = ({userInfo}) => {
             // tempList["Avo Discover"].show = false;
             // tempList["Mindmap"].show = false;
             // tempList["Selenium To Avo"].show = false;
+            // enabling below plugins for all license types - sathwik
+            tempList["AGS"].show = "true";
+            tempList["DE"].show = "true";
+            tempList["MR"].show = "true";
+            tempList["TV"].show = "true";
             tempList.showList = true;
             setPluginList(tempList);
         }
@@ -48,10 +51,11 @@ const PluginSection = ({userInfo}) => {
                     pluginList.showList && Object.keys(pluginList).map(pluginName =>
                         <Fragment key={pluginName} >
                         {
-                            pluginList[pluginName].show && 
+                            pluginName !== 'showList' && 
                             <PluginBox 
                                 pluginName={pluginName} 
                                 pluginTitle={pluginList[pluginName].title}
+                                pluginShow={pluginList[pluginName].show}
                             />
                         }
                         </Fragment>

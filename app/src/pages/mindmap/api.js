@@ -305,6 +305,12 @@ export const excelToMindmap = async(data) => {
         else if (res.data == 'valueError') {
             return {error : MSG.MINDMAP.ERR_EMPTY_COL}
         } 
+        else if (res.data == 'duplicateSce') {
+            return {error : MSG.MINDMAP.ERR_DUPLI_EXCEL_SCE_DATA}
+        } 
+        else if (res.data == 'duplicateMod') {
+            return {error : MSG.MINDMAP.ERR_DUPLI_EXCEL_MOD_DATA}
+        } 
         else if (res.data == "emptySheet" || res.data == 'fail') {
             return {error : MSG.MINDMAP.ERR_EXCEL_SHEET}
         }
@@ -326,6 +332,53 @@ export const excelToMindmap = async(data) => {
 export const importMindmap = async(data) => {
     try{
         const res = await axios(url+'/importMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
+export const writeFileServer = async(data) => {
+    try{
+        const res = await axios(url+'/writeFileServer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
+
+export const writeZipFileServer = async(data) => {
+    try{
+        const res = await axios(url+'/writeZipFileServer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -698,5 +751,55 @@ export const exportToProject = async(moduleId) => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }
+}
+export const exportToMMSkel = async(data) => {
+    try{
+        const res = await axios(url+'/exportToMMSkel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }
+}
+export const jsonToMindmap = async(moduleId) => {
+    try{
+        const res = await axios(url+'/jsonToMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+                mindmapId:moduleId
+            },
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }

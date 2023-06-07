@@ -13,6 +13,7 @@ import { Button } from "primereact/button";
 
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
+    const userInfo = useSelector(state=>state.login.userinfo);
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
     const initProj = useSelector(state=>state.mindmap.selectedProj)
@@ -25,12 +26,15 @@ const ModuleListDrop = (props) =>{
     const isAssign = props.isAssign
     const [options,setOptions] = useState(undefined)
     const [modlist,setModList] = useState(moduleList)
-    const SearchInp = useRef()
+    const SearchInp = useRef();
+    const [searchInpText,setSearchInpText] = useState('');
+    const [searchInpTextEnE,setSearchInpTextEnE] = useState('');
+    const SearchInpEnE = useRef();
     const SearchMdInp = useRef()
     const [modE2Elist, setModE2EList] = useState(moduleList)
     const [searchForNormal, setSearchForNormal] = useState(false)
     const [importPop,setImportPop] = useState(false)
-    const [blockui,setBlockui] = useState({show:false})
+    const setBlockui=props.setBlockui
     const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
     const [selectedSc,setSelctedSc] = useState([])
@@ -44,6 +48,7 @@ const ModuleListDrop = (props) =>{
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoad = useSelector(state=>state.mindmap.isEnELoad);
+    const plugin = useSelector(state=>state.plugin.LS)
 
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
     useEffect(()=> {
@@ -54,6 +59,7 @@ const ModuleListDrop = (props) =>{
         }}
         else{dispatch({type:actionTypes.SAVED_LIST,payload:true})}
         setWarning(false); 
+        
      }, [ moduleList,initProj])
      useEffect(()=> {
         return () => {
@@ -70,7 +76,7 @@ const ModuleListDrop = (props) =>{
          if(!isE2EOpen){
         setIsCreateE2E(false);
         }
-         
+        
      },[initProj])
      useEffect(() => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
@@ -79,11 +85,12 @@ const ModuleListDrop = (props) =>{
 
      useEffect(()=>{
         if(moduleSelect.type === 'endtoend') {
-            // setIsE2EOpen(true)
-            // setCollapse(true);
             
         }
-        
+        searchModule("");
+        searchModule_E2E("");
+        setSearchInpTextEnE("");
+        setSearchInpText("");
         setWarning(false);
         setScenarioList([]);
      }, [proj])
@@ -122,15 +129,20 @@ const ModuleListDrop = (props) =>{
         setFirstRender(false);
     }
     const searchModule = (val) =>{
-        setSearchForNormal(true);
-        var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+        if(SearchInp && SearchInp.current) {
+            if (val === "") setSearchForNormal(false)
+            else setSearchForNormal(true);
+            SearchInp.current.value = val;
+            setSearchInpText(val);
+        }
         
     }
     const searchScenario = (val) =>{
         setFilterSc(val)
     }
      const loadModule = async(modID) =>{
+        dispatch({type:actionTypes.IS_ENELOAD,payload:false});
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
         // if(moduleSelect._id === modID){
@@ -173,10 +185,6 @@ const ModuleListDrop = (props) =>{
                         setBlockui({show:false})
                         setShowNote(true)
                         return;}
-                        else {
-                            dispatch({type:actionTypes.IS_ENELOAD,payload:false});
-                            dispatch({type:actionTypes.SELECT_MODULE,payload:{}});
-                        }
                         if(Object.keys(moduleSelect).length===0 || firstRender){
                             loadModule(modID)
                             return;
@@ -259,8 +267,12 @@ const ModuleListDrop = (props) =>{
             initmodule = moduleList
             setModE2EList(moduleList)
         }
-        var filter = initmodule.filter((e)=>(e.type==='endtoend'&&(e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)||e.type==='basic'))
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+        if(SearchInpEnE && SearchInpEnE.current) {
+            SearchInpEnE.current.value = val;
+            setSearchInpTextEnE(val);
+        }
+        // var filter = moduleList.filter((e)=>(e.type==='endtoend'&&(e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)||e.type==='basic'))
+        // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter && filter.length ? filter : moduleList})
     }
     const setOptions1 = (data) =>{
         setOptions(data)
@@ -321,6 +333,7 @@ const ModuleListDrop = (props) =>{
                                                 {
                                                 key: 'image',
                                                 text: 'Import Module',
+                                                disabled:userInfo.isTrial?true:false,
                                                 onClick:()=>{setImportPop(true);
                                         setSearchForNormal(true);}}
                                             ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
@@ -336,12 +349,12 @@ const ModuleListDrop = (props) =>{
                                     }
                                     setAllModSelected(!allModSelected)
                                     }} ></input>
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value);setSearchForNormal(true)}}/>
+                                        <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
                                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                                 </div>
                                 <div className='moduleList'>
                                     {moduleList.map((e,i)=>{
-                                        if(e.type==="basic")
+                                        if(e.type==="basic" && ((searchInpText !== "" && e.name.toUpperCase().indexOf(searchInpText.toUpperCase())!==-1) || searchInpText === ""))
                                         return(
                                             <div key={i}>
                                                     <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
@@ -362,7 +375,8 @@ const ModuleListDrop = (props) =>{
                                         <h6 id='Endto' style={{margin: '6px -230px 3px -13px', display: !collapseForModules? 'none': ''}}>
                                                 End to End Flows
                                         </h6>
-                                    {userRole!=="Test Engineer"? <IconDropdown items={[ 
+                                    {plugin.ETT!==undefined?<>
+                                        {userRole!=="Test Engineer" ? <IconDropdown disabled={userInfo.isTrial} items={[ 
                                             {
                                                 key: 'csv',
                                                 text: 'Create New',
@@ -374,18 +388,19 @@ const ModuleListDrop = (props) =>{
                                             ]}
                                             id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
                                         />  :null}
+                                    </>:null}
                                 </div>
                                 <div className='searchBox pxBlack'>
                                     <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                        <input disabled={userInfo.isTrial} className='pFont' placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
                                 </div>
                                 <div className='moduleList'>
                                         {moduleList.map((e,i)=>{
-                                            if(e.type==="endtoend")
+                                            if(e.type==="endtoend" && ((searchInpTextEnE !== "" && e.name.toUpperCase().indexOf(searchInpTextEnE.toUpperCase())!==-1) || searchInpTextEnE === ""))
                                             return(<>
                                                     
-                                                    <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
+                                                    <div key={i} data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={!userInfo.isTrial?(e)=>selectModules(e):""} title={e.name} >
                                                     <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.75rem', display:'flex',flexDirection:'row-reverse',marginLeft:'-6px'}}> <span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span> <div  ><img style={{marginLeft:'-24px'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" /></div></div>
                                                     
                                                     </div>

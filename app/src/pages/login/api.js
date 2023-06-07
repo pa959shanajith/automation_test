@@ -77,21 +77,21 @@ export const validateUserState = async() => {
 */
 export const checkUser = async(user) => {
     try{
-        const res = await axios(url+"/checkUser", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: {'username': user},
-            credentials : 'include'
-        });
-        if (res.status === 200){
-            return res.data;
+            const res = await axios(url+"/checkUser", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                data: {'username': user},
+                credentials : 'include'
+            });
+            if (res.status === 200){
+                return res.data;
+            }
+            else{
+                return {error: 'Failed to check user'}
+            }
         }
-        else{
-            return {error: 'Failed to check user'}
-        }
-    }
     catch(err){
         return {error: 'Failed to check user'}
     }
@@ -262,5 +262,29 @@ export const unlock = async(username, password) => {
     }
     catch(err){
         console.log(err);
+    }
+}
+
+export const UpdateUserInfoforLicence = async(username) => {
+    try{
+        const res = await axios(url+"/hooks/upgradeLicense", {
+            method: "POST",
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                username: username
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            return {error: 'Failed to update user licence details'}
+        }
+    }
+    catch(err){
+        return {error: 'Failed to update user licence details'}
     }
 }

@@ -11,7 +11,8 @@ const initialState = {
         'testsuiteid': undefined,
         'projectid': undefined,
         'testsuitename': undefined
-    }
+    },
+    LS:{}
 }
 
 const reducer = (state=initialState, action) => {
@@ -48,6 +49,11 @@ const reducer = (state=initialState, action) => {
             return{
                 ...state,
                 RD: initialState.RD
+            }
+        case actionTypes.SET_LS:
+            return{
+                ...state,
+                LS: action.payload
             }
         default:
             return state

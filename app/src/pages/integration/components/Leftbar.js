@@ -1,18 +1,25 @@
-import React, { Fragment} from 'react';
-import { ActionBar, Thumbnail } from '../../global';
+import React, { Fragment, useState} from 'react';
+import { ActionBar, Header, Thumbnail } from '../../global';
 import  "../styles/Leftbar.scss";
 import { useDispatch ,useSelector } from 'react-redux';
 import * as actionTypes from '../state/action.js';
+import { Messages as MSG, setMsg } from '../../global';
+
 
 const Leftbar = (props) => {
     const dispatch = useDispatch();
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
     const screenType = useSelector(state=>state.integration.screenType);
+    const userRole = useSelector(state=>state.login.SR);
 
     const callIconClick = iconType => {
+        if(userRole === 'Test Engineer'){
+            setMsg(MSG.INTEGRATION.ERR_ENG_MSG);
+            return;
+        }
         let clickedScreen = null;
 
-        if(["qTest","ALM","Zephyr","Jira"].includes(iconType)) clickedScreen = iconType;
+        if(["qTest","ALM","Zephyr","Jira","Azure"].includes(iconType)) clickedScreen = iconType;
         else if(iconType === "Import") 
         {   clickedScreen = "Zephyr";
             props.setImportPop(true)
@@ -33,7 +40,7 @@ const Leftbar = (props) => {
                 <span onClick={()=>callIconClick("qTest")} title="qTest">
                     <img alt="qTestIcon" 
                         id={(screenType === "qTest")? "selectedIcon" : null}  
-                        src='static/imgs/qTest.png'
+                        src='static/imgs/qtest.png'
                     /> 
                     <div>qTest</div>
                 </span>
@@ -45,7 +52,7 @@ const Leftbar = (props) => {
                     <h4>Integration</h4>
                     <span onClick={()=>callIconClick("ALM")} title="ALM">
                         <img alt="ALMIcon" 
-                            src='static/imgs/ALM.png'
+                            src='static/imgs/ALM.svg'
                         />
                         <div>ALM</div>
                     </span>
@@ -58,7 +65,7 @@ const Leftbar = (props) => {
                    <span onClick={()=>callIconClick("Zephyr")} title="Zephyr">
                         <img alt="ZephyrIcon"  
                             id={(screenType === "Zephyr")? "selectedIcon" : null} 
-                            src='static/imgs/Zephyr.png'
+                            src='static/imgs/zephyr.png'
                         />
                         <div>Zephyr</div>
                     </span> 
@@ -71,11 +78,25 @@ const Leftbar = (props) => {
                    <span onClick={()=>callIconClick("Jira")} title="Jira">
                         <img alt="JiraIcon"  
                             id={(screenType === "Jira")? "selectedIcon" : null} 
-                            src='static/imgs/JiraSoftware.png'
+                            src='static/imgs/jira.png'
                         />
                         <div>Jira</div>
                     </span> 
-                </Fragment> )     
+                </Fragment> )  
+
+            case "Azure":
+                case "AzureUpdate":
+                    return(
+                    <Fragment>
+                        <h4>Integration</h4>
+                       <span onClick={()=>callIconClick("Azure")} title="Azure DevOps">
+                            <img alt="AzureIcon"  
+                                id={(screenType === "Azure")? "selectedIcon" : null} 
+                                src='static/imgs/Azure.png'
+                            />
+                            <div>Azure DevOps</div>
+                        </span> 
+                    </Fragment> )    
             default :
             return(
             <Fragment>
@@ -90,23 +111,30 @@ const Leftbar = (props) => {
                     </span>
                     <span onClick={()=>callIconClick("ALM")} title="ALM">
                         <img alt="AlmIcon" 
-                            src='static/imgs/ALM.png'
+                            src='static/imgs/ALM.svg'
                         />
                         <div>ALM</div>
                     </span>
                     <span onClick={()=>callIconClick("Zephyr")} title="Zephyr">
                         <img alt="ZephyrIcon" 
                             id={(screenType === "Zephyr")? "selectedIcon" : null} 
-                            src='static/imgs/Zephyr.png'
+                            src='static/imgs/zephyr.png'
                         />
                         <div>Zephyr</div>
                     </span>
                     <span onClick={()=>callIconClick("Jira")} title="Jira">
                         <img alt="JiraIcon" 
                             id={(screenType === "Jira")? "selectedIcon" : null} 
-                            src='static/imgs/JiraSoftware.png'
+                            src='static/imgs/jira.png'
                         />
                         <div>Jira</div>
+                    </span>
+                    <span onClick={()=>callIconClick("Azure")} title="Azure">
+                        <img alt="AzureIcon" 
+                            id={(screenType === "Azure")? "selectedIcon" : null} 
+                            src='static/imgs/Azure.png'
+                        />
+                        <div>Azure DevOps</div>
                     </span>
             </Fragment>    )
         }

@@ -22,6 +22,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 let port = null;
 let count=0;
+let scrnreused=[]
 let editorExtensionId = "bcdklcknooclndglabfjppeeomefcjof";
 
 const Genius = (props) => {
@@ -90,7 +91,9 @@ const Genius = (props) => {
       setSelectedBrowser("chrome");
     }
     count=0
+    dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } })
   }
+  
   else if (data==="resetCount"){
     count=0
   }
@@ -106,6 +109,7 @@ const Genius = (props) => {
        }
       setSelectedBrowser("chrome");
       }
+      dispatch({ type: actionTypesGlobal.CLOSE_GENIUS, payload: { showGenuisWindow: false, geniusWindowProps: {} } })
     }
     else if (data.action && data.action === "startDebugging") {
       if (savedRef.current) {
@@ -174,19 +178,57 @@ const Genius = (props) => {
     else if (typeof data === "object") {
 
       count ++;
+      
+      var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
+      const completeScenraio=moduledata.children.filter((scenario,idx)=>{
+        return scenario.name==selectedScenario.text
+      })
+      if(completeScenraio[0].children.length!==data.data.screens.length && count!==1){
+        let screenDetails=data.data.screens
+       
+        let deletedScreen=completeScenraio[0].children.filter((screen,idx)=>{
+         let {name }=screen;
+       
+        let deletedScreen= screenDetails.find(screen => screen.name === name)
+        if(deletedScreen===undefined){
+          return screen
+        }
+      })
+      let deletedScrnIds=deletedScreen.map((screen,idx)=>{
+        return screen._id
+      })
+      
+     let deletedTestcaseIds=deletedScreen.map((screen,idx)=>{
+      return screen.children[0]._id
+     })
+    
+   
+     
+      await deleteScenario({scenarioIds:[],screenIds:deletedScrnIds,testcaseIds:deletedTestcaseIds})
+      }
       let testcaseids=[]
       let scrnids
       if(count===1){
-        const currentScnToDelete=modScenarios.filter(scn=>scn.name===selectedScenario.text)
+        const currentScnToDelete=completeScenraio.filter(scn=>scn.name===selectedScenario.text)
        scrnids=currentScnToDelete[0].children.map((screen,idx)=>{
-         return screen._id
+        
+         return {_id:screen._id,screenReused:screen.reuse}
        })
 const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
   screen.children.map((testcase,id)=>{
   testcaseids.push(testcase._id)
  })
 })
-  await deleteScenario({scenarioIds:[],screenIds:scrnids,testcaseIds:testcaseids})
+for(let i =0;i<scrnids.length;i++){
+
+  if(!scrnids[i].screenReused)
+  await deleteScenario({scenarioIds:[],screenIds:[scrnids[i]._id],testcaseIds:[testcaseids[i]]})
+  else scrnreused.push(scrnids[i])
+
+      }
+    }
+    else{
+     scrnreused=[]
     }
           
       var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
@@ -196,7 +238,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
         
         
         const isAlreadySaved=data.alreadySaved
-        const res = await PluginApi.getGeniusData(data, scenarioData,isAlreadySaved,completeScenraioDetials);
+        const res = await PluginApi.getGeniusData(data, scenarioData,isAlreadySaved,completeScenraioDetials,scrnreused);
         savedRef.current = true;
         
         if (port) port.postMessage({
@@ -824,7 +866,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
           </div>
           <div className='dialog__child' style={{ padding: "5px 0px", fontSize: "18px", fontFamily: "Mulish", fontWeight: 600, marginBottom: 0 }}> Users </div>
           <div className="dialog__child" id="projectCreateBox" style={{ height: '12rem', overflowY: "auto" }}>
-            <div style={{ display: 'flex', width: "100%", marginTop: "10px" }}>
+            <div style={{ display: 'flex', width: "100%", marginTop: "10px" }} >
               <SearchBox
                 placeholder="Enter Username"
                 width="20rem"
@@ -916,6 +958,8 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
               }
               onChange={(e, item) => {
                 setSelectedProject(item)
+                setScenarioName('')
+                setModuleName('')  
                               }}
               placeholder="Select"
               width="300px"
@@ -1029,7 +1073,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
              
            { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?<div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
         
-        <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5>
+        {/* <h5 style={{color:"#343A40",fontSize:'18px'}}><b>NOTE: </b> Click <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> to install Avo Genius extension.</h5> */}
         {userInfo.isTrial && <h5 style={{color:"#343A40",fontSize:'18px'}}><i>As part of the trial, Avo Genius is restricted to work only with Avo Test applications.</i></h5>}
         
       
@@ -1066,8 +1110,7 @@ const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
       <div style={{marginTop:'auto',marginBottom:'auto'}}>
      
       
-      {(BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")? null:<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >{`Avo Genius is supported only on Google Chrome and Microsoft Edge.`}</h5>}
-        { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?(warning ?<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >Avo Genius extension not found. Install it from <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> and re-launch Avo Genius</h5>:null):null} 
+      {((BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome") ||  warning )? <h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >Avo Genius extension not found. Install it from <a style={{color:"#9678b8", textDecoration:"underline"}} href='https://chrome.google.com/webstore/detail/bcdklcknooclndglabfjppeeomefcjof/' target={"_blank"} referrerPolicy={"no-referrer"}>here</a> and re-launch Avo Genius</h5>:<h5 style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600",color:"#343A40",fontSize:'18px' }} >{`Avo Genius is supported only on Google Chrome and Microsoft Edge.`}</h5>}
       
           </div>
         </>}

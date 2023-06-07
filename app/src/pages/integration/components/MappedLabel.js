@@ -16,12 +16,12 @@ const MappedLabel = props => {
         <Fragment>
             { typeof(props.list) === "object" && props.list.length>1}
                 {info?<InfoPopup reqDetails={reqDetails[testId]} displayError={displayError} screenType={screenType} setInfo={setInfo}/>:null}
-            <div className="mlalm__container" data-type={props.type}>
+            <div className="mlalm__container" style={screenType === 'Zephyr' ? {marginRight: '3rem'}:null} data-type={props.type}>
                 <div className="mlalm_topLabel" data-selected={props.selected.includes(`${props.mapIdx}-0`)}>
                     <div className="mlalm_label" 
                         onClick={props.handleClick ? (e)=>props.handleClick(e, props.type, `${props.mapIdx}-0`) : null}
                     >
-                        {typeof(props.list) === "object" ? props.list[0] : props.list}
+                        {typeof(props.list) === "object" ? props.list[0] : props.list}{(props.summary) ? ' : '+props.summary : ''}
                     </div>
                     {(type==='testcase' && screenType==='Zephyr')?
                         <i onClick={()=>setInfo(true)} className="fa fa-info" title="Requirement mapping info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
@@ -41,7 +41,7 @@ const MappedLabel = props => {
                             >
                                 {item}
                             </div>
-                            {(type==='testcase' && (screenType==='Zephyr' || screenType==='Jira'))?
+                            {(type==='testcase' && (screenType==='Zephyr' || screenType==='Jira' || screenType==='Azure'))?
                                 <i onClick={()=>{setInfo(true); settestId(idx+1);}} className="fa fa-info" title="Requirement mapping info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
                             }
                             { props.selected.includes(`${props.mapIdx}-${idx+1}`) && !props.unSynced &&

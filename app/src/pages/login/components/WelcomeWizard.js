@@ -211,7 +211,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
+				 
+                link.setAttribute('download',  "AvoAssureClient"+(userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
+//                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -453,8 +455,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       {
         title:"Establish Avo Server and Client Connection:", 
         items:[
-          {title:"Initialise Avo Client via desktop shortcut",imageName:"WW_win_4_1"},
-          {title:"Connect ICE via clicking on Connect Button",imageName:"WW_win_4_2"}
+          {title:"Initialise Avo Assure client via desktop shortcut",imageName:"WW_win_4_1"},
+          {title:"Connect Avo Assure client via clicking on Connect Button",imageName:"WW_win_4_2"}
         ],
         type:"NOR"
       }
@@ -553,7 +555,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     {/* <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/> */}
                 </span>}
 
-                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
+                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 5 - 10 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
                 // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
                 }
 
