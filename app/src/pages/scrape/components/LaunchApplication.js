@@ -82,7 +82,11 @@ const LaunchApplication = props => {
     const [os, setOS] = useState(null);
 
     const [appPath, setAppPath] = useState("");
-    const appPathHandler = event => setAppPath(event.target.value);
+    const appPathHandler = event => {
+        let value = event.target.value.trim();
+        const appPath = value.toString().replaceAll('"', "");
+        setAppPath(appPath);
+        }
 
     const [sNum, setSNum] = useState("");
     const sNumHandler = event => setSNum(event.target.value);
