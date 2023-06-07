@@ -24,6 +24,7 @@ exports.loadUserInfo = async (req, res) => {
 			firstname: userData.firstname,
 			lastname: userData.lastname,
 			role: userData.defaultrole,
+			userimage: userData.profileimage,
 			taskwflow: configpath.strictTaskWorkflow,
 			token: configpath.defaultTokenExpiry,
 			dateformat: configpath.dateFormat,
@@ -42,7 +43,7 @@ exports.loadUserInfo = async (req, res) => {
 		req.session.additionalroles = userData.addroles,
 		req.session.firstname = userData.firstname,
 		req.session.lastname = userData.lastname,
-
+              		
 		inputs = {
 			"roleid": selectedRole,
 			"query": "permissionInfoByRoleID"
