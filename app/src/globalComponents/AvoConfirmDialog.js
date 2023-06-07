@@ -1,6 +1,6 @@
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Button } from "primereact/button";
-import "./AvoConfirmDialog.scss";
+// import "./AvoConfirmDialog.scss";
 
 const AvoConfirmDialog = ({
   className,
