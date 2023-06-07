@@ -460,7 +460,7 @@ if (cluster.isMaster) {
 		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
 		app.post('/manageSessionData', auth.protect, admin.adminPrivilegeCheck, admin.manageSessionData);
 		app.post('/unlockUser', auth.protect, admin.unlockUser);
-		app.post('/manageUserDetails', auth.protect, admin.adminPrivilegeCheck, admin.manageUserDetails);
+		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
 		app.post('/fetchLockedUsers', auth.protect, admin.fetchLockedUsers);
 		app.post('/testLDAPConnection', auth.protect, admin.testLDAPConnection);

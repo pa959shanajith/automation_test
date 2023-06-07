@@ -7,6 +7,9 @@ import Link from '@mui/material/Link';
 import {Card} from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
 import '../styles/reports.scss';
+import ExecutionprofileTable from './ExecutionprofileTable';
+
+
 
 const reports = () => {
     const [activeIndex, setActiveIndex] = useState("Functional Test");

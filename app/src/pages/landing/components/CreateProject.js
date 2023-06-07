@@ -29,6 +29,8 @@ const  CreateProject=({ visible, onHide  }) =>{
     const [queryDisplayUser, setQueryDisplayUser] = useState('');
     const [items , setItems]= useState([])
     const [projectData , setProjectData] = useState([]);
+    const[refreshData, setRefreshData] = useState(false);
+  
 
  
     const userDetails = async () => {
@@ -68,19 +70,11 @@ const  CreateProject=({ visible, onHide  }) =>{
         { name: 'Mobile Web', code: 'PRS', image:'static/imgs/mobileWeb.png' },
         { name: 'Mobile Apps', code: 'PRS', image:'/static/imgs/mobileApps.png' }, 
     ];
-    // const [items , setItems]= useState ([
-    //     { id: 1,name: 'Virat Kohli', primaryRole:'Team Lead', email:'virat@gmail.com' },
-    //     { id: 2, name: 'Glenn Maxwell', primaryRole:'QA Engineer' ,  email:'glenn@gmail.com' },
-    //     { id: 3, name: 'Fafdu Plesisi',primaryRole:'Test Manager',  email:'faf@gmail.com'  },
-    //     { id: 4, name: 'Rajat Patidar',primaryRole:'Test Manager',  email:'rajat@gmail.com'  },
-    //     { id: 5, name: 'Mohammed  Siraj', primaryRole:'Test Manager',  email:'siraj@gmail.com'  },
- 
-    //   ]);
 
-    const roles=[
-        {name:'Team Lead'},
-        {name:'Test Manager'},
-        {name:'QA'},
+    const roles =[
+      { name: 'Test Lead' },
+      { name: 'Test Manager' },
+      { name: 'QA' },
     ];
 
     const handleCheckboxChange = (event) => {
@@ -146,6 +140,7 @@ const  CreateProject=({ visible, onHide  }) =>{
 
       const handleClose = () => {
         onHide(); 
+        setRefreshData(!refreshData);
       };
 
 
@@ -236,37 +231,60 @@ const handleRoleChange = (e, id) => {
   console.log(id)
 };
 
+useEffect (() =>{
+setSelectedApp('');
+setValue('');
+setDisplayUser([])
+userDetails()
+},[refreshData])
 
 
+
+   
    const handleCreate = async() => {
-
-    const filteredUserDetails = displayUser.map((user) => ({
-      id: user.id,
-      name: user.name,
-      role: user.selectedRole ? user.selectedRole.name : user.primaryRole,
-    }));
-    console.log(filteredUserDetails)
-
-    var projData = {
-      projectName : value,
-      projectApptype : selectedApp.name,
-      userDetails : filteredUserDetails,
-
+    if (value !== "" && selectedApp !== "" && displayUser.length !== 0){
+      const filteredUserDetails = displayUser.map((user) => ({
+        id: user.id,
+        name: user.name,
+        role: user.selectedRole ? user.selectedRole.name : user.primaryRole,
+      }));
+      console.log(filteredUserDetails)
+  
+      var projData = {
+        "projectName" : value,
+        type : selectedApp.name,
+        assignedUsers : filteredUserDetails,
+        domain:"banking",
+        releases: [{ "name": "R1", "cycles": [{ "name": "C1" }] }],
+  
+      }
+      console.log(projData)
+      const project = await userCreateProject_ICE(projData)
+      console.log(project)
+      if(project.error){
+  
+      }
+     else{
+      toast.current.show({
+        severity: "success",
+        summary: "Project Created Successfully..",
+        detail: "Project Created Successfully....!",
+        life: 1000 ,
+      });
+      onHide(); 
+      setRefreshData(!refreshData);
     }
-    console.log(projData)
-    const project = await userCreateProject_ICE(projData)
-    if(project.error){
-
-    }
-   else{
-    toast.current.show({
-      severity: "success",
-      summary: "Project Created Successfully..",
-      detail: "Project Created Successfully....!",
-      life: 1000 ,
-    });
-    onHide(); 
-  }
+      
+    }else {
+      toast.current.show({
+        severity: "error",
+        summary: "Please Fill all the Mandatory Fields..!",
+        detail: "Please Fill all the Mandatory Fields..!",
+        life: 1000 ,
+        closable: true,
+        className:'toast_msg'
+      });
+}
 
   };
     
@@ -278,7 +296,7 @@ const handleRoleChange = (e, id) => {
 
     const footerContent = (
         <div className='btn-11'>
-        <Button label="Cancel" severity="secondary" text className='btn1' />
+        <Button label="Cancel" severity="secondary"  text className='btn1'  onClick={ handleClose} />
         <Button  className="btn2" label='Create' onClick={handleCreate}></Button>
         </div>  
     );
@@ -290,7 +308,6 @@ const handleRoleChange = (e, id) => {
         </div>
       );
     };
-  
 
    
     return (
@@ -298,10 +315,10 @@ const handleRoleChange = (e, id) => {
         <Dialog className='Project-Dialog' header="Create Project" visible={visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>  
         <Card className='project-name-1'>
         <div className='pro-name1'>
-        < h5 className='proj__name'>Project Name</h5>
+         < h5 className='proj__name'> Project Name <span className="imp-cls"> * </span> </h5>
             <InputText className="proj-input"value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter Project Name" />
             <div className='dropdown-1'>
-                <h5 className='application__name'>Application Type</h5>
+                <h5 className='application__name'>Application Type <span className="imp-cls"> * </span></h5>
             <Dropdown  value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name" 
                 placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " />
                 </div>
@@ -310,7 +327,7 @@ const handleRoleChange = (e, id) => {
         </Card>
         <Card className='card11' style={{height:'25rem'}}>
             <div className="card-input1">
-            <h5 className='select-users'>Select Users</h5>
+            <h5 className='select-users'>Select Users <span className="imp-cls"> * </span></h5>
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
@@ -343,7 +360,24 @@ const handleRoleChange = (e, id) => {
                     
                                 </h5>
                                 <Dropdown value={(item.selectedRole) ? item.selectedRole : ''} onChange={(e)=>handleRoleChange(e, item.id)} options={roles} optionLabel="name" 
-                                placeholder="Select a Role" className="role-dropdown"  />
+                                // valueTemplate={(option) => {
+                                //   return (
+                                //     <>
+                                //       {option && (
+                                //         <div className="selected-role">
+                                //           <span>{option.name}</span>
+                                //           <button
+                                //             className="cancel-selection"
+                                //             onClick={handleCancelSelection}
+                                //           >
+                                //             &#10005;
+                                //           </button>
+                                //         </div>
+                                //       )}
+                                //     </>
+                                //   );
+                                // }}
+                                placeholder="Select a Role" className="role-dropdown"/>
                                 
                         </div>
                        
@@ -361,7 +395,7 @@ const handleRoleChange = (e, id) => {
 
         <Card className='card22' style={{height:'25rem'}}>
             <div className='card-input2'>
-            <h5 className='selected-users'>Selected Users</h5>
+            <h5 className='selected-users'>Selected Users <span className="imp-cls"> * </span></h5>
             <div className='selectallbtn'>
         <span className="p-input-icon-left">
         <i className="pi pi-search" />
