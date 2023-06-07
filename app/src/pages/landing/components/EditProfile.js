@@ -8,7 +8,6 @@ import { Toast } from 'primereact/toast';
 import { Tooltip } from 'primereact/tooltip';
 // import { Form } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import ToastWrapper from '../../global/components/ToastWrapper';
 import { loadUserInfoActions } from '../LandingSlice';
 import { manageUserDetails } from '../api'
 import '../styles/EditProfile.scss';
@@ -169,7 +168,7 @@ const EditProfile = (props) => {
 
     // Footer elements to the Dialog Box
     const editProfileFooter = () =>
-        <ToastWrapper>
+        <>
             <Button
                 label="Cancel"
                 size='small'
@@ -181,7 +180,7 @@ const EditProfile = (props) => {
                 onClick={updateSubmitHandler}
             // disabled={(newpassword != '' && confirmNewpassword != '') && (newpassword === confirmNewpassword) ? false : true} 
             />
-        </ToastWrapper>
+        </>
 
 
     return (

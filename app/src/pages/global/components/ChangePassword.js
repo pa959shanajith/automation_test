@@ -5,7 +5,6 @@ import { Tooltip } from 'primereact/tooltip';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { resetPassword } from '../api';
-import ToastWrapper from './ToastWrapper';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { useDispatch } from 'react-redux';
 import '../styles//ChangePassword.scss';
@@ -112,8 +111,8 @@ const ChangePassword = (props) => {
     }
 
     // Footer elements to the Dialog Box
-    const changePasswordFooter = () =>
-        <ToastWrapper>
+    const changePasswordFooter = () =>( 
+        <>
             <Button
                 label="Cancel"
                 size='small'
@@ -124,8 +123,7 @@ const ChangePassword = (props) => {
                 size='small'
                 onClick={saveButtonHandler}
                 disabled={(newpassword != '' && confirmNewpassword != '') && (newpassword === confirmNewpassword) ? false : true} />
-        </ToastWrapper>
-
+        </>)
     return (
         <>
             <div className='surface-card m-6'>

@@ -13,11 +13,11 @@ const HomePage = () => {
     navigate = useNavigate()
     const dispatch = useDispatch();
 
-    // useEffect(async () => {
-    //     if (window.localStorage['navigateScreen'] !== "landing") {
-    //         RedirectPage(navigate, { reason: "screenMismatch" });
-    //     }
-    // }, [dispatch]);
+    useEffect(async () => {
+        if (window.localStorage['navigateScreen'] !== "landing") {
+            RedirectPage(navigate, { reason: "screenMismatch" });
+        }
+    }, [dispatch]);
 
 
     return (

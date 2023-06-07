@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import{ Messages as MSG, setMsg}  from '../../global';
+import { Messages as MSG, } from '../../global';
 import * as api from '../api';
 import { Navigate } from 'react-router-dom';
 import { InputText } from 'primereact/inputtext';
 import { Tooltip } from 'primereact/tooltip';
 import { Button } from 'primereact/button';
-import { redirect } from 'react-router-dom';
 import '../styles/StaticElements.scss'
 import { Toast } from 'primereact/toast';
 
@@ -24,7 +23,10 @@ const Login = () => {
     const toast = useRef(null);
 
     const toastError = (erroMessage) => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 3000 });
+        if(erroMessage.CONTENT){
+            toast.current.show({ severity: erroMessage.VARIANT, summary: erroMessage.VARIANT, detail: erroMessage.CONTENT, life: 3000 });
+        }
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 3000 });
     }
 
     const forgotPasswordLinkHandler = () => {
@@ -96,7 +98,7 @@ const Login = () => {
             }
             else if (userValidate === 'validCredential') setRedirectTo('/');
             else if (userValidate === 'inValidCredential' || userValidate === "invalid_username_password") {
-                toastError("Please enter a valid Username and Password ");
+                toastError(MSG.LOGIN.ERR_USER_LOGIN_CREDENTIALS);
             } else if (userValidate === "changePwd") {
                 toastError("Changing Password is not implemented in code");
             } else if (userValidate === "timeout") {
@@ -128,7 +130,6 @@ const Login = () => {
             toastError("Please enter a valid email address")
         }
         else {
-            toastError("Hurrayyyyy you enter a valid email address")
             api.forgotPasswordEmail({ "email": email.toLowerCase(), "username": '' })
                 .then(data => {
                     if (data.status && data.status === "duplicates_found") {
@@ -138,18 +139,34 @@ const Login = () => {
                         toastError(MSG.LOGIN.SUCC_REC_MAIL);
                     }
                     else if (data === "userLocked") {
-                        toastError("User account is locked!");
+                        toastError(MSG.LOGIN.ERR_USER_LOCKED);
                     }
                     else {
-                        toastError(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                        console.log(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     };
                 })
                 .catch(err => {
-                    toastError(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     console.error("Error", err)
                 });
         }
     }
+    // need code for future ------Single Sign on 
+    // const singleSignOnSubmitHandler = () => {
+    //     try {
+    //         const checkUserIsPresent = await api.checkUser(username);
+    //         if (checkUserIsPresent.redirect) {
+    //             window.location.href = checkUserIsPresent.redirect;
+    //         }
+    //         else if (checkUserIsPresent.proceed) {
+    //             check_credentials();
+    //         }
+    //         else if (checkUserIsPresent === "invalidServerConf") toastError("Authentication Server Configuration is invalid!");
+    //         else toastError(errorMsg);
+    //     }
+    //     catch (err) {
+    //         toastError(err)
+    //     }
+    // }
 
     return (
         <>
@@ -160,45 +177,52 @@ const Login = () => {
                     <>
                         <h2>Avo Assure-Login</h2>
                         <form onSubmit={loginSubmitHandler}>
-                            <div className="p-input-icon-left mb-5">
-                                <i className='pi pi-user' />
-                                <InputText
-                                    id="username"
-                                    className='user_input'
-                                    value={username}
-                                    onChange={handleUsername}
-                                    placeholder='Enter your username'
-                                    type="text"
-                                    required
-                                />
-                            </div>
-                            <div className="p-input-icon-left mb-5">
-                                <i className='pi pi-lock' />
-                                <InputText
-                                    id="password"
-                                    value={password}
-                                    className={`user_input `}
-                                    onChange={handlePassword}
-                                    placeholder='Password'
-                                    type={showPassword ? "type" : "password"}
-                                    required
-                                />
-                                {password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={() => { setShowPassword(!showPassword) }}>
-                                    <i className={`${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
+                            <div className='flex flex-column'>
+                                <label className='text-left' htmlFor="username">Username</label>
+                                <div className="p-input-icon-left mb-5 mt-2">
+                                    <i className='pi pi-user' />
+                                    <InputText
+                                        id="username"
+                                        className='user_input'
+                                        value={username}
+                                        onChange={handleUsername}
+                                        placeholder='Enter your username'
+                                        type="text"
+                                        required
+                                    />
                                 </div>
-                                }
                             </div>
 
-                            <div className='forget_password_link mb-5'>
+                            <div className='flex flex-column'>
+                                <label className='text-left' htmlFor="password">Password</label>
+                                <div className="p-input-icon-left mb-5 mt-2">
+                                    <i className='pi pi-lock' />
+                                    <InputText
+                                        id="password"
+                                        value={password}
+                                        className='user_input'
+                                        onChange={handlePassword}
+                                        placeholder='Password'
+                                        type={showPassword ? "type" : "password"}
+                                        required
+                                    />
+                                    {password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={() => { setShowPassword(!showPassword) }}>
+                                        <i className={`${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div className='link forgot_password mb-5'>
                                 <a onClick={forgotPasswordLinkHandler} >Forgot Username & Password </a>
                             </div>
                             <div className='login_btn mb-5'>
                                 <Button id="login" label='Login' disabled={disableLoginButton} text raised></Button>
                             </div>
-                            <div className='single_sign-on_link mb-3'>
+                            <div className='link mb-3'>
                                 <a onClick={singleSignOnHandler} >Use Single Sign-On </a>
                             </div>
-                            <p>Don't have an account? <span className='create-on_link'> <Button label='Create one' tooltip='Contact your admin for creating an account' tooltipOptions={{ position: 'bottom' }} link /></span></p>
+                            <p>Don't have an account?<span className='link'><a tooltip='Contact your admin for creating an account' tooltipOptions={{ position: 'bottom' }} >Create one</a> </span> </p>
                         </form>
                     </>}
 
@@ -206,17 +230,20 @@ const Login = () => {
                     <h2>Forgot Username or Password</h2>
                     <span>Provide your registered e-mail to send a link to reset your Password or to know Username  </span>
                     <form onSubmit={forgotUsernameOrPasswordSubmitHandler}>
-                        <div className="p-input-icon-left mb-5">
-                            <i className='pi pi-user'></i>
-                            <InputText
-                                type="email"
-                                id="username"
-                                value={email}
-                                onChange={emailHandler}
-                                placeholder='Enter your username'
-                                className='forgetPassword_user_input'
-                                required
-                            />
+                        <div className='flex flex-column'>
+                            <label className='text-left' htmlFor="username">Email</label>
+                            <div className="p-input-icon-left mb-5 mt-2">
+                                <i className='pi pi-user'></i>
+                                <InputText
+                                    type="email"
+                                    id="username"
+                                    value={email}
+                                    onChange={emailHandler}
+                                    placeholder='Enter your email'
+                                    className='forgetPassword_user_input'
+                                    required
+                                />
+                            </div>
                         </div>
                         <div className='login_btn mb-5'>
                             <Button id="submit" label='Submit' disabled={!email} text raised></Button>
@@ -226,10 +253,13 @@ const Login = () => {
 
                 {singleSignOnScreen && <>
                     <h2>Avo Assure - login with SAML SSO</h2>
-                    <form>
-                        <div className="p-input-icon-left mb-5">
-                            <i className='pi pi-user'></i>
-                            <InputText id="username" className='forgetPassword_user_input' placeholder='Enter your username' type="email" required />
+                    <form >
+                        <div className='flex flex-column'>
+                            <label className='text-left' htmlFor="username">Email</label>
+                            <div className="p-input-icon-left mb-5 mt-2">
+                                <i className='pi pi-user'></i>
+                                <InputText id="username" className='forgetPassword_user_input' placeholder='Email' type="email" required />
+                            </div>
                         </div>
                         <div className='login_btn mb-5'>
                             <Button id="submit" label='Submit' disabled={false} text raised></Button>
