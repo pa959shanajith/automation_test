@@ -982,7 +982,41 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`} className="action_icons" alt="Edit Icon" title='Schedule'/>&nbsp;&nbsp;&nbsp;
-                                     {showSauceLabs&&<img onClick={() =>{onClick('displayBasic4')}} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
+                                     {showSauceLabs&&<img onClick={() =>{
+                                    onClick('displayBasic4');
+                                    setCurrentKey(item.configurekey);
+                                    setAppType(item.executionRequest.batchInfo[0].appType);
+                                    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
+                                    setCurrentName(item.configurename);
+                                    let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
+                                        return ({
+                                            assignedTime: "",
+                                            releaseid: element.releaseId,
+                                            cycleid: element.cycleId,
+                                            testsuiteid: element.testsuiteId,
+                                            testsuitename: element.testsuiteName,
+                                            projectidts: element.projectId,
+                                            assignedTestScenarioIds: "",
+                                            subTaskId: "",
+                                            versionnumber: element.versionNumber,
+                                            domainName: element.domainName,
+                                            projectName: element.projectName,
+                                            cycleName: element.cycleName
+                                        });                                   
+                                    });
+                                    setCurrentTask({
+                                        testSuiteDetails: testSuiteDetails
+                                    });
+                                    let accessibilityParametersValue = item.executionRequest.batchInfo.map((element) => {
+                                        return (element.suiteDetails[0].accessibilityParameters)
+                                    });
+                                    setAccessibilityParameters(accessibilityParametersValue);
+                                    readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setChangeLable(true);
+                                    // setShowIcePopup(false);
+                                    }} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
                                      { showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" title="CI/CD" className="action_icons" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      { showCICD && <img onClick={() =>{
@@ -1082,7 +1116,41 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`}  className="action_icons" title="Schedule" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
-                                     {showSauceLabs&&<img onClick={() =>{onClick('displayBasic4')}} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
+                                     {showSauceLabs&&<img onClick={() =>{
+                                    onClick('displayBasic4');
+                                    setCurrentKey(item.configurekey);
+                                    setAppType(item.executionRequest.batchInfo[0].appType);
+                                    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
+                                    setCurrentName(item.configurename);
+                                    let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
+                                        return ({
+                                            assignedTime: "",
+                                            releaseid: element.releaseId,
+                                            cycleid: element.cycleId,
+                                            testsuiteid: element.testsuiteId,
+                                            testsuitename: element.testsuiteName,
+                                            projectidts: element.projectId,
+                                            assignedTestScenarioIds: "",
+                                            subTaskId: "",
+                                            versionnumber: element.versionNumber,
+                                            domainName: element.domainName,
+                                            projectName: element.projectName,
+                                            cycleName: element.cycleName
+                                        });                                   
+                                    });
+                                    setCurrentTask({
+                                        testSuiteDetails: testSuiteDetails
+                                    });
+                                    let accessibilityParametersValue = item.executionRequest.batchInfo.map((element) => {
+                                        return (element.suiteDetails[0].accessibilityParameters)
+                                    });
+                                    setAccessibilityParameters(accessibilityParametersValue);
+                                    readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setChangeLable(true);
+                                    // setShowIcePopup(false);
+                                    }} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
                                      {showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon" title='CI/CD'/>}&nbsp;&nbsp;&nbsp;
                                     { showCICD && <img onClick={() =>{
