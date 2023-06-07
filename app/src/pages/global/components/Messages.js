@@ -486,6 +486,8 @@ const Messages={
     },
 
     LOGIN: {
+        ERR_USER_LOGIN_CREDENTIALS: {"CONTENT": "Please enter a valid Username and Password", "VARIANT": VARIANT.ERROR},
+        ERR_USER_LOCKED: {"CONTENT": "User account is locked!", "VARIANT": VARIANT.ERROR},
         SUCC_FORGOTP_MAIL: {"CONTENT":'Successfully sent an email to reset your password! Please login with the temporary password sent in the email.', "VARIANT": VARIANT.SUCCESS},
         SUCC_UNLOCKED: {"CONTENT":'Successfully unlocked the user account! Please login again.', "VARIANT": VARIANT.SUCCESS},
         SUCC_UNLOCK_MAIL: {"CONTENT":"Successfully sent an email! Please unlock the account using verification password sent in the email.", "VARIANT": VARIANT.SUCCESS},

@@ -15,7 +15,7 @@ const StaticElements = ({children}) => {
     return (
         <div className="login_container">
             <div className="split_left">
-                <h1>Hello</h1>
+                <h1>Hello,</h1>
                 <h2>Welcome to Avo  Assure</h2>
                 <h3>Login to experience Intelligence</h3>
                 <img className="" src="static/imgs/animated_login.gif" alt="Login" />
