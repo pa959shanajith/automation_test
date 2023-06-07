@@ -368,8 +368,8 @@ if (cluster.isMaster) {
 			let projName = req.query.projName	
 			projName = projName.replace(/\s+/g, '');
 			let exportfile =path.join(__dirname,'./assets/ExportMindmap')
-			let username = req.user.username;
-			username = username.split('.').join("");
+			let userid = req.session.userid;
+			exportfile=exportfile+"/"+userid+".zip";
 			exportfile=exportfile+"/"+username+".zip";
 			var dateObj = new Date();
 			var month = dateObj.getUTCMonth() + 1;
