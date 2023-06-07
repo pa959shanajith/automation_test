@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
-import "../styles/LaunchApplication.scss"
+import "../styles/LaunchApplication.scss";
+import {getDeviceSerialNumber_ICE} from "../api";
 
 const LaunchApplication = props => {
 
@@ -122,11 +123,23 @@ const LaunchApplication = props => {
         }
     }
 
+    const handleSerialNumber = () => {
+        setOS("android"); 
+        setError(false);
+        getDeviceSerialNumber_ICE().then(data => {
+            if(data) {}
+            setSerialNumber(data);
+            console.log(data);
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
     const mobileApp = {
         'content': <div className="ss__mblapp_inputs">
                 { !os && <div className="ss__mblapp_os_op">Choose OS</div>}
                 <div className="ss__mblapp_chooseApp">
-                    <button data-test="chooseAndriod" className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={()=>{setOS("android"); setError(false);}}>Android</button>
+                <button data-test="chooseAndriod" className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={handleSerialNumber}>Android</button>
                     <button data-test="chooseIOS"className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
                 </div>
                 { os === "ios" && <>
@@ -136,8 +149,13 @@ const LaunchApplication = props => {
                     <input data-test="iosUDID" className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UUID' value={uuid} onChange={uuidHandler} name="uuidNum_i" />
                 </> }
                 { os === "android" && <>
-                    <input data-test="andriodAppPath" className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler} name="appPath_a" /> 
-                    <input data-test="andriodSerialNumber" className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" />
+                    <input data-test="andriodAppPath" className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler} name="appPath_a" />
+                    <select data-test="andriodSerialNumber" className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
+                        <option value="" disabled>Select Mobile Serial Number</option>
+                        {serialNumbers.map((serialNumber) => ( 
+                            <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
+                        ))}
+                    </select>
                 </> }
         </div>,
 

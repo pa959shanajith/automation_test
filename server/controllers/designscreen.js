@@ -591,4 +591,52 @@ exports.importScreenfromExcel = async (req, res) =>{
 		return res.status(500).send("fail");
 	}
 
-}; 
+};
+
+exports.getDeviceSerialNumber_ICE = function (req, res) {
+	try {
+		logger.info("Inside UI service: getDeviceSerialNumber_ICE");
+		var username=req.session.username;
+		var icename = undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		logger.info("ICE Socket requesting Address: %s" , icename);
+		logger.info("Sending socket request to get serial number");
+		var dataToIce = {"emitAction": "getSerialNumber", "username": icename};
+		redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+		
+		try {
+			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.debug("ICE Socket requesting Address: %s", icename);
+			redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+				
+				
+				redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+
+				function get_device_serial_listener(channel, message) {
+					var data = JSON.parse(message);
+					if (icename == data.username && ["unavailableLocalServer", "get_serial_number"].includes(data.onAction)) {
+						redisServer.redisSubServer.removeListener("message", get_device_serial_listener);
+						if (data.onAction == "unavailableLocalServer") {
+							logger.error("Error occurred in getDeviceSerialNumber_ICE: Socket Disconnected");
+							if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+								var soc = myserver.socketMapNotify[username];
+								soc.emit("ICEnotAvailable");
+							}
+						} else if (data.onAction == "get_serial_number") {
+							var resultData = data.value;
+							res.send(resultData);	
+						}
+					}
+				}
+				redisServer.redisSubServer.on("message", get_device_serial_listener);
+					
+				});
+		} catch (exception) {
+			logger.error("Exception in the service getDeviceSerialNumber_ICE: %s", exception);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDeviceSerialNumber_ICE: %s",exception);
+		res.send("fail");
+	}
+};
