@@ -578,6 +578,7 @@ if (cluster.isMaster) {
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
 		app.post('/importScreenfromExcel', auth.protect, designscreen.importScreenfromExcel);
 		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
+		app.post('/getDeviceSerialNumber_ICE', auth.protect, designscreen.getDeviceSerialNumber_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);

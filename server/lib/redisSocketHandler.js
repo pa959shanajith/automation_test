@@ -157,6 +157,10 @@ default_sub.on("message", (channel, message) => {
 		mySocket.emit("saucelablogin", data.responsedata);
 		break;
 
+	case "getSerialNumber":
+		mySocket.emit("getSerialNumber");
+		break;
+
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);
@@ -397,6 +401,10 @@ module.exports.initListeners = mySocket => {
 			server_sub.unsubscribe('ICE_STATUS_' + username);
 		}
 		cache.set("ICE_status",pulse_ICE)
+	});
+	mySocket.on("get_serial_number", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "get_serial_number", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 };
 
