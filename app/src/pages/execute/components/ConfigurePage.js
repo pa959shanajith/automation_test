@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment,useRef } from "react";
 import { TabMenu } from "primereact/tabmenu";
+import {v4 as uuid} from 'uuid';
 import { Card } from "primereact/card";
 import "../styles/ConfigurePage.scss";
 import { Panel } from "primereact/panel";
@@ -28,6 +29,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { selections } from "../../utility/mockData";
 
 
 const ConfigurePage = ({setLoading}) => {
@@ -70,6 +72,7 @@ const ConfigurePage = ({setLoading}) => {
   const [selectedProject, setSelectedProject] = useState('');
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
+  const [modules, setModules] = useState("normalExecution");
   const buttonEl = useRef(null);
   // const [visible, setVisible] = useState(false);
 
@@ -89,6 +92,9 @@ const ConfigurePage = ({setLoading}) => {
   const [dataparam, setDataparam] = useState({});
   const [condition, setCondition] = useState({});
   const [accessibility, setAccessibility] = useState({});
+  const [configTxt, setConfigTxt] = useState("");
+  const [avodropdown, setAvodropdown] = useState({});
+  const [mode, setMode] = useState(selections[0]);
 
   const [currentKey,setCurrentKey] = useState('');
   const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
@@ -121,10 +127,7 @@ const ConfigurePage = ({setLoading}) => {
   }, [getConfigData?.projects]);
 
   const onModalBtnClick = (getBtnType) => {
-    if (getBtnType === "Next") {
-      setTabIndex(1);
-    } else if (getBtnType === "Save") {
-      console.log(xpanded);
+    if (getBtnType === "Save") {
       const paramPaths = Object.values(dataparam).reduce((ac, cv) => {
         ac[cv.key] = ac[cv.key] || [];
         ac[cv.key].push(cv);
@@ -151,8 +154,58 @@ const ConfigurePage = ({setLoading}) => {
           accessibilityParameters: Object.values(accessibilityParams[el?.key].map((el) => el?.value)),
         }))
       };
-      dispatch(updateTestSuite(dataObj));
-      // dispatch(storeConfigureKey());
+      const executionData = {
+        type: "",
+        poolid: "",
+        targetUser: "",
+        source: "task",
+        exectionMode: "serial",
+        executionEnv: "default",
+        browserType: avodropdown?.browser?.map((el) => el.key),
+        configurename: configTxt,
+        executiontype: "asynchronous",
+        selectedModuleType: modules,
+        configurekey: uuid(),
+        isHeadless: mode === "Headless",
+        avogridId: "",
+        avoagents: [],
+        integration: {
+          alm: { url: "", username: "", password: "" },
+          qtest: { url: "", username: "", password: "", qteststeps: "" },
+          zephyr: { url: "", username: "", password: "" },
+        },
+        batchInfo: xpanded?.map((el) => ({
+            scenarioTaskType: "disable",
+            testsuiteName: el?.suitename,
+            testsuiteId: el?.suiteid,
+            batchname: "",
+            versionNumber: 0,
+            appType: "Web",
+            domainName: "Banking",
+            projectName: getConfigData?.projects[0]?.name,
+            projectId: getConfigData?.projects[0]?._id,
+            releaseId: getConfigData?.projects[0]?.releases[0]?.name,
+            cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
+            cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
+            scenarionIndex: [1],
+            // suiteDetails: [
+            //   {
+            //     condition: 0,
+            //     dataparam: [""],
+            //     scenarioName: "Scenario_check",
+            //     scenarioId: "646efee42d7bb349c1ab2f19",
+            //     accessibilityParameters: [],
+            //   },
+            // ],
+        })),
+        // donotexe: { current: { } },
+        scenarioFlag: false,
+        isExecuteNow: false,
+      };
+      dispatch(updateTestSuite(dataObj)).then(() => dispatch(storeConfigureKey(executionData)));
+      setVisible(false);
+    } else if (getBtnType === "Next") {
+      setTabIndex(1);
     } else setVisible(false);
   };
 
@@ -558,7 +611,7 @@ const copyConfigKey = (title) => {
   useEffect(()=>{
     (async() => {
       const configurationList = await fetchConfigureList({
-                'projectid': "642d4a250934a8c996e598a0"
+                'projectid': "646b3f8495cef4ee0ababfdf"
       });
             setConfigList(configurationList.map((item, idx)=>{
                return{
@@ -834,7 +887,7 @@ const copyConfigKey = (title) => {
     setSelectedRadio(value);
   };
   const tabMenuItems = configList.length > 0
-  ? [...items, { label: <Button className="delete_button" size="small"> Delete</Button> }, { label:<Button className="addConfi_button" size="small"> Add Configuration</Button> }]
+  ? [...items, { label: <Button className="delete_button" size="small"> Delete</Button> }, { label:<Button onClick={() => setVisible(true)} className="addConfi_button" size="small"> Add Configuration</Button> }]
       : items;
   const checkboxHeaderTemplate = () => {
     return (
@@ -990,6 +1043,14 @@ const copyConfigKey = (title) => {
               setCondition={setCondition}
               accessibility={accessibility}
               setAccessibility={setAccessibility}
+              modules={modules}
+              setModules={setModules}
+              configTxt={configTxt}
+              setConfigTxt={setConfigTxt}
+              avodropdown={avodropdown}
+              setAvodropdown={setAvodropdown}
+              mode={mode}
+              setMode={setMode}
             />
           }
           headerTxt="Execution Configuration set up"
