@@ -57,7 +57,7 @@ const App = () => {
     {/* <ProgressBar /> */}
     {/* <ErrorBoundary> */}
     <div className="main_content">
-      {location.pathname !== '/login' && <Topbar />}
+      {!['/login', '/'].includes(location.pathname) && <Topbar />}
       <RouteApp/>
     </div>
     {/* </ErrorBoundary> */}

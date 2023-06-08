@@ -289,7 +289,7 @@ const CanvasNew = (props) => {
         var cdLinks = [...dLinks]
         var csections = {...sections}
         mnode.forEach((name)=>{
-            var res = createNode(e,cnodes,clinks,cdNodes,cdLinks,csections,{...count},name,verticalLayout)
+            var res = createNode(e,cnodes,clinks,cdNodes,cdLinks,csections,{...count},name.value,verticalLayout)
             cnodes = res.nodeDisplay
             clinks = res.linkDisplay
             cdNodes = res.dNodes
@@ -302,7 +302,6 @@ const CanvasNew = (props) => {
         setdNodes(cdNodes)
         setBlockui({show:false})
         displayError(MSG.MINDMAP.SUCC_NODE_CREATE);
-        setCreateNew('autosave')
     }
     const clickAddNode=(e)=>{
         var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
@@ -548,28 +547,12 @@ const CanvasNew = (props) => {
   const handleContext=(e,type)=>{
     setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
     setBox(e.target.parentElement.id)
+    setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
    if(type==="modules") menuRef_module.current.show(e)
    else if(type==="scenarios")menuRef_scenario.current.show(e)
    else if(type==="screens")menuRef_screen.current.show(e)
    else menuRef_Teststep.current.show(e)
   }
-
-  const footerContentScenario = (
-    <div>
-        <Button label="Add Scenarios"  onClick={() => setVisibleScenario(false)} className="add_scenario_btn" /> 
-    </div> 
-);
-
-const footerContentScreen =(
-    <div>
-              <Button label="Add Screens"  onClick={() => setVisibleScreen(false)} className="add_scenario_btn" /> 
-          </div>
-    )
-    const footerContentTeststep =(
-      <div>
-                <Button label="Add Test Step"  onClick={() => setVisibleTestStep(false)} className="add_scenario_btn" /> 
-            </div>
-      )
       const addRowScenario = () => {
         const newRow = { id: addScenario.length + 1, value: inputValue, isEditing: false };
         setAddScenario((prevData) => [...prevData, newRow]);
@@ -1012,12 +995,28 @@ const footerContentScreen =(
       },
     },
   ];
+  
+  const footerContentScenario = (
+    <div>
+        <Button label="Add Scenarios"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);}} className="add_scenario_btn" /> 
+    </div> 
+);
 
+const footerContentScreen =(
+    <div>
+              <Button label="Add Screens"  onClick={() => {setVisibleScreen(false);createMultipleNode(box.split("node_")[1],addScreen);}} className="add_scenario_btn" /> 
+          </div>
+    )
+    const footerContentTeststep =(
+      <div>
+                <Button label="Add Test Step"  onClick={() => {setVisibleTestStep(false);createMultipleNode(box.split("node_")[1],addTestStep);}} className="add_scenario_btn" /> 
+            </div>
+      )
 
     return (
         <Fragment>
-                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} />}
-        {visibleDesignStep && <DesignModal visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
+                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} />}
+        {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetails} appType={appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
              <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Scenario" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>

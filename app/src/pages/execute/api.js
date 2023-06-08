@@ -103,3 +103,26 @@ export const readTestSuite_ICE = async(readTestSuite) => {
         return {error:MSG.EXECUTE.ERR_TESTSUITE_FETCH}
     }
 }
+export const getProjectList = async() => {
+    try{
+        const res = await axios(url+'/populateProjects', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {"action":"populateProjects"},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}

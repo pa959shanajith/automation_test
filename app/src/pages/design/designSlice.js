@@ -40,10 +40,14 @@ const initialState = {
         paramHeader: "",
     },
     wsdlError: [],
-    actionError: []
+    actionError: [],
+    copiedTestCases: {},
+    TestCases: [],
+    modified: {},
+    saveEnable: false,
 }
 
-export const counterSlice = createSlice({
+export const designSlice = createSlice({
   name: 'design',
   initialState,
   reducers: {
@@ -130,8 +134,19 @@ export const counterSlice = createSlice({
     },
     wsdlError:(state,action)=>{
      state.wsdlError = action.payload;
-    }
-     
+    },
+    copiedTestCases: (state, action)=>{
+      state.copiedTestCases = action.payload;
+    },
+    TestCases:(state, action)=>{
+      state.TestCases = action.payload;
+    },
+    Modified:(state, action)=>{
+      state.Modified = action.payload;
+    },
+    SaveEnable:(state, action)=>{
+      state.SaveEnable = action.payload;
+    },
   },
 })
 
@@ -152,6 +167,9 @@ importData,
 unassignTask,
 toDeleteScenarios,
 appType,
-savedList,saveMindMap ,ScrapeData, disableAction, disableAppend,actionError,WsData,wsdlError} = counterSlice.actions
+savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError
+TestCases,
+Modified,
+SaveEnable} = designSlice.actions
 
-export default counterSlice.reducer
+export default designSlice.reducer

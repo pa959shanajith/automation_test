@@ -7,6 +7,8 @@ const initialState = {
   projects: [],
   configureData: {},
   requiredFeilds: {},
+  testsuiteData: {},
+  testsuiteId: "",
   avoAgentAndGrid: {
     avoagents: [
       {
@@ -172,7 +174,7 @@ const initialState = {
   error: "",
 };
 
-const getProjects = createAsyncThunk("config/fetchProjects", async (args) => {
+const getProjects = createAsyncThunk("config/fetchProjects", async () => {
   return await axios(`${url}/fetchProjects`, {
     method: "POST",
     headers: {
@@ -217,65 +219,33 @@ const getAvoAgentAndAvoGrid = createAsyncThunk(
   }
 );
 
+const readTestSuite = createAsyncThunk("config/readTestSuite", async (args) => {
+  return await axios(`${url}/readTestSuite_ICE`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: {
+      param: "readTestSuite_ICE",
+      readTestSuite: args.dataParams,
+      fromFlag: "mindmaps",
+    },
+    credentials: "include",
+  })
+    .then((response) => response.data)
+    .catch((err) => console.log(err));
+});
+
 const storeConfigureKey = createAsyncThunk(
   "config/storeConfigureKey",
-  async () => {
+  async (args) => {
     return await axios(`${url}/storeConfigureKey`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       data: {
-        executionData: {
-          type: "",
-          poolid: "",
-          targetUser: "",
-          source: "task",
-          exectionMode: "serial",
-          executionEnv: "default",
-          browserType: ["2", "8"],
-          configurename: "Module_4",
-          executiontype: "asynchronous",
-          selectedModuleType: "normalExecution",
-          configurekey: "fc0f3cd1-0ebb-4620-8f74-5cdb0e44d8f6",
-          isHeadless: true,
-          avogridId: "",
-          avoagents: [],
-          integration: {
-            alm: { url: "", username: "", password: "" },
-            qtest: { url: "", username: "", password: "", qteststeps: "" },
-            zephyr: { url: "", username: "", password: "" },
-          },
-          batchInfo: [
-            {
-              scenarioTaskType: "disable",
-              testsuiteName: "Module_2",
-              testsuiteId: "646c554f5218324709350cfe",
-              batchname: "",
-              versionNumber: 0,
-              appType: "Web",
-              domainName: "Banking",
-              projectName: "Banking_Project",
-              projectId: "646b3f8495cef4ee0ababfdf",
-              releaseId: "release1",
-              cycleName: "cycle1",
-              cycleId: "646b3f8495cef4ee0ababfde",
-              scenarionIndex: [1],
-              suiteDetails: [
-                {
-                  condition: 0,
-                  dataparam: [""],
-                  scenarioName: "Scenario_check",
-                  scenarioId: "646efee42d7bb349c1ab2f19",
-                  accessibilityParameters: [],
-                },
-              ],
-            },
-          ],
-          donotexe: { current: { "646c554f5218324709350cfe": [1] } },
-          scenarioFlag: false,
-          isExecuteNow: false,
-        },
+        executionData: args
       },
       credentials: "include",
     })
@@ -284,15 +254,35 @@ const storeConfigureKey = createAsyncThunk(
   }
 );
 
-export { getProjects, getModules, getAvoAgentAndAvoGrid, storeConfigureKey };
+const updateTestSuite = createAsyncThunk("config/updateTestSuite", async (args) => {
+  return await axios(`${url}/updateTestSuite_ICE`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    data: args,
+    credentials: "include",
+  })
+    .then((response) => response.data)
+    .catch((err) => console.log(err));
+});
+
+export {
+  getProjects,
+  getModules,
+  getAvoAgentAndAvoGrid,
+  readTestSuite,
+  updateTestSuite,
+  storeConfigureKey,
+};
 
 const configureSetupSlice = createSlice({
   name: "configureSetup",
   initialState,
   reducers: {
     checkRequired: (state, action) => {
-      state.requiredFeilds = { ...state.requiredFeilds, ...action.payload }
-    }
+      state.requiredFeilds = { ...state.requiredFeilds, ...action.payload };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getProjects.pending, (state) => {
@@ -337,6 +327,32 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(getAvoAgentAndAvoGrid.rejected, (state, action) => {
       state.avoAgentAndGrid = {};
+      state.error = action.error.message;
+    });
+    builder.addCase(readTestSuite.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(readTestSuite.fulfilled, (state, action) => {
+      state.loading = false;
+      state.testsuiteData = action.payload;
+      state.testsuiteId = action?.meta?.arg?.dataId;
+      state.error = "";
+    });
+    builder.addCase(readTestSuite.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+    builder.addCase(updateTestSuite.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateTestSuite.fulfilled, (state, action) => {
+      state.loading = false;
+      // state.testsuiteData = action.payload;
+      // state.testsuiteId = action?.meta?.arg?.dataId;
+      state.error = "";
+    });
+    builder.addCase(updateTestSuite.rejected, (state, action) => {
+      state.loading = false;
       state.error = action.error.message;
     });
     builder.addCase(storeConfigureKey.pending, (state) => {
