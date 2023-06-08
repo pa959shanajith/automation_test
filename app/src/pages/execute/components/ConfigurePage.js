@@ -20,22 +20,22 @@ import { SelectButton } from "primereact/selectbutton";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from 'primereact/toast';
-import {fetchConfigureList,getPools,getICE_list,getProjectList,ExecuteTestSuite_ICE,execAutomation,readTestSuite_ICE} from '../api';
+import {fetchConfigureList,getPools,getICE_list,getProjectList,ExecuteTestSuite_ICE,execAutomation,readTestSuite_ICE,deleteConfigureKey} from '../api';
 // import { Messages as MSG,VARIANT} from '../../global';
 import AvoModal from '../../../globalComponents/AvoModal';
 import ConfigureSetup from './ConfigureSetup';
-import { getAvoAgentAndAvoGrid, getModules, getProjects, storeConfigureKey } from '../configureSetupSlice';
+import { getAvoAgentAndAvoGrid, getModules, getProjects, storeConfigureKey,updateTestSuite } from '../configureSetupSlice';
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
 import DropDownList from '../../global/components/DropDownList';
 import {ResetSession,setMsg, Messages as MSG,VARIANT} from '../../global';
-import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+// import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { selections } from "../../utility/mockData";
 
 
-const ConfigurePage = ({setLoading}) => {
+const ConfigurePage = ({setShowConfirmPop}) => {
   const [visible, setVisible] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
@@ -95,6 +95,7 @@ const [proceedExecution, setProceedExecution] = useState(false);
 // 
   const [smartMode,setSmartMode] = useState('normal')
   const [selectedICE,setSelectedICE] = useState("")
+
   
   // const current_task = useSelector(state=>state.plugin.CT)
   // const [loading,setLoading] = useState(false)
@@ -125,7 +126,8 @@ console.log(availableICE);
     // setLoading(false)
     // setMsg(error)
 }
-
+const [footerType, setFooterType] = useState("CancelNext");
+  const [tabIndex, setTabIndex] = useState(0);
   const items = [ { label: "Configurations" }, { label: "Scheduled Executions" }];
   
   
@@ -235,7 +237,7 @@ console.log(availableICE);
     } else setVisible(false);
   };
   const readTestSuiteFunct = async (readTestSuite, item) => {
-    setLoading("Loading in Progress. Please Wait");
+    // setLoading("Loading in Progress. Please Wait");
     const result = await readTestSuite_ICE(readTestSuite, "execute");
     if(result.error){displayError(result.error);return;}
     else if (result.testSuiteDetails) {
@@ -269,7 +271,7 @@ console.log(availableICE);
         }
         setEachData(tableData);
     }
-    setLoading(false);
+    // setLoading(false);
 }
   
 const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType) => {
@@ -348,6 +350,7 @@ const showSuccess_Schedule = () => {
 var myJsObj = {key: currentKey,
   'executionType' : executionTypeInRequest}
 var str = JSON.stringify(myJsObj, null, 4);
+
 
 useEffect(()=>{
   fetchData();
@@ -429,16 +432,7 @@ const populateICElist =(arr,unallocated,iceStatusdata)=>{
   ice.sort((a,b) => a.icename.localeCompare(b.icename))
       setAvailableICE(ice);
   }
-  console.log(projectId);
-console.log(smartMode);
-console.log(selectedICE);
-// console.log(loading);
-console.log(poolList);
-console.log(chooseICEPoolOptions);
-console.log(iceStatus);
-console.log(poolType);
-console.log(iceNameIdMap);
-console.log(availableICE);
+  
 
   const handleWeekInputChange = (event) => {
     setMonthlyRecurrenceWeekValue(event.target.value);
@@ -470,6 +464,9 @@ console.log(availableICE);
       icon: 'pi pi-exclamation-triangle',
     });
   };
+//   const onClickDeleteDevOpsConfig = (item, key) => {
+//     setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{item.configurename}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
+// }
   const copyKeyUrlFunc = (id) => {
     const data = document.getElementById(id).title;
     if (!data) {
@@ -724,10 +721,10 @@ const copyConfigKey = (title) => {
       ],
     },
   ];
-//   const deleteDevOpsConfig = (key) => {
-//     setLoading('Please Wait...');
+//   const deleteDevOpsConfig = (configurekey) => {
+//     // setLoading('Please Wait...');
 //     setTimeout(async () => {
-//         const deletedConfig = await deleteConfigureKey(key);
+//         const deletedConfig = await deleteConfigureKey(configurekey);
 //         if(deletedConfig.error) {
 //             if(deletedConfig.error.CONTENT) {
 //                 setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
@@ -752,31 +749,29 @@ const copyConfigKey = (title) => {
 //             }
 //             setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
 //         }
-//         setLoading(false);
+//         // setLoading(false);
 //     }, 500);
 //     setShowConfirmPop(false);
 // }
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
     if(Array.isArray(executionData.targetUser)){
-  for(let icename in executionData.targetUser){
-    let ice_id = iceNameIdMap[executionData.targetUser[icename]];
-    if(ice_id && ice_id.status){
+      for(let icename in executionData.targetUser){
+        let ice_id = iceNameIdMap[executionData.targetUser[icename]];
+        if(ice_id && ice_id.status){
+                    setDataExecution(executionData);
+          setAllocateICE(false);
+                    setProceedExecution(true);
+        } 
+      }
+    }else{
+      let ice_id = iceNameIdMap[executionData.targetUser];
+      if(ice_id && ice_id.status){
                 setDataExecution(executionData);
-      setAllocateICE(false);
+        setAllocateICE(false);
                 setProceedExecution(true);
-                return
-    } 
-  }
-}else{
-  let ice_id = iceNameIdMap[executionData.targetUser];
-  if(ice_id && ice_id.status){
-            setDataExecution(executionData);
-    setAllocateICE(false);
-            setProceedExecution(true);
-            return
-  } 
-}
+      } 
+    }
     ExecuteTestSuite(executionData);
 }
   
@@ -786,7 +781,7 @@ const copyConfigKey = (title) => {
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(eachData, currentTask, appType,  moduleInfo, accessibilityParameters, '');
     if(modul_Info === false) return;
-    setLoading("Sending Execution Request");
+    // setLoading("Sending Execution Request");
     executionData["source"]="task";
     executionData["exectionMode"]=execAction;
     executionData["executionEnv"]=execEnv;
@@ -796,7 +791,7 @@ const copyConfigKey = (title) => {
     executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
     ResetSession.start();
     try{
-        setLoading(false);
+        // setLoading(false);
         const data = await ExecuteTestSuite_ICE(executionData);
         if (data.errorapi){displayError(data.errorapi);return;}
         if (data === "begin"){
@@ -815,7 +810,7 @@ const copyConfigKey = (title) => {
         setExecAction("serial");
         setExecEnv("default");
     }catch(error) {
-        setLoading(false);
+        // setLoading(false);
         ResetSession.end();
         displayError(MSG.EXECUTE.ERR_EXECUTE)
         setBrowserTypeExe([]);
@@ -831,10 +826,14 @@ const copyConfigKey = (title) => {
     (async() => {
             const configurationList = await fetchConfigureList({
                 'projectid': "642d4a250934a8c996e598a0"
+              
             });
             setConfigList(configurationList.map((item, idx)=>{
+              console.log("set is",item.configurekey);
                return{
+                
               sno: idx+1,
+              
               profileName: (
                 <div>
                   <Checkbox  className="checkbox_header"/>
@@ -854,7 +853,9 @@ const copyConfigKey = (title) => {
                     onClick={() => {
                       dispatch(getPoolsexe());
                       dispatch(getICE());
-                      setVisible_execute(true)}
+                      setVisible_execute(true)
+                      setCurrentKey(item.configurekey);
+                    }
                     }
                     
                     size="small"
@@ -986,11 +987,15 @@ const copyConfigKey = (title) => {
                     width: "4.5rem",
                     fontFamily: "Open Sans",
                     fontStyle: "normal",
-                    height:"2.5rem"
+                    height:"2.5rem",
                     
                   }}
                   size="small"
-                    onClick={() => {setVisible_CICD(true);setCurrentKey(item.configurekey)}}
+                    onClick={() => {
+                      setVisible_CICD(true);
+                      setCurrentKey(item.configurekey);
+                      console.log(item.configurekey);
+                    }}
                   
                   >
                    
@@ -1039,7 +1044,7 @@ const copyConfigKey = (title) => {
           })   );
     }
   )();
-  },[visible_execute,visible_schedule,visible_CICD]);
+  },[visible_execute,visible_schedule,visible_CICD, selectedICE]);
   
   
  
@@ -1096,8 +1101,11 @@ const copyConfigKey = (title) => {
                 if (showIcePopup) {
                     dataExecution.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):"")
                     dataExecution.poolid = ""
-                    if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
+                   
+                    if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename], 
+                    console.log(selectedICE,"after if"));
                     else dataExecution.targetUser = selectedICE
+                   
                     CheckStatusAndExecute(dataExecution, iceNameIdMap);
                     // onHide(name);
                 }
@@ -1114,8 +1122,10 @@ const copyConfigKey = (title) => {
                     }
                     // onHide(name);
                 }
+                
             }
         } autoFocus />
+    
         </div>
     );
 }
