@@ -118,7 +118,20 @@ export const counterSlice = createSlice({
     },
     disableAction:(state, action)=>{
       state.disableAction = action.payload;
+    },
+    disableAppend:(state, action)=>{
+      state.disableAppend= action.payload;
+    },
+    actionError:(state, action)=>{
+      state.actionError = action.payload;
+    },
+    WsData:(state, action)=>{
+     state.WsData = action.payload;
+    },
+    wsdlError:(state,action)=>{
+     state.wsdlError = action.payload;
     }
+     
   },
 })
 
@@ -139,6 +152,6 @@ importData,
 unassignTask,
 toDeleteScenarios,
 appType,
-savedList,saveMindMap ,ScrapeData, disableAction} = counterSlice.actions
+savedList,saveMindMap ,ScrapeData, disableAction, disableAppend,actionError,WsData,wsdlError} = counterSlice.actions
 
 export default counterSlice.reducer

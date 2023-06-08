@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Messages as MSG} from '../global/components/Messages'
+import { Messages as MSG} from '../global/components/Messages'
 import {url} from '../../App';
 
 /*Component getProjectList
@@ -678,4 +678,90 @@ export const exportToProject = async(moduleId) => {
         console.error(err)
         return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
     }
+}
+
+export const initScraping_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/initScraping_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'initScraping_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(history);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+
+
+export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId) =>	{
+    return new Promise((resolve, reject)=>{
+        axios(url+"/getScrapeDataScreenLevel_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param: 'getScrapeDataScreenLevel_ICE',
+                screenId: screenId,
+                projectId: projectId,
+                type: type,
+                testCaseId: testCaseId
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error))
+    })
+}
+
+
+export const updateScreen_ICE = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/updateScreen_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
+export const excelToScreen = (data) =>	{
+    return new Promise((resolve, reject)=>{
+        const res = axios(url+"/importScreenfromExcel", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error))
+    })
 }

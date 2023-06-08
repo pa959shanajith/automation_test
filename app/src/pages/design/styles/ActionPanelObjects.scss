@@ -8,6 +8,7 @@
 
         .p-dialog-header-icons {
             right: 2% !important;
+            position: absolute;
         }
     }
 }
@@ -15,9 +16,15 @@
 .add__object__header {
     .p-dialog-header-icons {
         right: 2% !important;
+        position: absolute;
     }
     .p-dialog-header{
         height: 3rem !important;
+        background: #E2E2ED !important;
+    border-top-right-radius: 4px;
+    padding: 0.3rem 0 !important;
+    height: 3rem !important;
+
     }
 
 }
@@ -156,10 +163,15 @@
     .p-dialog-header {
         padding: 0.6rem 0 !important;
         height: 3rem !important;
+        background: #E2E2ED !important;
+    border-top-right-radius: 4px;
+    // padding: 0.3rem 0 !important;
+    // height: 3rem !important;
     }
 
     .p-dialog-header-icons {
         right: 2% !important;
+        position: absolute;
     }
 
     .p-dialog-title {
@@ -249,6 +261,7 @@
 .create__object__modal {
     .p-dialog-header-icons {
         right:2% !important;
+        position: absolute;
     }
 
     .p-dropdown .p-dropdown-label.p-placeholder {
@@ -260,6 +273,10 @@
     .p-dialog-header {
         padding: 0.8rem 0 !important;
         height: 3rem !important;
+        background: #E2E2ED !important;
+    border-top-right-radius: 4px;
+    // padding: 0.3rem 0 !important;
+    // height: 3rem !important;
     }
 
     .p-dialog-title {
@@ -320,9 +337,14 @@
 .compare__object__modal {
     .p-dialog-header-icons {
        right: 2% !important;
+       position: absolute;
     }
     .p-dialog-header{
         height: 3rem !important;
+        background: #E2E2ED !important;
+    border-top-right-radius: 4px;
+    padding: 0.3rem 0 !important;
+    height: 3rem !important;
     }
 
     position: relative;

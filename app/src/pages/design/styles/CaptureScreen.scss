@@ -5,6 +5,9 @@
 
   .p-dialog-header {
     height: 3rem !important;
+    background: #E2E2ED !important;
+    border-top-right-radius: 4px;
+
   }
 
   .p-dialog-title {
@@ -83,6 +86,11 @@
   .p-datatable .p-datatable-thead>tr>th {
     background: rgba(96, 91, 255, 0.1) !important;
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem !important;
+  }
+
+  .p-datatable .p-datatable-tbody>tr>td {
+    padding:0.5rem !important;
   }
 }
 
@@ -213,6 +221,13 @@
       position: relative;
       right: 96%;
     }
+    .p-datatable .p-datatable-tbody>tr>td {
+      padding: 0.5rem;
+    }
+
+    .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
+       padding: 0.5rem;
+    }
 
     .p-dialog-title {
       .dailog_header1 {
@@ -244,20 +259,7 @@
           color: #605BFF;
         }
 
-        .btn_panel {
-          &__single {
-            border-radius: 0.5rem;
-            padding: 0.5rem 1.5rem;
-            border: 1px solid #C7C7C7;
-            background: #FFFFFF;
-            font-family: "Open Sans";
-            font-weight: 500;
-            font-size: 14px;
-            position: absolute;
-            right: 2rem;
-            top: 1.5rem;
-          }
-
+          .btn_panel{
           border-radius: 0.5rem;
           padding: 0.5rem 1.5rem;
           border: 1px solid #aca9ff;
@@ -296,6 +298,18 @@
         color: #030229;
 
       }
+    }
+    .btn_panel__single {
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid #C7C7C7;
+      background: #FFFFFF;
+      font-family: "Open Sans";
+      font-weight: 500;
+      font-size: 14px;
+      position: absolute;
+      right: 2rem;
+      top: 1.5rem;
     }
 
   }
@@ -463,3 +477,5 @@
 .text__insprint__info {
   padding: 1.2rem 0;
 }
+
+

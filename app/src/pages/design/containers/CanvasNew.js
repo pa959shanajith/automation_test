@@ -546,6 +546,7 @@ const CanvasNew = (props) => {
 
   const reject = () => {}
   const handleContext=(e,type)=>{
+    setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
     setBox(e.target.parentElement.id)
    if(type==="modules") menuRef_module.current.show(e)
    else if(type==="scenarios")menuRef_scenario.current.show(e)
@@ -1015,7 +1016,7 @@ const footerContentScreen =(
 
     return (
         <Fragment>
-                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} />}
+                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} />}
         {visibleDesignStep && <DesignModal visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
