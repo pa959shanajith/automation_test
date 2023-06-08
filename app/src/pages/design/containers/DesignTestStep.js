@@ -34,6 +34,7 @@ const DesignModal = (props) => {
     const [overlay, setOverlay] = useState("");
     const [hideSubmit, setHideSubmit] = useState(false);
     const [keywordList, setKeywordList] = useState(null);
+    const [keywordListTable, setKeywordListTable] = useState([]);
     const [testCaseData, setTestCaseData] = useState([]);
     const [testScriptData, setTestScriptData] = useState(null);
     const [stepSelect, setStepSelect] = useState({edit: false, check: [], highlight: []});
@@ -59,6 +60,7 @@ const DesignModal = (props) => {
     const [showPopup, setShow] = useState(false);
     const [debugEnable, setDebugEnable] = useState(false);
     const [newtestcase,setnewtestcase] = useState([]);
+    const [keyword, setKeyword] = useState('');
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -278,7 +280,7 @@ const DesignModal = (props) => {
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
                 let errorFlag = false;
-                let testCases = [...testCaseData]
+                let testCases = [...newtestcase]
 
                 for (let i = 0; i < testCases.length; i++) {
                     let step = i + 1
@@ -481,28 +483,14 @@ const DesignModal = (props) => {
     }
 
     const addRow = () => {
-        let testCases = [...testCaseData]
-        let insertedRowIdx = [];
-        runClickAway = false;
-        if (stepSelect.check.length === 1) {
-            const rowIdx = stepSelect.check[0];
-            testCases.splice(rowIdx+1, 0, emptyRowData);
-            insertedRowIdx.push(rowIdx+1)
-        }
-        else if (stepSelect.highlight.length === 1 && !stepSelect.check.length) {
-            const rowIdx = stepSelect.highlight[0];
-            testCases.splice(rowIdx+1, 0, emptyRowData);
-            insertedRowIdx.push(rowIdx+1)
-        }
-        else {
-            testCases.splice(testCaseData.length, 0, emptyRowData);
-            insertedRowIdx.push(testCaseData.length)
-        }
-        setTestCaseData(testCases);
-        setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
-        setHeaderCheck(false);
-        setChanged(true);
-        headerCheckRef.current.indeterminate = false;
+        let oldTestCases = [...newtestcase]
+       let emptyAddedRow=[...oldTestCases,emptyRowData]
+       setnewtestcase(emptyAddedRow)
+        // setTestCaseData(testCases);
+        // // setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
+        // setHeaderCheck(false);
+        // setChanged(true);
+        // headerCheckRef.current.indeterminate = false;
         // setEdit(false);
     }
 
@@ -899,7 +887,8 @@ const DesignModal = (props) => {
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
                 <div className='btn__grp'>
                     <Button size='small' onClick={()=>debugTestCases('1')} label='Debug' outlined></Button>
-                    <Button size='small' label='Add Test Step'></Button>
+                    <Button size='small' label='Add Test Step' onClick={()=>addRow()}></Button>
+                    <Button size='small' lable='Save' onClick={saveTestCases}></Button>
                 </div>
             </div>
         </>
@@ -934,7 +923,7 @@ const DesignModal = (props) => {
                 <Dropdown
                     value={options.value}
                     options={objNameList}
-                    onChange={(e) => {options.editorCallback(e.value);setKeywordList(getKeywords(e.value).keywords)}}
+                    onChange={(e) => {options.editorCallback(e.value);setKeywordListTable(getKeywords(e.value).keywords);setKeyword(getKeywords(e.value).keywords[0]);console.log(getKeywords(e.value).keywords)}}
                     placeholder="Select a Status"
                 />
             );
@@ -942,9 +931,9 @@ const DesignModal = (props) => {
         const keywordEditor = (options) => {
             return (
                 <Dropdown
-                    value={options.value}
-                    options={keywordList.keywords}
-                    onChange={(e) => options.editorCallback(e.value)}
+                    value={keyword.length>0?keyword:options.value}
+                    options={keywordListTable.length>0?keywordListTable:getKeywords(options.rowData.custname).keywords}
+                    onChange={(e) => {options.editorCallback(e.value);setKeyword([])}}
                     placeholder="Select a Status"
                 />
             );
@@ -952,6 +941,13 @@ const DesignModal = (props) => {
         const textEditor = (options) => {
             return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
         };
+        const onRowEditComplete = (e) => {
+            let testcase = [...newtestcase];
+            let { newData, index } = e;
+            testcase[index] = newData;
+            setnewtestcase(testcase);
+        };
+
     return (
         <>
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} >
@@ -961,7 +957,7 @@ const DesignModal = (props) => {
                             <DataTable
                                 value={newtestcase.length>0 ?newtestcase:[]}
                                 emptyMessage={newtestcase.length === 0?emptyMessage:null}
-                                rowReorder editMode="row" dataKey="id" >
+                                rowReorder editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} >
                                 <Column style={{ width: '3em' }} rowReorder />
                                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
                                 <Column field="custname" header="Select all" editor={(options) => elementEditor(options)}></Column>
