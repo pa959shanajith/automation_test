@@ -180,7 +180,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
     var nodeDisplay = {}
     var linkDisplay = {}
     var s = d3.select('.mp__canvas_svg');
-    let  cSize= [parseFloat(s.style("width"))/3, parseFloat(s.style("height"))];
+    let  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     var typeNum = {
         'modules': 0,
         'endtoend': 0,
@@ -200,7 +200,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
     };
     childCounter(1, tree);
     var newHeight = d3.max(levelCount) * 90;
-    const d3Tree = d3.tree().size([newHeight * 2, cSize[0]]);
+    const d3Tree = d3.tree().size([newHeight * 2, cSize[0]/3]);
     const hierarchyLayout = d3.hierarchy(tree);
     const data = d3Tree(hierarchyLayout);
     data.each((node, idx) => {
@@ -208,64 +208,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
       });
     const dNodesArray = data.descendants();
     const dLinks = data.links();
-    // .map((link, index) => {
-    //     const newLink = {
-    //       ...link,
-    //       source: {
-    //         ...link.source.data,
-    //         x: link.source.x,
-    //         y: link.source.y,
-    //         id: index // Generate a unique id for the source node
-    //       },
-    //       target: {
-    //         ...link.target.data,
-    //         x: link.target.x,
-    //         y: link.target.y,
-    //         id: index+1 // Generate a unique id for the target node
-    //       }
-    //     };
-    //     return newLink;
-    //   });;
-    // const dNodes = dNodesArray.map((d)=>d.data)
-    // const dNodes = dNodesArray.map((d, idx) => {
-    //     const generateId = (index) => index;
-        
-    //     const mapChildren = (children) => {
-    //       return children.map((child, childIdx) => {
-    //         const newChild = {
-    //           ...child.data,
-    //           x: child.x,
-    //           y: child.y,
-    //           id: child.id?child.id:generateId(childIdx+1),
-    //           parent: {
-    //             ...child.parent.data,
-    //             id: child.parent.data.id ? child.parent.data.id : generateId(idx) // Generate a unique id for the parent node
-    //           } // Generate a unique id for the child node
-    //         };
-            
-    //         if (child.children) {
-    //           newChild.children = mapChildren(child.children);
-    //         }
-            
-    //         return newChild;
-    //       });
-    //     };
-        
-    //     const newData = {
-    //       ...d.data,
-    //       x: d.x,
-    //       y: d.y,
-    //       id: idx,
-    //       parent: d.parent ? { ...d.parent.data, id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1) } : null  // Generate a unique id for the node
-    //     };
-        
-    //     if (d.children) {
-    //       newData.children = mapChildren(d.children);
-    //     }
-        
-    //     return newData;
-    //   });
-    const dNodes = dNodesArray.map((d, idx) => {
+  const dNodes = dNodesArray.map((d, idx) => {
         const generateId = (parentId, childIndex) => childIndex;
       
         const mapChildren = (children, parentId) => {
@@ -277,7 +220,8 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
               id: child.id ? child.id : generateId(parentId, childIdx + 1),
               parent: {
                 ...child.parent.data,
-                id: child.parent.data.id ? child.parent.data.id : parentId // Use the parent's ID as the unique identifier
+                id: child.parent.data.id ? child.parent.data.id : parentId,
+                // parent: child.parent.parent.data? child.parent.parent.data:null // Use the parent's ID as the unique identifier
               }
             };
       
@@ -290,12 +234,16 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         };
       
         const newData = {
-          ...d.data,
-          x: d.x,
-          y: d.y,
-          id: idx,
-          parent: d.parent ? { ...d.parent.data, id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0) } : null
-        };
+            ...d.data,
+            x: d.x,
+            y: d.y,
+            id: idx,
+            parent: d.parent ? {
+              ...d.parent.data,
+              id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0),
+              parent: d.parent.parent ? { ...d.parent.parent.data } : null
+            } : null
+          };
       
         if (d.children) {
           newData.children = mapChildren(d.children, newData.id); // Pass the parent's ID as the initial parent ID for children mapping
@@ -590,14 +538,30 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
                 node._id=nodeID
         }
         dNodes.push(node);
-        if(Object.isExtensible(dNodes[uNix])){
+        if(Object.isExtensible(dNodes[pi])){
             const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, dNodes[uNix]] };
             dNodes[pi] = newObject;
-            dNodes[pi].children.push(dNodes[uNix]);
         }
-        dNodes[pi].children.push(dNodes[uNix]);
+        else dNodes[pi].children.push(dNodes[uNix]);
         dNodes[uNix].childIndex = dNodes[pi].children.length;
         dNodes[uNix].cidxch = 'true'; // child index updated
+        if( dNodes[uNix].type === 'screens')
+        for(var i =0; dNodes[0].children.length>i; i++){
+            if(dNodes[0].children[i].name === dNodes[uNix].parent.name){
+                  const newObject = { ...dNodes[0].children[i], children: [...dNodes[0].children[i].children, dNodes[uNix]] };
+                  dNodes[0].children[i] = newObject;
+            }
+        }
+        else if (dNodes[uNix].type === 'testcases') {
+            for (var k = 0; k < dNodes[0].children.length; k++) {
+              for (var j = 0; j < dNodes[0].children[k].children.length; j++) {
+                if (dNodes[0].children[k].children[j].name === dNodes[uNix].parent.name) {
+                  const newObject = { ...dNodes[0].children[k].children[j], children: [...dNodes[0].children[k].children[j].children, dNodes[uNix]] };
+                  dNodes[0].children[k].children[j] = newObject;
+                }
+              }
+            }
+          }
         var currentNode = addNode(dNodes[uNix]);
         var link = {
                 id: uuid(),
