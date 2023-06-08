@@ -11,17 +11,35 @@
     overflow-x: hidden;
 
     .split_left {
-        padding: 3% 0%;
+        padding: 3% 0.5%;
         width: 50%;
+        flex-grow: 1;
+        color: #605BFF;
         background-color: #33005C;
 
-        >h1,
-        >h2,
-        >h3 {
-            padding: 2%;
-            color: #605BFF;
-            margin: 1% 0%;
+        >h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
         }
+
+        >h2 {
+            font-weight: 500;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        >h3 {
+            font-weight: 500;
+            font-size: 1.5rem;
+        }
+
+        // >h1,
+        // >h2,
+        // >h3 {
+        //     padding: 2%;
+        //     color: #605BFF;
+        //     margin: 1% 0%;
+        // }
     }
 
     .split_right {
@@ -35,7 +53,7 @@
 
     .right_side_login {
         display: flex;
-        padding: 10% 10%;
+        padding: 7% 14%;
         flex-direction: column;
         position: fixed;
         text-align: center;
@@ -53,12 +71,16 @@
             width: 22rem;
         }
 
-        .forget_password_link {
-            margin: -1rem 0 0 10.5rem;
+        .link {
             text-decoration: none;
             font-size: small;
             color: #4338CA;
             font-weight: 700;
+            cursor: pointer;
+        }
+
+        .forgot_password {
+            text-align-last: right;
         }
 
         .login_btn {
@@ -69,31 +91,5 @@
             }
         }
 
-        .single_sign-on_link {
-            text-decoration: none;
-            font-size: small;
-            color: #4338CA;
-            font-weight: 700;
-
-        }
-
-        .create-on_link {
-            .p-button {
-                border: none !important;
-                padding: 0 !important;
-
-                .p-button-label {
-                    font-weight: 500 !important;
-                }
-
-                .p-button-link:enabled:focus {
-                    box-shadow: none !important;
-                }
-
-                &:focus {
-                    box-shadow: none !important;
-                }
-            }
-        }
     }
 }

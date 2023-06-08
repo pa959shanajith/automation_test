@@ -125,10 +125,36 @@ const InputBox = (props) => {
                     dNodes[e].original_name = dNodes[pi].original_name;
                     dNodes[e].rnm = dNodes[pi].rnm;
                     d3.select('#node_' + e + ' > text').text(tmp);
-                    d3.select('#node_' + e + ' > title').text(tmp);
-
+                    d3.select('#node_' + e + ' > title').text(tmp); 
                 });
             }
+            if(dNodes[pi].type === 'scenarios'){
+                for (var j = 0; dNodes[0].children.length>j; j++){
+                    if(dNodes[0].children[j].id === dNodes[pi].id){
+                        dNodes[0].children[j].name = tmp;
+                    }
+                }
+            }
+            if(dNodes[pi].type === 'screens'){
+                for (var k = 0; dNodes[0].children.length>k; k++){
+                    for (var m =0 ; dNodes[0].children[k].children.length>m; m++){
+                        if(dNodes[0].children[k].children[m].id === dNodes[pi].id){
+                            dNodes[0].children[k].children[m].name = tmp;
+                        }
+                    }
+                }
+            }
+            if(dNodes[pi].type === 'testcases'){
+                for (var n = 0; dNodes[0].children.length>n; n++){
+                    for (var p =0 ; dNodes[0].children[n].children.length>p; p++){
+                        for(var s =0; dNodes[0].children[n].children[p].children.length>s; s++){
+                            if(dNodes[0].children[n].children[p].children[s].id === dNodes[pi].id){
+                                dNodes[0].children[n].children[p].children[s].name = tmp;
+                            }
+                        }
+                    }
+                }  
+            }  
         }
         replicateName(pi);
         props.setInpBox(false)
