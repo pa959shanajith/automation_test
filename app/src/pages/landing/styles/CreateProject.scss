@@ -85,14 +85,15 @@
     float: right;
     width: 43%;
     min-width: 43%;
+    height: 25rem;
     }
     .card22{
         .p-card-body{
             margin: 0rem;
             overflow-x: hidden;
             overflow-y: auto;
-            height: auto;
-            min-height: 25rem;
+            // height: auto;
+            // min-height: 25rem;
         }
     
     }
@@ -399,17 +400,14 @@
             right: 0.3rem;
         }
     }
-    .p-multiselect-item{
-        font-family: 'Open Sans' !important;
-        font-size: 12px !important;
-    }
-    .p-multiselect.p-multiselect-chip .p-multiselect-token{
-     padding: 0.2rem 0.2rem !important;
-    margin-right: 0.2rem !important;
-    font-size: 7px !important;
-    height: 1rem !important;
-    width: 3rem !important;
-    }
+   .imp-cls{
+    color: red;
+   }
+   .toast_msg{
+    position: relative;
+    z-index:1101;
+   }
+   
     
     
     

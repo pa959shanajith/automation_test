@@ -12,7 +12,6 @@ import {
   accessibilities,
   conditions,
   configTableHead,
-  selections,
 } from "../../utility/mockData";
 import "../styles/ConfigureSetup.scss";
 import GridBrowser from "./GridBrowser";
@@ -32,13 +31,17 @@ const ConfigureSetup = ({
   setCondition,
   accessibility,
   setAccessibility,
+  modules,
+  setModules,
+  configTxt,
+  setConfigTxt,
+  avodropdown,
+  setAvodropdown,
+  mode,
+  setMode
 }) => {
-  const [avodropdown, setAvodropdown] = useState({});
   const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
-  const [mode, setMode] = useState(selections[0]);
   const [configTable, setConfigTable] = useState([]);
-  const [modules, setModules] = useState("normalExecution");
-  const [configTxt, setConfigTxt] = useState("");
   const [tableFilter, setTableFilter] = useState("");
   const [useDefault, setUseDefault] = useState("");
   const dispatch = useDispatch();
@@ -129,6 +132,7 @@ const ConfigureSetup = ({
             key: el.key,
             suitescenarios: getSuiteId?.scenarioids,
             suitename: getSuiteId?.testsuitename,
+            suiteid: getProjectData?.testsuiteId
           });
         el.children.forEach((item, index) => {
           const dataParamValue = `dataParamName${index}${ind}`;

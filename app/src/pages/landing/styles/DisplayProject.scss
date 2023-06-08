@@ -18,6 +18,7 @@
   width: 14rem;
   height: 3.2rem;
   border: none; 
+  cursor: pointer;
 }
 .default-project{
   background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
@@ -44,7 +45,7 @@
     position: absolute;
     z-index: 1;
     top:6.1rem;
-    right:61rem;
+    right:77rem;
     .p-menuitem-link:hover{
       background: rgba(96, 91, 255, 0.2) !important;
       border-radius: 3px !important;
@@ -88,13 +89,13 @@ margin-left: 0.5rem;
   border: none !important;
 }
 .DefaultProjectName{
-  position: relative;
-  left: 20rem;
-  bottom: 24.5rem;
+  position: fixed;
+  bottom: 42.3rem;
+  left: 24rem;
   z-index: 1;
-  color: #030229;
-  font-weight: 500;
   font-size: 24px;
+  font-weight: 500;
+  color: #030229;
 }
 .sort_btn{
   border:none;
@@ -110,8 +111,8 @@ margin-left: 0.5rem;
   color: #6c757d;
 }
 .Default_Project_icon{
-  position: relative;
-    bottom: 26.2rem;
-    left: 17.5rem;
-    z-index: 1;
+  left: 21.8rem;
+  z-index: 1;
+  position: fixed;
+  bottom: 42.2rem;
 }

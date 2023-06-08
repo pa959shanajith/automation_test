@@ -6,7 +6,6 @@ const AvoSelect = ({ selectOptions, selectMode, setSelectMode, labelTxt }) => {
     <div className="avo_select">
       <label>
         <span>{labelTxt}</span>
-        <img src="static/imgs/Required.svg" className="required_icon" />
       </label>
       <SelectButton
         value={selectMode}

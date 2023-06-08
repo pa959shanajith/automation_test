@@ -238,63 +238,14 @@ const readTestSuite = createAsyncThunk("config/readTestSuite", async (args) => {
 
 const storeConfigureKey = createAsyncThunk(
   "config/storeConfigureKey",
-  async () => {
+  async (args) => {
     return await axios(`${url}/storeConfigureKey`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       data: {
-        executionData: {
-          type: "",
-          poolid: "",
-          targetUser: "",
-          source: "task",
-          exectionMode: "serial",
-          executionEnv: "default",
-          browserType: ["2", "8"],
-          configurename: "Module_4",
-          executiontype: "asynchronous",
-          selectedModuleType: "normalExecution",
-          configurekey: "fc0f3cd1-0ebb-4620-8f74-5cdb0e44d8f6",
-          isHeadless: true,
-          avogridId: "",
-          avoagents: [],
-          integration: {
-            alm: { url: "", username: "", password: "" },
-            qtest: { url: "", username: "", password: "", qteststeps: "" },
-            zephyr: { url: "", username: "", password: "" },
-          },
-          batchInfo: [
-            {
-              scenarioTaskType: "disable",
-              testsuiteName: "Module_2",
-              testsuiteId: "646c554f5218324709350cfe",
-              batchname: "",
-              versionNumber: 0,
-              appType: "Web",
-              domainName: "Banking",
-              projectName: "Banking_Project",
-              projectId: "646b3f8495cef4ee0ababfdf",
-              releaseId: "release1",
-              cycleName: "cycle1",
-              cycleId: "646b3f8495cef4ee0ababfde",
-              scenarionIndex: [1],
-              suiteDetails: [
-                {
-                  condition: 0,
-                  dataparam: [""],
-                  scenarioName: "Scenario_check",
-                  scenarioId: "646efee42d7bb349c1ab2f19",
-                  accessibilityParameters: [],
-                },
-              ],
-            },
-          ],
-          donotexe: { current: { "646c554f5218324709350cfe": [1] } },
-          scenarioFlag: false,
-          isExecuteNow: false,
-        },
+        executionData: args
       },
       credentials: "include",
     })

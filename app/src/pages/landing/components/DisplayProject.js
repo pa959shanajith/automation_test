@@ -1,89 +1,104 @@
-import React, { Fragment, useRef } from "react";
-import { useState } from "react";
+import React, { Fragment, useRef ,useEffect,useState} from "react";
 import "../styles/DisplayProject.scss";
 import { Panel } from "primereact/panel";
 import { Ripple } from "primereact/ripple";
 import { InputText } from "primereact/inputtext";
 import CreateProject from "../components/CreateProject";
 import { Menu } from "primereact/menu";
+import {getProjectList} from "../../design/api"
+import { useSelector, useDispatch} from 'react-redux';
+import { loadUserInfoActions } from '../LandingSlice';
+import {userCreateProject_ICE,getProjectIDs,getUserDetails} from "../api"
+import { selectedProj, selectedModule, isEnELoad } from '../../design/designSlice';
+
+
 
 const DisplayProject = (props) => {
   const [visible, setVisible] = useState(false);
   const [sortVisible, setSortVisible] = useState(false);
   const [searchProjectName, setSearchProjectName] = useState("");
-  const [defaultProjectId, setDefaultProjectId] = useState(1);
+  const [defaultProjectId, setDefaultProjectId] = useState(null);
+  const [defaultProject, setDefaultProject] = useState(null);
+  const [projectsDetails, setProjectsDetails] = useState({});
+  const [appTypeDetails, setApptypeDetails] = useState([]);
+  const [getProjectLists,setProjectList]=useState([]);
+  const [appTypeDialog, setAppTypeDialog] = useState(null)
+  const [assignedUsers, setAssignedUsers] = useState({});
+  const [projectName, setProjectName] = useState("");
+  const dispatch = useDispatch();
+  const selectProj = useSelector(state=>state.design.selectedProj);  
+  const prjList = useSelector(state=>state.design.projectList)
+  const projectDetail = useSelector((state) => state.landing.projectDetails);
+
+  
+  // const [userDetailList,setUserDetailList]=useState([]);
   const sortItems = [
     { label: "Last Modified", value: "dateCreated", command: () => sortByModified() },
     { label: "Date Created", value: "lastModified", command: () => sortByCreated() },
     { label: "Alphabetical", value: "name", command: () => sortByName() },
   ];
 
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      name: "webserivces",
-      modifiedBy: "User 1",
-      appType: "Web",
-      createdDate: "2022-01-02",
-      modifiedDate: "2022-02-04"
-    },
-    {
-      id: 2,
-      name: "Mobile_app",
-      modifiedBy: "User 2",
-      appType: "Mobile",
-      createdDate: "2022-01-28",
-      modifiedDate: "2022-05-06"
-    },
-    {
-      id: 3,
-      name: "Desktop_app",
-      modifiedBy: "User 3",
-      appType: "Desktop",
-      createdDate: "2022-01-03",
-      modifiedDate: "2022-02-04"
-    },
-    {
-      id: 4,
-      name: "Project 4",
-      modifiedBy: "User 4",
-      appType: "WebService",
-      createdDate: "2022-01-14",
-      modifiedDate: "2022-02-05"
-    },
-    {
-      id: 5,
-      name: "Project 5",
-      modifiedBy: "User 5",
-      appType: "SAP",
-      createdDate: "2022-01-08",
-      modifiedDate: "2022-02-06"
-    },
-  ])
 
+  useEffect(() => {
+    if (filteredProjects && filteredProjects.length > 0) {
+    setDefaultProjectId(filteredProjects[0].key);
+    }
+    }, [filteredProjects]);
+    useEffect(()=>{
+      (async() => {
+          const ProjectList = await getProjectList();
+          // loadProjectDetails(ProjectList)
+          // const createdList = await userCreateProject_ICE();
+          setProjectsDetails(ProjectList)
+          // setApptypeDetails(createdList)
+          // console.log(createdList);
+      if(ProjectList.error){
+              // setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+      }else{
+
+              const arraynew = ProjectList.projectId.map((element, index) => {
+                  return (
+                      {
+                          key: element,
+                          text: ProjectList.projectName[index], 
+                          value: ProjectList.appTypeName[index], 
+                      }
+                  )
+              });
+              setProjectList(arraynew);
+          }
+      })()
+  },[])
+
+//   const loadProjectDetails = ProjectList => {
+//     console.log(loadProjectDetails);
+//     dispatch(loadUserInfoActions.setProjectDetails(ProjectList.projectDetails));
+// }
+
+  
 
 
   const sortByName = () => {
-    const sortedProjects = [...projects].sort((a, b) => a.name.localeCompare(b.name));
-    setProjects(sortedProjects);
+    const sortedProjects = [...getProjectLists].sort((a, b) => a.text.localeCompare(b.text));
+    setProjectList(sortedProjects);
     setSortVisible(false);
   };
   const sortByCreated = () => {
-    const sortedProjects = [...projects].sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
-    setProjects(sortedProjects);
+    const sortedProjects = [...getProjectLists].sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
+    setProjectList(sortedProjects);
     setSortVisible(false);
   };
   const sortByModified = () => {
-    const sortedProjects = [...projects].sort((a, b) => new Date(a.modifiedDate) - new Date(b.modifiedDate));
-    setProjects(sortedProjects);
+    const sortedProjects = [...getProjectLists].sort((a, b) => new Date(a.modifiedDate) - new Date(b.modifiedDate));
+    setProjectList(sortedProjects);
     setSortVisible(false);
   };
   const handleSearchProject = (event) => {
     setSearchProjectName(event.target.value);
   };
 
-  const filteredProjects = projects.filter((project) =>
-    project.name.toLowerCase().includes(searchProjectName.toLowerCase())
+  const filteredProjects = getProjectLists.filter((project) =>
+    project.text.toLowerCase().includes(searchProjectName.toLowerCase())
   );
   function showSortMenu(event) {
     setSortVisible(!sortVisible);
@@ -98,7 +113,11 @@ const DisplayProject = (props) => {
     setVisible(false);
   };
 
-  const defaultProject = projects.find((project) => project.id === defaultProjectId);
+useEffect(() => {
+  const selectedProject = filteredProjects.find(project => project.key === defaultProjectId);
+  setDefaultProject(selectedProject);
+  }, [defaultProjectId, filteredProjects]);
+
 
   const template = (options) => {
     const toggleIcon = options.collapsed
@@ -132,34 +151,40 @@ const DisplayProject = (props) => {
         </div>
         <div className="project-list">
           {filteredProjects.map((project) => (
-            <div key={project.id} >
+            <div key={project.key} >
               <button
-                className={project.id === defaultProjectId ? 'default-project project-card' : 'project-card'}
-                onClick={() => setDefaultProjectId(project.id)}>
-                <h2 className="projectInside">{project.name} </h2>
+                className={project.key === defaultProjectId ? 'default-project project-card' : 'project-card'}
+                onClick={() =>{
+                  if(project.key !== defaultProjectId){
+                    setDefaultProjectId(project.key);
+                  }}}>
+                <h2 className="projectInside">{project.text} </h2>
                 <>
-                  {project.appType === "Web" && (<img src="static/imgs/web.png" alt="Web App Icon" height="20" />)}
-                  {project.appType === "Mobile" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="20" />)}
-                  {project.appType === "Desktop" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
-                  {project.appType === "WebService" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="20" />)}
-                  {project.appType === "SAP" && (<img src="static/imgs/SAP.png" alt="Mobile App Icon" height="20" width='18' />)}
-                  {project.appType === "OEBS" && (<img src="static/imgs/OEBS.png" alt="Mobile App Icon" height="20" />)}
+                  {project.value === "Web" && (<img src="static/imgs/web.png" alt="Web App Icon" height="20" />)}
+                  {project.value === "MobileWeb" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="20" />)}
+                  {project.value === "Desktop" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
+                  {project.value === "Webservice" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="20" />)}
+                  {project.value === "SAP" && (<img src="static/imgs/SAP.png" alt="Mobile App Icon" height="20" width='18' />)}
+                  {project.value === "OEBS" && (<img src="static/imgs/oracleApps.png" alt="Mobile App Icon" height="17" width='25'/>)}
+                  {project.value === "Mainframe" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
+                  {project.value === "Mobileapps" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
                 </>
-                <p className="projectInsideLast">Last Modified By {project.modifiedBy}</p>
+                <p className="projectInsideLast">Last Modified By Swati{project.modifiedBy}</p>
               </button>
             </div>))}
         </div>
       </Panel>
-      <p className="DefaultProjectName">{defaultProject.name}</p>
+      <p className="DefaultProjectName">{defaultProject && defaultProject.text}</p>
       <div className="Default_Project_icon">
-        {defaultProject.appType === "Web" && (<img src="static/imgs/web.png" alt="Web App Icon" height="25" />)}
-        {defaultProject.appType === "Mobile" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="25" />)}
-        {defaultProject.appType === "Desktop" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
-        {defaultProject.appType === "WebService" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="25" />)}
-        {defaultProject.appType === "SAP" && (<img src="static/imgs/SAP.png" alt="Mobile App Icon" height="20" />)}
-        {defaultProject.appType === "OEBS" && (<img src="static/imgs/OEBS.png" alt="Mobile App Icon" height="25" />)}
+        {defaultProject && defaultProject.value === "Web" && (<img src="static/imgs/web.png" alt="Web App Icon" height="25" />)}
+        {defaultProject && defaultProject.value === "MobileWeb" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="25" />)}
+        {defaultProject && defaultProject.value === "Desktop" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
+        {defaultProject && defaultProject.value === "Webservice" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="25" />)}
+        {defaultProject && defaultProject.value === "SAP" && (<img src="static/imgs/SAP.png" alt="Mobile App Icon" height="20" />)}
+        {defaultProject && defaultProject.value === "OEBS" && (<img src="static/imgs/oracleApps.png" alt="Mobile App Icon" height="17" width='25'/>)}
+        {defaultProject && defaultProject.value === "Mainframe" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
+        {defaultProject && defaultProject.value === "MobileApps" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
       </div>
-      {/* <HomePage defaultProjectName={defaultProject.name} /> */}
     </>
   );
 };

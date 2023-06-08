@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment,useRef } from "react";
 import { TabMenu } from "primereact/tabmenu";
+import {v4 as uuid} from 'uuid';
 import { Card } from "primereact/card";
 import "../styles/ConfigurePage.scss";
 import { Panel } from "primereact/panel";
@@ -30,6 +31,8 @@ import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
 import DropDownList from '../../global/components/DropDownList';
 import {ResetSession,setMsg, Messages as MSG,VARIANT} from '../../global';
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { selections } from "../../utility/mockData";
 
 
 const ConfigurePage = ({setLoading}) => {
@@ -68,6 +71,7 @@ const ConfigurePage = ({setLoading}) => {
   const [selectedProject, setSelectedProject] = useState('');
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
+  const [modules, setModules] = useState("normalExecution");
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
   const [allocateICE,setAllocateICE] = useState(false);
@@ -102,6 +106,13 @@ const [proceedExecution, setProceedExecution] = useState(false);
   const [inputErrorBorder,setInputErrorBorder] = useState(false);
   const [iceNameIdMap,setIceNameIdMap] = useState({});
   const [availableICE,setAvailableICE] = useState([])
+  const [xpanded, setXpanded] = useState([]);
+  const [dataparam, setDataparam] = useState({});
+  const [condition, setCondition] = useState({});
+  const [accessibility, setAccessibility] = useState({});
+  const [configTxt, setConfigTxt] = useState("");
+  const [avodropdown, setAvodropdown] = useState({});
+  const [mode, setMode] = useState(selections[0]);
 
   const [currentKey,setCurrentKey] = useState('');
   const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
@@ -138,6 +149,90 @@ console.log(availableICE);
       dispatch(storeConfigureKey());
     }
     else setVisible(false);
+    if (getBtnType === "Save") {
+      const paramPaths = Object.values(dataparam).reduce((ac, cv) => {
+        ac[cv.key] = ac[cv.key] || [];
+        ac[cv.key].push(cv);
+        return ac;
+      }, {});
+      const checkcondition = Object.values(condition).reduce((ac, cv) => {
+        ac[cv.key] = ac[cv.key] || [];
+        ac[cv.key].push(cv);
+        return ac;
+      }, {});
+      const accessibilityParams = Object.values(accessibility).reduce((ac, cv) => {
+        ac[cv.key] = ac[cv.key] || [];
+        ac[cv.key].push(cv);
+        return ac;
+      }, {});
+      const dataObj = {
+        param: "updateTestSuite_ICE",
+        batchDetails: xpanded?.map((el) => ({
+          testsuiteid: el?.testsuiteid,
+          testsuitename: el?.suitename,
+          testscenarioids: el?.suitescenarios,
+          getparampaths: Object.values(paramPaths[el?.key].map((el) => el?.value)),
+          conditioncheck: Object.values(checkcondition[el?.key].map((el) => el?.value?.code === "T" ? "1" : 0)),
+          accessibilityParameters: Object.values(accessibilityParams[el?.key].map((el) => el?.value)),
+        }))
+      };
+      const executionData = {
+        type: "",
+        poolid: "",
+        targetUser: "",
+        source: "task",
+        exectionMode: "serial",
+        executionEnv: "default",
+        browserType: avodropdown?.browser?.map((el) => el.key),
+        configurename: configTxt,
+        executiontype: "asynchronous",
+        selectedModuleType: modules,
+        configurekey: uuid(),
+        isHeadless: mode === "Headless",
+        avogridId: "",
+        avoagents: [],
+        integration: {
+          alm: { url: "", username: "", password: "" },
+          qtest: { url: "", username: "", password: "", qteststeps: "" },
+          zephyr: { url: "", username: "", password: "" },
+        },
+        batchInfo: xpanded?.map((el) => ({
+            scenarioTaskType: "disable",
+            testsuiteName: el?.suitename,
+            testsuiteId: el?.suiteid,
+            batchname: "",
+            versionNumber: 0,
+            appType: "Web",
+            domainName: "Banking",
+            projectName: getConfigData?.projects[0]?.name,
+            projectId: getConfigData?.projects[0]?._id,
+            releaseId: getConfigData?.projects[0]?.releases[0]?.name,
+            cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
+            cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
+            scenarionIndex: [],
+            suiteDetails: [
+              {
+                condition: 0,
+                dataparam: [""],
+                scenarioName: "",
+                scenarioId: "",
+                accessibilityParameters: [],
+              },
+            ],
+        })),
+        donotexe: {
+          current: xpanded?.map((el) => ({
+            [el?.suiteid]: [0],
+          }))
+        },
+        scenarioFlag: false,
+        isExecuteNow: false,
+      };
+      dispatch(updateTestSuite(dataObj)).then(() => dispatch(storeConfigureKey(executionData)));
+      setVisible(false);
+    } else if (getBtnType === "Next") {
+      setTabIndex(1);
+    } else setVisible(false);
   };
   const readTestSuiteFunct = async (readTestSuite, item) => {
     setLoading("Loading in Progress. Please Wait");
@@ -1052,8 +1147,8 @@ const copyConfigKey = (title) => {
     setSelectedRadio(value);
   };
   const tabMenuItems = configList.length > 0
-  ? [...items, { label: <Button className="delete_button" size="small"> Delete</Button> }, { label:<Button className="addConfi_button" size="small"> Add Configuration</Button> }]
-  : items;
+  ? [...items, { label: <Button className="delete_button" size="small"> Delete</Button> }, { label:<Button onClick={() => setVisible(true)} className="addConfi_button" size="small"> Add Configuration</Button> }]
+      : items;
   const checkboxHeaderTemplate = () => {
     return (
       <>
@@ -1192,14 +1287,36 @@ const copyConfigKey = (title) => {
     </div>
         <div className="ConfigurePage_container  m-2">{renderTable()}</div>
         <AvoModal
-        visible={visible}
-        setVisible={setVisible}
-        onModalBtnClick={onModalBtnClick}
-        content={<ConfigureSetup configData={getConfigData} />}
-        headerTxt="Execution Configuration set up"
-        footerType="CancelNext"
-        modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
-      />
+          visible={visible}
+          setVisible={setVisible}
+          onModalBtnClick={onModalBtnClick}
+          content={
+            <ConfigureSetup
+              configData={getConfigData}
+              xpanded={xpanded}
+              setXpanded={setXpanded}
+              tabIndex={tabIndex}
+              setTabIndex={setTabIndex}
+              dataparam={dataparam}
+              setDataparam={setDataparam}
+              condition={condition}
+              setCondition={setCondition}
+              accessibility={accessibility}
+              setAccessibility={setAccessibility}
+              modules={modules}
+              setModules={setModules}
+              configTxt={configTxt}
+              setConfigTxt={setConfigTxt}
+              avodropdown={avodropdown}
+              setAvodropdown={setAvodropdown}
+              mode={mode}
+              setMode={setMode}
+            />
+          }
+          headerTxt="Execution Configuration set up"
+          footerType={footerType}
+          modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
+        />
       </div>
       <Toast ref={toast} position="bottom-center" />
     </>
