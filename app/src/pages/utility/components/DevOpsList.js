@@ -22,9 +22,6 @@ import {getProjectList} from '../../mindmap/api';
 import { FormInput } from '../../admin/components/FormComp';
 import {getDetails_SAUCELABS} from '../../settings/api';
 import {saveSauceLabData} from '../../utility/api';
-import index from 'uuid-random';
-import async from 'async';
-import { name } from 'agenda/dist/agenda/name';
 
 
 
