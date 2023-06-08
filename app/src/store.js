@@ -7,7 +7,7 @@ import loginReducer from './pages/login/loginSlice'
 import designSlice from "./pages/design/designSlice";
 import configureSetupSlice from "./pages/execute/configureSetupSlice";
 
-
+import globalSlice from "./pages/global/globalSlice";
 import stepsSlice from './pages/landing/components/VerticalComponentsSlice';
 import landingReducer from './pages/landing/LandingSlice';
 import configurePageSlice from "./pages/execute/configurePageSlice";
@@ -22,6 +22,8 @@ export default configureStore({
         // admin:adminReducer
         design: designSlice,
         configsetup: configureSetupSlice,
-        configpage: configurePageSlice
+        configpage: configurePageSlice,
+        progressbar: globalSlice,
+        
     }
 })
