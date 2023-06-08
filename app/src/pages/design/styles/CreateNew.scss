@@ -7,6 +7,12 @@
     border: 1px solid transparent;
     width: 100%;
 }
+@media screen and (max-width:890px){
+    .mp__canvas{
+        top: 75px;
+        height: calc(100% - 75px);
+    }
+}
 .note{
     
     font-size: 12px;

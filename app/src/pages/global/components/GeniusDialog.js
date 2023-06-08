@@ -9,7 +9,7 @@ const GeniusDialog = () => {
   const showGeniusDialog = useSelector((state) => state.progressbar.showGenuisWindow)
   const geniusWindowProps = useSelector((state) => state.progressbar.geniusWindowProps)
   const showSmallPopup = useSelector((state) => state.progressbar.showSmallPopup)
-  const userInfo=useSelector(state=>state.login.userinfo)
+  const userInfo = useSelector((state) => state.landing.userinfo);
   const[small,setSmall]=useState(false)
   const dispatch = useDispatch();
   useEffect(()=>{

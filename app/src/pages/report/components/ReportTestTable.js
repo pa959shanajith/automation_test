@@ -1,8 +1,44 @@
-import React from 'react'; 
+import React, {useEffect, useState} from 'react'; 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Breadcrumbs, Link } from '@mui/material';
+import { Chart } from 'primereact/chart';
 
 export default function BasicDemo() {
+    const [chartData, setChartData] = useState({});
+    const [chartOptions, setChartOptions] = useState({});
+
+    useEffect(() => {
+        const documentStyle = getComputedStyle(document.documentElement);
+        const data = {
+            labels: ['A', 'B', 'C','D', 'E'],
+            datasets: [
+                {
+                    data: [100, 50, 10, 20,40],
+                    backgroundColor: [
+                        documentStyle.getPropertyValue('--blue-500'), 
+                        documentStyle.getPropertyValue('--yellow-500'), 
+                        documentStyle.getPropertyValue('--green-500'),
+                        documentStyle.getPropertyValue('--red-500'),
+                        documentStyle.getPropertyValue('--orange-500')
+                    ],
+                    hoverBackgroundColor: [
+                        documentStyle.getPropertyValue('--blue-400'), 
+                        documentStyle.getPropertyValue('--yellow-400'), 
+                        documentStyle.getPropertyValue('--green-400'),
+                        documentStyle.getPropertyValue('--red-500'),
+                        documentStyle.getPropertyValue('--orange-500')
+                    ]
+                }
+            ]
+        };
+        const options = {
+            cutout: '60%'
+        };
+
+        setChartData(data);
+        setChartOptions(options);
+    }, []);
+
     return (
         <>
         <Breadcrumbs>
@@ -21,6 +57,9 @@ export default function BasicDemo() {
                         Total Test Cases
                         Local OS
                         Platfrom
+                    </div>
+                    <div className="card flex justify-content-center">
+                        <Chart type="doughnut" data={chartData} options={chartOptions} className="w-full md:w-30rem" />
                     </div>
                 </TabPanel>
                 <TabPanel header="Execution Settings">
