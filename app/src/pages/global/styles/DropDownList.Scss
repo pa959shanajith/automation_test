@@ -1,0 +1,46 @@
+@import "../../global/styles/ColorVariables.scss";
+.form-inp-dropdown-popup{
+    font-size: 14px;
+    width: calc(70% - 3rem);
+    // height: 100%;
+    right: 1.65rem;
+    max-height: 123px;
+    box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+    display: block;
+    background: $whiteColor;
+    margin-top: 2px;
+    z-index: 1;
+    position: absolute;
+    ul{
+        padding-left: 2px;
+        margin: 4px;
+        width: calc(100% - 14px);
+    }
+    .dropdown-list-item:hover{
+        background: $primaryColor;
+        border-radius: 3px;
+        color: $whiteColor;
+        cursor: pointer;
+    }
+}
+.dropdown-list-item{
+    font-weight: 500;
+    display: flex;
+    padding: 3px 12px;
+}
+.selectedCheckBox{
+    background: $primaryColor;
+    border-radius: 3px;
+    color: $whiteColor;
+    cursor: pointer;
+}
+.dropdownInputError{
+    border: 1px solid $red!important;
+}
+.adminControl-ice div input {
+  
+    width: 59%;
+    margin-left: 6rem;
+    margin-top: 1rem;
+    height: 1.2rem;
+}

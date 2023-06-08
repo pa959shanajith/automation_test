@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {url} from '../../App';
-import { Messages as MSG} from '../global/components/Messages';
-// import {history} from './index'
+import { Messages as MSG,RedirectPage} from '../global/components/Messages';
+import {history} from './index'
 
 export const fetchConfigureList = async(props) => {
     console.log(props);
@@ -124,5 +124,54 @@ export const getProjectList = async() => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+export const ExecuteTestSuite_ICE = async(executionData) => { 
+    try{
+        const res = await axios(url+'/ExecuteTestSuite_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {param : 'ExecuteTestSuite_ICE',
+            executionData: executionData},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {errorapi:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}
+    }catch(err){
+        console.error(err)
+        return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}
+    }
+}
+export const execAutomation = async(props) => {
+    try{
+        console.log(props)
+        const res = await axios(url+'/execAutomation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"key":props},
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.log(res.data + '  408')
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
