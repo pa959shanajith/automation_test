@@ -42,7 +42,8 @@ const UserDemo = (props) => {
                 return (
                             <div className='ProfileDisplay'>
                                 <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800"
-                                label={initials } 
+                                image={userInfo.userimage ? userInfo.userimage : initials} 
+                                label={ !userInfo.userimage ? initials :''}
                                 onClick={handleUserMenu} size="xlarge" shape="circle"/>
                                 <div className="flex flex-column">
                                     <span className="font-bold c">{userInfo.username}</span>
@@ -120,11 +121,9 @@ const UserDemo = (props) => {
                 message="Are you sure you want to logout?" 
                 icon="pi pi-exclamation-triangle" 
                 accept={confirmLogout} />
-            <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800 profile"
-                // image={userLoginInfo.profilePictureUrl ? userLoginInfo.profilePictureUrl :''} 
-                // label={userLoginInfo.profilePictureUrl ? userLoginInfo.username : getInitials()}
-                image={userInfo ? userInfo :''} 
-                label={ userInfo ? initials :''}
+            <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800 "
+                image={userInfo.userimage ? userInfo.userimage : initials} 
+                label={ !userInfo.userimage ? initials :''}
                 onClick={handleUserMenu} size='small' shape="circle"/>
         </div>
    );

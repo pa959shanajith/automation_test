@@ -14,6 +14,7 @@ const AvoConfirmDialog = ({
 }) => {
 
   return (
+    <div className='Logout_modal'>
     <ConfirmDialog
       className="Logout_modal"
       visible={visible}
@@ -22,6 +23,7 @@ const AvoConfirmDialog = ({
       message={message} 
       icon={icon} 
       accept={accept} />
+      </div>
   );
 };
 
