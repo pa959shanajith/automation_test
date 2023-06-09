@@ -444,7 +444,7 @@ useEffect(()=>{
             return (
                 {
                   selectall: item.custname,
-                  objectproperty: item.tag,
+                  objectProperty: item.tag,
                   browserscrape: 'google chrome',
                   screenshots: 'view',
                   actions: '',
@@ -453,7 +453,7 @@ useEffect(()=>{
                 return (
                     {
                       selectall: item.custname,
-                      objectproperty: item.tag,
+                      objectProperty: item.tag,
                       browserscrape: 'google chrome',
                       screenshots: 'view',
                       actions: '',
