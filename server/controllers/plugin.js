@@ -60,7 +60,7 @@ exports.userCreateProject_ICE = async (req, res) =>{
 		const inputs = {
 			name: createProjectObj.projectName,
 			domain: createProjectObj.domain,
-			type: createProjectObj.appType,
+			type: createProjectObj.type,
 			releases: createProjectObj.releases,
       assignedUsers:createProjectObj.assignedUsers,
 			createdby: userid,
