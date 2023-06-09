@@ -98,13 +98,20 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [isEmpty, setIsEmpty] = useState(false);
     const [defaultValues, setDefaultValues] = useState({});
     const [osNames, setOsNames] = useState([]);
+    const [iphone, setIphone] = useState([]);
+    const [android, setAndroid] = useState([]);
     const [selectedOS, setSelectedOS] = useState('');
     const [selectedSaucelabBrowser, setSelectedSaucelabBrowser] = useState('');
+    const [selectedMobileVersion, setSelectedMobileVersion] = useState('');
     const [selectedVersion, setSelectedVersion] = useState('');
-
+    const [platforms, setPlatforms] = useState([{key:"android", text:"android",title:"android" ,index:0},{key:"iphone", text:"iphone",title:"iphone" ,index:1}]);
+    const [selectedPlatforms, setSelectedPlatforms] = useState('');
     const [saucelabBrowsers, setSaucelabBrowsers] = useState({});
     const [browserVersions, setBrowserVersions] = useState([]);
-    const [browserDetails,setBrowserDetails] = useState([])
+    const [browserDetails,setBrowserDetails] = useState([]);
+    const [mobileDetails,setMobileDetails] = useState([]);
+    const [mobilePlatform,setMobilePlatform] = useState([]);
+    const [emulator, setEmulator]= useState([]);
     const [sauceLab, setSauceLab] = useState(false);
     const [browserlist, setBrowserlist] = useState([
         {
@@ -337,6 +344,35 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setSelectedVersion(option.key)
     }
 
+    const onAndroidVersionChange = (option) => {
+        setSelectedMobileVersion(option.key);
+        let findAndroidEmulator = mobileDetails[selectedPlatforms][option.key.split(' ')[1]]
+            setEmulator(findAndroidEmulator);
+            console.log(findAndroidEmulator);
+    }
+
+    const onMobilePlatformChange = async (option) => {
+        setSelectedPlatforms(option.key)
+        
+        let findMobileVersions = Object.keys(mobileDetails[option.key]).map((element, index) => {
+            let each_version = option.key+" "+element 
+            return (
+                {
+                    key:each_version,
+                    text:each_version,
+                    title:each_version,
+                    index: index
+                }
+            )});
+            setAndroid(findMobileVersions);
+            console.log(findMobileVersions);
+            setMobilePlatform(findMobileVersions)
+    }
+
+    const onEmulatorChange = async (option) => {
+        setMobilePlatform(option.key)
+    }
+
 
     const copyKeyUrlFunc = (id) => {
         const data = document.getElementById(id).title;
@@ -403,6 +439,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setDisplayBasic4(false);
         // open the new dialog
         setLoading('Fetching details...') 
+        SauceLabPayload['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
         let data = await saveSauceLabData({
             SauceLabPayload
         });
@@ -432,7 +469,33 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             });
             setSaucelabBrowsers(arrayBrowser);
             setBrowserDetails(data);
-          } else {
+        }
+           else if (data && data.android && data.iphone){
+            setLoading(false);
+            setDisplayBasic5(true);
+            const arrayAndroid =Object.keys(data.android).map((element, index) => {
+                return {
+                  key: element,
+                  text: "Android"+element,
+                  title: "Android"+element,
+                  index: index
+                };
+              });
+              setAndroid(arrayAndroid);
+
+
+              const arrayIphone =Object.keys(data.iphone).map((element, index) => {
+                return {
+                  key: element,
+                  text: "iphone"+element,
+                  title: "iphone"+element,
+                  index: index
+                };
+              });
+              setIphone(arrayIphone);
+              setMobileDetails(data);
+          }
+           else {
             setLoading(false);
             // Data is empty or doesn't have expected properties
             if (data == "unavailableLocalServer"){
@@ -1290,17 +1353,26 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onDismiss={() => {setDisplayBasic5(false)}} onHide={() => onHide('displayBasic5')}>
                      
 
+                    <div><h6>Platforms</h6></div>
+                    {showSauceLabs&&<SearchDropdown
+                    noItemsText={[]}
+                    onChange={onMobilePlatformChange}
+                    options={platforms}
+                    selectedKey={''}
+                    width='15rem'
+                    placeholder='select Platform'
+                    />}
                     <div><h6>Operating System</h6></div>
-                    <SearchDropdown
+                    {!showSauceLabs&&<SearchDropdown
                     noItemsText={[]}
                     onChange={onOsChange}
                     options={osNames}
                     selectedKey={selectedOS}
                     width='15rem'
                     placeholder='select OS'
-                    />
+                    />}
                     <div><h6>Browser</h6></div>
-                    <SearchDropdown
+                    {!showSauceLabs&&<SearchDropdown
                     noItemsText={[ ]}
                     onChange={onSaucelabBrowserChange}
                     options={saucelabBrowsers}
@@ -1308,17 +1380,38 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     width='15rem'
                     placeholder='select Browser'
 
-                    />
+                    />}
                     <div><h6>Versions</h6></div>
-                    <SearchDropdown
+                    {showSauceLabs && <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={onAndroidVersionChange}
+                    options={android}
+                    selectedKey={''}
+                    width='15rem'
+                    placeholder='select android versions'
+
+                    />}
+                    
+                    <div><h6>Versions</h6></div>
+                    {!showSauceLabs&&<SearchDropdown
                     noItemsText={[ ]}
                     onChange={onVersionChange}
                     options={browserVersions}
                     selectedKey={selectedVersion}
                     width='15rem'
                     placeholder='select Versions'
+
                     
-                    />
+                    />}
+                    <div><h6>Emulator</h6></div>
+                    {showSauceLabs &&<SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={onEmulatorChange}
+                    options={emulator}
+                    selectedKey={''}
+                    width='15rem'
+                    placeholder='select Emulator'
+                     />}
                     <div>
                         <div>
                             <div className='adminControl-ice-saucelabs'>

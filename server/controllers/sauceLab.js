@@ -38,7 +38,7 @@ exports.saveSauceLabData = function (req, res) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					var SauceLabDetails = {
-						"action":req.body.query || 'sauceMobileWebDetails',
+						"action":req.body.SauceLabPayload.query,
 						"SauceLabURL": check_SauceLabURL,
 						"SauceLabusername" : check_SauceLabusername,
 						"SauceLabAccessKey": check_SauceLabAccessKey
