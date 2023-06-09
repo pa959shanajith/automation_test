@@ -5,6 +5,8 @@ import PopupMsg, {setMsg} from './components/PopupMsg';
 import {Messages, VARIANT} from './components/Messages';
 import ModalContainer from './components/ModalContainer';
 import ChangePassword from './components/ChangePassword';
+import ScrollBar from './components/ScrollBar';
+import ResetSession from './components/ResetSession';
 
 export { 
         ProgressBar,
@@ -16,4 +18,6 @@ export {
         setMsg,
         ModalContainer,
         ChangePassword,
+        ScrollBar,
+        ResetSession, 
     };

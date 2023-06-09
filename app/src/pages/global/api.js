@@ -55,3 +55,22 @@ export const resetPassword = (newpassword, currpassword=null, userData=null) => 
         })
     })
 }
+export const keepSessionAlive = () => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/keepSessionAlive", {
+            method : 'POST',
+            credentials : 'include'
+        })
+        .then(res=>{
+            if (res.status === 200) {
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err)
+        })
+    });
+}

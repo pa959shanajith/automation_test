@@ -123,6 +123,18 @@ export const designSlice = createSlice({
     disableAction:(state, action)=>{
       state.disableAction = action.payload;
     },
+    disableAppend:(state, action)=>{
+      state.disableAppend= action.payload;
+    },
+    actionError:(state, action)=>{
+      state.actionError = action.payload;
+    },
+    WsData:(state, action)=>{
+     state.WsData = action.payload;
+    },
+    wsdlError:(state,action)=>{
+     state.wsdlError = action.payload;
+    },
     copiedTestCases: (state, action)=>{
       state.copiedTestCases = action.payload;
     },
@@ -155,7 +167,7 @@ importData,
 unassignTask,
 toDeleteScenarios,
 appType,
-savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases,
+savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
 TestCases,
 Modified,
 SaveEnable} = designSlice.actions

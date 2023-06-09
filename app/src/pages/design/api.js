@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Messages as MSG} from '../global/components/Messages'
+import { Messages as MSG} from '../global/components/Messages'
 import {url} from '../../App';
 
 /*Component getProjectList
@@ -680,6 +680,29 @@ export const exportToProject = async(moduleId) => {
     }
 }
 
+export const initScraping_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/initScraping_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'initScraping_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(history);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+
+
 
 /*Component 
   props : {groupids:["id1","id2"],groupnames:["name1","name2"]}
@@ -800,6 +823,23 @@ export const updateScreen_ICE = arg => {
     });
 }
 
+export const excelToScreen = (data) =>	{
+    return new Promise((resolve, reject)=>{
+        const res = axios(url+"/importScreenfromExcel", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error))
+    })
+}
 /*Component DesignContent
   api returns {"template":"","reuse":bool,"testcase":[{"addTestCaseDetails":"","addTestCaseDetailsInfo":"{\"actualResult_fail\":\"\",\"actualResult_pass\":\"\",\"testcaseDetails\":\"\"}","appType":"","cord":"","custname": "","inputVal":[""],"keywordVal":"","objectName":"","outputVal":"","remarks": "a;b","stepNo":int,"url":""}],"testcasename":"","del_flag":bool}
 */
@@ -953,6 +993,31 @@ export const getTestcasesByScenarioId_ICE = (testScenarioId) => {
             else{
                 reject(res.status)
             }
+        })
+        .catch(error=>reject(error))
+    })
+}
+
+export const exportScreenToExcel = (type, screenId, projectId, testCaseId) =>	{
+    return new Promise((resolve, reject)=>{
+        const res = axios(url+"/exportScreenToExcel", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json',
+            },
+            data : {
+                param: 'exportScreenToExcel',
+                screenId: screenId,
+                projectId: projectId,
+                type: type,
+                testCaseId: testCaseId
+            },
+            credentials : 'include',
+            responseType:'arraybuffer'
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
         })
         .catch(error=>reject(error))
     })

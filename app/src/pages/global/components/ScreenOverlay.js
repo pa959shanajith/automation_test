@@ -1,5 +1,5 @@
 import React from 'react';
-// import '../styles/ScreenOverlay.scss'
+import '../styles/ScreenOverlay.scss';
 
 /*Component ScreenOverlay
   use: block screen while loading something in background;
