@@ -10,6 +10,10 @@ import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
 import { getUserDetails, userCreateProject_ICE } from '../api';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { loadUserInfoActions } from '../LandingSlice';
+
 
 
 
@@ -304,6 +308,44 @@ const CreateProject = ({ visible, onHide }) => {
         name: user.name,
         role: user.selectedRole ? user.selectedRole.name : user.primaryRole,
       }));
+      console.log(filteredUserDetails)
+  
+      var projData = {
+        "projectName" : value,
+        type : selectedApp.name,
+        assignedUsers : filteredUserDetails,
+        domain:"banking",
+        releases: [{ "name": "R1", "cycles": [{ "name": "C1" }] }],
+  
+      }
+      console.log(projData)
+      const project = await userCreateProject_ICE(projData)
+      console.log(project)
+      if(project.error){
+  
+      }
+     else{
+      toast.current.show({
+        severity: "success",
+        summary: "Project Created Successfully..",
+        detail: "Project Created Successfully....!",
+        life: 1000 
+      });
+      dispatch(loadUserInfoActions.savedNewProject(true))
+      onHide(); 
+      setRefreshData(!refreshData);
+    }
+      
+    }else {
+      toast.current.show({
+        severity: "error",
+        summary: "Please Fill all the Mandatory Fields..!",
+        detail: "Please Fill all the Mandatory Fields..!",
+        life: 1000 ,
+        closable: true,
+        className:'toast_msg'
+      });
+}
 
       var projData = {
         projectName: value,

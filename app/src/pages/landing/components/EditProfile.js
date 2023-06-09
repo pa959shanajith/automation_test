@@ -6,7 +6,6 @@ import { Button } from 'primereact/button';
 import { Avatar } from 'primereact/avatar';
 import { Toast } from 'primereact/toast';
 import { Tooltip } from 'primereact/tooltip';
-// import { Form } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
 import { manageUserDetails } from '../api'
@@ -21,7 +20,6 @@ const EditProfile = (props) => {
     const [showDialog, setShowDialog] = useState(showDialogBox);
     const toastWrapperRef = useRef(null);
     const userInfo = useSelector((state) => state.landing.userinfo);
-    // const [updatedUserInfo, setUpdatedUserInfo] = useState(userInfo);
     const dispatch = useDispatch();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -37,17 +35,25 @@ const EditProfile = (props) => {
     const [isNewConfirmPassword, setIsNewConfirmPassword] = useState(true);
     const [loading, setLoading] = useState(false);
     const [changePass, setChangePass] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [base64String, setBase64String] = useState('');
 
 
     const chooseOptions = { icon: 'pi pi-camera', label: ' ' };
+    const onFileUpload = (event) => {
 
-    const onUpload = (event) => {
-        // Get the uploaded file
-        const uploadedFile = event.files[0];
-
-        // Set the profile image state
-        setProfileImage(uploadedFile);
+        const file = event.files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result;
+            setSelectedFile(file);
+            setBase64String(base64String);
+        };
+        if (file) {
+            reader.readAsDataURL(file);
+        }
     };
+
 
     useEffect(() => {
         const firstNameInitial = userInfo.firstname ? userInfo.firstname.slice(0, 1) : '';
@@ -65,6 +71,7 @@ const EditProfile = (props) => {
         setFirstName(userInfo.firstname);
         setLastName(userInfo.lastname);
         setEmail(userInfo.email_id);
+        setBase64String(userInfo.userimage);
     }
 
     useEffect(() => {
@@ -95,23 +102,23 @@ const EditProfile = (props) => {
             firstname: firstName,
             lastname: lastName,
             email: email,
+            userimage: base64String,
             role: userInfo.role,
             userConfig: true,//hardcoded only for inhouse
             type: 'inhouse' //hardcoded only for inhouse
         };
+        const userdetail = { ...userInfo, ['email_id']: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, userimage: userObj.userimage };
         (async () => {
             try {
                 var data = await manageUserDetails("update", userObj);
                 setLoading(false);
                 if (data === 'success') {
-                    dispatch(loadUserInfoActions.setUserInfo)
-                    // dispatch({type:setUserInfo, payload: { ...userInfo, ['email_id']: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname}})
-                    // setMsg(MSG.SETTINGS.SUCC_INFO_UPDATED);
-                    // click();
+                    dispatch(loadUserInfoActions.setUserInfo(userdetail))
                 } else if (data === "exists") {
                     // setMsg(MSG.ADMIN.WARN_USER_EXIST);
                 } else if (data === "fail") {
                     // setMsg(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
+                    console.log("failed to update user");
                 }
                 else if (/^2[0-4]{8}$/.test(data)) {
                     if (JSON.parse(JSON.stringify(data)[1])) {
@@ -137,27 +144,13 @@ const EditProfile = (props) => {
             }
             catch (error) {
                 // setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                console.log("Error:", error);
                 click();
             }
         })()
         resetFields();
     }
 
-
-
-
-
-    // useEffect(() => {
-    //     if (errorMsg) {
-    //         toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 3000 });
-    //     }
-    // }, [errorMsg]);
-
-    // useEffect(() => {
-    //     if (successMsg) {
-    //         toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 3000 });
-    //     }
-    // }, [successMsg]);
 
 
     // resets the input fields when clicks on Cancel and Save Button
@@ -178,7 +171,6 @@ const EditProfile = (props) => {
                 label="Save"
                 size='small'
                 onClick={updateSubmitHandler}
-            // disabled={(newpassword != '' && confirmNewpassword != '') && (newpassword === confirmNewpassword) ? false : true} 
             />
         </>
 
@@ -190,8 +182,8 @@ const EditProfile = (props) => {
                 <Dialog header="Basic Information" className="editProfile_dialog" visible={showDialog} style={{ width: '47vw' }} onHide={resetFields} footer={editProfileFooter}>
                     <div className='pt-3'>
                         <div className='profileImage'>
-                            <Avatar image={userInfo ? userInfo : ''}
-                                label={userInfo ? initials : ''}
+                            <Avatar image={base64String}
+                                // label={userInfo.userimage ? initials : ''}
                                 size='xlarge' title="User Profile" shape='circle'
                             />
                             <FileUpload className="userImage"
@@ -200,12 +192,13 @@ const EditProfile = (props) => {
                                 accept="image/*"
                                 maxFileSize={1000000}
                                 chooseOptions={chooseOptions}
-                                onUpload={onUpload}
+                                chooseLabel="Select Image"
+                                customUpload={true}
+                                uploadHandler={onFileUpload}
                             />
                         </div>
 
                         <div className='input_field'>
-                            {/* <form onSubmit={handleSubmit}> */}
                             {/* Name Input Field */}
                             <div className='pt-2'>
                                 <label htmlFor="name">Name</label>
@@ -227,8 +220,6 @@ const EditProfile = (props) => {
                                     value={email}
                                     type="email"
                                     onChange={(event) => { setEmail(event.target.value) }} />
-                                {/* // onChange={handleNameChange} */}
-                                {/* /> */}
                             </div>
 
                             {/* PrimaryRole Input Field */}
@@ -254,9 +245,6 @@ const EditProfile = (props) => {
                                     readOnly
                                 />
                             </div>
-                            {/* <button type='submit'>save</button> */}
-
-                            {/* </form> */}
                         </div>
                     </div>
                 </Dialog>

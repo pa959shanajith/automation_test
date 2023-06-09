@@ -145,3 +145,29 @@ export const manageUserDetails = async(action, userObj) => {
     }
 }
 
+
+export const fetchProjects = async(data) => {
+    try{
+        const res = await axios(url+'/fetchProjects', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+
