@@ -973,6 +973,13 @@ const DesignModal = (props) => {
     const textEditor = (options) => {
         return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
     };
+    const onRowEditComplete = (e) => {
+        let testcase = [...newtestcase];
+        let { newData, index } = e;
+        testcase[index] = newData;
+        setnewtestcase(testcase);
+    };
+
     return (
         <>
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} >
