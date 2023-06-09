@@ -124,8 +124,18 @@ console.log(availableICE);
 
   const displayError = (error) =>{
     // setLoading(false)
-    // setMsg(error)
+    setMsg(error)
 }
+const [displayBasic2, setDisplayBasic2] = useState(false);
+const [selectedItem, setSelectedItem] = useState({});
+ const [position, setPosition] = useState('center');
+
+const dialogFuncMap = {
+ 
+  'visible_execute': setVisible_execute
+ 
+}
+
 const [footerType, setFooterType] = useState("CancelNext");
   const [tabIndex, setTabIndex] = useState(0);
   const items = [ { label: "Configurations" }, { label: "Scheduled Executions" }];
@@ -847,7 +857,7 @@ const copyConfigKey = (title) => {
                       width: "8.5rem",
                       fontFamily: "Open Sans",
                       fontStyle: "normal",
-                      marginLeft:'9.5rem',
+                      marginLeft:'0.5rem',
                       height:"2.5rem"
                     }}
                     onClick={() => {
@@ -868,8 +878,8 @@ const copyConfigKey = (title) => {
                     header="Execute : Regression"
                     visible={visible_execute}
                     style={{ width: "50vw" }}
-                    onHide={() => setVisible_execute(false)}
-                    footer={renderFooter}
+                    onHide={() => {setVisible_execute(false)}}
+                    footer={renderFooter('visible_execute')}
                   >
                     
                     <Card className="execute_card p-card p-card-body ">
@@ -1008,7 +1018,7 @@ const copyConfigKey = (title) => {
                     visible={visible_CICD}
                     style={{ width: "50vw" }}
                     onHide={() => setVisible_CICD(false)}
-                    footer={footerContent_CICD}
+                    // footer={footerContent_CICD}
                   >
                     <Card className="Schedule_card  .p-card .p-card-content ">
                       <p className="m-0 ">
@@ -1094,7 +1104,7 @@ const copyConfigKey = (title) => {
     );
   };
            
-  const renderFooter = () => {
+  const renderFooter = (name) => {
     return (
         <div>
             <Button label="Execute" title="Execute" className="execute_button" onClick={async () => {
@@ -1107,7 +1117,7 @@ const copyConfigKey = (title) => {
                     else dataExecution.targetUser = selectedICE
                    
                     CheckStatusAndExecute(dataExecution, iceNameIdMap);
-                    // onHide(name);
+                    onHide(name);
                 }
                 else {
                     const temp = await execAutomation(currentKey);
@@ -1120,7 +1130,7 @@ const copyConfigKey = (title) => {
                     }else {
                         setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
                     }
-                    // onHide(name);
+                    onHide(name);
                 }
                 
             }
@@ -1129,21 +1139,29 @@ const copyConfigKey = (title) => {
         </div>
     );
 }
-// const onHide = (name) => {
-//     dialogFuncMap[`${name}`](false);
+const onHide = (name) => {
+    dialogFuncMap[`${name}`](false);
+}
+// const onClick = (name, position) => {
+//   dialogFuncMap[`${name}`](true);
+
+//   if (position) {
+//       setPosition(position);
+//   }
 // }
+
   // const footerContent_config = (
   //   <div className="btn-11">
   //     <Button label="Cancel" className="Cancle_button" />
   //     <Button className="execute_button" label="Execute" onClick={showSuccess_execute}></Button>
   //   </div>
   // );
-  const footerContent_CICD = (
-    <div className="btn-11">
-      <Button label="Cancel" className="Cancle_button" />
-      <Button className="confirm_button" label="Confirm"></Button>
-    </div>
-  );
+  // const footerContent_CICD = (
+  //   <div className="btn-11">
+  //     <Button label="Cancel" className="Cancle_button" />
+  //     <Button className="confirm_button" label="Confirm"></Button>
+  //   </div>
+  // );
   const footerContent_Schedule = (
     <div className="btn-11">
       <Button label="Cancel" className="Cancle_button" />
@@ -1157,7 +1175,7 @@ const copyConfigKey = (title) => {
     setSelectedRadio(value);
   };
   const tabMenuItems = configList.length > 0
-  ? [...items, { label: <Button className="delete_button" size="small"> Delete</Button> }, { label:<Button onClick={() => setVisible(true)} className="addConfi_button" size="small"> Add Configuration</Button> }]
+  ? [...items, { label:<Button onClick={() => setVisible(true)} className="addConfi_button" size="small"> Add Configuration</Button> }]
       : items;
   const checkboxHeaderTemplate = () => {
     return (
