@@ -32,6 +32,7 @@
         top: -1rem;
         right: 1rem;
     }
+
     .proj-input{
         position: relative;
         top: 0.5rem;
@@ -45,6 +46,10 @@
         position: relative;
         top: 0.5rem;
         height: 2.25rem;
+        .p-dropdown-label{
+         display: flex;
+         align-items: center;
+        }
     }
     
     .proj-input::placeholder{
@@ -234,13 +239,14 @@
         height: 2.25rem;
     }
     .Project-Dialog{
+        background: white;
         .p-dialog-header {
-       background: #e9ecef !important;
-       padding: 1rem !important;
-       font-family: 'Open Sans' !important;
-      font-style: normal !important;
-      font-weight: 600 !important; 
-      font-size: 20px !important;
+     background: rgba(96, 91, 255, 0.08) !important;
+     padding: 1rem !important;
+     font-family: 'Open Sans' !important;
+     font-style: normal !important;
+     font-weight: 600 !important; 
+     font-size: 20px !important;
         }
         .p-dialog-content{
             overflow: hidden;
@@ -403,11 +409,10 @@
    .imp-cls{
     color: red;
    }
-   .toast_msg{
-    position: relative;
-    z-index:1101;
-   }
-   
+//    .custom-toast {
+//     position: absolute;
+//     z-index: 99999999;
+//   }
     
     
     

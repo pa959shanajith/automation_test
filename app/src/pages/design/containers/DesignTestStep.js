@@ -34,6 +34,7 @@ const DesignModal = (props) => {
     const [overlay, setOverlay] = useState("");
     const [hideSubmit, setHideSubmit] = useState(false);
     const [keywordList, setKeywordList] = useState(null);
+    const [keywordListTable, setKeywordListTable] = useState([]);
     const [testCaseData, setTestCaseData] = useState([]);
     const [testScriptData, setTestScriptData] = useState(null);
     const [stepSelect, setStepSelect] = useState({ edit: false, check: [], highlight: [] });
@@ -58,7 +59,8 @@ const DesignModal = (props) => {
     const [groupList, setGroupList] = useState([])
     const [showPopup, setShow] = useState(false);
     const [debugEnable, setDebugEnable] = useState(false);
-    const [newtestcase, setnewtestcase] = useState([]);
+    const [newtestcase,setnewtestcase] = useState([]);
+    const [keyword, setKeyword] = useState('');
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -316,7 +318,7 @@ const DesignModal = (props) => {
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
                 let errorFlag = false;
-                let testCases = [...testCaseData]
+                let testCases = [...newtestcase]
 
                 for (let i = 0; i < testCases.length; i++) {
                     let step = i + 1
@@ -519,28 +521,14 @@ const DesignModal = (props) => {
     }
 
     const addRow = () => {
-        let testCases = [...testCaseData]
-        let insertedRowIdx = [];
-        runClickAway = false;
-        if (stepSelect.check.length === 1) {
-            const rowIdx = stepSelect.check[0];
-            testCases.splice(rowIdx + 1, 0, emptyRowData);
-            insertedRowIdx.push(rowIdx + 1)
-        }
-        else if (stepSelect.highlight.length === 1 && !stepSelect.check.length) {
-            const rowIdx = stepSelect.highlight[0];
-            testCases.splice(rowIdx + 1, 0, emptyRowData);
-            insertedRowIdx.push(rowIdx + 1)
-        }
-        else {
-            testCases.splice(testCaseData.length, 0, emptyRowData);
-            insertedRowIdx.push(testCaseData.length)
-        }
-        setTestCaseData(testCases);
-        setStepSelect({ edit: false, check: [], highlight: insertedRowIdx });
-        setHeaderCheck(false);
-        setChanged(true);
-        headerCheckRef.current.indeterminate = false;
+        let oldTestCases = [...newtestcase]
+       let emptyAddedRow=[...oldTestCases,emptyRowData]
+       setnewtestcase(emptyAddedRow)
+        // setTestCaseData(testCases);
+        // // setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
+        // setHeaderCheck(false);
+        // setChanged(true);
+        // headerCheckRef.current.indeterminate = false;
         // setEdit(false);
     }
 
@@ -930,8 +918,9 @@ const DesignModal = (props) => {
                 <h4 className='dailog_header2'>Signup screen 1</h4>
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
                 <div className='btn__grp'>
-                    <Button size='small' onClick={() => setVisibleDependentTestCaseDialog(true)} label='Debug' outlined></Button>
-                    <Button size='small' label='Add Test Step'></Button>
+                    <Button size='small' onClick={()=>setVisibleDependentTestCaseDialog(true)} label='Debug' outlined></Button>
+                    <Button size='small' label='Add Test Step' onClick={()=>addRow()}></Button>
+                    <Button size='small' lable='Save' onClick={saveTestCases}></Button>
                 </div>
             </div>
         </>
@@ -991,9 +980,9 @@ const DesignModal = (props) => {
                     <Accordion activeIndex={0}>
                         <AccordionTab header={props.fetchingDetails["name"]} onClick={toggleTableVisibility}>
                             <DataTable
-                                value={newtestcase.length > 0 ? newtestcase : []}
-                                emptyMessage={newtestcase.length === 0 ? emptyMessage : null}
-                                rowReorder editMode="row" dataKey="id" >
+                                value={newtestcase.length>0 ?newtestcase:[]}
+                                emptyMessage={newtestcase.length === 0?emptyMessage:null}
+                                rowReorder editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} >
                                 <Column style={{ width: '3em' }} rowReorder />
                                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
                                 <Column field="custname" header="Select all" editor={(options) => elementEditor(options)}></Column>
