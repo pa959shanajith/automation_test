@@ -1015,7 +1015,7 @@ const footerContentScreen =(
 
     return (
         <Fragment>
-                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} />}
+                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} />}
         {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetails} appType={appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 

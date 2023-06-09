@@ -12,7 +12,7 @@ import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlErro
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid'; 
-import ScreenOverlay from '../../global/components/ScreenOverlay';
+import{ScreenOverlay } from '../../global';
 // import * as actionTypes from '../state/action';
 
 // dispatch(ScrapeData(payloadvalue))
@@ -48,6 +48,7 @@ const CaptureModal = (props) => {
   const [showPop, setShowPop] = useState("");
   const [capturedDataToSave, setCapturedDataToSave] = useState([]);
   const [newScrapedCapturedData, setNewScrapedCapturedData] = useState([]);
+  const [masterCapture, setMasterCapture] = useState(false);
 
 
 
@@ -524,6 +525,26 @@ useEffect(()=>{
     setOverlay(blockMsg);
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
+        if(capturedDataToSave.length!==0 && masterCapture){
+          let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
+            let deleted=capturedDataToSave.map(item=>item.objId);
+            setCaptureData([]);
+            setCapturedDataToSave([]);
+         let params = {
+                    'deletedObj': deleted,
+                    'modifiedObj':[],
+                    'addedObj': {...added, view: []},
+                    'screenId': props.fetchingDetails["_id"],
+                    'userId': userInfo.user_id,
+                    'roleId': userInfo.role,
+                    'param': 'saveScrapeData',
+                    'orderList': []
+                }
+                scrapeApi.updateScreen_ICE(params)
+                .then(response => {
+               console.log('done')})
+               .catch(error=>console.log(error))
+              }
         let err = null;
         setOverlay("");
         console.log(data);
@@ -576,7 +597,7 @@ useEffect(()=>{
 
           setNewScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
-          setCapturedDataToSave([...capturedDataToSave,...scrapeItemList])
+          masterCapture?setCapturedDataToSave([...scrapeItemList]):setCapturedDataToSave([...capturedDataToSave,...scrapeItemList])
           updateScrapeItems(scrapeItemList);
           setScrapedURL(updatedNewScrapeData.scrapedurl);
           setMirror({ scrape: viewString.mirror, compare: null });
@@ -609,7 +630,7 @@ useEffect(()=>{
   const footerCapture = (
     <div className='footer__capture'>
       {/* <Button className='btn_clr'>Clear</Button> */}
-      <Button className='btn_capture' onMouseDownCapture={() =>{setVisible(false);setCaptureData([]);startScrape(captureButton);}}>Capture</Button>
+      <Button className='btn_capture' onMouseDownCapture={() =>{setVisible(false);startScrape(captureButton);}}>Capture</Button>
       {/* {console.log("Capture btn is clicked")} */}
     </div>
   )
@@ -629,9 +650,9 @@ useEffect(()=>{
         <img className="screen_btn" src="static/imgs/ic-screen-icon.png" />
         {/* <Button onclick={startScrape(captureButton)}>Hello</Button> */}
         {captureData.length > 0 ? <div className='Header__btn'>
-          <button className='add__more__btn' onClick={() => handleAddMore('add more')}>Add More</button>
+          <button className='add__more__btn' onClick={() => {setMasterCapture(false);handleAddMore('add more')}}>Add More</button>
           <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
-          <button className="btn-capture" onClick={() => handleAddMore('capture')}>Capture Objects</button>
+          <button className="btn-capture" onClick={() => {setMasterCapture(true);handleAddMore('capture')}}>Capture Objects</button>
         </div> : <button className='btn_panel__single' onClick={togglePanel}>Action Panel</button>}
       </div>
     </>
