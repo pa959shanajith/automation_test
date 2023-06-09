@@ -16,6 +16,9 @@ const ActionPanel = (props) => {
       btn3: '',
       btn4: ''
     });
+    const [inputValue, setInputValue] = useState('');
+    // const [dropdownValue, setDropdownValue] = useState('');
+    const [displayedValues, setDisplayedValues] = useState([]);
     const [value, setValue] = useState('');
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [items, setItems] = useState([{id:1, name:'q_btn', objname: 'btn1'},
@@ -51,6 +54,21 @@ const ActionPanel = (props) => {
       </div>
     )
 
+    const handleInputChange = (e) => {
+      setInputValue(e.target.value);
+    };
+  
+    const handleDropdownChange = (e) => {
+      setSelectObjectType(e.value);
+    };
+
+    const handleAdd = () => {
+      const newValues = [...displayedValues, inputValue];
+      setDisplayedValues(newValues);
+      setInputValue('');
+      selectObjectType('');
+    };
+
 
     const handleSpanClick = (index) => {
       if (selectedSpan === index) {
@@ -73,15 +91,19 @@ const ActionPanel = (props) => {
       <Card className='add_object__left' title="Add Object">
       <div>
         <p className='object__type'>Select Object Type</p>
-        <Dropdown value={selectObjectType} onChange={(e) => setSelectObjectType(e.value)} options={objectType} optionLabel="name" 
+        <Dropdown value={selectObjectType} onChange={handleDropdownChange} options={objectType} optionLabel="name" 
     placeholder="Search" className="w-full md:w-15rem object__dropdown" />
         <p className='object__type__name'>Enter Object Name</p>
-        <input className='object__type__input' placeholder='Text Input'/>
-        <button className='add_object_btn'>Add</button>
+        <input className='object__type__input' value={inputValue} onChange={handleInputChange} placeholder='Text Input'/>
+        <button className='add_object_btn' onClick={handleAdd}>Add</button>
       </div>
       </Card>
       <Card className='add_object__right' title="Added Objects">
-
+      {displayedValues.map((value, index) => (
+          <div key={index}>
+            <p>{value}</p>
+          </div>
+        ))}
       </Card>
       </div>
     </Dialog>

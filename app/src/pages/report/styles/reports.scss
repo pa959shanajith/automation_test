@@ -221,8 +221,15 @@
 
 
 .tabview{
-    display: flex;
+    display: inline-flex;
+    flex-flow: wrap;
     justify-content: space-evenly;
+    align-content: space-around;
+    align-items: flex-end;
+    justify-items: stretch;
+    flex-wrap: wrap;
+    flex-direction: row;
+    height: calc(100% - 24rem);
 }
 
 .testCards{
@@ -239,6 +246,9 @@
     position: relative;
     top: 93px;
     width: 334.11px;
+    &:hover{
+        transform:scale(1.1);
+    }
 }
 
 .buttonReports{

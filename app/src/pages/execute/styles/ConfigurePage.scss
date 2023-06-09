@@ -326,10 +326,6 @@
   .p-inputtext {
     margin: 0;
     margin-right: 5rem;
-    // margin-left: 0rem;
-    // float: right;
-    // margin-right: 35rem;
-    // margin-top: 1.5rem;
   }
 }
 
@@ -467,29 +463,64 @@
   background-color: transparent;
   border: none;
   margin-left: 16.5rem;
-  margin-top: 1rem;
+  margin-top: -3rem;
+  left: 14rem;
 }
+// .inputtext_devops {
+//   margin-right: 0rem;
+//   margin-top: 1rem;
+//   font-family: "open Sans";
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center;
+// }
+// .copy_devops {
+//   order: -1;
+//   margin-bottom: 0.5rem;
+//   color: #000000;
+//   background-color: transparent;
+//   border: none;
+//   margin-right: 0.5rem;
+// }
 .inputtext_devops {
-  margin-right: 0rem;
-  margin-top: 7rem;
-  font-family: "open Sans";
+  display: flex;
+  align-items: center;
+  width: 30.5rem;
+  height: 112px;
 }
-.devops_label {
-  margin-top: 5rem;
-  position: absolute;
-  font-family: "open Sans";
-}
-.lable_sync {
-  position: absolute;
-  margin-top: 1.5rem;
-}
+
 .copy_devops {
+  margin-left: auto;
+  margin-right: 0.5rem;
   color: #000000;
   background-color: transparent;
   border: none;
-  margin-top: 0rem;
-  position: absolute;
+  top: -7rem;
+  left: 30.5rem;
 }
+
+.container_devopsLabel {
+  margin-top: 5rem; /* Adjust this value to create space above the container */
+  
+}
+
+.container_devopsLabel .devops_label {
+  display: block;
+  margin-top: -4.5rem;
+  line-height: 3rem;
+}
+
+// .lable_sync {
+
+//   margin-top: 3rem;
+// }
+// .copy_devops {
+//   color: #000000;
+//   background-color: transparent;
+//   border: none;
+//   margin-top: 0rem;
+ 
+// }
 .dialog_CICD {
   .p-dialog-header {
     background: #e9ecef !important;
@@ -534,28 +565,70 @@
     color: none !important;
   }
 }
+.lable_sync {
+  display: flex;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.Async_lable {
+  margin-right: 0.5rem;
+}
 
 .inputSwitch_CICD {
-  margin-left: 7rem;
-  position: absolute;
-  font-family: "open Sans";
+  margin-left: 1rem;
 }
+
 .sync_label {
-  position: absolute;
-  margin-top: 0rem;
-  margin-left: 10.5rem;
-  font-family: "open Sans";
+  margin-left: 1.3rem;
+  font-family: "Open Sans";
 }
+
+.inputSwitch_CICD,
+.sync_label {
+  display: flex;
+  align-items: center;
+}
+
 .Async_lable {
-  position: absolute;
+  order: -1;
+  margin-bottom: 0.4rem;
+  font-family: "Open Sans";
+}
+
+.inputSwitch_CICD {
+  font-family: "Open Sans", sans-serif;
   margin-top: 0rem;
-  font-family: "open Sans";
 }
-.inputtext_CICD {
-  width: 16.5rem;
-  position: absolute;
-  top: 16rem;
+
+.sync_label {
+  font-family: "Open Sans", sans-serif;
 }
+
+// .inputSwitch_CICD {
+//   margin-left: 1rem;
+//   // position: absolute;
+//   display: flex;
+//   flex-direction: column;
+//   font-family: "open Sans";
+//   margin-top: -1.5rem;
+// }
+// .sync_label {
+//   // position: absolute;
+//   margin-top: -26rem;
+//   margin-left: 10.5rem;
+//   font-family: "open Sans";
+//   display: flex;
+// }
+// .Async_lable {
+//   order: -1;
+//   margin-bottom: 0.5rem;
+// }
+// .inputtext_CICD {
+//   width: 16.5rem;
+//   position: absolute;
+//   top: 16rem;
+// }
 .delete_button {
   margin-left: 48rem;
   font-family: "Open Sans";
@@ -589,9 +662,11 @@
 }
 
 .datatable_list {
+  .p-datatable .p-datatable-thead > tr > th{
   width: 100%;
   height: calc(100vh - 250px);
   margin-right: 5rem;
+}
 }
 .actions-header {
   text-align: left !important;
@@ -777,4 +852,30 @@ left:3rem;
 }
 .noEndDate_lable{
   margin-top: 1rem;
+}
+// .devopsUrl_label{
+// margin-top: 0rem;
+// }
+.profile_label{
+margin-top: 0.7rem;
+}
+.container_url {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
+.container_url .devopsUrl_label {
+  margin-bottom: 1rem;
+  margin-bottom: 0.5rem
+}
+
+.container_url .inputtext_CICD {
+  width: 30.5rem;
+  margin-bottom: 0rem;
+  height: 2.7rem;
+}
+.inputTextarea{
+  width: 30.5rem;
+  height: 141px;
 }

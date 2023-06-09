@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Messages as MSG} from '../global/components/Messages'
+import { Messages as MSG} from '../global/components/Messages'
 import {url} from '../../App';
 
 /*Component getProjectList
@@ -678,4 +678,322 @@ export const exportToProject = async(moduleId) => {
         console.error(err)
         return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
     }
+}
+
+export const initScraping_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/initScraping_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'initScraping_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(history);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+
+
+
+/*Component 
+  props : {groupids:["id1","id2"],groupnames:["name1","name2"]}
+  api returns notifications groups 
+  if groupids and groupnames are both empty then all the groups will be sent
+*/
+
+export const getNotificationGroups = async(props) => {
+    try{
+        const res = await axios(url+'/getNotificationGroups', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
+    }
+}
+
+
+/* Component
+  api returns data in array - [{"username","id","id","userRole"},{"username","id","id","userRole"},,,]
+*/
+
+export const getUserDetails = async(action, args) => { 
+    try{
+        const res = await axios(url+'/getUserDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,args: args},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        else if(res.status === "fail" ){
+            return {error:MSG.ADMIN.ERR_FETCH_USER}
+        }
+        else if(res.status === "empty" ){
+            return {error:MSG.ADMIN.ERR_EMPTY_USER}
+        }
+        else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_FETCH_USER}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_FETCH_USER}
+    }
+}
+
+
+/*Component DesignContent
+  api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
+*/
+export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId) =>	{
+    return new Promise((resolve, reject)=>{
+        axios(url+"/getScrapeDataScreenLevel_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param: 'getScrapeDataScreenLevel_ICE',
+                screenId: screenId,
+                projectId: projectId,
+                type: type,
+                testCaseId: testCaseId
+            },
+            credentials : 'include',
+        }).then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(error=>reject(error))
+    })
+}
+
+/*Component DesignContent
+  api returns String (Invalid Session/Success)
+*/
+export const updateScreen_ICE = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/updateScreen_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
+export const excelToScreen = (data) =>	{
+    return new Promise((resolve, reject)=>{
+        const res = axios(url+"/importScreenfromExcel", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error))
+    })
+}
+/*Component DesignContent
+  api returns {"template":"","reuse":bool,"testcase":[{"addTestCaseDetails":"","addTestCaseDetailsInfo":"{\"actualResult_fail\":\"\",\"actualResult_pass\":\"\",\"testcaseDetails\":\"\"}","appType":"","cord":"","custname": "","inputVal":[""],"keywordVal":"","objectName":"","outputVal":"","remarks": "a;b","stepNo":int,"url":""}],"testcasename":"","del_flag":bool}
+*/
+export const readTestCase_ICE = (userInfo, testCaseId, testCaseName, versionnumber, screenName) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/readTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'readTestCase_ICE',
+                userInfo: userInfo,
+                testcaseid: testCaseId,
+                testcasename: testCaseName,
+                versionnumber: versionnumber,
+                screenName : screenName
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject({error: res.status});
+            }
+        })
+        .catch(err=>reject({error: err}));
+    });
+}
+
+/*Component DesignContent
+  api returns String (Invalid Session/Success)
+*/
+export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userInfo, versionnumber, import_status, copiedTestCases) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/updateTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'updateTestCase_ICE',
+                testcaseid: testCaseId,
+                testcasename: testCaseName,
+                testcasesteps: JSON.stringify(testCaseData),
+                userinfo: userInfo,
+                skucodetestcase : "skucodetestcase",
+                tags: "tags",
+                versionnumber: versionnumber,
+                import_status: import_status,
+                copiedTestCases: copiedTestCases
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(error=>reject(error));
+    });
+}
+
+/*Component ActionbarItems (DesignPage)
+  api returns String (Invalid Session/unavailableLocalServer/success/fail/Terminate/browserUnavailable/scheduleModeOn/ExecutionOnlyAllowed)
+                or {status:"", "":xpath}
+*/ 
+export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'debugTestCase_ICE',
+                userInfo: userInfo,
+                browsertypes: browserType,
+                testcaseids: testcaseID,
+                apptype: appType,
+                geniusExecution
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(error=>reject(error));
+    });
+}
+
+/*Component ActionbarItems (DesignPage)
+  api returns {"<type>":{"<keyword>":{"inputtype": [""],"inputval": [""],"outputval": [""]}}
+}
+*/ 
+export const getKeywordDetails_ICE = (appType) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/getKeywordDetails_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'getKeywordDetails_ICE',
+                projecttypename : appType
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(error=>reject(error))
+    })
+}
+
+/*Component DependentTestCaseDialog
+  api returns [{"testcaseId":"","testcaseName":""}]
+*/ 
+export const getTestcasesByScenarioId_ICE = (testScenarioId) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/getTestcasesByScenarioId_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'getTestcasesByScenarioId_ICE',
+                testScenarioId : testScenarioId
+            },
+            credentials : 'include',
+        })
+        .then(res=>{   
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(error=>reject(error))
+    })
 }
