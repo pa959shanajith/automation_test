@@ -545,6 +545,7 @@ const CanvasNew = (props) => {
 
   const reject = () => {}
   const handleContext=(e,type)=>{
+    setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
     setBox(e.target.parentElement.id)
     setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
    if(type==="modules") menuRef_module.current.show(e)
@@ -1014,8 +1015,8 @@ const footerContentScreen =(
 
     return (
         <Fragment>
-                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} />}
-        {visibleDesignStep && <DesignModal fetchingDetails={fetchingDetails} appType={appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
+                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} />}
+        {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetails} appType={appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
              <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Scenario" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
