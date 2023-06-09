@@ -15,41 +15,24 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
 import { selectedProj, selectedModule, isEnELoad, initEnEProj,savedList } from '../designSlice';
 import AvoInput from "../../../globalComponents/AvoInput";
+// import { Icon } from 'primereact/icon';
 
 
 
 
 // this component shows side panel of module containers in design screen
 
-import TreeView from '@mui/lab/TreeView';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TreeItem from '@mui/lab/TreeItem';
+// import TreeView from '@mui/lab/TreeView';
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+// import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+// import TreeItem from '@mui/lab/TreeItem';
 
-export  function MultiSelectTreeView() {
-    // const icons =()=>{
-    //     return(
-    //         // <img src={moduleIcon}/>
-    //         <img src={moduleIcon} alt="Custom Icon" style={{ marginRight: 8, width: 16, height: 16 }} />
-    //     )
-    // }
-  return (
-    <TreeView
-      aria-label="multi-select"
-      defaultCollapseIcon={<ExpandMoreIcon />}
-      defaultExpandIcon={<ChevronRightIcon />}
-      multiSelect
-      sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-    >
-      <TreeItem nodeId="5" label="projectAvoAssure">
-        <TreeItem nodeId="6" label="moduleLogIn">
-            <TreeItem nodeId="8" label="AVATARLog" />
-            <TreeItem nodeId="9" label="Password" />
-        </TreeItem>
-      </TreeItem>
-    </TreeView>
-  );
-}
+import { Tree } from 'primereact/tree';
+// import { NodeService } from './service/NodeService';
+
+
+
+        
 
 const ModuleListSidePanel =()=>{
   const dispatch = useDispatch()
@@ -66,6 +49,7 @@ const ModuleListSidePanel =()=>{
     const [options,setOptions] = useState(undefined)
     const [showInput, setShowInput] = useState(false);
     const [moduleLists, setModuleLists] = useState(null);
+    const [ moduleListsForScenario,  setModuleListsForScenario] = useState(null);
     const [showInputE2E, setShowInputE2E] = useState(false);
     const [projectList, setProjectList] = useState([]);
     const [projectId, setprojectId] = useState("");
@@ -81,7 +65,6 @@ const ModuleListSidePanel =()=>{
     const [searchForNormal, setSearchForNormal] = useState(false)
     const [importPop,setImportPop] = useState(false)
     const [blockui,setBlockui] = useState({show:false})
-    const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
     const [selectedSc,setSelctedSc] = useState([])
     const [isE2EOpen, setIsE2EOpen] = useState(false);
@@ -94,7 +77,7 @@ const ModuleListSidePanel =()=>{
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
-
+    const [scenarioList,setScenarioList] = useState([])
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
     useEffect(()=> {
         if(!searchForNormal && !isCreateE2E ) {
@@ -159,6 +142,7 @@ const ModuleListSidePanel =()=>{
     }
     // const collapsed =()=> setCollapse(!collapse)
     // const collapsedForModules =()=> setCollapseForModules (!collapseForModules )
+    console.log("scenarios",scenarioList)
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
@@ -360,6 +344,7 @@ const ModuleListSidePanel =()=>{
           // dispatch(selectedModule(modules[0]))
         })()
       }, [dispatch, projectId])
+      console.log("modules",proj)
 
       useEffect(()=>{
         (async()=>{
@@ -376,7 +361,7 @@ const ModuleListSidePanel =()=>{
           setProjectList(data)
         })()
       },[projectId])
-
+       console.log("projData",projectList)
       const clickForSearch = ()=>{
                setShowInput(true) }
       const click_X_Button = ()=>{
@@ -389,86 +374,220 @@ const ModuleListSidePanel =()=>{
       const click_X_ButtonE2E = ()=>{
         setShowInputE2E(false)
       }
+// ////////////////// E2E popUp
+const LongContentDemo = () => {
+  const [newProjectList, setNewProjectList] = useState([]);
+  useEffect(() => {
+    (async () => {
+      let projectCollection = [];
+      for (let proj of projectList) {
+        const modData = await getModules({
+          tab: 'endToend',
+          projectid: proj.id,
+          version: 0,
+          cycId: null,
+          modName: '',
+          moduleid: null
+        });
+        let moduleCollection = [];
+        for (let mod of modData) {
+          if (mod.type === 'basic') {
+            let scenarioCollection = [];
+            const scenData = await populateScenarios(mod._id);
+            for (let scenarioData of scenData) {
+              scenarioCollection.push({
+                id: scenarioData._id,
+                name: scenarioData.name
+              });
+            }
+            moduleCollection.push({
+              id: mod._id,
+              name: mod.name,
+              scenarioList: scenarioCollection
+            });
+          }
+        }
+        projectCollection.push({
+          id: proj.id,
+          name: proj.name,
+          moduleList: moduleCollection
+        });
+      }
+      setNewProjectList(projectCollection);
+    })();
+  }, []);
 
-    function LongContentDemo() {
-    
-      // const [visible, setVisible] = useState(showE2EPopup);
-    const footerContent = (
+  const CheckboxSelectionDemo = () => {
+    const [selectedKeys, setSelectedKeys] = useState([]);
+
+    const handleCheckboxChange = (e, projIdx, moduleIdx, scenarioIdx, projName, modName, sceName) => {
+      const selectedScenario = `${projIdx}-${moduleIdx}-${scenarioIdx}`;
+      
+      console.log("projIdx",projIdx)
+      console.log("moduleIdx",moduleIdx)
+      console.log("scenarioIdx",scenarioIdx)
+      console.log("projName",projName)
+      console.log("modName",modName)
+      console.log("sceName",sceName)
+      console.log("e.checked",e.checked)
+      console.log("selectedScenario",selectedScenario)
+      if (e.checked) {
+        setSelectedKeys([...selectedKeys, {
+            projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
+        }]);
+        {console.log("setSlectedKeys",[...selectedKeys, {
+            projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
+        }])}
+      } else {
+        setSelectedKeys(selectedKeys.filter((key) => key.selectedScenario !== selectedScenario));
+      }
+    };
+
+    const handleTransferScenarios = () => {
+      // Logic to transfer selected scenarios to the right box
+      // You can access the selected scenarios using `selectedKeys` state
+    //   const selectedScenarios = selectedKeys.map((key) => ({
+    //     projIdx: parseInt(key.split('-')[0]),
+    //     moduleIdx: parseInt(key.split('-')[1]),
+    //     scenarioIdx: parseInt(key.split('-')[2])
+    //   }));
+
+      // TODO: Perform the necessary actions with the selected scenarios
+
+      setSelectedKeys([]); // Clear the selected scenarios after transferring
+    };
+     console.log("newProjectList",newProjectList)
+    return (
+      <div>
+        <Tree
+          value={newProjectList.map((project, projIdx) => ({
+            key: projIdx,
+            label: (
+              <div className="labelOfArray">
+                <img src="static/imgs/projectSideIcon.png" alt="modules" />
+                {project.name}
+              </div>
+            ),
+            children: project.moduleList.map((module, moduleIdx) => ({
+              key: `${projIdx}-${moduleIdx}`,
+              label: (
+                <div className="labelOfArray">
+                  <img src="static/imgs/moduleIcon.png" alt="modules" />
+                  {module.name}
+                </div>
+              ),
+              children: module.scenarioList.map((scenario, scenarioIdx) => ({
+                key: `${projIdx}-${moduleIdx}-${scenarioIdx}`,
+                label: (
+                  <label style={{alignItem:'center',justifyContent:'center'}}>
+                    <Checkbox
+                      onChange={(e) => handleCheckboxChange(e, projIdx, moduleIdx, scenarioIdx, project.name, module.name, scenario.name)}
+                    //   checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${projIdx}-${moduleIdx}-${scenarioIdx}`)}
+                        checked={Object.keys(selectedKeys)}
+                    />
+                    <>
+                    {console.log("selectedKeys",Object.keys(selectedKeys))}
+                    {/* {console.log("checked",Object.keys(selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${projIdx}-${moduleIdx}-${scenarioIdx}`)))} */}
+                    </>
+                    <img style={{width:'18px',height:'16px'}} src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
+                    {scenario.name}
+                  </label>
+                )
+              }))
+            }))
+          }))}
+          selectionMode="multiple"
+          selectionKeys={selectedKeys}
+          style={{ height: '22.66rem', overflowY: 'auto' }}
+          onSelectionChange={(e) => setSelectedKeys(e.value)}
+        />
+        {/* <button onClick={handleTransferScenarios}>Transfer Scenarios</button> */}
+      </div>
+    );
+  };
+      const footerContent = (
         <div>
             <Button label="Cancel"  onClick={() => setShowE2EPopup(false)} className="p-button-text" />
             <Button label="Save"  onClick={() => setShowE2EPopup(false)} autoFocus />
         </div>
-    );
-
-      return (
-      <div className="E2E_container">
-        <div className="card flex justify-content-center">
-            {/* <Dialog header="Header" visible={showE2EPopup} style={{ width: '50vw' }} onHide={() => setShowE2EPopup(false)} footer={footerContent}>
-            </Dialog> */}
-
-             
-             <Dialog className='Project-Dialog' header="Create End to End Flow" visible={showE2EPopup} style={{ width: "74.875rem",height:'100%',backgroundColor:'#605BFF' }} onHide={() => setShowE2EPopup(false)} footer={footerContent}>  
-                 <div className="mainCentralContainer">
-                  <div className="nameTopSection">
-                  <div class="col-12 lg:col-12 xl:col-5 md:col-12 sm:col-12 flex flex-column">
-                    <AvoInput
-                    htmlFor="username"
-                    labelTxt="Name"
-                    infoIcon="static/imgs/Info_icon.svg"
-                    required={true}
-                    placeholder="Enter End to End Module Name"
-                    // inputTxt={configTxt}
-                    customClass="inputRow_for_E2E_popUp"
-                    // setInputTxt={setConfigTxt}
-                    inputType="lablelRowReqInfo"/>
-                  </div>
-                  </div>
-                  <div className="cenralTwinBox">
-                    <div className="leftBox">
-                    <Card className="leftCard"  >
-                      <div className='headlineSearchInput'>
-                        <div className='headlineRequired'>
-                           <h5 style={{fontSize:'14px'}}>Select Scenarios</h5>
-                           <img src="static/imgs/Required.svg" className="required_icon" />
-                         </div>
-                         <span className="p-input-icon-left">
-                         <i className="pi pi-search" />
-                         <InputText placeholder="Search Scenarios by name" style={{width:'32rem',height:'2.2rem'}} className='inputContainer'    />    
-                        </span>
-                     </div>
-                     <MultiSelectTreeView/>
-                         {/* <p className="m-0">
-                         </p> */}
-
-                    </Card>
+      );
+  return (
+    <div className="E2E_container">
+      <div className="card flex justify-content-center">
+        <Dialog
+          className="Project-Dialog"
+          header="Create End to End Flow"
+          visible={showE2EPopup}
+          style={{ width: '74.875rem', height: '100%', backgroundColor: '#605BFF' }}
+          onHide={() => setShowE2EPopup(false)}
+          footer={footerContent}
+        >
+          <div className="mainCentralContainer">
+            <div className="nameTopSection">
+              <div class="col-12 lg:col-12 xl:col-5 md:col-12 sm:col-12 flex flex-column">
+                <AvoInput
+                  htmlFor="username"
+                  labelTxt="Name"
+                  required={true}
+                  placeholder="Enter End to End Module Name"
+                  customClass="inputRow_for_E2E_popUp"
+                  inputType="lablelRowReqInfo"
+                />
+              </div>
+            </div>
+            <div className="centralTwinBox">
+              <div className="leftBox">
+                <Card className="leftCard">
+                  <div className="headlineSearchInput">
+                    <div className="headlineRequired">
+                      <h5 style={{ fontSize: '14px' }}>Select Scenarios</h5>
+                      <img src="static/imgs/Required.svg" className="required_icon" />
                     </div>
-                    <div className="centerButtons">
-                      <div className="centerButtonsIndiVisual">
-                        <Button   label='>'outlined />
-                        <Button  label='<' outlined />
-                      </div>
-                    </div>
-                    <div className="rightBox">
-                    <Card className="rightCard" >
-                         <div className="initialText">
-                          <div className="initial1StText">
-                              <h3 className="textClass"> No Scenarios Yet</h3>
-                          </div>
-                          <div className="initial2NdText">
-                          <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" /> 
-                          <h3 className="textClass">Select Module</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" /> 
-                          <h3 >Select Scenarios</h3>
-                          </div> 
-                         </div>
-                    </Card>
-                    </div>
+                    <span className="p-input-icon-left">
+                      <i className="pi pi-search" />
+                      <InputText
+                        placeholder="Search Scenarios by name"
+                        style={{ width: '32rem', height: '2.2rem' }}
+                        className="inputContainer"
+                      />
+                    </span>
                   </div>
-                 </div>
-            </Dialog>
-        </div>
-        </div>
-         )
-      }
+                  <CheckboxSelectionDemo />
+                </Card>
+              </div>
+              <div className="centerButtons">
+                <div className="centerButtonsIndiVisual">
+                  <Button label=">" outlined />
+                  {/* <Button label="<" outlined /> */}
+                </div>
+              </div>
+              <div className="rightBox">
+                <Card className="rightCard">
+                <div className="headlineSearchInputOfRightBox">
+                    <div className="headlineRequiredOfRightBox">
+                      <h5 style={{ fontSize: '14px' }}>Selected Scenarios</h5>
+                      <img src="static/imgs/Required.svg" className="required_icon" />
+                    </div>
+                    <span className="p-input-icon-left">
+                      <i className="pi pi-search" />
+                      <InputText
+                        placeholder="Search Scenarios by name"
+                        style={{ width: '31rem', height: '2.2rem' }}
+                        className="inputContainer"
+                      />
+                    </span>
+                  </div>
+                </Card>
+                
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
       
     return(
         <>

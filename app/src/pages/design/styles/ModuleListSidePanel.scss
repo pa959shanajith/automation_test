@@ -157,7 +157,7 @@
             // border: 1px solid yellow;
 
         }
-        .cenralTwinBox{
+        .centralTwinBox{
             width:100%;
             height: 86%;
             // border: 1px solid red;
@@ -189,6 +189,14 @@
                            }
 
                          }
+                         .labelOfArray{
+                            display: flex;
+                            align-items: center;
+                            img{
+                                width: 16px;
+                                height: 18px;
+                            }
+                         }
                 }
     
             }
@@ -215,6 +223,15 @@
                          width: 100%;
                          height:100%;
                         //  margin-left: 2.8rem;
+                        .headlineSearchInputOfRightBox{
+                            .headlineRequiredOfRightBox{
+                                display: flex;
+                                flex-direction: row;
+                                .required_icon{
+                                    padding-left: 4px;
+                                }
+                        }
+                        }
                         .p-card .p-card-content{
                            padding: 0rem;
                         }
