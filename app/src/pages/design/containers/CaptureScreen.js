@@ -13,6 +13,8 @@ import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid'; 
 import{ScreenOverlay } from '../../global';
+import ImportModal from '../../design/containers/ImportModal';
+import ExportModal from '../../design/containers/ExportModal';
 // import * as actionTypes from '../state/action';
 
 // dispatch(ScrapeData(payloadvalue))
@@ -159,13 +161,8 @@ useEffect(()=>{
     return selectedRow === rowData ? 'selected-row' : '';
   };
 
-  const handleEdit = () => {
-    // Handle edit logic
-  };
 
-  const handleDelete = () => {
-    // Handle delete logic
-  };
+
 
   // const handleRowHover = (rowData) => {
   //   const rowIndex = rowData.index
@@ -213,6 +210,25 @@ useEffect(()=>{
   //     </div>
   //   );
   // };
+//   const renderActionsCell = (rowData) => {
+//     console.log(rowData)
+
+//     return (
+//       <div
+//         className="actions-cell"
+//       >
+// <>
+//             <img src='static/imgs/ic-edit.png' style={{height:"20px", width:"20px"}} className='edit__icon' onClick={() => handleEdit(rowData)} />
+//             <img src='static/imgs/ic-delete-bin.png'  style={{height:"20px", width:"20px"}} className='delete__icon' onClick={() => handleDelete(rowData)} />
+//           </>
+
+//       </div>
+//     );
+//   };
+
+
+
+
 
 
 
@@ -626,6 +642,87 @@ useEffect(()=>{
     setScrapeItems([...scrapeItems, ...newList])
   }
 
+  const handleMouseEnterRow = (rowData) => {
+    console.log("Mouse entered");
+    console.log(rowData);
+    setHoveredRow(rowData.index);
+  };
+
+
+    const handleDelete = (rowData) => {
+      const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
+      setCaptureData(updatedData);
+    };
+
+    const handleEdit = (rowData) =>{
+      const updatedData = captureData.map((item) => {
+        if (item.selectall === rowData.selectall) {
+          return { ...item, editing: true };
+        }
+        return item;
+      });
+      setCaptureData(updatedData);
+    }
+
+    const handleSelectAllChange = (rowData, newValue) => {
+      const updatedData = captureData.map((item) => {
+        if (item.selectall === rowData.selectall) {
+          return { ...item, selectall: newValue };
+        }
+        return item;
+      });
+      setCaptureData(updatedData);
+    };
+  
+    const renderSelectAllCell = (rowData) => {
+      if (rowData.editing) {
+        return (
+          <input
+            type="text"
+            value={rowData.selectall}
+            onChange={(e) => handleSelectAllChange(rowData, e.target.value)}
+          />
+        );
+      }
+      return rowData.selectall;
+    };
+    
+
+    
+  const renderActionsCell = (rowData) => {
+    return (
+     <div>
+      <img src="static/imgs/ic-edit.png"
+            style={{ height: "20px", width: "20px" }}
+            className="edit__icon" onClick={() => handleEdit(rowData)} />
+          <img
+            src="static/imgs/ic-delete-bin.png"
+            style={{ height: "20px", width: "20px" }}
+            className="delete__icon"  onClick={() => handleDelete(rowData)}/>
+     </div>
+      )
+    
+    };
+
+ 
+  const handleMouseLeaveRow = () => {
+    setHoveredRow(null);
+  };
+
+
+
+  // const renderIcons = (rowData) => {
+  //   if (rowData === hoveredRow) {
+  //     return (
+  //       <>
+  //         <img src='static/imgs/ic-edit.png' style={{height:"20px", width:"20px"}} className='edit__icon' />
+  //         <img src='static/imgs/ic-delete-bin.png'  style={{height:"20px", width:"20px"}} className='delete__icon'  />
+  //       </>
+  //     );
+  //   }
+  //   return null;
+  // };
+  
 
   const footerCapture = (
     <div className='footer__capture'>
@@ -744,11 +841,11 @@ useEffect(()=>{
                 <span className='insprint_auto'>
                   <span className='import__block'>
                     <img className='add_obj' src="static/imgs/ic-import.png" />
-                    <p className='imp__text'>Import Screen</p>
+                    <p className='imp__text' onClick={() =>setShowObjModal("importModal")}>Import Screen</p>
                   </span>
                   <span className='export__block'>
                     <img className='add_obj' src="static/imgs/ic-export.png" />
-                    <p className='imp__text'>Export Screen</p>
+                    <p className='imp__text' onClick={() =>setShowObjModal("exportModal")}>Export Screen</p>
                   </span>
                 </span>
               </div>
@@ -761,11 +858,11 @@ useEffect(()=>{
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             <Column rowReorder style={{ width: '3rem' }} />
             <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-            <Column field="selectall" header="Select all"></Column>
+            <Column field="selectall" header="Select all" body={renderSelectAllCell}></Column>
             <Column field="objectProperty" header="ObjectProperty"></Column>
             <Column field="browserscrape" header="Browser Scraped On"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
-            <Column field="actions" header="Actions" />
+            <Column field="actions" header="Actions"   body={renderActionsCell}/>
           </DataTable>
         </div>
       </Dialog>
@@ -801,6 +898,10 @@ useEffect(()=>{
       {currentDialog === 'replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
       {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
       {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+      {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
+      { showObjModal === "importModal" && <ImportModal  fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web"  fetchingDetails={props.fetchingDetails} />}
+      { showObjModal === "exportModal" && <ExportModal  appType="Web"  fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
+      
     </>
   );
 }
