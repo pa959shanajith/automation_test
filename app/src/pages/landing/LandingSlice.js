@@ -9,14 +9,18 @@ export const loadUserInfo = createSlice({
         notify: { data: [], unread: 0 },
         dateformat: "DD-MM-YYYY",
         showChangePasswordDialog: false,
-        projectDetails:{},
-        // apptype:'',
+        projectDetails: {},
+        projectModifiedDetails:{},
+        selectedProject:null,
+        savedNewProject:false
     },
     reducers: {
         setUserInfo: (state, action) => {
             state.userinfo = action.payload;
         },
-
+        savedNewProject:(state,action)=>{
+            state.savedNewProject=action.payload;
+        },
         setRole: (state, action) => {
             state.userRole = action.payload;
         },
@@ -28,7 +32,13 @@ export const loadUserInfo = createSlice({
             state.showChangePasswordDialog = !state.showChangePasswordDialog;
         }, 
         setProjectDetails: (state, action) => {
-            state.project = action.payload;
+            state.projectDetails = action.payload;
+        },
+        setProjectModifiedDetails: (state, action) => {
+            state.projectModifiedDetails = action.payload;
+        },
+        setSelectedProject: (state, action) => {
+            state.selectedProject = action.payload;
         },
         // setApptype: (state, action) => {
         //     state.apptype = action.payload;

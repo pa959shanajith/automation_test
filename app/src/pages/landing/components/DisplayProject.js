@@ -8,6 +8,8 @@ import { Menu } from "primereact/menu";
 import {getProjectList} from "../../design/api"
 import {fetchProjects} from "../api"
 import { useSelector, useDispatch} from 'react-redux';
+import { loadUserInfoActions } from '../LandingSlice';
+
 
 
 
@@ -26,6 +28,10 @@ const DisplayProject = (props) => {
   const [appTypeDialog, setAppTypeDialog] = useState(null)
   const [assignedUsers, setAssignedUsers] = useState({});
   const [projectName, setProjectName] = useState("");
+  const createdProject = useSelector((state) => state.landing.savedNewProject);
+  const dispatch = useDispatch();
+
+
 
 
   
@@ -86,6 +92,36 @@ const DisplayProject = (props) => {
          }
       })()
     },[])
+    useEffect(()=>{
+      if(createdProject){
+      (async()=>{
+        const ProjectList = await fetchProjects({ readme: "projects" });
+        setProjectsDetails(ProjectList)
+        if(ProjectList.error){
+          // setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+  }else{
+          const arraynew = ProjectList.map((element,index)=>{
+            return(
+              {
+                key:index,
+
+                projectName:element.name,
+                modifiedName:element.firstname,
+                modifiedDate:element.releases[0].modifiedon,
+                createdDate:element.releases[0].createdon,
+                appType:element.type,
+                projectId:element._id,
+              }
+            )
+          })
+          setProjectList(arraynew);
+          dispatch(loadUserInfoActions.savedNewProject(false))
+         }
+      })()
+      
+    }
+    },[createdProject])
+    
 
  
   const sortByName = () => {
@@ -181,7 +217,7 @@ useEffect(() => {
                   {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
                   {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
                 </>
-                <p className="projectInsideLast" title="project.modifiedDate">LastModifiedon {project.modifiedDate.slice(0, 3)} By {project.modifiedName}</p>
+                <p className="projectInsideLast" title="project.modifiedDate">Last modified on:{project.modifiedDate.slice(0, 3)} By {project.modifiedName}</p>
               </button>
             </div>))}
         </div>

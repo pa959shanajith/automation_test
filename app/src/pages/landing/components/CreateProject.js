@@ -10,6 +10,10 @@ import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
 import { getUserDetails, userCreateProject_ICE } from '../api';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { loadUserInfoActions } from '../LandingSlice';
+
 
 
 
@@ -30,6 +34,8 @@ const  CreateProject=({ visible, onHide  }) =>{
     const [items , setItems]= useState([])
     const [projectData , setProjectData] = useState([]);
     const[refreshData, setRefreshData] = useState(false);
+    const dispatch = useDispatch();
+
   
 
  
@@ -269,8 +275,9 @@ userDetails()
         severity: "success",
         summary: "Project Created Successfully..",
         detail: "Project Created Successfully....!",
-        life: 1000 ,
+        life: 1000 
       });
+      dispatch(loadUserInfoActions.savedNewProject(true))
       onHide(); 
       setRefreshData(!refreshData);
     }
