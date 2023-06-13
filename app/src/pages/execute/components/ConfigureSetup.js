@@ -115,6 +115,11 @@ const ConfigureSetup = ({
   }, [configTxt]);
 
   useEffect(() => {
+    console.log(xpanded);
+    console.log(selectedNodeKeys);
+  }, [selectedNodeKeys]);
+
+  useEffect(() => {
     const getXpanded = [...xpanded];
     const getStateOfParam = { ...dataparam };
     const getStateOfCondition = { ...condition };
@@ -191,6 +196,11 @@ const ConfigureSetup = ({
       ...avodropdown,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const onCheckboxChange = (e) => {
+    console.log(e);
+    setSelectedNodeKeys(e.value)
   };
 
   const onNodeXpand = (e) => {
@@ -473,12 +483,13 @@ const ConfigureSetup = ({
               <div className="table_section col-12 lg:col-12 xl:col-9 md:col-12 sm:col-12">
                 <TreeTable
                   onExpand={(e) => onNodeXpand(e)}
+                  onSelect={(e) => onNodeXpand(e)}
                   header={tableTreeHeader}
                   value={configTable}
                   selectionMode="checkbox"
                   selectionKeys={selectedNodeKeys}
                   loading={configData.loading}
-                  onSelectionChange={(e) => setSelectedNodeKeys(e.value)}
+                  onSelectionChange={(e) => onCheckboxChange(e)}
                   className="tabletree_class"
                   rowClassName={rowClassName}
                   showGridlines
