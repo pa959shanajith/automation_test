@@ -120,6 +120,7 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   const [configTxt, setConfigTxt] = useState("");
   const [avodropdown, setAvodropdown] = useState({});
   const [mode, setMode] = useState(selections[0]);
+  const [updateKey, setUpdateKey] = useState("");
 
   const [currentKey,setCurrentKey] = useState('');
   const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
@@ -163,135 +164,6 @@ const ConfigurePage = ({setShowConfirmPop}) => {
       dispatch(getModules(getConfigData?.projects));
   }, [getConfigData?.projects]);
 
-  const configModal = (getType, getData = null) => {
-    if(getType === 'CancelUpdate'){
-      const getAvogrid = [
-        ...getConfigData?.avoAgentAndGrid?.avoagents,
-        ...getConfigData?.avoAgentAndGrid?.avogrids,
-      ];
-      getAvogrid.forEach((el, index, arr) => {
-        if (Object.keys(el).includes("Hostname")) {
-          getAvogrid[index] = { ...el, name: el.Hostname };
-        }
-      });
-      setAvodropdown({
-        ...avodropdown,
-        avogrid: getAvogrid.filter((el) => el.name === getData.executionRequest.avoagents[0])[0],
-        browser: browsers.filter((el) => getData.executionRequest.browserType.includes(el.key))
-      });
-      setMode(getData?.executionRequest?.isHeadless ? selections[1] : selections[0]);
-      setConfigTxt(getData.configurename);
-      setModules(getData.executionRequest.selectedModuleType);
-    }
-    setVisible(true);
-    setSetupBtn(getType);
-  };
-
-  const onModalBtnClick = (getBtnType) => {
-    if (getBtnType === "Save" || getBtnType === "Update") {
-      const paramPaths = Object.values(dataparam).reduce((ac, cv) => {
-        ac[cv.key] = ac[cv.key] || [];
-        ac[cv.key].push(cv);
-        return ac;
-      }, {});
-      const checkcondition = Object.values(condition).reduce((ac, cv) => {
-        ac[cv.key] = ac[cv.key] || [];
-        ac[cv.key].push(cv);
-        return ac;
-      }, {});
-      const accessibilityParams = Object.values(accessibility).reduce(
-        (ac, cv) => {
-          ac[cv.key] = ac[cv.key] || [];
-          ac[cv.key].push(cv);
-          return ac;
-        },
-        {}
-      );
-      const dataObj = {
-        param: "updateTestSuite_ICE",
-        batchDetails: xpanded?.map((el) => ({
-          testsuiteid: el?.testsuiteid,
-          testsuitename: el?.suitename,
-          testscenarioids: el?.suitescenarios,
-          getparampaths: Object.values(
-            paramPaths[el?.key].map((el) => el?.value)
-          ),
-          conditioncheck: Object.values(
-            checkcondition[el?.key].map((el) =>
-              el?.value?.code === "T" ? "1" : 0
-            )
-          ),
-          accessibilityParameters: Object.values(
-            accessibilityParams[el?.key].map((el) => el?.value)
-          ),
-        })),
-      };
-      const executionData = {
-        type: "",
-        poolid: "",
-        targetUser: "",
-        source: "task",
-        exectionMode: "serial",
-        executionEnv: "default",
-        browserType: avodropdown?.browser?.map((el) => el.key),
-        configurename: configTxt,
-        executiontype: "asynchronous",
-        selectedModuleType: modules,
-        configurekey: uuid(),
-        isHeadless: mode === "Headless",
-        avogridId: "",
-        avoagents: [avodropdown.avogrid.name],
-        integration: {
-          alm: { url: "", username: "", password: "" },
-          qtest: { url: "", username: "", password: "", qteststeps: "" },
-          zephyr: { url: "", username: "", password: "" },
-        },
-        batchInfo: xpanded?.map((item) => ({
-          scenarioTaskType: "disable",
-          testsuiteName: item.suitename,
-          testsuiteId: item.suiteid,
-          batchname: "",
-          versionNumber: 0,
-          appType: "Web",
-          domainName: "Banking",
-          projectName: getConfigData?.projects[0]?.name,
-          projectId: getConfigData?.projects[0]?._id,
-          releaseId: getConfigData?.projects[0]?.releases[0]?.name,
-          cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
-          cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
-          scenarionIndex: [1],
-          suiteDetails: [
-            {
-              condition: 0,
-              dataparam: [""],
-              scenarioName: "Scenario_check",
-              scenarioId: "646efee42d7bb349c1ab2f19",
-              accessibilityParameters: [],
-            },
-          ],
-        })),
-        donotexe: {
-          current: xpanded?.reduce((ac, cv) => {
-            ac[cv['suiteid']] = [0]
-            return ac;
-          }, {})
-        },
-        scenarioFlag: false,
-        isExecuteNow: false,
-      };
-      dispatch(updateTestSuite(dataObj)).then(() =>
-        dispatch(storeConfigureKey(executionData))
-      );
-      setVisible(false);
-    } else if (getBtnType === "Next") {
-      setTabIndex(1);
-      setFooterType(setupBtn);
-    } else if (getBtnType === "Cancel") {
-      setTabIndex(0);
-      setFooterType("CancelNext");
-      setVisible(false);
-    }else setVisible(false);
-  };
   const readTestSuiteFunct = async (readTestSuite, item) => {
     // setLoading("Loading in Progress. Please Wait");
     const result = await readTestSuite_ICE(readTestSuite, "execute");
@@ -969,7 +841,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
     }
   };
 
-  useEffect(() => {
+  const tableUpdate = () => {
     (async () => {
       const configurationList = await fetchConfigureList({
         projectid: "646b3f8495cef4ee0ababfdf",
@@ -1215,7 +1087,149 @@ var dataforApi = {poolid:"",projectids: [projId]}
         })
       );
     })();
+  };
+
+  useEffect(() => {
+    tableUpdate();
   }, [visible_execute, visible_schedule, visible_CICD, selectedICE]);
+
+  const configModal = (getType, getData = null) => {
+    if(getType === 'CancelUpdate'){
+      const getAvogrid = [
+        ...getConfigData?.avoAgentAndGrid?.avoagents,
+        ...getConfigData?.avoAgentAndGrid?.avogrids,
+      ];
+      getAvogrid.forEach((el, index, arr) => {
+        if (Object.keys(el).includes("Hostname")) {
+          getAvogrid[index] = { ...el, name: el.Hostname };
+        }
+      });
+      setUpdateKey(getData.executionRequest.configurekey);
+      setAvodropdown({
+        ...avodropdown,
+        avogrid: getAvogrid.filter((el) => el.name === getData.executionRequest.avoagents[0])[0],
+        browser: browsers.filter((el) => getData.executionRequest.browserType.includes(el.key))
+      });
+      setMode(getData?.executionRequest?.isHeadless ? selections[1] : selections[0]);
+      setConfigTxt(getData.configurename);
+      setModules(getData.executionRequest.selectedModuleType);
+    } else {
+      setUpdateKey("");
+      setAvodropdown({});
+      setMode(selections[0]);
+      setConfigTxt("");
+      setModules("normalExecution");
+    }
+    setVisible(true);
+    setSetupBtn(getType);
+  };
+
+  const onModalBtnClick = (getBtnType) => {
+    if (getBtnType === "Save" || getBtnType === "Update") {
+      const paramPaths = Object.values(dataparam).reduce((ac, cv) => {
+        ac[cv.key] = ac[cv.key] || [];
+        ac[cv.key].push(cv);
+        return ac;
+      }, {});
+      const checkcondition = Object.values(condition).reduce((ac, cv) => {
+        ac[cv.key] = ac[cv.key] || [];
+        ac[cv.key].push(cv);
+        return ac;
+      }, {});
+      const accessibilityParams = Object.values(accessibility).reduce(
+        (ac, cv) => {
+          ac[cv.key] = ac[cv.key] || [];
+          ac[cv.key].push(cv);
+          return ac;
+        },
+        {}
+      );
+      const dataObj = {
+        param: "updateTestSuite_ICE",
+        batchDetails: xpanded?.map((el) => ({
+          testsuiteid: el?.testsuiteid,
+          testsuitename: el?.suitename,
+          testscenarioids: el?.suitescenarios,
+          getparampaths: Object.values(
+            paramPaths[el?.key].map((el) => el?.value)
+          ),
+          conditioncheck: Object.values(
+            checkcondition[el?.key].map((el) =>
+              el?.value?.code === "T" ? "1" : 0
+            )
+          ),
+          accessibilityParameters: Object.values(
+            accessibilityParams[el?.key].map((el) => el?.value)
+          ),
+        })),
+      };
+      const executionData = {
+        type: "",
+        poolid: "",
+        targetUser: "",
+        source: "task",
+        exectionMode: "serial",
+        executionEnv: "default",
+        browserType: avodropdown?.browser?.map((el) => el.key),
+        configurename: configTxt,
+        executiontype: "asynchronous",
+        selectedModuleType: modules,
+        configurekey: getBtnType === "Update" ? updateKey : uuid(),
+        isHeadless: mode === "Headless",
+        avogridId: "",
+        avoagents: [avodropdown.avogrid.name],
+        integration: {
+          alm: { url: "", username: "", password: "" },
+          qtest: { url: "", username: "", password: "", qteststeps: "" },
+          zephyr: { url: "", username: "", password: "" },
+        },
+        batchInfo: xpanded?.map((item) => ({
+          scenarioTaskType: "disable",
+          testsuiteName: item.suitename,
+          testsuiteId: item.suiteid,
+          batchname: "",
+          versionNumber: 0,
+          appType: "Web",
+          domainName: "Banking",
+          projectName: getConfigData?.projects[0]?.name,
+          projectId: getConfigData?.projects[0]?._id,
+          releaseId: getConfigData?.projects[0]?.releases[0]?.name,
+          cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
+          cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
+          scenarionIndex: [1],
+          suiteDetails: [
+            {
+              condition: 0,
+              dataparam: [""],
+              scenarioName: "Scenario_check",
+              scenarioId: "646efee42d7bb349c1ab2f19",
+              accessibilityParameters: [],
+            },
+          ],
+        })),
+        donotexe: {
+          current: xpanded?.reduce((ac, cv) => {
+            ac[cv['suiteid']] = [0]
+            return ac;
+          }, {})
+        },
+        scenarioFlag: false,
+        isExecuteNow: false,
+      };
+      dispatch(updateTestSuite(dataObj)).then(() =>
+        dispatch(storeConfigureKey(executionData))
+      );
+      tableUpdate();
+      setVisible(false);
+    } else if (getBtnType === "Next") {
+      setTabIndex(1);
+      setFooterType(setupBtn);
+    } else if (getBtnType === "Cancel") {
+      setTabIndex(0);
+      setFooterType("CancelNext");
+      setVisible(false);
+    }else setVisible(false);
+  };
 
   const onNodeSelect = (e) => {
     if (e && e.node && e.node.key) {
