@@ -21,7 +21,7 @@ const AvoConfirmDialog = ({
       showHeader={showHeader}
       message={message} 
       icon={icon} 
-      accept={accept} />
+      accept={(e) => accept(e)} />
   );
 };
 
