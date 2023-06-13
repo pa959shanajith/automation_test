@@ -39,6 +39,7 @@ import DropDownList from '../../global/components/DropDownList';
 import {ResetSession,setMsg, Messages as MSG,VARIANT} from '../../global';
 // import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { browsers, selections } from "../../utility/mockData";
+import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
 
 const ConfigurePage = ({setShowConfirmPop}) => {
@@ -101,6 +102,7 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   //
   const [smartMode,setSmartMode] = useState('normal')
   const [selectedICE,setSelectedICE] = useState("")
+  const [deleteItem, setDeleteItem] = useState(null);
 
 
   // const current_task = useSelector(state=>state.plugin.CT)
@@ -123,11 +125,12 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   const [updateKey, setUpdateKey] = useState("");
 
   const [currentKey,setCurrentKey] = useState('');
+  const [currentSelectedItem,setCurrentSelectedItem] = useState('');
   const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
   const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
   const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
-  console.log(currentKey);
-  console.log(availableICE);
+  const [logoutClicked, setLogoutClicked] = useState(false);
+  const [profileTxt, setProfileTxt]=useState("");
 
   const displayError = (error) =>{
     // setLoading(false)
@@ -429,20 +432,26 @@ var dataforApi = {poolid:"",projectids: [projId]}
   };
 
   const confirm_delete = (event, item) => {
-    // event.preventDefault(); // Prevent the default behavior of the button click
-    confirmPopup({
-      target: event.currentTarget,
-      message: (
-        <p>
-          Are you sure you want to delete <b>{item.configurename}</b> Execution Profile?
-        </p>
-      ),
-      icon: 'pi pi-exclamation-triangle',
-    });
-  };
-  //   const onClickDeleteDevOpsConfig = (item, key) => {
-  //     setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{item.configurename}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
-  // }
+    setDeleteItem(item);
+    event.preventDefault(); // Prevent the default behavior of the button click
+    setLogoutClicked(true);
+    let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
+    setProfileTxt(text);
+  //   confirmPopup({
+  //     target: event.currentTarget,
+  //     message: (
+  //      <p>
+  //         Are you sure you want to delete <b>{item.configurename}</b> Execution Profile?
+  //       </p>
+  //     ),
+  //     icon: 'pi pi-exclamation-triangle',
+  //   });
+  // };
+//   const onClickDeleteDevOpsConfig = (item, key) => {
+//     setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{item.configurename}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
+
+}
+
   const copyKeyUrlFunc = (id) => {
     const data = document.getElementById(id).title;
     if (!data) {
@@ -732,38 +741,39 @@ var dataforApi = {poolid:"",projectids: [projId]}
       ],
     },
   ];
-  //   const deleteDevOpsConfig = (configurekey) => {
-  //     // setLoading('Please Wait...');
-  //     setTimeout(async () => {
-  //         const deletedConfig = await deleteConfigureKey(configurekey);
-  //         if(deletedConfig.error) {
-  //             if(deletedConfig.error.CONTENT) {
-  //                 setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
-  //             } else {
-  //                 setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
-  //             }
-  //         }else {
-  //             const configurationList = await fetchConfigureList({
-  //                 'projectid': selectedProject
-  //             });
-  //             if(configurationList.error) {
-  //                 if(configurationList.error.CONTENT) {
-  //                     setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
-  //                 } else {
-  //                     setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
-  //                 }
-  //             }else {
-  //                 const integrationData = configurationList.map((item,idx)=>{
-  //                     setIntegration(item.executionRequest.integration)
-  //                 })
-  //                 setConfigList(configurationList);
-  //             }
-  //             setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
-  //         }
-  //         // setLoading(false);
-  //     }, 500);
-  //     setShowConfirmPop(false);
-  // }
+  const deleteDevOpsConfig = () => {
+    // setLoading('Please Wait...');
+    setTimeout(async () => {
+        const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
+        console.log(deleteItem.configurekey);
+        if(deletedConfig.error) {
+            if(deletedConfig.error.CONTENT) {
+                setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
+            } else {
+                setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
+            }
+        }else {
+            const configurationList = await fetchConfigureList({
+                'projectid': selectedProject
+            });
+            if(configurationList.error) {
+                if(configurationList.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
+                }
+            }else {
+                const integrationData = configurationList.map((item,idx)=>{
+                    setIntegration(item.executionRequest.integration)
+                })
+                setConfigList(configurationList);
+            }
+            setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
+        }
+        // setLoading(false);
+    }, 500);
+    setShowConfirmPop(false);
+}
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
     if(Array.isArray(executionData.targetUser)){
@@ -803,9 +813,9 @@ var dataforApi = {poolid:"",projectids: [projId]}
     executionData["source"]="task";
     executionData["exectionMode"]=execAction;
     executionData["executionEnv"]=execEnv;
-    executionData["browserType"]=browserTypeExe;
+    executionData["browserType"]=["1"];
     executionData["integration"]=integration;
-    executionData["batchInfo"]=modul_Info;
+    executionData["batchInfo"]=(currentSelectedItem && currentSelectedItem.executionRequest && currentSelectedItem.executionRequest.batchInfo) ? currentSelectedItem.executionRequest.batchInfo : [];
     executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
     ResetSession.start();
     try{
@@ -871,8 +881,9 @@ var dataforApi = {poolid:"",projectids: [projId]}
                   onClick={() => {
                     dispatch(getPoolsexe());
                     dispatch(getICE());
-                      setVisible_execute(true)
+                    setVisible_execute(true)
                     setCurrentKey(item.configurekey);
+                    setCurrentSelectedItem(item);
                   }}
                   size="small"
                 >
@@ -896,7 +907,6 @@ var dataforApi = {poolid:"",projectids: [projId]}
                       <div>Execution Mode : Headless</div>
                     </p>
                   </Card>
-
                   <div className="radioButtonContainer">
                     <RadioButton
                       value="Execute with Avo Assure Agent/ Grid"
@@ -1563,6 +1573,15 @@ var dataforApi = {poolid:"",projectids: [projId]}
         />
       </div>
       <Toast ref={toast} position="bottom-center" />
+      <AvoConfirmDialog className="Logout_modal"
+        visible={logoutClicked}
+        onHide={setLogoutClicked} 
+        showHeader={false}
+        message = {profileTxt}
+              
+        icon="pi pi-exclamation-triangle" 
+        accept={deleteDevOpsConfig} 
+        />
     </>
   );
 };
