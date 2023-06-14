@@ -11,12 +11,14 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import { InputText } from 'primereact/inputtext';
 
 
 const DesignModal = (props) => {
+    const toast = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const headerCheckRef = useRef();
@@ -902,14 +904,30 @@ const DesignModal = (props) => {
         setShowTable(true);
     };
     const handleAdd = () => {
-        const update = testCases;
-        const addTestcaseData = update.testCaseName;
-        update.checked = true;
-        setTestCases(update);
-        setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
-        setAddedTestCase([...addedTestCase, addTestcaseData]);
-        setDependencyTestCaseFlag(true);
+        const update = { ...testCases };
+        const addTestcaseData = {};
+        const TestIDPresent = addedTestCase.filter(item => {
+            return item.testCaseID === testCases.testCaseID
+        });
+        console.log("TestIDPresent", TestIDPresent);
+        if (TestIDPresent.length > 0) {
+            toastError("Duplicate Dependent Testcase found");
+        }
+        else {
+            addTestcaseData["testCaseID"] = update.testCaseID;
+            addTestcaseData["testCaseName"] = update.testCaseName;
+            addTestcaseData["disableAndBlock"] = update.disableAndBlock;
+            addTestcaseData["checked"] = true;
+            setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
+            setAddedTestCase([...addedTestCase, addTestcaseData]);
+            setDependencyTestCaseFlag(true);
+            setTestCases(null);
+        }
     };
+
+    const toastError = (errMessage) => {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 10000 });
+    }
 
     const headerTemplate = (
         <>
@@ -932,14 +950,14 @@ const DesignModal = (props) => {
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">No Design Step yet</p>
             </div>
-            <Button className="btn-design-single" label='Design Test Steps'></Button>
+            <Button size='small' className="btn-design-single" label='Design Test Steps'></Button>
         </div>
     );
 
     const footerContent = (
         <div>
-            <Button label="Cancel" className="p-button-text" />
-            <Button label="Debug" onClick={() => debugTestCases('1')} autoFocus />
+            <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
+            <Button label="Debug" size='small' onClick={() => debugTestCases('1')} autoFocus />
         </div>
     );
     const renderActionsCell = (rowData) => {
@@ -992,6 +1010,7 @@ const DesignModal = (props) => {
 
     return (
         <>
+            <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} >
                 <div className='toggle__tab'>
                     <Accordion activeIndex={0}>
@@ -1046,14 +1065,13 @@ const DesignModal = (props) => {
                             <div>
                                 {addedTestCase.map((value, index) => (
                                     <div key={index}>
-                                        <p className={addedTestCase.length > 0 ? 'text__added__step' : ''}>{value}</p>
+                                        <p className={addedTestCase.length > 0 ? 'text__added__step' : ''}>{value.testCaseName}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     </div>
                 </div>
-
             </Dialog>
         </>
     )
