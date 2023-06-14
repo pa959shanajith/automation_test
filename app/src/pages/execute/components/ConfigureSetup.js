@@ -57,7 +57,7 @@ const ConfigureSetup = ({
           const conditionName = `conditionName${ind}${index}`;
           const accessibilityName = `accessibilityName${ind}${index}`;
           childTree.push({
-            key: `0-${ind}`,
+            key: `${index}-${ind}`,
             data: {
               name: e?.name,
               dataParameterization: (
@@ -115,11 +115,6 @@ const ConfigureSetup = ({
   }, [configTxt]);
 
   useEffect(() => {
-    console.log(xpanded);
-    console.log(selectedNodeKeys);
-  }, [selectedNodeKeys]);
-
-  useEffect(() => {
     const getXpanded = [...xpanded];
     const getStateOfParam = { ...dataparam };
     const getStateOfCondition = { ...condition };
@@ -168,7 +163,7 @@ const ConfigureSetup = ({
       }
     });
     setXpanded(getXpanded);
-  }, [getProjectData]);
+  }, [getProjectData.testsuiteData]);
 
   const onDataparamChange = (e, getKey) => {
     setDataparam({
@@ -199,7 +194,6 @@ const ConfigureSetup = ({
   };
 
   const onCheckboxChange = (e) => {
-    console.log(e);
     setSelectedNodeKeys(e.value)
   };
 

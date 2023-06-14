@@ -1229,7 +1229,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
       dispatch(updateTestSuite(dataObj)).then(() =>
         dispatch(storeConfigureKey(executionData))
       );
-      tableUpdate();
+      // tableUpdate();
       setVisible(false);
     } else if (getBtnType === "Next") {
       setTabIndex(1);
