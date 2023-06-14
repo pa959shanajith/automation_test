@@ -168,7 +168,7 @@ const ConfigureSetup = ({
       }
     });
     setXpanded(getXpanded);
-  }, [getProjectData]);
+  }, [getProjectData.testsuiteData]);
 
   const onDataparamChange = (e, getKey) => {
     setDataparam({

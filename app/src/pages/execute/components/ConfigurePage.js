@@ -1,29 +1,35 @@
-import React, { useState, useEffect, Fragment,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { TabMenu } from "primereact/tabmenu";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from "uuid";
 import { Card } from "primereact/card";
-import "../styles/ConfigurePage.scss";
 import { Panel } from "primereact/panel";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Breadcrumbs, Checkbox } from "@mui/material";
+import { Checkbox } from "@mui/material";
 import { Button } from "primereact/button";
 import { Link } from "react-router-dom";
-import { Dialog } from "primereact/dialog";
 import { RadioButton } from "primereact/radiobutton";
-import { Dropdown } from "primereact/dropdown";
 import { Tree } from "primereact/tree";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
-import { Divider } from "primereact/divider";
-import { SelectButton } from "primereact/selectbutton";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputTextarea } from "primereact/inputtextarea";
-import { Toast } from 'primereact/toast';
-import {fetchConfigureList,getPools,getICE_list,getProjectList,ExecuteTestSuite_ICE,execAutomation,readTestSuite_ICE,deleteConfigureKey} from '../api';
-// import { Messages as MSG,VARIANT} from '../../global';
+import { Toast } from "primereact/toast";
+import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { useDispatch, useSelector } from "react-redux";
+import "../styles/ConfigurePage.scss";
 import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
+import {
+  fetchConfigureList,
+  getPools,
+  getICE_list,
+  getProjectList,
+  ExecuteTestSuite_ICE,
+  execAutomation,
+  readTestSuite_ICE,
+  deleteConfigureKey,
+} from "../api";
 import {
   getAvoAgentAndAvoGrid,
   getModules,
@@ -31,90 +37,60 @@ import {
   storeConfigureKey,
   updateTestSuite,
 } from "../configureSetupSlice";
-import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
-import { useDispatch, useSelector } from "react-redux";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
-import DropDownList from '../../global/components/DropDownList';
-import {ResetSession,setMsg, Messages as MSG,VARIANT} from '../../global';
-// import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import DropDownList from "../../global/components/DropDownList";
+import { ResetSession, setMsg, Messages as MSG, VARIANT } from "../../global";
 import { browsers, selections } from "../../utility/mockData";
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
-
-const ConfigurePage = ({setShowConfirmPop}) => {
+const ConfigurePage = ({ setShowConfirmPop }) => {
   const [visible, setVisible] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
   const [ingredient, setIngredient] = useState("");
-  const [showLegend, setShowLegend] = useState(false);
   const [showIcePopup, setShowIcePopup] = useState(false);
-  // const [selectedRadio, setSelectedRadio] = useState('');
-  const [radioButton_grid, setRadioButton_grid] = useState(
-    "Execute with Avo Assure Agent/ Grid"
-  );
-  const [radioButton_Weekly, setRadioButton_Weekly] = useState(true);
-  const [selectedRadio, setSelectedRadio] = useState(
-    "Execute with Avo Assure Client"
-  );
   const [selectedNodeKey, setSelectedNodeKey] = useState(null);
-  const [selectRecurrenceKey, setSelectRecurrenceKey] = useState(null);
   const [time, setTime] = useState(null);
-  const [days, setDays] = useState(null);
-  const [showCheckbox, setShowCheckbox] = useState(false);
   const [time_limit, setTime_limit] = useState(null);
   const [counter, setCounter] = useState(0);
-  const [value_input, setValue_input] = useState(null);
   const [checked, setChecked] = useState(false);
   const toast = useRef(null);
-  const [projectData1, setProjectData1] = useState([]);
-  const [projectData, setProjectData] = useState([]);
-  const url = window.location.href.slice(0, -7)+'execAutomation';
-  const [projectName, setProjectName] = useState('');
+  const url = window.location.href.slice(0, -7) + "execAutomation";
   const [projectId, setprojectId] = useState("");
-  // const current_task = useSelector(state=>state.plugin.PN);
-  const [cycleName, setCycleName] = useState('');
-  const [selectedProject, setSelectedProject] = useState('');
+  const [selectedProject, setSelectedProject] = useState("");
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [modules, setModules] = useState("normalExecution");
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
-  const [allocateICE,setAllocateICE] = useState(false);
+  const [allocateICE, setAllocateICE] = useState(false);
   const [eachData, setEachData] = useState([]);
   const [currentTask, setCurrentTask] = useState({});
-  const [appType, setAppType] = useState('');
-  const [moduleInfo,setModuleInfo] = useState([]);
-  const [execAction,setExecAction] = useState("serial"); 
-  const [execEnv,setExecEnv] = useState("default");
+  const [appType, setAppType] = useState("");
+  const [moduleInfo, setModuleInfo] = useState([]);
+  const [execAction, setExecAction] = useState("serial");
+  const [execEnv, setExecEnv] = useState("default");
   const [accessibilityParameters, setAccessibilityParameters] = useState([]);
-  const [browserTypeExe,setBrowserTypeExe] = useState([]);
-  const [integration,setIntegration] = useState({
-    alm: {url:"",username:"",password:""}, 
-    qtest: {url:"",username:"",password:"",qteststeps:""}, 
-    zephyr: {url:"",username:"",password:""}
+  const [browserTypeExe, setBrowserTypeExe] = useState([]);
+  const [integration, setIntegration] = useState({
+    alm: { url: "", username: "", password: "" },
+    qtest: { url: "", username: "", password: "", qteststeps: "" },
+    zephyr: { url: "", username: "", password: "" },
   });
   const [proceedExecution, setProceedExecution] = useState(false);
-  // const [visible, setVisible] = useState(false);
-
-  // const dispatch = useDispatch();
-  //
-  const [smartMode,setSmartMode] = useState('normal')
-  const [selectedICE,setSelectedICE] = useState("")
+  const [smartMode, setSmartMode] = useState("normal");
+  const [selectedICE, setSelectedICE] = useState("");
   const [deleteItem, setDeleteItem] = useState(null);
-
-
-  // const current_task = useSelector(state=>state.plugin.CT)
-  // const [loading,setLoading] = useState(false)
-  const [poolList,setPoolList] = useState({})
-  const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([])
-  const [iceStatus,setIceStatus] = useState([])
-  const [poolType,setPoolType] = useState("unallocated");
+  const [poolList, setPoolList] = useState({});
+  const [chooseICEPoolOptions, setChooseICEPoolOptions] = useState([]);
+  const [iceStatus, setIceStatus] = useState([]);
+  const [poolType, setPoolType] = useState("unallocated");
   const [ExeScreen, setExeScreen] = useState(true);
-  const [inputErrorBorder,setInputErrorBorder] = useState(false);
-  const [iceNameIdMap,setIceNameIdMap] = useState({});
-  const [availableICE,setAvailableICE] = useState([])
+  const [inputErrorBorder, setInputErrorBorder] = useState(false);
+  const [iceNameIdMap, setIceNameIdMap] = useState({});
+  const [availableICE, setAvailableICE] = useState([]);
   const [xpanded, setXpanded] = useState([]);
   const [dataparam, setDataparam] = useState({});
   const [condition, setCondition] = useState({});
@@ -123,29 +99,29 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   const [avodropdown, setAvodropdown] = useState({});
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
-
-  const [currentKey,setCurrentKey] = useState('');
-  const [currentSelectedItem,setCurrentSelectedItem] = useState('');
-  const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
+  const [currentKey, setCurrentKey] = useState("");
+  const [currentSelectedItem, setCurrentSelectedItem] = useState("");
+  const [executionTypeInRequest, setExecutionTypeInRequest] =
+    useState("asynchronous");
   const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
   const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
   const [logoutClicked, setLogoutClicked] = useState(false);
-  const [profileTxt, setProfileTxt]=useState("");
+  const [profileTxt, setProfileTxt] = useState("");
+  const [radioButton_grid, setRadioButton_grid] = useState(
+    "Execute with Avo Assure Agent/ Grid"
+  );
 
-  const displayError = (error) =>{
+  const displayError = (error) => {
     // setLoading(false)
-    setMsg(error)
-}
-  const [displayBasic2, setDisplayBasic2] = useState(false);
-  const [selectedItem, setSelectedItem] = useState({});
- const [position, setPosition] = useState('center');
+    setMsg(error);
+  };
 
   const dialogFuncMap = {
     visible_execute: setVisible_execute,
   };
 
   const [footerType, setFooterType] = useState("CancelNext");
-    const [setupBtn, setSetupBtn] = useState(null);
+  const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const items = [
     { label: "Configurations" },
@@ -167,56 +143,6 @@ const ConfigurePage = ({setShowConfirmPop}) => {
       dispatch(getModules(getConfigData?.projects));
   }, [getConfigData?.projects]);
 
-  const readTestSuiteFunct = async (readTestSuite, item) => {
-    // setLoading("Loading in Progress. Please Wait");
-    const result = await readTestSuite_ICE(readTestSuite, "execute");
-    if (result.error) {
-      displayError(result.error);
-      return;
-    } else if (result.testSuiteDetails) {
-      var data = result.testSuiteDetails;
-      var keys = Object.keys(data);
-      var tableData = [];
-      keys.map((itm) => tableData.push({ ...data[itm] }));
-
-      for (var m = 0; m < keys.length; m++) {
-        if (!tableData[m].executestatus.includes(0)) {
-          tableData[m].scenarioids.map((scenarioid, index) => {
-            tableData[m].executestatus[index] = 0;
-            if (m < item.executionRequest.batchInfo.length) {
-              if (
-                item.executionRequest.selectedModuleType === "normalExecution"
-              ) {
-                for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
-                  if (
-                    scenarioid ===
-                    item.executionRequest.batchInfo[m].suiteDetails[k]
-                      .scenarioId
-                  ) {
-                    tableData[m].executestatus[index] = 1;
-                    break;
-                  }
-                }
-              } else {
-                for (
-                  var n = 0;
-                  n < item.executionRequest.batchInfo[m].scenarionIndex.length;
-                  n++
-                ) {
-                  tableData[m].executestatus[
-                    item.executionRequest.batchInfo[m].scenarionIndex[n]
-                  ] = 1;
-                }
-              }
-            }
-          });
-        }
-      }
-      setEachData(tableData);
-    }
-    // setLoading(false);
-}
-
   const parseLogicExecute = (
     eachData,
     current_task,
@@ -234,15 +160,15 @@ const ConfigurePage = ({setShowConfirmPop}) => {
       var cycid = testsuiteDetails.cycleid;
       var projectid = testsuiteDetails.projectidts;
 
-      for(var j =0 ; j<eachData[i].executestatus.length; j++){
-          if(eachData[i].executestatus[j]===1){
+      for (var j = 0; j < eachData[i].executestatus.length; j++) {
+        if (eachData[i].executestatus[j] === 1) {
           selectedRowData.push({
             condition: eachData[i].condition[j],
             dataparam: [eachData[i].dataparam[j].trim()],
             scenarioName: eachData[i].scenarionames[j],
             scenarioId: eachData[i].scenarioids[j],
             scenariodescription: undefined,
-                  accessibilityParameters: accessibilityParameters
+            accessibilityParameters: accessibilityParameters,
           });
         }
       }
@@ -331,11 +257,11 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   }, []);
 
   const fetchData = async () => {
-  setSmartMode('normal');
+    setSmartMode("normal");
     setSelectedICE("");
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
     var projId = "642d4a250934a8c996e598a0";
-var dataforApi = {poolid:"",projectids: [projId]}
+    var dataforApi = { poolid: "", projectids: [projId] };
     // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
     if (data.error) {
@@ -365,24 +291,24 @@ var dataforApi = {poolid:"",projectids: [projId]}
     if (iceStatusdata !== undefined) iceStatusValue = iceStatusdata.ice_ids;
     else if (iceStatusdata === undefined) iceStatusValue = iceStatus.ice_ids;
     const statusUpdate = (ice) => {
-    var color = '#fdc010' ;
-    var status = 'Offline';
-    if(ice.connected){
-      color = '#95c353';
-      status = 'Online'
+      var color = "#fdc010";
+      var status = "Offline";
+      if (ice.connected) {
+        color = "#95c353";
+        status = "Online";
       }
-    if(ice.mode){
-      color = 'red';
-      status = 'DND mode'
+      if (ice.mode) {
+        color = "red";
+        status = "DND mode";
       }
-    return {color,status}
-  }
-  if(unallocated){
-    setPoolType("unallocated")
-    if(arr===undefined) iceStatusdata = iceStatus;
-    arr = Object.entries(iceStatusdata.unallocatedICE)
-    arr.forEach((e)=>{
-      var res = statusUpdate(e[1])
+      return { color, status };
+    };
+    if (unallocated) {
+      setPoolType("unallocated");
+      if (arr === undefined) iceStatusdata = iceStatus;
+      arr = Object.entries(iceStatusdata.unallocatedICE);
+      arr.forEach((e) => {
+        var res = statusUpdate(e[1]);
         e[1].color = res.color;
         e[1].statusCode = res.status;
         ice.push(e[1]);
@@ -408,17 +334,14 @@ var dataforApi = {poolid:"",projectids: [projId]}
       });
       setIceNameIdMap(iceNameIdMapData);
     }
-  ice.sort((a,b) => a.icename.localeCompare(b.icename))
+    ice.sort((a, b) => a.icename.localeCompare(b.icename));
     setAvailableICE(ice);
-  }
-  
+  };
 
   const handleWeekInputChange = (event) => {
     setMonthlyRecurrenceWeekValue(event.target.value);
-  }
-  // const toggleDropdown = () => {
-  //   setIsOpen(!isOpen);
-  // };
+  };
+
   const getRecurrenceType = (event) => {
     setRecurrenceType(event.target.value);
   };
@@ -437,38 +360,8 @@ var dataforApi = {poolid:"",projectids: [projId]}
     setLogoutClicked(true);
     let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
     setProfileTxt(text);
-  //   confirmPopup({
-  //     target: event.currentTarget,
-  //     message: (
-  //      <p>
-  //         Are you sure you want to delete <b>{item.configurename}</b> Execution Profile?
-  //       </p>
-  //     ),
-  //     icon: 'pi pi-exclamation-triangle',
-  //   });
-  // };
-//   const onClickDeleteDevOpsConfig = (item, key) => {
-//     setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{item.configurename}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
+  };
 
-}
-
-  const copyKeyUrlFunc = (id) => {
-    const data = document.getElementById(id).title;
-    if (!data) {
-      setApiKeyCopyToolTip("Nothing to Copy!");
-      setTimeout(() => {
-        setApiKeyCopyToolTip("Click to Copy");
-      }, 1500);
-      return;
-    }
-    const x = document.getElementById(id);
-    x.select();
-    document.execCommand('copy');
-    setApiKeyCopyToolTip("Copied!");
-    setTimeout(() => {
-      setApiKeyCopyToolTip("Click to Copy");
-    }, 1500);
-}
   const copyConfigKey = (title) => {
     if (navigator.clipboard.writeText(title)) {
       setCopyToolTip("Copied!");
@@ -476,7 +369,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
         setCopyToolTip("Click to Copy");
       }, 1500);
     }
-}
+  };
   const tree_CICD = [
     {
       key: "0",
@@ -491,8 +384,6 @@ var dataforApi = {poolid:"",projectids: [projId]}
           label: (
             <div className="input_CICD ">
               <div class="container_url">
-                {/* <span className="devopsUrl_label" id='api-url' value={url}>DevOps Integration API url : </span> */}
-
                 <label for="inputField" class="devopsUrl_label">
                   Devops Integration URL
                 </label>
@@ -502,8 +393,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
                   class="inputtext_CICD"
                   value={url}
                 />
-                {/* <Tooltip title={copyToolTip}/> */}
-                {/* <Tooltip id="copy" effect="solid" backgroundColor="black" title={copyToolTip} arrow={true}/> */}
+
                 <Button
                   icon="pi pi-copy"
                   className="copy_CICD"
@@ -553,31 +443,9 @@ var dataforApi = {poolid:"",projectids: [projId]}
                     cols={30}
                     value={str}
                   />
-
                   <Button icon="pi pi-copy" className="copy_devops" />
                 </div>
               </div>
-
-              {/* <div className="lable_sync">
-                <lable className="Async_lable"> Asynchronous</lable>
-                <InputSwitch className="inputSwitch_CICD"
-                  checked={checked}
-                  onChange={(e) => setChecked(e.value)}
-                />
-                <label  className="sync_label" id="sync" htmlFor="synch" value="synchronous">
-                  Synchronous{" "}
-                </label>
-              </div> */}
-
-              {/* <div class="container_devopsLabel">
-                <lable className="devops_label">Devops Request Body</lable>
-              </div>
-              <div>
-                <div className="inputtext_devops">
-                  <InputTextarea rows={4} cols={30} />
-                  <Button icon="pi pi-copy" className="copy_devops" />
-                </div>
-              </div> */}
             </div>
           ),
         },
@@ -665,7 +533,6 @@ var dataforApi = {poolid:"",projectids: [projId]}
                   <span className="yearly_lable">Yearly</span>
                 </lable>
               </div>
-              {/* <div className="recurrence-content"> */}
               {recurrenceType === "Weekly" && (
                 <div className="weekly-recurrence-list">
                   <div className=" schedule_input_counter">
@@ -697,7 +564,6 @@ var dataforApi = {poolid:"",projectids: [projId]}
                   </div>
                 </div>
               )}
-              {/* </div> */}
             </div>
           ),
         },
@@ -741,64 +607,76 @@ var dataforApi = {poolid:"",projectids: [projId]}
       ],
     },
   ];
+
   const deleteDevOpsConfig = () => {
     // setLoading('Please Wait...');
     setTimeout(async () => {
-        const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
-        console.log(deleteItem.configurekey);
-        if(deletedConfig.error) {
-            if(deletedConfig.error.CONTENT) {
-                setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
-            } else {
-                setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
-            }
-        }else {
-            const configurationList = await fetchConfigureList({
-                'projectid': selectedProject
-            });
-            if(configurationList.error) {
-                if(configurationList.error.CONTENT) {
-                    setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
-                } else {
-                    setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
-                }
-            }else {
-                const integrationData = configurationList.map((item,idx)=>{
-                    setIntegration(item.executionRequest.integration)
-                })
-                setConfigList(configurationList);
-            }
-            setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
+      const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
+      console.log(deleteItem.configurekey);
+      if (deletedConfig.error) {
+        if (deletedConfig.error.CONTENT) {
+          setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
+        } else {
+          setMsg(
+            MSG.CUSTOM(
+              "Error While Deleting Execute Configuration",
+              VARIANT.ERROR
+            )
+          );
         }
-        // setLoading(false);
+      } else {
+        const configurationList = await fetchConfigureList({
+          projectid: selectedProject,
+        });
+        if (configurationList.error) {
+          if (configurationList.error.CONTENT) {
+            setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
+          } else {
+            setMsg(
+              MSG.CUSTOM(
+                "Error While Fetching Execute Configuration List",
+                VARIANT.ERROR
+              )
+            );
+          }
+        } else {
+          const integrationData = configurationList.map((item, idx) => {
+            setIntegration(item.executionRequest.integration);
+          });
+          setConfigList(configurationList);
+        }
+        setMsg(
+          MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
+        );
+      }
+      // setLoading(false);
     }, 500);
     setShowConfirmPop(false);
-}
+  };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
-    if(Array.isArray(executionData.targetUser)){
-      for(let icename in executionData.targetUser){
+    if (Array.isArray(executionData.targetUser)) {
+      for (let icename in executionData.targetUser) {
         let ice_id = iceNameIdMap[executionData.targetUser[icename]];
-        if(ice_id && ice_id.status){
+        if (ice_id && ice_id.status) {
           setDataExecution(executionData);
           setAllocateICE(false);
           setProceedExecution(true);
         }
       }
-    }else{
+    } else {
       let ice_id = iceNameIdMap[executionData.targetUser];
-      if(ice_id && ice_id.status){
+      if (ice_id && ice_id.status) {
         setDataExecution(executionData);
         setAllocateICE(false);
         setProceedExecution(true);
       }
     }
     ExecuteTestSuite(executionData);
-}
+  };
 
   const ExecuteTestSuite = async (executionData) => {
-       
-    if(executionData === undefined) executionData = dataExecution;
+    if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(
       eachData,
@@ -810,15 +688,21 @@ var dataforApi = {poolid:"",projectids: [projId]}
     );
     if (modul_Info === false) return;
     // setLoading("Sending Execution Request");
-    executionData["source"]="task";
-    executionData["exectionMode"]=execAction;
-    executionData["executionEnv"]=execEnv;
-    executionData["browserType"]=["1"];
-    executionData["integration"]=integration;
-    executionData["batchInfo"]=(currentSelectedItem && currentSelectedItem.executionRequest && currentSelectedItem.executionRequest.batchInfo) ? currentSelectedItem.executionRequest.batchInfo : [];
-    executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
+    executionData["source"] = "task";
+    executionData["exectionMode"] = execAction;
+    executionData["executionEnv"] = execEnv;
+    executionData["browserType"] = ["1"];
+    executionData["integration"] = integration;
+    executionData["batchInfo"] =
+      currentSelectedItem &&
+      currentSelectedItem.executionRequest &&
+      currentSelectedItem.executionRequest.batchInfo
+        ? currentSelectedItem.executionRequest.batchInfo
+        : [];
+    executionData["scenarioFlag"] =
+      currentTask.scenarioFlag == "True" ? true : false;
     ResetSession.start();
-    try{
+    try {
       // setLoading(false);
       const data = await ExecuteTestSuite_ICE(executionData);
       if (data.errorapi) {
@@ -840,10 +724,10 @@ var dataforApi = {poolid:"",projectids: [projId]}
       setModuleInfo([]);
       setExecAction("serial");
       setExecEnv("default");
-    }catch(error) {
+    } catch (error) {
       // setLoading(false);
       ResetSession.end();
-        displayError(MSG.EXECUTE.ERR_EXECUTE)
+      displayError(MSG.EXECUTE.ERR_EXECUTE);
       setBrowserTypeExe([]);
       setModuleInfo([]);
       setExecAction("serial");
@@ -851,260 +735,106 @@ var dataforApi = {poolid:"",projectids: [projId]}
     }
   };
 
-  const tableUpdate = () => {
-    (async () => {
-      const configurationList = await fetchConfigureList({
-        projectid: "646b3f8495cef4ee0ababfdf",
+  const tableUpdate = async () => {
+    const getState = [...configList];
+    const configurationList = await fetchConfigureList({
+      projectid:getConfigData?.projects[0]?._id
+    });
+    configurationList.forEach((item, idx) => {
+      getState.push({
+        sno: idx + 1,
+        profileName: (
+          <div>
+            <Checkbox className="checkbox_header" />
+            <span>{item.configurename}</span>
+          </div>
+        ),
+        executionOptions: (
+          <div className="Buttons_config">
+            <Button
+              style={{
+                width: "8.5rem",
+                fontFamily: "Open Sans",
+                fontStyle: "normal",
+                marginLeft: "0.5rem",
+                height: "2.5rem",
+              }}
+              onClick={() => {
+                dispatch(getPoolsexe());
+                dispatch(getICE());
+                setVisible_execute(true);
+                setCurrentKey(item.configurekey);
+                setCurrentSelectedItem(item);
+              }}
+              size="small"
+            >
+              {" "}
+              Execute Now
+            </Button>
+            <Button
+              style={{
+                width: "6rem",
+                fontFamily: "Open Sans",
+                fontStyle: "normal",
+                height: "2.5rem",
+              }}
+              onClick={() => setVisible_schedule(true)}
+              size="small"
+            >
+              {" "}
+              Schedule
+            </Button>
+
+            <Button
+              style={{
+                width: "4.5rem",
+                fontFamily: "Open Sans",
+                fontStyle: "normal",
+                height: "2.5rem",
+              }}
+              size="small"
+              onClick={() => {
+                setVisible_CICD(true);
+                setCurrentKey(item.configurekey);
+                console.log(item.configurekey);
+              }}
+            >
+              CI/CD
+            </Button>
+          </div>
+        ),
+        actions: (
+          <div>
+            <ConfirmPopup
+              target={buttonEl.current}
+              visible={visible}
+              onHide={() => setVisible(false)}
+            />
+            <Button
+              icon="pi pi-pencil"
+              className=" pencil_button p-button-edit"
+              onClick={() => configModal("CancelUpdate", item)}
+            ></Button>
+            <Button
+              icon="pi pi-trash"
+              className="p-button-edit"
+              onClick={(event) => confirm_delete(event, item)}
+            ></Button>
+          </div>
+        ),
       });
-      setConfigList(
-        configurationList.map((item, idx) => {
-          console.log("set is", item.configurekey);
-          return {
-            sno: idx + 1,
-
-            profileName: (
-              <div>
-                <Checkbox className="checkbox_header" />
-                <span>{item.configurename}</span>
-              </div>
-            ),
-            executionOptions: (
-              <div className="Buttons_config">
-                <Button
-                  style={{
-                    width: "8.5rem",
-                    fontFamily: "Open Sans",
-                    fontStyle: "normal",
-                      marginLeft:'0.5rem',
-                      height:"2.5rem"
-                  }}
-                  onClick={() => {
-                    dispatch(getPoolsexe());
-                    dispatch(getICE());
-                    setVisible_execute(true)
-                    setCurrentKey(item.configurekey);
-                    setCurrentSelectedItem(item);
-                  }}
-                  size="small"
-                >
-                  {" "}
-                  Execute Now
-                </Button>
-                <Dialog
-                  className="dialog_execute "
-                  header="Execute : Regression"
-                  visible={visible_execute}
-                  style={{ width: "50vw" }}
-                  onHide={() => {
-                    setVisible_execute(false);
-                  }}
-                  footer={renderFooter("visible_execute")}
-                >
-                  <Card className="execute_card p-card p-card-body ">
-                    <p className="m-0 ">
-                      <div>Avo Agent:SBLTQAFFF </div>
-                      <div>Selected Browsers : Google Chrome</div>
-                      <div>Execution Mode : Headless</div>
-                    </p>
-                  </Card>
-                  <div className="radioButtonContainer">
-                    <RadioButton
-                      value="Execute with Avo Assure Agent/ Grid"
-                      onChange={() => {
-                        setShowIcePopup(false);
-                      }}
-                      checked={
-                        radioButton_grid ===
-                        "Execute with Avo Assure Agent/ Grid"
-                      }
-                    />
-                    <label className="executeRadio_label_grid ml-2">
-                      Execute with Avo Assure Agent/ Grid
-                    </label>
-                    <div className="radioButtonContainer1">
-                      <RadioButton
-                        value="Execute with Avo Assure Client"
-                        // onChange={(e) => handleRadioButtonChange(e.value)}
-                        onChange={() => {
-                          setShowIcePopup(true);
-                        }}
-                        checked={
-                          ingredient === "Execute with Avo Assure Client"
-                        }
-                      />
-                    </div>
-                    <label className=" executeRadio_label_clint ml-2">
-                      Execute with Avo Assure Client
-                    </label>
-                  </div>
-                  {/* <div className='adminControl-ice popup-content popup-content-status'> */}
-                  {/* <div> */}
-                  {showIcePopup && (
-                    <div>
-                      <div className="legends-container">
-                        <span className="legend_Status" title="Token Name">
-                          Status:
-                        </span>
-                        <div className="legend">
-                          <span id="status" className="status-available"></span>
-                          <span className="legend-text">Available</span>
-                        </div>
-                        <div className="legend">
-                          <span
-                            id="status"
-                            className="status-unavailable"
-                          ></span>
-                          <span className="legend-text">Unavailable</span>
-                        </div>
-                        <div className="legend">
-                          <span id="status" className="status-dnd"></span>
-                          <span className="legend-text">Do Not Disturb</span>
-                        </div>
-                      </div>
-                      <div>
-                        <span
-                          className="execute_dropdown .p-dropdown-label "
-                          title="Token Name"
-                        >
-                          Execute on
-                        </span>
-                        {/* <Dropdown
-                            className="dropdown_execute .p-inputtext"
-                            placeholder="Search"
-                          ></Dropdown> */}
-                        <div className="adminControl-ice popup-content">
-                          <DropDownList
-                            poolType={poolType}
-                            ExeScreen={ExeScreen}
-                            inputErrorBorder={inputErrorBorder}
-                            setInputErrorBorder={setInputErrorBorder}
-                            placeholder={"Search"}
-                            data={availableICE}
-                            smartMode={ExeScreen === true ? smartMode : ""}
-                            selectedICE={selectedICE}
-                            setSelectedICE={setSelectedICE}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {/* </div> */}
-                  {/* </div> */}
-                </Dialog>
-
-                <Button
-                  style={{
-                    width: "6rem",
-                    fontFamily: "Open Sans",
-                    fontStyle: "normal",
-                      height:'2.5rem'
-                  }}
-                  onClick={() => setVisible_schedule(true)}
-                  size="small"
-                >
-                  {" "}
-                  Schedule
-                </Button>
-                <Dialog
-                  className="dialog_Schedule"
-                  header="Schedule : Regression"
-                  visible={visible_schedule}
-                  style={{ width: "60vw" }}
-                  onHide={() => setVisible_schedule(false)}
-                  footer={footerContent_Schedule}
-                >
-                  <Card className="Schedule_card  .p-card .p-card-content ">
-                    <p className="m-0 ">
-                      <div>Avo Agent:SBLTQAFFF </div>
-                      <div>Selected Browsers : Google Chrome</div>
-                      <div>Execution Mode : Headless</div>
-                    </p>
-                  </Card>
-
-                  <Tree
-                    className="schedule_tree"
-                    value={treeData}
-                    selectionMode="single"
-                    selectionKeys={selectedNodeKey}
-                    onSelectionChange={onNodeSelect}
-                    // onToggle={onToggleNode}
-                  />
-                </Dialog>
-                <Button
-                  style={{
-                    width: "4.5rem",
-                    fontFamily: "Open Sans",
-                    fontStyle: "normal",
-                    height:"2.5rem",
-                    
-                  }}
-                  size="small"
-                  onClick={() => {
-                    setVisible_CICD(true);
-                    setCurrentKey(item.configurekey);
-                    console.log(item.configurekey);
-                  }}
-                >
-                  CI/CD
-                </Button>
-
-                <Dialog
-                  className="dialog_CICD"
-                  header="Execute : Regression"
-                  visible={visible_CICD}
-                  style={{ width: "50vw" }}
-                  onHide={() => setVisible_CICD(false)}
-                  // footer={footerContent_CICD}
-                >
-                  <Card className="Schedule_card  .p-card .p-card-content ">
-                    <p className="m-0 ">
-                      <div>Avo Agent:SBLTQAFFF</div>
-                      <div>Selected Browsers : Google Chrome</div>
-                      <div>Execution Mode : Headless</div>
-                    </p>
-                  </Card>
-
-                  <Tree
-                    className="CICD_tree"
-                    value={tree_CICD}
-                    selectionMode="single"
-                    selectionKeys={selectedNodeKey}
-                    onSelectionChange={onNodeSelect}
-                  />
-                </Dialog>
-              </div>
-            ),
-            actions: (
-              <div>
-                <ConfirmPopup
-                  target={buttonEl.current}
-                  visible={visible}
-                  onHide={() => setVisible(false)}
-                />
-                <Button
-                  icon="pi pi-pencil"
-                  className=" pencil_button p-button-edit"
-                  onClick={() => configModal('CancelUpdate', item)}
-                ></Button>
-                <Button
-                  icon="pi pi-trash"
-                  className="p-button-edit"
-                  onClick={(event) => confirm_delete(event, item)}
-                ></Button>
-              </div>
-            ),
-          };
-        })
-      );
-    })();
+    });
+    setConfigList(getState);
   };
 
   useEffect(() => {
-    tableUpdate();
-  }, [visible_execute, visible_schedule, visible_CICD, selectedICE]);
+    if (getConfigData?.projects[0]?._id) {
+      tableUpdate();
+    }
+  }, [getConfigData?.projects[0]?._id]);
 
   const configModal = (getType, getData = null) => {
-    if(getType === 'CancelUpdate'){
+    if (getType === "CancelUpdate") {
       const getAvogrid = [
         ...getConfigData?.avoAgentAndGrid?.avoagents,
         ...getConfigData?.avoAgentAndGrid?.avogrids,
@@ -1117,10 +847,16 @@ var dataforApi = {poolid:"",projectids: [projId]}
       setUpdateKey(getData.executionRequest.configurekey);
       setAvodropdown({
         ...avodropdown,
-        avogrid: getAvogrid.filter((el) => el.name === getData.executionRequest.avoagents[0])[0],
-        browser: browsers.filter((el) => getData.executionRequest.browserType.includes(el.key))
+        avogrid: getAvogrid.filter(
+          (el) => el.name === getData.executionRequest.avoagents[0]
+        )[0],
+        browser: browsers.filter((el) =>
+          getData.executionRequest.browserType.includes(el.key)
+        ),
       });
-      setMode(getData?.executionRequest?.isHeadless ? selections[1] : selections[0]);
+      setMode(
+        getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
+      );
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
     } else {
@@ -1219,9 +955,9 @@ var dataforApi = {poolid:"",projectids: [projId]}
         })),
         donotexe: {
           current: xpanded?.reduce((ac, cv) => {
-            ac[cv['suiteid']] = [0]
+            ac[cv["suiteid"]] = [0];
             return ac;
-          }, {})
+          }, {}),
         },
         scenarioFlag: false,
         isExecuteNow: false,
@@ -1229,7 +965,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
       dispatch(updateTestSuite(dataObj)).then(() =>
         dispatch(storeConfigureKey(executionData))
       );
-      tableUpdate();
+      // tableUpdate();
       setVisible(false);
     } else if (getBtnType === "Next") {
       setTabIndex(1);
@@ -1238,7 +974,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
       setTabIndex(0);
       setFooterType("CancelNext");
       setVisible(false);
-    }else setVisible(false);
+    } else setVisible(false);
   };
 
   const onNodeSelect = (e) => {
@@ -1246,17 +982,8 @@ var dataforApi = {poolid:"",projectids: [projId]}
       setSelectedNodeKey(e.node.key);
     }
   };
-  const onNodeSelect1 = (e) => {
-    if (e && e.node && e.node.key) {
-      setSelectRecurrenceKey(e.node.key);
-    }
-  };
 
   const Breadcrumbs = () => {
-    // const [isOpen, setIsOpen] = useState(false);
-    // const toggleDropdown = () => {
-    //   setIsOpen(!isOpen);
-    // };
     return (
       <nav>
         <ul
@@ -1289,81 +1016,45 @@ var dataforApi = {poolid:"",projectids: [projId]}
     );
   };
 
-  const renderFooter = (name) => {
-    return (
-      <div>
-        <Button
-          label="Execute"
-          title="Execute"
-          className="execute_button"
-          onClick={async () => {
-            if (showIcePopup) {
-              dataExecution.type =
-                ExeScreen === true
-                  ? smartMode === "normal"
-                    ? ""
-                    : smartMode
-                  : "";
-              dataExecution.poolid = "";
-
-              if ((ExeScreen === true ? smartMode : "") !== "normal")
-                dataExecution.targetUser = Object.keys(selectedICE).filter(
-                  (icename) => selectedICE[icename],
-                  console.log(selectedICE, "after if")
-                );
-              else dataExecution.targetUser = selectedICE;
-
-              CheckStatusAndExecute(dataExecution, iceNameIdMap);
-              onHide(name);
-            } else {
-              const temp = await execAutomation(currentKey);
-              if (temp.status !== "pass") {
-                if (temp.error && temp.error.CONTENT) {
-                  setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
-                } else {
-                  setMsg(
-                    MSG.CUSTOM(
-                      "Error While Adding Configuration to the Queue",
-                      VARIANT.ERROR
-                    )
-                  );
-                }
-              } else {
-                setMsg(
-                  MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS)
-                );
-              }
-              onHide(name);
-            }
-          }}
-          autoFocus
-        />
-      </div>
-    );
-  };
   const onHide = (name) => {
     dialogFuncMap[`${name}`](false);
   };
-  // const onClick = (name, position) => {
-  //   dialogFuncMap[`${name}`](true);
 
-  //   if (position) {
-  //       setPosition(position);
-  //   }
-  // }
+  const onExecuteBtnClick = async () => {
+    if (showIcePopup) {
+      dataExecution.type =
+        ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
+      dataExecution.poolid = "";
 
-  // const footerContent_config = (
-  //   <div className="btn-11">
-  //     <Button label="Cancel" className="Cancle_button" />
-  //     <Button className="execute_button" label="Execute" onClick={showSuccess_execute}></Button>
-  //   </div>
-  // );
-  // const footerContent_CICD = (
-  //   <div className="btn-11">
-  //     <Button label="Cancel" className="Cancle_button" />
-  //     <Button className="confirm_button" label="Confirm"></Button>
-  //   </div>
-  // );
+      if ((ExeScreen === true ? smartMode : "") !== "normal")
+        dataExecution.targetUser = Object.keys(selectedICE).filter(
+          (icename) => selectedICE[icename],
+          console.log(selectedICE, "after if")
+        );
+      else dataExecution.targetUser = selectedICE;
+
+      CheckStatusAndExecute(dataExecution, iceNameIdMap);
+      // onHide(name);
+    } else {
+      const temp = await execAutomation(currentKey);
+      if (temp.status !== "pass") {
+        if (temp.error && temp.error.CONTENT) {
+          setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
+        } else {
+          setMsg(
+            MSG.CUSTOM(
+              "Error While Adding Configuration to the Queue",
+              VARIANT.ERROR
+            )
+          );
+        }
+      } else {
+        setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+      }
+      // onHide(name);
+    }
+  };
+
   const footerContent_Schedule = (
     <div className="btn-11">
       <Button label="Cancel" className="Cancle_button" />
@@ -1375,10 +1066,6 @@ var dataforApi = {poolid:"",projectids: [projId]}
     </div>
   );
 
-  const handleRadioButtonChange = (value) => {
-    setRadioButton_grid(value);
-    setSelectedRadio(value);
-  };
   const tabMenuItems =
     configList.length > 0
       ? [
@@ -1386,7 +1073,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
           {
             label: (
               <Button
-                onClick={() => configModal('CancelSave')}
+                onClick={() => configModal("CancelSave")}
                 className="addConfi_button"
                 size="small"
               >
@@ -1407,7 +1094,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
   };
 
   const renderTable = () => {
-    if (configList.length > 0) {
+    if (!!configList.length) {
       return (
         <>
           <DataTable
@@ -1457,6 +1144,147 @@ var dataforApi = {poolid:"",projectids: [projId]}
               header={<span className="actions-header">Actions</span>}
             />
           </DataTable>
+          <AvoModal
+            visible={visible_execute}
+            setVisible={setVisible_execute}
+            onModalBtnClick={onExecuteBtnClick}
+            content={
+              <>
+                <Card className="execute_card p-card p-card-body ">
+                  <p className="m-0 ">
+                    <div>Avo Agent:{currentSelectedItem && currentSelectedItem.executionRequest && currentSelectedItem.executionRequest.avoagents.length > 0 ? currentSelectedItem.executionRequest.avoagents[0] : 'Any Agent'} </div>
+                    <div>Selected Browsers : Google Chrome</div>
+                    <div>Execution Mode : Headless</div>
+                  </p>
+                </Card>
+                <div className="radioButtonContainer">
+                  <RadioButton
+                    value="Execute with Avo Assure Agent/ Grid"
+                    onChange={() => {
+                      setShowIcePopup(false);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Agent/ Grid"
+                    }
+                  />
+                  <label className="executeRadio_label_grid ml-2">
+                    Execute with Avo Assure Agent/ Grid
+                  </label>
+                  <div className="radioButtonContainer1">
+                    <RadioButton
+                      value="Execute with Avo Assure Client"
+                      onChange={() => {
+                        setShowIcePopup(true);
+                      }}
+                      checked={ingredient === "Execute with Avo Assure Client"}
+                    />
+                  </div>
+                  <label className=" executeRadio_label_clint ml-2">
+                    Execute with Avo Assure Client
+                  </label>
+                </div>
+                {showIcePopup && (
+                  <div>
+                    <div className="legends-container">
+                      <span className="legend_Status" title="Token Name">
+                        Status:
+                      </span>
+                      <div className="legend">
+                        <span id="status" className="status-available"></span>
+                        <span className="legend-text">Available</span>
+                      </div>
+                      <div className="legend">
+                        <span id="status" className="status-unavailable"></span>
+                        <span className="legend-text">Unavailable</span>
+                      </div>
+                      <div className="legend">
+                        <span id="status" className="status-dnd"></span>
+                        <span className="legend-text">Do Not Disturb</span>
+                      </div>
+                    </div>
+                    <div>
+                      <span
+                        className="execute_dropdown .p-dropdown-label "
+                        title="Token Name"
+                      >
+                        Execute on
+                      </span>
+
+                      <div className="adminControl-ice popup-content">
+                        <DropDownList
+                          poolType={poolType}
+                          ExeScreen={ExeScreen}
+                          inputErrorBorder={inputErrorBorder}
+                          setInputErrorBorder={setInputErrorBorder}
+                          placeholder={"Search"}
+                          data={availableICE}
+                          smartMode={ExeScreen === true ? smartMode : ""}
+                          selectedICE={selectedICE}
+                          setSelectedICE={setSelectedICE}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            }
+            headerTxt="Execute: Regression"
+            footerType="Execute"
+            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+          />
+          <AvoModal
+            visible={visible_schedule}
+            setVisible={setVisible_schedule}
+            // onModalBtnClick={onExecuteBtnClick}
+            content={
+              <>
+                <Card className="Schedule_card  .p-card .p-card-content ">
+                  <p className="m-0 ">
+                    <div>Avo Agent:SBLTQAFFF </div>
+                    <div>Selected Browsers : Google Chrome</div>
+                    <div>Execution Mode : Headless</div>
+                  </p>
+                </Card>
+
+                <Tree
+                  className="schedule_tree"
+                  value={treeData}
+                  selectionMode="single"
+                  selectionKeys={selectedNodeKey}
+                  onSelectionChange={onNodeSelect}
+                  // onToggle={onToggleNode}
+                />
+              </>
+            }
+            headerTxt="Schedule: Regression"
+            footerType="Schedule"
+            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+          />
+          <AvoModal
+            visible={visible_CICD}
+            setVisible={setVisible_CICD}
+            content={
+              <>
+                <Card className="Schedule_card  .p-card .p-card-content ">
+                  <p className="m-0 ">
+                    <div>Avo Agent:SBLTQAFFF</div>
+                    <div>Selected Browsers : Google Chrome</div>
+                    <div>Execution Mode : Headless</div>
+                  </p>
+                </Card>
+
+                <Tree
+                  className="CICD_tree"
+                  value={tree_CICD}
+                  selectionMode="single"
+                  selectionKeys={selectedNodeKey}
+                  onSelectionChange={onNodeSelect}
+                />
+              </>
+            }
+            headerTxt="CICD: Regression"
+            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+          />
         </>
       );
     } else {
@@ -1515,7 +1343,10 @@ var dataforApi = {poolid:"",projectids: [projId]}
               <span className="text1 ">No Configuration's yet</span>
             </div>
           </div>
-          <Button className="configure_button" onClick={() => configModal('CancelSave')}>
+          <Button
+            className="configure_button"
+            onClick={() => configModal("CancelSave")}
+          >
             {" "}
             configure{" "}
           </Button>
@@ -1527,7 +1358,6 @@ var dataforApi = {poolid:"",projectids: [projId]}
     <>
       <div>
         <Breadcrumbs />
-
         <div>
           {configList.length > 0 ? (
             <div>
@@ -1573,15 +1403,15 @@ var dataforApi = {poolid:"",projectids: [projId]}
         />
       </div>
       <Toast ref={toast} position="bottom-center" />
-      <AvoConfirmDialog className="Logout_modal"
+      <AvoConfirmDialog
+        className="Logout_modal"
         visible={logoutClicked}
-        onHide={setLogoutClicked} 
+        onHide={setLogoutClicked}
         showHeader={false}
-        message = {profileTxt}
-              
-        icon="pi pi-exclamation-triangle" 
-        accept={deleteDevOpsConfig} 
-        />
+        message={profileTxt}
+        icon="pi pi-exclamation-triangle"
+        accept={deleteDevOpsConfig}
+      />
     </>
   );
 };
