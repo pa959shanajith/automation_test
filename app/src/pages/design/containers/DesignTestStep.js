@@ -59,8 +59,12 @@ const DesignModal = (props) => {
     const [groupList, setGroupList] = useState([])
     const [showPopup, setShow] = useState(false);
     const [debugEnable, setDebugEnable] = useState(false);
-    const [newtestcase,setnewtestcase] = useState([]);
+    const [newtestcase, setnewtestcase] = useState([]);
     const [keyword, setKeyword] = useState('');
+    const [testCaseIDsList, setTestCaseIDsList] = useState([]);
+    const [testcaseList, setTestcaseList] = useState([]);
+    const [dependencyTestCaseFlag, setDependencyTestCaseFlag] = useState(false);
+
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -153,9 +157,6 @@ const DesignModal = (props) => {
         }
         //eslint-disable-next-line
     }, [userInfo, props.current_task]);
-
-    const [testcaseList, setTestcaseList] = useState([]);
-    const [error, setError] = useState("");
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -522,8 +523,8 @@ const DesignModal = (props) => {
 
     const addRow = () => {
         let oldTestCases = [...newtestcase]
-       let emptyAddedRow=[...oldTestCases,emptyRowData]
-       setnewtestcase(emptyAddedRow)
+        let emptyAddedRow = [...oldTestCases, emptyRowData]
+        setnewtestcase(emptyAddedRow)
         // setTestCaseData(testCases);
         // // setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
         // setHeaderCheck(false);
@@ -843,6 +844,7 @@ const DesignModal = (props) => {
     //Debug function
 
     const debugTestCases = selectedBrowserType => {
+        setVisibleDependentTestCaseDialog(false);
         let testcaseID = [];
         let browserType = [];
 
@@ -850,7 +852,7 @@ const DesignModal = (props) => {
 
         // globalSelectedBrowserType = selectedBrowserType;5
 
-        if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
+        if (dependencyTestCaseFlag) testcaseID = testCaseIDsList;
         else testcaseID.push(props.fetchingDetails['_id']);
         setOverlay('Debug in Progress. Please Wait...');
         // ResetSession.start();
@@ -888,10 +890,6 @@ const DesignModal = (props) => {
             });
     };
 
-    const handleDesignBtn = () => {
-        setVisibleDependentTestCaseDialog(true);
-    }
-
     const handleSpanClick = (index) => {
         if (selectedSpan === index) {
             setSelectedSpan(null);
@@ -904,11 +902,13 @@ const DesignModal = (props) => {
         setShowTable(true);
     };
     const handleAdd = () => {
-        setTestCases(...testCases, testCases.checked = true);
-        console.log("testCases", testCases);
-        const addTestcaseData = testCases.testCaseName;
+        const update = testCases;
+        const addTestcaseData = update.testCaseName;
+        update.checked = true;
+        setTestCases(update);
+        setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
         setAddedTestCase([...addedTestCase, addTestcaseData]);
-        setTestCases('');
+        setDependencyTestCaseFlag(true);
     };
 
     const headerTemplate = (
@@ -918,8 +918,8 @@ const DesignModal = (props) => {
                 <h4 className='dailog_header2'>Signup screen 1</h4>
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
                 <div className='btn__grp'>
-                    <Button size='small' onClick={()=>setVisibleDependentTestCaseDialog(true)} label='Debug' outlined></Button>
-                    <Button size='small' label='Add Test Step' onClick={()=>addRow()}></Button>
+                    <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' outlined></Button>
+                    <Button size='small' label='Add Test Step' onClick={() => addRow()}></Button>
                     <Button size='small' lable='Save' onClick={saveTestCases}></Button>
                 </div>
             </div>
@@ -970,15 +970,25 @@ const DesignModal = (props) => {
             />
         );
     };
+
     const textEditor = (options) => {
         return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
     };
+
     const onRowEditComplete = (e) => {
         let testcase = [...newtestcase];
         let { newData, index } = e;
         testcase[index] = newData;
         setnewtestcase(testcase);
     };
+
+    const DependentTestCaseDialogHideHandler = () => {
+        setVisibleDependentTestCaseDialog(false);
+        setDependencyTestCaseFlag(false);
+        setTestCases(null);
+        setTestCaseIDsList([]);
+        setAddedTestCase([]);
+    }
 
     return (
         <>
@@ -987,8 +997,8 @@ const DesignModal = (props) => {
                     <Accordion activeIndex={0}>
                         <AccordionTab header={props.fetchingDetails["name"]} onClick={toggleTableVisibility}>
                             <DataTable
-                                value={newtestcase.length>0 ?newtestcase:[]}
-                                emptyMessage={newtestcase.length === 0?emptyMessage:null}
+                                value={newtestcase.length > 0 ? newtestcase : []}
+                                emptyMessage={newtestcase.length === 0 ? emptyMessage : null}
                                 rowReorder editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} >
                                 <Column style={{ width: '3em' }} rowReorder />
                                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
@@ -1004,7 +1014,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
 
-            <Dialog className={"debug__object__modal"} header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={() => setVisibleDependentTestCaseDialog(false)} footer={footerContent}>
+            <Dialog className="debug__object__modal" header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
@@ -1033,10 +1043,10 @@ const DesignModal = (props) => {
                                     <p>Clear</p>
                                 </span>
                             </div>
-                            <div className={addedTestCase.length > 0 ? 'added__card' : ''}>
+                            <div>
                                 {addedTestCase.map((value, index) => (
                                     <div key={index}>
-                                        <p className={addedTestCase.length > 0 ? 'text__added__step' : ''}>{value.testCaseName}</p>
+                                        <p className={addedTestCase.length > 0 ? 'text__added__step' : ''}>{value}</p>
                                     </div>
                                 ))}
                             </div>
