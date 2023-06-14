@@ -11,12 +11,14 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import { InputText } from 'primereact/inputtext';
 
 
 const DesignModal = (props) => {
+    const toast = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const headerCheckRef = useRef();
@@ -59,8 +61,12 @@ const DesignModal = (props) => {
     const [groupList, setGroupList] = useState([])
     const [showPopup, setShow] = useState(false);
     const [debugEnable, setDebugEnable] = useState(false);
-    const [newtestcase,setnewtestcase] = useState([]);
+    const [newtestcase, setnewtestcase] = useState([]);
     const [keyword, setKeyword] = useState('');
+    const [testCaseIDsList, setTestCaseIDsList] = useState([]);
+    const [testcaseList, setTestcaseList] = useState([]);
+    const [dependencyTestCaseFlag, setDependencyTestCaseFlag] = useState(false);
+
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -153,9 +159,6 @@ const DesignModal = (props) => {
         }
         //eslint-disable-next-line
     }, [userInfo, props.current_task]);
-
-    const [testcaseList, setTestcaseList] = useState([]);
-    const [error, setError] = useState("");
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -522,8 +525,8 @@ const DesignModal = (props) => {
 
     const addRow = () => {
         let oldTestCases = [...newtestcase]
-       let emptyAddedRow=[...oldTestCases,emptyRowData]
-       setnewtestcase(emptyAddedRow)
+        let emptyAddedRow = [...oldTestCases, emptyRowData]
+        setnewtestcase(emptyAddedRow)
         // setTestCaseData(testCases);
         // // setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
         // setHeaderCheck(false);
@@ -843,6 +846,7 @@ const DesignModal = (props) => {
     //Debug function
 
     const debugTestCases = selectedBrowserType => {
+        setVisibleDependentTestCaseDialog(false);
         let testcaseID = [];
         let browserType = [];
 
@@ -850,7 +854,7 @@ const DesignModal = (props) => {
 
         // globalSelectedBrowserType = selectedBrowserType;5
 
-        if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
+        if (dependencyTestCaseFlag) testcaseID = testCaseIDsList;
         else testcaseID.push(props.fetchingDetails['_id']);
         setOverlay('Debug in Progress. Please Wait...');
         // ResetSession.start();
@@ -888,10 +892,6 @@ const DesignModal = (props) => {
             });
     };
 
-    const handleDesignBtn = () => {
-        setVisibleDependentTestCaseDialog(true);
-    }
-
     const handleSpanClick = (index) => {
         if (selectedSpan === index) {
             setSelectedSpan(null);
@@ -904,12 +904,30 @@ const DesignModal = (props) => {
         setShowTable(true);
     };
     const handleAdd = () => {
-        setTestCases(...testCases, testCases.checked = true);
-        console.log("testCases", testCases);
-        const addTestcaseData = testCases.testCaseName;
-        setAddedTestCase([...addedTestCase, addTestcaseData]);
-        setTestCases('');
+        const update = { ...testCases };
+        const addTestcaseData = {};
+        const TestIDPresent = addedTestCase.filter(item => {
+            return item.testCaseID === testCases.testCaseID
+        });
+        console.log("TestIDPresent", TestIDPresent);
+        if (TestIDPresent.length > 0) {
+            toastError("Duplicate Dependent Testcase found");
+        }
+        else {
+            addTestcaseData["testCaseID"] = update.testCaseID;
+            addTestcaseData["testCaseName"] = update.testCaseName;
+            addTestcaseData["disableAndBlock"] = update.disableAndBlock;
+            addTestcaseData["checked"] = true;
+            setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
+            setAddedTestCase([...addedTestCase, addTestcaseData]);
+            setDependencyTestCaseFlag(true);
+            setTestCases(null);
+        }
     };
+
+    const toastError = (errMessage) => {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 10000 });
+    }
 
     const headerTemplate = (
         <>
@@ -918,8 +936,8 @@ const DesignModal = (props) => {
                 <h4 className='dailog_header2'>Signup screen 1</h4>
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
                 <div className='btn__grp'>
-                    <Button size='small' onClick={()=>setVisibleDependentTestCaseDialog(true)} label='Debug' outlined></Button>
-                    <Button size='small' label='Add Test Step' onClick={()=>addRow()}></Button>
+                    <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' outlined></Button>
+                    <Button size='small' label='Add Test Step' onClick={() => addRow()}></Button>
                     <Button size='small' lable='Save' onClick={saveTestCases}></Button>
                 </div>
             </div>
@@ -932,14 +950,14 @@ const DesignModal = (props) => {
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">No Design Step yet</p>
             </div>
-            <Button className="btn-design-single" label='Design Test Steps'></Button>
+            <Button size='small' className="btn-design-single" label='Design Test Steps'></Button>
         </div>
     );
 
     const footerContent = (
         <div>
-            <Button label="Cancel" className="p-button-text" />
-            <Button label="Debug" onClick={() => debugTestCases('1')} autoFocus />
+            <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
+            <Button label="Debug" size='small' onClick={() => debugTestCases('1')} autoFocus />
         </div>
     );
     const renderActionsCell = (rowData) => {
@@ -970,9 +988,11 @@ const DesignModal = (props) => {
             />
         );
     };
+
     const textEditor = (options) => {
         return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
     };
+
     const onRowEditComplete = (e) => {
         let testcase = [...newtestcase];
         let { newData, index } = e;
@@ -980,15 +1000,24 @@ const DesignModal = (props) => {
         setnewtestcase(testcase);
     };
 
+    const DependentTestCaseDialogHideHandler = () => {
+        setVisibleDependentTestCaseDialog(false);
+        setDependencyTestCaseFlag(false);
+        setTestCases(null);
+        setTestCaseIDsList([]);
+        setAddedTestCase([]);
+    }
+
     return (
         <>
+            <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} >
                 <div className='toggle__tab'>
                     <Accordion activeIndex={0}>
                         <AccordionTab header={props.fetchingDetails["name"]} onClick={toggleTableVisibility}>
                             <DataTable
-                                value={newtestcase.length>0 ?newtestcase:[]}
-                                emptyMessage={newtestcase.length === 0?emptyMessage:null}
+                                value={newtestcase.length > 0 ? newtestcase : []}
+                                emptyMessage={newtestcase.length === 0 ? emptyMessage : null}
                                 rowReorder editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} >
                                 <Column style={{ width: '3em' }} rowReorder />
                                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
@@ -1004,7 +1033,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
 
-            <Dialog className={"debug__object__modal"} header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={() => setVisibleDependentTestCaseDialog(false)} footer={footerContent}>
+            <Dialog className="debug__object__modal" header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
@@ -1033,7 +1062,7 @@ const DesignModal = (props) => {
                                     <p>Clear</p>
                                 </span>
                             </div>
-                            <div className={addedTestCase.length > 0 ? 'added__card' : ''}>
+                            <div>
                                 {addedTestCase.map((value, index) => (
                                     <div key={index}>
                                         <p className={addedTestCase.length > 0 ? 'text__added__step' : ''}>{value.testCaseName}</p>
@@ -1043,7 +1072,6 @@ const DesignModal = (props) => {
                         </div>
                     </div>
                 </div>
-
             </Dialog>
         </>
     )
