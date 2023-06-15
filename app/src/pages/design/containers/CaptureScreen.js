@@ -345,11 +345,14 @@ useEffect(()=>{
                 {
                   selectall: item.custname,
                   objectProperty: item.tag,
-                  screenshots: <Button label="View Screenshot" outlined text raised onClick={()=>{setScreenshotData({
-                    header: item.custname,
-                    imageUrl: mirror.scrape || "",
-                    enable: true
-                  })}}></Button>,
+                  screenshots: <Button label="View Screenshot" outlined text raised onClick={()=>{
+                      setScreenshotData({
+                      header: item.custname,
+                      imageUrl: mirror.scrape || "",
+                      enable: true
+                    });
+                    onHighlight();
+                  }}></Button>,
                   actions: '',
                   objectDetails:item
                 
@@ -689,10 +692,11 @@ useEffect(()=>{
 		   let mirrorImg = new Image();
 
 		mirrorImg.onload = function(){
-      let aspect_ratio = mirrorImg.height / mirrorImg.width;
-      let ds_width = 500;
+      // let aspect_ratio = mirrorImg.height / mirrorImg.width;
+      let aspect_ratio = mirrorImg.width / mirrorImg.height;
+      let ds_width = 650;
       let ds_height = ds_width * aspect_ratio;
-      let ds_ratio = 490 / mirrorImg.width;
+      let ds_ratio = 800 / mirrorImg.width;
       if (ds_height > 300) ds_height = 300;
       ds_height += 45; // popup header size included
       setMirrorHeight(ds_height);
