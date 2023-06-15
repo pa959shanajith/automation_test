@@ -147,6 +147,9 @@ export const designSlice = createSlice({
     SaveEnable:(state, action)=>{
       state.SaveEnable = action.payload;
     },
+    objValue:(state, action)=>{
+      state.objValue = action.payload
+    },
   },
 })
 
@@ -170,6 +173,6 @@ appType,
 savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
 TestCases,
 Modified,
-SaveEnable} = designSlice.actions
+SaveEnable,objValue} = designSlice.actions
 
 export default designSlice.reducer
