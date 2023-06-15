@@ -8,17 +8,43 @@
   bottom: 0.8rem;
 }
 .project-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  background: #ffffff;
-  border-radius: 0.5rem;
+  // display: flex;
+  // flex-direction: column;
+  // align-items: flex-start;
+  // background: #ffffff;
+  // border-radius: 0.5rem;
   // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  padding: 0.8rem;
-  width: 14rem;
-  height: 3.2rem;
-  border: none; 
-  cursor: pointer;
+  // padding: 0.8rem;
+  // width: 20rem;
+  // height: 3.2rem;
+  // border: none; 
+  // cursor: pointer;
+
+
+  // align-items: flex-start;
+    background: #fff;
+  //   border: none;
+  //   border-radius: 0.5rem;
+  //   cursor: pointer;
+  //   display: flex;
+  //   flex-direction: column-reverse;
+  //   height: 3.2rem;
+  //   padding: 0.5rem;
+  //   width: 20rem;
+  border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    height: 3.2rem;
+    padding: 0.5rem;
+    width: 20rem;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-content: flex-start;
+    
+    .img{
+      height: 1rem;
+    }
 }
 .default-project{
   background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
@@ -26,27 +52,44 @@
 .projectInside {
   font-family: "Open Sans";
   font-style: normal;
-  font-style: normal;
+  // font-style: normal;
+  // width: 18.5rem;
     font-weight: 400;
+    // font-size: 16px;
+    // line-height: 17px;
+    // color: rgba(3, 2, 41, 0.6);
+    padding-left: 0.3rem;
+    // white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+
+
+    color: rgba(3,2,41,.6);
+    font-family: Open Sans;
     font-size: 16px;
-    line-height: 3px;
-    color: rgba(3, 2, 41, 0.6);
-    padding-left: 2rem;
+    line-height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 18rem;
 }
 .projectInsideLast {
   font-style: normal;
     font-weight: 400;
     font-size: 12px;
-    line-height: 1px;
+    // line-height: 24px;
     color: rgba(0, 0, 0, 0.4);
-    padding-left:2rem ;
+    padding-left:0.3rem ;
+    // line-height: 60px;
+    // position: absolute;
+    // left: 7.3rem;
     
 }
 .sort-Menu{
     position: absolute;
     z-index: 1;
     top:6.1rem;
-    right:77rem;
+    right:70rem;
     .p-menuitem-link:hover{
       background: rgba(96, 91, 255, 0.2) !important;
       border-radius: 3px !important;
@@ -82,14 +125,14 @@ margin-left: 0.5rem;
   font-family: 'Open Sans' !important;
   font-style: normal !important;
   font-weight: 400 !important;
-  width: 14rem !important;
+  width: 20rem !important;
   background: #FAFAFB !important;
   border: none !important;
 }
 .DefaultProjectName{
   position: fixed;
   bottom: 42.3rem;
-  left: 24rem;
+  left: 30.5rem;
   z-index: 1;
   font-size: 24px;
   font-weight: 500;
@@ -102,20 +145,25 @@ margin-left: 0.5rem;
   color: #6c757d;
   }
 .add_btn{
-  margin: 0rem 1rem 0rem 1.378rem;
+  margin: 0rem 1rem 0rem 10.1rem;
   border:none;
   background: transparent;
   cursor: pointer;
   color: #6c757d;
 }
 .Default_Project_icon{
-  left: 21.8rem;
+  left: 27.8rem;
   z-index: 1;
   position: fixed;
   bottom: 42.2rem;
 }
-.project-list{
+.project{
   overflow-y: auto;
   max-height: 35rem;
 }
+// .projectNameApptype{
+//   display: flex;
+//   align-items: flex-start;
+//   flex-direction: row;
+// }
 // }
