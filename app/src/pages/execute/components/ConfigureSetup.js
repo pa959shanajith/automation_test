@@ -57,7 +57,7 @@ const ConfigureSetup = ({
           const conditionName = `conditionName${ind}${index}`;
           const accessibilityName = `accessibilityName${ind}${index}`;
           childTree.push({
-            key: `0-${ind}`,
+            key: `${index}-${ind}`,
             data: {
               name: e?.name,
               dataParameterization: (
@@ -163,7 +163,7 @@ const ConfigureSetup = ({
       }
     });
     setXpanded(getXpanded);
-  }, [getProjectData]);
+  }, [getProjectData.testsuiteData]);
 
   const onDataparamChange = (e, getKey) => {
     setDataparam({
@@ -191,6 +191,10 @@ const ConfigureSetup = ({
       ...avodropdown,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const onCheckboxChange = (e) => {
+    setSelectedNodeKeys(e.value)
   };
 
   const onNodeXpand = (e) => {
@@ -473,12 +477,13 @@ const ConfigureSetup = ({
               <div className="table_section col-12 lg:col-12 xl:col-9 md:col-12 sm:col-12">
                 <TreeTable
                   onExpand={(e) => onNodeXpand(e)}
+                  onSelect={(e) => onNodeXpand(e)}
                   header={tableTreeHeader}
                   value={configTable}
                   selectionMode="checkbox"
                   selectionKeys={selectedNodeKeys}
                   loading={configData.loading}
-                  onSelectionChange={(e) => setSelectedNodeKeys(e.value)}
+                  onSelectionChange={(e) => onCheckboxChange(e)}
                   className="tabletree_class"
                   rowClassName={rowClassName}
                   showGridlines
