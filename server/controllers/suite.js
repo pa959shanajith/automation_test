@@ -176,16 +176,10 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	const batchExecutionData = req.body.executionData;
 	if(batchExecutionData.executionEnv == 'saucelabs') {
-		//DAS call to fetch username , pass , remote_url
-		const actionName = "getDetails_SAUCELABS";
-		const userId = req.session.userid;
-		let inputs = {
-			"userId": userId
-		};
-		const sauceDetails = await utils.fetchData(inputs, "admin/getDetails_SAUCELABS", actionName);
-		batchExecutionData.sauce_username = sauceDetails!='empty' ? sauceDetails.username : '';
-		batchExecutionData.sauce_access_key = sauceDetails!='empty' ? sauceDetails.api : '';
-		batchExecutionData.remote_url = sauceDetails!='empty' ? sauceDetails.url : '';
+		batchExecutionData.sauce_username = batchExecutionData.saucelabDetails.SaucelabsUsername;
+		batchExecutionData.sauce_access_key = batchExecutionData.saucelabDetails.Saucelabskey;
+		batchExecutionData.remote_url = batchExecutionData.saucelabDetails.SaucelabsURL;
+		delete batchExecutionData.saucelabDetails;
 	}
 	if(batchExecutionData['configurekey'] && req.query == 'fetchingTestSuiteIds') {
 		let index = -1;

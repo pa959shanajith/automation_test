@@ -60,7 +60,7 @@ exports.saveSauceLabData = function (req, res) {
 								data = data.value;
 								res.send(data);
 							}
-							}
+						}
 					}
 					redisServer.redisSubServer.on("message",SauceLablogin_listener);
 				} else {

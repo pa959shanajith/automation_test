@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession} from '../../global';
 import { SearchBox , SearchDropdown, Toggle  } from '@avo/designcomponents';
@@ -19,14 +19,15 @@ import "../styles/DevOps.scss";
 import DropDownList from '../../global/components/DropDownList';
 import { getPools, getICE_list } from '../../execute/api';
 import {getProjectList} from '../../mindmap/api';
-import { FormInput } from '../../admin/components/FormComp';
+import { FormInput } from '../../settings/components/AllFormComp';
 import {getDetails_SAUCELABS} from '../../settings/api';
 import {saveSauceLabData} from '../../utility/api';
 import index from 'uuid-random';
 import async from 'async';
 import { name } from 'agenda/dist/agenda/name';
+import { log } from 'handlebars';
 
-
+import '../../admin/styles/FormComp.scss'
 
 
 const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig, projectIdTypesDicts }) => {
@@ -75,6 +76,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [browserTypeExe,setBrowserTypeExe] = useState([]); // Contains selected browser id for execution
 	const [execAction,setExecAction] = useState("serial"); 
 	const [execEnv,setExecEnv] = useState("default");
+    const inpRef=useRef(null)
     const [integration,setIntegration] = useState({
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
@@ -98,20 +100,21 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [isEmpty, setIsEmpty] = useState(false);
     const [defaultValues, setDefaultValues] = useState({});
     const [osNames, setOsNames] = useState([]);
-    const [iphone, setIphone] = useState([]);
-    const [android, setAndroid] = useState([]);
     const [selectedOS, setSelectedOS] = useState('');
     const [selectedSaucelabBrowser, setSelectedSaucelabBrowser] = useState('');
     const [selectedMobileVersion, setSelectedMobileVersion] = useState('');
     const [selectedVersion, setSelectedVersion] = useState('');
-    const [platforms, setPlatforms] = useState([{key:"android", text:"android",title:"android" ,index:0},{key:"iphone", text:"iphone",title:"iphone" ,index:1}]);
+    const [platforms, setPlatforms] = useState([]);
     const [selectedPlatforms, setSelectedPlatforms] = useState('');
     const [saucelabBrowsers, setSaucelabBrowsers] = useState({});
     const [browserVersions, setBrowserVersions] = useState([]);
     const [browserDetails,setBrowserDetails] = useState([]);
     const [mobileDetails,setMobileDetails] = useState([]);
     const [mobilePlatform,setMobilePlatform] = useState([]);
+    const [platformVersions,setPlatformVersions] = useState([]);
     const [emulator, setEmulator]= useState([]);
+    const [selectedEmulator, setSelectedEmulator]= useState('');
+
     const [sauceLab, setSauceLab] = useState(false);
     const [browserlist, setBrowserlist] = useState([
         {
@@ -344,16 +347,25 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setSelectedVersion(option.key)
     }
 
-    const onAndroidVersionChange = (option) => {
-        setSelectedMobileVersion(option.key);
-        let findAndroidEmulator = mobileDetails[selectedPlatforms][option.key.split(' ')[1]]
-            setEmulator(findAndroidEmulator);
-            console.log(findAndroidEmulator);
+    const onMobileVersionChange = (option) => {
+        setSelectedMobileVersion(option.text);
+        setSelectedEmulator('')
+        setEmulator([])
+        let findEmulator = mobileDetails[selectedPlatforms][option.key.split(" ")[1]].map((element,index) => ({
+            key: element,
+            text: element,
+            title: element,
+            index: index
+        }))
+        setEmulator(findEmulator);
+        console.log(findEmulator);
     }
 
     const onMobilePlatformChange = async (option) => {
         setSelectedPlatforms(option.key)
-        
+        setSelectedMobileVersion('')
+        setSelectedEmulator('')
+        setEmulator([])
         let findMobileVersions = Object.keys(mobileDetails[option.key]).map((element, index) => {
             let each_version = option.key+" "+element 
             return (
@@ -364,13 +376,14 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     index: index
                 }
             )});
-            setAndroid(findMobileVersions);
-            console.log(findMobileVersions);
-            setMobilePlatform(findMobileVersions)
+            setPlatformVersions(findMobileVersions);
+            // console.log(findMobileVersions);
+            // setMobilePlatform(findMobileVersions)
     }
 
     const onEmulatorChange = async (option) => {
         setMobilePlatform(option.key)
+        setSelectedEmulator(option.key)
     }
 
 
@@ -416,8 +429,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             const data = await getDetails_SAUCELABS()
             if (data.error) { setMsg(data.error); return; }
             if(data !=="empty"){
-                setIsEmpty(false);
+                setIsEmpty(true);
                 setDefaultValues(data);
+            } else {
+                setIsEmpty(false);
             }
             setLoading(false);
         } catch (error) {
@@ -470,30 +485,20 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setSaucelabBrowsers(arrayBrowser);
             setBrowserDetails(data);
         }
-           else if (data && data.android && data.iphone){
+        else if (data && data.android && data.iphone){
+            const arrayPlatforms = Object.keys(data).map((element, index) => { 
+                return {
+                    key: element,
+                    text: element,
+                    title: element,
+                    index: index
+                }
+            })
+            setPlatforms(arrayPlatforms);
+
+            setMobileDetails(data);
             setLoading(false);
             setDisplayBasic5(true);
-            const arrayAndroid =Object.keys(data.android).map((element, index) => {
-                return {
-                  key: element,
-                  text: "Android"+element,
-                  title: "Android"+element,
-                  index: index
-                };
-              });
-              setAndroid(arrayAndroid);
-
-
-              const arrayIphone =Object.keys(data.iphone).map((element, index) => {
-                return {
-                  key: element,
-                  text: "iphone"+element,
-                  title: "iphone"+element,
-                  index: index
-                };
-              });
-              setIphone(arrayIphone);
-              setMobileDetails(data);
           }
            else {
             setLoading(false);
@@ -690,6 +695,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         dataExecution.poolid = ""
                         if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
                         else dataExecution.targetUser = selectedICE
+                        dataExecution['executionEnv'] = 'default'
                         CheckStatusAndExecute(dataExecution, iceNameIdMap);
                         onHide(name);
                     }
@@ -1218,7 +1224,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon" title='CI/CD'/>}&nbsp;&nbsp;&nbsp;
                                     { showCICD && <img onClick={() =>{
                                     onClick('displayBasic4');
-                                    setExecEnv('saucelabs')
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
@@ -1334,16 +1339,25 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <form id='Saucelabs-form'>
                             <div  className='Saucelabs_input'>
                                 <div className="flex flex-row">
-                                    <FormInput textValue={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL" name="Saucelabs-URL" placeholder="Enter Saucelabs Remote URL"/> 
+                                    <FormInput value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL" 
+                                        name="Saucelabs-URL" 
+                                        placeholder="Enter Saucelabs Remote URL" 
+                                        onChange={(event) => {
+                                        setDefaultValues({...defaultValues,SaucelabsURL:event.target.value}) }}
+                                        className = {'middle__input__border form-control__conv-project form-control-custom left-opt'}/>
                                 </div>
                                 <div className="flex flex-row">
-                                    <FormInput textValue={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"/>
+                                    <FormInput value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username" onChange={(event) => {
+                                        setDefaultValues({...defaultValues,SaucelabsUsername:event.target.value})}}
+                                        className = {'middle__input__border form-control__conv-project form-control-custom left-opt'}/>
                                 </div>
                                 <div className="flex flex-row">
-                                    <FormInput textValue={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"/>
+                                    <FormInput value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key" onChange={(event) => {
+                                        setDefaultValues({...defaultValues,Saucelabskey:event.target.value}) }}
+                                        className = {'middle__input__border form-control__conv-project form-control-custom left-opt'}/>
                                 </div>
                                 <div>
-                                {defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
+                                {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
                                 </div>
                             </div>
                         </form>
@@ -1353,65 +1367,79 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onDismiss={() => {setDisplayBasic5(false)}} onHide={() => onHide('displayBasic5')}>
                      
 
+                    {showSauceLabs&&
+                    <>
                     <div><h6>Platforms</h6></div>
-                    {showSauceLabs&&<SearchDropdown
+                    <SearchDropdown
                     noItemsText={[]}
                     onChange={onMobilePlatformChange}
                     options={platforms}
-                    selectedKey={''}
+                    selectedKey={selectedPlatforms}
                     width='15rem'
                     placeholder='select Platform'
-                    />}
+                    />
+                    </>}
+                    {!showSauceLabs&&<>
                     <div><h6>Operating System</h6></div>
-                    {!showSauceLabs&&<SearchDropdown
+                    <SearchDropdown
                     noItemsText={[]}
                     onChange={onOsChange}
                     options={osNames}
                     selectedKey={selectedOS}
                     width='15rem'
                     placeholder='select OS'
-                    />}
+                    />
+                    </>}
+                    {!showSauceLabs&&
+                    <>
                     <div><h6>Browser</h6></div>
-                    {!showSauceLabs&&<SearchDropdown
+                    <SearchDropdown
                     noItemsText={[ ]}
                     onChange={onSaucelabBrowserChange}
                     options={saucelabBrowsers}
                     selectedKey={selectedSaucelabBrowser}
                     width='15rem'
                     placeholder='select Browser'
-
-                    />}
+                    />
+                    </>}
+                    {showSauceLabs &&
+                    <>
                     <div><h6>Versions</h6></div>
-                    {showSauceLabs && <SearchDropdown
+                    <SearchDropdown
                     noItemsText={[ ]}
-                    onChange={onAndroidVersionChange}
-                    options={android}
-                    selectedKey={''}
+                    disabled={selectedPlatforms == ''}
+                    onChange={onMobileVersionChange}
+                    options={platformVersions}
+                    selectedKey={selectedMobileVersion}
                     width='15rem'
                     placeholder='select android versions'
-
-                    />}
+                    />
+                    </>}
                     
+                    {!showSauceLabs&&
+                    <>
                     <div><h6>Versions</h6></div>
-                    {!showSauceLabs&&<SearchDropdown
+                    <SearchDropdown
                     noItemsText={[ ]}
                     onChange={onVersionChange}
                     options={browserVersions}
                     selectedKey={selectedVersion}
                     width='15rem'
                     placeholder='select Versions'
-
-                    
-                    />}
+                    />
+                    </>}
+                    {showSauceLabs &&
+                    <>
                     <div><h6>Emulator</h6></div>
-                    {showSauceLabs &&<SearchDropdown
+                    <SearchDropdown
                     noItemsText={[ ]}
                     onChange={onEmulatorChange}
                     options={emulator}
-                    selectedKey={''}
+                    selectedKey={selectedEmulator}
                     width='15rem'
                     placeholder='select Emulator'
-                     />}
+                    />
+                    </>}
                     <div>
                         <div>
                             <div className='adminControl-ice-saucelabs'>
@@ -1453,10 +1481,21 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             else dataExecution.targetUser = selectedICE
 
                             dataExecution['executionEnv'] = 'saucelabs'
-                            dataExecution['platform'] = selectedOS;
-                            dataExecution['version'] = selectedVersion;
-                            dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedSaucelabBrowser)[0].key]
-                            console.log(dataExecution['browserType']);
+                            dataExecution['saucelabDetails'] = defaultValues
+                            if(!showSauceLabs){
+                                dataExecution['platform'] = selectedOS;
+                                dataExecution['version'] = selectedVersion;
+                                dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedSaucelabBrowser)[0].key]
+                            } else {
+                                dataExecution["browserType"] = ['1']
+                                dataExecution['mobile'] = {
+                                    "platformName": selectedPlatforms,
+                                    "browserName": "Chrome",
+                                    "deviceName": selectedEmulator,
+                                    "platformVersion": selectedMobileVersion.split(" ")[1]
+                                }
+                            }
+                            
                             CheckStatusAndExecute(dataExecution, iceNameIdMap);
                             onHide('displayBasic5');
                         }
