@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserDetails, getNotificationGroups } from '../api';
-import { Messages as MSG, RedirectPage } from "../../global";
+import { Messages as MSG,ScreenOverlay, setMsg,RedirectPage} from "../../global";
 import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
 import * as DesignApi from "../api";
 import { Dialog } from 'primereact/dialog';
@@ -11,12 +11,14 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import { InputText } from 'primereact/inputtext';
 
 
 const DesignModal = (props) => {
+    const toast = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const headerCheckRef = useRef();
@@ -59,21 +61,28 @@ const DesignModal = (props) => {
     const [groupList, setGroupList] = useState([])
     const [showPopup, setShow] = useState(false);
     const [debugEnable, setDebugEnable] = useState(false);
-    const [newtestcase,setnewtestcase] = useState([]);
+    const [newtestcase, setnewtestcase] = useState([]);
     const [keyword, setKeyword] = useState('');
+    const [testCaseIDsList, setTestCaseIDsList] = useState([]);
+    const [testcaseList, setTestcaseList] = useState([]);
+    const [dependencyTestCaseFlag, setDependencyTestCaseFlag] = useState(false);
+    const [deleteTestDialog, setDeleteTestDialog] = useState(false);
+    const [testCase, setTestCase] = useState(null)
+    const [rowEdit, setRowEdit] = useState(false);
+    const[selectedTestCases,setSelectedTestCases]=useState(null)
     let runClickAway = true;
     const emptyRowData = {
-        "objectName": "",
-        "custname": "",
-        "keywordVal": "",
+        "stepNo": '',
+        "objectName": ' ',
+        "custname": '',
+        "keywordVal": '',
         "inputVal": [""],
-        "outputVal": "",
-        "stepNo": "",
-        "url": "",
-        "appType": "",
-        "remarksStatus": "",
+        "outputVal": '',
         "remarks": "",
-        "_id_": "",
+        "url": ' ',
+        "appType": props.appType,
+        "addDetails": "",
+        "cord": '',
         "addTestCaseDetails": "",
         "addTestCaseDetailsInfo": ""
     };
@@ -119,17 +128,17 @@ const DesignModal = (props) => {
     useEffect(() => {
         if (props.imported) {
             fetchTestCases()
-                .then(data => {
-                    if (data === "success")
-                        console.log(MSG.DESIGN.SUCC_TC_IMPORT);
-                    else
-                        console.log(MSG.DESIGN.WARN_DELETED_TC_FOUND);
-                    props.setImported(false)
-                    setStepSelect({ edit: false, check: [], highlight: [] });
-                    setChanged(false);
-                    // headerCheckRef.current.indeterminate = false;
-                })
-                .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
+            .then(data=>{
+                if (data==="success") 
+                    setMsg(MSG.DESIGN.SUCC_TC_IMPORT);
+                else 
+                    setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                props.setImported(false)
+                setStepSelect({edit: false, check: [], highlight: []});
+                setChanged(false);
+                // headerCheckRef.current.indeterminate = false;
+            })
+            .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
         //eslint-disable-next-line
     }, [props.imported]);
@@ -153,9 +162,6 @@ const DesignModal = (props) => {
         }
         //eslint-disable-next-line
     }, [userInfo, props.current_task]);
-
-    const [testcaseList, setTestcaseList] = useState([]);
-    const [error, setError] = useState("");
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -185,7 +191,7 @@ const DesignModal = (props) => {
 
                     testCases.reverse();
                     setTestcaseList(testCases);
-                    console.log(testCases);
+                    // console.log(testCases);
                 }
             })
             .catch(error => console.error("ERROR::::", error));
@@ -218,14 +224,14 @@ const DesignModal = (props) => {
                     // setHideSubmit(data.testcase.length === 0);
                     // setReusedTC(data.reuse);
 
-                    DesignApi.getScrapeDataScreenLevel_ICE("Web", props.fetchingDetails.parent['_id'], props.fetchingDetails.projectId, props.fetchingDetails.testCaseId)
+                    DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectId, props.fetchingDetails.testCaseId)
                         .then(scriptData => {
                             if (scriptData === "Invalid Session") return;
 
                             setTestScriptData(scriptData.view);
                             // props.setMirror(scriptData.mirror);
 
-                            DesignApi.getKeywordDetails_ICE("Web")
+                            DesignApi.getKeywordDetails_ICE(props.appType)
                                 .then(keywordData => {
                                     if (keywordData === "Invalid Session") return;
 
@@ -243,7 +249,7 @@ const DesignModal = (props) => {
                                                 delete testcase[i];
                                                 testcase = testcase.filter(n => n !== null);
                                             } else {
-                                                if ("Web" === "Webservice") {
+                                                if (props.appType === "Webservice") {
                                                     if (testcase[i].keywordVal === "setHeader" || testcase[i].keywordVal === "setHeaderTemplate") {
                                                         testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
                                                     }
@@ -254,14 +260,14 @@ const DesignModal = (props) => {
                                                 testcaseArray.push(testcase[i]);
                                             }
                                         }
-                                        // setOverlay("");
+                                        setOverlay("");
                                     }
                                     setDraggable(false);
                                     setTestCaseData(testcaseArray);
                                     setnewtestcase(testcaseArray);
                                     setPastedTC([]);
-                                    setObjNameList(getObjNameList("Web", scriptData.view));
-                                    console.log(getObjNameList("Web", scriptData.view))
+                                    setObjNameList(getObjNameList(props.appType, scriptData.view));
+                                    // console.log(getObjNameList(props.appType, scriptData.view))
                                     let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                     resolve(msg);
                                 })
@@ -271,32 +277,32 @@ const DesignModal = (props) => {
                                     setTestScriptData(null);
                                     setKeywordList(null);
                                     setObjNameList(null);
-                                    console.error("Error getObjectType method! \r\n ", error);
-                                    console.log(MSG.DESIGN.ERR_FETCH_TC);
+                                    setMsg("Error getObjectType method! \r\n ", error);
+                                    setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                     reject("fail");
                                 });
-                        })
-                        .catch(error => {
-                            setOverlay("");
-                            setTestCaseData([]);
-                            setTestScriptData(null);
-                            setKeywordList(null);
-                            setObjNameList(null);
-                            console.log(MSG.DESIGN.ERR_FETCH_TC);
-                            console.error("Error getObjectType method! \r\n " + (error));
-                            reject("fail");
-                        });
-                })
-                .catch(error => {
-                    setOverlay("");
-                    setTestCaseData([]);
-                    setTestScriptData(null);
-                    setKeywordList(null);
-                    setObjNameList(null);
-                    console.log(MSG.DESIGN.ERR_FETCH_TC);
-                    console.error("Error getTestScriptData method! \r\n " + (error));
-                    reject("fail");
-                });
+                    })
+                    .catch(error => {
+                        setOverlay("");
+                        setTestCaseData([]);
+                        setTestScriptData(null);
+                        setKeywordList(null);
+                        setObjNameList(null);
+                        setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                        setMsg("Error getObjectType method! \r\n " + (error));
+                        reject("fail");
+                    });
+            })
+            .catch(error => {
+                setOverlay("");
+                setTestCaseData([]);
+                setTestScriptData(null);
+                setKeywordList(null);
+                setObjNameList(null);
+                setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                setMsg("Error getTestScriptData method! \r\n " + (error));
+                reject("fail");
+            });
         });
     };
 
@@ -321,18 +327,18 @@ const DesignModal = (props) => {
                 let testCases = [...newtestcase]
 
                 for (let i = 0; i < testCases.length; i++) {
-                    let step = i + 1
-                    testCases[i].stepNo = step;
+                    // let step = i + 1
+                    // testCases[i].stepNo = step;
 
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
                         if (!testCases[i].keywordVal) col = "keyword";
-                        console.log(MSG.CUSTOM(`Please select ${col} Name at Step No. ${step}`));
+                        // setMsg(MSG.CUSTOM(`Please select ${col} Name a`));
                         errorFlag = true;
                         break;
                     } else {
-                        testCases[i].custname = testCases[i].custname.trim();
-                        if (testCases[i].keywordVal === 'SwitchToFrame' && String(testScriptData) !== "undefined") {
+                        // testCases[i].custname = testCases[i].custname.trim();
+                         if (testCases[i].keywordVal === 'SwitchToFrame' && String(testScriptData) !== "undefined") {
                             let scriptData = [...testScriptData];
                             for (let j = 0; j < scriptData.length; j++) {
                                 if (!(['@Browser', '@Oebs', '@Window', '@Generic', '@Custom'].includes(scriptData[j].custname)) && scriptData[j].url !== "") {
@@ -347,8 +353,8 @@ const DesignModal = (props) => {
                         }
                     }
                     if (!testCases[i].url) testCases[i].url = "";
-
-                    if (!testCases[i].cord) testCases[i].cord = "";
+                    
+                    // if (!testCases[i].cord) testCases[i].cord = "";
 
                 }
 
@@ -357,12 +363,11 @@ const DesignModal = (props) => {
                         .then(data => {
                             if (data === "Invalid Session") return;
                             if (data === "success") {
-
-                                if ("Web".toLowerCase() === "web" && Object.keys(modified).length !== 0) {
+                                if (props.appType.toLowerCase() === "web" && Object.keys(modified).length !== 0) {
                                     let scrape_data = {};
                                     // let { appType, projectId, testCaseId, versionnumber } = props.current_task;
 
-                                    DesignApi.getScrapeDataScreenLevel_ICE("Web", props.fetchingDetails['parent']['_id'], props.fetchingDetails.projectId, props.fetchingDetails['_id'])
+                                    DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails['parent']['_id'], props.fetchingDetails.projectId, props.fetchingDetails['_id'])
                                         .then(res => {
                                             scrape_data = res;
                                             let modifiedObjects = [];
@@ -372,11 +377,10 @@ const DesignModal = (props) => {
                                                     modifiedObjects.push(scrape_data.view[i]);
                                                 }
                                             }
-
                                             let params = {
                                                 'deletedObj': [],
                                                 'modifiedObj': modifiedObjects,
-                                                'addedObj': { ...scrape_data, view: [] },
+                                                'addedObj': {...scrape_data, view: []},
                                                 'testCaseId': props.fetchingDetails.testCaseId,
                                                 'userId': userInfo.user_id,
                                                 'roleId': userInfo.role,
@@ -384,60 +388,60 @@ const DesignModal = (props) => {
                                                 'param': 'DebugModeScrapeData',
                                                 'orderList': scrape_data.orderlist
                                             }
-
+                                    
                                             DesignApi.updateScreen_ICE(params)
-                                                .then(data1 => {
-                                                    if (data1 === "Invalid Session") return;
-
-                                                    if (data1 === "Success") {
-                                                        fetchTestCases()
-                                                            .then(msg => {
-                                                                setChanged(false);
-                                                                msg === "success"
-                                                                    ? console.log(MSG.DESIGN.SUCC_TC_SAVE)
-                                                                    : console.log(MSG.DESIGN.WARN_DELETED_TC_FOUND)
-                                                            })
-                                                            .catch(error => {
-                                                                console.log(MSG.DESIGN.ERR_FETCH_TC);
-                                                                console.error("Error: Fetch TestCase Failed ::::", error)
-                                                            });
-                                                    } else console.log(MSG.DESIGN.ERR_SAVE_TC);
-                                                })
-                                                .catch(error => {
-                                                    console.log(MSG.DESIGN.ERR_SAVE_TC);
-                                                    console.error("Error::::", error)
-                                                })
-                                        })
-                                        .catch(error => {
-                                            console.log(MSG.DESIGN.ERR_SAVE_TC);
-                                            console.error("Error:::::", error)
-                                        });
-                                }
-                                else {
-                                    fetchTestCases()
-                                        .then(data => {
-                                            setChanged(false);
-                                            data === "success"
-                                                ? console.log(MSG.DESIGN.SUCC_TC_SAVE)
-                                                : console.log(MSG.DESIGN.WARN_DELETED_TC_FOUND);
-                                        })
-                                        .catch(error => {
-                                            console.log(MSG.DESIGN.ERR_FETCH_TC);
-                                            console.error("Error: Fetch TestCase Failed ::::", error)
-                                        });
-                                }
-                            } else console.log(MSG.DESIGN.ERR_SAVE_TC);
-                        })
-                        .catch(error => {
-                            console.log(MSG.DESIGN.ERR_SAVE_TC);
-                            console.error("Error::::", error);
-                        });
+                                            .then(data1 => {
+                                                if (data1 === "Invalid Session") return ;
+                                                
+                                                if (data1 === "Success") {            
+                                                    fetchTestCases()
+                                                    .then(msg=>{
+                                                        setChanged(false);
+                                                        msg === "success"
+                                                        ? setMsg(MSG.DESIGN.SUCC_TC_SAVE)
+                                                        : setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND)
+                                                    })
+                                                    .catch(error => {
+                                                        setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                                                        setMsg("Error: Fetch TestCase Failed ::::", error)
+                                                    });
+                                                } else setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                                            })
+                                            .catch(error => {
+                                                setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                                                setMsg("Error::::", error)
+                                            })
+                                })
+                                .catch(error=> {
+                                    setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                                    setMsg("Error:::::", error)
+                                });
+                            }
+                            else{
+                                fetchTestCases()
+                                .then(data=>{
+                                    setChanged(false);
+                                    data === "success" 
+                                    ? setMsg(MSG.DESIGN.SUCC_TC_SAVE) 
+                                    : setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                                })
+                                .catch(error=>{
+                                    setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                                    setMsg("Error: Fetch TestCase Failed ::::", error)
+                                });
+                            }
+                        } else setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                    })
+                    .catch(error => { 
+                        setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                        setMsg("Error::::", error);
+                    });
                     errorFlag = false;
                 }
-            } else console.log(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
+            } else setMsg(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
         }
-        setStepSelect({ edit: false, check: [], highlight: [] });
-        headerCheckRef.current.indeterminate = false;
+        setStepSelect({edit: false, check: [], highlight: []});
+        // headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setDebugEnable(false);
     }
@@ -491,10 +495,10 @@ const DesignModal = (props) => {
 
     const deleteTestcase = () => {
         let testCases = [...testCaseData]
-        if (testCases.length === 1 && !testCases[0].custname) console.log(MSG.DESIGN.WARN_DELETE);
-        else if (stepSelect.check.length <= 0) console.log(MSG.DESIGN.WARN_SELECT_STEP);
-        else if (reusedTC) props.setShowConfirmPop({ 'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': () => { props.setShowConfirmPop(false); onDeleteTestStep() } });
-        else props.setShowConfirmPop({ 'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': () => onDeleteTestStep() });
+        if (testCases.length === 1 && !testCases[0].custname) setMsg(MSG.DESIGN.WARN_DELETE);
+        else if (stepSelect.check.length <= 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP);
+        else if (reusedTC) props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{props.setShowConfirmPop(false);onDeleteTestStep()}});
+        else props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
 
     const onDeleteTestStep = () => {
@@ -522,10 +526,13 @@ const DesignModal = (props) => {
 
     const addRow = () => {
         let oldTestCases = [...newtestcase]
-       let emptyAddedRow=[...oldTestCases,emptyRowData]
+        let emptyRowDataIndex={...emptyRowData,stepNo:String(oldTestCases.length+1)}
+       let emptyAddedRow=[...oldTestCases,emptyRowDataIndex]
+       
        setnewtestcase(emptyAddedRow)
         // setTestCaseData(testCases);
-        // // setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
+
+        setStepSelect({edit: false, check: [], highlight: []});
         // setHeaderCheck(false);
         // setChanged(true);
         // headerCheckRef.current.indeterminate = false;
@@ -551,7 +558,7 @@ const DesignModal = (props) => {
         let highlight = [...stepSelect.highlight]
         let focus = [];
         runClickAway = false;
-        if (check.length === 0 && highlight.length === 0) console.log(MSG.DESIGN.WARN_SELECT_STEP_DEL);
+        if (check.length === 0 && highlight.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_DEL);
         else {
             if (check.length === 1) focus = check;
             else if (highlight.length === 1 && !check.length) { focus = highlight; check = highlight }
@@ -581,13 +588,13 @@ const DesignModal = (props) => {
         let copyTestCases = []
         let copyContent = {}
         let copyErrorFlag = false;
-        if (selectedRows.length === 0) console.log(MSG.DESIGN.WARN_SELECT_STEP_COPY);
-        else {
-            let sortedSteps = selectedRows.map(step => parseInt(step)).sort((a, b) => a - b)
+        if (selectedRows.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_COPY);
+        else{
+            let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
             for (let idx of sortedSteps) {
                 if (!testCaseData[idx].custname) {
-                    if (selectedRows.length === 1) console.log(MSG.DESIGN.ERR_EMPTY_TC_COPY);
-                    else console.log(MSG.DESIGN.ERR_INVALID_OBJ_REF);
+                    if (selectedRows.length === 1) setMsg(MSG.DESIGN.ERR_EMPTY_TC_COPY);
+                    else setMsg(MSG.DESIGN.ERR_INVALID_OBJ_REF);
                     copyErrorFlag = true;
                     break
                 }
@@ -611,8 +618,8 @@ const DesignModal = (props) => {
     const onPasteSteps = () => {
         setStepSelect(oldState => ({ ...oldState, highlight: [] }));
 
-        if (!copiedContent.testCaseId) {
-            console.log(MSG.DESIGN.WARN_NO_TC_PASTE);
+        if (!copiedContent.testCaseId){
+            setMsg(MSG.DESIGN.WARN_NO_TC_PASTE);
             return;
         }
 
@@ -625,7 +632,7 @@ const DesignModal = (props) => {
                 }
             }
             if (copiedContent.appType !== "Web" && appTypeFlag) {
-                console.log(MSG.DESIGN.WARN_DIFF_PROJTYPE);
+                setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
             }
             else {
                 setShowConfPaste(true);
@@ -836,38 +843,39 @@ const DesignModal = (props) => {
         }
     }
 
-    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, "Web", testScriptData), [keywordList, props.current_task, testScriptData]);
+    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
     //Debug function
 
     const debugTestCases = selectedBrowserType => {
+        setVisibleDependentTestCaseDialog(false);
         let testcaseID = [];
         let browserType = [];
 
-        if ("Web" !== "MobileWeb" && "Web" !== "Mainframe") browserType.push(selectedBrowserType);
+        if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
 
         // globalSelectedBrowserType = selectedBrowserType;5
 
-        if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
+        if (dependencyTestCaseFlag) testcaseID = testCaseIDsList;
         else testcaseID.push(props.fetchingDetails['_id']);
         setOverlay('Debug in Progress. Please Wait...');
         // ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, "Web")
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
             .then(data => {
                 setOverlay("");
                 // ResetSession.end();
-                if (data === "Invalid Session") return;
-                else if (data === "unavailableLocalServer") console.log(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
-                else if (data === "success") console.log(MSG.DESIGN.SUCC_DEBUG)
-                else if (data === "fail") console.log(MSG.DESIGN.ERR_DEBUG)
-                else if (data === "Terminate") console.log(MSG.DESIGN.WARN_DEBUG_TERMINATE)
-                else if (data === "browserUnavailable") console.log(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
-                else if (data === "scheduleModeOn") console.log(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
-                else if (data === "ExecutionOnlyAllowed") console.log(MSG.GENERIC.WARN_EXECUTION_ONLY)
-                else if (data.status === "success") {
-                    let rows = {}
+                if (data === "Invalid Session") return ;
+                else if (data === "unavailableLocalServer")  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
+                else if (data === "success") setMsg(MSG.DESIGN.SUCC_DEBUG)
+                else if (data === "fail") setMsg(MSG.DESIGN.ERR_DEBUG)
+                else if (data === "Terminate") setMsg(MSG.DESIGN.WARN_DEBUG_TERMINATE)
+                else if (data === "browserUnavailable") setMsg(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
+                else if (data === "scheduleModeOn") setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
+                else if (data === "ExecutionOnlyAllowed") setMsg(MSG.GENERIC.WARN_EXECUTION_ONLY)
+                else if (data.status === "success"){
+                    let rows={}
                     mainTestCases.forEach((testCase, index) => {
                         if (index + 1 in data) {
                             rows[testCase.custname] = data[index + 1].xpath;
@@ -875,22 +883,18 @@ const DesignModal = (props) => {
                     });
                     dispatch(Modified(rows));
                     dispatch(SaveEnable(!saveEnable))
-                    console.log(MSG.DESIGN.SUCC_DEBUG);
+                    setMsg(MSG.DESIGN.SUCC_DEBUG);
                 } else {
-                    console.log(data);
-                }
+                    setMsg(data);
+                }										
             })
             .catch(error => {
                 setOverlay("");
                 // ResetSession.end();
-                console.log(MSG.DESIGN.ERR_DEBUG);
-                console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+                setMsg(MSG.DESIGN.ERR_DEBUG);
+                setMsg("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
             });
     };
-
-    const handleDesignBtn = () => {
-        setVisibleDependentTestCaseDialog(true);
-    }
 
     const handleSpanClick = (index) => {
         if (selectedSpan === index) {
@@ -904,12 +908,30 @@ const DesignModal = (props) => {
         setShowTable(true);
     };
     const handleAdd = () => {
-        setTestCases(...testCases, testCases.checked = true);
-        console.log("testCases", testCases);
-        const addTestcaseData = testCases.testCaseName;
-        setAddedTestCase([...addedTestCase, addTestcaseData]);
-        setTestCases('');
+        const update = { ...testCases };
+        const addTestcaseData = {};
+        const TestIDPresent = addedTestCase.filter(item => {
+            return item.testCaseID === testCases.testCaseID
+        });
+        // console.log("TestIDPresent", TestIDPresent);
+        if (TestIDPresent.length > 0) {
+            toastError("Duplicate Dependent Testcase found");
+        }
+        else {
+            addTestcaseData["testCaseID"] = update.testCaseID;
+            addTestcaseData["testCaseName"] = update.testCaseName;
+            addTestcaseData["disableAndBlock"] = update.disableAndBlock;
+            addTestcaseData["checked"] = true;
+            setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
+            setAddedTestCase([...addedTestCase, addTestcaseData]);
+            setDependencyTestCaseFlag(true);
+            setTestCases(null);
+        }
     };
+
+    const toastError = (errMessage) => {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 10000 });
+    }
 
     const headerTemplate = (
         <>
@@ -918,10 +940,18 @@ const DesignModal = (props) => {
                 <h4 className='dailog_header2'>Signup screen 1</h4>
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
                 <div className='btn__grp'>
-                    <Button size='small' onClick={()=>setVisibleDependentTestCaseDialog(true)} label='Debug' outlined></Button>
+                    <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' outlined></Button>
                     <Button size='small' label='Add Test Step' onClick={()=>addRow()}></Button>
-                    <Button size='small' lable='Save' onClick={saveTestCases}></Button>
                 </div>
+            </div>
+        </>
+    );
+
+    const footerTemplate = (
+        <>
+            <div className='btn__grp'>
+               <Button size='small' label='Save' onClick={saveTestCases}></Button>
+              {selectedTestCases &&  <Button size='small' label='Delete' onClick={()=>setDeleteTestDialog(true)}></Button>}
             </div>
         </>
     );
@@ -932,79 +962,151 @@ const DesignModal = (props) => {
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">No Design Step yet</p>
             </div>
-            <Button className="btn-design-single" label='Design Test Steps'></Button>
+            <Button size='small' className="btn-design-single" label='Design Test Steps' onClick={()=>addRow()}></Button>
         </div>
     );
 
     const footerContent = (
         <div>
-            <Button label="Cancel" className="p-button-text" />
-            <Button label="Debug" onClick={() => debugTestCases('1')} autoFocus />
+            <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
+            <Button label="Debug" size='small' onClick={() => debugTestCases('1')} autoFocus />
         </div>
     );
-    const renderActionsCell = (rowData) => {
-        return (
-            <div>
-                <img src="static/imgs/ic-edit.png" style={{ height: "20px", width: "20px" }} className="edit__icon" alt='' />
-                <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }} className="delete__icon" alt='' />
-            </div>
-        )
-    };
+    // const renderActionsCell = (rowData) => {
+    //     return (
+    //      <div>
+    //         <img src="static/imgs/ic-edit.png" style={{ height: "20px", width: "20px" }} className="edit__icon" alt='' />
+    //         <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }}className="delete__icon"  alt='' />
+    //      </div>
+    //       )
+    //     };
+    
     const elementEditor = (options) => {
         return (
             <Dropdown
                 value={options.value}
                 options={objNameList}
-                onChange={(e) => { options.editorCallback(e.value); setKeywordList(getKeywords(e.value).keywords) }}
-                placeholder="Select a Status"
+                onChange={(e) => {options.editorCallback(e.value);setKeywordListTable(getKeywords(e.value).keywords);setKeyword(getKeywords(e.value).keywords[0])}}
+                placeholder="Select a custname"
             />
         );
     };
     const keywordEditor = (options) => {
         return (
             <Dropdown
-                value={options.value}
-                options={keywordList.keywords}
-                onChange={(e) => options.editorCallback(e.value)}
-                placeholder="Select a Status"
+                value={keyword.length>0?keyword:options.value}
+                options={keywordListTable.length>0?keywordListTable:getKeywords(options.rowData.custname).keywords}
+                onChange={(e) => {options.editorCallback(e.value);setKeyword([]);}}
+                placeholder="Select a keywords"
             />
         );
     };
-    const textEditor = (options) => {
+
+    const inputEditor = (options) => {
         return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
     };
+    const outputEditor = (options) => {
+        return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+    };
+
     const onRowEditComplete = (e) => {
         let testcase = [...newtestcase];
         let { newData, index } = e;
         testcase[index] = newData;
         setnewtestcase(testcase);
     };
+        
+    const deleteProduct = () => {
+        let testcases = newtestcase.filter(function(objFromA) {
+            return !selectedTestCases.find(function(objFromB) {
+                return objFromA.stepNo === objFromB.stepNo
+              
+            })
+        })
+    
+        setnewtestcase(testcases);
+        setDeleteTestDialog(false);
+        setTestCase(emptyRowData);
+        setSelectedTestCases(null)
+        setMsg(MSG.CUSTOM('success full deleted test steps'));
+    };
+        const hideDeleteProductDialog = () => {
+            setDeleteTestDialog(false);
+        };
+        
+        // const actionBodyTemplate = () => {
+        //     return (
+        //         <React.Fragment>
+        //             <img src="static/imgs/ic-edit.png" style={{ height: "20px", width: "20px" }} className="edit__icon" alt='edit' onClick={() => handleRowEdit()} />
+        //             <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }} className="delete__icon" alt='delete' onClick={() => setDeleteTestDialog(true)} />
+                    
+        //         </React.Fragment>
+        //     );
+        // };
+        const deleteProductDialogFooter = (
+            <React.Fragment>
+                <Button label="No" icon="pi pi-times" outlined onClick={hideDeleteProductDialog} />
+                <Button label="Yes" icon="pi pi-check" severity="danger" onClick={deleteProduct} />
+            </React.Fragment>
+        );
+        const reorderTestCases=(e)=>{
+            const reorderedTestcase=e.value
+            const newReorderedTestCases=reorderedTestcase.map((testcase,idx)=>{
+                return {...testcase, [testcase.stepNo]:idx+1}
+            })
+            setnewtestcase(newReorderedTestCases)
+        }
+
+        // const onCellEditComplete = (e) => {
+        //     let { rowData, newValue, field } = e;
+        //     let editedTestCases=[...newtestcase]
+        //     const updatedRowData = {...rowData,  [field]: newValue };
+        //     editedTestCases.splice(e.rowIndex, 1, updatedRowData);
+        //     setnewtestcase(editedTestCases);
+        // };
+        // const cellEditor = (options) => {
+        //     if (options.field === 'custname') return elementEditor(options);
+        //     else if (options.field === 'keywordVal') return keywordEditor(options);
+        //     else return textEditor(options);
+        //   };
+
+    const DependentTestCaseDialogHideHandler = () => {
+        setVisibleDependentTestCaseDialog(false);
+        setDependencyTestCaseFlag(false);
+        setTestCases(null);
+        setTestCaseIDsList([]);
+        setAddedTestCase([]);
+    }
 
     return (
         <>
-            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} >
+        {overlay && <ScreenOverlay content={overlay} />}
+        <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
+            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} footer={footerTemplate} >
                 <div className='toggle__tab'>
                     <Accordion activeIndex={0}>
                         <AccordionTab header={props.fetchingDetails["name"]} onClick={toggleTableVisibility}>
                             <DataTable
                                 value={newtestcase.length>0 ?newtestcase:[]}
-                                emptyMessage={newtestcase.length === 0?emptyMessage:null}
-                                rowReorder editMode="row" dataKey="id" onRowEditComplete={onRowEditComplete} >
-                                <Column style={{ width: '3em' }} rowReorder />
-                                <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
-                                <Column field="custname" header="Select all" editor={(options) => elementEditor(options)}></Column>
-                                <Column field="keywordVal" header="Keyword" editor={(options) => keywordEditor(options)}></Column>
-                                <Column field="inputVal" header="Input" editor={(options) => textEditor(options)}></Column>
-                                <Column field="outputVal" header="Output" editor={(options) => textEditor(options)}></Column>
+                                selectionMode="checkbox" selection={selectedTestCases}
+                                onSelectionChange={(e) => setSelectedTestCases(e.value)}  
+                                emptyMessage={newtestcase.length === 0?emptyMessage:null} onRowEditComplete={onRowEditComplete}
+                                rowReorder editMode="row" reorderableRows onRowReorder={(e) => reorderTestCases(e)} resizableColumns showGridlines size='small' >
+                                <Column style={{ width: '3em' ,textAlign: 'center' }} rowReorder />
+                                <Column selectionMode="multiple" style={{ width: '3em' ,textAlign: 'center' }} />
+                                <Column field="custname" header="Element Name" editor={(options) => elementEditor(options)} ></Column>
+                                <Column field="keywordVal" header="Keyword" editor={(options) => keywordEditor(options)}  ></Column>
+                                <Column field="inputVal" header="Input" editor={(options) => inputEditor(options)} ></Column>
+                                <Column field="outputVal" header="Output" editor={(options) => outputEditor(options)} ></Column>
                                 <Column field="remarks" header="Remarks" />
-                                <Column rowEditor headerStyle={{ width: '10%', minWidth: '8rem' }} bodyStyle={{ textAlign: 'center' }} />
+                                <Column rowEditor field="action" header="Actions" bodyStyle={{ textAlign: 'center' }} ></Column>
                             </DataTable>
                         </AccordionTab>
                     </Accordion>
-                </div>
+                </div> 
             </Dialog>
 
-            <Dialog className={"debug__object__modal"} header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={() => setVisibleDependentTestCaseDialog(false)} footer={footerContent}>
+            <Dialog className="debug__object__modal" header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
@@ -1033,7 +1135,7 @@ const DesignModal = (props) => {
                                     <p>Clear</p>
                                 </span>
                             </div>
-                            <div className={addedTestCase.length > 0 ? 'added__card' : ''}>
+                            <div>
                                 {addedTestCase.map((value, index) => (
                                     <div key={index}>
                                         <p className={addedTestCase.length > 0 ? 'text__added__step' : ''}>{value.testCaseName}</p>
@@ -1043,7 +1145,16 @@ const DesignModal = (props) => {
                         </div>
                     </div>
                 </div>
-
+            </Dialog>
+            <Dialog visible={deleteTestDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+                <div className="confirmation-content">
+                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                    {newtestcase && (
+                        <span>
+                            Are you sure you want to delete?
+                        </span>
+                    )}
+                </div>
             </Dialog>
         </>
     )

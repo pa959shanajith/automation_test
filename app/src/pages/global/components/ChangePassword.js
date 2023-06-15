@@ -26,16 +26,17 @@ const ChangePassword = (props) => {
     const [digitPresent, setDigitPresent] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    const [confirmPasswordFocus, setConfirmPasswordFocus] = useState(false);
 
     useEffect(() => {
         if (errorMsg) {
-            toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 3000 });
+            toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
         }
     }, [errorMsg]);
 
     useEffect(() => {
         if (successMsg) {
-            toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 3000 });
+            toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 5000 });
         }
     }, [successMsg]);
 
@@ -111,7 +112,7 @@ const ChangePassword = (props) => {
     }
 
     // Footer elements to the Dialog Box
-    const changePasswordFooter = () =>( 
+    const changePasswordFooter = () => (
         <>
             <Button
                 label="Cancel"
@@ -143,6 +144,7 @@ const ChangePassword = (props) => {
                                 style={{ width: '25vw' }}
                                 id="newPassword"
                                 value={newpassword}
+                                className={'input_field'}
                                 onChange={newPasswordOnChangeHandler}
                                 placeholder='Enter new password'
                                 type={showNewPassword ? "text" : "password"}
@@ -184,6 +186,8 @@ const ChangePassword = (props) => {
                             <InputText
                                 style={{ width: '25vw' }}
                                 id="confirmPassword"
+                                onFocus={() => setConfirmPasswordFocus(true)}
+                                className={`input_field ${confirmPasswordFocus && newpassword !== confirmNewpassword ? 'p-invalid' : 'input_field_success' }`}
                                 value={confirmNewpassword}
                                 onChange={confirmNewPasswordOnChangeHandler}
                                 placeholder='Confirm new password'

@@ -33,63 +33,49 @@
             font-size: 1.5rem;
         }
 
-        // >h1,
-        // >h2,
-        // >h3 {
-        //     padding: 2%;
-        //     color: #605BFF;
-        //     margin: 1% 0%;
-        // }
     }
 
     .split_right {
         width: 50%;
-    }
 
-    .icon_img {
-        height: 3rem;
-        margin: 0rem 5rem;
-    }
+        .right_side_login {
+            display: flex;
+            padding: 3% 14%;
+            flex-direction: column;
+            position: fixed;
+            text-align: center;
+            gap: 2rem;
 
-    .right_side_login {
-        display: flex;
-        padding: 7% 14%;
-        flex-direction: column;
-        position: fixed;
-        text-align: center;
-        gap: 2rem;
-
-        >h2 {
-            color: #605BFF;
-        }
-
-        .forgetPassword_user_input {
-            width: 24rem;
-        }
-
-        .user_input {
-            width: 22rem;
-        }
-
-        .link {
-            text-decoration: none;
-            font-size: small;
-            color: #4338CA;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .forgot_password {
-            text-align-last: right;
-        }
-
-        .login_btn {
-            .p-button.p-button-text {
-                color: #ffff !important;
-                background-color: #4338ca !important;
-
+            .icon_img {
+                height: 4rem;
+                margin: 0.5rem 5rem 3rem;
             }
-        }
 
+            .forgetPassword_user_input {
+                width: 24rem;
+            }
+
+            .user_input {
+                width: 22rem;
+            }
+
+            .link {
+                text-decoration: none;
+                font-size: small;
+                color: #4338CA;
+                font-weight: 700;
+                cursor: pointer;
+            }
+
+            .forgot_password {
+                text-align-last: right;
+            }
+
+            .login_btn {
+                display: flex;
+                justify-content: space-between;
+            }
+
+        }
     }
 }
