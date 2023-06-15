@@ -61,6 +61,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [modules, setModules] = useState("normalExecution");
+  const [dotNotExe, setDotNotExe] = useState({});
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
   const [allocateICE, setAllocateICE] = useState(false);
@@ -107,6 +108,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [profileTxt, setProfileTxt] = useState("");
   const [searchProfile, setSearchProfile] = useState("");
   const [browserTxt,setBrowserTxt]=useState("");
+  const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -336,7 +338,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const handleWeekInputChange = (event) => {
     setMonthlyRecurrenceWeekValue(event.target.value);
   };
-
   const getRecurrenceType = (event) => {
     setRecurrenceType(event.target.value);
   };
@@ -863,6 +864,25 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       );
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
+      setDotNotExe(getData);
+      setSelectedNodeKeys({
+        "1": {
+            "checked": true,
+            "partialChecked": false
+        },
+        "1-0": {
+            "checked": true,
+            "partialChecked": false
+        },
+        "1-1": {
+            "checked": true,
+            "partialChecked": false
+        },
+        "1-2": {
+            "checked": true,
+            "partialChecked": false
+        }
+    });
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -894,6 +914,24 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         },
         {}
       );
+      const getSelected = Object.keys(selectedNodeKeys);
+      const parent = getSelected.filter((el) => el.length === 1);
+      const child = getSelected
+        .filter((el) => el.length > 1)
+        .map((e) => ({ [e.charAt(0)]: e.charAt(2) }));
+      const selectedKeys = {};
+      const selectedArr = parent.map((element) => child.map((el) => el[element] ? el[element] : false).filter((i) => i !== false))
+      // parent.map((item, index) => ({ [item]: selectedArr[index] }))
+      parent.forEach((item, index) => {
+        selectedKeys[item] = selectedArr[index]
+      })
+      let getCurrent = {};
+      xpanded?.forEach((val) => {
+        let numberArray = [];
+        selectedKeys[Number(val.key)].forEach( ele => numberArray.push(+ele));
+        getCurrent[val.suiteid] =  numberArray
+      });
+      
       const dataObj = {
         param: "updateTestSuite_ICE",
         batchDetails: xpanded?.map((el) => ({
@@ -927,7 +965,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         configurekey: getBtnType === "Update" ? updateKey : uuid(),
         isHeadless: mode === "Headless",
         avogridId: "",
-        avoagents: [avodropdown.avogrid.name],
+        avoagents: [avodropdown?.avogrid?.name],
         integration: {
           alm: { url: "", username: "", password: "" },
           qtest: { url: "", username: "", password: "", qteststeps: "" },
@@ -958,10 +996,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           ],
         })),
         donotexe: {
-          current: xpanded?.reduce((ac, cv) => {
-            ac[cv["suiteid"]] = [0];
-            return ac;
-          }, {}),
+          current: getCurrent
         },
         scenarioFlag: false,
         isExecuteNow: false,
@@ -1445,6 +1480,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               setAvodropdown={setAvodropdown}
               mode={mode}
               setMode={setMode}
+              selectedNodeKeys={selectedNodeKeys}
+              setSelectedNodeKeys={setSelectedNodeKeys}
+              dotNotExe={dotNotExe}
+              setDotNotExe={setDotNotExe}
             />
           }
           headerTxt="Execution Configuration set up"
