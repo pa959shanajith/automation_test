@@ -10,6 +10,7 @@ const initialState = {
     objValue: { val: null },
     enableIdentifier:false,
     listofcheckeditems:[],
+    elementPropertiesUpdated:false,
     isFiltered: false,
     cert: {},
     WsData: {
@@ -88,14 +89,17 @@ const reducer = (state=initialState, action) => {
                 return {
                     ...state,
                     enableIdentifier: action.payload
-                
-                }
+            }
         case actionTypes.SET_LISTOFCHECKEDITEMS:
                 return {
                     ...state,
                     listofcheckeditems: action.payload
-                
-                }
+            }
+        case actionTypes.SET_ELEMENT_PROPERTIES:
+                return {
+                    ...state,
+                    elementPropertiesUpdated : action.payload
+            }                
                 
 
 

@@ -171,12 +171,12 @@ const listOfCheckedItems=useSelector((state) => state.scrape.listofcheckeditems)
         })
         const checkForOnlyOneCheckedItems=localItems.filter(item=>item.checked)
         if(checkForOnlyOneCheckedItems.length===1 && checkForOnlyOneCheckedItems[0].identifier!==undefined) {
-            const defaultNames={xpath:'Absolute X-Path',id:'ID Attribute',rxpath:'Relative X path',name:'Name Attribute',classname:'Classname Attribute'}
+            const defaultNames={xpath:'Absolute X-Path',id:'ID Attribute',rxpath:'Relative X path',name:'Name Attribute',classname:'Classname Attribute',cssselector:'CSS Selector',href:'Href Attribute',label:'Label'}
             const currentIdentifier=checkForOnlyOneCheckedItems[0].identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
             props.setIdentifierList(currentIdentifier)
         }
         else{
-            props.setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+            props.setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'cssselector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}])
         }
         setScrapeItems(localItems)
         dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: listOfCheckedItems})
