@@ -13,34 +13,48 @@ position: fixed;
 }
 
 .custom-tieredmenu {
-  background-color: #030229 !important;
+  // background-color: #FAFAFB !important;
+  background:linear-gradient(180deg,#EDECEC 15%,#fafafb 13%)!important;
   border-radius: 8px !important;
-  width: 13.3rem !important;
+  width: 13.5rem !important;
   position: relative;
   z-index: 1;
   position: absolute;
   top: 2.6rem;
-  right: 0rem;
+  right: 0.2rem;
 
-  .p-menuitem-icon,
-  .p-menuitem-text {
-    color: #ffffff !important;
-  }
+  // .p-menuitem-icon,
+  // .p-menuitem-text {
+  //   color: #ffffff !important;
+  // }
 
   .p-menuitem-link:not(.p-disabled):hover {
     background: #bec2be !important;
   }
 
-  .p-submenu-list {
-    background-color: #030229 !important;
-  }
+  // .p-submenu-list {
+  //   background-color: #030229 !important;
+  // }
 }
 
-.ProfileDisplay {
+.ProfileDisplay  {
   text-align: center;
   margin-bottom: 0.8rem;
   margin-right: 0.5rem;
   margin-top: 1rem;
-  color: #ffffff;
+  // color: #ffffff;
+}
+.tooltipEmailId{
+  // max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  left: 0.8rem;
+  position: relative;
+  cursor: pointer;
+  color: #495057;
+  }
+.p-avatar.p-avatar-image{
+  border:2px solid white !important;
 }
 }
