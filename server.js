@@ -234,7 +234,7 @@ if (cluster.isMaster) {
 
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
-    var plugin = require('./server/controllers/plugin');
+    	var plugin = require('./server/controllers/plugin');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -248,6 +248,7 @@ if (cluster.isMaster) {
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.use(csrf({
 			cookie: true
 		}));
