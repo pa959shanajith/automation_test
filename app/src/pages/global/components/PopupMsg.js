@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import '../styles/PopupMsg.scss'
 
 /*Component PopupMsg
   use: block screen and show popup
