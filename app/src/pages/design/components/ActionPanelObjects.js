@@ -93,7 +93,7 @@ const ActionPanel = (props) => {
         <p className='object__type'>Select Object Type</p>
         <Dropdown value={selectObjectType} onChange={handleDropdownChange} options={objectType} optionLabel="name" 
     placeholder="Search" className="w-full md:w-15rem object__dropdown" />
-        <p className='object__type__name'>Enter Object Name</p>
+        <p className='object__type__name'>Enter Element Name</p>
         <input className='object__type__input' value={inputValue} onChange={handleInputChange} placeholder='Text Input'/>
         <button className='add_object_btn' onClick={handleAdd}>Add</button>
       </div>
@@ -112,8 +112,8 @@ const ActionPanel = (props) => {
      <p className='text__content'>Please select the object type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
      <card className='map__card'>
      <div className='captured__text'>
-      <span>Captured Objects</span>
-      <span className='custom__obj__text'>Custom Objects</span>
+      <span>Captured Elements</span>
+      <span className='custom__obj__text'>Custom Elements</span>
      </div>
      {items.map((item)=>{
       return (<div key={item.id} className='object__list'>
@@ -135,8 +135,8 @@ const ActionPanel = (props) => {
      <p className='text__content'>Please select the object type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
      <card className='map__card'>
      <div className='captured__text'>
-      <span>Captured Objects</span>
-      <span className='new__captured__text'>New Captured Objects</span>
+      <span>Captured Elements</span>
+      <span className='new__captured__text'>Newly Captured Elements</span>
      </div>
      {items.map((item)=>{
       return (<div key={item.id} className='object__list'>
@@ -183,7 +183,7 @@ const ActionPanel = (props) => {
    <Dialog className='compare__object__modal' header="Compare Object:Sign up screen 1" style={{height: "21.06rem",width: "24.06rem"}} visible={props.isOpen==='compareObject'} onHide={props.OnClose} footer={footerCompare}>
     <div className='compare__object'>
       <span className='compare__btn'>
-        <p className='compare__text'>All Browsers</p>
+        <p className='compare__text'>List Of Browsers</p>
       </span>
       <span className='browser__col'>
       <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1? 'browser__col__selected': 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan===1 && <img className='sel__tick' src='static/imgs/ic-tick.png'/>}</span>

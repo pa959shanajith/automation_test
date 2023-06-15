@@ -941,6 +941,32 @@ export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, ge
     });
 }
 
+export const highlightScrapElement_ICE = (xpath, objurl, appType, top, left, width, height) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/highlightScrapElement_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {"action": "highlightScrapElement_ICE",
+                    "elementXpath": xpath, 
+                    "elementUrl": objurl,
+                    "appType": appType,
+                    "top": top,
+                    "left": left,
+                    "width": width,
+                    "height": height
+                },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data);
+            else reject(res.status);
+        })
+        .catch(err => reject(err));
+    });
+}
+
 /*Component ActionbarItems (DesignPage)
   api returns {"<type>":{"<keyword>":{"inputtype": [""],"inputval": [""],"outputval": [""]}}
 }
