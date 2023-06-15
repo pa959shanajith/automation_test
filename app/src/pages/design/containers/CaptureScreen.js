@@ -14,7 +14,8 @@ import { v4 as uuid } from 'uuid';
 import{ScreenOverlay } from '../../global';
 import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
-import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
+// import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
+import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
 
 
@@ -922,7 +923,14 @@ useEffect(()=>{
         </div>
         {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>}
       </Dialog>
-      <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" />
+      {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
+      <AvoConfirmDialog
+                visible={showNote}
+                onHide={() => setShowNote(false)} 
+                showHeader={false}
+                message={confirmPopupMsg} 
+                icon="pi pi-exclamation-triangle" 
+                accept={() => {setMasterCapture(true);handleAddMore('capture')}} />
       <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
