@@ -23,6 +23,7 @@ exports.loadUserInfo = async (req, res) => {
 			additionalrole: userData.addroles,
 			firstname: userData.firstname,
 			lastname: userData.lastname,
+			createdon: userData.createdon,
 			role: userData.defaultrole,
 			userimage: userData.profileimage,
 			taskwflow: configpath.strictTaskWorkflow,

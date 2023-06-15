@@ -26,6 +26,15 @@ const AvoModal = ({
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
       { btnTxt: "Update", autoFocus: false, btnType: null, key: "save"},
     ],
+    Execute: [
+      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
+      { btnTxt: "Execute", autoFocus: false, btnType: null, key: "save"},
+
+    ],
+    Schedule: [
+      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
+      { btnTxt: "Schedule", autoFocus: false, btnType: null, key: "save"},
+    ],
   };
   const footerContent = footerValues[footerType]?.map((el) => (
     <div>

@@ -1,12 +1,15 @@
 .compare__object__note {
   .p-dialog-header-icons {
-    right: 2% !important;
+    right: 2%!important;
+    position: relative;
+    top: 16%;
   }
 
   .p-dialog-header {
     height: 3rem !important;
     background: #E2E2ED !important;
     border-top-right-radius: 4px;
+    padding: 0.6rem 0!important;
 
   }
 
@@ -103,7 +106,7 @@
 
 .btn-capture-single {
   background: #605BFF;
-  border-radius: 10px;
+  border-radius: 6px;
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 600;
@@ -191,6 +194,7 @@
   font-size: 14px;
   padding: 0 0.8rem;
   top: 1rem;
+  cursor: pointer;
 }
 
 .upgrade_auto {
@@ -203,6 +207,7 @@
   font-size: 14px;
   padding: 0 0.8rem;
   top: 1rem;
+  cursor: pointer;
 }
 
 
@@ -274,7 +279,7 @@
 
         .btn-capture {
           background: #605BFF;
-          border-radius: 10px;
+          border-radius: 6px;
           font-family: 'Open Sans';
           font-style: normal;
           font-weight: 600;
@@ -333,33 +338,36 @@
 
 .insprint__block {
   border-right: 1px solid #E2E2ED;
+  cursor: pointer;
 
   .insprint__text {
     position: relative;
-    top: 2rem;
+    top: 0rem;
     left: 2rem;
-    font-size: 14px;
+    font-size: 16px;
     font-family: 'Open sans';
   }
 
   .info__btn {
-    height: 9%;
-    position: relative;
-    left: 95%;
-    top: 13%;
     cursor: pointer;
+    height: 11%;
+    width: 5%;
+    left: 5%;
+    position: relative;
+    bottom: 21%;
   }
 
 }
 
 .upgrade__block {
   border-right: 1px solid #E2E2ED;
+  cursor: pointer;
 
   .insprint__text {
     position: relative;
-    top: 2rem;
-    left: 2rem;
-    font-size: 14px;
+    top: 0rem;
+    left: 4rem;
+    font-size: 16px;
     font-family: "Open sans";
   }
 
@@ -368,21 +376,24 @@
   }
 
   .info__btn {
-    height: 9%;
-    position: relative;
-    left: 96%;
-    top: 13%;
+    bottom: 21%;
     cursor: pointer;
+    height: 11%;
+    left: 4%;
+    position: relative;
+    width: 4%;
   }
 }
 
 .imp_exp__block {
+  cursor: pointer;
   .insprint__text {
     position: relative;
     top: 2rem;
     right: 1rem;
     font-size: 14px;
     font-family: "Open sans";
+    cursor: pointer;
   }
 
   .insprint_auto {
@@ -396,7 +407,7 @@
     padding: 0 0.8rem;
     top: 1rem;
     right: 0.65rem;
-    ;
+    cursor: pointer;
   }
 
   .import__block {
@@ -404,12 +415,14 @@
     padding: 1.5rem 0rem;
     position: relative;
     bottom: 2rem;
+    cursor: pointer;
   }
 
   .export__block {
     display: flex;
     position: relative;
     bottom: 2rem;
+    cursor: pointer;
   }
 
   .add_obj {
@@ -425,13 +438,15 @@
 
 .utility__block {
   border-right: 1px solid #E2E2ED;
+  cursor: pointer;
 
   .insprint__text {
     position: relative;
-    top: 2rem;
+    top: 0rem;
     right: 1rem;
-    font-size: 14px;
+    font-size: 16px;
     font-family: "Open sans";
+    cursor: pointer;
   }
 
   .insprint_auto {
@@ -445,19 +460,57 @@
     padding: 0 0.8rem;
     top: 1rem;
     right: 0.65rem;
-    ;
+    cursor: pointer;
   }
 
+  .info__btn {
+    cursor: pointer;
+    height: 11%;
+    left: 23%;
+    position: relative;
+    bottom: 22%;
+    width: 9%;
+  }
+}
+
+.createManual__block{
   .create__block {
     right: 1.45rem;
   }
 
-  .info__btn {
-    height: 9%;
+  border-right: 1px solid #E2E2ED;
+  cursor: pointer;
+
+  .insprint__text {
     position: relative;
-    left: 91%;
-    top: 13%;
+    top: 0rem;
+    right: 1rem;
+    font-size: 16px;
+    font-family: "Open sans";
     cursor: pointer;
+  }
+
+  .insprint_auto {
+    float: left;
+    padding-right: 2rem;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+    right: 0.65rem;
+    cursor: pointer;
+  }
+
+  .info__btn {
+    bottom: 22%;
+    cursor: pointer;
+    height: 11%;
+    left: 9%;
+    position: relative;
+    width: 8%;
   }
 }
 
@@ -466,7 +519,7 @@
   width: 32%;
   position: absolute;
   z-index: 1;
-  background-color: #030229;
+  background-color: #495057;
   border-radius: 8px;
   padding: 0.8rem 0.8rem;
   color: white;
@@ -479,3 +532,31 @@
 }
 
 
+.footer__btn{
+  display: flex;
+
+}
+
+.screenshot_pop{
+  width: 500px!important;
+  .p-dialog-header {
+    background: #E2E2ED !important;
+    height: 3rem !important;
+  }
+  .p-dialog-header-icons{
+  position: relative;
+  bottom: 1rem;
+  }
+}
+.screenshot_pop__content{
+  overflow: auto;
+}
+.screenshot_img{
+  width: 100%;
+}
+
+// .header__popup{
+//   .p-dialog-header {
+//     background: #E2E2ED !important;
+//   }
+// }

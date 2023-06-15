@@ -38,7 +38,7 @@ const Analysis = (props) => {
             </div>
             <Card header={header} className='surface-card shadow-3 m-3 analysis_big_card'></Card>
 
-            <div className='flex flex-row'>
+            {/* <div className='flex flex-row'>
                 <div className='tiles_container'>
                     <img src="static/imgs/blue_tile.png" className='avo_tile'></img>
                     <div className='first_tile_text'>  
@@ -59,9 +59,8 @@ const Analysis = (props) => {
                             <Button className='btn' size="small" rounded text raised>Go to Learning Center</Button>
                         </a>   
                     </div>
-                </div>
-                
-            </div>
+                </div>  
+            </div> */}
         </div>
 
     </div>

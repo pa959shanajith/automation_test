@@ -23,10 +23,16 @@ const Login = () => {
     const toast = useRef(null);
 
     const toastError = (erroMessage) => {
-        if(erroMessage.CONTENT){
-            toast.current.show({ severity: erroMessage.VARIANT, summary: erroMessage.VARIANT, detail: erroMessage.CONTENT, life: 3000 });
+        if (erroMessage.CONTENT) {
+            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
         }
-        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 3000 });
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
+    }
+    const toastSuccess = (erroMessage) => {
+        if (erroMessage.CONTENT) {
+            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
+        }
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
     }
 
     const forgotPasswordLinkHandler = () => {
@@ -40,6 +46,7 @@ const Login = () => {
     const backButtonHandler = () => {
         setShowloginScreen(true);
         setSingleSignOnScreen(false);
+        setShowForgotPasswordScreen(false);
     }
     const handleUsername = event => {
         setUsername(event.target.value);
@@ -136,17 +143,17 @@ const Login = () => {
                         toastError(MSG.LOGIN.DUP_ACC_EXISTS);
                     }
                     else if (data === 'success' || data === "invalid_username_password" || data === "fail") {
-                        toastError(MSG.LOGIN.SUCC_REC_MAIL);
+                        toastSuccess(MSG.LOGIN.SUCC_REC_MAIL);
                     }
                     else if (data === "userLocked") {
                         toastError(MSG.LOGIN.ERR_USER_LOCKED);
                     }
                     else {
-                        console.log(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                        toastError(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     };
                 })
                 .catch(err => {
-                    console.error("Error", err)
+                    console.log("Error", err)
                 });
         }
     }
@@ -175,7 +182,6 @@ const Login = () => {
             <>
                 {showloginScreen &&
                     <>
-                        <h2>Avo Assure-Login</h2>
                         <form onSubmit={loginSubmitHandler}>
                             <div className='flex flex-column'>
                                 <label className='text-left' htmlFor="username">Username</label>
@@ -188,12 +194,13 @@ const Login = () => {
                                         onChange={handleUsername}
                                         placeholder='Enter your username'
                                         type="text"
-                                        required
+                                        
                                     />
                                 </div>
                             </div>
 
                             <div className='flex flex-column'>
+                                <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
                                 <label className='text-left' htmlFor="password">Password</label>
                                 <div className="p-input-icon-left mb-5 mt-2">
                                     <i className='pi pi-lock' />
@@ -204,10 +211,9 @@ const Login = () => {
                                         onChange={handlePassword}
                                         placeholder='Password'
                                         type={showPassword ? "type" : "password"}
-                                        required
                                     />
                                     {password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={() => { setShowPassword(!showPassword) }}>
-                                        <i className={`${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
+                                        <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
                                     </div>
                                     }
                                 </div>
@@ -216,37 +222,36 @@ const Login = () => {
                             <div className='link forgot_password mb-5'>
                                 <a onClick={forgotPasswordLinkHandler} >Forgot Username & Password </a>
                             </div>
-                            <div className='login_btn mb-5'>
-                                <Button id="login" label='Login' disabled={disableLoginButton} text raised></Button>
+                            <div className='mb-5'>
+                                <Button id="login" label='Login' size="small" disabled={disableLoginButton} ></Button>
                             </div>
                             <div className='link mb-3'>
                                 <a onClick={singleSignOnHandler} >Use Single Sign-On </a>
                             </div>
-                            <p>Don't have an account?<span className='link'><a tooltip='Contact your admin for creating an account' tooltipOptions={{ position: 'bottom' }} >Create one</a> </span> </p>
+                            <h5>Don't have an account? Contact your admin to create account.</h5>
                         </form>
                     </>}
 
                 {showForgotPasswordScreen && <>
                     <h2>Forgot Username or Password</h2>
-                    <span>Provide your registered e-mail to send a link to reset your Password or to know Username  </span>
+                    <span>Provide your registered e-mail to send a link to reset your Password or to retrieve Username  </span>
                     <form onSubmit={forgotUsernameOrPasswordSubmitHandler}>
                         <div className='flex flex-column'>
-                            <label className='text-left' htmlFor="username">Email</label>
+                            <label className='text-left' htmlFor="email">Email</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
                                 <InputText
-                                    type="email"
-                                    id="username"
+                                    id="email"
                                     value={email}
                                     onChange={emailHandler}
                                     placeholder='Enter your email'
                                     className='forgetPassword_user_input'
-                                    required
                                 />
                             </div>
                         </div>
                         <div className='login_btn mb-5'>
-                            <Button id="submit" label='Submit' disabled={!email} text raised></Button>
+                            <Button id="back" label='Back' size="small" onClick={backButtonHandler} disabled={false} text ></Button>
+                            <Button id="submit" label='Submit' size="small" disabled={!email} ></Button>
                         </div>
                     </form>
                 </>}
@@ -255,17 +260,15 @@ const Login = () => {
                     <h2>Avo Assure - login with SAML SSO</h2>
                     <form >
                         <div className='flex flex-column'>
-                            <label className='text-left' htmlFor="username">Email</label>
+                            <label className='text-left' htmlFor="username">Username</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
-                                <InputText id="username" className='forgetPassword_user_input' placeholder='Email' type="email" required />
+                                <InputText id="username" className='forgetPassword_user_input' placeholder='Email' />
                             </div>
                         </div>
                         <div className='login_btn mb-5'>
-                            <Button id="submit" label='Submit' disabled={false} text raised></Button>
-                        </div>
-                        <div className='mb-5'>
-                            <Button id="back" label='Back' onClick={backButtonHandler} disabled={false} text raised></Button>
+                            <Button id="back" label='Back' size="small" onClick={backButtonHandler} disabled={false} text ></Button>
+                            <Button id="submit" label='Submit' size="small" disabled={false} ></Button>
                         </div>
                     </form>
                 </>}

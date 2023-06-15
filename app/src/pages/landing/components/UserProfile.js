@@ -1,6 +1,7 @@
 import React, { useState, useRef,useEffect} from "react";
 import { Avatar } from 'primereact/avatar';
 import { TieredMenu } from 'primereact/tieredmenu';
+import { Tooltip } from "primereact/tooltip";
 import { ConfirmDialog} from 'primereact/confirmdialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
@@ -48,10 +49,14 @@ const UserDemo = (props) => {
                                 <div className="flex flex-column">
                                     <span className="font-bold c">{userInfo.username}</span>
                                     <span className="text-sm c">{userInfo.rolename}</span>
-                                    <span className="text-sm c">{userInfo.email_id}</span>
+                                    <Tooltip target=".tooltipEmailId" position="bottom" content={userInfo.email_id}/>
+                                    <span className="text-sm max-w-12rem tooltipEmailId">{userInfo.email_id}</span>
                                 </div>
                             </div>)
                             }
+        },
+        {
+            separator: true
         },
         {
             label: 'Edit Profile',
@@ -81,7 +86,7 @@ const UserDemo = (props) => {
             ]
         },
         {
-            label: 'Notification Setting',
+            label: 'Notification Settings',
             icon: 'pi pi-fw pi-bell',
         },
         {
@@ -114,14 +119,14 @@ const UserDemo = (props) => {
             { showUserMenu && <TieredMenu className='custom-tieredmenu' model={userMenuItems} />}
             { showEditProfileDialog && <EditProfile showDialogBox = {showEditProfileDialog} setShowDialogBox= {setShowEditProfileDialog}/>}
             { showChangePasswordDialog && < ChangePassword showDialogBox = {showChangePasswordDialog} setShowDialogBox= {setShowChangePasswordDialog}/>}
-            <AvoConfirmDialog className="Logout_modal"
+            <AvoConfirmDialog 
                 visible={logoutClicked}
                 onHide={setLogoutClicked} 
                 showHeader={false}
                 message="Are you sure you want to logout?" 
                 icon="pi pi-exclamation-triangle" 
                 accept={confirmLogout} />
-            <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800 "
+            <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800 profile"
                 image={userInfo.userimage ? userInfo.userimage : initials} 
                 label={ !userInfo.userimage ? initials :''}
                 onClick={handleUserMenu} size='small' shape="circle"/>

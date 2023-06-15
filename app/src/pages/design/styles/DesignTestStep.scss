@@ -33,17 +33,12 @@
     }
 }
 
-.debug__object__modal{
+.debug__object__modal {
     .p-dialog-header {
         background: #E2E2ED !important;
-        border-top-right-radius: 4px;
-        padding: 0.3rem 0 !important;
-        height: 4rem !important;
-    }
-    .p-dialog-content{
-        padding: 1rem;
     }
 }
+
 .toggle__tab {
     margin-top: 2rem !important;
 
@@ -84,9 +79,9 @@
     margin-left: auto;
     margin-right: auto;
     width: 16vw;
-  }
+}
 
-  .not_captured_message {
+.not_captured_message {
     bottom: 1rem;
     display: flex;
     align-content: center;
@@ -94,9 +89,9 @@
     justify-content: center;
     position: relative;
     right: 1rem;
-  }
+}
 
-  .btn-design-single {
+.btn-design-single {
     background: #605BFF;
     border-radius: 10px;
     font-family: 'Open Sans';
@@ -109,9 +104,9 @@
     border: none;
     left: 9rem;
     padding: 0.5rem 0.5rem;
-  }
+}
 
-  .debug__opt {
+.debug__opt {
     padding: 0 1.2rem;
     position: relative;
     top: 3%;
@@ -129,14 +124,14 @@
     }
 }
 
-.empty__msg{
+.empty__msg {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     align-items: center;
 }
 
-.empty__msg1{
+.empty__msg1 {
     width: 39%;
     margin-left: 16rem;
 }
@@ -150,7 +145,7 @@
     width: 50%;
 }
 
-.design__fst__card{
+.design__fst__card {
     border: 1px solid lightgray;
     height: 7rem;
     border-radius: 3px;
@@ -159,36 +154,39 @@
 
 }
 
-.design__snd__card{
+.design__snd__card {
     border: 1px solid lightgray;
     height: 13.5rem;
     border-radius: 3px;
     width: 100%;
     margin-top: 0.5rem;
 }
-.add__depend__test{
+
+.add__depend__test {
     margin-left: 0.5rem;
     width: 15rem;
     margin-top: 1rem;
 }
 
-.add__test__case{
+.add__test__case {
     display: flex;
     flex-direction: row;
     gap: 1rem;
 }
 
-.debug__btn{
+.debug__btn {
     display: flex;
     flex-direction: row;
     gap: 1rem;
 }
-.add__btn{
+
+.add__btn {
     width: 6rem;
     height: 2.5rem;
     margin-top: 1rem;
 }
-.design__thr__card{
+
+.design__thr__card {
     display: flex;
     flex-direction: row;
     gap: 7rem;
@@ -196,28 +194,16 @@
     height: 2rem;
 }
 
-.added__card{
+.text__added__step {
+    background: rgba(96, 91, 255, .2);
     border-radius: 3px;
-    background: rgba(96, 91, 255, 0.2);
-    font-family: 'Open Sans';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-color: #605BFF;
-margin: 1rem;
-height: 2rem;
-}
-.text__added__step{
-    top: 0.4rem;
+    color: #605bff;
+    font-family: Open Sans;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    height: 2rem;
+    margin: 0.5rem;
     position: relative;
-    left: 0.5rem;
-    border-radius: 3px;
-    background: rgba(96, 91, 255, 0.2);
-    font-family: 'Open Sans';
-font-style: normal;
-font-weight: 400;
-font-size: 14px;
-color: #605BFF;
-margin: 1rem;
-height: 2rem;
+    padding: 0.5rem;
 }

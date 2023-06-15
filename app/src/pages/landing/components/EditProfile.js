@@ -104,6 +104,7 @@ const EditProfile = (props) => {
             email: email,
             userimage: base64String,
             role: userInfo.role,
+            createdon:userInfo.createdon,
             userConfig: true,//hardcoded only for inhouse
             type: 'inhouse' //hardcoded only for inhouse
         };
@@ -179,7 +180,7 @@ const EditProfile = (props) => {
         <>
             <div className='surface-card m-6'>
                 {/* <Toast ref={toastWrapperRef} position="bottom-center" /> */}
-                <Dialog header="Basic Information" className="editProfile_dialog" visible={showDialog} style={{ width: '47vw' }} onHide={resetFields} footer={editProfileFooter}>
+                <Dialog header="Profile Information" className="editProfile_dialog" visible={showDialog} style={{ width: '33vw' }} onHide={resetFields} footer={editProfileFooter}>
                     <div className='pt-3'>
                         <div className='profileImage'>
                             <Avatar image={base64String}
@@ -201,13 +202,23 @@ const EditProfile = (props) => {
                         <div className='input_field'>
                             {/* Name Input Field */}
                             <div className='pt-2'>
-                                <label htmlFor="name">Name</label>
+                                <label htmlFor="name">First Name</label>
                                 <InputText
-                                    style={{ width: '30vw' }}
+                                    style={{ width: '30vw',height:'5vh' }}
                                     // id="name"
                                     value={firstName}
                                     type="text"
                                     onChange={(event) => { setFirstName(event.target.value) }}
+                                />
+                            </div>
+                            <div className='pt-2'>
+                                <label htmlFor="name">Second Name</label>
+                                <InputText
+                                    style={{ width: '30vw',height:'5vh' }}
+                                    // id="name"
+                                    value={lastName}
+                                    type="text"
+                                    onChange={(event) => { setLastName(event.target.value) }}
                                 />
                             </div>
 
@@ -215,7 +226,7 @@ const EditProfile = (props) => {
                             <div className='pt-2'>
                                 <label htmlFor="Email">Email </label>
                                 <InputText
-                                    style={{ width: '30vw' }}
+                                    style={{ width: '30vw',height:'5vh' }}
                                     // id="email"
                                     value={email}
                                     type="email"
@@ -226,23 +237,25 @@ const EditProfile = (props) => {
                             <div className='pt-2'>
                                 <label htmlFor="Primary Role">Primary Role </label>
                                 <InputText
-                                    style={{ width: '30vw' }}
+                                    style={{ width: '30vw',height:'5vh' }}
                                     id="primary Role"
                                     value={userInfo.rolename}
                                     type="text"
                                     readOnly
+                                    disable={true}
                                 />
                             </div>
 
-                            {/* PrimaryRole Input Field */}
+                            {/* RegisteredDate Input Field */}
                             <div className='pt-2'>
                                 <label htmlFor="Registered Date">Registered Date </label>
                                 <InputText
-                                    style={{ width: '30vw' }}
+                                    style={{ width: '30vw',height:'5vh' }}
                                     id="Registered Date"
-                                    value={userInfo.rolename}
+                                    value={userInfo.createdon.slice(5,16)}
                                     type="text"
                                     readOnly
+                                    disable={true}
                                 />
                             </div>
                         </div>
