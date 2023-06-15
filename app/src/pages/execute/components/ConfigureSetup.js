@@ -38,9 +38,12 @@ const ConfigureSetup = ({
   avodropdown,
   setAvodropdown,
   mode,
-  setMode
+  setMode,
+  selectedNodeKeys,
+  setSelectedNodeKeys,
+  dotNotExe,
+  setDotNotExe
 }) => {
-  const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
   const [useDefault, setUseDefault] = useState("");
@@ -109,6 +112,11 @@ const ConfigureSetup = ({
     });
     setConfigTable(mainTree);
   }, [configData?.configureData, modules, dataparam, condition, accessibility]);
+
+  useEffect(() => {
+    console.log(configData?.configureData);
+    console.log(dotNotExe);
+  }, [dotNotExe]);
 
   useEffect(() => {
     dispatch(checkRequired({ configName: configTxt }));

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment,useRef } from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 import { TabMenu } from "primereact/tabmenu";
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from "uuid";
 import { Card } from "primereact/card";
 import "../styles/ConfigurePage.scss";
 import { Panel } from "primereact/panel";
@@ -19,8 +19,17 @@ import { Divider } from "primereact/divider";
 import { SelectButton } from "primereact/selectbutton";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputTextarea } from "primereact/inputtextarea";
-import { Toast } from 'primereact/toast';
-import {fetchConfigureList,getPools,getICE_list,getProjectList,ExecuteTestSuite_ICE,execAutomation,readTestSuite_ICE,deleteConfigureKey} from '../api';
+import { Toast } from "primereact/toast";
+import {
+  fetchConfigureList,
+  getPools,
+  getICE_list,
+  getProjectList,
+  ExecuteTestSuite_ICE,
+  execAutomation,
+  readTestSuite_ICE,
+  deleteConfigureKey,
+} from "../api";
 // import { Messages as MSG,VARIANT} from '../../global';
 import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
@@ -35,14 +44,13 @@ import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { useDispatch, useSelector } from "react-redux";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
-import DropDownList from '../../global/components/DropDownList';
-import {ResetSession,setMsg, Messages as MSG,VARIANT} from '../../global';
+import DropDownList from "../../global/components/DropDownList";
+import { ResetSession, setMsg, Messages as MSG, VARIANT } from "../../global";
 // import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { browsers, selections } from "../../utility/mockData";
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
-
-const ConfigurePage = ({setShowConfirmPop}) => {
+const ConfigurePage = ({ setShowConfirmPop }) => {
   const [visible, setVisible] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
@@ -70,51 +78,52 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   const toast = useRef(null);
   const [projectData1, setProjectData1] = useState([]);
   const [projectData, setProjectData] = useState([]);
-  const url = window.location.href.slice(0, -7)+'execAutomation';
-  const [projectName, setProjectName] = useState('');
+  const url = window.location.href.slice(0, -7) + "execAutomation";
+  const [projectName, setProjectName] = useState("");
   const [projectId, setprojectId] = useState("");
   // const current_task = useSelector(state=>state.plugin.PN);
-  const [cycleName, setCycleName] = useState('');
-  const [selectedProject, setSelectedProject] = useState('');
+  const [cycleName, setCycleName] = useState("");
+  const [selectedProject, setSelectedProject] = useState("");
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [modules, setModules] = useState("normalExecution");
+  const [dotNotExe, setDotNotExe] = useState({});
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
-  const [allocateICE,setAllocateICE] = useState(false);
+  const [allocateICE, setAllocateICE] = useState(false);
   const [eachData, setEachData] = useState([]);
   const [currentTask, setCurrentTask] = useState({});
-  const [appType, setAppType] = useState('');
-  const [moduleInfo,setModuleInfo] = useState([]);
-  const [execAction,setExecAction] = useState("serial"); 
-  const [execEnv,setExecEnv] = useState("default");
+  const [appType, setAppType] = useState("");
+  const [moduleInfo, setModuleInfo] = useState([]);
+  const [execAction, setExecAction] = useState("serial");
+  const [execEnv, setExecEnv] = useState("default");
   const [accessibilityParameters, setAccessibilityParameters] = useState([]);
-  const [browserTypeExe,setBrowserTypeExe] = useState([]);
-  const [integration,setIntegration] = useState({
-    alm: {url:"",username:"",password:""}, 
-    qtest: {url:"",username:"",password:"",qteststeps:""}, 
-    zephyr: {url:"",username:"",password:""}
+  const [browserTypeExe, setBrowserTypeExe] = useState([]);
+  const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
+  const [integration, setIntegration] = useState({
+    alm: { url: "", username: "", password: "" },
+    qtest: { url: "", username: "", password: "", qteststeps: "" },
+    zephyr: { url: "", username: "", password: "" },
   });
   const [proceedExecution, setProceedExecution] = useState(false);
   // const [visible, setVisible] = useState(false);
 
   // const dispatch = useDispatch();
   //
-  const [smartMode,setSmartMode] = useState('normal')
-  const [selectedICE,setSelectedICE] = useState("")
+  const [smartMode, setSmartMode] = useState("normal");
+  const [selectedICE, setSelectedICE] = useState("");
   const [deleteItem, setDeleteItem] = useState(null);
-
 
   // const current_task = useSelector(state=>state.plugin.CT)
   // const [loading,setLoading] = useState(false)
-  const [poolList,setPoolList] = useState({})
-  const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([])
-  const [iceStatus,setIceStatus] = useState([])
-  const [poolType,setPoolType] = useState("unallocated");
+  const [poolList, setPoolList] = useState({});
+  const [chooseICEPoolOptions, setChooseICEPoolOptions] = useState([]);
+  const [iceStatus, setIceStatus] = useState([]);
+  const [poolType, setPoolType] = useState("unallocated");
   const [ExeScreen, setExeScreen] = useState(true);
-  const [inputErrorBorder,setInputErrorBorder] = useState(false);
-  const [iceNameIdMap,setIceNameIdMap] = useState({});
-  const [availableICE,setAvailableICE] = useState([])
+  const [inputErrorBorder, setInputErrorBorder] = useState(false);
+  const [iceNameIdMap, setIceNameIdMap] = useState({});
+  const [availableICE, setAvailableICE] = useState([]);
   const [xpanded, setXpanded] = useState([]);
   const [dataparam, setDataparam] = useState({});
   const [condition, setCondition] = useState({});
@@ -124,28 +133,29 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
 
-  const [currentKey,setCurrentKey] = useState('');
-  const [currentSelectedItem,setCurrentSelectedItem] = useState('');
-  const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
+  const [currentKey, setCurrentKey] = useState("");
+  const [currentSelectedItem, setCurrentSelectedItem] = useState("");
+  const [executionTypeInRequest, setExecutionTypeInRequest] =
+    useState("asynchronous");
   const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
   const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
   const [logoutClicked, setLogoutClicked] = useState(false);
-  const [profileTxt, setProfileTxt]=useState("");
+  const [profileTxt, setProfileTxt] = useState("");
 
-  const displayError = (error) =>{
+  const displayError = (error) => {
     // setLoading(false)
-    setMsg(error)
-}
+    setMsg(error);
+  };
   const [displayBasic2, setDisplayBasic2] = useState(false);
   const [selectedItem, setSelectedItem] = useState({});
- const [position, setPosition] = useState('center');
+  const [position, setPosition] = useState("center");
 
   const dialogFuncMap = {
     visible_execute: setVisible_execute,
   };
 
   const [footerType, setFooterType] = useState("CancelNext");
-    const [setupBtn, setSetupBtn] = useState(null);
+  const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const items = [
     { label: "Configurations" },
@@ -156,7 +166,6 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   const getConfigPage = useSelector((store) => store);
   const dispatch = useDispatch();
 
-  console.log(getConfigPage);
   useEffect(() => {
     dispatch(getProjects());
     dispatch(getAvoAgentAndAvoGrid());
@@ -215,7 +224,7 @@ const ConfigurePage = ({setShowConfirmPop}) => {
       setEachData(tableData);
     }
     // setLoading(false);
-}
+  };
 
   const parseLogicExecute = (
     eachData,
@@ -234,15 +243,15 @@ const ConfigurePage = ({setShowConfirmPop}) => {
       var cycid = testsuiteDetails.cycleid;
       var projectid = testsuiteDetails.projectidts;
 
-      for(var j =0 ; j<eachData[i].executestatus.length; j++){
-          if(eachData[i].executestatus[j]===1){
+      for (var j = 0; j < eachData[i].executestatus.length; j++) {
+        if (eachData[i].executestatus[j] === 1) {
           selectedRowData.push({
             condition: eachData[i].condition[j],
             dataparam: [eachData[i].dataparam[j].trim()],
             scenarioName: eachData[i].scenarionames[j],
             scenarioId: eachData[i].scenarioids[j],
             scenariodescription: undefined,
-                  accessibilityParameters: accessibilityParameters
+            accessibilityParameters: accessibilityParameters,
           });
         }
       }
@@ -331,11 +340,11 @@ const ConfigurePage = ({setShowConfirmPop}) => {
   }, []);
 
   const fetchData = async () => {
-  setSmartMode('normal');
+    setSmartMode("normal");
     setSelectedICE("");
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
     var projId = "642d4a250934a8c996e598a0";
-var dataforApi = {poolid:"",projectids: [projId]}
+    var dataforApi = { poolid: "", projectids: [projId] };
     // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
     if (data.error) {
@@ -357,32 +366,29 @@ var dataforApi = {poolid:"",projectids: [projId]}
   };
 
   const populateICElist = (arr, unallocated, iceStatusdata) => {
-    console.log("arr", arr);
-    console.log("unallocated", unallocated);
-    console.log("iceStatusdata", iceStatusdata);
     var ice = [];
     var iceStatusValue = {};
     if (iceStatusdata !== undefined) iceStatusValue = iceStatusdata.ice_ids;
     else if (iceStatusdata === undefined) iceStatusValue = iceStatus.ice_ids;
     const statusUpdate = (ice) => {
-    var color = '#fdc010' ;
-    var status = 'Offline';
-    if(ice.connected){
-      color = '#95c353';
-      status = 'Online'
+      var color = "#fdc010";
+      var status = "Offline";
+      if (ice.connected) {
+        color = "#95c353";
+        status = "Online";
       }
-    if(ice.mode){
-      color = 'red';
-      status = 'DND mode'
+      if (ice.mode) {
+        color = "red";
+        status = "DND mode";
       }
-    return {color,status}
-  }
-  if(unallocated){
-    setPoolType("unallocated")
-    if(arr===undefined) iceStatusdata = iceStatus;
-    arr = Object.entries(iceStatusdata.unallocatedICE)
-    arr.forEach((e)=>{
-      var res = statusUpdate(e[1])
+      return { color, status };
+    };
+    if (unallocated) {
+      setPoolType("unallocated");
+      if (arr === undefined) iceStatusdata = iceStatus;
+      arr = Object.entries(iceStatusdata.unallocatedICE);
+      arr.forEach((e) => {
+        var res = statusUpdate(e[1]);
         e[1].color = res.color;
         e[1].statusCode = res.status;
         ice.push(e[1]);
@@ -408,14 +414,13 @@ var dataforApi = {poolid:"",projectids: [projId]}
       });
       setIceNameIdMap(iceNameIdMapData);
     }
-  ice.sort((a,b) => a.icename.localeCompare(b.icename))
+    ice.sort((a, b) => a.icename.localeCompare(b.icename));
     setAvailableICE(ice);
-  }
-  
+  };
 
   const handleWeekInputChange = (event) => {
     setMonthlyRecurrenceWeekValue(event.target.value);
-  }
+  };
   // const toggleDropdown = () => {
   //   setIsOpen(!isOpen);
   // };
@@ -437,20 +442,19 @@ var dataforApi = {poolid:"",projectids: [projId]}
     setLogoutClicked(true);
     let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
     setProfileTxt(text);
-  //   confirmPopup({
-  //     target: event.currentTarget,
-  //     message: (
-  //      <p>
-  //         Are you sure you want to delete <b>{item.configurename}</b> Execution Profile?
-  //       </p>
-  //     ),
-  //     icon: 'pi pi-exclamation-triangle',
-  //   });
-  // };
-//   const onClickDeleteDevOpsConfig = (item, key) => {
-//     setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{item.configurename}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
-
-}
+    //   confirmPopup({
+    //     target: event.currentTarget,
+    //     message: (
+    //      <p>
+    //         Are you sure you want to delete <b>{item.configurename}</b> Execution Profile?
+    //       </p>
+    //     ),
+    //     icon: 'pi pi-exclamation-triangle',
+    //   });
+    // };
+    //   const onClickDeleteDevOpsConfig = (item, key) => {
+    //     setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{item.configurename}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
+  };
 
   const copyKeyUrlFunc = (id) => {
     const data = document.getElementById(id).title;
@@ -463,12 +467,12 @@ var dataforApi = {poolid:"",projectids: [projId]}
     }
     const x = document.getElementById(id);
     x.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     setApiKeyCopyToolTip("Copied!");
     setTimeout(() => {
       setApiKeyCopyToolTip("Click to Copy");
     }, 1500);
-}
+  };
   const copyConfigKey = (title) => {
     if (navigator.clipboard.writeText(title)) {
       setCopyToolTip("Copied!");
@@ -476,7 +480,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
         setCopyToolTip("Click to Copy");
       }, 1500);
     }
-}
+  };
   const tree_CICD = [
     {
       key: "0",
@@ -744,61 +748,71 @@ var dataforApi = {poolid:"",projectids: [projId]}
   const deleteDevOpsConfig = () => {
     // setLoading('Please Wait...');
     setTimeout(async () => {
-        const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
-        console.log(deleteItem.configurekey);
-        if(deletedConfig.error) {
-            if(deletedConfig.error.CONTENT) {
-                setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
-            } else {
-                setMsg(MSG.CUSTOM("Error While Deleting Execute Configuration",VARIANT.ERROR));
-            }
-        }else {
-            const configurationList = await fetchConfigureList({
-                'projectid': selectedProject
-            });
-            if(configurationList.error) {
-                if(configurationList.error.CONTENT) {
-                    setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
-                } else {
-                    setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
-                }
-            }else {
-                const integrationData = configurationList.map((item,idx)=>{
-                    setIntegration(item.executionRequest.integration)
-                })
-                setConfigList(configurationList);
-            }
-            setMsg(MSG.CUSTOM("Execution Profile deleted successfully.",VARIANT.SUCCESS));
+      const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
+      if (deletedConfig.error) {
+        if (deletedConfig.error.CONTENT) {
+          setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
+        } else {
+          setMsg(
+            MSG.CUSTOM(
+              "Error While Deleting Execute Configuration",
+              VARIANT.ERROR
+            )
+          );
         }
-        // setLoading(false);
+      } else {
+        const configurationList = await fetchConfigureList({
+          projectid: selectedProject,
+        });
+        if (configurationList.error) {
+          if (configurationList.error.CONTENT) {
+            setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
+          } else {
+            setMsg(
+              MSG.CUSTOM(
+                "Error While Fetching Execute Configuration List",
+                VARIANT.ERROR
+              )
+            );
+          }
+        } else {
+          const integrationData = configurationList.map((item, idx) => {
+            setIntegration(item.executionRequest.integration);
+          });
+          setConfigList(configurationList);
+        }
+        setMsg(
+          MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
+        );
+      }
+      // setLoading(false);
     }, 500);
     setShowConfirmPop(false);
-}
+  };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
-    if(Array.isArray(executionData.targetUser)){
-      for(let icename in executionData.targetUser){
+    if (Array.isArray(executionData.targetUser)) {
+      for (let icename in executionData.targetUser) {
         let ice_id = iceNameIdMap[executionData.targetUser[icename]];
-        if(ice_id && ice_id.status){
+        if (ice_id && ice_id.status) {
           setDataExecution(executionData);
           setAllocateICE(false);
           setProceedExecution(true);
         }
       }
-    }else{
+    } else {
       let ice_id = iceNameIdMap[executionData.targetUser];
-      if(ice_id && ice_id.status){
+      if (ice_id && ice_id.status) {
         setDataExecution(executionData);
         setAllocateICE(false);
         setProceedExecution(true);
       }
     }
     ExecuteTestSuite(executionData);
-}
+  };
 
   const ExecuteTestSuite = async (executionData) => {
-       
-    if(executionData === undefined) executionData = dataExecution;
+    if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(
       eachData,
@@ -810,15 +824,21 @@ var dataforApi = {poolid:"",projectids: [projId]}
     );
     if (modul_Info === false) return;
     // setLoading("Sending Execution Request");
-    executionData["source"]="task";
-    executionData["exectionMode"]=execAction;
-    executionData["executionEnv"]=execEnv;
-    executionData["browserType"]=["1"];
-    executionData["integration"]=integration;
-    executionData["batchInfo"]=(currentSelectedItem && currentSelectedItem.executionRequest && currentSelectedItem.executionRequest.batchInfo) ? currentSelectedItem.executionRequest.batchInfo : [];
-    executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
+    executionData["source"] = "task";
+    executionData["exectionMode"] = execAction;
+    executionData["executionEnv"] = execEnv;
+    executionData["browserType"] = ["1"];
+    executionData["integration"] = integration;
+    executionData["batchInfo"] =
+      currentSelectedItem &&
+      currentSelectedItem.executionRequest &&
+      currentSelectedItem.executionRequest.batchInfo
+        ? currentSelectedItem.executionRequest.batchInfo
+        : [];
+    executionData["scenarioFlag"] =
+      currentTask.scenarioFlag == "True" ? true : false;
     ResetSession.start();
-    try{
+    try {
       // setLoading(false);
       const data = await ExecuteTestSuite_ICE(executionData);
       if (data.errorapi) {
@@ -840,10 +860,10 @@ var dataforApi = {poolid:"",projectids: [projId]}
       setModuleInfo([]);
       setExecAction("serial");
       setExecEnv("default");
-    }catch(error) {
+    } catch (error) {
       // setLoading(false);
       ResetSession.end();
-        displayError(MSG.EXECUTE.ERR_EXECUTE)
+      displayError(MSG.EXECUTE.ERR_EXECUTE);
       setBrowserTypeExe([]);
       setModuleInfo([]);
       setExecAction("serial");
@@ -858,7 +878,6 @@ var dataforApi = {poolid:"",projectids: [projId]}
       });
       setConfigList(
         configurationList.map((item, idx) => {
-          console.log("set is", item.configurekey);
           return {
             sno: idx + 1,
 
@@ -875,13 +894,13 @@ var dataforApi = {poolid:"",projectids: [projId]}
                     width: "8.5rem",
                     fontFamily: "Open Sans",
                     fontStyle: "normal",
-                      marginLeft:'0.5rem',
-                      height:"2.5rem"
+                    marginLeft: "0.5rem",
+                    height: "2.5rem",
                   }}
                   onClick={() => {
                     dispatch(getPoolsexe());
                     dispatch(getICE());
-                    setVisible_execute(true)
+                    setVisible_execute(true);
                     setCurrentKey(item.configurekey);
                     setCurrentSelectedItem(item);
                   }}
@@ -997,7 +1016,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
                     width: "6rem",
                     fontFamily: "Open Sans",
                     fontStyle: "normal",
-                      height:'2.5rem'
+                    height: "2.5rem",
                   }}
                   onClick={() => setVisible_schedule(true)}
                   size="small"
@@ -1035,14 +1054,12 @@ var dataforApi = {poolid:"",projectids: [projId]}
                     width: "4.5rem",
                     fontFamily: "Open Sans",
                     fontStyle: "normal",
-                    height:"2.5rem",
-                    
+                    height: "2.5rem",
                   }}
                   size="small"
                   onClick={() => {
                     setVisible_CICD(true);
                     setCurrentKey(item.configurekey);
-                    console.log(item.configurekey);
                   }}
                 >
                   CI/CD
@@ -1084,7 +1101,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
                 <Button
                   icon="pi pi-pencil"
                   className=" pencil_button p-button-edit"
-                  onClick={() => configModal('CancelUpdate', item)}
+                  onClick={() => configModal("CancelUpdate", item)}
                 ></Button>
                 <Button
                   icon="pi pi-trash"
@@ -1104,7 +1121,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
   }, [visible_execute, visible_schedule, visible_CICD, selectedICE]);
 
   const configModal = (getType, getData = null) => {
-    if(getType === 'CancelUpdate'){
+    if (getType === "CancelUpdate") {
       const getAvogrid = [
         ...getConfigData?.avoAgentAndGrid?.avoagents,
         ...getConfigData?.avoAgentAndGrid?.avogrids,
@@ -1117,12 +1134,37 @@ var dataforApi = {poolid:"",projectids: [projId]}
       setUpdateKey(getData.executionRequest.configurekey);
       setAvodropdown({
         ...avodropdown,
-        avogrid: getAvogrid.filter((el) => el.name === getData.executionRequest.avoagents[0])[0],
-        browser: browsers.filter((el) => getData.executionRequest.browserType.includes(el.key))
+        avogrid: getAvogrid.filter(
+          (el) => el.name === getData.executionRequest.avoagents[0]
+        )[0],
+        browser: browsers.filter((el) =>
+          getData.executionRequest.browserType.includes(el.key)
+        ),
       });
-      setMode(getData?.executionRequest?.isHeadless ? selections[1] : selections[0]);
+      setMode(
+        getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
+      );
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
+      setDotNotExe(getData);
+      setSelectedNodeKeys({
+        "1": {
+            "checked": true,
+            "partialChecked": false
+        },
+        "1-0": {
+            "checked": true,
+            "partialChecked": false
+        },
+        "1-1": {
+            "checked": true,
+            "partialChecked": false
+        },
+        "1-2": {
+            "checked": true,
+            "partialChecked": false
+        }
+    });
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -1154,6 +1196,24 @@ var dataforApi = {poolid:"",projectids: [projId]}
         },
         {}
       );
+      const getSelected = Object.keys(selectedNodeKeys);
+      const parent = getSelected.filter((el) => el.length === 1);
+      const child = getSelected
+        .filter((el) => el.length > 1)
+        .map((e) => ({ [e.charAt(0)]: e.charAt(2) }));
+      const selectedKeys = {};
+      const selectedArr = parent.map((element) => child.map((el) => el[element] ? el[element] : false).filter((i) => i !== false))
+      // parent.map((item, index) => ({ [item]: selectedArr[index] }))
+      parent.forEach((item, index) => {
+        selectedKeys[item] = selectedArr[index]
+      })
+      let getCurrent = {};
+      xpanded?.forEach((val) => {
+        let numberArray = [];
+        selectedKeys[Number(val.key)].forEach( ele => numberArray.push(+ele));
+        getCurrent[val.suiteid] =  numberArray
+      });
+      
       const dataObj = {
         param: "updateTestSuite_ICE",
         batchDetails: xpanded?.map((el) => ({
@@ -1187,7 +1247,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
         configurekey: getBtnType === "Update" ? updateKey : uuid(),
         isHeadless: mode === "Headless",
         avogridId: "",
-        avoagents: [avodropdown.avogrid.name],
+        avoagents: [avodropdown?.avogrid?.name],
         integration: {
           alm: { url: "", username: "", password: "" },
           qtest: { url: "", username: "", password: "", qteststeps: "" },
@@ -1218,10 +1278,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
           ],
         })),
         donotexe: {
-          current: xpanded?.reduce((ac, cv) => {
-            ac[cv['suiteid']] = [0]
-            return ac;
-          }, {})
+          current: getCurrent
         },
         scenarioFlag: false,
         isExecuteNow: false,
@@ -1238,7 +1295,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
       setTabIndex(0);
       setFooterType("CancelNext");
       setVisible(false);
-    }else setVisible(false);
+    } else setVisible(false);
   };
 
   const onNodeSelect = (e) => {
@@ -1308,8 +1365,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
 
               if ((ExeScreen === true ? smartMode : "") !== "normal")
                 dataExecution.targetUser = Object.keys(selectedICE).filter(
-                  (icename) => selectedICE[icename],
-                  console.log(selectedICE, "after if")
+                  (icename) => selectedICE[icename]
                 );
               else dataExecution.targetUser = selectedICE;
 
@@ -1386,7 +1442,7 @@ var dataforApi = {poolid:"",projectids: [projId]}
           {
             label: (
               <Button
-                onClick={() => configModal('CancelSave')}
+                onClick={() => configModal("CancelSave")}
                 className="addConfi_button"
                 size="small"
               >
@@ -1515,7 +1571,10 @@ var dataforApi = {poolid:"",projectids: [projId]}
               <span className="text1 ">No Configuration's yet</span>
             </div>
           </div>
-          <Button className="configure_button" onClick={() => configModal('CancelSave')}>
+          <Button
+            className="configure_button"
+            onClick={() => configModal("CancelSave")}
+          >
             {" "}
             configure{" "}
           </Button>
@@ -1565,6 +1624,10 @@ var dataforApi = {poolid:"",projectids: [projId]}
               setAvodropdown={setAvodropdown}
               mode={mode}
               setMode={setMode}
+              selectedNodeKeys={selectedNodeKeys}
+              setSelectedNodeKeys={setSelectedNodeKeys}
+              dotNotExe={dotNotExe}
+              setDotNotExe={setDotNotExe}
             />
           }
           headerTxt="Execution Configuration set up"
@@ -1573,15 +1636,15 @@ var dataforApi = {poolid:"",projectids: [projId]}
         />
       </div>
       <Toast ref={toast} position="bottom-center" />
-      <AvoConfirmDialog className="Logout_modal"
+      <AvoConfirmDialog
+        className="Logout_modal"
         visible={logoutClicked}
-        onHide={setLogoutClicked} 
+        onHide={setLogoutClicked}
         showHeader={false}
-        message = {profileTxt}
-              
-        icon="pi pi-exclamation-triangle" 
-        accept={deleteDevOpsConfig} 
-        />
+        message={profileTxt}
+        icon="pi pi-exclamation-triangle"
+        accept={deleteDevOpsConfig}
+      />
     </>
   );
 };
