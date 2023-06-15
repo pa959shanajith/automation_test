@@ -153,8 +153,6 @@ exports.getProjectsMMTS = async (req, res) => {
             const inputs = {
                 "query": "getProjectsMMTS",
                 "userid": req.session.userid
-                // "userid": "64648076bea85cf8dddd3902"
-
             };
             const result = await utils.fetchData(inputs, "/mindmap/getProjectsMMTS", fnName);
             if (result == "fail") return res.send("fail");
