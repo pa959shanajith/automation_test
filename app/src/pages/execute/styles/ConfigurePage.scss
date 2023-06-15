@@ -5,9 +5,9 @@
   height: 96vh;
   padding-bottom: 10rem;
   padding-top: 0rem;
-  font-family: "Open Sans";
+  font-family: "OpenSans";
   font-weight: normal;
-  // width: 125%;
+  //width:125%;
   .m-2 {
     margin: 0.5rem !important;
     margin-top: -0.9;
@@ -44,7 +44,7 @@
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
     .tab-menu .p-tabmenu-nav {
       margin: -1rem 0 0;
-  }
+    }
   }
   .p-datatable .p-datatable-tbody > tr > td {
     text-align: left;
@@ -52,7 +52,6 @@
     border-width: 0 0 1px 0;
     padding: 0.3rem 1rem;
   }
-  
 }
 .config_header {
   border: 1px solid #dee2e6 !important;
@@ -231,8 +230,8 @@
   margin-right: 15rem;
 }
 .addConfig_button {
-  margin: 0;
-  display: inline-flex;
+  margin: -78px 0 0 48rem;
+  display: flex;
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
@@ -240,8 +239,9 @@
   vertical-align: bottom;
   text-align: center;
   overflow: hidden;
-  position: relative;
-  height: 1rem;
+  margin-top: -3rem;
+  height: 2.5rem;
+  margin-left: 61rem;
 }
 .p-button-edit {
   margin: 0;
@@ -274,22 +274,28 @@
     font-size: 20px !important;
   }
 }
-  .dialog_execute{
-    .p-dialog .p-dialog-header-icons {
-      position: relative !important ;
-      right: 4% !important;
+.dialog_execute {
+  .p-dialog .p-dialog-header-icons {
+    position: relative !important ;
+    right: 4% !important;
   }
-  
 }
 .execute_card {
-  height: 12rem;
-  margin-top: 2rem;
   background: #f7f7f7;
-  text-decoration-color: #030229;
-  font-family: "Open Sans";
-  line-height: 42px;
-  font-weight: "400";
+  font-family: Open Sans;
   font-size: "14px";
+  font-weight: "400";
+  height: 8rem;
+  line-height: 42px;
+  margin-top: 1rem;
+  text-decoration-color: #030229;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  .executedropdown {
+    .col-3 {
+      padding: 0;
+    }
+  }
 }
 .RadioButton_execute {
   margin-top: 2rem;
@@ -350,11 +356,26 @@
 }
 
 .legend-text {
-  margin-left: 5px;
-  margin-top: 2rem;
-  font-family: "Open Sans";
+  font-size: .9rem;
+  margin-left: 104px;
+  position: relative;
+  top: 30px;
 }
+.legend-text1{
+  font-size: .9rem;
+  margin-left: 104px;
+  position: relative;
+  top: 30px;
+  left: -16rem;
 
+}
+.legend-text2{
+  font-size: .9rem;
+  margin-left: 104px;
+  position: relative;
+  top: 30px;
+  left: -8rem;
+}
 .status-available,
 .status-unavailable,
 .status-dnd {
@@ -373,53 +394,61 @@
 
 .status-available {
   background-color: green;
-  margin-top: 2rem;
+  position: relative;
+  top: 1rem;
   font-family: "Open Sans";
+  left: 6rem;
 }
 
 .status-unavailable {
   background-color: #ff9f42;
-  margin-top: 2rem;
+  position: relative;
+  top: 1rem;
   font-family: "Open Sans";
+  left: -2rem;
 }
 
 .status-dnd {
   background-color: #ea5455;
-  margin-top: 2rem;
+  position: relative;
+  // top: -1rem;
   font-family: "Open Sans";
+  top: 0.9rem;
+  left: -10rem;
 }
 .execute_dropdown {
-  margin-left: 0rem;
+  margin-left: 27px;
   position: relative;
-  top: 2rem;
-
-  .p-dropdown-label {
-    display: block;
-    white-space: nowrap;
-
-    flex: 1 1 auto;
-    width: 17%;
-    text-overflow: ellipsis;
-    cursor: pointer;
-    width: 12rem;
-    margin-left: -43rem;
-    margin-right: 20rem;
-  }
-  .p-dropdown {
-    display: inline-flex;
-    cursor: pointer;
-    position: relative;
-    -webkit-user-select: none;
-    user-select: none;
-    margin-top: -3rem;
-    margin-left: 9rem;
-  }
-  .p-dropdown .p-dropdown-label {
-    background: transparent;
-    border: 0 none;
-    margin-right: 10rem;
-  }
+  top: 18px;
 }
+
+.p-dropdown-label {
+  display: block;
+  white-space: nowrap;
+
+  flex: 1 1 auto;
+  width: 17%;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  width: 12rem;
+  margin-left: -43rem;
+  margin-right: 20rem;
+}
+// .p-dropdown {
+//   display: inline-flex;
+//   cursor: pointer;
+//   position: relative;
+//   -webkit-user-select: none;
+//   user-select: none;
+//   margin-top: -3rem;
+//   margin-left: 9rem;
+// }
+.p-dropdown .p-dropdown-label {
+  background: transparent;
+  border: 0 none;
+  margin-right: 10rem;
+}
+
 .dialog_Schedule {
   height: 46rem;
   .p-dialog-header {
@@ -445,7 +474,6 @@
   display: flex;
   justify-content: flex-start;
 
-  
   .p-card .p-card-content {
     padding: 1.25rem 16px;
     margin-top: -2rem;
@@ -466,22 +494,7 @@
   margin-top: -3rem;
   left: 14rem;
 }
-// .inputtext_devops {
-//   margin-right: 0rem;
-//   margin-top: 1rem;
-//   font-family: "open Sans";
-//   display: flex;
-//   flex-direction: row;
-//   align-items: center;
-// }
-// .copy_devops {
-//   order: -1;
-//   margin-bottom: 0.5rem;
-//   color: #000000;
-//   background-color: transparent;
-//   border: none;
-//   margin-right: 0.5rem;
-// }
+
 .inputtext_devops {
   display: flex;
   align-items: center;
@@ -501,7 +514,6 @@
 
 .container_devopsLabel {
   margin-top: 5rem; /* Adjust this value to create space above the container */
-  
 }
 
 .container_devopsLabel .devops_label {
@@ -510,17 +522,6 @@
   line-height: 3rem;
 }
 
-// .lable_sync {
-
-//   margin-top: 3rem;
-// }
-// .copy_devops {
-//   color: #000000;
-//   background-color: transparent;
-//   border: none;
-//   margin-top: 0rem;
- 
-// }
 .dialog_CICD {
   .p-dialog-header {
     background: #e9ecef !important;
@@ -605,30 +606,7 @@
   font-family: "Open Sans", sans-serif;
 }
 
-// .inputSwitch_CICD {
-//   margin-left: 1rem;
-//   // position: absolute;
-//   display: flex;
-//   flex-direction: column;
-//   font-family: "open Sans";
-//   margin-top: -1.5rem;
-// }
-// .sync_label {
-//   // position: absolute;
-//   margin-top: -26rem;
-//   margin-left: 10.5rem;
-//   font-family: "open Sans";
-//   display: flex;
-// }
-// .Async_lable {
-//   order: -1;
-//   margin-bottom: 0.5rem;
-// }
-// .inputtext_CICD {
-//   width: 16.5rem;
-//   position: absolute;
-//   top: 16rem;
-// }
+
 .delete_button {
   margin-left: 48rem;
   font-family: "Open Sans";
@@ -655,28 +633,34 @@
   font-size: 14px;
   margin-left: 60rem;
   font-weight: 600;
-
 }
 .pencil_button {
   margin-left: 7rem;
 }
 
 .datatable_list {
-  .p-datatable .p-datatable-thead > tr > th{
-  width: 100%;
-  height: calc(100vh - 250px);
-  margin-right: 5rem;
-}
+  .p-datatable .p-datatable-thead > tr > th {
+    width: 100%;
+    height: calc(100vh - 250px);
+    margin-right: 5rem;
+  }
 }
 .actions-header {
   text-align: left !important;
   position: absolute;
   margin-left: 8.9rem;
   margin-top: -1rem;
+  font-weight: bold;
+  font-family: "Open Sans";
+}
+.SNo-header{
+  font-weight: bold;
+  font-family: "Open Sans";
 }
 .executionOption-header {
   // margin-left: 10rem;
   margin-left: 1rem;
+  font-weight: bold;
 }
 .checkbox_header {
   // margin-left: 3rem;
@@ -704,38 +688,35 @@
   margin-left: 9.5rem;
 }
 
-.executeRadio_label_grid
- {
-  
+.executeRadio_label_grid {
   font-family: Open Sans;
-  
-  position:absolute;
-top:23.9rem;
-left:3rem;
-  margin-top: -2.6rem;
-
+  left: 3rem;
+  margin-top: 0rem;
+  /* position: absolute; */
+  display: flex;
 }
 .radioButtonContainer {
   align-items: flex-end;
+  align-items: center;
   display: flex;
-  // margin-bottom: .rem;
-  margin-top: 2rem;
-
-}
-.radioButtonContainer1{
- 
-  margin-left: 19.6rem;
-    margin-top: 1.4rem;
-
+  margin-left: 1.4rem;
+  margin-top: 2.1rem;
 }
 
-.executeRadio_label_clint{
-  
-   font-family: Open Sans;
-    margin-top: -3rem;
-    position: absolute;
-    left: 24.3rem;
-    top:24.4rem
+.radioButtonContainer1 {
+  margin-left: 3.1rem;
+  margin-top: 0.4rem;
+
+}
+
+.executeRadio_label_clint {
+  font-family: Open Sans;
+  left: 24.3rem;
+  margin-top: 0.5rem;
+  /* position: absolute; */
+  display: flex;
+  top: 24.4rem;
+
 }
 .Cancle_button {
   font-family: "Open Sans";
@@ -845,20 +826,19 @@ left:3rem;
 .tabs {
   line-height: 1rem;
 }
-.endAfter_lable{
+.endAfter_lable {
   margin-top: 2rem;
 }
-.end_lable{
+.end_lable {
   margin-top: 0rem;
 }
-.noEndDate_lable{
+.noEndDate_lable {
   margin-top: 1rem;
 }
-// .devopsUrl_label{
-// margin-top: 0rem;
-// }
-.profile_label{
-margin-top: 0.7rem;
+
+.profile_label {
+  margin-top: 0.7rem;
+  font-weight: bold;
 }
 .container_url {
   display: flex;
@@ -868,7 +848,7 @@ margin-top: 0.7rem;
 
 .container_url .devopsUrl_label {
   margin-bottom: 1rem;
-  margin-bottom: 0.5rem
+  margin-bottom: 0.5rem;
 }
 
 .container_url .inputtext_CICD {
@@ -876,7 +856,94 @@ margin-top: 0.7rem;
   margin-bottom: 0rem;
   height: 2.7rem;
 }
-.inputTextarea{
+.inputTextarea {
   width: 30.5rem;
   height: 141px;
 }
+.searchBoxInput {
+  float: right;
+  margin-right: -295%;
+  position: relative;
+  top: 3rem;
+}
+.grid_download_dialog__content__code {
+  padding: 1rem;
+  border-color: #000000;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  background-color: #b8d8ff;
+}
+.executiontypenamepre {
+  width: 58vh;
+  margin-left: -1px;
+}
+.serachProfileName {
+  width: 11rem;
+  display: flex;
+  margin-left: 49rem;
+  margin-top: -3.1rem;
+  height: 2.5rem;
+}
+
+.tabmenu_confige {
+  .p-tabmenu-nav .p-menuitem-text {
+    line-height: 1;
+    margin-top: -2rem;
+  }
+}
+.search_icelist {
+  margin-left: 8rem;
+  margin-top: -0.2rem;
+  align-items: center;
+  display: flex;
+  div {
+    width: 100%;
+    input {
+      width: 50%;
+    }
+  }
+}
+
+.execution-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.execution-row1 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.execution-label {
+  font-weight: bold;
+  margin-right: 10px;
+  
+}
+.execution-label1 {
+  font-weight: bold;
+padding-right: 2rem;
+  
+}
+.execution-value {
+
+  font-weight: normal;
+ padding-right: 5.6rem;
+}
+.execution-value1 {
+
+  font-weight: normal;
+ padding-right: 2rem;
+}
+// .execution-label2{
+//   font-weight: bold;
+//   margin-right: 20px;
+// }
+
+
+
+
+
+
+
+
