@@ -54,7 +54,7 @@ const AvoModal = ({
       visible={visible}
       className="modalClass"
       style={modalSytle}
-      onHide={() => onModalBtnClick("Cancel")}
+      onHide={() => setVisible(false)}
       {...(headerClass ? { headerClassName: headerClass } : {})}
       {...(footerContent ? { footer: footerContent } : {})}
     >
