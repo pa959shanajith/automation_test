@@ -328,7 +328,7 @@ exports.connectAzure_ICE = function(req, res) {
 
                             function azure_login_5_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Azure_details"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "Azure_details","auto_populate"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", azure_login_5_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
@@ -348,6 +348,12 @@ exports.connectAzure_ICE = function(req, res) {
                                             count++;
                                         }
                                     }
+                                    else if (data.onAction == "auto_populate") {
+                                        var resultData = data.value;
+                                        logger.error("Error occurred while fetching data from azure devOps : "+resultData);
+                                        res.status(429).send(resultData);
+                                    }
+
                                 }
                             }
                             redisServer.redisSubServer.on("message", azure_login_5_listener);
