@@ -24,7 +24,6 @@ import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { ContextMenu } from 'primereact/contextMenu';
 import { deletedNodes } from '../designSlice';
-import { ClickAwayListener } from '@mui/material';
 
 
 /*Component Canvas
