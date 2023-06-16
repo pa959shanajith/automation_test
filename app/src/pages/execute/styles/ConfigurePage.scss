@@ -185,25 +185,25 @@
   background: #ffffff;
   // box-shadow: inset 0px -1px 0px #E5E5E5;
   button {
-    margin-right: 10px; /* Adjust the value to control the spacing */
+    margin-right: 10px; 
     background: #ffffff;
     width: 90px;
     height: 17px;
 
-    /* h6/bold-700/line-height-1.2 */
+   
 
     font-family: "OPen Sans";
     font-style: normal;
     font-weight: 700;
     font-size: 14px;
     line-height: 17px;
-    /* identical to box height, or 121% */
+  
 
     /* pruple */
 
     color: #605bff;
 
-    /* Inside auto layout */
+  
 
     flex: none;
     order: 0;
@@ -260,7 +260,7 @@
   color: grey;
 }
 .p-button-edit:hover {
-  color: grey; /* Set the same color as the default color to remove the hover effect */
+  color: grey; 
   background: grey;
 }
 
@@ -285,18 +285,103 @@
   font-family: Open Sans;
   font-size: "14px";
   font-weight: "400";
-  height: 8rem;
+  height: 6rem;
   line-height: 42px;
   margin-top: 1rem;
   text-decoration-color: #030229;
   margin-left: 1rem;
   margin-right: 1rem;
   .executedropdown {
-    .col-3 {
+    .text_card {
       padding: 0;
+      width: 25%;
+    font-family: 'Open Sans';
+    font-weight: bold;
+    display: flex;
+    margin-top: -2rem;
+    line-height: 4rem;
     }
+    .text_value{
+      font-weight: normal;
+ 
+     
+      .agent_name{
+        display: flex;
+        margin-top: -1.8rem;
+        margin-left: -6rem;
+        font-family: 'Open Sans';
+      }
+    }
+    .text_card1{
+      display: flex;
+      margin-left: 4rem;
+      /* position: relative; */
+      top: -2rem;
+      align-items: center;
+      position: relative;
+      font-weight: bold;
+      left: 8rem;
+      .execute_text{
+        display: flex;
+        margin-left: -7rem;
+      }
+      }
   }
-}
+   
+    .text_value1{
+      display: flex;
+      margin-left: rem;
+      position: relative;
+      top: -2rem;
+      left: 5rem;
+      .execute_name{
+        display: flex;
+        margin-left: 30.3rem;
+        margin-top: -3.6rem;
+    }
+    
+    
+      }
+    
+    .text_card3{
+      .browser_text{
+        display: flex;
+        margin-left: -11.6rem;
+        font-weight: bold;
+        margin-top: -2.8rem;
+      }
+    }
+    .text_value3{
+      .browser_name{
+        display: flex;
+        margin-left: -13.6rem;
+        margin-top: -2.8rem;
+      }
+  }
+ 
+    .text_card4{
+      .integration_text{
+        display: flex;
+        font-weight: bold;
+        left: 4.5rem;
+        margin-left: -6rem;
+        margin-top: -3rem;
+
+      }
+  }
+    
+    .text_value4{
+      left: 37.6rem;
+      top: -6.5rem;
+      .integration_name{
+        display: flex;
+        margin-top: -4rem;
+        margin-left: 35.5rem
+      }
+    }
+
+  }
+
 .RadioButton_execute {
   margin-top: 2rem;
   margin-left: -1rem;
@@ -420,20 +505,32 @@
   margin-left: 27px;
   position: relative;
   top: 18px;
+  .p-dropdown-label {
+      display: block;
+      white-space: nowrap;
+    
+      flex: 1 1 auto;
+      width: 17%;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      width: 12rem;
+      margin-left: -43rem;
+      margin-right: 20rem;
+    }
 }
 
-.p-dropdown-label {
-  display: block;
-  white-space: nowrap;
+// .p-dropdown-label {
+//   display: block;
+//   white-space: nowrap;
 
-  flex: 1 1 auto;
-  width: 17%;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  width: 12rem;
-  margin-left: -43rem;
-  margin-right: 20rem;
-}
+//   flex: 1 1 auto;
+//   width: 17%;
+//   text-overflow: ellipsis;
+//   cursor: pointer;
+//   width: 12rem;
+//   margin-left: -43rem;
+//   margin-right: 20rem;
+// }
 // .p-dropdown {
 //   display: inline-flex;
 //   cursor: pointer;
@@ -443,11 +540,11 @@
 //   margin-top: -3rem;
 //   margin-left: 9rem;
 // }
-.p-dropdown .p-dropdown-label {
-  background: transparent;
-  border: 0 none;
-  margin-right: 10rem;
-}
+// .p-dropdown .p-dropdown-label {
+//   background: transparent;
+//   border: 0 none;
+//   margin-right: 10rem;
+// }
 
 .dialog_Schedule {
   height: 46rem;
@@ -492,7 +589,9 @@
   border: none;
   margin-left: 16.5rem;
   margin-top: -3rem;
-  left: 14rem;
+  left: 10rem;
+  display: flex;
+    top: -1rem;
 }
 
 .inputtext_devops {
@@ -509,7 +608,11 @@
   background-color: transparent;
   border: none;
   top: -7rem;
-  left: 30.5rem;
+  left: -18.1rem;
+  display: flex;
+  // margin-right: 0.5rem;
+  top: -10rem;
+  display: flex;
 }
 
 .container_devopsLabel {
@@ -649,7 +752,7 @@
   text-align: left !important;
   position: absolute;
   margin-left: 8.9rem;
-  margin-top: -1rem;
+  margin-top: -0.8rem;
   font-weight: bold;
   font-family: "Open Sans";
 }
@@ -839,6 +942,9 @@
 .profile_label {
   margin-top: 0.7rem;
   font-weight: bold;
+  position: relative;
+    top: -0.5rem;
+
 }
 .container_url {
   display: flex;
@@ -869,9 +975,12 @@
 .grid_download_dialog__content__code {
   padding: 1rem;
   border-color: #000000;
+  border-top: 20px solid #d3d3d3;
   border-radius: 3px;
   white-space: pre-wrap;
   background-color: #b8d8ff;
+  margin-right: 21rem;
+  margin-left: 0rem;
 }
 .executiontypenamepre {
   width: 58vh;
@@ -883,6 +992,7 @@
   margin-left: 49rem;
   margin-top: -3.1rem;
   height: 2.5rem;
+  font-family: "Open Sans";
 }
 
 .tabmenu_confige {
@@ -897,49 +1007,25 @@
   align-items: center;
   display: flex;
   div {
-    width: 100%;
+    width: 50%;
+    margin-right: 15rem;
     input {
-      width: 50%;
+      width: 99%;
+
     }
   }
 }
 
-.execution-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+.text_card{
+  .col-3 {
+    width: 25%;
+    font-family: 'Open Sans';
+    font-weight: bold;
+    display: flex;
+    margin-top: -2rem;
+    line-height: 4rem;
 }
-.execution-row1 {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
 }
-
-.execution-label {
-  font-weight: bold;
-  margin-right: 10px;
-  
-}
-.execution-label1 {
-  font-weight: bold;
-padding-right: 2rem;
-  
-}
-.execution-value {
-
-  font-weight: normal;
- padding-right: 5.6rem;
-}
-.execution-value1 {
-
-  font-weight: normal;
- padding-right: 2rem;
-}
-// .execution-label2{
-//   font-weight: bold;
-//   margin-right: 20px;
-// }
-
 
 
 
