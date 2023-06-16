@@ -1,30 +1,43 @@
-.Whole_container{
-    max-height:100vh;
-    max-width: 17vw;
-    min-width: 17vw;
+.CollapseWholeCont{ 
+    height:95%;
+    display: flex;
+    flex-direction: row-reverse;
+
+    .collapseBut img{
+        width:25px;
+        height:25px;
+        float: right;
+    }
+                }
+   .Whole_container{
+    height:100%;
+    // width: 17vw;
     border-bottom: 0.5px solid #C7C7C7;
     background-color: rgb(255, 255, 255);
     z-index: 1;
     overflow: auto;
     overflow-x: visible;
     .project_name_section{
-        height:9% ;
-        border-bottom: 0.5px solid #C7C7C7;
+        height:7% ;
+        border-bottom: 0.5px solid #575353;
         display: flex;
         justify-content: space-around;
         align-items: center;
-    
+    border:1px solid blue($color: #d41717)
     }
     .project_name_section select{
         // margin: 1rem 2.5rem 1.7rem;
     }
+    
+
     .normalModule_main_container{
-        height:40% ;
+        height:58% ;
+        border-top: 0.5px solid #c7c7c7;
         border-bottom: 0.5px solid #C7C7C7;
         
     }
     .E2E_main_container{
-        height:51% ;
+        height:35% ;
         border-bottom: 1px solid rgb(91, 89, 89);
     }
     .moduleLayer_icon{
@@ -261,6 +274,54 @@
 
                             }
                         }
+                        .ScenairoList{
+                            max-height: 85%;
+                            // border: 1px solid black;
+                            overflow-y: auto;
+
+                            .EachScenarioNameBox{
+                                // border: 1px solid rgb(213, 30, 30);
+                                max-width: 100%;
+                                max-height: 10%;
+                                justify-content: center;
+                                // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                margin-top: 6px;
+                                cursor: pointer;
+                                
+                            }
+                            .EachScenarioNameBox:hover{
+                                background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
+                            }
+                            .ScenarioName {
+                                display: flex;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                max-width: 91%;
+                                max-height: 100%;
+                                // border: 1px solid rgb(19, 225, 126);
+                                padding-left: 1rem;
+                                align-items: center;
+                            }
+                            .ScenarioName img{
+                                height: 25px;
+                                width: 25px;
+                            }
+                            .ScenarioName h4{
+                                  font-size: 13px;
+                                  font-family: "open sans";
+                                  font-weight: 400;
+                                  color:rgb(8, 8, 8,1);
+                                  padding-left: 0.8rem;
+                                  overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
+                            .ScenarioName i {
+                                padding-left: 71%;
+                            }
+                        }
+                        
                 }
 
 

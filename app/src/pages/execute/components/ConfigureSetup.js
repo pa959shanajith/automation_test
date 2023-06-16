@@ -42,7 +42,7 @@ const ConfigureSetup = ({
   selectedNodeKeys,
   setSelectedNodeKeys,
   dotNotExe,
-  setDotNotExe
+  setDotNotExe,
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
@@ -114,11 +114,6 @@ const ConfigureSetup = ({
   }, [configData?.configureData, modules, dataparam, condition, accessibility]);
 
   useEffect(() => {
-    console.log(configData?.configureData);
-    console.log(dotNotExe);
-  }, [dotNotExe]);
-
-  useEffect(() => {
     dispatch(checkRequired({ configName: configTxt }));
   }, [configTxt]);
 
@@ -140,7 +135,7 @@ const ConfigureSetup = ({
             key: el.key,
             suitescenarios: getSuiteId?.scenarioids,
             suitename: getSuiteId?.testsuitename,
-            suiteid: getProjectData?.testsuiteId
+            suiteid: getProjectData?.testsuiteId,
           });
         el.children.forEach((item, index) => {
           const dataParamValue = `dataParamName${index}${ind}`;
@@ -173,6 +168,31 @@ const ConfigureSetup = ({
     setXpanded(getXpanded);
   }, [getProjectData.testsuiteData]);
 
+  useEffect(() => {
+    if (!!Object.keys(dotNotExe).length) {
+      const getExecutions = configData?.configureData?.normalExecution;
+      const getNotExe = dotNotExe?.executionRequest?.donotexe?.current;
+      const nodeObj = {};
+      getExecutions.forEach((el, ind) => {
+        if (Object.keys(getNotExe).includes(el.moduleid)) {
+          nodeObj[ind] = {
+            checked: true,
+            partialChecked: getNotExe[el.moduleid].length !== el.scenarios.length
+          };
+          if (getNotExe[el.moduleid].length) {
+            getNotExe[el.moduleid].forEach((item) => {
+              nodeObj[`${ind}-${item}`] = {
+                checked: true,
+                partialChecked: false
+              };
+            });
+          }
+        }
+      });
+      setSelectedNodeKeys(nodeObj);
+    }
+  }, [dotNotExe]);
+  console.log(selectedNodeKeys);
   const onDataparamChange = (e, getKey) => {
     setDataparam({
       ...dataparam,
@@ -202,7 +222,7 @@ const ConfigureSetup = ({
   };
 
   const onCheckboxChange = (e) => {
-    setSelectedNodeKeys(e.value)
+    setSelectedNodeKeys(e.value);
   };
 
   const onNodeXpand = (e) => {

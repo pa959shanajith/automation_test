@@ -411,8 +411,6 @@ if (cluster.isMaster) {
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
-		var devOps = require('./server/controllers/devOps');
-
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
 		app.post('/getProjectsNeo', (req, res) => (res.send("false")));

@@ -865,24 +865,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
       setDotNotExe(getData);
-      setSelectedNodeKeys({
-        "1": {
-            "checked": true,
-            "partialChecked": false
-        },
-        "1-0": {
-            "checked": true,
-            "partialChecked": false
-        },
-        "1-1": {
-            "checked": true,
-            "partialChecked": false
-        },
-        "1-2": {
-            "checked": true,
-            "partialChecked": false
-        }
-    });
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -928,7 +910,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       let getCurrent = {};
       xpanded?.forEach((val) => {
         let numberArray = [];
-        selectedKeys[Number(val.key)].forEach( ele => numberArray.push(+ele));
+        selectedKeys[Number(val.key)]?.forEach( ele => numberArray.push(+ele));
         getCurrent[val.suiteid] =  numberArray
       });
       
@@ -1013,6 +995,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setTabIndex(0);
       setFooterType("CancelNext");
       setVisible(false);
+      setSelectedNodeKeys({});
     } else setVisible(false);
   };
 
@@ -1176,14 +1159,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             <div className="col-3 text_card1"><div className="execute_text">Execution Mode:</div></div>
              <div className="col-3 text_value1"><div className="execute_name">{currentSelectedItem &&
               currentSelectedItem.executionRequest &&
-              currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}
-              </div>
-              </div>
-            <div className="col-3 text_card3"><div className="browser_text"> Selected Browsers:</div></div>
-            <div className="col-3 text_value3"><div className="browser_name">{browserTxt}</div></div>
-            <div className="col-3 text_card4"><div className="integration_text"> Integration Type:</div></div>
-            <div className="col-3 text_value4"><div className="integration_name">ALM</div></div>
+              currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}</div></div>
+            <div className="col-3">Selected Browsers:</div>
+            <div className="col-3">{browserTxt}</div>
+            <div className="col-3">Integration Type:</div>
+            <div className="col-3">ALM</div>
           </div>
+          
         </p>
       </Card>
     );

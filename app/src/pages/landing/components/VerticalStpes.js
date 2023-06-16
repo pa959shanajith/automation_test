@@ -65,6 +65,7 @@ function VerticalSteps(params) {
       <h2 className= "GetStd">Get Started</h2>
       <Box > 
         <Stepper  className='Stepper' activeStep = {activeStep.value} orientation="vertical">
+          {console.log("activeStep",activeStep.value)}
           {steps.map((step, index) => ( 
             <Step key={step.label}>
               <StepLabel  className='stepLabel'>
@@ -78,7 +79,10 @@ function VerticalSteps(params) {
                      <Box className='buttonNav'>
                         <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'}
                            value={step.title}
-                             onClick={(e)=>handleNext(e.target.value)}>{step.title}</Button>
+                             onClick={(e)=>handleNext(e.target.value)}
+                                  disabled={
+                                    (step.title==="Execute" && activeStep.value < 1) || (step.title==="Report" && activeStep.value < 2)
+                                    } >{step.title}</Button>
                         <NavigateNextIcon className='verticalicon'/>
                      </Box>
                 </Box>
