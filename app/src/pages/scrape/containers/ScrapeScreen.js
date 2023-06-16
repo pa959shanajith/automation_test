@@ -80,8 +80,8 @@ const ScrapeScreen = (props)=>{
         .catch(error=> console.log(error));
     // }
     //eslint-disable-next-line
-    dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
     setIdentifierModiefied(false)
+    dispatch({type: actionTypes.SET_ELEMENT_PROPERTIES, payload:false})
     dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: []})
         }
     },[identifierModified,elementPropertiesUpdated])
