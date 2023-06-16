@@ -98,7 +98,7 @@ const CreateNew = ({importRedirect}) => {
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
-        {(!loading)? <ModuleListSidePanel/>:null}
+        {(!loading)? <ModuleListDrop/>:null}
         {(!loading)?
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>

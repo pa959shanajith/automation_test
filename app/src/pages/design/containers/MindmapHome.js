@@ -11,6 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import ModuleListSidePanel from '../components/ModuleListSidePanel';
+import ModuleListDrop from '../components/ModuleListDrop';
 
 
 /*Component MindmapHome
@@ -72,7 +73,7 @@ const MindmapHome = () => {
     <div className='mp__container'>
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       <div className='mp__body'>
-        {!show && <ModuleListSidePanel/>}
+        {!show && <ModuleListDrop/>}
         <Fragment>
         {showCard && <div className='cardMindmap'>
             <Card  id='p_card' className='Module'>
@@ -97,7 +98,7 @@ const MindmapHome = () => {
         </Fragment>        
         {/* } */}
       </div>
-      <div className='mp__footer'> 
+      {/* <div className='mp__footer'> 
         <div className="main-footer">
           <div className="main-footer-content">
               <span className="right-text">
@@ -105,7 +106,7 @@ const MindmapHome = () => {
               </span>
             </div>
           </div>
-       </div>
+       </div> */}
     </div>
   );
 }
