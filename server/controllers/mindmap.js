@@ -1097,7 +1097,7 @@ exports.importMindmap = async (req, res) => {
 		} else {			
 			let impPath = path.join(__dirname,'../../assets/ImportMindmap/'+userid)
 			if (fs.existsSync(impPath)) {				
-				await fs.rmSync(impPath, { recursive: true, force: true });
+				await fs.rmdirSync(impPath, { recursive: true});
 			}
 			return res.send(result);
 		}
@@ -1122,7 +1122,7 @@ exports.writeZipFileServer = async(req,res) => {
 			}
 			const targetDir = path.join(__dirname, '../../assets/ImportMindmap/'+userid);
 			if (fs.existsSync(targetDir)) {				
-				await fs.rmSync(targetDir, { recursive: true, force: true });
+				await fs.rmdirSync(targetDir,{ recursive: true});
 			}
 			if (!fs.existsSync(targetDir)) {				
 			  fs.mkdirSync(targetDir);
