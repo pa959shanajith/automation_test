@@ -226,8 +226,8 @@ const DisplayProject = (props) => {
                     {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
                     {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
                     {/* <div className="ProjectTooltip"> */}
-                    <h2 className="projectInside" title={project.projectName+"\n"+project.modifiedDate+" By "+project.modifiedName}>{project.projectName}</h2>
-                    <h2 className="projectInsideLast" >{project.modifiedDate} By {project.modifiedName}</h2>
+                    <h2 className="projectInside" title={project.projectName+"\n"+project.modifiedDate+" by "+project.modifiedName}>{project.projectName}</h2>
+                    <h2 className="projectInsideLast" >{project.modifiedDate} by {project.modifiedName}</h2>
                     {/* </div> */}
                     {/* <Tooltip target=".ProjectTooltip" position="bottom" content={project.projectName+"\n"+project.modifiedDate} /> */}
                 </button>
