@@ -20,6 +20,7 @@ import ModuleListDrop from '../components/ModuleListDrop';
     import header, footer, and list of side bar element for differnet page
 */
 const MindmapHome = () => {
+  const dispatch = useDispatch();
   const [options,setOptions] = useState(undefined)
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
@@ -32,9 +33,11 @@ const MindmapHome = () => {
   }
   const [showCard, setShowCard] = useState(true);
   const [show, setShow] = useState(false);
+  console.log("showCard",showCard)
+  console.log("show", show)
   var Component = createType["newmindmap"];
    const handleModule = ()=>{
-    setShowCard(false)
+    setShowCard(false);
     setShow(true);
    }
    const handleGenius = () =>{
@@ -62,7 +65,14 @@ const MindmapHome = () => {
         moduleid:null
       }
       var moduledata = await getModules(req);
-      if(moduledata.length > 0) setOptions1('newmindmap');
+      if(moduledata.length > 0){
+        setOptions1('newmindmap');
+        setShowCard(false);
+        setShow(true);
+      }else{
+        setShowCard(true);
+        setShow(false);
+      }
     })()
   },[]);
  
@@ -75,7 +85,7 @@ const MindmapHome = () => {
       <div className='mp__body'>
         {!show && <ModuleListDrop/>}
         <Fragment>
-        {showCard && <div className='cardMindmap'>
+        {showCard &&  <div className='cardMindmap'>
             <Card  id='p_card' className='Module'>
               <span className='cardText'>
                 <h3 id='module'>Start by creating a Mindmap</h3>
@@ -106,8 +116,8 @@ const MindmapHome = () => {
               </span>
             </div>
           </div>
-       </div> */}
-    </div>
+       </div>*/}
+    </div> 
   );
 }
 export default MindmapHome;

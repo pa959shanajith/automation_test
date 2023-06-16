@@ -108,7 +108,7 @@ const CreateNew = ({importRedirect}) => {
                      {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?
                      <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     :<Fragment>
-                        <ExportMapButton/>
+                        {/* <ExportMapButton/> */}
                         <SaveMapButton disabled={true}/>
                      </Fragment>
                     )

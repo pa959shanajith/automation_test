@@ -91,9 +91,18 @@
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
     padding: 0.5rem !important;
   }
+  .p-column-title{
+    font-weight: bold !important;
+  }
 
   .p-datatable .p-datatable-tbody>tr>td {
     padding:0.5rem !important;
+  }
+  .ellipsis-column{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 5rem;
   }
 }
 
@@ -346,6 +355,7 @@
     left: 2rem;
     font-size: 16px;
     font-family: 'Open sans';
+    font-weight: bold;
   }
 
   .info__btn {
@@ -369,6 +379,7 @@
     left: 4rem;
     font-size: 16px;
     font-family: "Open sans";
+    font-weight: bold;
   }
 
   .upgrade_auto {
@@ -447,6 +458,7 @@
     font-size: 16px;
     font-family: "Open sans";
     cursor: pointer;
+    font-weight: bold;
   }
 
   .insprint_auto {
@@ -488,6 +500,7 @@
     font-size: 16px;
     font-family: "Open sans";
     cursor: pointer;
+    font-weight: bold;
   }
 
   .insprint_auto {
@@ -553,6 +566,20 @@
 }
 .screenshot_img{
   width: 100%;
+}
+
+.btn__screenshot{
+  background: none;
+    color: black;
+    padding: 0;
+    border: none;
+    font-family: "Open Sans";
+    &:hover{
+      font-family: "Open Sans";
+      border-bottom: 2px solid #605BFF;
+      font-weight: 600;
+      color: #605BFF;
+    }
 }
 
 // .header__popup{
