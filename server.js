@@ -253,7 +253,8 @@ if (cluster.isMaster) {
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);		
-
+		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
+		
 		app.use(csrf({
 			cookie: true
 		}));
