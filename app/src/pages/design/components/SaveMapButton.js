@@ -15,7 +15,7 @@ import { VARIANT, Messages as MSG, setMsg } from '../../global';
 
 const SaveMapButton = (props) => {
     const dispatch = useDispatch()
-    const deletedNodes = useSelector(state=>state.design.deletedNodes)
+    const deletedNodes = useSelector(state=>state.design.deletedNode)
     const unassignTask = useSelector(state=>state.design.unassignTask)
     const projId = useSelector(state=>state.design.selectedProj)
     const initEnEProj = useSelector(state=>state.design.initEnEProj)
