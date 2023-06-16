@@ -1084,6 +1084,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     setChangeLable(true);
+                                    setSauceLab(true);
                                     // setShowIcePopup(false);
                                     }} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
@@ -1218,6 +1219,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     setChangeLable(true);
+                                    setSauceLab(true);
                                     // setShowIcePopup(false);
                                     }} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
@@ -1344,17 +1346,17 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         placeholder="Enter Saucelabs Remote URL" 
                                         onChange={(event) => {
                                         setDefaultValues({...defaultValues,SaucelabsURL:event.target.value}) }}
-                                        className = {'middle__input__border form-control__conv-project form-control-custom left-opt'}/>
+                                        className = "saucelabs_input"/>
                                 </div>
                                 <div className="flex flex-row">
                                     <FormInput value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username" onChange={(event) => {
                                         setDefaultValues({...defaultValues,SaucelabsUsername:event.target.value})}}
-                                        className = {'middle__input__border form-control__conv-project form-control-custom left-opt'}/>
+                                        className = "saucelabs_input_URL"/>
                                 </div>
                                 <div className="flex flex-row">
                                     <FormInput value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key" onChange={(event) => {
                                         setDefaultValues({...defaultValues,Saucelabskey:event.target.value}) }}
-                                        className = {'middle__input__border form-control__conv-project form-control-custom left-opt'}/>
+                                        className = "saucelabs_input_Accesskey"/>
                                 </div>
                                 <div>
                                 {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
@@ -1395,6 +1397,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <div><h6>Browser</h6></div>
                     <SearchDropdown
                     noItemsText={[ ]}
+                    disabled={selectedOS == ''}
                     onChange={onSaucelabBrowserChange}
                     options={saucelabBrowsers}
                     selectedKey={selectedSaucelabBrowser}
@@ -1421,6 +1424,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <div><h6>Versions</h6></div>
                     <SearchDropdown
                     noItemsText={[ ]}
+                    disabled={selectedSaucelabBrowser == ''}
                     onChange={onVersionChange}
                     options={browserVersions}
                     selectedKey={selectedVersion}
@@ -1436,6 +1440,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     onChange={onEmulatorChange}
                     options={emulator}
                     selectedKey={selectedEmulator}
+                    disabled={selectedMobileVersion == ''}
                     width='15rem'
                     placeholder='select Emulator'
                     />

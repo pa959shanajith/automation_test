@@ -639,6 +639,7 @@
 #Saucelabs_dialog{
     // max-height: 95% !important;
     width: 39rem !important;
+    height: 20rem;
 }
 #Saucelabs-form{
     .input-label .left-opt {
@@ -659,6 +660,7 @@
     border-radius: 20px;
     outline: auto;
     width: 6rem;
+    top: 5rem;
     }
 
 .Saucelabs_input{
@@ -668,7 +670,7 @@
 .saucelabs_ilm__error_msg{
     font-family: "LatoWeb";
     font-size: 14px;
-    color: red;
+    color: black;
     position: absolute;
     right: 19rem;
     bottom: 3rem;
@@ -758,4 +760,80 @@
         overflow-y: unset !important;
     }
 
+}
+.saucelabs_input{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -1rem;
+    position: relative;
+}
+.saucelabs_input_URL{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -2.5rem;
+    position: relative;
+    
+}
+.saucelabs_input_Accesskey{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -4rem;
+    position: relative;
 }
