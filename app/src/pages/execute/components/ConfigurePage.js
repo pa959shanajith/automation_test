@@ -865,24 +865,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
       setDotNotExe(getData);
-      setSelectedNodeKeys({
-        "1": {
-            "checked": true,
-            "partialChecked": false
-        },
-        "1-0": {
-            "checked": true,
-            "partialChecked": false
-        },
-        "1-1": {
-            "checked": true,
-            "partialChecked": false
-        },
-        "1-2": {
-            "checked": true,
-            "partialChecked": false
-        }
-    });
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -928,7 +910,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       let getCurrent = {};
       xpanded?.forEach((val) => {
         let numberArray = [];
-        selectedKeys[Number(val.key)].forEach( ele => numberArray.push(+ele));
+        selectedKeys[Number(val.key)]?.forEach( ele => numberArray.push(+ele));
         getCurrent[val.suiteid] =  numberArray
       });
       
@@ -1013,6 +995,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setTabIndex(0);
       setFooterType("CancelNext");
       setVisible(false);
+      setSelectedNodeKeys({});
     } else setVisible(false);
   };
 
