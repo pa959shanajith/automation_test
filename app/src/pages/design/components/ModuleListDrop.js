@@ -5,9 +5,10 @@ import {ModalContainer,Messages as MSG, setMsg} from '../../global';
 import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
+import "../styles/ModuleListSidePanel.scss";
 import ImportMindmap from'../components/ImportMindmap.js';
 import { Button } from "primereact/button";
-import { isEnELoad, savedList , initEnEProj, selectedModule} from '../designSlice';
+import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist} from '../designSlice';
 
 
 const ModuleListDrop = (props) =>{
@@ -46,6 +47,7 @@ const ModuleListDrop = (props) =>{
     const [showNote, setShowNote] = useState(false);
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
+    const [collapseWhole, setCollapseWhole] = useState(true);
 
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
     useEffect(()=> {
@@ -111,6 +113,7 @@ const ModuleListDrop = (props) =>{
     }
     const collapsed =()=> setCollapse(!collapse)
     const collapsedForModules =()=> setCollapseForModules (!collapseForModules )
+    const collapsedForModuleWholeCont =()=> (setCollapseWhole(!collapseWhole))
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
@@ -169,19 +172,19 @@ const ModuleListDrop = (props) =>{
                 var name = type
                 // below code about scenarios fetching
         SearchScInp.current.value = ""
-                setSelctedSc([])
-                    if (isE2EOpen){
-                        setBlockui({content:'loading scenarios',show:true})
-                        //loading screen
-                        var res = await populateScenarios(modID)
-                        if(res.error){displayError(res.error);return}
-                        // props.setModName(name)
-                        setIsModuleSelectedForE2E(id);
-                        setScenarioList(res)
-                        setInitScList(res)
-                        setBlockui({show:false})
-                        setShowNote(true)
-                        return;}
+                // setSelctedSc([])
+                //     if (isE2EOpen){
+                //         setBlockui({content:'loading scenarios',show:true})
+                //         //loading screen
+                //         var res = await populateScenarios(modID)
+                //         if(res.error){displayError(res.error);return}
+                //         // props.setModName(name)
+                //         setIsModuleSelectedForE2E(id);
+                //         setScenarioList(res)
+                //         setInitScList(res)
+                //         setBlockui({show:false})
+                //         setShowNote(true)
+                //         return;}
                         if(Object.keys(moduleSelect).length===0 || firstRender){
                             loadModule(modID)
                             return;
@@ -305,110 +308,133 @@ const ModuleListDrop = (props) =>{
                 content={<Content/>} 
                 modalClass='modal-sm'
             />:null}
-            <div className='wholeContainer'>
-                <div className='fullContainer pxBlack' style={{width: collapseForModules? "15rem":"0.6rem",transitionDuration: '0.5s '}}>
-                    <div className='leftContainer pxBlack' style={{ display:"flex",}}>
-                        <div style={{display:'flex',flexDirection:'row-reverse'}}>
-                            <div className='collapseButtonForModulesDiv'><img className='collapseButtonForModules' style={{ height:'44px',width:'10px', position:'relative',transform: collapseForModules ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    }} onClick={collapsedForModules} src='static/imgs/collapseButton.png'  alt='collapseButton'/> </div>
-                                 <div className=''style={{}}>
-                            <div className='modulesBox' >
-                                <div style={{ display:"flex", justifyContent:"space-between" }}>
-                                        <img src="static/imgs/node-modules.png" alt="modules" style={{display:"flex",position:'',width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}} onClick={()=>{ CreateNew();setSearchForNormal(true);}}/>
-                                        <h6 id='moduleStyle' style={{ marginTop:'0.5rem'}}>
-                                            Modules
-                                        </h6>
-
-                                         {/* items={[ 
-                                         {
-                                        key: 'csv',
-                                            text: 'Create New',
-                                             onClick: () => {CreateNew();
-                                            setSearchForNormal(true);
-                                            }
-                                            },
-                                                {
-                                                key: 'image',
-                                                text: 'Import Module',
-                                                onClick:()=>{setImportPop(true);
-                                        setSearchForNormal(true);}}
-                                            ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
-                                        />  :null} */}
-                                        {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}   />:null}
-                                </div>
-                                <div className='searchBox pxBlack' style={{display:'flex'}}>
-                                            <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
+             <>
+      <div className="CollapseWholeCont">
+       <div className="collapseBut" style={{height:"8%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'16rem',zIndex:'2',}}>
+             <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); console.log("collapseWhole",collapseWhole)}}/> 
+          </div>
+       <div className="Whole_container" style={{width: collapseWhole? "17rem":"0.6rem",transitionDuration: '0.7s ',display: !collapseWhole? "none":"" }}>
+           {/* <div className="project_name_section">
+             <h5>Home/</h5>
+             <select onChange={(e)=>{setprojectId(e.target.value)}} style={{width:'10rem', height:'19px'}}>
+             {projectList.map((project, index) => (
+                      
+                               <option value={project.id} key={index}>{project.name}</option>
+                              
+                    
+                       ))}
+                 
+             </select>
+           </div> */}
+           
+           <div className="normalModule_main_container">
+               <div className="moduleLayer_plusIcon">
+                     <div className="moduleLayer_icon">
+                        <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" /> <h3 className="normalModHeadLine">Module Layers</h3> 
+                     </div>
+                     {/* <div className="SearchIconForModules">
+                       <span className={`pi pi-search ${showInput? 'searchIcon_adjust' :''}` } style={{fontSize:'1.1rem',cursor:'pointer'}} onClick={clickForSearch}></span>
+                       {showInput&&(
+                       <div>
+                           <input className="inputOfSearch" type="text"/>
+                           <i className="pi pi-times"  onClick={click_X_Button}></i>
+                       </div>)}
+                     </div> */}
+                     <img   src="static/imgs/plusNew.png" alt="NewModules" onClick={()=>{ CreateNew()}} /> 
+                </div>
+                <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
+                      <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
                                     if (!allModSelected) {
-                                        // dispatch({ type: actionTypes.SELECT_MODULELIST, payload: moduleList.filter(module=> module.type=='basic').map((modd) => modd._id) })
+                                        dispatch(selectedModulelist( moduleList.filter(module=> module.type=='basic').map((modd) => modd._id) ))
                                     } else {
-                                        // dispatch({ type: actionTypes.SELECT_MODULELIST, payload: [] })
+                                        dispatch(selectedModulelist([]) )
                                     }
-                                    setAllModSelected(!allModSelected)
-                                    }} ></input>
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
-                                        <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                                    setAllModSelected(!allModSelected)}} >
+                       </input>
+                       <input className='pFont' style={{width:'12rem'}}placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
+                                        <img  style={{height:'17px',width:'17px',marginTop:'3px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                </div>
+                <div className="NorModuleList">
+                        {/* {moduleLists && moduleLists.map((module, idx)=>{
+                              return(
+                              <>
+                                <div className="EachModNameBox" title={module.name}>
+                                   <div key={module.id} className="moduleName"  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)}><img src="static/imgs/moduleIcon.png" alt="modules" /><h4>{module.name}</h4></div>
+                                   
                                 </div>
-                                <div className='moduleList'>
-                                    {moduleList.map((e,i)=>{
+                              </>
+                              )
+                        })} */}
+                        {moduleList.map((e,i)=>{
                                         if(e.type==="basic" && ((searchInpText !== "" && e.name.toUpperCase().indexOf(searchInpText.toUpperCase())!==-1) || searchInpText === ""))
                                         return(
-                                            <div key={i}>
-                                                    <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
-                                                        <div className='modClick' value={e._id} style={{display:'flex',flexDirection:'row'}} >
-                                                        {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}  
-                                                        <span  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} className='modNme' value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</span>
-                                                        </div>
+                                            // <div key={i}>
+                                            //         <div data-test="modules" value={e._id}  className={'EachModNameBox'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
+                                            //             <div className='modClick' value={e._id} style={{display:'flex',flexDirection:'row'}} >
+                                            //             {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}  
+                                            //             <span  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} className='EachModNameBox' value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</span>
+                                            //             </div>
+                                            //         </div>
+                                            // </div>
+                                            <div key={i} data-test="modules" value={e._id} title={e.name} type={e.type}>
+                                                    <div className={'EachModNameBox'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  } >
+                                                      {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}
+                                                      <img src="static/imgs/moduleIcon.png" style={{width:'20px',height:'20px'}} alt="modules" />
+                                                      <span className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</span>  
                                                     </div>
                                             </div>
                                             )
                                     })}
+                </div>
+           </div>
+           <div className="E2E_main_container">
+               <div className="moduleLayer_plusIcon">
+                      <div className= 'moduleLayer_icon' >  
+                         <img src="static/imgs/E2ESideIcon.png" alt="modules" /> <h3 className="E2EHeadLine">End To End Flow</h3> 
+                      </div>
+                      {/* <div className="SearchIconForModulesE2E">
+                       <span className={`pi pi-search ${showInputE2E? 'searchIcon_adjust' :''}` } style={{fontSize:'1.1rem',cursor:'pointer'}} onClick={clickForSearchE2E}></span>
+                         {showInputE2E&&(
+                        <div>
+                            <input className="inputOfSearch" type="text"/>
+                            <i className="pi pi-times"  onClick={click_X_ButtonE2E}></i>
+                        </div>)}
+                     </div > */}
+                      <img   src="static/imgs/plusNew.png"   alt="PlusButtonOfE2E" /> 
+                      {/* {showE2EPopup&&<LongContentDemo/>} */}
+                </div>
+                   <div className='searchBox pxBlack'>
+                                       <img style={{marginLeft:'1.3rem',width:'1rem',}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
+                                           <input className='pFont' style={{width:'12rem'}} placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                           <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
+                   </div>
+                <div className="NorModuleList">
+                        {/* {moduleList && moduleList.map((module)=>{
+                              return(
+                              <>
+                                <div className="EachModNameBox">
+                                   <div key={module.id} className="moduleName" ><img src="static/imgs/E2EModuleSideIcon.png" alt="modules" /><h4 title={module.name}>{module.name}</h4></div>
+                                   
                                 </div>
-                            </div>
-                            <div className='section-dividers'></div>
-                            <div className='endToEnd'>
-                                <div style={{ display:"flex", justifyContent:"space-between", alignItems:'center', }}>
-                                    <img src="static/imgs/node-endtoend.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
-                                        <h6 id='Endto' style={{margin: '6px -230px 3px -13px', display: !collapseForModules? 'none': ''}}>
-                                                End to End Flows
-                                        </h6>
-                                    {/* {userRole!=="Test Engineer"? <IconDropdown items={[ 
-                                            {
-                                                key: 'csv',
-                                                text: 'Create New',
-                                                onClick: () => {clickCreateNew();
-                                                    collapsed();
-                                                    setIsE2EOpen(true);
-                                                }
-                                            },
-                                            ]}
-                                            id='plusIconEndtoEnd' placeholderIconName = 'plusIconEndtoEnd'
-                                        />  :null} */}
-                                </div>
-                                <div className='searchBox pxBlack'>
-                                    <img style={{marginLeft:'0.55rem',width:'1rem', marginRight:'0.3rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
-                                        <input className='pFont' placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
-                                        <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
-                                </div>
-                                <div className='moduleList'>
-                                        {moduleList.map((e,i)=>{
+                              </>
+                              )
+                        })} */}
+                        {moduleList.map((e,i)=>{
                                             if(e.type==="endtoend" && ((searchInpTextEnE !== "" && e.name.toUpperCase().indexOf(searchInpTextEnE.toUpperCase())!==-1) || searchInpTextEnE === ""))
                                             return(<>
                                                     
-                                                    <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
+                                                    <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'EachModNameBox'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
                                                     <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.75rem', display:'flex',flexDirection:'row-reverse',marginLeft:'-6px'}}> <span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span> <div  ><img style={{marginLeft:'-24px'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" /></div></div>
                                                     
                                                     </div>
                                                     </>
                                             )
                                         })}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
                 </div>
-                
-                <div className='scenarioListBox' style={{width:collapse? "10rem":"0.5rem", overflowX:'hidden',height:'57.7%',display: !collapseForModules || !isE2EOpen? 'none': '',}}>
+             </div>
+       </div>
+    </div>
+    <div className='scenarioListBox' style={{width:collapse? "10rem":"0.5rem", overflowX:'hidden',height:'57.7%',display: !collapseForModules || !isE2EOpen? 'none': '',}}>
                     <div style={{display:"flex", flexDirection:"column", width:"100%",overflowX:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
                             <img style={{width:'1.7rem',height:'1.7rem',marginTop:'5px',  display:!isE2EOpen || !collapse? 'none':'',}}  src='static/imgs/node-scenarios.png' alt='/node-scenarios'/>
@@ -446,8 +472,8 @@ const ModuleListDrop = (props) =>{
                         }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' alt='collapseButton'/> </div>
                  
                 </div>
-   
-               </div>
+        </>
+            
             
                 <div data-test="dropDown" onClick={()=>{
                     // dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
@@ -470,5 +496,7 @@ const Footer = (props) => (
         <button onClick={()=>{props.setWarning(false)}}>No</button>
     </div>
 )
+
+
 
 export default ModuleListDrop;
