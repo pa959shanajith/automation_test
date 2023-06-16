@@ -235,6 +235,7 @@ if (cluster.isMaster) {
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
     	var plugin = require('./server/controllers/plugin');
+		var devOps = require('./server/controllers/devOps');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);

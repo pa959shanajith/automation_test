@@ -185,25 +185,25 @@
   background: #ffffff;
   // box-shadow: inset 0px -1px 0px #E5E5E5;
   button {
-    margin-right: 10px; /* Adjust the value to control the spacing */
+    margin-right: 10px; 
     background: #ffffff;
     width: 90px;
     height: 17px;
 
-    /* h6/bold-700/line-height-1.2 */
+   
 
     font-family: "OPen Sans";
     font-style: normal;
     font-weight: 700;
     font-size: 14px;
     line-height: 17px;
-    /* identical to box height, or 121% */
+  
 
     /* pruple */
 
     color: #605bff;
 
-    /* Inside auto layout */
+  
 
     flex: none;
     order: 0;
@@ -260,7 +260,7 @@
   color: grey;
 }
 .p-button-edit:hover {
-  color: grey; /* Set the same color as the default color to remove the hover effect */
+  color: grey; 
   background: grey;
 }
 
@@ -420,20 +420,32 @@
   margin-left: 27px;
   position: relative;
   top: 18px;
+  .p-dropdown-label {
+      display: block;
+      white-space: nowrap;
+    
+      flex: 1 1 auto;
+      width: 17%;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      width: 12rem;
+      margin-left: -43rem;
+      margin-right: 20rem;
+    }
 }
 
-.p-dropdown-label {
-  display: block;
-  white-space: nowrap;
+// .p-dropdown-label {
+//   display: block;
+//   white-space: nowrap;
 
-  flex: 1 1 auto;
-  width: 17%;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  width: 12rem;
-  margin-left: -43rem;
-  margin-right: 20rem;
-}
+//   flex: 1 1 auto;
+//   width: 17%;
+//   text-overflow: ellipsis;
+//   cursor: pointer;
+//   width: 12rem;
+//   margin-left: -43rem;
+//   margin-right: 20rem;
+// }
 // .p-dropdown {
 //   display: inline-flex;
 //   cursor: pointer;
@@ -443,11 +455,11 @@
 //   margin-top: -3rem;
 //   margin-left: 9rem;
 // }
-.p-dropdown .p-dropdown-label {
-  background: transparent;
-  border: 0 none;
-  margin-right: 10rem;
-}
+// .p-dropdown .p-dropdown-label {
+//   background: transparent;
+//   border: 0 none;
+//   margin-right: 10rem;
+// }
 
 .dialog_Schedule {
   height: 46rem;
@@ -492,7 +504,9 @@
   border: none;
   margin-left: 16.5rem;
   margin-top: -3rem;
-  left: 14rem;
+  left: 10rem;
+  display: flex;
+    top: -1rem;
 }
 
 .inputtext_devops {
@@ -509,7 +523,11 @@
   background-color: transparent;
   border: none;
   top: -7rem;
-  left: 30.5rem;
+  left: 2.9rem;
+  display: flex;
+  // margin-right: 0.5rem;
+  top: -10rem;
+  display: flex;
 }
 
 .container_devopsLabel {
@@ -649,7 +667,7 @@
   text-align: left !important;
   position: absolute;
   margin-left: 8.9rem;
-  margin-top: -1rem;
+  margin-top: -0.8rem;
   font-weight: bold;
   font-family: "Open Sans";
 }
@@ -839,6 +857,9 @@
 .profile_label {
   margin-top: 0.7rem;
   font-weight: bold;
+  position: relative;
+    top: -0.5rem;
+
 }
 .container_url {
   display: flex;
@@ -883,6 +904,7 @@
   margin-left: 49rem;
   margin-top: -3.1rem;
   height: 2.5rem;
+  font-family: "Open Sans";
 }
 
 .tabmenu_confige {
@@ -899,46 +921,11 @@
   div {
     width: 100%;
     input {
-      width: 50%;
+      width: 78%;
     }
   }
 }
 
-.execution-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.execution-row1 {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.execution-label {
-  font-weight: bold;
-  margin-right: 10px;
-  
-}
-.execution-label1 {
-  font-weight: bold;
-padding-right: 2rem;
-  
-}
-.execution-value {
-
-  font-weight: normal;
- padding-right: 5.6rem;
-}
-.execution-value1 {
-
-  font-weight: normal;
- padding-right: 2rem;
-}
-// .execution-label2{
-//   font-weight: bold;
-//   margin-right: 20px;
-// }
 
 
 
