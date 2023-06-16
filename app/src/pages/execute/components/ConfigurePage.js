@@ -1159,13 +1159,14 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             <div className="col-3 text_card1"><div className="execute_text">Execution Mode:</div></div>
              <div className="col-3 text_value1"><div className="execute_name">{currentSelectedItem &&
               currentSelectedItem.executionRequest &&
-              currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}</div></div>
-            <div className="col-3">Selected Browsers:</div>
-            <div className="col-3">{browserTxt}</div>
-            <div className="col-3">Integration Type:</div>
-            <div className="col-3">ALM</div>
+              currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}
+              </div>
+              </div>
+            <div className="col-3 text_card3"><div className="browser_text"> Selected Browsers:</div></div>
+            <div className="col-3 text_value3"><div className="browser_name">{browserTxt}</div></div>
+            <div className="col-3 text_card4"><div className="integration_text"> Integration Type:</div></div>
+            <div className="col-3 text_value4"><div className="integration_name">ALM</div></div>
           </div>
-          
         </p>
       </Card>
     );
