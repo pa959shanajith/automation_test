@@ -285,18 +285,103 @@
   font-family: Open Sans;
   font-size: "14px";
   font-weight: "400";
-  height: 8rem;
+  height: 6rem;
   line-height: 42px;
   margin-top: 1rem;
   text-decoration-color: #030229;
   margin-left: 1rem;
   margin-right: 1rem;
   .executedropdown {
-    .col-3 {
+    .text_card {
       padding: 0;
+      width: 25%;
+    font-family: 'Open Sans';
+    font-weight: bold;
+    display: flex;
+    margin-top: -2rem;
+    line-height: 4rem;
     }
+    .text_value{
+      font-weight: normal;
+ 
+     
+      .agent_name{
+        display: flex;
+        margin-top: -1.8rem;
+        margin-left: -6rem;
+        font-family: 'Open Sans';
+      }
+    }
+    .text_card1{
+      display: flex;
+      margin-left: 4rem;
+      /* position: relative; */
+      top: -2rem;
+      align-items: center;
+      position: relative;
+      font-weight: bold;
+      left: 8rem;
+      .execute_text{
+        display: flex;
+        margin-left: -7rem;
+      }
+      }
   }
-}
+   
+    .text_value1{
+      display: flex;
+      margin-left: rem;
+      position: relative;
+      top: -2rem;
+      left: 5rem;
+      .execute_name{
+        display: flex;
+        margin-left: 30.3rem;
+        margin-top: -3.6rem;
+    }
+    
+    
+      }
+    
+    .text_card3{
+      .browser_text{
+        display: flex;
+        margin-left: -11.6rem;
+        font-weight: bold;
+        margin-top: -2.8rem;
+      }
+    }
+    .text_value3{
+      .browser_name{
+        display: flex;
+        margin-left: -13.6rem;
+        margin-top: -2.8rem;
+      }
+  }
+ 
+    .text_card4{
+      .integration_text{
+        display: flex;
+        font-weight: bold;
+        left: 4.5rem;
+        margin-left: -6rem;
+        margin-top: -3rem;
+
+      }
+  }
+    
+    .text_value4{
+      left: 37.6rem;
+      top: -6.5rem;
+      .integration_name{
+        display: flex;
+        margin-top: -4rem;
+        margin-left: 35.5rem
+      }
+    }
+
+  }
+
 .RadioButton_execute {
   margin-top: 2rem;
   margin-left: -1rem;
@@ -890,9 +975,12 @@
 .grid_download_dialog__content__code {
   padding: 1rem;
   border-color: #000000;
+  border-top: 20px solid #d3d3d3;
   border-radius: 3px;
   white-space: pre-wrap;
   background-color: #b8d8ff;
+  margin-right: 21rem;
+  margin-left: 0rem;
 }
 .executiontypenamepre {
   width: 58vh;
@@ -919,13 +1007,14 @@
   align-items: center;
   display: flex;
   div {
-    width: 100%;
+    width: 50%;
+    margin-right: 15rem;
     input {
-      width: 78%;
+      width: 99%;
+
     }
   }
 }
-
 
 
 

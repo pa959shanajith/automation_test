@@ -29,7 +29,7 @@
         }
         .tabletree_class {
           .p-treetable-wrapper {
-            height: 35vh;
+            height: 50vh;
             overflow: auto;
           }
           .module_icons {
@@ -59,18 +59,30 @@
           font-family: "Open Sans";
           font-weight: normal;
 
-          .column_class {
+          .column_dataParameterization {
+            width: 15.25rem;
+            .p-multiselect .p-multiselect-label.p-placeholder {
+              text-align: left;
+              line-height: 0.5rem;
+            }
+          }
+          .column_condition {
+            width: 7.25rem;
+            .p-multiselect .p-multiselect-label.p-placeholder {
+              text-align: left;
+              line-height: 0.5rem;
+            }
+          }
+          .column_accessibility {
             width: 11.25rem;
             .p-multiselect .p-multiselect-label.p-placeholder {
               text-align: left;
               line-height: 0.5rem;
             }
           }
-
-          .column_class_name {
+          .column_name {
             width: 17.4375rem;
           }
-
           .p-treetable-thead>tr>th {
             background: #F3F2FF;
             padding: 0.8rem 0.8rem;
@@ -126,7 +138,7 @@
               display: inline-block;
               width: 293.7%;
             }
-            .column_class_name{
+            .column_name{
               .p-checkbox {
                 width: 42px;
               }
@@ -138,7 +150,7 @@
           }
 
           .p-treetable-tbody>tr.genaralRow {
-            .column_class_name{
+            .column_name{
               .p-checkbox {
                 width: 46px;
               }
