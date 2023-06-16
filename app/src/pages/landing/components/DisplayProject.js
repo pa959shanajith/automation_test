@@ -4,6 +4,7 @@ import { Panel } from "primereact/panel";
 import { InputText } from "primereact/inputtext";
 import CreateProject from "../components/CreateProject";
 import { Menu } from "primereact/menu";
+import { Tooltip } from 'primereact/tooltip';
 import { fetchProjects } from "../api"
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
@@ -18,14 +19,15 @@ const DisplayProject = (props) => {
   const [defaultProject, setDefaultProject] = useState(null);
   const [projectsDetails, setProjectsDetails] = useState([]);
   const [getProjectLists, setProjectList] = useState([]);
+  const [selectedsortItems,setSelectedsortItems] = useState(null)
   const createdProject = useSelector((state) => state.landing.savedNewProject);
   const dispatch = useDispatch();
 
 
   const sortItems = [
-    { label: "Last Modified", value: "dateCreated", command: () => sortByModified() },
-    { label: "Date Created", value: "lastModified", command: () => sortByCreated() },
-    { label: "Alphabetical", value: "name", command: () => sortByName() },
+    { label: "Last Modified", value: "dateCreated",  command: () => sortByModified('Last Modified'),icon: selectedsortItems === 'Last Modified' ? 'pi pi-check' : '', },
+    { label: "Date Created", value: "lastModified",icon: selectedsortItems === 'Date Created' ? 'pi pi-check' : '', command: () => sortByCreated('Date Created') },
+    { label: "Alphabetical", value: "name", icon: selectedsortItems === 'Alphabetical' ? 'pi pi-check' : '', command: () => sortByName('Alphabetical')},
   ];
 
 
@@ -52,20 +54,20 @@ const DisplayProject = (props) => {
     var years = Math.floor(months / 12);
     var output = "";
     if (years == 0 && months == 0 && hours == 0 && minutes == 0 && seconds >= 0) {
-      output = "Created Now";
+      output = "Created now";
     }
     else if (years == 0 && months == 0 && hours == 0 && minutes >= 1 ) {
-      output ="Last Modified On " + minutes + "min ago";
+      output ="Last modified " + minutes + "min ago";
     }
     else if (years == 0 && months == 0 && hours >= 1 ) {
-      output ="Last Modified On " + hours + "h ago";
+      output ="Last modified " + hours + "h ago";
     }
     else if (years == 0 && months >= 1 ) {
-      output ="Last Modified On " + months + "months ago";
+      output ="Last modified " + months + "months ago";
     }
     else
     {
-      output ="Last Modified On " + years + "y ago";
+      output ="Last modified " + years + "y ago";
     }
 
     return output;
@@ -127,22 +129,31 @@ const DisplayProject = (props) => {
   }, [createdProject])
 
 
+  useEffect(()=>{
+    if (sortItems.length > 0){
+      setSelectedsortItems(sortItems[0].label);
+    }
+  },[]);
 
-  const sortByName = () => {
+  const sortByName = (item) => {
     const sortedProjects = [...getProjectLists].sort((a, b) => a.projectName.localeCompare(b.projectName));
     setProjectList(sortedProjects);
+    setSelectedsortItems(item);
     setSortVisible(false);
   };
-  const sortByCreated = () => {
+  const sortByCreated = (item) => {
     const sortedProjects = [...getProjectLists].sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
     setProjectList(sortedProjects);
+    setSelectedsortItems(item);
     setSortVisible(false);
   };
-  const sortByModified = () => {
+  const sortByModified = (item) => {
     const sortedProjects = [...getProjectLists].sort((a, b) => new Date(b.modifiedDate) - new Date(a.modifiedDate));
     setProjectList(sortedProjects);
+    setSelectedsortItems(item);
     setSortVisible(false);
   };
+
   const handleSearchProject = (event) => {
     setSearchProjectName(event.target.value);
   };
@@ -175,12 +186,14 @@ const DisplayProject = (props) => {
     const className = `${options.className} justify-content-start`;
     return (
       <>
-        {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} id="sort_menu_color" />}
+        {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color" />}
         <div className={className}>
           <span className="All_Project_font" >ALL PROJECTS</span>
-          <button className="pi pi-plus add_btn" title="Create Project" onClick={handleOpenDialog} />
+          <Tooltip target=".add_btn" position="bottom" content="Create Project"/>
+          <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
           <CreateProject visible={visible} onHide={handleCloseDialog} />
-          <button className="pi pi-sort-amount-down sort_btn" title="Sort Projects" onClick={showSortMenu} />
+          <Tooltip target=".sort_btn" position="bottom" content="Sort Projects"/>
+          <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
         </div>
       </>
     )
@@ -209,12 +222,14 @@ const DisplayProject = (props) => {
                     {project.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
                     {project.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="20" />)}
                     {project.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
-                    {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="17" width='25' />)}
+                    {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='15' />)}
                     {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
                     {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
-                    {/* <Tooltip target=".projectInside .projectInsideLast" position="bottom" content={project.projectName}{project.modifiedDate}/> */}
-                    <h2 className="projectInside" title={project.projectName}>{project.projectName}</h2>
-                  <h2 className="projectInsideLast" title={project.modifiedName}>{project.modifiedDate} By {project.modifiedName}</h2>
+                    {/* <div className="ProjectTooltip"> */}
+                    <h2 className="projectInside" title={project.projectName+"\n"+project.modifiedDate+" By "+project.modifiedName}>{project.projectName}</h2>
+                    <h2 className="projectInsideLast" >{project.modifiedDate} By {project.modifiedName}</h2>
+                    {/* </div> */}
+                    {/* <Tooltip target=".ProjectTooltip" position="bottom" content={project.projectName+"\n"+project.modifiedDate} /> */}
                 </button>
               </div>))}
           </div>
@@ -226,7 +241,7 @@ const DisplayProject = (props) => {
         {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
         {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="25" />)}
         {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="17" width='25' />)}
+        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="23" width='35' />)}
         {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
         {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
       </div>
