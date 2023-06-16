@@ -1,7 +1,10 @@
 @import "../../global/styles/ColorVariables.scss";
 .mp__canvas_svg{
-    width: 100%;
-    height: 100%;
+    width: 103%;
+    height: 113%;
+    position: relative;
+    bottom: 72px;
+    right: 2rem;
 }
 .mp__canvas_svg_genius{
     width: 100%;
@@ -112,7 +115,7 @@
 }
 
 .p-contextmenu{
-    width: 15rem !important;
+    width: 17.5rem !important;
 }
 
 .p-column-title{

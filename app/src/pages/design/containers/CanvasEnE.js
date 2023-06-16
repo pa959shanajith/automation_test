@@ -64,8 +64,8 @@ const CanvasEnE =(props)=>{
             var scenarioIds=[]
             var parentIds=[]
             for(let i = 0 ;i<deletedNoded.length; i++){
-                if(deletedNodes[i].length>1){
-                    if(deletedNodes[i][1]=="scenarios"){
+                if(deletedNoded[i].length>1){
+                    if(deletedNoded[i][1]=="scenarios"){
                         scenarioIds.push(deletedNoded[i][0]);
                         parentIds.push(deletedNoded[i][2]);                    
                     }
@@ -83,7 +83,7 @@ const CanvasEnE =(props)=>{
                 setCreateNew('autosave')                            
             })()
         }
-    },[deletedNoded]
+    },[deletedNoded, dispatch, displayError, setBlockui]
     )
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount

@@ -28,7 +28,7 @@ const AvoModal = ({
     ],
     Execute: [
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Execute", autoFocus: false, btnType: null, key: "save"},
+      { btnTxt: "Execute", autoFocus: false, btnType: null, key: "save" },
 
     ],
     Schedule: [

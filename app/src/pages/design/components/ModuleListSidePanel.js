@@ -1,7 +1,7 @@
 import "../styles/ModuleListSidePanel.scss";
 import 'primeicons/primeicons.css';
 import { getModules,getProjectList,populateScenarios } from "../api";
-import  React, { useState, useEffect, useRef } from 'react';
+import  React, { useState, useEffect, useRef,memo} from 'react';
 import * as d3 from  'd3';
 import { useSelector, useDispatch} from 'react-redux';
 import { Button } from 'primereact/button';
@@ -15,6 +15,7 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
 import { selectedProj, selectedModule, isEnELoad, initEnEProj,savedList } from '../designSlice';
 import AvoInput from "../../../globalComponents/AvoInput";
+import SaveMapButton from "./SaveMapButton";
 // import { Icon } from 'primereact/icon';
 
 
@@ -69,7 +70,7 @@ const ModuleListSidePanel =()=>{
     const [selectedSc,setSelctedSc] = useState([])
     const [isE2EOpen, setIsE2EOpen] = useState(false);
     const [collapse, setCollapse] = useState(false);
-    const [collapseForModules, setCollapseForModules] = useState(true);
+    const [collapseWhole, setCollapseWhole] = useState(true);
     const SearchScInp = useRef()
     const [filterSc,setFilterSc] = useState('');
     const userRole = useSelector(state=>state.login.SR);
@@ -143,6 +144,8 @@ const ModuleListSidePanel =()=>{
     // const collapsed =()=> setCollapse(!collapse)
     // const collapsedForModules =()=> setCollapseForModules (!collapseForModules )
     console.log("scenarios",scenarioList)
+
+    const collapsedForModuleWholeCont =()=> (setCollapseWhole(!collapseWhole))
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
@@ -377,6 +380,11 @@ const ModuleListSidePanel =()=>{
 // ////////////////// E2E popUp
 const LongContentDemo = () => {
   const [newProjectList, setNewProjectList] = useState([]);
+  const [storedSelectedKeys, setStoredSelectedKeys] = useState([]);
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [transferBut, setTransferBut] = useState([]);
+  const [inputE2EData, setInputE2EData] = useState('');
+  // const forCatchingCheckBoxSelDemo = useMemo(()=> CheckboxSelectionDemo())
   useEffect(() => {
     (async () => {
       let projectCollection = [];
@@ -416,47 +424,127 @@ const LongContentDemo = () => {
       setNewProjectList(projectCollection);
     })();
   }, []);
+  const handleArrowBut =()=>{
+       setTransferBut(selectedKeys)
+      
+  }
+  const pushingEnENmInArr ={name:inputE2EData}
+  transferBut[0]= pushingEnENmInArr
+  console.log("inputE2EData",inputE2EData)
+  console.log("transferBut[1]",transferBut)
 
+  const HardCodedApiDataForE2E = {
+    "action": "/saveEndtoEndData",
+    "write": 10,
+    "map": [
+        {
+            "id": 0,
+            "childIndex": 0,
+            "_id": null,
+            "oid": null,
+            "name": "",
+            "type": "endtoend",
+            "pid": null,
+            "pid_c": null,
+            "task": null,
+            "renamed": false,
+            "orig_name": null,
+            "taskexists": null,
+            "state": "created",
+            "cidxch": null
+        },
+        {
+            "id": 1,
+            "childIndex": 1,
+            "_id": "641831913b886ffbc86bf169",
+            "oid": null,
+            "name": "Scenario_Endgame1",
+            "type": "scenarios",
+            "pid": 0,
+            "task": null,
+            "renamed": false,
+            "orig_name": null,
+            "taskexists": null,
+            "state": "created",
+            "cidxch": "true"
+        },
+        {
+            "id": 2,
+            "childIndex": 2,
+            "_id": "641831913b886ffbc86bf168",
+            "oid": null,
+            "name": "Scenario_EndGame",
+            "type": "scenarios",
+            "pid": 0,
+            "task": null,
+            "renamed": false,
+            "orig_name": null,
+            "taskexists": null,
+            "state": "created",
+            "cidxch": "true"
+        },
+        {
+            "id": 3,
+            "childIndex": 3,
+            "_id": "6417ff373b886ffbc86bf101",
+            "oid": null,
+            "name": "Scenario_IronMan",
+            "type": "scenarios",
+            "pid": 0,
+            "task": null,
+            "renamed": false,
+            "orig_name": null,
+            "taskexists": null,
+            "state": "created",
+            "cidxch": "true"
+        }
+    ],
+    "deletednode": [],
+    "unassignTask": [],
+    "prjId": "6417fca33b886ffbc86bf0df",
+    "createdthrough": "Web",
+    "relId": null
+}
+   HardCodedApiDataForE2E.map[0].name =inputE2EData
+ console.log("readingdataE2E",HardCodedApiDataForE2E.map[0].name)
+ console.log("readingdataE2EName",HardCodedApiDataForE2E)
+ console.log("length of transferbut",transferBut.length)
+
+  const HandleSaveButton =()=>{
+    
+  }
   const CheckboxSelectionDemo = () => {
-    const [selectedKeys, setSelectedKeys] = useState([]);
+  
 
     const handleCheckboxChange = (e, projIdx, moduleIdx, scenarioIdx, projName, modName, sceName) => {
       const selectedScenario = `${projIdx}-${moduleIdx}-${scenarioIdx}`;
-      
-      console.log("projIdx",projIdx)
-      console.log("moduleIdx",moduleIdx)
-      console.log("scenarioIdx",scenarioIdx)
-      console.log("projName",projName)
-      console.log("modName",modName)
-      console.log("sceName",sceName)
-      console.log("e.checked",e.checked)
-      console.log("selectedScenario",selectedScenario)
       if (e.checked) {
         setSelectedKeys([...selectedKeys, {
             projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
         }]);
-        {console.log("setSlectedKeys",[...selectedKeys, {
-            projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
-        }])}
+        // setStoredSelectedKeys([...selectedKeys, {
+        //   projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
+        // }]);
       } else {
         setSelectedKeys(selectedKeys.filter((key) => key.selectedScenario !== selectedScenario));
+        // setStoredSelectedKeys(selectedKeys.filter((key) => key.selectedScenario !== selectedScenario));
       }
     };
 
     const handleTransferScenarios = () => {
       // Logic to transfer selected scenarios to the right box
       // You can access the selected scenarios using `selectedKeys` state
-    //   const selectedScenarios = selectedKeys.map((key) => ({
-    //     projIdx: parseInt(key.split('-')[0]),
-    //     moduleIdx: parseInt(key.split('-')[1]),
-    //     scenarioIdx: parseInt(key.split('-')[2])
-    //   }));
+      const selectedScenarios = selectedKeys.map((key) => ({
+        projIdx: parseInt(key.split('-')[0]),
+        moduleIdx: parseInt(key.split('-')[1]),
+        scenarioIdx: parseInt(key.split('-')[2])
+      }));
 
       // TODO: Perform the necessary actions with the selected scenarios
 
       setSelectedKeys([]); // Clear the selected scenarios after transferring
     };
-     console.log("newProjectList",newProjectList)
+    //  console.log("newProjectList",newProjectList)
     return (
       <div>
         <Tree
@@ -482,12 +570,9 @@ const LongContentDemo = () => {
                   <label style={{alignItem:'center',justifyContent:'center'}}>
                     <Checkbox
                       onChange={(e) => handleCheckboxChange(e, projIdx, moduleIdx, scenarioIdx, project.name, module.name, scenario.name)}
-                    //   checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${projIdx}-${moduleIdx}-${scenarioIdx}`)}
-                        checked={Object.keys(selectedKeys)}
+                      checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${projIdx}-${moduleIdx}-${scenarioIdx}`)}
                     />
                     <>
-                    {console.log("selectedKeys",Object.keys(selectedKeys))}
-                    {/* {console.log("checked",Object.keys(selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${projIdx}-${moduleIdx}-${scenarioIdx}`)))} */}
                     </>
                     <img style={{width:'18px',height:'16px'}} src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
                     {scenario.name}
@@ -497,18 +582,20 @@ const LongContentDemo = () => {
             }))
           }))}
           selectionMode="multiple"
-          selectionKeys={selectedKeys}
+          // selectionKeys={selectedKeys}
           style={{ height: '22.66rem', overflowY: 'auto' }}
-          onSelectionChange={(e) => setSelectedKeys(e.value)}
+          // onSelectionChange={(e) => setSelectedKeys(e.value)}
         />
         {/* <button onClick={handleTransferScenarios}>Transfer Scenarios</button> */}
       </div>
     );
   };
+   const MemorizedCheckboxSelectionDemo = React.memo(CheckboxSelectionDemo)
       const footerContent = (
         <div>
             <Button label="Cancel"  onClick={() => setShowE2EPopup(false)} className="p-button-text" />
-            <Button label="Save"  onClick={() => setShowE2EPopup(false)} autoFocus />
+            <Button label="Save"  onClick={() => {setShowE2EPopup(false); console.log("inputE2E",inputE2EData)}} autoFocus />
+            {/* <SaveMapButton  isEnE={true}   /> */}
         </div>
       );
   return (
@@ -532,6 +619,8 @@ const LongContentDemo = () => {
                   placeholder="Enter End to End Module Name"
                   customClass="inputRow_for_E2E_popUp"
                   inputType="lablelRowReqInfo"
+                  inputTxt={inputE2EData}
+                  setInputTxt={setInputE2EData}
                 />
               </div>
             </div>
@@ -552,12 +641,13 @@ const LongContentDemo = () => {
                       />
                     </span>
                   </div>
-                  <CheckboxSelectionDemo />
+                   <MemorizedCheckboxSelectionDemo/>
+                  {/* <CheckboxSelectionDemo /> */}
                 </Card>
               </div>
               <div className="centerButtons">
                 <div className="centerButtonsIndiVisual">
-                  <Button label=">" outlined />
+                  <Button label=">" onClick={handleArrowBut} outlined />
                   {/* <Button label="<" outlined /> */}
                 </div>
               </div>
@@ -576,7 +666,19 @@ const LongContentDemo = () => {
                         className="inputContainer"
                       />
                     </span>
-                  </div>
+                </div>
+                <div className="ScenairoList">
+                        { transferBut.map((ScenarioSelected)=>{
+                              return(
+                              <>
+                                <div className="EachScenarioNameBox" >
+                                   <div key={ScenarioSelected.scenarioIdx} className="ScenarioName" ><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" /><h4>{ScenarioSelected.sceName}</h4><i className="pi pi-times"></i></div>
+                                   
+                                </div>
+                              </>
+                              )
+                        })}
+                </div>
                 </Card>
                 
               </div>
@@ -591,7 +693,11 @@ const LongContentDemo = () => {
       
     return(
         <>
-       <div className="Whole_container">
+      <div className="CollapseWholeCont">
+       <div className="collapseBut" style={{height:"8%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'16.4rem',zIndex:'2',}}>
+             <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); console.log("collapseWhole",collapseWhole)}}/> 
+          </div>
+       <div className="Whole_container" style={{width: collapseWhole? "17rem":"0.6rem",transitionDuration: '0.7s ',display: !collapseWhole? "none":"" }}>
            <div className="project_name_section">
              <h5>Home/</h5>
              {/* <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
@@ -607,6 +713,7 @@ const LongContentDemo = () => {
                  
              </select>
            </div>
+           
            <div className="normalModule_main_container">
                <div className="moduleLayer_plusIcon">
                   <div className={`moduleLayer_icon ${showInput? 'moduleLayer_icon_SearchOn' 
@@ -668,6 +775,7 @@ const LongContentDemo = () => {
                 </div>
              </div>
        </div>
+    </div>
         </>
 
     )
