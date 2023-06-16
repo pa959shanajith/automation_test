@@ -15,7 +15,7 @@ import { VARIANT, Messages as MSG, setMsg } from '../../global';
 
 const SaveMapButton = (props) => {
     const dispatch = useDispatch()
-    const deletedNodes = useSelector(state=>state.design.deletedNode)
+    const deletedNoded = useSelector(state=>state.design.deletedNodes)
     const unassignTask = useSelector(state=>state.design.unassignTask)
     const projId = useSelector(state=>state.design.selectedProj)
     const initEnEProj = useSelector(state=>state.design.initEnEProj)
@@ -28,7 +28,7 @@ const SaveMapButton = (props) => {
           // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNoded,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -41,7 +41,7 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList)=>{
     var tab = "endToend"
     var selectedProject;
     var error = !1
@@ -102,7 +102,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
     var data = {
         write: flag,
         map: mapData,
-        deletednode: deletedNodes,
+        deletednode: deletedNoded,
         unassignTask: [],
         prjId: projId,
         cycId:cycId,
