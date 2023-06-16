@@ -142,7 +142,7 @@ useEffect(()=>{
     setCurrentDialog(null);
   };
 
-  const handleSelectionChange = (e) => {
+  const onRowClick = (e) => {
     setSelectedCapturedElement(e.value);
   };
 
@@ -271,7 +271,7 @@ useEffect(()=>{
 
       let viewString = capturedDataToSave;
       let haveItems = viewString.length !== 0;
-
+      let newlyScrapeList = [];
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
@@ -284,6 +284,8 @@ useEffect(()=>{
           else if (typeof data === "object" && props.appType !== "Webservice") {
             haveItems = data.view.length !== 0;
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
+
+            newlyScrapeList=newScrapeList;
 
             setMainScrapedData(data);
             if(capturedDataToSave.length===0)setCapturedDataToSave([...capturedDataToSave,...newScrapeList]);
@@ -345,29 +347,29 @@ useEffect(()=>{
                 {
                   selectall: item.custname,
                   objectProperty: item.tag,
-                  screenshots: <Button label="View Screenshot" outlined text raised onClick={()=>{
+                  screenshots: <span className="btn__screenshot" onClick={()=>{
                       setScreenshotData({
                       header: item.custname,
                       imageUrl: mirror.scrape || "",
                       enable: true
                     });
                     onHighlight();
-                  }}></Button>,
+                  }}>View Screenshot</span>,
                   actions: '',
                   objectDetails:item
                 
                 }
-              )}):data.view.map((item) => {
+              )}):newlyScrapeList.map((item) => {
                 return (
                     {
                       selectall: item.custname,
                       objectProperty: item.tag,
                       browserscrape: 'google chrome',
-                      screenshots: <Button label="View Screenshot" outlined text raised onClick={()=>{setScreenshotData({
+                      screenshots: <span className="btn__screenshot" onClick={()=>{setScreenshotData({
                         header: item.custname,
                         imageUrl: data.mirror || "",
                         enable: true
-                      })}}></Button>,
+                      }); onHighlight();}}>View Screenshot</span>,
                       actions: '',
                       objectDetails:item
                     }
@@ -383,7 +385,7 @@ useEffect(()=>{
         })
     });
   }
-
+// {console.log(captureData[0].selectall)}
 
   const saveScrapedObjects = () => {
     let scrapeItemsL = [...capturedDataToSave];
@@ -896,12 +898,12 @@ useEffect(()=>{
         </div>)}
         <div className="card-table">
 
-          <DataTable size="small" className='datatable__col' value={captureData} dragHandleIcon="pi pi-bars" rowReorder resizableColumns reorderableRows onRowReorder={handleRowReorder} showGridlines selectionMode={"single"} selection={selectedCapturedElement} onSelectionChange={handleSelectionChange} tableStyle={{ minWidth: '50rem' }} headerCheckboxToggleAllDisabled={false} emptyMessage={emptyMessage}>
+          <DataTable size="small" className='datatable__col' value={captureData} dragHandleIcon="pi pi-bars" rowReorder resizableColumns reorderableRows onRowReorder={handleRowReorder} showGridlines selectionMode={"single"} selection={selectedCapturedElement} onSelectionChange={onRowClick} tableStyle={{ minWidth: '50rem' }} headerCheckboxToggleAllDisabled={false} emptyMessage={emptyMessage}>
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
-            <Column rowReorder style={{ width: '3rem' }} />
+            {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-            <Column field="selectall" header="Select all" body={renderSelectAllCell}></Column>
-            <Column field="objectProperty" header="ObjectProperty"></Column>
+            <Column field="selectall" header="Element Name" body={renderSelectAllCell} bodyClassName="ellipsis-column"></Column>
+            <Column field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
             <Column field="actions" header="Actions"   body={renderActionsCell}/>
           </DataTable>
@@ -925,7 +927,7 @@ useEffect(()=>{
             <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
           </span>
         </div>
-        {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>}
+        {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
       </Dialog>
       {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
       <AvoConfirmDialog
