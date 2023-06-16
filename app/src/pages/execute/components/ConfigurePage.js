@@ -95,7 +95,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [condition, setCondition] = useState({});
   const [accessibility, setAccessibility] = useState({});
   const [configTxt, setConfigTxt] = useState("");
-  const [avodropdown, setAvodropdown] = useState({});
+  const [avodropdown, setAvodropdown] = useState();
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
   const [currentKey, setCurrentKey] = useState("");
@@ -122,7 +122,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     visible_execute: setVisible_execute,
   };
 
-  const [footerType, setFooterType] = useState("CancelNext");
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const items = [
@@ -581,43 +580,43 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         },
       ],
     },
-    // {
-    //   key: "1",
-    //   label: "Range of Recurrence",
-    //   data: "Events Folder",
-    //   icon: "pi pi-fw pi-calendar",
+    {
+      key: "1",
+      label: "Range of Recurrence",
+      data: "Events Folder",
+      icon: "pi pi-fw pi-calendar",
 
-    //   children: [
-    //     {
-    //       key: "1-0",
-    //       label: (
-    //         <div className="schedule_date  ">
-    //           <div>
-    //             <RadioButton
-    //               value="End Date "
-    //               checked={time_limit === "End Date "}
-    //             />
-    //             <label className=" end_lable ml-2">End Date </label>
-    //           </div>
-    //           <div>
-    //             <RadioButton
-    //               value="End After "
-    //               checked={time_limit === "End After"}
-    //             />
-    //             <label className=" endAfter_lable ml-2">End After </label>
-    //           </div>
-    //           <div>
-    //             <RadioButton
-    //               value="No end date "
-    //               checked={time_limit === "No end date"}
-    //             />
-    //             <label className=" noEndDate_lable ml-2">No end date</label>
-    //           </div>
-    //         </div>
-    //       ),
-    //     },
-    //   ],
-    // },
+      children: [
+        {
+          key: "1-0",
+          label: (
+            <div className="schedule_date  ">
+              <div>
+                <RadioButton
+                  value="End Date "
+                  checked={time_limit === "End Date "}
+                />
+                <label className=" end_lable ml-2">End Date </label>
+              </div>
+              <div>
+                <RadioButton
+                  value="End After "
+                  checked={time_limit === "End After"}
+                />
+                <label className=" endAfter_lable ml-2">End After </label>
+              </div>
+              <div>
+                <RadioButton
+                  value="No end date "
+                  checked={time_limit === "No end date"}
+                />
+                <label className=" noEndDate_lable ml-2">No end date</label>
+              </div>
+            </div>
+          ),
+        },
+      ],
+    },
   ];
 
   const deleteDevOpsConfig = () => {
@@ -871,6 +870,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setMode(selections[0]);
       setConfigTxt("");
       setModules("normalExecution");
+      setSelectedNodeKeys({});
     }
     setVisible(true);
     setSetupBtn(getType);
@@ -988,12 +988,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       );
       // tableUpdate();
       setVisible(false);
-    } else if (getBtnType === "Next") {
-      setTabIndex(1);
-      setFooterType(setupBtn);
     } else if (getBtnType === "Cancel") {
-      setTabIndex(0);
-      setFooterType("CancelNext");
+      setConfigTxt("");
       setVisible(false);
       setSelectedNodeKeys({});
     } else setVisible(false);
@@ -1157,7 +1153,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             <div className="col-3">Execution Mode:</div>
              <div className="col-3">{currentSelectedItem &&
               currentSelectedItem.executionRequest &&
-              currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}</div>
+              currentSelectedItem.executionRequest.integration.isHeadless==true?"Headless":"Non-Headless"}</div>
             <div className="col-3">Selected Browsers:</div>
             <div className="col-3">{browserTxt}</div>
             <div className="col-3">Integration Type:</div>
@@ -1470,7 +1466,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             />
           }
           headerTxt="Execution Configuration set up"
-          footerType={footerType}
+          footerType={setupBtn}
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
         />
       </div>

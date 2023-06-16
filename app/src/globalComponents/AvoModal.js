@@ -14,10 +14,6 @@ const AvoModal = ({
 }) => {
 
   const footerValues = {
-    CancelNext: [
-      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Next", autoFocus: false, btnType: null, key: "next"},
-    ],
     CancelSave: [
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
       { btnTxt: "Save", autoFocus: false, btnType: null, key: "save"},

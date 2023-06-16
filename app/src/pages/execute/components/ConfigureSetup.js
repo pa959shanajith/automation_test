@@ -5,9 +5,7 @@ import { RadioButton } from "primereact/radiobutton";
 import { TabView, TabPanel } from "primereact/tabview";
 import { MultiSelect } from "primereact/multiselect";
 import { Column } from "primereact/column";
-import { Checkbox } from "primereact/checkbox";
 import { TreeTable } from "primereact/treetable";
-import { Tree } from "primereact/tree";
 import {
   accessibilities,
   conditions,
@@ -177,13 +175,14 @@ const ConfigureSetup = ({
         if (Object.keys(getNotExe).includes(el.moduleid)) {
           nodeObj[ind] = {
             checked: true,
-            partialChecked: getNotExe[el.moduleid].length !== el.scenarios.length
+            partialChecked:
+              getNotExe[el.moduleid].length !== el.scenarios.length,
           };
           if (getNotExe[el.moduleid].length) {
             getNotExe[el.moduleid].forEach((item) => {
               nodeObj[`${ind}-${item}`] = {
                 checked: true,
-                partialChecked: false
+                partialChecked: false,
               };
             });
           }
@@ -288,266 +287,62 @@ const ConfigureSetup = ({
     }
   };
 
-  const exeinfo = [
-    {
-      key: "0",
-      label: (
-        <span>
-          <span>
-            <img src="static/imgs/PlayIcon.svg" className="exe_icons" />
-          </span>
-          <span>Execution Information</span>
-        </span>
-      ),
-      data: "Documents Folder",
-      children: [
-        {
-          key: "0-0",
-          label: (
-            <span>
-              <span>
-                <img src="static/imgs/clock.svg" className="exe_icons" />
-              </span>
-              <span>Implicit timeout</span>
-            </span>
-          ),
-          data: "Documents Folder",
-          children: [
-            {
-              key: "0-0-0",
-              label: (
-                <span>
-                  <RadioButton
-                    inputId="useDefault"
-                    name="timeout"
-                    value="Use default"
-                    onChange={(e) => setUseDefault(e.value)}
-                    checked={useDefault === "Use default"}
-                  />
-                  <label htmlFor="useDefault" className="ml-2">
-                    Use default
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-            {
-              key: "0-0-1",
-              label: (
-                <span>
-                  <RadioButton
-                    inputId="userdefine"
-                    name="timeout"
-                    value="User define"
-                    onChange={(e) => setUseDefault(e.value)}
-                    checked={useDefault === "User define"}
-                  />
-                  <label htmlFor="userDefine" className="ml-2">
-                    User define
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-          ],
-        },
-        {
-          key: "0-1",
-          label: (
-            <span>
-              <span>
-                <img src="static/imgs/refresh.svg" className="exe_icons" />
-              </span>
-              <span>Retry executions</span>
-            </span>
-          ),
-          data: "Documents Folder",
-          children: [
-            {
-              key: "0-0-0",
-              label: (
-                <span>
-                  <RadioButton
-                    inputId="ingredient4"
-                    name="pizza"
-                    value="Onion"
-                  />
-                  <label htmlFor="ingredient4" className="ml-2">
-                    Don’t retry
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-            {
-              key: "0-0-1",
-              label: (
-                <span>
-                  <RadioButton
-                    inputId="ingredient4"
-                    name="pizza"
-                    value="Onion"
-                  />
-                  <label htmlFor="ingredient4" className="ml-2">
-                    Retry failed executions immediately
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-            {
-              key: "0-0-2",
-              label: (
-                <span>
-                  <RadioButton
-                    inputId="ingredient4"
-                    name="pizza"
-                    value="Onion"
-                  />
-                  <label htmlFor="ingredient4" className="ml-2">
-                    Retry after executing all
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-            {
-              key: "0-0-3",
-              label: (
-                <span>
-                  <RadioButton
-                    inputId="ingredient4"
-                    name="pizza"
-                    value="Onion"
-                  />
-                  <label htmlFor="ingredient4" className="ml-2">
-                    Retry all executions
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-            {
-              key: "0-0-4",
-              label: (
-                <span>
-                  <RadioButton
-                    inputId="ingredient4"
-                    name="pizza"
-                    value="Onion"
-                  />
-                  <label htmlFor="ingredient4" className="ml-2">
-                    Retry failed executions only
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-          ],
-        },
-        {
-          key: "0-2",
-          label: (
-            <span>
-              <span>
-                <img src="static/imgs/video.svg" className="exe_icons" />
-              </span>
-              <span>Execution Video</span>
-            </span>
-          ),
-          data: "Documents Folder",
-          children: [
-            {
-              key: "0-0-0",
-              label: (
-                <span>
-                  <Checkbox
-                    inputId="executeVideo"
-                    name="pizza"
-                    value="Cheese"
-                    // onChange={onIngredientsChange}
-                    // checked={ingredients.includes("Cheese")}
-                  />
-                  <label htmlFor="executeVideo" className="ml-2">
-                    Record execution Video
-                  </label>
-                </span>
-              ),
-              data: "Documents Folder",
-            },
-          ],
-        },
-      ],
-    },
-  ];
-
   return (
     <div className="grid config_setup">
-      <TabView activeIndex={tabIndex} onTabChange={(e) => setTabIndex(e.index)}>
-        <TabPanel header="Configuration Information">
-          <div className="config_container">
-            <div className="grid">
-              <div class="col-12 lg:col-12 xl:col-5 md:col-12 sm:col-12 flex flex-column">
-                <AvoInput
-                  htmlFor="username"
-                  labelTxt="Configuration Name"
-                  infoIcon="static/imgs/Info_icon.svg"
-                  required={true}
-                  placeholder="Enter Configuration Name"
-                  inputTxt={configTxt}
-                  customClass="inputColumn"
-                  setInputTxt={setConfigTxt}
-                  inputType="lablelRowReqInfo"
-                />
-              </div>
-            </div>
-            <div className="grid config_subcontainer">
-              <div className="table_section col-12 lg:col-12 xl:col-9 md:col-12 sm:col-12">
-                <TreeTable
-                  onExpand={(e) => onNodeXpand(e)}
-                  onSelect={(e) => onNodeXpand(e)}
-                  header={tableTreeHeader}
-                  value={configTable}
-                  selectionMode="checkbox"
-                  selectionKeys={selectedNodeKeys}
-                  loading={configData.loading}
-                  onSelectionChange={(e) => onCheckboxChange(e)}
-                  className="tabletree_class"
-                  rowClassName={rowClassName}
-                  showGridlines
-                  globalFilter={tableFilter}
-                >
-                  {configTableHead.map((el) => (
-                    <Column
-                      field={el.field}
-                      header={el.code}
-                      className={
-                        el.field === "name"
-                          ? "column_class_name"
-                          : "column_class"
-                      }
-                      {...(el.field === "name" ? { expander: true } : {})}
-                    ></Column>
-                  ))}
-                </TreeTable>
-              </div>
-              <GridBrowser
-                mode={mode}
-                setMode={setMode}
-                avodropdown={avodropdown}
-                onAvoSelectChange={onAvoSelectChange}
-                avogrids={[
-                  ...configData?.avoAgentAndGrid?.avoagents,
-                  ...configData?.avoAgentAndGrid?.avogrids,
-                ]}
-              />
-            </div>
+      <div className="config_container">
+        <div className="grid">
+          <div class="col-12 lg:col-12 xl:col-6 md:col-12 sm:col-12 flex flex-column">
+            <AvoInput
+              htmlFor="username"
+              labelTxt="Configuration Name"
+              infoIcon="static/imgs/Info_icon.svg"
+              required={true}
+              placeholder="Enter Configuration Name"
+              inputTxt={configTxt}
+              customClass="inputRow"
+              setInputTxt={setConfigTxt}
+              inputType="lablelRowReqInfo"
+            />
           </div>
-        </TabPanel>
-        <TabPanel header="Execution Information">
-          <Tree value={exeinfo} className="config_tree" />
-        </TabPanel>
-      </TabView>
+        </div>
+        <div className="grid config_subcontainer">
+          <div className="table_section col-12 lg:col-12 xl:col-9 md:col-12 sm:col-12">
+            <TreeTable
+              onExpand={(e) => onNodeXpand(e)}
+              onSelect={(e) => onNodeXpand(e)}
+              header={tableTreeHeader}
+              value={configTable}
+              selectionMode="checkbox"
+              selectionKeys={selectedNodeKeys}
+              loading={configData.loading}
+              onSelectionChange={(e) => onCheckboxChange(e)}
+              className="tabletree_class"
+              rowClassName={rowClassName}
+              showGridlines
+              globalFilter={tableFilter}
+            >
+              {configTableHead.map((el) => (
+                <Column
+                  field={el.field}
+                  header={el.code}
+                  className={`column_${el.field}`}
+                  {...(el.field === "name" ? { expander: true } : {})}
+                ></Column>
+              ))}
+            </TreeTable>
+          </div>
+          <GridBrowser
+            mode={mode}
+            setMode={setMode}
+            avodropdown={avodropdown}
+            onAvoSelectChange={onAvoSelectChange}
+            avogrids={[
+              ...configData?.avoAgentAndGrid?.avoagents,
+              ...configData?.avoAgentAndGrid?.avogrids,
+            ]}
+          />
+        </div>
+      </div>
     </div>
   );
 };
