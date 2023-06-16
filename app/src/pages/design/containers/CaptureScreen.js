@@ -1,6 +1,8 @@
 import { React, useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux"
 import { Dialog } from 'primereact/dialog';
+import { InputText } from 'primereact/inputtext';
+
 import { Button } from 'primereact/button';
 import '../styles/CaptureScreen.scss';
 import { DataTable } from 'primereact/datatable';
@@ -10,8 +12,8 @@ import ActionPanel from '../components/ActionPanelObjects';
 import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue } from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
-import { v4 as uuid } from 'uuid'; 
-import{ScreenOverlay } from '../../global';
+import { v4 as uuid } from 'uuid';
+import { ScreenOverlay } from '../../global';
 import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
@@ -21,7 +23,7 @@ import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
-  const objValues = useSelector(state=>state.design.objValue);
+  const objValues = useSelector(state => state.design.objValue);
   const [visible, setVisible] = useState(false);
   const [showCaptureData, setShowCaptureData] = useState([]);
   const [showPanel, setShowPanel] = useState(true);
@@ -45,7 +47,7 @@ const CaptureModal = (props) => {
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
   const [captureData, setCaptureData] = useState([]);
   const [screenshotData, setScreenshotData] = useState([]);
-  const[endScrape,setEndScrape]=useState(false)
+  const [endScrape, setEndScrape] = useState(false)
   const [showObjModal, setShowObjModal] = useState(false);
   const userInfo = useSelector((state) => state.landing.userinfo);
   const [showPop, setShowPop] = useState("");
@@ -54,12 +56,15 @@ const CaptureModal = (props) => {
   const [masterCapture, setMasterCapture] = useState(false);
   const [showNote, setShowNote] = useState(false);
   const [screenshotY, setScreenshotY] = useState(null);
-	const [mirrorHeight, setMirrorHeight] = useState("0px");
+  const [mirrorHeight, setMirrorHeight] = useState("0px");
   const [dsRatio, setDsRatio] = useState(1);
   const [highlight, setHighlight] = useState(false);
-  const appType= props.appType;
-  const [imageHeight,setImageHeight]=useState(0);
+  const appType = props.appType;
+  const [imageHeight, setImageHeight] = useState(0);
   const [activeEye, setActiveEye] = useState(false);
+  const [modified, setModified] = useState(null);
+  const [editingCell, setEditingCell] = useState(null);
+
 
 
 
@@ -69,17 +74,17 @@ const CaptureModal = (props) => {
   const imageRef4 = useRef(null);
 
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
-  const[selectedCapturedElement,setSelectedCapturedElement] = useState(null);
+  const [selectedCapturedElement, setSelectedCapturedElement] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
 
-useEffect(()=>{
-  fetchScrapeData()
-},[])
- useEffect(()=>{
-  if(endScrape)
-  fetchScrapeData();
-  setEndScrape(false)
- },[endScrape])
+  useEffect(() => {
+    fetchScrapeData()
+  }, [])
+  useEffect(() => {
+    if (endScrape)
+      fetchScrapeData();
+    setEndScrape(false)
+  }, [endScrape])
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
@@ -156,8 +161,8 @@ useEffect(()=>{
   }
 
 
-  const handleBrowserClose = () =>{
-      setVisible(false);
+  const handleBrowserClose = () => {
+    setVisible(false);
   }
 
 
@@ -176,9 +181,9 @@ useEffect(()=>{
 
 
   const onSave = (e, confirmed) => {
-       
+
     let continueSave = true;
-    
+
     // if (mainScrapedData.reuse && !confirmed) {
     //     setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen has been reused. Are you sure you want to save scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onSave(null, true);}})
     //     return;
@@ -193,76 +198,76 @@ useEffect(()=>{
     let scrapeItemsL = [...capturedDataToSave];
 
     if (scrapeItemsL.length > 0) {
+      for (let scrapeItem of scrapeItemsL) {
+        if (uniqueCusts.includes(scrapeItem.title)) {
+          dCustname = true;
+          scrapeItem.duplicate = true;
+          dCusts.push(scrapeItem.title);
+        }
+        else {
+          scrapeItem.duplicate = false;
+          uniqueCusts.push(scrapeItem.title);
+        }
+      }
+      if (!dCustname) {
         for (let scrapeItem of scrapeItemsL) {
-            if (uniqueCusts.includes(scrapeItem.title)) {
-                dCustname = true;
-                scrapeItem.duplicate = true;
-                dCusts.push(scrapeItem.title);
-            }
-            else {
-                scrapeItem.duplicate = false;
-                uniqueCusts.push(scrapeItem.title);
-            }
+          if (scrapeItem.xpath === "" || scrapeItem.xpath === undefined) continue;
+          let xpath = scrapeItem.xpath;
+
+          if (props.appType === 'MobileWeb') xpath = xpath.split(";")[2];
+
+          if (uniqueXPaths.includes(xpath)) {
+            dXpath = true;
+            scrapeItem.duplicate = true;
+            dCusts2.push(scrapeItem.title);
+          }
+          else {
+            scrapeItem.duplicate = false;
+            uniqueXPaths.push(xpath);
+          }
         }
-        if (!dCustname) {
-            for (let scrapeItem of scrapeItemsL) {
-                if (scrapeItem.xpath === "" || scrapeItem.xpath === undefined) continue;
-                let xpath = scrapeItem.xpath;
+      }
 
-                if (props.appType === 'MobileWeb') xpath = xpath.split(";")[2];
-
-                if (uniqueXPaths.includes(xpath)) {
-                    dXpath = true;
-                    scrapeItem.duplicate = true;
-                    dCusts2.push(scrapeItem.title);
-                }
-                else {
-                    scrapeItem.duplicate = false;
-                    uniqueXPaths.push(xpath);
-                }
-            }
-        }
-
-        // if (dCustname) {
-        //     continueSave = false;
-        //     setShowPop({
-        //         'type': 'modal',
-        //         'title': 'Save Scrape data',
-        //         'content': <div className="ss__dup_labels">
-        //             Please rename/delete duplicate scraped objects
-        //             <br/><br/>
-        //             Object characterstics are same for:
-        //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-        //                 <div className="ss__dup_scroll">
-        //                 { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-        //                 </div>
-        //             {/* </ScrollBar> */}
-        //         </div>,
-        //         'footer': <button onClick={()=>setShowPop("")}>OK</button>
-        //     })
-        // } else if (dXpath) {
-        //     continueSave = false;
-        //     setShowConfirmPop({
-        //         'title': 'Save Scrape data',
-        //         'content': <div className="ss__dup_labels">
-        //             Object characteristics are same for the below list of objects:
-        //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-        //                 <div className="ss__dup_scroll">
-        //                 { dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-        //                 </div>
-        //             {/* </ScrollBar> */}
-        //             <br/>
-        //             Do you still want to continue?
-        //         </div>,
-        //         'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
-        //         'continueText': "Continue",
-        //         'rejectText': "Cancel"
-        //     })
-        // }
+      // if (dCustname) {
+      //     continueSave = false;
+      //     setShowPop({
+      //         'type': 'modal',
+      //         'title': 'Save Scrape data',
+      //         'content': <div className="ss__dup_labels">
+      //             Please rename/delete duplicate scraped objects
+      //             <br/><br/>
+      //             Object characterstics are same for:
+      //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+      //                 <div className="ss__dup_scroll">
+      //                 { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+      //                 </div>
+      //             {/* </ScrollBar> */}
+      //         </div>,
+      //         'footer': <button onClick={()=>setShowPop("")}>OK</button>
+      //     })
+      // } else if (dXpath) {
+      //     continueSave = false;
+      //     setShowConfirmPop({
+      //         'title': 'Save Scrape data',
+      //         'content': <div className="ss__dup_labels">
+      //             Object characteristics are same for the below list of objects:
+      //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+      //                 <div className="ss__dup_scroll">
+      //                 { dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+      //                 </div>
+      //             {/* </ScrollBar> */}
+      //             <br/>
+      //             Do you still want to continue?
+      //         </div>,
+      //         'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
+      //         'continueText': "Continue",
+      //         'rejectText': "Cancel"
+      //     })
+      // }
     }
 
-    if (continueSave) saveScrapedObjects();
-}
+    if (true) saveScrapedObjects();
+  }
 
 
   const fetchScrapeData = () => {
@@ -288,7 +293,7 @@ useEffect(()=>{
             newlyScrapeList=newScrapeList;
 
             setMainScrapedData(data);
-            if(capturedDataToSave.length===0)setCapturedDataToSave([...capturedDataToSave,...newScrapeList]);
+            if (capturedDataToSave.length === 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
             setMirror({ scrape: data.mirror, compare: null });
             setNewScrapedData([]);
             setScrapeItems(newScrapeList);
@@ -342,7 +347,7 @@ useEffect(()=>{
             // screenshot
           }
           resolve("success");
-          let newData = viewString.length>0?viewString.map((item) => {
+          let newData = viewString.length > 0 ? viewString.map((item) => {
             return (
                 {
                   selectall: item.custname,
@@ -392,55 +397,55 @@ useEffect(()=>{
     let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
     let views = [];
     let orderList = [];
-    // let modifiedObjects = Object.values(modified);
+    let modifiedObjects = modified;
 
     for (let scrapeItem of scrapeItemsL) {
-        if (!scrapeItem.objId) {
-            if (scrapeItem.isCustom) views.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId});
-            else views.push({...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.title, tempOrderId: scrapeItem.tempOrderId});
-            orderList.push(scrapeItem.tempOrderId);
-        }
-        else orderList.push(scrapeItem.objId);
+      if (!scrapeItem.objId) {
+        if (scrapeItem.isCustom) views.push({ custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+        else views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.title, tempOrderId: scrapeItem.tempOrderId });
+        orderList.push(scrapeItem.tempOrderId);
+      }
+      else orderList.push(scrapeItem.objId);
     }
-    
+
     let params = {
-        'deletedObj': [],
-        'modifiedObj': [],
-        'addedObj': {...added, view: views},
-        'screenId': props.fetchingDetails["_id"],
-        'userId': userInfo.user_id,
-        'roleId': userInfo.role,
-        'param': 'saveScrapeData',
-        'orderList': orderList
+      'deletedObj': [],
+      'modifiedObj': modifiedObjects,
+      'addedObj': { ...added, view: views },
+      'screenId': props.fetchingDetails["_id"],
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+      'param': 'saveScrapeData',
+      'orderList': orderList
     }
 
     scrapeApi.updateScreen_ICE(params)
-    .then(response => {
+      .then(response => {
         if (response === "Invalid Session") return null;
-        else fetchScrapeData().then(resp=>{
-            if (resp === 'success' || typeof(resp) === "object"){
-                typeof(resp)==="object" && resp.length>0 
-                ? <div className="ss__dup_labels">
-                                Scraped data saved successfully.
-                                <br/><br/>
-                                <strong>Warning: Please scrape an IRIS reference object.</strong>
-                                <br/><br/>
-                                Matching objects found for:
-                                {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-                                <div className="ss__dup_scroll">
-                                { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-                                </div>
-                                {/* </ScrollBar> */}
-                            </div>
-                : <div>Scraped Data saved successfull</div>;
-                let numOfObj = scrapeItemsL.length;
-                // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
-            } else console.error(resp);
+        else fetchScrapeData().then(resp => {
+          if (resp === 'success' || typeof (resp) === "object") {
+            typeof (resp) === "object" && resp.length > 0
+              ? <div className="ss__dup_labels">
+                Scraped data saved successfully.
+                <br /><br />
+                <strong>Warning: Please scrape an IRIS reference object.</strong>
+                <br /><br />
+                Matching objects found for:
+                {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+                <div className="ss__dup_scroll">
+                  {resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+                </div>
+                {/* </ScrollBar> */}
+              </div>
+              : <div>Scraped Data saved successfull</div>;
+            let numOfObj = scrapeItemsL.length;
+            // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
+          } else console.error(resp);
         })
-        .catch(error => console.error(error));
-    })
-    .catch(error => console.error(error))
-}
+          .catch(error => console.error(error));
+      })
+      .catch(error => console.error(error))
+  }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
     let screenViewObject = {};
@@ -455,26 +460,27 @@ useEffect(()=>{
     setOverlay(blockMsg);
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
-        if(capturedDataToSave.length!==0 && masterCapture){
+        if (capturedDataToSave.length !== 0 && masterCapture) {
           let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
-            let deleted=capturedDataToSave.map(item=>item.objId);
-            setCaptureData([]);
-            setCapturedDataToSave([]);
-         let params = {
-                    'deletedObj': deleted,
-                    'modifiedObj':[],
-                    'addedObj': {...added, view: []},
-                    'screenId': props.fetchingDetails["_id"],
-                    'userId': userInfo.user_id,
-                    'roleId': userInfo.role,
-                    'param': 'saveScrapeData',
-                    'orderList': []
-                }
-                scrapeApi.updateScreen_ICE(params)
-                .then(response => {
-               console.log('done')})
-               .catch(error=>console.log(error))
-              }
+          let deleted = capturedDataToSave.map(item => item.objId);
+          setCaptureData([]);
+          setCapturedDataToSave([]);
+          let params = {
+            'deletedObj': deleted,
+            'modifiedObj': [],
+            'addedObj': { ...added, view: [] },
+            'screenId': props.fetchingDetails["_id"],
+            'userId': userInfo.user_id,
+            'roleId': userInfo.role,
+            'param': 'saveScrapeData',
+            'orderList': []
+          }
+          scrapeApi.updateScreen_ICE(params)
+            .then(response => {
+              console.log('done')
+            })
+            .catch(error => console.log(error))
+        }
         let err = null;
         setOverlay("");
         // ResetSession.end();
@@ -526,7 +532,7 @@ useEffect(()=>{
 
           setNewScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
-          masterCapture?setCapturedDataToSave([...scrapeItemList]):setCapturedDataToSave([...capturedDataToSave,...scrapeItemList])
+          masterCapture ? setCapturedDataToSave([...scrapeItemList]) : setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
           updateScrapeItems(scrapeItemList);
           setScrapedURL(updatedNewScrapeData.scrapedurl);
           setMirror({ scrape: viewString.mirror, compare: null });
@@ -535,7 +541,7 @@ useEffect(()=>{
           if (viewString.view.length > 0) setSaved({ flag: false });
           setEndScrape(true)
 
-          
+
         }
       })
       .catch(error => {
@@ -544,12 +550,8 @@ useEffect(()=>{
         // setMsg(MSG.SCRAPE.ERR_SCRAPE);
         console.error("Fail to Load design_ICE. Cause:", error);
       });
-    
+
   }
-
- 
-
-  
 
   const updateScrapeItems = newList => {
     setScrapeItems([...scrapeItems, ...newList])
@@ -560,62 +562,62 @@ useEffect(()=>{
   };
 
 
-    const handleDelete = (rowData) => {
-      const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
-      setCaptureData(updatedData);
-    };
+  const handleDelete = (rowData) => {
+    const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
+    setCaptureData(updatedData);
+  };
 
-    const handleEdit = (rowData) =>{
-      const updatedData = captureData.map((item) => {
-        if (item.selectall === rowData.selectall) {
-          return { ...item, editing: true };
-        }
-        return item;
-      });
-      setCaptureData(updatedData);
-    }
-
-    const handleSelectAllChange = (rowData, newValue) => {
-      const updatedData = captureData.map((item) => {
-        if (item.selectall === rowData.selectall) {
-          return { ...item, selectall: newValue };
-        }
-        return item;
-      });
-      setCaptureData(updatedData);
-    };
-  
-    const renderSelectAllCell = (rowData) => {
-      if (rowData.editing) {
-        return (
-          <input
-            type="text"
-            value={rowData.selectall}
-            onChange={(e) => handleSelectAllChange(rowData, e.target.value)}
-          />
-        );
+  const handleEdit = (rowData) => {
+    const updatedData = captureData.map((item) => {
+      if (item.selectall === rowData.selectall) {
+        return { ...item, editing: true };
       }
-      return rowData.selectall;
-    };
-    
+      return item;
+    });
+    setCaptureData(updatedData);
+  }
 
-    
+  const handleSelectAllChange = (rowData, newValue) => {
+    const updatedData = captureData.map((item) => {
+      if (item.selectall === rowData.selectall) {
+        return { ...item, selectall: newValue };
+      }
+      return item;
+    });
+    setCaptureData(updatedData);
+  };
+
+  // const renderSelectAllCell = (rowData) => {
+  //   if (rowData.editing) {
+  //     return (
+  //       <input
+  //         type="text"
+  //         value={rowData.selectall}
+  //         onChange={(e) => handleSelectAllChange(rowData, e.target.value)}
+  //       />
+  //     );
+  //   }
+  //   return rowData.selectall;
+  // };
+
+
+
   const renderActionsCell = (rowData) => {
     return (
-     <div>
-      <img src="static/imgs/ic-edit.png"
-            style={{ height: "20px", width: "20px" }}
-            className="edit__icon" onClick={() => handleEdit(rowData)} />
-          <img
-            src="static/imgs/ic-delete-bin.png"
-            style={{ height: "20px", width: "20px" }}
-            className="delete__icon"  onClick={() => handleDelete(rowData)}/>
-     </div>
-      )
-    
-    };
+      <div>
+        <img src="static/imgs/ic-edit.png"
+          style={{ height: "20px", width: "20px" }}
+          className="edit__icon" onClick={() => handleEdit(rowData)} />
+        <img
+          src="static/imgs/ic-delete-bin.png"
+          style={{ height: "20px", width: "20px" }}
+          className="delete__icon" onClick={() => handleDelete(rowData)} />
+      </div>
+    )
 
- 
+  };
+
+
   const handleMouseLeaveRow = () => {
     setHoveredRow(null);
   };
@@ -633,17 +635,17 @@ useEffect(()=>{
   //   }
   //   return null;
   // };
-  
+
 
   const footerCapture = (
     <div className='footer__capture'>
-      <Button className='btn_capture' onMouseDownCapture={() =>{setVisible(false);startScrape(captureButton);}}>Capture</Button>
+      <Button className='btn_capture' onMouseDownCapture={() => { setVisible(false); startScrape(captureButton); }}>Capture</Button>
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button className='btn_capture' onMouseDownCapture={() => {setVisible(false);startScrape(captureButton)}}>Capture</Button>
+      <Button className='btn_capture' onMouseDownCapture={() => { setVisible(false); startScrape(captureButton) }}>Capture</Button>
     </div>
   );
 
@@ -655,7 +657,7 @@ useEffect(()=>{
         <img className="screen_btn" src="static/imgs/ic-screen-icon.png" />
         {captureData.length > 0 ? <div className='Header__btn'>
           <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
-          <button className='add__more__btn' onClick={() => {setMasterCapture(false);handleAddMore('add more')}}>Add More</button>
+          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }}>Add More</button>
           <button className="btn-capture" onClick={() => setShowNote(true)}>Capture Elements</button>
         </div> : <button className='btn_panel__single' onClick={togglePanel}>Action Panel</button>}
       </div>
@@ -672,26 +674,26 @@ useEffect(()=>{
 
   const footerSave = (
     <>
-    <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} ></Button>
+      <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)}></Button>
+      <Button label='Save' onClick={onSave} ></Button>
     </>
   )
 
-  const confirmPopupMsg =(
+  const confirmPopupMsg = (
     <div> <p>Note :This will completely refresh all <strong>Captured Elements</strong> on the screen. In case you want to Capture only additional elements use the <strong>"Add More"</strong> option </p></div>
   )
   const onHighlight = () => {
-    capturedDataToSave.map((object)=>{
+    capturedDataToSave.map((object) => {
       if (objValues.val === object.val) setActiveEye(true);
-    else if (activeEye) setActiveEye(false);
-    })  
+      else if (activeEye) setActiveEye(false);
+    })
     let objVal = selectedCapturedElement[0].objectDetails;
     dispatch(objValue(objVal));
   }
 
-  useEffect(()=>{
-    if (mirror.scrape){
-		   let mirrorImg = new Image();
+  useEffect(() => {
+    if (mirror.scrape) {
+      let mirrorImg = new Image();
 
 		mirrorImg.onload = function(){
       // let aspect_ratio = mirrorImg.height / mirrorImg.width;
@@ -705,124 +707,233 @@ useEffect(()=>{
       setImageHeight(mirrorImg.height)
       setDsRatio(ds_ratio);
     }
-    mirrorImg.src = `data:image/PNG;base64,${mirror.scrape}`;
-  }
     else {
-			setMirrorHeight("0px");
-			setDsRatio(1);
-		}
-    dispatch(objValue({val: null }));
-		setHighlight(false);
-	}, [mirror])
+      setMirrorHeight("0px");
+      setDsRatio(1);
+    }
+    dispatch(objValue({ val: null }));
+    setHighlight(false);
+  }, [mirror])
 
 
-  useEffect(()=>{
-		if (objValues.val !== null){
-			let ScrapedObject = objValues;
+  useEffect(() => {
+    if (objValues.val !== null) {
+      let ScrapedObject = objValues;
 
-			let top=0; let left=0; let height=0; let width=0;
-			let displayHighlight = true;
-			if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True'){
-				setHighlight(false)
-				// setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
-			} else if (ScrapedObject.height && ScrapedObject.width) {
-				if (ScrapedObject.viewTop != undefined) {
-					if (ScrapedObject.viewTop < imageHeight) {
-						// perform highlight
-						top = ScrapedObject.viewTop * dsRatio
-					}
-					else {
-						// popup error message
-						displayHighlight=false
-					}
-				}
-				else {
-					if (ScrapedObject.top < imageHeight) {
-						// perform highlight
-						top = ScrapedObject.top * dsRatio;
-					}
-					else {
-						// popup error message
-						displayHighlight=false
-					}
-				}
-				// ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
-				left = ScrapedObject.left * dsRatio;
-				height = ScrapedObject.height * dsRatio;
-				width = ScrapedObject.width * dsRatio;
+      let top = 0; let left = 0; let height = 0; let width = 0;
+      let displayHighlight = true;
+      if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True') {
+        setHighlight(false)
+        // setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
+      } else if (ScrapedObject.height && ScrapedObject.width) {
+        if (ScrapedObject.viewTop != undefined) {
+          if (ScrapedObject.viewTop < imageHeight) {
+            // perform highlight
+            top = ScrapedObject.viewTop * dsRatio
+          }
+          else {
+            // popup error message
+            displayHighlight = false
+          }
+        }
+        else {
+          if (ScrapedObject.top < imageHeight) {
+            // perform highlight
+            top = ScrapedObject.top * dsRatio;
+          }
+          else {
+            // popup error message
+            displayHighlight = false
+          }
+        }
+        // ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
+        left = ScrapedObject.left * dsRatio;
+        height = ScrapedObject.height * dsRatio;
+        width = ScrapedObject.width * dsRatio;
 
-				if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1){
-					top = top + 112;
-					left = left + 15;	
-				} 
-				else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD'){
-					top = top + 2;
-					left = left + 3;
-				}
-				else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD'){
-					top = top + 35;
-					left = left-36;
-				}
-				// if (highlight){setHighlight} else{setHighlight(false)}
-				if(displayHighlight){
-					setHighlight({
-						top: `${Math.round(top)}px`, 
-						left: `${Math.round(left)}px`, 
-						height: `${Math.round(height)}px`, 
-						width: `${Math.round(width)}px`, 
-						backgroundColor: "yellow", 
-						border: "1px solid red", 
-						opacity: "0.7"
-					});
-				}
-				else {
-					setHighlight(false);
-					// setMsg(Messages.SCRAPE.ERR_HIGHLIGHT_OUT_OF_RANGE);
-				}
-				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
-			} else setHighlight(false);
-			if(!ScrapedObject.xpath.startsWith('iris')){
-				scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
-					.then(data => {
-						if (data === "Invalid Session") return null;
-						if (data === "fail") return null;
-					})
-					.catch(error => console.error("Error while highlighting. ERROR::::", error));
-			}
-		}
-		else setHighlight(false);
-		//eslint-disable-next-line
-	}, [objValues])
-
-
+        if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1) {
+          top = top + 112;
+          left = left + 15;
+        }
+        else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD') {
+          top = top + 2;
+          left = left + 3;
+        }
+        else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD') {
+          top = top + 35;
+          left = left - 36;
+        }
+        // if (highlight){setHighlight} else{setHighlight(false)}
+        if (displayHighlight) {
+          setHighlight({
+            top: `${Math.round(top)}px`,
+            left: `${Math.round(left)}px`,
+            height: `${Math.round(height)}px`,
+            width: `${Math.round(width)}px`,
+            backgroundColor: "yellow",
+            border: "1px solid red",
+            opacity: "0.7"
+          });
+        }
+        else {
+          setHighlight(false);
+          // setMsg(Messages.SCRAPE.ERR_HIGHLIGHT_OUT_OF_RANGE);
+        }
+        // highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
+      } else setHighlight(false);
+      if (!ScrapedObject.xpath.startsWith('iris')) {
+        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
+          .then(data => {
+            if (data === "Invalid Session") return null;
+            if (data === "fail") return null;
+          })
+          .catch(error => console.error("Error while highlighting. ERROR::::", error));
+      }
+    }
+    else setHighlight(false);
+    //eslint-disable-next-line
+  }, [objValues])
 
 
-  const headerScreenshot =(
+
+
+  const headerScreenshot = (
     <>
-    <div className='header__popup'>
-    {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
-    <div>
-    <img data-test="eyeIcon" className="ss_eye_icon" 
-                onClick={onHighlight} 
-                src={activeEye ? "static/imgs/ic-highlight-element-inactive.png": ""} 
-                alt="eyeIcon"/>
-    </div>
-    </div>
+      <div className='header__popup'>
+        {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
+        <div>
+          <img data-test="eyeIcon" className="ss_eye_icon"
+            onClick={onHighlight}
+            src={activeEye ? "static/imgs/ic-highlight-element-inactive.png" : ""}
+            alt="eyeIcon" />
+        </div>
+      </div>
     </>
   )
+  const handleSave = (value, cellValue, customFlag = '') => {
+    let localScrapeItems = [...scrapeItems];
+    let updNewScrapedData = { ...newScrapedData };
+    let objId = "";
+    let isCustom = false;
+    let obj = null;
+    for (let scrapeItem of localScrapeItems) {
+      if (scrapeItem.val === value) {
+        scrapeItem.title = cellValue;
+        if (customFlag) {
+          scrapeItem.tag = cellValue.tag;
+          scrapeItem.url = cellValue.url;
+          scrapeItem.xpath = cellValue.xpath;
+          scrapeItem.editable = true;
+        }
+        objId = scrapeItem.objId;
+        isCustom = scrapeItem.isCustom;
+        if (objId) obj = { ...mainScrapedData.view[scrapeItem.objIdx], custname: cellValue };
+        else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = { ...newScrapedData.view[scrapeItem.objIdx], custname: cellValue }
+        // else only if customFlag is true
+      };
+    }
+
+    if (objId) {
+      let modifiedDict = { ...modified }
+      modifiedDict[objId] = obj;
+      setModified(modifiedDict);
+    }
+    else if (!isCustom) setNewScrapedData(updNewScrapedData);
+    if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
+    setScrapeItems(localScrapeItems);
+  }
+
+  const onCellEditComplete = (e) => {
+    let { rowData, newValue, field, originalEvent: event } = e;
+    if (newValue.trim().length > 0) {
+      setCellValue(newValue);
+      rowData.selectall = newValue;
+      handleSave(rowData.objectDetails.val, newValue);
+
+    }
+    else event.preventDefault();
+  }
+
+  const cellEditor = (options) => {
+    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+  };
 
 
 
+
+  const [editing, setEditing] = useState(false);
+  const [cellValue, setCellValue] = useState(null);
+  const [showInput, setShowInput] = useState(false);
+  const [editedObjectValue, setEditedObjectValue] = useState("");
+  const hoverCellTemplate = (rowData) => {
+    setEditedObjectValue(rowData.objectDetails.val);
+    setCellValue(rowData.selectall);
+    const handleMouseEnter = () => {
+      setEditing(true);
+    };
+
+    const handleMouseLeave = () => {
+      setEditing(false);
+    };
+
+    const handleInputChange = (e) => {
+      setCellValue(e.target.value);
+      rowData.selectall = e.target.value;
+    };
+
+    const EditHandler = () => {
+      console.log("Inside Input");
+      setShowInput(true);
+      setEditing(false);
+    }
+
+    
+
+    // console.log("capturedDataToSave",capturedDataToSave);
+    // console.log("captureData", captureData);
+    // const updateEditedData = [];
+    // capturedDataToSave.filter(toSaveData => {
+    //   captureData.some(item => {
+    //     if(toSaveData.objId === item.objId && toSaveData.custname !== item.selectall) {
+    //       updateEditedData.push({...toSaveData, "custname" : item.selectall, "title": item.selectall });
+    //     }
+
+    //   })
+    // });
+
+    // console.log(updateEditedData);
+    // setModifyElementName([...updateEditedData]);
+    // setEditing(false);
+    // setShowInput(false);
+
+    return (
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        {editing ? <div>
+          <span> {cellValue} </span>
+          <Button icon="pi pi-pencil" rounded text onClick={EditHandler} />
+        </div> :
+          <div>
+            {showInput ? <>
+              <InputText value={cellValue} onChange={handleInputChange} />
+              <Button icon="pi pi-check" rounded text onClick={() => handleSave(editedObjectValue, cellValue)} />
+            </> : <span>{cellValue} </span>
+            }
+
+          </div>
+        }
+      </div>
+    );
+  };
 
   return (
     <>
-     { overlay && <ScreenOverlay content={overlay} />}
+      {overlay && <ScreenOverlay content={overlay} />}
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={footerSave}>
         {showPanel && (<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
               <div className='insprint__block'>
-              <p className='insprint__text'>In Sprint Automation</p>
+                <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png"></img>
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
                   <img className='add_obj' title="add object" src="static/imgs/ic-add-object.png"></img>
@@ -839,7 +950,7 @@ useEffect(()=>{
                 </div>)}
               </div>
               <div className='upgrade__block'>
-              <p className='insprint__text'>Upgrade Analyzer</p>
+                <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png"></img>
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
                   <img className='add_obj' src="static/imgs/ic-compare.png"></img>
@@ -856,7 +967,7 @@ useEffect(()=>{
                 </div>)}
               </div>
               <div className='utility__block'>
-              <p className='insprint__text'>Capture from PDF</p>
+                <p className='insprint__text'>Capture from PDF</p>
                 <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png"></img>
                 <span className='insprint_auto'>
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
@@ -869,7 +980,7 @@ useEffect(()=>{
                 </div>)}
               </div>
               <div className='createManual__block'>
-              <p className='insprint__text'>Create Manually</p>
+                <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png"></img>
                 <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
@@ -883,11 +994,11 @@ useEffect(()=>{
               </div>
               <div className='imp_exp__block'>
                 <span className='insprint_auto'>
-                  <span className='import__block' onClick={() =>setShowObjModal("importModal")}>
+                  <span className='import__block' onClick={() => setShowObjModal("importModal")}>
                     <img className='add_obj' src="static/imgs/ic-import.png" />
                     <p className='imp__text'>Import Screen</p>
                   </span>
-                  <span className='export__block' onClick={() =>setShowObjModal("exportModal")}>
+                  <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
                     <img className='add_obj' src="static/imgs/ic-export.png" />
                     <p className='imp__text'>Export Screen</p>
                   </span>
@@ -898,20 +1009,38 @@ useEffect(()=>{
         </div>)}
         <div className="card-table">
 
-          <DataTable size="small" className='datatable__col' value={captureData} dragHandleIcon="pi pi-bars" rowReorder resizableColumns reorderableRows onRowReorder={handleRowReorder} showGridlines selectionMode={"single"} selection={selectedCapturedElement} onSelectionChange={onRowClick} tableStyle={{ minWidth: '50rem' }} headerCheckboxToggleAllDisabled={false} emptyMessage={emptyMessage}>
+          <DataTable
+            size="small"
+            editMode="cell"
+            className='datatable__col'
+            value={captureData}
+            dragHandleIcon="pi pi-bars"
+            rowReorder resizableColumns
+            reorderableRows
+            onRowReorder={handleRowReorder}
+            showGridlines
+            selectionMode={"single"}
+            selection={selectedCapturedElement}
+            onSelectionChange={onRowClick}
+            tableStyle={{ minWidth: '50rem' }}
+            headerCheckboxToggleAllDisabled={false}
+            emptyMessage={emptyMessage}
+          >
+            {/* editMode="cell"
+            onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
             <Column field="selectall" header="Element Name" body={renderSelectAllCell} bodyClassName="ellipsis-column"></Column>
             <Column field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
-            <Column field="actions" header="Actions"   body={renderActionsCell}/>
+            <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
-          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={()=>{setScreenshotData({...screenshotData, enable: false})}} style={{height: `${mirrorHeight}px`}}>
-          <div className="screenshot_pop__content" >
-          { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
-             <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
-          </div>
+          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false }) }} style={{ height: `${mirrorHeight}px` }}>
+            <div className="screenshot_pop__content" >
+              {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
+              <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+            </div>
           </Dialog>
         </div>
       </Dialog>
@@ -931,12 +1060,12 @@ useEffect(()=>{
       </Dialog>
       {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
       <AvoConfirmDialog
-                visible={showNote}
-                onHide={() => setShowNote(false)} 
-                showHeader={false}
-                message={confirmPopupMsg} 
-                icon="pi pi-exclamation-triangle" 
-                accept={() => {setMasterCapture(true);handleAddMore('capture')}} />
+        visible={showNote}
+        onHide={() => setShowNote(false)}
+        showHeader={false}
+        message={confirmPopupMsg}
+        icon="pi pi-exclamation-triangle"
+        accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
       <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
@@ -956,9 +1085,9 @@ useEffect(()=>{
       {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
       {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
       {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
-      { showObjModal === "importModal" && <ImportModal  fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web"  fetchingDetails={props.fetchingDetails} />}
-      { showObjModal === "exportModal" && <ExportModal  appType="Web"  fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
-      
+      {showObjModal === "importModal" && <ImportModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web" fetchingDetails={props.fetchingDetails} />}
+      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
+
     </>
   );
 }
