@@ -33,6 +33,7 @@ const MindmapHome = () => {
   }
   const [showCard, setShowCard] = useState(true);
   const [show, setShow] = useState(false);
+  const [initBlockUi, setInitBlockUi] = useState(false)
   console.log("showCard",showCard)
   console.log("show", show)
   var Component = createType["newmindmap"];
@@ -69,9 +70,11 @@ const MindmapHome = () => {
         setOptions1('newmindmap');
         setShowCard(false);
         setShow(true);
+        
       }else{
         setShowCard(true);
         setShow(false);
+        setInitBlockUi(true)
       }
     })()
   },[]);
@@ -81,11 +84,11 @@ const MindmapHome = () => {
  
   return (
     <div className='mp__container'>
-      {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
+      {(blockui.show)?<ScreenOverlay content="Loading Content"/>:null}
       <div className='mp__body'>
         {!show && <ModuleListDrop/>}
         <Fragment>
-        {showCard &&  <div className='cardMindmap'>
+        {((showCard && !show) && initBlockUi) &&  <div className='cardMindmap'>
             <Card  id='p_card' className='Module'>
               <span className='cardText'>
                 <h3 id='module'>Start by creating a Mindmap</h3>
@@ -104,8 +107,9 @@ const MindmapHome = () => {
               <img className='avoGeniusImg' src='static\imgs\AvoGenius.png' alt='Start Avo Genius'/>
             </Card>
           </div>}
+          </Fragment>
           {show &&  <Component/>}
-        </Fragment>        
+               
         {/* } */}
       </div>
       {/* <div className='mp__footer'> 
