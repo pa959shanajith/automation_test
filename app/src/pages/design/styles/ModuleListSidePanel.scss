@@ -1,5 +1,5 @@
 .CollapseWholeCont{ 
-    height:95%;
+    height:100%;
     display: flex;
     flex-direction: row-reverse;
 
@@ -15,7 +15,7 @@
     border-bottom: 0.5px solid #C7C7C7;
     background-color: rgb(255, 255, 255);
     z-index: 1;
-    overflow: auto;
+    // overflow: auto;
     overflow-x: visible;
     .project_name_section{
         height:7% ;
@@ -31,13 +31,13 @@
     
 
     .normalModule_main_container{
-        height:58% ;
+        height:70% ;
         border-top: 0.5px solid #c7c7c7;
         border-bottom: 0.5px solid #C7C7C7;
         
     }
     .E2E_main_container{
-        height:35% ;
+        height:30% ;
         border-bottom: 1px solid rgb(91, 89, 89);
     }
     .moduleLayer_icon{
@@ -115,18 +115,26 @@
         // border: 1px solid black;
         overflow-y: auto;
     }
+    .NorModuleListE2E{
+        max-height: 65%;
+        // border: 1px solid black;
+        overflow-y: auto;
+    }
     
     .EachModNameBox{
         // border: 1px solid rgb(213, 30, 30);
         max-width: 100%;
         max-height: 10%;
-        justify-content: center;
+        // justify-content: center;
         // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
         overflow: hidden;
         text-overflow: ellipsis;
         margin-top: 6px;
         cursor: pointer;
-        
+        display: flex;
+        padding-left: 7%;
+        align-items: center;
+
     }
     .EachModNameBox:hover{
         background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
@@ -138,7 +146,8 @@
         max-width: 91%;
         max-height: 100%;
         // border: 1px solid rgb(19, 225, 126);
-        padding-left: 1rem;
+        padding-left: 0.5rem;
+        font-size: 14px;
     }
     .moduleName img{
         height: 20px;

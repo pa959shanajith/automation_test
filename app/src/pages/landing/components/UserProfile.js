@@ -49,7 +49,7 @@ const UserDemo = (props) => {
                                 <div className="flex flex-column">
                                     <span className="font-bold c">{userInfo.username}</span>
                                     <span className="text-sm c">{userInfo.rolename}</span>
-                                    <Tooltip target=".tooltipEmailId" position="bottom" content={userInfo.email_id}/>
+                                    <Tooltip target=".tooltipEmailId" position="left" content={userInfo.email_id}/>
                                     <span className="text-sm max-w-12rem tooltipEmailId">{userInfo.email_id}</span>
                                 </div>
                             </div>)
