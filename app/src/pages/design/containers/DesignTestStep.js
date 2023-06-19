@@ -75,7 +75,7 @@ const DesignModal = (props) => {
     useEffect(()=>{
         const parentScreenId = () =>{
             for (var i = 0; i < parentScreen.length; i++) {
-                if (props.fetchingDetails['parent']["children"][idx]["name"] === parentScreen[i].name) {
+                if (props.fetchingDetails["name"] === parentScreen[i].name) {
                     setIdx(i);
                     return setShow({
                         name: parentScreen[i].name,
@@ -90,8 +90,6 @@ const DesignModal = (props) => {
         }
         parentScreenId();
     },[parentScreen, props.fetchingDetails,idx])
-    console.log(showPopup)
-    console.log(idx)
     useEffect(() => {
         if (draggedFlag) {
             setStepSelect({ edit: false, check: [], highlight: [] });
@@ -684,7 +682,7 @@ const DesignModal = (props) => {
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} footer={footerTemplate} >
                 <div className='toggle__tab'>
-                <Accordion multiple activeIndex={idx} onTabChange={(e) => setIdx(e.index)}>
+                <Accordion multiple activeIndex={[idx]}>
                 {parentScreen.map((item)=><AccordionTab header={item.name} onClick={toggleTableVisibility}>
                             <DataTable
                                 value={newtestcase.length>0 ?newtestcase:[]}
