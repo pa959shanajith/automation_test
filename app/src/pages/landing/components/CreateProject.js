@@ -78,13 +78,13 @@ const CreateProject = ({ visible, onHide }) => {
 
   const apps = [
     { name: 'Web', code: 'NY', image: 'static/imgs/web.png' },
-    { name: 'Sap', code: 'RM', image: 'static/imgs/SAP.png' },
-    { name: 'Oebs', code: 'LDN', image: 'static/imgs/OEBS.png' },
-    { name: 'DeskTop', code: 'IST', image: 'static/imgs/desktop.png' },
-    { name: 'Webservices', code: 'PRS', image: 'static/imgs/webService.png' },
+    { name: 'SAP', code: 'RM', image: 'static/imgs/SAP.svg' },
+    { name: 'Oracle Applications', code: 'LDN', image: 'static/imgs/OEBS.svg' },
+    { name: 'Desktop', code: 'IST', image: 'static/imgs/desktop.png' },
+    { name: 'Web services', code: 'PRS', image: 'static/imgs/webService.png' },
     { name: 'Mainframe', code: 'PRS', image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'PRS', image: 'static/imgs/mobileWeb.png' },
-    { name: 'Mobile Apps', code: 'PRS', image: '/static/imgs/mobileApps.png' },
+    { name: 'Mobile Applications', code: 'PRS', image: '/static/imgs/mobileApps.png' },
   ];
 
   const roles = [
@@ -354,34 +354,20 @@ const CreateProject = ({ visible, onHide }) => {
                 <div key={item.id} className="users-list">
                   <Checkbox className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id} checked={selectedCheckboxes.some((cb) => cb.id === item.id)} onChange={handleCheckboxChange} />
                   <h5 htmlFor={`checkbox-${item.id}`} className="label-2 ml-2 mr-2 mt-2 mb-2" title={item.email} >
-
+                   <div className='user-info' >
                     <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '27px', height: '26px' }} >{item.initials}</Avatar></span>
-
+                   <div className='name_And_Role'>
                     <span className='user-name'> {item.name}</span>
                     <span className='user-role'>{item.primaryRole}</span>
-
                     <span className='tooltip'></span>
+                    </div>
+                    </div>
 
                   </h5>
+                  <div className='role__dd'>
                   <Dropdown value={(item.selectedRole) ? item.selectedRole : ''} onChange={(e) => handleRoleChange(e, item.id)} options={roles} optionLabel="name"
-                    // valueTemplate={(option) => {
-                    //   return (
-                    //     <>
-                    //       {option && (
-                    //         <div className="selected-role">
-                    //           <span>{option.name}</span>
-                    //           <button
-                    //             className="cancel-selection"
-                    //             onClick={handleCancelSelection}
-                    //           >
-                    //             &#10005;
-                    //           </button>
-                    //         </div>
-                    //       )}
-                    //     </>
-                    //   );
-                    // }}
                     placeholder="Select a Role" className="role-dropdown" />
+                    </div>
 
                 </div>
 
@@ -416,17 +402,18 @@ const CreateProject = ({ visible, onHide }) => {
           <div className='check-bx3'>
             <ul>
               {displayUser.map((checkboxId) => (
-                <>
+                <div className="selected_users__list"> 
                   <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id} value={checkboxId.id} checked={selectedAssignedCheckboxes.some((ab) => ab.id === checkboxId.id)}
                     onChange={handleAssignedCheckboxChange}
                   >{checkboxId} </Checkbox>
-                  <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 ">
-                    <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '27px', height: '26px' }} >{checkboxId.initials}</Avatar></span>
+                  <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 " title={checkboxId.email}>
+                    <div className="nameRole_user">
+                    <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '26px', height: '23px',fontSize:"13px" }} >{checkboxId.initials}</Avatar></span>
                     <span className='asgnd-name'> {checkboxId.name} </span>
                     <span className='asgnd-role'>{!checkboxId.selectedRole.name ? checkboxId.primaryRole : checkboxId.selectedRole.name}</span>
-
+                    </div>
                   </h5>
-                </>
+                </div>
 
               ))}
             </ul>
