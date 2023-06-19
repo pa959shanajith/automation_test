@@ -111,9 +111,9 @@ const ConfigureSetup = ({
     setConfigTable(mainTree);
   }, [configData?.configureData, modules, dataparam, condition, accessibility]);
 
-  useEffect(() => {
-    dispatch(checkRequired({ configName: configTxt }));
-  }, [configTxt]);
+  // useEffect(() => {
+  //   dispatch(checkRequired({ configName: configTxt }));
+  // }, [configTxt]);
 
   useEffect(() => {
     const getXpanded = [...xpanded];
@@ -166,13 +166,18 @@ const ConfigureSetup = ({
     setXpanded(getXpanded);
   }, [getProjectData.testsuiteData]);
 
+  console.log(getProjectData.testsuiteData);
+
   useEffect(() => {
     if (!!Object.keys(dotNotExe).length) {
       const getExecutions = configData?.configureData?.normalExecution;
       const getNotExe = dotNotExe?.executionRequest?.donotexe?.current;
       const nodeObj = {};
+      // const getXpanded = [...xpanded];
       getExecutions.forEach((el, ind) => {
         if (Object.keys(getNotExe).includes(el.moduleid)) {
+          console.log(el);
+          console.log(getExecutions);
           nodeObj[ind] = {
             checked: true,
             partialChecked:
@@ -186,12 +191,20 @@ const ConfigureSetup = ({
               };
             });
           }
+          // getXpanded.push({
+          //   testsuiteid: 0,
+          //   key: ind,
+          //   suitescenarios: el?.scenarios.map((item) => item._id),
+          //   suitename: el?.name,
+          //   suiteid: el?.moduleid,
+          // });
         }
       });
+      // setXpanded(getXpanded);
       setSelectedNodeKeys(nodeObj);
     }
   }, [dotNotExe]);
-  console.log(selectedNodeKeys);
+
   const onDataparamChange = (e, getKey) => {
     setDataparam({
       ...dataparam,
@@ -280,10 +293,10 @@ const ConfigureSetup = ({
   );
 
   const rowClassName = (node) => {
-    if (node?.key?.length === 1) {
-      return { customRow: true };
-    } else {
+    if (node?.key?.includes('-')) {
       return { genaralRow: true };
+    } else {
+      return { customRow: true };
     }
   };
 
