@@ -10,26 +10,27 @@ const AvoModal = ({
   footerType = null,
   headerTxt,
   modalSytle,
-  onModalBtnClick = () => {}
+  onModalBtnClick = () => {},
+  isDisabled = false
 }) => {
 
   const footerValues = {
     CancelSave: [
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Save", autoFocus: false, btnType: null, key: "save"},
+      { btnTxt: "Save", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
     ],
     CancelUpdate: [
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Update", autoFocus: false, btnType: null, key: "save"},
+      { btnTxt: "Update", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
     ],
     Execute: [
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Execute", autoFocus: false, btnType: null, key: "save" },
+      { btnTxt: "Execute", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
 
     ],
     Schedule: [
       { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Schedule", autoFocus: false, btnType: null, key: "save"},
+      { btnTxt: "Schedule", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
     ],
   };
   const footerContent = footerValues[footerType]?.map((el) => (
@@ -40,6 +41,7 @@ const AvoModal = ({
         {...(el?.btnType && { [el?.btnType]: true })}
         onClick={() => onModalBtnClick(el?.btnTxt)}
         autoFocus={el?.autoFocus}
+        disabled={el.disabled}
       />
     </div>
   ));
