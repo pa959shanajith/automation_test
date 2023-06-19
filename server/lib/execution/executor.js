@@ -120,7 +120,7 @@ class TestSuiteExecutor {
             execReq['sauce_access_key'] = batchData.sauce_access_key
             execReq['remote_url'] = batchData.remote_url
             if(batchData.batchInfo[0].appType == 'Web') {
-                execReq['saucelabOsVersion'] = batchData.saucelabBrowserVersion
+                execReq['browserVersion'] = batchData.browserVersion
                 execReq['platform'] = batchData.platform
             } else {
                 execReq["mobile"] = batchData.mobile

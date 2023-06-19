@@ -1489,7 +1489,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             dataExecution['saucelabDetails'] = defaultValues
                             if(!showSauceLabs){
                                 dataExecution['platform'] = selectedOS;
-                                dataExecution['version'] = selectedVersion;
+                                dataExecution['browserVersion'] = selectedVersion;
                                 dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedSaucelabBrowser)[0].key]
                             } else {
                                 dataExecution["browserType"] = ['1']
