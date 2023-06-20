@@ -30,9 +30,9 @@ const Login = () => {
     }
     const toastSuccess = (erroMessage) => {
         if (erroMessage.CONTENT) {
-            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
+            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
         }
-        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
     }
 
     const forgotPasswordLinkHandler = () => {
@@ -219,16 +219,16 @@ const Login = () => {
                                 </div>
                             </div>
 
-                            <div className='link forgot_password mb-5'>
-                                <a onClick={forgotPasswordLinkHandler} >Forgot Username & Password </a>
-                            </div>
                             <div className='mb-5'>
                                 <Button id="login" label='Login' size="small" disabled={disableLoginButton} ></Button>
+                            </div>
+                            <div className='link mb-5'>
+                                <a onClick={forgotPasswordLinkHandler} >Forgot Username & Password </a>
                             </div>
                             <div className='link mb-3'>
                                 <a onClick={singleSignOnHandler} >Use Single Sign-On </a>
                             </div>
-                            <h5>Don't have an account? Contact your admin to create account.</h5>
+                            <span className="text-sm">Don't have an account? Contact your admin to create account.</span>
                         </form>
                     </>}
 
@@ -237,14 +237,14 @@ const Login = () => {
                     <span>Provide your registered e-mail to send a link to reset your Password or to retrieve Username  </span>
                     <form onSubmit={forgotUsernameOrPasswordSubmitHandler}>
                         <div className='flex flex-column'>
-                            <label className='text-left' htmlFor="email">Email</label>
+                            <label className='text-left' htmlFor="email">Email address</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
                                 <InputText
                                     id="email"
                                     value={email}
                                     onChange={emailHandler}
-                                    placeholder='Enter your email'
+                                    placeholder='Enter your email address'
                                     className='forgetPassword_user_input'
                                 />
                             </div>
@@ -258,12 +258,12 @@ const Login = () => {
 
                 {singleSignOnScreen && <>
                     <h2>Avo Assure - login with SAML SSO</h2>
-                    <form >
+                    <form>
                         <div className='flex flex-column'>
                             <label className='text-left' htmlFor="username">Username</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
-                                <InputText id="username" className='forgetPassword_user_input' placeholder='Email' />
+                                <InputText id="username" className='forgetPassword_user_input' placeholder='Username' />
                             </div>
                         </div>
                         <div className='login_btn mb-5'>

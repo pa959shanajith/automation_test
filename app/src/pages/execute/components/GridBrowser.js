@@ -30,13 +30,13 @@ const GridBrowser = ({
       <div className="avogrid_container">
         <div className="avogrid_fields">
           <AvoDropdown
-            dropdownValue={avodropdown.avogrid}
+            dropdownValue={avodropdown?.avogrid ? avodropdown?.avogrid : {name: 'Any Agent', _id: '1111'} }
             onDropdownChange={onAvoSelectChange}
             dropdownOptions={avogrids}
             name="avogrid"
             placeholder="Select Avo Grid"
-            required={true}
             labelTxt="Avo Agent / Avo Grid"
+            required={false}
           />
         </div>
         <div className="avogrid_fields">

@@ -14,10 +14,10 @@ const Legends = ({isEnE}) => {
                 <Fragment>
                     <g data-test="modules">
                         <circle className="ct-modules" cx="667" cy="0" r="10"></circle>
-                        <text className="ct-nodeLabel" x="681" y="3">TestSuite </text>
+                        <text className="ct-nodeLabel" x="681" y="3">Test Suite</text>
                     </g>
                     <g data-test="scenarios">
-                    <circle className="ct-scenarios" cx="739" cy="0" r="10"></circle>
+                    <circle className="ct-scenarios" cx="746" cy="0" r="10"></circle>
                     <text className="ct-nodeLabel" x="759" y="3">Testcase</text>
                 </g>
                     <g data-test="screens">
@@ -36,7 +36,7 @@ const Legends = ({isEnE}) => {
                     </g>
                     <g data-test="scenarios">
                         <circle className="ct-scenarios" cx="789" cy="0" r="10"></circle>
-                        <text className="ct-nodeLabel" x="804" y="3">Scenario</text>
+                        <text className="ct-nodeLabel" x="804" y="3">Testcase</text>
                     </g>
                 </> )}
             </g>

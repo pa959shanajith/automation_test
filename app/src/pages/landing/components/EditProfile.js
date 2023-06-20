@@ -212,7 +212,7 @@ const EditProfile = (props) => {
                                 />
                             </div>
                             <div className='pt-2'>
-                                <label htmlFor="name">Second Name</label>
+                                <label htmlFor="name">Last Name</label>
                                 <InputText
                                     style={{ width: '30vw',height:'5vh' }}
                                     // id="name"

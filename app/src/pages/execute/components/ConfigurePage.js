@@ -96,7 +96,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [condition, setCondition] = useState({});
   const [accessibility, setAccessibility] = useState({});
   const [configTxt, setConfigTxt] = useState("");
-  const [avodropdown, setAvodropdown] = useState({});
+  const [avodropdown, setAvodropdown] = useState();
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
   const [currentKey, setCurrentKey] = useState("");
@@ -108,8 +108,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [logoutClicked, setLogoutClicked] = useState(false);
   const [profileTxt, setProfileTxt] = useState("");
   const [searchProfile, setSearchProfile] = useState("");
-  const [browserTxt,setBrowserTxt]=useState("");
-  const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
+  const [browserTxt, setBrowserTxt] = useState("");
+  const [selectedNodeKeys, setSelectedNodeKeys] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -123,7 +123,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     visible_execute: setVisible_execute,
   };
 
-  const [footerType, setFooterType] = useState("CancelNext");
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
@@ -252,7 +251,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       life: 1000,
     });
   };
-  const showSuccess_Schedule = () => {
+  const showSuccess_Schedule = (btnType) => {
+    if(btnType === 'Cancel'){
+      setVisible_CICD(false);
+    }
     toast.current.show({
       severity: "success",
       summary: "Success",
@@ -333,7 +335,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               var res = statusUpdate(iceStatusValue[k[0]]);
               iceNameIdMapData[k[1].icename] = {};
               iceNameIdMapData[k[1].icename].id = k[0];
-              iceNameIdMapData[k[1].icename].status = iceStatusValue[k[0]].status;
+              iceNameIdMapData[k[1].icename].status =
+                iceStatusValue[k[0]].status;
               k[1].color = res.color;
               k[1].statusCode = res.status;
               ice.push(k[1]);
@@ -406,9 +409,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 /> */}
                 <pre className='grid_download_dialog__content__code cicdpre'>
                         <code id='api-url' title={url}>
-                        {url}
-                        </code>
-                    </pre>
+                    {url}
+                  </code>
+                </pre>
 
                 <Button
                   icon="pi pi-copy"
@@ -459,17 +462,26 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                     cols={30}
                     value={str}
                   /> */}
-                  
-                    <pre className='grid_download_dialog__content__code executiontypenamepre' >
-                        <code className="executiontypecode" id='devops-key' title={str} >
-                            {str}
-                            {/* {abc} */}
-                        </code>
-                        </pre>
-                        
-                  <Button icon="pi pi-copy" className="copy_devops" onClick={() => {  copyConfigKey(str) }}
-                   title={copyToolTip}/>
-                  
+
+                  <pre className="grid_download_dialog__content__code executiontypenamepre">
+                    <code
+                      className="executiontypecode"
+                      id="devops-key"
+                      title={str}
+                    >
+                      {str}
+                      {/* {abc} */}
+                    </code>
+                  </pre>
+
+                  <Button
+                    icon="pi pi-copy"
+                    className="copy_devops"
+                    onClick={() => {
+                      copyConfigKey(str);
+                    }}
+                    title={copyToolTip}
+                  />
                 </div>
               </div>
             </div>
@@ -595,43 +607,43 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         },
       ],
     },
-    // {
-    //   key: "1",
-    //   label: "Range of Recurrence",
-    //   data: "Events Folder",
-    //   icon: "pi pi-fw pi-calendar",
+    {
+      key: "1",
+      label: "Range of Recurrence",
+      data: "Events Folder",
+      icon: "pi pi-fw pi-calendar",
 
-    //   children: [
-    //     {
-    //       key: "1-0",
-    //       label: (
-    //         <div className="schedule_date  ">
-    //           <div>
-    //             <RadioButton
-    //               value="End Date "
-    //               checked={time_limit === "End Date "}
-    //             />
-    //             <label className=" end_lable ml-2">End Date </label>
-    //           </div>
-    //           <div>
-    //             <RadioButton
-    //               value="End After "
-    //               checked={time_limit === "End After"}
-    //             />
-    //             <label className=" endAfter_lable ml-2">End After </label>
-    //           </div>
-    //           <div>
-    //             <RadioButton
-    //               value="No end date "
-    //               checked={time_limit === "No end date"}
-    //             />
-    //             <label className=" noEndDate_lable ml-2">No end date</label>
-    //           </div>
-    //         </div>
-    //       ),
-    //     },
-    //   ],
-    // },
+      children: [
+        {
+          key: "1-0",
+          label: (
+            <div className="schedule_date  ">
+              <div>
+                <RadioButton
+                  value="End Date "
+                  checked={time_limit === "End Date "}
+                />
+                <label className=" end_lable ml-2">End Date </label>
+              </div>
+              <div>
+                <RadioButton
+                  value="End After "
+                  checked={time_limit === "End After"}
+                />
+                <label className=" endAfter_lable ml-2">End After </label>
+              </div>
+              <div>
+                <RadioButton
+                  value="No end date "
+                  checked={time_limit === "No end date"}
+                />
+                <label className=" noEndDate_lable ml-2">No end date</label>
+              </div>
+            </div>
+          ),
+        },
+      ],
+    },
   ];
 
   const deleteDevOpsConfig = () => {
@@ -763,7 +775,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const tableUpdate = async () => {
     const getState = [...configList];
     const configurationList = await fetchConfigureList({
-      projectid:getConfigData?.projects[0]?._id
+      projectid: getConfigData?.projects[0]?._id,
     });
     configurationList.forEach((item, idx) => {
       getState.push({
@@ -866,6 +878,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setMode(selections[0]);
       setConfigTxt("");
       setModules("normalExecution");
+      setSelectedNodeKeys({});
     }
     setVisible(true);
     setSetupBtn(getType);
@@ -897,37 +910,55 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         .filter((el) => el.length > 1)
         .map((e) => ({ [e.charAt(0)]: e.charAt(2) }));
       const selectedKeys = {};
-      const selectedArr = parent.map((element) => child.map((el) => el[element] ? el[element] : false).filter((i) => i !== false))
+      const selectedArr = parent.map((element) =>
+        child
+          .map((el) => (el[element] ? el[element] : false))
+          .filter((i) => i !== false)
+      );
       // parent.map((item, index) => ({ [item]: selectedArr[index] }))
       parent.forEach((item, index) => {
-        selectedKeys[item] = selectedArr[index]
-      })
+        selectedKeys[item] = selectedArr[index];
+      });
       let getCurrent = {};
       xpanded?.forEach((val) => {
-        let numberArray = [];
-        selectedKeys[Number(val.key)]?.forEach( ele => numberArray.push(+ele));
-        getCurrent[val.suiteid] =  numberArray
+        if (Object.keys(selectedNodeKeys).includes(val.key)) {
+          let numberArray = [];
+          selectedKeys[Number(val.key)]?.forEach((ele) =>
+            numberArray.push(+ele)
+          );
+          getCurrent[val.suiteid] = numberArray;
+        }
       });
-      
-      const dataObj = {
-        param: "updateTestSuite_ICE",
-        batchDetails: xpanded?.map((el) => ({
-          testsuiteid: el?.testsuiteid,
-          testsuitename: el?.suitename,
-          testscenarioids: el?.suitescenarios,
-          getparampaths: Object.values(
-            paramPaths[el?.key].map((el) => el?.value)
-          ),
-          conditioncheck: Object.values(
-            checkcondition[el?.key].map((el) =>
-              el?.value?.code === "T" ? "1" : 0
-            )
-          ),
-          accessibilityParameters: Object.values(
-            accessibilityParams[el?.key].map((el) => el?.value)
-          ),
-        })),
-      };
+      let batchInfoData = [];
+      xpanded?.forEach((item) => {
+        if (Object.keys(selectedNodeKeys).includes(item.key)) {
+          batchInfoData.push({
+            scenarioTaskType: "disable",
+            testsuiteName: item.suitename,
+            testsuiteId: item.suiteid,
+            batchname: "",
+            versionNumber: 0,
+            appType: "Web",
+            domainName: "Banking",
+            projectName: getConfigData?.projects[0]?.name,
+            projectId: getConfigData?.projects[0]?._id,
+            releaseId: getConfigData?.projects[0]?.releases[0]?.name,
+            cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
+            cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
+            scenarionIndex: [1],
+            suiteDetails: [
+              {
+                condition: 0,
+                dataparam: [""],
+                scenarioName: "Scenario_check",
+                scenarioId: "646efee42d7bb349c1ab2f19",
+                accessibilityParameters: [],
+              },
+            ],
+          });
+        }
+      });
+
       const executionData = {
         type: "",
         poolid: "",
@@ -948,48 +979,42 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           qtest: { url: "", username: "", password: "", qteststeps: "" },
           zephyr: { url: "", username: "", password: "" },
         },
-        batchInfo: xpanded?.map((item) => ({
-          scenarioTaskType: "disable",
-          testsuiteName: item.suitename,
-          testsuiteId: item.suiteid,
-          batchname: "",
-          versionNumber: 0,
-          appType: "Web",
-          domainName: "Banking",
-          projectName: getConfigData?.projects[0]?.name,
-          projectId: getConfigData?.projects[0]?._id,
-          releaseId: getConfigData?.projects[0]?.releases[0]?.name,
-          cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
-          cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
-          scenarionIndex: [1],
-          suiteDetails: [
-            {
-              condition: 0,
-              dataparam: [""],
-              scenarioName: "Scenario_check",
-              scenarioId: "646efee42d7bb349c1ab2f19",
-              accessibilityParameters: [],
-            },
-          ],
-        })),
+        batchInfo: batchInfoData,
         donotexe: {
-          current: getCurrent
+          current: getCurrent,
         },
         scenarioFlag: false,
         isExecuteNow: false,
+      };
+
+      const dataObj = {
+        param: "updateTestSuite_ICE",
+        batchDetails: xpanded?.filter((e) => e.testsuiteid !== 0).map((el) => ({
+          testsuiteid: el?.testsuiteid ? el?.testsuiteid : "" ,
+          testsuitename: el?.suitename,
+          testscenarioids: el?.suitescenarios,
+          getparampaths: !!Object.values(paramPaths).length && Object.values(
+            paramPaths[el?.key].map((el) => el?.value)
+          ),
+          conditioncheck: !!Object.values(checkcondition).length && Object.values(
+            checkcondition[el?.key].map((el) =>
+              el?.value?.code === "T" ? "1" : 0
+            )
+          ),
+          accessibilityParameters: !!Object.values(accessibilityParams).length && Object.values(
+            accessibilityParams[el?.key].map((el) => el?.value)
+          ),
+        })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
         dispatch(storeConfigureKey(executionData))
       );
       // tableUpdate();
       setVisible(false);
-    } else if (getBtnType === "Next") {
-      setTabIndex(1);
-      setFooterType(setupBtn);
     } else if (getBtnType === "Cancel") {
-      setTabIndex(0);
-      setFooterType("CancelNext");
+      setConfigTxt("");
       setVisible(false);
+      setDotNotExe({});
       setSelectedNodeKeys({});
     } else setVisible(false);
   };
@@ -1035,17 +1060,17 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
   useEffect(() => {
     browsers.forEach((el) => {
-      if(el.key == currentSelectedItem?.executionRequest?.browserType[0]) {
+      if (el.key == currentSelectedItem?.executionRequest?.browserType[0]) {
         setBrowserTxt(el.name);
       }
-    })
+    });
   }, [currentSelectedItem?.executionRequest?.browserType[0]]);
 
   const onHide = (name) => {
     dialogFuncMap[`${name}`](false);
   };
 
-  const onExecuteBtnClick = async () => {
+  const onExecuteBtnClick = async (btnType) => {
     if (showIcePopup) {
       dataExecution.type =
         ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
@@ -1053,7 +1078,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
       if ((ExeScreen === true ? smartMode : "") !== "normal")
         dataExecution.targetUser = Object.keys(selectedICE).filter(
-          (icename) => selectedICE[icename],
+          (icename) => selectedICE[icename]
         );
       else dataExecution.targetUser = selectedICE;
 
@@ -1077,12 +1102,15 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       }
       // onHide(name);
     }
+    if(btnType === 'Cancel'){
+      setVisible_execute(false);
+    }
     toast.current.show({
       severity: "success",
       summary: "Success",
       detail: "Execution has started",
       life: 1000,
-    })
+    });
   };
 
   const footerContent_Schedule = (
@@ -1137,7 +1165,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               </Button>
               </div>
             ),
-            
           },
         ]
       : items;
@@ -1247,11 +1274,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               marginRight: "-2rem",
             }}
           >
-            <Column showGridlines
+            <Column
               field="sno"
               header={<span className="SNo-header" showGridlines>S No</span>}
             />
-            <Column showGridlines
+            <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
@@ -1261,7 +1288,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               header={checkboxHeaderTemplate}
               
             />
-            <Column 
+            <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
@@ -1291,8 +1318,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             onModalBtnClick={onExecuteBtnClick}
             content={
               <>
-              
-                  {renderExecutionCard()}
+                {renderExecutionCard()}
                 <div className="radioButtonContainer">
                   <RadioButton
                     value="Execute with Avo Assure Agent/ Grid"
@@ -1314,7 +1340,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                         setShowIcePopup(true);
                         setRadioButton_grid(e.target.value);
                       }}
-                      checked={radioButton_grid === "Execute with Avo Assure Client"}
+                      checked={
+                        radioButton_grid === "Execute with Avo Assure Client"
+                      }
                     />
                   </div>
                   <label className=" executeRadio_label_clint ml-2">
@@ -1324,7 +1352,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 {showIcePopup && (
                   <div>
                     <div className="legends-container">
-                     
                       <div className="legend">
                         <span id="status" className="status-available"></span>
                         <span className="legend-text">Available</span>
@@ -1347,7 +1374,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                       </span>
 
                       <div className="search_icelist ">
-                        <DropDownList 
+                        <DropDownList
                           poolType={poolType}
                           ExeScreen={ExeScreen}
                           inputErrorBorder={inputErrorBorder}
@@ -1395,7 +1422,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             setVisible={setVisible_CICD}
             content={
               <>
-               {renderExecutionCard()}
+                {renderExecutionCard()}
 
                 <Tree
                   className="CICD_tree"
@@ -1406,10 +1433,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 />
               </>
             }
-            headerTxt= {`CICD: demo123`}
+            headerTxt={`CICD: demo123`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
-            onClick={showSuccess_Schedule}
-          
+            onModalBtnClick={showSuccess_Schedule}
           />
         </>
       );
@@ -1435,8 +1461,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   fontFamily: "open Sans",
                 }} showGridlines
               >
-                
-               Configuration Profile Name
+                Configuration Profile Name
               </span>
               <span
                 style={{
@@ -1538,8 +1563,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             />
           }
           headerTxt="Execution Configuration set up"
-          footerType={footerType}
+          footerType={setupBtn}
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
+          isDisabled={ (!configTxt || !avodropdown?.browser?.length || !Object.keys(selectedNodeKeys)?.length) }
         />
       </div>
       <Toast ref={toast} position="bottom-center" />
