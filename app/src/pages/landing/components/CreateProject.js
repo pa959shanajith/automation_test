@@ -17,6 +17,7 @@ import { loadUserInfoActions } from '../LandingSlice';
 
 
 
+
 const CreateProject = ({ visible, onHide }) => {
   const [value, setValue] = useState('');
   const [selectedApp, setSelectedApp] = useState(null);
@@ -37,6 +38,7 @@ const CreateProject = ({ visible, onHide }) => {
   const toastSuccess = useRef(null);
   const toastError = useRef(null);
   const toastContainerRef = useRef(null);
+  const userInfo = useSelector((state) => state.landing.userinfo);
 
 
 
@@ -324,7 +326,7 @@ const CreateProject = ({ visible, onHide }) => {
             <div className='dropdown-1'>
               <h5 className='application__name'>Application Type <span className="imp-cls"> * </span></h5>
               <Dropdown value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name"
-                placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " />
+                placeholder="Select an Application Type" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " />
             </div>
           </div>
 
