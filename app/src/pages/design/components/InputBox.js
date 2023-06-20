@@ -197,7 +197,7 @@ function validNodeDetails(value) {
     var nName, flag = !0;
     nName = value;
     var regex = /^[a-zA-Z0-9_]*$/;;
-    if (nName.length === 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName === 'Screen_0' || nName === 'Scenario_0' || nName === 'Testcase_0') {
+    if (nName.length === 0 || nName.length > 255 || !(regex.test(nName)) || nName === 'Screen_0' || nName === 'Scenario_0' || nName === 'Testcase_0') {
         d3.select('#ct-inpAct').classed('errorClass',!0);
         flag = !1;
     }
