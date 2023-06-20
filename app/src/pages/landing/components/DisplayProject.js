@@ -20,6 +20,7 @@ const DisplayProject = (props) => {
   const [projectsDetails, setProjectsDetails] = useState([]);
   const [getProjectLists, setProjectList] = useState([]);
   const [selectedsortItems,setSelectedsortItems] = useState(null)
+  const userInfo = useSelector((state) => state.landing.userinfo);
   const createdProject = useSelector((state) => state.landing.savedNewProject);
   const dispatch = useDispatch();
 
@@ -190,7 +191,8 @@ const DisplayProject = (props) => {
         <div className={className}>
           <span className="All_Project_font" >ALL PROJECTS</span>
           <Tooltip target=".add_btn" position="bottom" content="Create Project"/>
-          <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
+          
+          <button className="pi pi-plus add_btn"  disabled = {(userInfo.rolename)!== "Test Manager"} onClick={handleOpenDialog} />
           <CreateProject visible={visible} onHide={handleCloseDialog} />
           <Tooltip target=".sort_btn" position="bottom" content="Sort Projects"/>
           <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />

@@ -198,3 +198,45 @@ export const deleteConfigureKey = async(props) => {
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
+export const getQueueState = async(data) => {
+    try{
+        const res = await axios(url+'/getQueueState', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }else if(res.status===200 && res.data === "fail"){            
+            return {error : MSG.GLOBAL.ERR_SOMETHING_WRONG};
+        }
+        else if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+    }catch(err){
+        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+    }
+}
+export const deleteExecutionListId = async(props) => {
+    try{
+            const res = await axios(url+'/deleteExecutionListId', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
