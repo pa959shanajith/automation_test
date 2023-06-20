@@ -239,7 +239,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       life: 1000,
     });
   };
-  const showSuccess_Schedule = () => {
+  const showSuccess_Schedule = (btnType) => {
+    if(btnType === 'Cancel'){
+      setVisible_CICD(false);
+    }
     toast.current.show({
       severity: "success",
       summary: "Success",
@@ -932,7 +935,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         }
       });
       let batchInfoData = [];
-      console.log(xpanded);
       xpanded?.forEach((item) => {
         if (Object.keys(selectedNodeKeys).includes(item.key)) {
           batchInfoData.push({
@@ -992,19 +994,19 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
       const dataObj = {
         param: "updateTestSuite_ICE",
-        batchDetails: xpanded?.map((el) => ({
-          testsuiteid: el?.testsuiteid,
+        batchDetails: xpanded?.filter((e) => e.testsuiteid !== 0).map((el) => ({
+          testsuiteid: el?.testsuiteid ? el?.testsuiteid : "" ,
           testsuitename: el?.suitename,
           testscenarioids: el?.suitescenarios,
-          getparampaths: Object.values(
+          getparampaths: !!Object.values(paramPaths).length && Object.values(
             paramPaths[el?.key].map((el) => el?.value)
           ),
-          conditioncheck: Object.values(
+          conditioncheck: !!Object.values(checkcondition).length && Object.values(
             checkcondition[el?.key].map((el) =>
               el?.value?.code === "T" ? "1" : 0
             )
           ),
-          accessibilityParameters: Object.values(
+          accessibilityParameters: !!Object.values(accessibilityParams).length && Object.values(
             accessibilityParams[el?.key].map((el) => el?.value)
           ),
         })),
@@ -1017,6 +1019,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
       setVisible(false);
+      setDotNotExe({});
       setSelectedNodeKeys({});
     } else setVisible(false);
   };
@@ -1072,7 +1075,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     dialogFuncMap[`${name}`](false);
   };
 
-  const onExecuteBtnClick = async () => {
+  const onExecuteBtnClick = async (btnType) => {
     if (showIcePopup) {
       dataExecution.type =
         ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
@@ -1103,6 +1106,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
       }
       // onHide(name);
+    }
+    if(btnType === 'Cancel'){
+      setVisible_execute(false);
     }
     toast.current.show({
       severity: "success",
@@ -1384,7 +1390,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             }
             headerTxt={`CICD: demo123`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
-            onClick={showSuccess_Schedule}
+            onModalBtnClick={showSuccess_Schedule}
           />
         </>
       );
@@ -1504,7 +1510,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           headerTxt="Execution Configuration set up"
           footerType={setupBtn}
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
-          isDisabled={ (!configTxt || !avodropdown?.browser?.length) }
+          isDisabled={ (!configTxt || !avodropdown?.browser?.length || !Object.keys(selectedNodeKeys)?.length) }
         />
       </div>
       <Toast ref={toast} position="bottom-center" />
