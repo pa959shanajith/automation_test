@@ -27,8 +27,7 @@ import {
   getProjectList,
   ExecuteTestSuite_ICE,
   execAutomation,
-  deleteConfigureKey,
-} from "../api";
+  deleteConfigureKey  } from "../api";
 import {
   getAvoAgentAndAvoGrid,
   getModules,
@@ -42,6 +41,8 @@ import DropDownList from "../../global/components/DropDownList";
 import { ResetSession, setMsg, Messages as MSG, VARIANT } from "../../global";
 import { browsers, selections } from "../../utility/mockData";
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
+import AvoInput from "../../../globalComponents/AvoInput";
+import ExecutionPage from "./executionPage";
 
 const ConfigurePage = ({ setShowConfirmPop }) => {
   const [visible, setVisible] = useState(false);
@@ -107,8 +108,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [logoutClicked, setLogoutClicked] = useState(false);
   const [profileTxt, setProfileTxt] = useState("");
   const [searchProfile, setSearchProfile] = useState("");
-  const [browserTxt,setBrowserTxt]=useState("");
-  const [selectedNodeKeys, setSelectedNodeKeys] = useState(null);
+  const [browserTxt, setBrowserTxt] = useState("");
+  const [selectedNodeKeys, setSelectedNodeKeys] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -124,10 +125,21 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState(0);
+
+  const [activeIndex1, setActiveIndex1] = useState(0);
+  console.log(activeIndex1);
+  // console.log(setActiveIndex1(index));
+  // console.log(setActiveIndex1);
   const items = [
     { label: "Configurations" },
-    { label: "Execution" },
+    { label: "Execution(s)" },
   ];
+  const handleTabChange = (e) => {
+    console.log(e);
+    setActiveIndex1(e.index);
+    // console.log(e.value.label)
+  };
 
   const getConfigData = useSelector((store) => store.configsetup);
   const getConfigPage = useSelector((store) => store);
@@ -239,7 +251,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       life: 1000,
     });
   };
-  const showSuccess_Schedule = () => {
+  const showSuccess_Schedule = (btnType) => {
+    if(btnType === 'Cancel'){
+      setVisible_CICD(false);
+    }
     toast.current.show({
       severity: "success",
       summary: "Success",
@@ -320,7 +335,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               var res = statusUpdate(iceStatusValue[k[0]]);
               iceNameIdMapData[k[1].icename] = {};
               iceNameIdMapData[k[1].icename].id = k[0];
-              iceNameIdMapData[k[1].icename].status = iceStatusValue[k[0]].status;
+              iceNameIdMapData[k[1].icename].status =
+                iceStatusValue[k[0]].status;
               k[1].color = res.color;
               k[1].statusCode = res.status;
               ice.push(k[1]);
@@ -355,6 +371,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     setLogoutClicked(true);
     let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
     setProfileTxt(text);
+    console.log(item.configurename)
+    // console.log(configurename)
   };
 
   const copyConfigKey = (title) => {
@@ -391,9 +409,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 /> */}
                 <pre className='grid_download_dialog__content__code cicdpre'>
                         <code id='api-url' title={url}>
-                        {url}
-                        </code>
-                    </pre>
+                    {url}
+                  </code>
+                </pre>
 
                 <Button
                   icon="pi pi-copy"
@@ -444,17 +462,26 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                     cols={30}
                     value={str}
                   /> */}
-                  
-                    <pre className='grid_download_dialog__content__code executiontypenamepre' >
-                        <code className="executiontypecode" id='devops-key' title={str} >
-                            {str}
-                            {/* {abc} */}
-                        </code>
-                        </pre>
-                        
-                  <Button icon="pi pi-copy" className="copy_devops" onClick={() => {  copyConfigKey(str) }}
-                   title={copyToolTip}/>
-                  
+
+                  <pre className="grid_download_dialog__content__code executiontypenamepre">
+                    <code
+                      className="executiontypecode"
+                      id="devops-key"
+                      title={str}
+                    >
+                      {str}
+                      {/* {abc} */}
+                    </code>
+                  </pre>
+
+                  <Button
+                    icon="pi pi-copy"
+                    className="copy_devops"
+                    onClick={() => {
+                      copyConfigKey(str);
+                    }}
+                    title={copyToolTip}
+                  />
                 </div>
               </div>
             </div>
@@ -748,22 +775,15 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const tableUpdate = async () => {
     const getState = [...configList];
     const configurationList = await fetchConfigureList({
-      projectid:getConfigData?.projects[0]?._id
+      projectid: getConfigData?.projects[0]?._id,
     });
     configurationList.forEach((item, idx) => {
       getState.push({
         sno: idx + 1,
         profileName: item.configurename,
-        executionOptions: (
-          <div className="Buttons_config">
-            <Button
-              style={{
-                width: "8.5rem",
-                fontFamily: "Open Sans",
-                fontStyle: "normal",
-                marginLeft: "0.5rem",
-                height: "2.5rem",
-              }}
+        executionOptions : (
+          <div className="Buttons_config_button">
+            <Button className="execute_now"
               onClick={() => {
                 dispatch(getPoolsexe());
                 dispatch(getICE());
@@ -776,13 +796,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               {" "}
               Execute Now
             </Button>
-            <Button
-              style={{
-                width: "6rem",
-                fontFamily: "Open Sans",
-                fontStyle: "normal",
-                height: "2.5rem",
-              }}
+            <Button className="schedule"
               onClick={() => setVisible_schedule(true)}
               size="small"
             >
@@ -790,13 +804,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               Schedule
             </Button>
 
-            <Button
-              style={{
-                width: "4.5rem",
-                fontFamily: "Open Sans",
-                fontStyle: "normal",
-                height: "2.5rem",
-              }}
+            <Button className="CICD" 
               size="small"
               onClick={() => {
                 setVisible_CICD(true);
@@ -902,37 +910,55 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         .filter((el) => el.length > 1)
         .map((e) => ({ [e.charAt(0)]: e.charAt(2) }));
       const selectedKeys = {};
-      const selectedArr = parent.map((element) => child.map((el) => el[element] ? el[element] : false).filter((i) => i !== false))
+      const selectedArr = parent.map((element) =>
+        child
+          .map((el) => (el[element] ? el[element] : false))
+          .filter((i) => i !== false)
+      );
       // parent.map((item, index) => ({ [item]: selectedArr[index] }))
       parent.forEach((item, index) => {
-        selectedKeys[item] = selectedArr[index]
-      })
+        selectedKeys[item] = selectedArr[index];
+      });
       let getCurrent = {};
       xpanded?.forEach((val) => {
-        let numberArray = [];
-        selectedKeys[Number(val.key)]?.forEach( ele => numberArray.push(+ele));
-        getCurrent[val.suiteid] =  numberArray
+        if (Object.keys(selectedNodeKeys).includes(val.key)) {
+          let numberArray = [];
+          selectedKeys[Number(val.key)]?.forEach((ele) =>
+            numberArray.push(+ele)
+          );
+          getCurrent[val.suiteid] = numberArray;
+        }
       });
-      
-      const dataObj = {
-        param: "updateTestSuite_ICE",
-        batchDetails: xpanded?.map((el) => ({
-          testsuiteid: el?.testsuiteid,
-          testsuitename: el?.suitename,
-          testscenarioids: el?.suitescenarios,
-          getparampaths: Object.values(
-            paramPaths[el?.key].map((el) => el?.value)
-          ),
-          conditioncheck: Object.values(
-            checkcondition[el?.key].map((el) =>
-              el?.value?.code === "T" ? "1" : 0
-            )
-          ),
-          accessibilityParameters: Object.values(
-            accessibilityParams[el?.key].map((el) => el?.value)
-          ),
-        })),
-      };
+      let batchInfoData = [];
+      xpanded?.forEach((item) => {
+        if (Object.keys(selectedNodeKeys).includes(item.key)) {
+          batchInfoData.push({
+            scenarioTaskType: "disable",
+            testsuiteName: item.suitename,
+            testsuiteId: item.suiteid,
+            batchname: "",
+            versionNumber: 0,
+            appType: "Web",
+            domainName: "Banking",
+            projectName: getConfigData?.projects[0]?.name,
+            projectId: getConfigData?.projects[0]?._id,
+            releaseId: getConfigData?.projects[0]?.releases[0]?.name,
+            cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
+            cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
+            scenarionIndex: [1],
+            suiteDetails: [
+              {
+                condition: 0,
+                dataparam: [""],
+                scenarioName: "Scenario_check",
+                scenarioId: "646efee42d7bb349c1ab2f19",
+                accessibilityParameters: [],
+              },
+            ],
+          });
+        }
+      });
+
       const executionData = {
         type: "",
         poolid: "",
@@ -953,35 +979,32 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           qtest: { url: "", username: "", password: "", qteststeps: "" },
           zephyr: { url: "", username: "", password: "" },
         },
-        batchInfo: xpanded?.map((item) => ({
-          scenarioTaskType: "disable",
-          testsuiteName: item.suitename,
-          testsuiteId: item.suiteid,
-          batchname: "",
-          versionNumber: 0,
-          appType: "Web",
-          domainName: "Banking",
-          projectName: getConfigData?.projects[0]?.name,
-          projectId: getConfigData?.projects[0]?._id,
-          releaseId: getConfigData?.projects[0]?.releases[0]?.name,
-          cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
-          cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
-          scenarionIndex: [1],
-          suiteDetails: [
-            {
-              condition: 0,
-              dataparam: [""],
-              scenarioName: "Scenario_check",
-              scenarioId: "646efee42d7bb349c1ab2f19",
-              accessibilityParameters: [],
-            },
-          ],
-        })),
+        batchInfo: batchInfoData,
         donotexe: {
-          current: getCurrent
+          current: getCurrent,
         },
         scenarioFlag: false,
         isExecuteNow: false,
+      };
+
+      const dataObj = {
+        param: "updateTestSuite_ICE",
+        batchDetails: xpanded?.filter((e) => e.testsuiteid !== 0).map((el) => ({
+          testsuiteid: el?.testsuiteid ? el?.testsuiteid : "" ,
+          testsuitename: el?.suitename,
+          testscenarioids: el?.suitescenarios,
+          getparampaths: !!Object.values(paramPaths).length && Object.values(
+            paramPaths[el?.key].map((el) => el?.value)
+          ),
+          conditioncheck: !!Object.values(checkcondition).length && Object.values(
+            checkcondition[el?.key].map((el) =>
+              el?.value?.code === "T" ? "1" : 0
+            )
+          ),
+          accessibilityParameters: !!Object.values(accessibilityParams).length && Object.values(
+            accessibilityParams[el?.key].map((el) => el?.value)
+          ),
+        })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
         dispatch(storeConfigureKey(executionData))
@@ -991,6 +1014,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
       setVisible(false);
+      setDotNotExe({});
       setSelectedNodeKeys({});
     } else setVisible(false);
   };
@@ -1036,17 +1060,17 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
   useEffect(() => {
     browsers.forEach((el) => {
-      if(el.key == currentSelectedItem?.executionRequest?.browserType[0]) {
+      if (el.key == currentSelectedItem?.executionRequest?.browserType[0]) {
         setBrowserTxt(el.name);
       }
-    })
+    });
   }, [currentSelectedItem?.executionRequest?.browserType[0]]);
 
   const onHide = (name) => {
     dialogFuncMap[`${name}`](false);
   };
 
-  const onExecuteBtnClick = async () => {
+  const onExecuteBtnClick = async (btnType) => {
     if (showIcePopup) {
       dataExecution.type =
         ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
@@ -1054,7 +1078,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
       if ((ExeScreen === true ? smartMode : "") !== "normal")
         dataExecution.targetUser = Object.keys(selectedICE).filter(
-          (icename) => selectedICE[icename],
+          (icename) => selectedICE[icename]
         );
       else dataExecution.targetUser = selectedICE;
 
@@ -1078,12 +1102,15 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       }
       // onHide(name);
     }
+    if(btnType === 'Cancel'){
+      setVisible_execute(false);
+    }
     toast.current.show({
       severity: "success",
       summary: "Success",
       detail: "Execution has started",
       life: 1000,
-    })
+    });
   };
 
   const footerContent_Schedule = (
@@ -1106,14 +1133,27 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             label: (
               <div className="search-and-button">
               <span className="p-input-icon-left">
-              {/* <i className="pi pi-search" /> */}
-              <InputText className="serachProfileName"
+              {/* <i className="pi pi-search search-icon"  /> */}
+              {/* <InputText className="serachProfileName"
                  width='20rem'
                  value={searchProfile}
                
                  onChange={(e)=>setSearchProfile(e.target.value)}
                  placeholder="Search"
-              />
+              /> */}
+              <div className="serachProfileName">
+                <AvoInput 
+          icon="pi pi-search"
+          placeholder="Search"
+          style={{marginleft:"3rem"}}
+          value={searchProfile}
+        
+          onChange={(e)=>setSearchProfile(e.target.value)}
+          inputTxt={searchProfile}
+          setInputTxt={setSearchProfile}
+          inputType="searchIcon"
+        />
+        </div>
                
             </span>
               <Button
@@ -1125,7 +1165,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               </Button>
               </div>
             ),
-            
           },
         ]
       : items;
@@ -1137,43 +1176,94 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       </>
     );
   };
+  // const renderExecutionCard = () => {
+  //   return (
+  //     <Card className="execute_card p-card p-card-body">
+  //       <p className="m-0">
+  //         <div className="grid executedropdown">
+  //           <div className="col-3 text_card">Avo Agent:</div>
+  //           <div className="col-3 text_value"> <div className="agent_name">
+  //             {currentSelectedItem &&
+  //             currentSelectedItem.executionRequest &&
+  //             currentSelectedItem.executionRequest.avoagents.length > 0
+  //               ? currentSelectedItem.executionRequest.avoagents[0]
+  //               : 'Any Agent'}
+  //               </div>
+  //           </div>
+            
+  //           <div className="col-3 text_card1"><div className="execute_text">Execution Mode:</div></div>
+  //            <div className="col-3 text_value1"><div className="execute_name">{currentSelectedItem &&
+  //             currentSelectedItem.executionRequest &&
+  //             currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}
+  //             </div>
+  //             </div>
+  //           <div className="col-3 text_card3"><div className="browser_text"> Selected Browsers:</div></div>
+  //           <div className="col-3 text_value3"><div className="browser_name">{browserTxt}</div></div>
+  //           <div className="col-3 text_card4"><div className="integration_text"> Integration Type:</div></div>
+  //           <div className="col-3 text_value4"><div className="integration_name">ALM</div></div>
+  //         </div>
+  //       </p>
+  //     </Card>
+  //   );
+  // };
+  
   const renderExecutionCard = () => {
     return (
       <Card className="execute_card p-card p-card-body">
-        <p className="m-0">
-          <div className="grid executedropdown">
-            <div className="col-3 text_card">Avo Agent:</div>
-            <div className="col-3 text_value"> <div className="agent_name">
-              {currentSelectedItem &&
-              currentSelectedItem.executionRequest &&
-              currentSelectedItem.executionRequest.avoagents.length > 0
-                ? currentSelectedItem.executionRequest.avoagents[0]
-                : 'Any Agent'}
-                </div>
+        <div className="grid executedropdown">
+          <div className="col-6">
+            <div className="text_card">Avo Agent:</div>
+            <div className="text_value">
+              <div className="agent_name">
+                {currentSelectedItem &&
+                currentSelectedItem.executionRequest &&
+                currentSelectedItem.executionRequest.avoagents.length > 0
+                  ? currentSelectedItem.executionRequest.avoagents[0]
+                  : 'Any Agent'}
+              </div>
             </div>
-            
-            <div className="col-3 text_card1"><div className="execute_text">Execution Mode:</div></div>
-             <div className="col-3 text_value1"><div className="execute_name">{currentSelectedItem &&
-              currentSelectedItem.executionRequest &&
-              currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}
-              </div>
-              </div>
-            <div className="col-3 text_card3"><div className="browser_text"> Selected Browsers:</div></div>
-            <div className="col-3 text_value3"><div className="browser_name">{browserTxt}</div></div>
-            <div className="col-3 text_card4"><div className="integration_text"> Integration Type:</div></div>
-            <div className="col-3 text_value4"><div className="integration_name">ALM</div></div>
           </div>
-        </p>
+          <div className="col-6">
+            <div className="text_card1">
+              <div className="execute_text">Execution Mode:</div>
+            </div>
+            <div className="text_value1">
+              <div className="execute_name">
+                {currentSelectedItem &&
+                currentSelectedItem.executionRequest &&
+                currentSelectedItem.executionRequest.integration.isHeadless === true
+                  ? 'Non-Headless'
+                  : 'Headless'}
+              </div>
+            </div>
+          </div>
+          <div className="col-6">
+            <div className="text_card3">
+              <div className="browser_text">Selected Browsers:</div>
+            </div>
+            <div className="text_value3">
+              <div className="browser_name">{browserTxt}</div>
+            </div>
+          </div>
+          <div className="col-6">
+            <div className="text_card4">
+              <div className="integration_text">Integration Type:</div>
+            </div>
+            <div className="text_value4">
+              <div className="integration_name">ALM</div>
+            </div>
+          </div>
+        </div>
       </Card>
     );
   };
-  
   
 
   const renderTable = () => {
     if (!!configList.length) {
       return (
         <>
+        
           <DataTable showGridlines
             className="  datatable_list  "
             value={configList}
@@ -1181,14 +1271,14 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             style={{
               width: "100%",
               height: "calc(100vh - 250px)",
-              marginRight: "-1rem",
+              marginRight: "-2rem",
             }}
           >
-            <Column 
+            <Column
               field="sno"
-              header={<span className="SNo-header">S No</span>}
+              header={<span className="SNo-header" showGridlines>S No</span>}
             />
-            <Column 
+            <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
@@ -1196,16 +1286,17 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
+              
             />
-            <Column 
+            <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginRight: "23rem",
               }}
-              field="executionOptions"
+              field="executionOptions" 
               header={
-                <span className="executionOption-header">
+                <span className="executionOption-header" showGridlines>
                   Execution Options
                 </span>
               }
@@ -1218,7 +1309,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 textAlign: "left",
               }}
               field="actions"
-              header={<span className="actions-header">Actions</span>}
+              header={<span className="actions-header"showGridlines>Actions</span>}
             />
           </DataTable>
           <AvoModal
@@ -1227,8 +1318,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             onModalBtnClick={onExecuteBtnClick}
             content={
               <>
-              
-                  {renderExecutionCard()}
+                {renderExecutionCard()}
                 <div className="radioButtonContainer">
                   <RadioButton
                     value="Execute with Avo Assure Agent/ Grid"
@@ -1250,7 +1340,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                         setShowIcePopup(true);
                         setRadioButton_grid(e.target.value);
                       }}
-                      checked={radioButton_grid === "Execute with Avo Assure Client"}
+                      checked={
+                        radioButton_grid === "Execute with Avo Assure Client"
+                      }
                     />
                   </div>
                   <label className=" executeRadio_label_clint ml-2">
@@ -1260,7 +1352,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 {showIcePopup && (
                   <div>
                     <div className="legends-container">
-                     
                       <div className="legend">
                         <span id="status" className="status-available"></span>
                         <span className="legend-text">Available</span>
@@ -1283,7 +1374,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                       </span>
 
                       <div className="search_icelist ">
-                        <DropDownList 
+                        <DropDownList
                           poolType={poolType}
                           ExeScreen={ExeScreen}
                           inputErrorBorder={inputErrorBorder}
@@ -1331,7 +1422,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             setVisible={setVisible_CICD}
             content={
               <>
-               {renderExecutionCard()}
+                {renderExecutionCard()}
 
                 <Tree
                   className="CICD_tree"
@@ -1342,10 +1433,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 />
               </>
             }
-            headerTxt= {`CICD: demo123`}
+            headerTxt={`CICD: demo123`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
-            onClick={showSuccess_Schedule}
-          
+            onModalBtnClick={showSuccess_Schedule}
           />
         </>
       );
@@ -1360,7 +1450,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   marginRight: "13rem",
                   fontWeight: "bold",
                   fontFamily: "open Sans",
-                }}
+                }} showGridlines
               >
                 S.No.
               </span>
@@ -1369,17 +1459,16 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   marginRight: "13rem",
                   fontWeight: "bold",
                   fontFamily: "open Sans",
-                }}
+                }} showGridlines
               >
-                
-               Configuration Profile Name
+                Configuration Profile Name
               </span>
               <span
                 style={{
                   marginRight: "18rem",
                   fontWeight: "normal",
                   fontFamily: "open Sans",
-                }}
+                }} showGridlines
               >
                 Execution Options
               </span>
@@ -1423,15 +1512,25 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         <div>
           {configList.length > 0 ? (
             <div>
-              <TabMenu className="   tabs tab-menu" model={tabMenuItems} />
+              <TabMenu className="   tabs tab-menu" activeIndex={activeIndex1} model={tabMenuItems} onTabChange={(e) => handleTabChange(e)} />
             </div>
           ) : (
+            // <div>
+            //   <TabMenu className="tabmenu_confige" model={items} />
+            // </div>
             <div>
-              <TabMenu className="tabmenu_confige" model={items} />
-            </div>
+            <TabMenu model={items}  activeIndex1={activeIndex1}  onTabChange={(e) => handleTabChange(e)} />
+            {/* {activeIndex1 === 0 &&(<div className="ConfigurePage_container  m-2">{renderTable()}</div>)}
+                {activeIndex1 === 1 && <executionPage/> } */}
+               
+      
+           
+      
+
+          </div>
           )}
         </div>
-        <div className="ConfigurePage_container  m-2">{renderTable()}</div>
+        {activeIndex1 !== 1?<div className="ConfigurePage_container  m-2" showGridlines>{renderTable()} </div>:<ExecutionPage />}
         <AvoModal
           visible={visible}
           setVisible={setVisible}
@@ -1466,6 +1565,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           headerTxt="Execution Configuration set up"
           footerType={setupBtn}
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
+          isDisabled={ (!configTxt || !avodropdown?.browser?.length || !Object.keys(selectedNodeKeys)?.length) }
         />
       </div>
       <Toast ref={toast} position="bottom-center" />

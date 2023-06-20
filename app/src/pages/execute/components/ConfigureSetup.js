@@ -40,7 +40,6 @@ const ConfigureSetup = ({
   selectedNodeKeys,
   setSelectedNodeKeys,
   dotNotExe,
-  setDotNotExe,
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
@@ -111,9 +110,9 @@ const ConfigureSetup = ({
     setConfigTable(mainTree);
   }, [configData?.configureData, modules, dataparam, condition, accessibility]);
 
-  useEffect(() => {
-    dispatch(checkRequired({ configName: configTxt }));
-  }, [configTxt]);
+  // useEffect(() => {
+  //   dispatch(checkRequired({ configName: configTxt }));
+  // }, [configTxt]);
 
   useEffect(() => {
     const getXpanded = [...xpanded];
@@ -122,6 +121,11 @@ const ConfigureSetup = ({
     const getStateOfAccess = { ...accessibility };
     configTable.forEach((el, ind) => {
       if (el.id === getProjectData?.testsuiteId) {
+        getXpanded.forEach((item, i) => {
+          if(el.key === item.key){
+            getXpanded.splice(i, 1);
+          }
+        });
         const getSuiteId =
           getProjectData?.testsuiteData[getProjectData?.testsuiteId];
         const duplicate = getXpanded.findIndex(
@@ -171,6 +175,7 @@ const ConfigureSetup = ({
       const getExecutions = configData?.configureData?.normalExecution;
       const getNotExe = dotNotExe?.executionRequest?.donotexe?.current;
       const nodeObj = {};
+      const getXpanded = [...xpanded];
       getExecutions.forEach((el, ind) => {
         if (Object.keys(getNotExe).includes(el.moduleid)) {
           nodeObj[ind] = {
@@ -186,12 +191,25 @@ const ConfigureSetup = ({
               };
             });
           }
+          const duplicate = getXpanded.findIndex(
+            (item) => item?.suiteid === el?.moduleid
+          );
+          if (duplicate === -1) {
+            getXpanded.push({
+              testsuiteid: 0,
+              key: ind.toString(),
+              suitescenarios: el?.scenarios.map((item) => item._id),
+              suitename: el?.name,
+              suiteid: el?.moduleid,
+            });
+          }
         }
       });
+      setXpanded(getXpanded);
       setSelectedNodeKeys(nodeObj);
     }
   }, [dotNotExe]);
-  console.log(selectedNodeKeys);
+
   const onDataparamChange = (e, getKey) => {
     setDataparam({
       ...dataparam,
@@ -280,10 +298,10 @@ const ConfigureSetup = ({
   );
 
   const rowClassName = (node) => {
-    if (node?.key?.length === 1) {
-      return { customRow: true };
-    } else {
+    if (node?.key?.includes('-')) {
       return { genaralRow: true };
+    } else {
+      return { customRow: true };
     }
   };
 
