@@ -911,7 +911,6 @@ const CaptureModal = (props) => {
   const onCellEditComplete = (e) => {
     let { rowData, newValue, field, originalEvent: event } = e;
     if (newValue.trim().length > 0) {
-      setCellValue(newValue);
       rowData.selectall = newValue;
       handleSave(rowData.objectDetails.val, newValue);
     }
