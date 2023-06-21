@@ -31,21 +31,14 @@
     background: rgba(96, 91, 255, 0.08);
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
   }
+  .p-datatable>.p-datatable-wrapper {
+    overflow: auto;
+    height: 35rem;
+    width: 99%;
+}
+
 
   .p-datatable .p-datatable-thead > tr > th {
-    // text-align: left;
-    // padding: 1rem 1rem;
-    // border: 1px solid #dee2e6;
-    // border-width: 0 0 1px 0;
-    // font-weight: 700;
-    // color: #343a40;
-    // background: #f8f9fa;
-    // transition: box-shadow 0.2s;
-    // padding: 0rem !important;
-    // // background: rgba(96, 91, 255, 0.08);
-    // background: #f8f9fa;
-    // border:  #dee2e6;
-    // box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
     background: #f8f9fa;
     border:  #dee2e6;
     border-width: 0 0 1px;
@@ -294,7 +287,7 @@
   overflow: hidden;
   margin-top: -3rem;
   height: 2rem;
-  margin-left: 68rem;
+  margin-left: 67rem;
   top: 0.5rem;
 }
 .p-button-edit {
@@ -543,7 +536,7 @@
   border: none;
   margin-left: 27.5rem;
   margin-top: -3rem;
-  left: 10rem;
+  left: 12.5rem;
   display: flex;
     top: -1rem;
     .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
@@ -565,12 +558,10 @@
   color: #000000;
   background-color: transparent;
   border: none;
-  top: -7rem;
-  left: 2.9rem;
+  left: 14.9rem;
   display: flex;
-  // margin-right: 0.5rem;
   margin-right: 19.9rem;
-  top: -9rem;
+  top: -7rem;
   display: flex;
 }
 
@@ -582,6 +573,7 @@
   display: block;
   margin-top: -4.5rem;
   line-height: 3rem;
+  margin-left: 3rem;
 }
 
 .dialog_CICD {
@@ -640,6 +632,7 @@
 
 .Async_lable {
   margin-right: 0.5rem;
+  margin-left: 3rem;
 }
 
 .inputSwitch_CICD {
@@ -726,6 +719,7 @@
   font-weight: bold;
   font-family: "Open Sans";
   margin-left: 0.4rem;
+  width: 1rem;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
@@ -781,14 +775,14 @@
 
 .radioButtonContainer1 {
   margin-left: 3.1rem;
-  margin-top: 0.4rem;
+  margin-top: 0.1rem;
 
 }
 
 .executeRadio_label_clint {
   font-family: Open Sans;
   left: 24.3rem;
-  margin-top: 0.5rem;
+  // margin-top: 0.5rem;
   /* position: absolute; */
   display: flex;
   top: 24.4rem;
@@ -932,7 +926,8 @@
 
 .container_url .devopsUrl_label {
   margin-bottom: 1rem;
-  margin-bottom: 0.5rem;
+  margin-left: 3rem;
+  margin-top: 2rem;
 }
 
 .container_url .inputtext_CICD {
@@ -957,18 +952,18 @@
   border-radius: 3px;
   white-space: pre-wrap;
   background-color: #b8d8ff;
-  margin-right: 21rem;
-  margin-left: 0rem;
+  margin-left: 44px;
+  margin-right: 8.5rem;
 }
 .executiontypenamepre {
   width: 78vh;
-  margin-left: -1px;
+  margin-left: 45px;
 }
 .serachProfileName {
   .p-input-icon-left, .p-input-icon-right {
     display: inline-block;
     position: relative;
-    margin-left: 54.5rem;
+    margin-left: 53.5rem;
     top: -0.5rem;
   
 }
@@ -985,9 +980,13 @@
   margin-top: -0.2rem;
   align-items: center;
   display: flex;
+  
   div {
     width: 50%;
     margin-right: 15rem;
+    width: 50%;
+    height: 11rem;
+    overflow: auto;
     input {
       width: 99%;
 

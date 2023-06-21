@@ -2,7 +2,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
- value: 0
+ value: 0,
+ id:''
 
 }
 
@@ -13,9 +14,14 @@ export const stepsSlice = createSlice({
     updateSteps: (state, action) => {
       state.value=action.payload
     },
+    getStep: (state, action) => {
+      state.id=action.payload
+      console.log(state,action);
+    },
   },
+
 });
 
-export const { updateSteps } = stepsSlice.actions;
+export const { updateSteps,getStep } = stepsSlice.actions;
 
 export default stepsSlice.reducer;
