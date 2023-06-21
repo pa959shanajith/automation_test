@@ -74,8 +74,19 @@ export const browsers = [
 export const selections = ["Non-Headless", "Headless"];
 
 export const schedulePeriod = [
-  { name: 'Accounting', key: 'A' },
-  { name: 'Marketing', key: 'M' },
-  { name: 'Production', key: 'P' },
-  { name: 'Research', key: 'R' }
+  { name: 'One Time', key: 'OT' },
+  { name: 'Daily', key: 'DY' },
+  { name: 'Weekly', key: 'WY' },
+  { name: 'Monthly ', key: 'MY' }
+];
+
+export const scheduleWeeks = [
+  { name: 'Monday', key: 'MON' },
+  { name: 'Tuesday', key: 'TUE' },
+  { name: 'Wednesday', key: 'WED' },
+  { name: 'Thursday', key: 'THU' },
+  { name: 'Friday', key: 'FRI' },
+  { name: 'Saturday', key: 'SAT' },
+  { name: 'Sunday', key: 'SUN' },
+  { name: 'All', key: 'ALL' }
 ];

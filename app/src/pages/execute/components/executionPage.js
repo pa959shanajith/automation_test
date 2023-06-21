@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react';
 import {  setMsg, Messages as MSG, VARIANT } from "../../global";
 import {getQueueState,deleteExecutionListId} from '../api';
-import CheckboxTree from 'react-checkbox-tree';
+// import CheckboxTree from 'react-checkbox-tree';
 
 
 
@@ -72,13 +72,14 @@ const ExecutionPage = () => {
               <h4>Manage Execution Queue</h4>
               {executionQueue && (
                 (executionQueue.list.length > 0) ? (
-                  <CheckboxTree
-                    showNodeIcon={false}
-                    className='devOps_checkbox_tree'
-                    nodes={executionQueue.list}
-                    expanded={executionQueue.expanded}
-                    onExpand={(expanded) => setExecutionQueue({...executionQueue, expanded: expanded})}
-                  />
+                    <div>Queue</div>
+                //   <CheckboxTree
+                //     showNodeIcon={false}
+                //     className='devOps_checkbox_tree'
+                //     nodes={executionQueue.list}
+                //     expanded={executionQueue.expanded}
+                //     onExpand={(expanded) => setExecutionQueue({...executionQueue, expanded: expanded})}
+                //   />
                 ) : (
                   <p>You have nothing pending to execute. Try to Execute any Configure Key and come here.</p>
                 )
