@@ -139,26 +139,32 @@ const ActionPanel = (props) => {
     <>
       <Dialog className='add__object__header' header='Add Element' visible={props.isOpen === 'addObject'} onHide={props.OnClose} style={{ height: "28.06rem", width: "38.06rem" }} position='right' footer={addElementfooter}>
         <div className='card__add_object'>
-          <Card className='add_object__left' title="Add Element">
+          <Card className='add_object__left'>
             <div className='flex flex-column'>
-              <label className='text-left pl-4' htmlFor="object__dropdown">Select Element Type</label>
-              <Dropdown value={selectObjectType} onChange={handleDropdownChange} options={objectType} optionLabel="name"
-                placeholder="Search" className="w-full md:w-15rem object__dropdown" />
-              <label className='text-left pl-4' htmlFor="Element_name">Enter Element Name</label>
-              <InputText
-                type="text"
-                className='Element_name p-inputtext-sm'
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder='Text Input'
-                style={{ width: "15rem", marginLeft: "1.25rem" }} />
-              <Button size="small" onClick={handleAdd} style={{ width: "max-content" }}>Add</Button>
+              <div  className="pb-3">
+                <label className='text-left pl-4' htmlFor="object__dropdown">Select Element Type</label>
+                <Dropdown value={selectObjectType} onChange={handleDropdownChange} options={objectType} optionLabel="name"
+                  placeholder="Search" className="w-full md:w-15rem object__dropdown" />
+              </div>
+              <div className="pb-5">
+                <label className='text-left pl-4' htmlFor="Element_name">Enter Element Name</label>
+                <InputText
+                  type="text"
+                  className='Element_name p-inputtext-sm'
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  placeholder='Text Input'
+                  style={{ width: "15rem", marginLeft: "1.25rem" }} />
+              </div>
+              <div style={{marginLeft:"13.5rem"}}>
+                <Button icon="pi pi-plus" size="small" onClick={handleAdd} ></Button>
+              </div>
             </div>
           </Card>
-          <Card className='add_object__right p-4' title="Added Elements">
+          <Card className='add_object__right' title="Added Elements">
             {objects.map((value, index) => (
               <div key={index} className='' >
-                <p>{value.objName}</p>
+                <p className="text__added__step">{value.objName}</p>
               </div>
             ))}
           </Card>
