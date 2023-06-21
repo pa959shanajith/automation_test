@@ -7,11 +7,15 @@ import {setImportData} from '../designSlice';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
 
 
 
 
-const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport}) => {
+
+const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport, importPop}) => {
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
@@ -31,13 +35,9 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
     if(!Object.keys(projList).length >0) return null
     return(
     <>
-        <ModalContainer 
-        modalClass = "modal-mmd"
-        title='Import Modules'
-        close={()=>setImportPop(false)}
-        footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}
-        content={<Container submit={submit} setMindmapData={setMindmapData}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>} 
-      />
+        <Dialog className='ImportDialog' header='Import Modules' onHide={()=>setImportPop(false)} visible={importPop} style={{ width: '50vw' }} footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}>
+            <Container submit={submit} setMindmapData={setMindmapData}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>
+        </Dialog>
     </>
     )
 }
@@ -56,19 +56,22 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
     const [uploadFileField,setUploadFileField] = useState(false)
-    const [uploadFilezip,setUploadFilezip] = useState("") 
-
+    const [uploadFilezip,setUploadFilezip] = useState("");
+    const [selectedImport, setSelectedImport] = useState(null);
+    const [projectValue, setProjectValue] = useState(null);
+    const [SheetValue, setSheetValue] = useState(null);
+    const [projectId, setProjectId] = useState(null);
     const upload = (e) => {
         let  project = "";
         if(importType === 'zip'){
             project = projRef.current.value;
-        if(project=='def-val'){
-            displayError({CONTENT:"Please select project",VARIANT:VARIANT.ERROR});
-            setDisableSubmit(true)
-            return false
-            
+            if(project==='def-val'){
+                displayError({CONTENT:"Please select project",VARIANT:VARIANT.ERROR});
+                setDisableSubmit(true)
+                return false
+                
+            }
         }
-    }
         setError('')
         setFiledUpload(undefined)
         setBlockui({show:true,content:'Uploading ...'})
@@ -76,18 +79,22 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     }
     const changeImportType = (e) => {
         // projRef.current.value = ""
+        setSelectedImport(e.value);
         if(projRef.current)projRef.current.value = ''
         if(uploadFileRef.current)uploadFileRef.current.value = ''
-        setImportType(e.target.value)        
+        setImportType(e.value)        
         setFiledUpload(undefined)
         setDisableSubmit(true)
         setError('')
-        if(e.target.value==="zip"){ setUploadFileField(false); resetImportModule();}
+        if(e.target.value==="zip"){ setUploadFileField(false); 
+            // resetImportModule();
+        }
     }
-    const resetImportModule = async() => {
+    const resetImportModule = async(e) => {
       if(uploadFileRef.current)uploadFileRef.current.value = ''
-        if(projRef.current.value) {
-            var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
+        changeProject(e)
+        if(projRef.current.props.value) {
+            var moduledata = await getModules({"tab":"tabCreate","projectid":projectId,"moduleid":null,"query":"modLength"})
             if (moduledata.length>0){
                 setError('Please select a Project which has no Modules.')                
                 setUploadFileField(false)
@@ -96,10 +103,10 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 return
             }
         }
-        if(projRef.current.value) setUploadFileField(true)
+        if(projRef.current.props.value) {setUploadFileField(true)
         setSheetList([])
         setFiledUpload(undefined)
-        setError('')        
+        setError('')  }      
     }
     const acceptType = {
         pd:".pd",
@@ -187,14 +194,14 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     // setBlockui({content:'Importing ...',show:true})
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY)
                     ResetSession.start()
-                    var importproj=projRef.current ? projRef.current.value: undefined          
-                    var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheetRef.current? sheetRef.current.value: undefined})
+                    var importproj= projectId          
+                    var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: SheetValue})
                     if(res.error){displayError(res.error);ResetSession.end();return;}                    
                     else{
                         
                         var importexcel = await jsonToMindmap({"type":"excel","importproj":importproj})
                         if(importexcel.error){displayError(importexcel.error);ResetSession.end();return;}
-                        if(importexcel == "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);ResetSession.end();return;}
+                        if(importexcel === "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);ResetSession.end();return;}
                         setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                         setBlockui({show:false})
                         ResetSession.end();
@@ -202,7 +209,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY)
                     // setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
-                    var res = await jsonToMindmap({"type":"json","importproj":projRef.current ? projRef.current.value: undefined})
+                    var res = await jsonToMindmap({"type":"json","importproj":projectId})
                     if(res.error){displayError(res.error);ResetSession.end();return;}
                     if(res == "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);ResetSession.end();return;}
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
@@ -213,8 +220,8 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         loadImportData({
                             importType,
                             importData, 
-                            importProj:projRef.current ? projRef.current.value: undefined,
-                            sheet:sheetRef.current? sheetRef.current.value: undefined,
+                            importProj:projectId,
+                            sheet:SheetValue,
                             dispatch:dispatch,
                             displayError:displayError,
                             setBlockui:setBlockui,
@@ -228,24 +235,76 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
             })()
         }
     },[submit])
+    const items = [
+        { name: 'Select Import Format', code: 'NY', value:'def-val', disabled:true },
+        { name: 'Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'excel'},
+        { name: 'Structure only - Json (.json)', code: 'LDN', value:'json' },
+        { name: 'Complete Module(S) (.zip)', code: 'IST', value:'zip' }
+    ]
+    const projectItem  = Object.entries(projList).map((e)=>{
+           return { value:e[1].name,
+                    key:e[0]
+           }
+    });
+    const excelSheetItem = sheetList.map((e,i)=>{
+        return {value:e, key:i}
+    })
+
+    function changeProject(e){
+       setProjectValue(e.value);
+       for(var i = 0; e.target.name.length>i; i++){
+            if (e.value === e.target.name[i].value){
+                setProjectId(e.target.name[i].key);
+            }
+       }
+    }
     return(
         <div data-test='mp__import-popup' className = 'mp__import-popup'>
-            <div>
-                <label>Import from: </label>
+            <div className='paddingLabel'>
+            <label htmlFor='import'>Import format: </label>
+                <Dropdown
+                inputId="import"
+                name="import"
+                ref={ftypeRef}
+                value={selectedImport}
+                options={items}
+                optionLabel="name"
+                placeholder="Select Import Format"
+                className="imp-inp"
+                style={{width:'20rem', marginLeft:'2.6rem'}}
+                onChange={(e) => {
+                    changeImportType(e);
+                }}
+                />
+                {/* <label>Import from: </label>
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                     <option value={'def-val'} disabled>Select Import Format</option>
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
-                    <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
+                    {/* <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
                     {/* <option value={'git'}>Git (.mm)</option>  */}                    
-					<option value={'json'}>Structure only - Json (.json)</option>
+					{/* <option value={'json'}>Structure only - Json (.json)</option>
                     <option value={'zip'}>Complete Module(S) (.zip)</option>
-                </select>
+                </select> */}
             </div>
             {isMultiImport && 
                 <Fragment>
                     {(importType==='zip')?
-                        <div>
-                            <label>
+                        <div className='paddingLabel'>
+                             <label htmlFor='project'>Project: </label>
+                        <Dropdown
+                                    inputId="project"
+                                    name={projectItem}
+                                    ref={projRef}
+                                    value={projectValue}
+                                    options={projectItem}
+                                    optionLabel="value"
+                                    placeholder="Select Project"
+                                    className="imp-inp"
+                                    style={{width:'20rem', marginLeft:'6rem'}}
+                                    defaultValue={'def-val'}
+                                    onChange={(e)=>resetImportModule(e)}
+                                />
+                            {/* <label>
                             Project:   
                             </label>
                             <select className='imp-inp' onChange={resetImportModule} disabled={false} ref={projRef}>
@@ -256,8 +315,8 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                                     })
                                 })()       
                                 }
-                                {/* <option value={fileUpload.projectID} >{projList[fileUpload.projectID].name}</option> */}
-                            </select>
+                                <option value={fileUpload.projectID} >{projList[fileUpload.projectID].name}</option>
+                            </select> */}
                         </div>
                     :null}
                     
@@ -267,14 +326,28 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 <Fragment>
                     {(importType==='git')?
                         <Fragment>
-                            <div>
-                                <label>Project: </label>
+                            <div className='paddingLabel'>
+                            <label htmlFor='project'>Project: </label>
+                        <Dropdown
+                                    inputId="project"
+                                    name={projectItem}
+                                    ref={projRef}
+                                    value={projectValue}
+                                    options={projectItem}
+                                    optionLabel="value"
+                                    placeholder="Select Project"
+                                    className="imp-inp"
+                                    style={{width:'20rem', marginLeft:'6rem'}}
+                                    defaultValue={'def-val'}
+                                    onChange={(e)=>changeProject(e)}
+                                />
+                                {/* <label>Project: </label>
                                 <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
                                     <option value={'def-val'} disabled>Select Project</option>
                                     {Object.entries(projList).map((e,i)=>
                                     <option value={e[1].id} key={i}>{e[1].name}</option>
                                 )}
-                                </select>
+                                </select> */}
                             </div>
                             <div>
                                 <label>Git Configuration: </label>
@@ -293,7 +366,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
-                        (<>{uploadFileField || (["excel","json"].includes(importType))?<div>
+                        (<>{uploadFileField || (["excel","json"].includes(importType))?<div className='paddingLabel'>
                             <label>Upload File: </label>
                             <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="zip"} type='file' onChange={(e) => upload(e)} ref={uploadFileRef}/>
                             </div>:null}</>)
@@ -304,8 +377,22 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
             {fileUpload && /* !isMultiImport && */
                 <Fragment>
                     {(importType==='zip')?
-                    <div>
-                        <label>Project: </label>
+                    <div className='paddingLabel'>
+                        <label htmlFor='project'>Project: </label>
+                        <Dropdown
+                                    inputId="project"
+                                    name={projectItem}
+                                    ref={projRef}
+                                    value={projectValue}
+                                    options={projectItem}
+                                    optionLabel="value"
+                                    placeholder="Select Project"
+                                    className="imp-inp"
+                                    style={{width:'20rem', marginLeft:'6rem'}}
+                                    defaultValue={'def-val'}
+                                    onChange={(e)=>changeProject(e)}
+                                />
+                        {/* <label>Project: </label>
                         <select className='imp-inp' disabled={false} ref={projRef}>
                         <option value={'def-val'}>Select Project</option>
                             {(()=>{
@@ -315,7 +402,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                             })()       
                             }
                             {/* <option value={fileUpload.projectID} >{projList[fileUpload.projectID].name}</option> */}
-                        </select>
+                        {/* </select> */}
                     </div>
                     :null}
                     {(importType==='pd')?
@@ -336,33 +423,61 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     </div>:null
                     }
 					{(importType==='json')?
-                    <div>
-                        <label>Project: </label>
-                        <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
-                            <option value={'def-val'} disabled>Select Project</option>
-                            {Object.entries(projList).map((e,i)=>
-                            <option value={e[1].id} key={i}>{e[1].name}</option>
-                        )}
-                        </select>
+                    <div className='paddingLabel'>
+                        <label htmlFor='project'>Project: </label>
+                        <Dropdown
+                                    inputId="project"
+                                    name={projectItem}
+                                    ref={projRef}
+                                    value={projectValue}
+                                    options={projectItem}
+                                    optionLabel="value"
+                                    placeholder="Select Project"
+                                    className="imp-inp"
+                                    style={{width:'20rem', marginLeft:'6rem'}}
+                                    defaultValue={'def-val'}
+                                    onChange={(e)=>changeProject(e)}
+                                />
                     </div>:null
                     }
                     {(importType==='excel')?
                     <Fragment>
-                    <div>
-                        <label>Project: </label>
-                        <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
-                            <option value={'def-val'} disabled>Select Project</option>
-                            {Object.entries(projList).map((e,i)=>
-                            <option value={e[1].id} key={i}>{e[1].name}</option>
-                        )}
-                        </select>
+                    <div className='paddingLabel'>
+                    <label htmlFor='project'>Project: </label>
+                        <Dropdown
+                                    inputId="project"
+                                    name={projectItem}
+                                    ref={projRef}
+                                    value={projectValue}
+                                    options={projectItem}
+                                    optionLabel="value"
+                                    placeholder="Select Project"
+                                    className="imp-inp"
+                                    style={{width:'20rem', marginLeft:'6rem'}}
+                                    defaultValue={'def-val'}
+                                    onChange={(e)=>changeProject(e)}
+                                />
                     </div>
-                    <div>
-                        <label>Select Sheet: </label>
+                    <div className='paddingLabel'>
+                    <label htmlFor='Sheet'>Select Sheet:</label>
+                        <Dropdown
+                                    inputId="Sheet"
+                                    name="Sheet"
+                                    ref={sheetRef}
+                                    value={SheetValue}
+                                    options={excelSheetItem}
+                                    optionLabel="value"
+                                    placeholder="Please Select Sheet"
+                                    className="imp-inp"
+                                    style={{width:'20rem', marginLeft:'6rem'}}
+                                    defaultValue={'def-val'}
+                                    onChange={(e)=>setSheetValue(e.value)}
+                                />
+                        {/* <label>Select Sheet: </label>
                         <select defaultValue={"def-val"} ref={sheetRef}>
                             <option value="def-val" disabled>Please Select Sheet</option>
                             {sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
-                        </select>
+                        </select> */}
                     </div>
                     </Fragment>
                     :null}
@@ -377,7 +492,7 @@ const Footer = ({error,setSubmit,disableSubmit}) =>{
       <Fragment>
             <div className='mnode__buttons'>
                 <label className='err-message'>{error}</label>                
-                <button disabled={disableSubmit} onClick={()=>setSubmit(true)}>Import</button>                
+                <Button disabled={disableSubmit} onClick={()=>setSubmit(true)} label='Import'/>                
             </div>
       </Fragment>
     )
@@ -387,14 +502,21 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitV
     var err = false;
     [ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
         if(e.current){
-            e.current.style.border = '1px solid black';
-            if(e.current.value === 'def-val' || e.current.value === ''){
+            // e.current.style.border = '1px solid black';
+            if(e.current.props){
+                if(e.current.props.value === 'def-val' || e.current.props.value === ''){
+                    err = true
+                }
+            }
+            else if(e.current.value === 'def-val' || e.current.value === ''){
                 e.current.style.border = '1px solid red';
                 err = true
             }
-            if(e.current.type === 'file' && !uploadFileRef.current.files[0]){
-                e.current.style.border = '1px solid red';
-                err = true
+            if(e.current.type === 'file' || !e.current.props.__TYPE === 'Dropdown'){
+                if(!uploadFileRef.current.files[0]){
+                    e.current.style.border = '1px solid red';
+                    err = true
+                }
             }
         }
     })
@@ -501,7 +623,7 @@ const uploadFile = async({setBlockui,uploadFileRef,setMindmapData,setSheetList,s
                     var modules=[]
                     var scenarios=[]                    
                     for (let i=0;i<duplicateData.length;i++){
-                        if (i==0){
+                        if (i===0){
                             if(duplicateData[i]["name"] && duplicateData[i]["testscenarios"]){
                                 duplicateData[i]["status"]="first"
                                 

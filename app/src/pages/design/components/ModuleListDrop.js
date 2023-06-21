@@ -679,7 +679,7 @@ const ModuleListDrop = (props) =>{
                        </div>)}
                      </div> */}
                      <i className="pi pi-file-import mindmapImport" onClick={()=>setImportPop(true)}></i>
-                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}   />:null}
+                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
                      <img   src="static/imgs/plusNew.png" alt="NewModules" onClick={()=>{ CreateNew()}} /> 
                 </div>
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>

@@ -31,7 +31,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const copyNodes = useSelector(state=>state.design.copyNodes)
     const prjList = useSelector(state=>state.design.projectList)
     const initProj = useSelector(state=>state.design.selectedProj)
-    const setselectedProjectNameForDropdown = useSelector(state=>state.design.selectedProj)
+    // const setselectedProjectNameForDropdown = useSelector(state=>state.design.selectedProj)
     const moduleListed = useSelector(state=>state.design.moduleList)
     const selectedModuled = useSelector(state=>state.design.selectedModule)    
     const selectedModulelisted = useSelector(state=>state.design.selectedModulelist)
@@ -48,7 +48,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch(selectedProj(proj))
-        setselectedProjectNameForDropdown(proj);
+        // setselectedProjectNameForDropdown(proj);
         // if(!isEnELoad){
         //     // dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         //     // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
@@ -64,9 +64,9 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         dispatch(selectedModulelist([]))
         dispatch(screenData(screendata));
         if(screendata)dispatch(screenData(screendata))
-        if(SearchInp){
-            SearchInp.current.value = ""
-        }
+        // if(SearchInp){
+        //     SearchInp.current.value = ""
+        // }
         
         setBlockui({show:false})
         
