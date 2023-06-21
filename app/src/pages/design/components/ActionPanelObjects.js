@@ -13,16 +13,16 @@ import { v4 as uuid } from 'uuid';
 
 
 const ActionPanel = (props) => {
-  const [tempIdCounter, setTempIdCounter] = useState(0);
-  const [objects, setObjects] = useState([]);
-  const [selectObjectType, setSelectObjectType] = useState(null);
+  const [addElementTempIdCounter, setAddElementTempIdCounter] = useState(0);
+  const [addElementObjects, setAddElementObjects] = useState([]);
+  const [addElementSelectObjectType, setAddElementSelectObjectType] = useState(null);
   const [selectCustomObj, setSelectCustomObj] = useState({
     btn1: '',
     btn2: '',
     btn3: '',
     btn4: ''
   });
-  const [inputValue, setInputValue] = useState('');
+  const [addElementInputValue, setAddElementInputValue] = useState('');
   // const [dropdownValue, setDropdownValue] = useState('');
   const [displayedValues, setDisplayedValues] = useState([]);
   const [value, setValue] = useState('');
@@ -39,7 +39,7 @@ const ActionPanel = (props) => {
   ];
 
 
-  const objectType = [
+  const objectTypes = [
     { value: "a", typeOfElement: "lnk", name: "Link" },
     { value: "input", typeOfElement: "txtbox", name: "Textbox/Textarea" },
     { value: "table", typeOfElement: "tbl", name: "Table" },
@@ -56,10 +56,10 @@ const ActionPanel = (props) => {
     let newObjects = [];
     let newOrderList = [];
 
-    for (let i = 0; i < objects.length; i++) {
-      let name = objects[i].objName;
-      let type = objects[i].objType;
-      let tempId = objects[i].tempId;
+    for (let i = 0; i < addElementObjects.length; i++) {
+      let name = addElementObjects[i].objName;
+      let type = addElementObjects[i].objType;
+      let tempId = addElementObjects[i].tempId;
       let [tag, value] = type.split("-");
       let custname = `${name.trim()}_${value}`;
       let newUUID = uuid();
@@ -81,29 +81,28 @@ const ActionPanel = (props) => {
     props.OnClose();
   }
 
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
+  const handleAddElementInputChange = (e) => {
+    setAddElementInputValue(e.target.value);
   };
 
-  const handleDropdownChange = (e) => {
-    setSelectObjectType(e.value);
+  const handleAddElementDropdownChange = (e) => {
+    setAddElementSelectObjectType(e.value);
   };
 
   const handleAdd = () => {
     let updatedObjects = {};
-    objectType.map(object_type => {
-      if (object_type.value === selectObjectType) {
-        updatedObjects["objName"] = inputValue;
+    objectTypes.map(object_type => {
+      if (object_type.value === addElementSelectObjectType) {
+        updatedObjects["objName"] = addElementInputValue;
         updatedObjects["objType"] = object_type.value + '-' + object_type.typeOfElement;
-        updatedObjects["tempId"] = tempIdCounter + 1;
+        updatedObjects["tempId"] = addElementTempIdCounter + 1;
 
       }
     });
-    setObjects([...objects, updatedObjects]);
-    setInputValue('');
-    setSelectObjectType('');
-    setTempIdCounter(tempIdCounter + 1);
-
+    setAddElementObjects([...addElementObjects, updatedObjects]);
+    setAddElementInputValue('');
+    setAddElementSelectObjectType('');
+    setAddElementTempIdCounter(addElementTempIdCounter + 1);
   };
 
   const handleSpanClick = (index) => {
@@ -114,16 +113,15 @@ const ActionPanel = (props) => {
     }
   };
 
-  const handleClear = () => {
-    setSelectCustomObj(null);
-    setSelectObjectType(null);
+  const handleAddElementClear = () => {
+    setAddElementInputValue('');
+    setAddElementSelectObjectType('');
+    setAddElementObjects([]);
   }
-
-
 
   const addElementfooter = (
     <div className=''>
-      <Button size="small" onClick={handleClear} text >Clear</Button> {/*className='add_object_clear'*/}
+      <Button size="small" onClick={handleAddElementClear} text >Clear</Button> {/*className='add_object_clear'*/}
       <Button size="small" onClick={addElementSaveHandler}>Save</Button> {/*className='add_object_save' */}
     </div>
   )
@@ -143,7 +141,7 @@ const ActionPanel = (props) => {
             <div className='flex flex-column'>
               <div  className="pb-3">
                 <label className='text-left pl-4' htmlFor="object__dropdown">Select Element Type</label>
-                <Dropdown value={selectObjectType} onChange={handleDropdownChange} options={objectType} optionLabel="name"
+                <Dropdown value={addElementSelectObjectType} onChange={handleAddElementDropdownChange} options={objectTypes} optionLabel="name"
                   placeholder="Search" className="w-full md:w-15rem object__dropdown" />
               </div>
               <div className="pb-5">
@@ -151,8 +149,8 @@ const ActionPanel = (props) => {
                 <InputText
                   type="text"
                   className='Element_name p-inputtext-sm'
-                  value={inputValue}
-                  onChange={handleInputChange}
+                  value={addElementInputValue}
+                  onChange={handleAddElementInputChange}
                   placeholder='Text Input'
                   style={{ width: "15rem", marginLeft: "1.25rem" }} />
               </div>
@@ -162,7 +160,7 @@ const ActionPanel = (props) => {
             </div>
           </Card>
           <Card className='add_object__right' title="Added Elements">
-            {objects.map((value, index) => (
+            {addElementObjects.map((value, index) => (
               <div key={index} className='' >
                 <p className="text__added__step">{value.objName}</p>
               </div>
@@ -221,8 +219,7 @@ const ActionPanel = (props) => {
         <div className='create_obj'>
           <div className='create__left__panel'>
             <p>Select Object Type</p>
-            <Dropdown value={selectObjectType} required onChange={(e) => setSelectObjectType(e.value)} options={objectType} optionLabel="name"
-              placeholder="Search" className="w-full creat_object_dropdown w-21rem" />
+            <Dropdown placeholder="Search" className="w-full creat_object_dropdown w-21rem" />
             <span className='object__text'>Enter URL <img src="static/imgs/more-info.png"></img></span>
             <InputText required className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
             <span className='object__text'>Enter Name <img src="static/imgs/more-info.png"></img></span>
