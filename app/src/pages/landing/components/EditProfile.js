@@ -241,8 +241,7 @@ const EditProfile = (props) => {
                                     id="primary Role"
                                     value={userInfo.rolename}
                                     type="text"
-                                    readOnly
-                                    disable={true}
+                                    disabled={true}
                                 />
                             </div>
 
@@ -254,8 +253,7 @@ const EditProfile = (props) => {
                                     id="Registered Date"
                                     value={userInfo.createdon.slice(5,16)}
                                     type="text"
-                                    readOnly
-                                    disable={true}
+                                    disabled={true}
                                 />
                             </div>
                         </div>

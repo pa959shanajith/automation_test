@@ -23,6 +23,10 @@ export const globleSlice = createSlice({
          popup:(state, action) =>{
             state.popup = action.payload
          },
+         showGenuis:(state, action) =>{
+            state.showGenuisWindow = action.payload
+            state.geniusWindowProps = action.payload
+         },
          showGenuisWindow:(state, action) =>{
             state.showGenuisWindow = action.payload
          },
@@ -38,6 +42,6 @@ export const globleSlice = createSlice({
     }})
 
 
-    export const {progress,roleSwitched,popup,showGenuisWindow,geniusWindowProps,showSmallPopup,showTrialVideo} = globleSlice.actions
+    export const {progress,roleSwitched,popup,showGenuis,showGenuisWindow,geniusWindowProps,showSmallPopup,showTrialVideo} = globleSlice.actions
 
 export default globleSlice.reducer
