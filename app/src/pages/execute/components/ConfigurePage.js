@@ -42,6 +42,7 @@ import DropDownList from "../../global/components/DropDownList";
 import { ResetSession, setMsg, Messages as MSG, VARIANT } from "../../global";
 import { browsers, selections } from "../../utility/mockData";
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
+import ScheduleScreen from "./ScheduleScreen";
 
 const ConfigurePage = ({ setShowConfirmPop }) => {
   const [visible, setVisible] = useState(false);
@@ -109,6 +110,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [searchProfile, setSearchProfile] = useState("");
   const [browserTxt, setBrowserTxt] = useState("");
   const [selectedNodeKeys, setSelectedNodeKeys] = useState({});
+  const [fetechConfig, setFetechConfig] = useState([]);
+  const [configItem, setConfigItem] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -763,6 +766,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     const configurationList = await fetchConfigureList({
       projectid: getConfigData?.projects[0]?._id,
     });
+    setFetechConfig(configurationList);
     configurationList.forEach((item, idx) => {
       getState.push({
         sno: idx + 1,
@@ -796,7 +800,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 fontStyle: "normal",
                 height: "2.5rem",
               }}
-              onClick={() => setVisible_schedule(true)}
+              onClick={() => {
+                setConfigItem(idx);
+                setVisible_schedule(true);
+              }}
               size="small"
             >
               {" "}
@@ -1118,6 +1125,12 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     });
   };
 
+  const onScheduleBtnClick = (btnType) => {
+    if(btnType === 'Cancel'){
+      setVisible_schedule(false);
+    }
+  };
+
   const footerContent_Schedule = (
     <div className="btn-11">
       <Button label="Cancel" className="Cancle_button" />
@@ -1353,24 +1366,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}
-            // onModalBtnClick={onExecuteBtnClick}
-            content={
-              <>
-                {renderExecutionCard()}
-
-                <Tree
-                  className="schedule_tree"
-                  value={treeData}
-                  selectionMode="single"
-                  selectionKeys={selectedNodeKey}
-                  onSelectionChange={onNodeSelect}
-                  // onToggle={onToggleNode}
-                />
-              </>
-            }
+            onModalBtnClick={onScheduleBtnClick}
+            content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
             headerTxt="Schedule: Regression"
             footerType="Schedule"
-            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+            modalSytle={{ width: "50vw", height: "80vh", background: "#FFFFFF" }}
           />
           <AvoModal
             visible={visible_CICD}

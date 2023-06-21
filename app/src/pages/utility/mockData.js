@@ -72,3 +72,10 @@ export const browsers = [
 ];
 
 export const selections = ["Non-Headless", "Headless"];
+
+export const schedulePeriod = [
+  { name: 'Accounting', key: 'A' },
+  { name: 'Marketing', key: 'M' },
+  { name: 'Production', key: 'P' },
+  { name: 'Research', key: 'R' }
+];
