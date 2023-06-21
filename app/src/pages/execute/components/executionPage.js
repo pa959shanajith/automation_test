@@ -4,7 +4,7 @@ import {getQueueState,deleteExecutionListId} from '../api';
 // import CheckboxTree from 'react-checkbox-tree';
 import CheckboxTree from 'react-checkbox-tree';
 import { Tree } from 'primereact/tree';
-
+import "../styles/ExecutionPage.scss";
 
 
 
