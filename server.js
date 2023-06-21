@@ -1,6 +1,9 @@
 //load environment variables
 var env = require('node-env-file');
 var fs = require('fs');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 var envFilePath = __dirname + '/.env';
 try {
 	if (fs.existsSync(envFilePath)) {
@@ -434,6 +437,10 @@ if (cluster.isMaster) {
 		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		app.post('/deleteScenarioETE', auth.protect, mindmap.deleteScenarioETE);
 		app.post('/exportToProject', auth.protect, mindmap.exportToProject);
+		app.post('/writeFileServer', auth.protect, mindmap.writeFileServer);
+		app.post('/writeZipFileServer', auth.protect,upload.single('file'),mindmap.writeZipFileServer);
+		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
+		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
