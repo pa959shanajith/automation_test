@@ -20,7 +20,7 @@ import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
-
+import ModalContainer from '../../global/components/ModalContainer';
 
 
 const CaptureModal = (props) => {
@@ -65,19 +65,19 @@ const CaptureModal = (props) => {
   const appType = props.appType;
   const [imageHeight, setImageHeight] = useState(0);
   const [activeEye, setActiveEye] = useState(false);
-  const [modified, setModified] = useState(null);
+  const [showConfirmPop, setShowConfirmPop] = useState(false);
+  const [modified, setModified] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
-   //element properties states 
-   const[elementPropertiesUpdated,setElementPropertiesUpdated]=useState(false)
-   const[elementPropertiesVisible,setElementProperties]=useState(false);
-   const[elementValues,setElementValues]=useState([])
-   const[isIdentifierVisible,setIsIdentifierVisible]=useState(false)
-   const[regex,setRegex]=useState("")
-   const[moveCardUp,setMoveCardUp]=useState(false)
-   const[cardBottom,setCardBottom]=useState(null)
-   const defaultIdentifier=[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'cssselector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]
-   const defaultNames={xpath:'Absolute X-Path',id:'ID Attribute',rxpath:'Relative X path',name:'Name Attribute',classname:'Classname Attribute',cssselector:'CSS Selector',href:'Href Attribute',label:'Label'}
-
+  //element properties states 
+  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
+  const [elementPropertiesVisible, setElementProperties] = useState(false);
+  const [elementValues, setElementValues] = useState([])
+  const [isIdentifierVisible, setIsIdentifierVisible] = useState(false)
+  const [regex, setRegex] = useState("")
+  const [moveCardUp, setMoveCardUp] = useState(false)
+  const [cardBottom, setCardBottom] = useState(null)
+  const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
+  const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
 
 
 
@@ -94,12 +94,12 @@ const CaptureModal = (props) => {
     fetchScrapeData()
   }, [])
   useEffect(() => {
-    if (endScrape||elementPropertiesUpdated){
+    if (endScrape || elementPropertiesUpdated) {
       fetchScrapeData();
       setEndScrape(false)
       setElementPropertiesUpdated(false)
     }
-  }, [endScrape,elementPropertiesUpdated])
+  }, [endScrape, elementPropertiesUpdated])
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
@@ -194,6 +194,10 @@ const CaptureModal = (props) => {
     }
   };
 
+  const toastSuccess = (SuccMessage) => {
+    toast.current.show({ severity: 'success', summary: 'Success', detail: SuccMessage, life: 10000 });
+  }
+
 
   const onSave = (e, confirmed) => {
 
@@ -243,45 +247,46 @@ const CaptureModal = (props) => {
         }
       }
 
-      // if (dCustname) {
-      //     continueSave = false;
-      //     setShowPop({
-      //         'type': 'modal',
-      //         'title': 'Save Scrape data',
-      //         'content': <div className="ss__dup_labels">
-      //             Please rename/delete duplicate scraped objects
-      //             <br/><br/>
-      //             Object characterstics are same for:
-      //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-      //                 <div className="ss__dup_scroll">
-      //                 { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-      //                 </div>
-      //             {/* </ScrollBar> */}
-      //         </div>,
-      //         'footer': <button onClick={()=>setShowPop("")}>OK</button>
-      //     })
-      // } else if (dXpath) {
-      //     continueSave = false;
-      //     setShowConfirmPop({
-      //         'title': 'Save Scrape data',
-      //         'content': <div className="ss__dup_labels">
-      //             Object characteristics are same for the below list of objects:
-      //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-      //                 <div className="ss__dup_scroll">
-      //                 { dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-      //                 </div>
-      //             {/* </ScrollBar> */}
-      //             <br/>
-      //             Do you still want to continue?
-      //         </div>,
-      //         'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
-      //         'continueText': "Continue",
-      //         'rejectText': "Cancel"
-      //     })
-      // }
+      if (dCustname) {
+        continueSave = false;
+        setShowPop({
+          'type': 'modal',
+          'title': 'Save Scrape data',
+          'content': <div className="ss__dup_labels">
+            Please rename/delete duplicate scraped objects
+            <br /><br />
+            Object characterstics are same for:
+            {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+            <div className="ss__dup_scroll">
+              {dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+            </div>
+            {/* </ScrollBar> */}
+          </div>,
+          'footer': <button onClick={() => setShowPop("")}>OK</button>
+        })
+      }
+      else if (dXpath) {
+        continueSave = false;
+        setShowConfirmPop({
+          'title': 'Save Scrape data',
+          'content': <div className="ss__dup_labels">
+            Object characteristics are same for the below list of objects:
+            {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+            <div className="ss__dup_scroll">
+              {dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+            </div>
+            {/* </ScrollBar> */}
+            <br />
+            Do you still want to continue?
+          </div>,
+          'onClick': () => { setShowConfirmPop(false); saveScrapedObjects(); },
+          'continueText': "Continue",
+          'rejectText': "Cancel"
+        })
+      }
     }
 
-    if (true) saveScrapedObjects();
+    if (continueSave) saveScrapedObjects();
   }
 
 
@@ -308,7 +313,7 @@ const CaptureModal = (props) => {
             newlyScrapeList = newScrapeList;
 
             setMainScrapedData(data);
-            if (capturedDataToSave.length === 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
+            if (capturedDataToSave.length >= 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
             setMirror({ scrape: data.mirror, compare: null });
             setNewScrapedData([]);
             setScrapeItems(newScrapeList);
@@ -362,7 +367,7 @@ const CaptureModal = (props) => {
             // screenshot
           }
           resolve("success");
-          let newData = (viewString.length > 0 && !elementPropertiesUpdated)? viewString.map((item) => {
+          let newData = (viewString.length > 0 && !elementPropertiesUpdated) ? viewString.map((item) => {
             return (
               {
                 selectall: item.custname,
@@ -416,7 +421,8 @@ const CaptureModal = (props) => {
     let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
     let views = [];
     let orderList = [];
-    let modifiedObjects = modified;
+    let modifiedObjects = Object.values(modified);
+    setCapturedDataToSave([]);
 
     for (let scrapeItem of scrapeItemsL) {
       if (!scrapeItem.objId) {
@@ -444,19 +450,23 @@ const CaptureModal = (props) => {
         else fetchScrapeData().then(resp => {
           if (resp === 'success' || typeof (resp) === "object") {
             typeof (resp) === "object" && resp.length > 0
-              ? <div className="ss__dup_labels">
-                Scraped data saved successfully.
-                <br /><br />
-                <strong>Warning: Please scrape an IRIS reference object.</strong>
-                <br /><br />
-                Matching objects found for:
-                {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-                <div className="ss__dup_scroll">
-                  {resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
-                </div>
-                {/* </ScrollBar> */}
-              </div>
-              : <div>Scraped Data saved successfull</div>;
+              ? setShowPop({
+                title: "Saved Scrape Objects",
+                content: <div className="ss__dup_labels">
+                  Scraped data saved successfully.
+                  <br /><br />
+                  <strong>Warning: Please scrape an IRIS reference object.</strong>
+                  <br /><br />
+                  Matching objects found for:
+                  {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+                  <div className="ss__dup_scroll">
+                    {resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+                  </div>
+                  {/* </ScrollBar> */}
+                </div>,
+                footer: <button onClick={() => { setShowPop("") }} >OK</button>
+              })
+              : toastSuccess("Scraped Elements saved successfully.");
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
           } else console.error(resp);
@@ -606,18 +616,18 @@ const CaptureModal = (props) => {
     setCaptureData(updatedData);
   };
 
-  // const renderSelectAllCell = (rowData) => {
-  //   if (rowData.editing) {
-  //     return (
-  //       <input
-  //         type="text"
-  //         value={rowData.selectall}
-  //         onChange={(e) => handleSelectAllChange(rowData, e.target.value)}
-  //       />
-  //     );
-  //   }
-  //   return rowData.selectall;
-  // };
+  const renderSelectAllCell = (rowData) => {
+    if (rowData.editing) {
+      return (
+        <input
+          type="text"
+          value={rowData.selectall}
+          onChange={(e) => handleSelectAllChange(rowData, e.target.value)}
+        />
+      );
+    }
+    return rowData.selectall;
+  };
 
 
 
@@ -633,7 +643,7 @@ const CaptureModal = (props) => {
           className="delete__icon" onClick={() => handleDelete(rowData)} />
         <img src="static/imgs/ic-edit.png"
           style={{ height: "20px", width: "20px" }}
-          className="edit__icon" onClick={() =>openElementProperties(rowData)} />
+          className="edit__icon" onClick={() => openElementProperties(rowData)} />
       </div>
     )
 
@@ -687,10 +697,12 @@ const CaptureModal = (props) => {
   );
 
   const emptyMessage = (
-    <div>
-      <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
-      <p className="not_captured_message">Not Captured</p>
-      <button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</button>
+    <div className='empty_msg1'>
+      <div className='empty_msg'>
+        <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
+        <p className="not_captured_message">Not Captured</p>
+        <button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</button>
+      </div>
     </div>
   );
 
@@ -699,6 +711,33 @@ const CaptureModal = (props) => {
       <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)}></Button>
       <Button label='Save' onClick={onSave} ></Button>
     </>
+  )
+  const PopupDialog = () => (
+    <ModalContainer
+      title={showPop.title}
+      modalClass="modal-sm"
+      close={() => setShowPop("")}
+      content={showPop.content}
+      footer={showPop.footer}
+    />
+  );
+
+  const ConfirmPopup = () => (
+    <ModalContainer
+      title={showConfirmPop.title}
+      content={showConfirmPop.content}
+      close={() => setShowConfirmPop(false)}
+      footer={
+        <>
+          <button onClick={showConfirmPop.onClick}>
+            {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
+          </button>
+          <button onClick={() => setShowConfirmPop(false)}>
+            {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
+          </button>
+        </>
+      }
+    />
   )
 
   const confirmPopupMsg = (
@@ -729,6 +768,7 @@ const CaptureModal = (props) => {
         setImageHeight(mirrorImg.height)
         setDsRatio(ds_ratio);
       }
+      mirrorImg.src = `data:image/PNG;base64,${mirror.scrape}`;
     }
     else {
       setMirrorHeight("0px");
@@ -736,7 +776,7 @@ const CaptureModal = (props) => {
     }
     dispatch(objValue({ val: null }));
     setHighlight(false);
-}, [mirror])
+  }, [mirror])
 
 
   useEffect(() => {
@@ -820,410 +860,365 @@ const CaptureModal = (props) => {
 
 
 
-const headerScreenshot = (
-  <>
-    <div className='header__popup'>
-      {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
-      <div>
-        <img data-test="eyeIcon" className="ss_eye_icon"
-          onClick={onHighlight}
-          src={activeEye ? "static/imgs/ic-highlight-element-inactive.png" : ""}
-          alt="eyeIcon" />
-      </div>
-    </div>
-  </>
-)
-const handleSave = (value, cellValue, customFlag = '') => {
-  let localScrapeItems = [...scrapeItems];
-  let updNewScrapedData = { ...newScrapedData };
-  let objId = "";
-  let isCustom = false;
-  let obj = null;
-  for (let scrapeItem of localScrapeItems) {
-    if (scrapeItem.val === value) {
-      scrapeItem.title = cellValue;
-      if (customFlag) {
-        scrapeItem.tag = cellValue.tag;
-        scrapeItem.url = cellValue.url;
-        scrapeItem.xpath = cellValue.xpath;
-        scrapeItem.editable = true;
-      }
-      objId = scrapeItem.objId;
-      isCustom = scrapeItem.isCustom;
-      if (objId) obj = { ...mainScrapedData.view[scrapeItem.objIdx], custname: cellValue };
-      else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = { ...newScrapedData.view[scrapeItem.objIdx], custname: cellValue }
-      // else only if customFlag is true
-    };
-  }
-
-  if (objId) {
-    let modifiedDict = { ...modified }
-    modifiedDict[objId] = obj;
-    setModified(modifiedDict);
-  }
-  else if (!isCustom) setNewScrapedData(updNewScrapedData);
-  if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
-  setScrapeItems(localScrapeItems);
-}
-
-const onCellEditComplete = (e) => {
-  let { rowData, newValue, field, originalEvent: event } = e;
-  if (newValue.trim().length > 0) {
-    setCellValue(newValue);
-    rowData.selectall = newValue;
-    handleSave(rowData.objectDetails.val, newValue);
-
-  }
-  else event.preventDefault();
-}
-
-const cellEditor = (options) => {
-  return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
-};
-
-
-
-
-const [editing, setEditing] = useState(false);
-const [cellValue, setCellValue] = useState(null);
-const [showInput, setShowInput] = useState(false);
-const [editedObjectValue, setEditedObjectValue] = useState("");
-const hoverCellTemplate = (rowData) => {
-  setEditedObjectValue(rowData.objectDetails.val);
-  setCellValue(rowData.selectall);
-  const handleMouseEnter = () => {
-    setEditing(true);
-  };
-
-  const handleMouseLeave = () => {
-    setEditing(false);
-  };
-
-  const handleInputChange = (e) => {
-    setCellValue(e.target.value);
-    rowData.selectall = e.target.value;
-  };
-
-  const EditHandler = () => {
-    console.log("Inside Input");
-    setShowInput(true);
-    setEditing(false);
-  }
-
-
-
-  // console.log("capturedDataToSave",capturedDataToSave);
-  // console.log("captureData", captureData);
-  // const updateEditedData = [];
-  // capturedDataToSave.filter(toSaveData => {
-  //   captureData.some(item => {
-  //     if(toSaveData.objId === item.objId && toSaveData.custname !== item.selectall) {
-  //       updateEditedData.push({...toSaveData, "custname" : item.selectall, "title": item.selectall });
-  //     }
-
-  //   })
-  // });
-
-  // console.log(updateEditedData);
-  // setModifyElementName([...updateEditedData]);
-  // setEditing(false);
-  // setShowInput(false);
-
-  return (
-    <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      {editing ? <div>
-        <span> {cellValue} </span>
-        <Button icon="pi pi-pencil" rounded text onClick={EditHandler} />
-      </div> :
+  const headerScreenshot = (
+    <>
+      <div className='header__popup'>
+        {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
         <div>
-          {showInput ? <>
-            <InputText value={cellValue} onChange={handleInputChange} />
-            <Button icon="pi pi-check" rounded text onClick={() => handleSave(editedObjectValue, cellValue)} />
-          </> : <span>{cellValue} </span>
-          }
-
+          <img data-test="eyeIcon" className="ss_eye_icon"
+            onClick={onHighlight}
+            src={activeEye ? "static/imgs/ic-highlight-element-inactive.png" : ""}
+            alt="eyeIcon" />
         </div>
-      }
-    </div>
-  );
-};
-const saveElementProperties=()=>{
-  let actualXpath=selectedCapturedElement?.[0].objectDetails.xpath.split(';')
-  let arr=elementValues.map(element=>(
-      (element.value==='None')?{...element,value:"null"}:element
-  ))
-  let obj=arr.reduce((obj, item) => ({...obj, [item.key]: item.value}) ,{});
-  let newIdentifierList=arr.map(element=>(
-      {id:element.id,identifier:element.identifier}
-  )).map((element,idx)=>{
-      element.id=idx+1
+      </div>
+    </>
+  )
+  const handleSave = (value, cellValue, customFlag = '') => {
+    let localScrapeItems = [...scrapeItems];
+    let updNewScrapedData = { ...newScrapedData };
+    let objId = "";
+    let isCustom = false;
+    let obj = null;
+    for (let scrapeItem of localScrapeItems) {
+      if (scrapeItem.val === value) {
+        scrapeItem.title = cellValue;
+        if (customFlag) {
+          scrapeItem.tag = cellValue.tag;
+          scrapeItem.url = cellValue.url;
+          scrapeItem.xpath = cellValue.xpath;
+          scrapeItem.editable = true;
+        }
+        objId = scrapeItem.objId;
+        isCustom = scrapeItem.isCustom;
+        console.log("mainScrapedData.view[scrapeItem.objIdx]", mainScrapedData.view[scrapeItem.objIdx]);
+        if (objId) obj = { ...mainScrapedData.view[scrapeItem.objIdx], custname: cellValue };
+        else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = { ...newScrapedData.view[scrapeItem.objIdx], custname: cellValue }
+        // else only if customFlag is true
+      };
+    }
+
+    if (objId) {
+      let modifiedDict = { ...modified }
+      modifiedDict[objId] = obj;
+      setModified(modifiedDict);
+    }
+    else if (!isCustom) setNewScrapedData(updNewScrapedData);
+    if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
+    setScrapeItems(localScrapeItems);
+
+  }
+
+  const onCellEditComplete = (e) => {
+    let { rowData, newValue, field, originalEvent: event } = e;
+    if (newValue.trim().length > 0) {
+      rowData.selectall = newValue;
+      handleSave(rowData.objectDetails.val, newValue);
+    }
+    else event.preventDefault();
+  }
+
+  const cellEditor = (options) => {
+    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+  };
+
+  const addedCustomElement = (addedElements, orderList) => {
+    let addElementData = [];
+    addedElements.map(element => {
+      let objects = {};
+      objects.selectall = element.custname;
+      objects.objectProperty = element.tag;
+      objects.screenshots = '';
+      objects.actions = '';
+      objects.objectDetails = {};
+      addElementData.push(objects)
+    })
+    setCaptureData([...captureData, ...addElementData])
+    setCapturedDataToSave([...capturedDataToSave, ...addedElements])
+  }
+
+
+  const saveElementProperties = () => {
+    let actualXpath = selectedCapturedElement?.[0].objectDetails.xpath.split(';')
+    let arr = elementValues.map(element => (
+      (element.value === 'None') ? { ...element, value: "null" } : element
+    ))
+    let obj = arr.reduce((obj, item) => ({ ...obj, [item.key]: item.value }), {});
+    let newIdentifierList = arr.map(element => (
+      { id: element.id, identifier: element.identifier }
+    )).map((element, idx) => {
+      element.id = idx + 1
       return element
-  })
-  
-  
-  let finalXPath=`${obj.xpath};${obj.id};${obj.rxpath};${obj.name};${actualXpath[4]};${obj.classname};${actualXpath[6]};${actualXpath[7]};${actualXpath[8]};${actualXpath[9]};${obj.label};${obj.href};${obj.cssselector}`
-  console.log(finalXPath)
-  let params = {
-      'objectId':selectedCapturedElement.length>0?selectedCapturedElement[0].objectDetails.objId:null,
-      'identifiers':newIdentifierList,
-      'xpath':finalXPath,
-      'param':'updatedProperties',
+    })
+
+
+    let finalXPath = `${obj.xpath};${obj.id};${obj.rxpath};${obj.name};${actualXpath[4]};${obj.classname};${actualXpath[6]};${actualXpath[7]};${actualXpath[8]};${actualXpath[9]};${obj.label};${obj.href};${obj.cssselector}`
+    console.log(finalXPath)
+    let params = {
+      'objectId': selectedCapturedElement.length > 0 ? selectedCapturedElement[0].objectDetails.objId : null,
+      'identifiers': newIdentifierList,
+      'xpath': finalXPath,
+      'param': 'updatedProperties',
       'userId': userInfo.user_id,
       'roleId': userInfo.role,
-      
-      // 'identifier'
-  }
-  scrapeApi.updateScreen_ICE(params)
-      .then(response => {
-          console.log(response)
-          if(response == "Success"){
-              setElementPropertiesUpdated(true)
-              setElementProperties(false)
-             
-              // setMsg(MSG.SCRAPE.SUCC_OBJ_PROPERTIES);
-              toast.current.show({severity:'success', summary: 'Success', detail:'Element properties updated successfully', life: 5000});
 
-              
-              // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
-              
-          }
+      // 'identifier'
+    }
+    scrapeApi.updateScreen_ICE(params)
+      .then(response => {
+        console.log(response)
+        if (response == "Success") {
+          setElementPropertiesUpdated(true)
+          setElementProperties(false)
+
+          // setMsg(MSG.SCRAPE.SUCC_OBJ_PROPERTIES);
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element properties updated successfully', life: 5000 });
+
+
+          // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+
+        }
       })
       .catch(error => {
-          console.log(error)
-          
-              // setMsg("Some Error occured while updating element properties.");
-              // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+        console.log(error)
+
+        // setMsg("Some Error occured while updating element properties.");
+        // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
       }
       )
-}
-const footerContent = (
-  <div>
-      <div style={{position:'absolute',fontStyle:'italic'}}><span style={{color:'red'}}>*</span>Click on value fields to edit element properties.</div>
-      <Button label="Cancel" onClick={()=>{setElementProperties(false)}} className="p-button-text" style={{borderRadius:'20px',height:'2.2rem'}} />
-      <Button label="Save" onClick={saveElementProperties} autoFocus style={{borderRadius:'20px',height:'2.2rem'}} />
-  </div>
-)
-const onCellEditCompleteElementProperties = (e) => {
-const {key,value}=e.newRowData;
-const elementVals=[...elementValues]
+  }
+  const footerContent = (
+    <div>
+      <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div>
+      <Button label="Cancel" onClick={() => { setElementProperties(false) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
+      <Button label="Save" onClick={saveElementProperties} autoFocus style={{ borderRadius: '20px', height: '2.2rem' }} />
+    </div>
+  )
+  const onCellEditCompleteElementProperties = (e) => {
+    const { key, value } = e.newRowData;
+    const elementVals = [...elementValues]
 
 
-elementVals.find(v => v.key === key).value = value;
+    elementVals.find(v => v.key === key).value = value;
 
 
-console.log(elementVals)
-};
-const textEditor = (options) => {
-return <InputText classNametype="text" style={{width:'100%'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
-};
-//element properties renderer end 
+    console.log(elementVals)
+  };
+  const textEditor = (options) => {
+    return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+  };
+  //element properties renderer end 
 
-//elemenet properties function calls
-const onRowReorder=(e)=>{
-setElementValues(e.value)
-}
-const openElementProperties=(rowdata)=>{
-console.log(rowdata)
-let element=rowdata.objectDetails.xpath.split(';')
-let dataValue=[]
-let elementFinalProperties={
-  xpath:(element[0]==="null"||element[0]===""||element[0]==="undefined")?'None':element[0],
-  id:(element[1]==="null"|| element[1]===""||(element[1]==="undefined"))?'None':element[1],
-  rxpath:(element[2]==="null"||element[2]===""||(element[2]==="undefined"))?'None':element[2],
-  name:(element[3]==="null"||element[3]===""||(element[3]==="undefined"))?'None':element[3],
-  classname:(element[5]==="null"||element[5]===""||(element[5]==="undefined"))?'None':element[5],
-  cssselector:(element[12]==="null"||element[12]===""||(element[12]==="undefined"))?'None':element[12],
-  href:(element[11]==="null"||element[11]===""||(element[11]==="undefined"))?'None':element[11],
-  label:(element[10]==="null"||element[10]===""||(element[10]==="undefined"))?'None':element[10],
-   }
+  //elemenet properties function calls
+  const onRowReorder = (e) => {
+    setElementValues(e.value)
+  }
+  const openElementProperties = (rowdata) => {
+    console.log(rowdata)
+    let element = rowdata.objectDetails.xpath.split(';')
+    let dataValue = []
+    let elementFinalProperties = {
+      xpath: (element[0] === "null" || element[0] === "" || element[0] === "undefined") ? 'None' : element[0],
+      id: (element[1] === "null" || element[1] === "" || (element[1] === "undefined")) ? 'None' : element[1],
+      rxpath: (element[2] === "null" || element[2] === "" || (element[2] === "undefined")) ? 'None' : element[2],
+      name: (element[3] === "null" || element[3] === "" || (element[3] === "undefined")) ? 'None' : element[3],
+      classname: (element[5] === "null" || element[5] === "" || (element[5] === "undefined")) ? 'None' : element[5],
+      cssselector: (element[12] === "null" || element[12] === "" || (element[12] === "undefined")) ? 'None' : element[12],
+      href: (element[11] === "null" || element[11] === "" || (element[11] === "undefined")) ? 'None' : element[11],
+      label: (element[10] === "null" || element[10] === "" || (element[10] === "undefined")) ? 'None' : element[10],
+    }
 
-Object.entries(elementFinalProperties).forEach(([key, value], index) => {
-let currindex=rowdata.objectDetails.identifier.filter(element=>element.identifier===key)
-dataValue.push({id:currindex[0].id,identifier:key,key,value,name:defaultNames[key]})
-}
-)
-dataValue.sort((a,b)=>a.id-b.id)
-setElementValues(dataValue)
-setElementProperties(true)
-}
+    Object.entries(elementFinalProperties).forEach(([key, value], index) => {
+      let currindex = rowdata.objectDetails.identifier.filter(element => element.identifier === key)
+      dataValue.push({ id: currindex[0].id, identifier: key, key, value, name: defaultNames[key] })
+    }
+    )
+    dataValue.sort((a, b) => a.id - b.id)
+    setElementValues(dataValue)
+    setElementProperties(true)
+  }
 
-return (
-  <>
-    <Toast ref={toast} position="bottom-center"/>
-    {overlay && <ScreenOverlay content={overlay} />}
-    <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={footerSave}>
-      {showPanel && (<div className="card_modal">
-        <Card className='panel_card'>
-          <div className="action_panelCard">
-            <div className='insprint__block'>
-              <p className='insprint__text'>In Sprint Automation</p>
-              <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png"></img>
-              <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                <img className='add_obj' title="add object" src="static/imgs/ic-add-object.png"></img>
-                <p>Add Element</p>
-              </span>
-              <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                <img className='map_obj' title='map object' src="static/imgs/ic-map-object.png"></img>
-                <p>Map Element</p>
-              </span>
-              {isInsprintHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                <h3>InSprint Automation</h3>
-                <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                <a>Learn More</a>
-              </div>)}
-            </div>
-            <div className='upgrade__block'>
-              <p className='insprint__text'>Upgrade Analyzer</p>
-              <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png"></img>
-              <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
-                <img className='add_obj' src="static/imgs/ic-compare.png"></img>
-                <p>Compare Element</p>
-              </span>
-              <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
-                <img className='map_obj' src="static/imgs/ic-replace.png"></img>
-                <p>Replace Element</p>
-              </span>
-              {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                <h3>Upgrade Analyzer</h3>
-                <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                <a href='docs.avoautomation.com'>Learn More</a>
-              </div>)}
-            </div>
-            <div className='utility__block'>
-              <p className='insprint__text'>Capture from PDF</p>
-              <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png"></img>
-              <span className='insprint_auto'>
-                <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
-                <p>PDF Utility</p>
-              </span>
-              {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                <h3>Capture from PDF</h3>
-                <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                <a>Learn More</a>
-              </div>)}
-            </div>
-            <div className='createManual__block'>
-              <p className='insprint__text'>Create Manually</p>
-              <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png"></img>
-              <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
-                <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
-                <p>Create Element</p>
-              </span>
-              {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                <h3>Create Manually</h3>
-                <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                <a>Learn More</a>
-              </div>)}
-            </div>
-            <div className='imp_exp__block'>
-              <span className='insprint_auto'>
-                <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                  <img className='add_obj' src="static/imgs/ic-import.png" />
-                  <p className='imp__text'>Import Screen</p>
+  return (
+    <>
+      <Toast ref={toast} position="bottom-center" />
+      {overlay && <ScreenOverlay content={overlay} />}
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={footerSave}>
+        {showPanel && (<div className="card_modal">
+          <Card className='panel_card'>
+            <div className="action_panelCard">
+              <div className='insprint__block'>
+                <p className='insprint__text'>In Sprint Automation</p>
+                <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png"></img>
+                <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
+                  <img className='add_obj' title="add object" src="static/imgs/ic-add-object.png"></img>
+                  <p>Add Element</p>
                 </span>
-                <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
-                  <img className='add_obj' src="static/imgs/ic-export.png" />
-                  <p className='imp__text'>Export Screen</p>
+                <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
+                  <img className='map_obj' title='map object' src="static/imgs/ic-map-object.png"></img>
+                  <p>Map Element</p>
                 </span>
-              </span>
+                {isInsprintHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                  <h3>InSprint Automation</h3>
+                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
+                  <a>Learn More</a>
+                </div>)}
+              </div>
+              <div className='upgrade__block'>
+                <p className='insprint__text'>Upgrade Analyzer</p>
+                <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png"></img>
+                <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
+                  <img className='add_obj' src="static/imgs/ic-compare.png"></img>
+                  <p>Compare Element</p>
+                </span>
+                <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
+                  <img className='map_obj' src="static/imgs/ic-replace.png"></img>
+                  <p>Replace Element</p>
+                </span>
+                {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                  <h3>Upgrade Analyzer</h3>
+                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
+                  <a href='docs.avoautomation.com'>Learn More</a>
+                </div>)}
+              </div>
+              <div className='utility__block'>
+                <p className='insprint__text'>Capture from PDF</p>
+                <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png"></img>
+                <span className='insprint_auto'>
+                  <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
+                  <p>PDF Utility</p>
+                </span>
+                {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                  <h3>Capture from PDF</h3>
+                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
+                  <a>Learn More</a>
+                </div>)}
+              </div>
+              <div className='createManual__block'>
+                <p className='insprint__text'>Create Manually</p>
+                <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png"></img>
+                <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
+                  <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
+                  <p>Create Element</p>
+                </span>
+                {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                  <h3>Create Manually</h3>
+                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
+                  <a>Learn More</a>
+                </div>)}
+              </div>
+              <div className='imp_exp__block'>
+                <span className='insprint_auto'>
+                  <span className='import__block' onClick={() => setShowObjModal("importModal")}>
+                    <img className='add_obj' src="static/imgs/ic-import.png" />
+                    <p className='imp__text'>Import Screen</p>
+                  </span>
+                  <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
+                    <img className='add_obj' src="static/imgs/ic-export.png" />
+                    <p className='imp__text'>Export Screen</p>
+                  </span>
+                </span>
+              </div>
             </div>
-          </div>
-        </Card>
-      </div>)}
-      <div className="card-table">
+          </Card>
+        </div>)}
 
-        <DataTable
-          size="small"
-          editMode="cell"
-          className='datatable__col'
-          value={captureData}
-          dragHandleIcon="pi pi-bars"
-          rowReorder resizableColumns
-          reorderableRows
-          onRowReorder={handleRowReorder}
-          showGridlines
-          selectionMode={"single"}
-          selection={selectedCapturedElement}
-          onSelectionChange={onRowClick}
-          tableStyle={{ minWidth: '50rem' }}
-          headerCheckboxToggleAllDisabled={false}
-          emptyMessage={emptyMessage}
-        >
-          {/* editMode="cell"
+        <div className="card-table">
+
+          <DataTable
+            size="small"
+            editMode="cell"
+            className='datatable__col'
+            value={captureData}
+            dragHandleIcon="pi pi-bars"
+            rowReorder resizableColumns
+            reorderableRows
+            onRowReorder={handleRowReorder}
+            showGridlines
+            selectionMode={"single"}
+            selection={selectedCapturedElement}
+            onSelectionChange={onRowClick}
+            tableStyle={{ minWidth: '50rem' }}
+            headerCheckboxToggleAllDisabled={false}
+            emptyMessage={emptyMessage}
+          >
+            {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
-          {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
-          {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-          <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-          <Column field="selectall" header="Element Name" editor={(options) => cellEditor(options)} onCellEditComplete={onCellEditComplete}></Column>
-          <Column field="objectProperty" header="Element Type"></Column>
-          <Column field="screenshots" header="Screenshots"></Column>
-          <Column field="actions" header="Actions" body={renderActionsCell} />
-        </DataTable>
-        <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false }) }} style={{ height: `${mirrorHeight}px` }}>
-          <div className="screenshot_pop__content" >
-            {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-            <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
-          </div>
-        </Dialog>
-      </div>
-    </Dialog>
-    <Dialog className={visible === 'capture' ? "compare__object__note" : "compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
-      <div className={visible === 'capture' ? "compare__content__adj" : "compare__object"}>
-        <span className='compare__btn'>
-          <p className='compare__text'>List of Browsers</p>
-        </span>
-        <span className='browser__col'>
-          <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-        </span>
-      </div>
-      {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
-    </Dialog>
-    {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
-    <AvoConfirmDialog
-      visible={showNote}
-      onHide={() => setShowNote(false)}
-      showHeader={false}
-      message={confirmPopupMsg}
-      icon="pi pi-exclamation-triangle"
-      accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
-    <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
-      <div className={"compare__object"}>
-        <span className='compare__btn'>
-          <p className='compare__text'>List of Browsers</p>
-        </span>
-        <span className='browser__col'>
-          <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-        </span>
-      </div>
-    </Dialog>
-    {currentDialog === 'addObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-    {currentDialog === 'mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-    {currentDialog === 'replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-    {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-    {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-    {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
-    {showObjModal === "importModal" && <ImportModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web" fetchingDetails={props.fetchingDetails} />}
-    {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
-{/* //Element properties  */}
-    <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{width:'66vw',marginRight:'3.3rem'}} visible={elementPropertiesVisible}  onHide={() =>setElementProperties(false)}  footer={footerContent}>
-          <div className="card">
-              <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
-                <Column rowReorder style={{ width: '3rem' }} />
-                <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem',  flexGrow: '0.2'}} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
-                {/* <column ></column> */}
-                <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem',  flexGrow: '0.2'}} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-                <Column field="value" header="Value" editor={(options)=>textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{cursor:'url(static/imgs/Pencil24.png) 15 15,auto',width:'53%',minWidth:'34rem'}} style={{}}></Column>
-              </DataTable>
-          </div>
-    </Dialog>
-  </>
-);
+            {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
+            {/* <Column rowReorder style={{ width: '3rem' }} /> */}
+            <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
+            <Column field="selectall" header="Element Name"
+              editor={(options) => cellEditor(options)}
+              onCellEditComplete={onCellEditComplete}
+              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}>
+            </Column>
+            <Column field="objectProperty" header="Element Type"></Column>
+            <Column field="screenshots" header="Screenshots"></Column>
+            <Column field="actions" header="Actions" body={renderActionsCell} />
+          </DataTable>
+          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false }) }} style={{ height: `${mirrorHeight}px` }}>
+            <div className="screenshot_pop__content" >
+              {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
+              <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+            </div>
+          </Dialog>
+        </div>
+      </Dialog>
+      <Dialog className={visible === 'capture' ? "compare__object__note" : "compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
+        <div className={visible === 'capture' ? "compare__content__adj" : "compare__object"}>
+          <span className='compare__btn'>
+            <p className='compare__text'>List of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+        {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
+      </Dialog>
+      {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
+      <AvoConfirmDialog
+        visible={showNote}
+        onHide={() => setShowNote(false)}
+        showHeader={false}
+        message={confirmPopupMsg}
+        icon="pi pi-exclamation-triangle"
+        accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
+        <div className={"compare__object"}>
+          <span className='compare__btn'>
+            <p className='compare__text'>List of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+      </Dialog>
+      {currentDialog === 'addObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} addCustomElement={addedCustomElement} />}
+      {currentDialog === 'mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+      {currentDialog === 'replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+      {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+      {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+      {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
+      {showObjModal === "importModal" && <ImportModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web" fetchingDetails={props.fetchingDetails} />}
+      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
+      {/* //Element properties  */}
+      <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
+        <div className="card">
+          <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
+            <Column rowReorder style={{ width: '3rem' }} />
+            <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
+            {/* <column ></column> */}
+            <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
+            <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
+          </DataTable>
+        </div>
+      </Dialog>
+    </>
+  );
 }
 
 
@@ -1335,7 +1330,7 @@ function generateScrapeItemList(lastIdx, viewString, type = "old") {
       left: scrapeObject.left,
       height: scrapeObject.height,
       width: scrapeObject.width,
-      identifier:scrapeObject.identifier
+      identifier: scrapeObject.identifier
     }
     if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop != undefined) {
       scrapeItem['viewTop'] = scrapeObject.viewTop;
