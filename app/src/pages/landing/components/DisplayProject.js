@@ -7,6 +7,7 @@ import { Menu } from "primereact/menu";
 import { Tooltip } from 'primereact/tooltip';
 import { fetchProjects } from "../api"
 import { useSelector, useDispatch } from 'react-redux';
+import { updateSteps,getStep} from './VerticalComponentsSlice';
 import { loadUserInfoActions } from '../LandingSlice';
 
 
@@ -20,6 +21,7 @@ const DisplayProject = (props) => {
   const [projectsDetails, setProjectsDetails] = useState([]);
   const [getProjectLists, setProjectList] = useState([]);
   const [selectedsortItems,setSelectedsortItems] = useState(null)
+  const userInfo = useSelector((state) => state.landing.userinfo);
   const createdProject = useSelector((state) => state.landing.savedNewProject);
   const dispatch = useDispatch();
 
@@ -190,7 +192,8 @@ const DisplayProject = (props) => {
         <div className={className}>
           <span className="All_Project_font" >ALL PROJECTS</span>
           <Tooltip target=".add_btn" position="bottom" content="Create Project"/>
-          <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
+          
+          <button className="pi pi-plus add_btn"  disabled = {(userInfo.rolename)!== "Test Manager"} onClick={handleOpenDialog} />
           <CreateProject visible={visible} onHide={handleCloseDialog} />
           <Tooltip target=".sort_btn" position="bottom" content="Sort Projects"/>
           <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
@@ -199,53 +202,58 @@ const DisplayProject = (props) => {
     )
   };
 
+ 
+  useEffect(()=> {
+    dispatch(getStep(defaultProjectId));
+
+  },[defaultProjectId])
 
   return (
     <>
-      <Panel className="Project-Panel" headerTemplate={template} >
-        <div className="p-input-icon-left Project-search ">
-          <i className="pi pi-search" />
-          <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} />
-        </div>
-          <div className="project-list project">
-            {filteredProjects.map((project) => (
-              <div  key={project.projectId} >
-                <button
-                  className={project.projectId === defaultProjectId ? 'default-project project-card' : 'project-card'}
-                  onClick={() => {
-                    if (project.projectId !== defaultProjectId) {
-                      setDefaultProjectId(project.projectId);
-                    }
-                  }}>
-                    {project.appType === "5db0022cf87fdec084ae49b6" && (<img src="static/imgs/web.png" alt="Web App Icon" height="20"/>)}
-                    {project.appType === "5db0022cf87fdec084ae49b2" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="20" />)}
-                    {project.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
-                    {project.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="20" />)}
-                    {project.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
-                    {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='15' />)}
-                    {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
-                    {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
-                    {/* <div className="ProjectTooltip"> */}
-                    <h2 className="projectInside" title={project.projectName+"\n"+project.modifiedDate+" by "+project.modifiedName}>{project.projectName}</h2>
-                    <h2 className="projectInsideLast" >{project.modifiedDate} by {project.modifiedName}</h2>
-                    {/* </div> */}
-                    {/* <Tooltip target=".ProjectTooltip" position="bottom" content={project.projectName+"\n"+project.modifiedDate} /> */}
-                </button>
-              </div>))}
-          </div>
-      </Panel>
-      <p className="DefaultProjectName">{defaultProject && defaultProject.projectName}</p>
-      <div className="Default_Project_icon">
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b6" && (<img src="static/imgs/web.png" alt="Web App Icon" height="25" />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b2" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="25" />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="25" />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="23" width='35' />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
-        {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
+    <Panel className="Project-Panel" headerTemplate={template} >
+      <div className="p-input-icon-left Project-search ">
+        <i className="pi pi-search" />
+        <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} />
       </div>
-    </>
-  );
+        <div className="project-list project">
+          {filteredProjects.map((project) => (
+            <div  key={project.projectId} >
+              <button
+                className={project.projectId === defaultProjectId ? 'default-project project-card' : 'project-card'}
+                onClick={() => {
+                  if (project.projectId !== defaultProjectId) {
+                    setDefaultProjectId(project.projectId);
+                  }
+                }}>
+                  {project.appType === "5db0022cf87fdec084ae49b6" && (<img src="static/imgs/web.png" alt="Web App Icon" height="20"/>)}
+                  {project.appType === "5db0022cf87fdec084ae49b2" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="20" />)}
+                  {project.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
+                  {project.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="20" />)}
+                  {project.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
+                  {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='15' />)}
+                  {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
+                  {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
+                  {/* <div className="ProjectTooltip"> */}
+                  <h2 className="projectInside" title={project.projectName+"\n"+project.modifiedDate+" by "+project.modifiedName}>{project.projectName}</h2>
+                  <h2 className="projectInsideLast" >{project.modifiedDate} by {project.modifiedName}</h2>
+                  {/* </div> */}
+                  {/* <Tooltip target=".ProjectTooltip" position="bottom" content={project.projectName+"\n"+project.modifiedDate} /> */}
+              </button>
+            </div>))}
+        </div>
+    </Panel>
+    <p className="DefaultProjectName">{defaultProject && defaultProject.projectName}</p>
+    <div className="Default_Project_icon">
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b6" && (<img src="static/imgs/web.png" alt="Web App Icon" height="25" />)}
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b2" && (<img src="static/imgs/mobileWeb.png" alt="Mobile App Icon" height="25" />)}
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/desktop.png" alt="Mobile App Icon" height="20" />)}
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/webService.png" alt="Mobile App Icon" height="25" />)}
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" />)}
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="23" width='35' />)}
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/mainframe.png" alt="Mobile App Icon" height="18" width='18' />)}
+      {defaultProject && defaultProject.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/mobileApps.png" alt="Mobile App Icon" height="20" />)}
+    </div>
+  </>
+);
 };
 export default DisplayProject;

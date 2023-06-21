@@ -1,4 +1,5 @@
-.Header_size {
+.Topbar_Menu{
+    .Header_size {
     position: relative;
     height: 2.6rem;
     background: #ffffff !important;
@@ -28,3 +29,21 @@
     color: #605BFF;
     border-bottom: 2px solid #605BFF;
 }
+.needHelp
+{
+    position: absolute;
+    z-index: 4;
+    top: 37rem;
+    left: 90rem;
+    border-radius: 3rem;
+    .p-menu {
+        width: 13.5rem !important;
+    }
+}
+.needHelp_Menu{
+    position: absolute;
+    right: 2rem;
+    bottom: 4rem;
+}
+}
+

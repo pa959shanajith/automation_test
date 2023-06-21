@@ -72,10 +72,10 @@
     .card11{
         .p-card-body{
             margin: 0rem;
-            overflow-y: auto;
-            height: auto;
-            min-height: 25rem;
-            overflow-x: hidden;
+            // overflow-y: auto;
+            // height: auto;
+            // min-height: 25rem;
+            // overflow-x: hidden;
         }
     }  
     .card11{
@@ -142,11 +142,13 @@
      }
      .check1{
         position: relative;
-        bottom: 1rem;
+        background: white;
+        z-index: 6;
      }
      .check2{
          position: relative;
          bottom: 5rem;
+         overflow: auto;
      }
      
     .card{
@@ -233,6 +235,9 @@
     .user-select-checkbox {
         position: relative;
         top: 0.5rem;
+        height: 18rem;
+        overflow: hidden;
+        width: 35rem;
     }
     .selecteduser{
         width: 28rem;
@@ -265,11 +270,12 @@
     }
     .dropdown_role{
         position: relative;
-        bottom: 5.2rem;
+        bottom: 4.2rem;
         left: 21.5rem;
         color: #9E9E9E;
         font-size: 14px;
         font-family: 'Open sans' !important;
+        z-index: 9;
     }
     .check-bx3{
         display: flex;
