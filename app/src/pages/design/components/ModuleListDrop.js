@@ -734,7 +734,7 @@ const ModuleListDrop = (props) =>{
             />:null}
              <>
       <div className="CollapseWholeCont">
-       <div className="collapseBut" style={{height:"8%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'16rem',zIndex:'2',}}>
+       <div className="collapseBut" style={{height:"9%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'16rem',zIndex:'2',}}>
              <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); console.log("collapseWhole",collapseWhole)}}/> 
           </div>
        <div className="Whole_container" style={{width: collapseWhole? "17rem":"0.6rem",transitionDuration: '0.7s ',display: !collapseWhole? "none":"" }}>
@@ -777,8 +777,15 @@ const ModuleListDrop = (props) =>{
                                     }
                                     setAllModSelected(!allModSelected)}} >
                        </input>
-                       <input className='pFont' style={{width:'12rem'}}placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
-                                        <img  style={{height:'17px',width:'17px',marginTop:'3px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                       {/* <input className='pFont' style={{width:'12rem'}}placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
+                                        <img  style={{height:'17px',width:'17px',marginTop:'3px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/> */}
+                         <div className='inputSearchNorMod'>           
+                               <span className="p-input-icon-left">
+                                         <i className="pi pi-search" />
+                                         <InputText placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
+                                </span>
+                         </div>    
+         
                 </div>
                 <div className="NorModuleList">
                         {/* {moduleLists && moduleLists.map((module, idx)=>{
@@ -806,8 +813,8 @@ const ModuleListDrop = (props) =>{
                                                     <div className={'EachModNameBox'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  } >
                                                       {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}
                                                       <img src="static/imgs/moduleIcon.png" style={{width:'20px',height:'20px',marginLeft:'0.5rem'}} alt="modules" />
-                                                      <div style={{width:'6rem',textOverflow:'ellipsis',overflow:'hidden'}}>
-                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</h4>
+                                                      <div style={{width:'13rem',textOverflow:'ellipsis',overflow:'hidden'}}>
+                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',}}>{e.name}</h4>
                                                       </div>  
                                                     </div>
                                             </div>
@@ -832,11 +839,20 @@ const ModuleListDrop = (props) =>{
                       <img   src="static/imgs/plusNew.png" onClick={()=>setShowE2EPopup(true)}  alt="PlusButtonOfE2E" /> 
                       {showE2EPopup&&<LongContentDemo/>}
                 </div>
-                   <div className='searchBox pxBlack'>
+                   {/* <div className='searchBox pxBlack'>
                                        <img style={{marginLeft:'1.3rem',width:'1rem',}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
                                            <input className='pFont' style={{width:'12rem'}} placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                                            <img src={"static/imgs/ic-search-icon.png"} alt={'search'} />
-                   </div>
+                   </div> */}
+                   <div className='searchAndCheckImg'>
+                    <img style={{width:'1.05rem',height:'1.05rem'}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
+                    <div className='inputSearchNorMod'>           
+                               <span className="p-input-icon-left">
+                                         <i className="pi pi-search" />
+                                         <InputText placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                </span>
+                         </div> 
+                    </div>      
                 <div className="NorModuleListE2E">
                         {/* {moduleList && moduleList.map((module)=>{
                               return(
@@ -854,7 +870,7 @@ const ModuleListDrop = (props) =>{
                                                     
                                                     <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'EachModNameBox'+((moduleSelect._id===e._id)?" selected":"")} 
                                                           style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
-                                                          <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.3rem', display:'flex',alignItems:"center",width:'91%'}}> 
+                                                          <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.3rem', display:'flex',alignItems:"center",width:'99%'}}> 
                                                           <img style={{}} src="static/imgs/checkBoxIcon.png" alt="AddButton" /><img src="static/imgs/E2EModuleSideIcon.png" style={{marginLeft:'10px',width:'20px',height:'20px'}} alt="modules" /><span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span> <div  ></div></div>
                                                     
                                                     </div>
@@ -865,14 +881,13 @@ const ModuleListDrop = (props) =>{
              </div>
        </div>
     </div>
-    <div className='scenarioListBox' style={{width:collapse? "10rem":"0.5rem", overflowX:'hidden',height:'57.7%',display: !collapseForModules || !isE2EOpen? 'none': '',}}>
+    {/* <div className='scenarioListBox' style={{width:collapse? "10rem":"0.5rem", overflowX:'hidden',height:'57.7%',display: !collapseForModules || !isE2EOpen? 'none': '',}}>
                     <div style={{display:"flex", flexDirection:"column", width:"100%",overflowX:'hidden'}}>
                         <div style={{display:'flex',justifyContent:'space-between'}}>
                             <img style={{width:'1.7rem',height:'1.7rem',marginTop:'5px',  display:!isE2EOpen || !collapse? 'none':'',}}  src='static/imgs/node-scenarios.png' alt='/node-scenarios'/>
                     <div style={{paddingTop:'0.47rem',marginLeft: "4px",}}><h5 style={{fontSize:'17px',opacity:!isE2EOpen || !collapse? '0':''}}><b>Scenarios</b></h5></div>
                     <div style={{marginRight:'-0.4rem',marginTop:'0rem',cursor:'pointer'}} onClick={()=> {setIsE2EOpen(false);collapsed();  
                     }}><img src="static/imgs/X_button.png" alt="cross button" /></div></div>
-                    {/* scenario Search */}
                      <span style={{display:'flex', flexDirection:'row-reverse',  marginTop:'2px',marginRight:!isE2EOpen || !collapse? '15rem':''}}>
                         <input  style={{width:'137px',height: '23px', borderRadius:'6px',fontSize:'15px',marginRight:'0.65rem',}} placeholder="Search Scenario" ref={SearchScInp} onChange={(e)=>searchScenario(e.target.value)}></input>
                         <img style={{width: '12px', height: '17px', marginRight:"-8.2rem", marginTop:'2px',zIndex:'1'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
@@ -902,7 +917,7 @@ const ModuleListDrop = (props) =>{
                     <div className='collapseButtonDiv' style={{marginLeft: collapsed? "-4rem":''}} ><img className='collapseButton' style={{ cursor: !isE2EOpen ? 'no-drop' : 'pointer', transform: isE2EOpen && collapse ? 'rotate(180deg)' : 'rotate(0deg)',height:'30px',width:'8px', position:'relative'
                         }} onClick={isE2EOpen ? collapsed : null} src='static/imgs/collapseButton.png' alt='collapseButton'/> </div>
                  
-                </div>
+                </div> */}
         </>
             
             
