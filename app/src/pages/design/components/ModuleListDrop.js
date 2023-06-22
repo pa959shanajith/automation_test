@@ -1,6 +1,6 @@
 import React, { useState, Fragment, useRef, useEffect } from 'react';
 import { useSelector, useDispatch} from 'react-redux';
-import {getModules, populateScenarios}  from '../api'
+import {getModules, populateScenarios,getProjectList,saveE2EDataPopup}  from '../api'
 import {ModalContainer,Messages as MSG, setMsg} from '../../global';
 import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
@@ -91,6 +91,23 @@ const ModuleListDrop = (props) =>{
             // dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
         }
      },[]);
+
+     useEffect(()=>{
+        (async()=>{
+          var data=[]
+          const Projects = await getProjectList()
+          for(var i = 0; Projects.projectName.length>i; i++){
+              data.push({name:Projects.projectName[i], id:Projects.projectId[i]})
+            }
+            // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
+        //  const data =[ {
+        //     key: Projects.projectId,
+        //     value:Projects.projectNames
+        //   }]
+          setProjectList(data)
+        })()
+      },[projectId])
+
     //  useEffect (()=>{
     //     {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
     //  },[isCreateE2E])
@@ -370,103 +387,172 @@ const ModuleListDrop = (props) =>{
             setNewProjectList(projectCollection);
           })();
         }, []);
+        console.log("newProjectList",newProjectList)
         const handleArrowBut =()=>{
              setTransferBut(selectedKeys)
             
         }
-        const pushingEnENmInArr ={name:inputE2EData}
-        transferBut[0]= pushingEnENmInArr
-        console.log("inputE2EData",inputE2EData)
+        const pushingEnENmInArr ={
+            "id": 0,
+            "childIndex": 0,
+            "_id": null,
+            "oid": null,
+            "name":inputE2EData,
+            "type": "endtoend",
+            "pid": null,
+            "pid_c": null,
+            "task": null,
+            "renamed": false,
+            "orig_name": null,
+            "taskexists": null,
+            "state": "created",
+            "cidxch": null}
+        // transferBut[0]= pushingEnENmInArr
+        // console.log("inputE2EData",inputE2EData)
         console.log("transferBut[1]",transferBut)
       
-        const HardCodedApiDataForE2E = {
-          "action": "/saveEndtoEndData",
-          "write": 10,
-          "map": [
-              {
-                  "id": 0,
-                  "childIndex": 0,
-                  "_id": null,
-                  "oid": null,
-                  "name": "",
-                  "type": "endtoend",
-                  "pid": null,
-                  "pid_c": null,
-                  "task": null,
-                  "renamed": false,
-                  "orig_name": null,
-                  "taskexists": null,
-                  "state": "created",
-                  "cidxch": null
-              },
-              {
-                  "id": 1,
-                  "childIndex": 1,
-                  "_id": "641831913b886ffbc86bf169",
-                  "oid": null,
-                  "name": "Scenario_Endgame1",
-                  "type": "scenarios",
-                  "pid": 0,
-                  "task": null,
-                  "renamed": false,
-                  "orig_name": null,
-                  "taskexists": null,
-                  "state": "created",
-                  "cidxch": "true"
-              },
-              {
-                  "id": 2,
-                  "childIndex": 2,
-                  "_id": "641831913b886ffbc86bf168",
-                  "oid": null,
-                  "name": "Scenario_EndGame",
-                  "type": "scenarios",
-                  "pid": 0,
-                  "task": null,
-                  "renamed": false,
-                  "orig_name": null,
-                  "taskexists": null,
-                  "state": "created",
-                  "cidxch": "true"
-              },
-              {
-                  "id": 3,
-                  "childIndex": 3,
-                  "_id": "6417ff373b886ffbc86bf101",
-                  "oid": null,
-                  "name": "Scenario_IronMan",
-                  "type": "scenarios",
-                  "pid": 0,
-                  "task": null,
-                  "renamed": false,
-                  "orig_name": null,
-                  "taskexists": null,
-                  "state": "created",
-                  "cidxch": "true"
-              }
-          ],
-          "deletednode": [],
-          "unassignTask": [],
-          "prjId": "6417fca33b886ffbc86bf0df",
-          "createdthrough": "Web",
-          "relId": null
-      }
-         HardCodedApiDataForE2E.map[0].name =inputE2EData
-       console.log("readingdataE2E",HardCodedApiDataForE2E.map[0].name)
-       console.log("readingdataE2EName",HardCodedApiDataForE2E)
-       console.log("length of transferbut",transferBut.length)
+        
+    //      HardCodedApiDataForE2E.map[0].name =inputE2EData
+    //      HardCodedApiDataForE2E.map[1] =transferBut
+    //    console.log("readingdataE2E",HardCodedApiDataForE2E.map[1].name)
+    //    console.log("readingdataE2EName",HardCodedApiDataForE2E)
+    //    console.log("length of transferbut",transferBut.length)
       
-        const HandleSaveButton =()=>{
+        const dataOnSaveButton =async()=>{
+            console.log("dataOnClickSaveButton",transferBut);
+            let HardCodedApiDataForE2E = {
+                "action": "/saveEndtoEndData",
+                "write": 10,
+                "deletednode": [],
+                "map": [
+                    {
+                        "id": 0,
+                        "childIndex": 0,
+                        "_id": null,
+                        "oid": null,
+                        "name": inputE2EData,
+                        "type": "endtoend",
+                        "pid": null,
+                        "pid_c": null,
+                        "task": null,
+                        "renamed": false,
+                        "orig_name": null,
+                        "taskexists": null,
+                        "state": "created",
+                        "cidxch": null
+                    }
+                ],
+                "unassignTask": [],
+                "prjId": proj,
+                "createdthrough": "Web",
+                "relId": null,
+                
+            };
+            for(let scenarioItem in transferBut) {
+                HardCodedApiDataForE2E.map.push(
+                    {
+                        "id": parseInt(scenarioItem)+1,
+                        "childIndex": parseInt(scenarioItem)+1,
+                        "_id": transferBut[scenarioItem].scenarioId,
+                        "oid": null,
+                        "name": transferBut[scenarioItem].sceName,
+                        "type": "scenarios",
+                        "pid": 0,
+                        "task": null,
+                        "renamed": false,
+                        "orig_name": null,
+                        "taskexists": null,
+                        "state": "created",
+                        "cidxch": "true"
+                    }
+                )
+            }
+            // const HardCodedApiDataForE2E = {
+            //     "action": "/saveEndtoEndData",
+            //     "write": 10,
+            //     "map": [
+            //         {
+            //             "id": 0,
+            //             "childIndex": 0,
+            //             "_id": null,
+            //             "oid": null,
+            //             "name": "",
+            //             "type": "endtoend",
+            //             "pid": null,
+            //             "pid_c": null,
+            //             "task": null,
+            //             "renamed": false,
+            //             "orig_name": null,
+            //             "taskexists": null,
+            //             "state": "created",
+            //             "cidxch": null
+            //         },
+            //         {
+            //             "id": 1,
+            //             "childIndex": 1,
+            //             "_id": "641831913b886ffbc86bf169",
+            //             "oid": null,
+            //             "name": "Scenario_Endgame1",
+            //             "type": "scenarios",
+            //             "pid": 0,
+            //             "task": null,
+            //             "renamed": false,
+            //             "orig_name": null,
+            //             "taskexists": null,
+            //             "state": "created",
+            //             "cidxch": "true"
+            //         },
+            //         {
+            //             "id": 2,
+            //             "childIndex": 2,
+            //             "_id": "641831913b886ffbc86bf168",
+            //             "oid": null,
+            //             "name": "Scenario_EndGame",
+            //             "type": "scenarios",
+            //             "pid": 0,
+            //             "task": null,
+            //             "renamed": false,
+            //             "orig_name": null,
+            //             "taskexists": null,
+            //             "state": "created",
+            //             "cidxch": "true"
+            //         },
+            //         {
+            //             "id": 3,
+            //             "childIndex": 3,
+            //             "_id": "6417ff373b886ffbc86bf101",
+            //             "oid": null,
+            //             "name": "Scenario_IronMan",
+            //             "type": "scenarios",
+            //             "pid": 0,
+            //             "task": null,
+            //             "renamed": false,
+            //             "orig_name": null,
+            //             "taskexists": null,
+            //             "state": "created",
+            //             "cidxch": "true"
+            //         }
+            //     ],
+            //     "deletednode": [],
+            //     "unassignTask": [],
+            //     "prjId": "6417fca33b886ffbc86bf0df",
+            //     "createdthrough": "Web",
+            //     "relId": null
+            // }
+            console.log("inputE2EData",inputE2EData)
+            console.log("HardCodedApiDataForE2E",HardCodedApiDataForE2E);
+
+            const saveE2E_sce = await saveE2EDataPopup(HardCodedApiDataForE2E) 
+            if(saveE2E_sce.error){displayError(saveE2E_sce.error);return}
           
         }
         const CheckboxSelectionDemo = () => {
-        
       
-          const handleCheckboxChange = (e, projIdx, moduleIdx, scenarioIdx, projName, modName, sceName) => {
+          const handleCheckboxChange = (e, projIdx, moduleIdx, scenarioIdx, projName, modName, sceName,projectId,moduleId,scenarioId) => {
             const selectedScenario = `${projIdx}-${moduleIdx}-${scenarioIdx}`;
             if (e.checked) {
               setSelectedKeys([...selectedKeys, {
-                  projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
+                  projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario,projectId,moduleId,scenarioId
               }]);
               // setStoredSelectedKeys([...selectedKeys, {
               //   projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
@@ -490,7 +576,7 @@ const ModuleListDrop = (props) =>{
       
             setSelectedKeys([]); // Clear the selected scenarios after transferring
           };
-          //  console.log("newProjectList",newProjectList)
+           console.log("newProjectList",newProjectList)
           return (
             <div>
               <Tree
@@ -515,7 +601,7 @@ const ModuleListDrop = (props) =>{
                       label: (
                         <label style={{alignItem:'center',justifyContent:'center'}}>
                           <Checkbox
-                            onChange={(e) => handleCheckboxChange(e, projIdx, moduleIdx, scenarioIdx, project.name, module.name, scenario.name)}
+                            onChange={(e) => handleCheckboxChange(e, projIdx, moduleIdx, scenarioIdx, project.name, module.name, scenario.name,project.id,module.id,scenario.id)}
                             checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${projIdx}-${moduleIdx}-${scenarioIdx}`)}
                           />
                           <>
@@ -540,7 +626,7 @@ const ModuleListDrop = (props) =>{
             const footerContent = (
               <div>
                   <Button label="Cancel"  onClick={() => setShowE2EPopup(false)} className="p-button-text" />
-                  <Button label="Save"  onClick={() => {setShowE2EPopup(false); console.log("inputE2E",inputE2EData)}} autoFocus />
+                  <Button label="Save"  onClick={() => {setShowE2EPopup(false); dataOnSaveButton() }} autoFocus />
                   {/* <SaveMapButton  isEnE={true}   /> */}
               </div>
             );
@@ -718,7 +804,9 @@ const ModuleListDrop = (props) =>{
                                                     <div className={'EachModNameBox'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  } >
                                                       {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}
                                                       <img src="static/imgs/moduleIcon.png" style={{width:'20px',height:'20px',marginLeft:'0.5rem'}} alt="modules" />
-                                                      <span className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</span>  
+                                                      <div style={{width:'6rem',textOverflow:'ellipsis',overflow:'hidden'}}>
+                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</h4>
+                                                      </div>  
                                                     </div>
                                             </div>
                                             ) 

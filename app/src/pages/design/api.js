@@ -733,6 +733,30 @@ export const getNotificationGroups = async(props) => {
         return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
     }
 }
+export const saveE2EDataPopup = async(HardCodedApiDataForE2E) => {
+    try{
+        const res = await axios(url+'/saveEndtoEndData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: HardCodedApiDataForE2E,
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+            console.log("res.data",res.data)
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
+    }
+}
 
 
 /* Component
