@@ -12,7 +12,8 @@ export const loadUserInfo = createSlice({
         projectDetails: {},
         projectModifiedDetails:{},
         selectedProject:null,
-        savedNewProject:false
+        savedNewProject:false,
+        defaultSelectProject:{},
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -39,6 +40,9 @@ export const loadUserInfo = createSlice({
         },
         setSelectedProject: (state, action) => {
             state.selectedProject = action.payload;
+        },
+        setDefaultProject: (state, action) => {
+            state.defaultSelectProject = action.payload;
         },
         // setApptype: (state, action) => {
         //     state.apptype = action.payload;

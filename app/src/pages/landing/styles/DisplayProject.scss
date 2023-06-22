@@ -113,7 +113,7 @@
   font-size: 16px;
   line-height: 24px;
   color: rgba(3, 2, 41, 0.6);
-  margin-left: 0.5rem;
+  width: 16rem;
 }
 
 .Search_name {
@@ -125,37 +125,38 @@
   border: none !important;
 }
 
-.DefaultProjectName {
-  position: fixed;
-  bottom: 42.3rem;
-  left: 30.5rem;
-  z-index: 1;
-  font-size: 24px;
-  font-weight: 500;
-  color: #030229;
-}
+// .DefaultProjectName {
+//   position: fixed;
+//   bottom: 42.3rem;
+//   left: 30.5rem;
+//   z-index: 1;
+//   font-size: 24px;
+//   font-weight: 500;
+//   color: #030229;
+// }
 
 .sort_btn {
   border: none;
   background: transparent;
   cursor: pointer;
   color: #6c757d;
+  margin: 0rem 0.4rem;
 }
 
 .add_btn {
-  margin: 0rem 1rem 0rem 10.1rem;
   border: none;
   background: transparent;
   cursor: pointer;
   color: #6c757d;
+  margin: 0rem 0.4rem;
 }
 
-.Default_Project_icon {
-  left: 27.8rem;
-  z-index: 1;
-  position: fixed;
-  bottom: 42.2rem;
-}
+// .Default_Project_icon {
+//   left: 27.8rem;
+//   z-index: 1;
+//   position: fixed;
+//   bottom: 42.2rem;
+// }
 
 .project {
   overflow-y: auto;
@@ -165,4 +166,7 @@
 .p-menuitem-icon-left {
   position: relative;
   left: 1rem
+}
+.All_Project{
+  margin: 0.5rem 1.5rem;
 }
