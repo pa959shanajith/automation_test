@@ -64,7 +64,7 @@ const AzureContent = props => {
     const [totalStoriesCount, setTotalStoriesCount] = useState(0)
     const [pageSize, setPageSize] = useState(100);
     const [showCustmBtn,setShowCustmBtn] = useState(true);
- 
+    const [pageLimit,setPageLimit] = useState(['1-100'])
 
     // const callProjectDetails_ICE=async(e)=>{
     //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
@@ -121,9 +121,15 @@ const AzureContent = props => {
         let apiObj = Object.assign({"action": azureapiKeys.stories},azureLogin,selectedProject,{'skip':e.skip || 0});
         const workItemsDetails = await api.connectAzure_ICE(apiObj);
         if(workItemsDetails && workItemsDetails.userStories){
-            setUserStories(workItemsDetails.userStories);
+            const newArray = userStories.concat(workItemsDetails.userStories)
+            setUserStories(newArray);
             setStoriesToDisplay(workItemsDetails.userStories.slice(0,9));
-            setTotalRecords(workItemsDetails.userStories.length);
+            if(e && e.currPage){
+                const startIndex = e.currPage * recordsPerPage;
+                const endIndex = startIndex + recordsPerPage;
+                setStoriesToDisplay(newArray.slice(startIndex,endIndex));
+            }
+            setTotalRecords(workItemsDetails.total_count)
             setIsShowPagination(true);
             setTotalStoriesCount(workItemsDetails.total_count)
         }
@@ -357,6 +363,9 @@ const AzureContent = props => {
   const onPageChange = (e) =>{
     setCurrentPage(e.page);
     setSkipItem(e.first);
+    if( secondOption === 'Story'){
+        checkPaginator(e);
+    }
     const isLastPage = e.page === Math.ceil(totalRecords / recordsPerPage) - 1;
     setIsLastPage(isLastPage);
     const startIndex = e.page * recordsPerPage;
@@ -365,15 +374,29 @@ const AzureContent = props => {
     
   }
 
-  const handlePrevNext = (btnType) => {
-    setCurrentPage(0);setIsLastPage(false);
+  const checkPaginator = (e) => {
+    const findPageLimit = pageLimit[0].split('-');
+    let pageNumber = (e.page + 1) * 10;
+    if( pageNumber > userStories.length && pageNumber > parseInt(findPageLimit[1])){
+        let set_pagelimit = parseInt(findPageLimit[1]) + '-' + (parseInt(findPageLimit[1])+pageSize);
+        setPageLimit([set_pagelimit]);
+        handlePrevNext('next',e.page) 
+    }
+    if(pageNumber > userStories.length && pageNumber < parseInt(findPageLimit[0])){
+        let set_pagelimit = (parseInt(findPageLimit[0])-pageSize) + '-' + parseInt(findPageLimit[0]) 
+        setPageLimit([set_pagelimit]);
+        handlePrevNext('prev',e.page)
+    }
+  }
+
+  const handlePrevNext = (btnType,currPage) => {
     if(btnType === 'prev'){
         setSkipRecord(skipRecord-pageSize);
-        getWorkItems({skip:skipRecord-pageSize});
+        getWorkItems({skip:skipRecord-pageSize,currPage:currPage});
     }
     if(btnType === 'next'){
         setSkipRecord(skipRecord+pageSize);
-        getWorkItems({skip:skipRecord+pageSize});
+        getWorkItems({skip:skipRecord+pageSize,currPage:currPage});
     }
 
   }
@@ -517,26 +540,28 @@ const AzureContent = props => {
                 Pagination={ isShowPagination &&
                     <div className="pagination-controls-container"><div className="pagination-controls" 
                     style={{display: (secondOption === 'Story' && userStories && !userStories.length ) || (secondOption === 'TestPlans' && testSuites && !testSuites.length ) ?'none':''}}>
-                            <div className="cstm-prevbtn" style={{display:showCustmBtn?'':'none'}}>
+                            {/* <div className="cstm-prevbtn" style={{display:showCustmBtn?'':'none'}}>
                             <button style={!skipRecord ?{ pointerEvents: 'none' } : null} disabled={!skipRecord ?true:false} className="custom-button previous-btn round" onClick={(e) => handlePrevNext('prev')} >
                                 <span class="p-paginator-icon pi pi-angle-double-left"></span>
                             </button>
-                            </div>
-                        
+                            </div> */}
+                        {/* { currentPage < 4 && (  */}
                             <Paginator
                                 className='custom-paginator'
                                 first={currentPage * recordsPerPage}
                                 rows={recordsPerPage}
                                 totalRecords={totalRecords}
+                                pageLinkSize={8}
                                 rowsPerPageOptions={[10, 20, 30]}
                                 onPageChange={onPageChange}
                                 
                             />
-                        <div className="cstm-nxtbtn" style={{display:showCustmBtn?'':'none'}}>
+                             {/* )} */}
+                        {/* <div className="cstm-nxtbtn" style={{display:showCustmBtn?'':'none'}}>
                             <button style={!isLastPage || ((skipRecord+totalRecords) === totalStoriesCount) ? { pointerEvents: 'none' } : null} disabled={!isLastPage || ((skipRecord+totalRecords) === totalStoriesCount) ? true: false} className="custom-button next-btn round" onClick={(e) => handlePrevNext('next')} >
                                 <span class="p-paginator-icon pi pi-angle-double-right"></span>
                             </button>
-                        </div>
+                        </div> */}
                         </div></div>
                 }
                
