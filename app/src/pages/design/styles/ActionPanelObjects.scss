@@ -80,7 +80,7 @@
         .p-card-content {
             padding: 0rem;
             max-height: 13rem !important;
-            overflow-y: scroll !important;
+            overflow-y: auto !important;
             
         }
     }
@@ -279,6 +279,16 @@
 }
 
 .create__object__modal {
+    .p-dialog-content{
+        padding: 0 1.5rem 0rem !important; 
+    }
+    .accordin__elem {
+        .p-accordion-header-link {
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            height: 3rem !important;
+        }
+    }
     .p-dialog-header-icons {
         right: 2% !important;
         position: absolute;
@@ -304,7 +314,7 @@
     }
 
     .input__text {
-        width: 100% !important;
+        width: 22rem;
         height: 2rem;
     }
 
@@ -316,7 +326,8 @@
     }
 
     .object__text {
-        margin-top: 0.7rem;
+        width: 11rem;
+       
     }
 }
 
@@ -330,7 +341,7 @@
     top: 8%;
 
     .creat_object_dropdown {
-        left: 0%;
+        left: 1.5rem;
         height: 2rem;
     }
 
@@ -479,4 +490,30 @@
     top: 2%;
     position: relative;
     top: 0.2rem;
+}
+
+.create-elem{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1rem;
+}
+
+.accordion-actions{
+    position: relative;
+    left: 36rem;
+    bottom: 1rem;
+}
+.button-add{
+    margin-right: 1rem;
+    border: none;
+    cursor: pointer;
+}
+.button-delete{
+    border: none;
+    cursor: pointer;
+}
+.save_clear{ 
+    position: relative;
+    bottom: 0.7rem;
+    right: 1rem;
 }
