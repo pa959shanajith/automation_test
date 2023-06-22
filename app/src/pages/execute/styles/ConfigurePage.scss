@@ -994,18 +994,25 @@
   margin-top: -0.2rem;
   align-items: center;
   display: flex;
-  
-  div {
-    width: 50%;
-    margin-right: 15rem;
-    width: 50%;
-    height: 11rem;
+  .form-inp-dropdown-popup {
+    background: #fff;
+    box-shadow: 0 6px 12px rgba(0,0,0,.176);
+    display: block;
+    font-size: 14px;
+    margin-top: 2px;
+    max-height: 11vh;
+    position: absolute;
+    right: 20.5rem;
+    width: calc(51% - 5rem);
+    z-index: 1;
     overflow: auto;
+  }
+
     input {
-      width: 99%;
+      width: 20vw;
 
     }
-  }
+ 
 }
 
 .execute_card {
