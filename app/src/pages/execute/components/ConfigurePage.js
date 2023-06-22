@@ -273,7 +273,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     setSmartMode("normal");
     setSelectedICE("");
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
-    var projId = "642d4a250934a8c996e598a0";
+    var projId = getConfigData?.projects[0]?._id;
     var dataforApi = { poolid: "", projectids: [projId] };
     // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
