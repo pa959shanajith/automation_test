@@ -72,7 +72,7 @@ const CanvasNew = (props) => {
     const [reuseDelContent,setReuseDelContent] = useState()
     const [endToEndDelConfirm,setEndToEndDelConfirm] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true);
-    const appType = useSelector(state=>state.design.AppType);
+    const appType = "Web"
     const proj = useSelector(state=>state.design.selectedProj)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
