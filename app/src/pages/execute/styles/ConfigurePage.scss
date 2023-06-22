@@ -19,8 +19,22 @@
     margin-right: 9.5rem;
   }
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
-      padding: 0.5rem;
+    
+      padding: 0.5rem; 
+        background: #F3F2FF;
+                padding: 0.8rem 0.8rem;
+                font-size: 0.875rem;
+                color: #030229;
+                border: none;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+       
    }
+   
   .p-panel .p-panel-header {
     border: 1px solid #dee2e6;
     padding: 0.25rem;

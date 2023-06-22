@@ -381,113 +381,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       }, 1500);
     }
   };
-  const tree_CICD = [
-    {
-      key: "0",
-      label: "Elastic Execution Grid Information",
-      data: "Documents Folder",
-      icon: "pi pi-fw pi-calendar",
-      expanded: true,
-      children: [
-        {
-          key: "1",
-
-          label: (
-            <div className="input_CICD ">
-              <div class="container_url">
-                <label for="inputField" class="devopsUrl_label">
-                  Devops Integration URL
-                </label>
-                {/* <input
-                  type="text"
-                  id="inputField"
-                  class="inputtext_CICD"
-                  // value={url}
-                  
-                /> */}
-                <pre className='grid_download_dialog__content__code cicdpre'>
-                        <code id='api-url' title={url}>
-                    {url}
-                  </code>
-                </pre>
-
-                <Button
-                  icon="pi pi-copy"
-                  className="copy_CICD"
-                  onClick={() => {
-                    copyConfigKey(url);
-                  }}
-                  title={copyToolTip}
-                />
-              </div>
-              <div className="executiontype">
-                <div className="lable_sync">
-                  <label
-                    className="Async_lable"
-                    id="async"
-                    htmlFor="synch"
-                    value="asynchronous"
-                  >
-                    Asynchronous{" "}
-                  </label>
-                  <InputSwitch
-                    className="inputSwitch_CICD"
-                    label=""
-                    inlineLabel={true}
-                    onChange={() =>
-                      executionTypeInRequest == "asynchronous"
-                        ? setExecutionTypeInRequest("synchronous")
-                        : setExecutionTypeInRequest("asynchronous")
-                    }
-                    checked={executionTypeInRequest === "synchronous"}
-                  />
-                  <label
-                    className="sync_label"
-                    id="sync"
-                    htmlFor="synch"
-                    value="synchronous"
-                  >
-                    Synchronous{" "}
-                  </label>
-                </div>
-              </div>
-              <div className="container_devopsLabel" title={str}>
-                <span className="devops_label">DevOps Request Body : </span>
-                <div>
-                  {/* <InputTextarea
-                    className="inputtext_devops"
-                    rows={4}
-                    cols={30}
-                    value={str}
-                  /> */}
-
-                  <pre className="grid_download_dialog__content__code executiontypenamepre">
-                    <code
-                      className="executiontypecode"
-                      id="devops-key"
-                      title={str}
-                    >
-                      {str}
-                      {/* {abc} */}
-                    </code>
-                  </pre>
-
-                  <Button
-                    icon="pi pi-copy"
-                    className="copy_devops"
-                    onClick={() => {
-                      copyConfigKey(str);
-                    }}
-                    title={copyToolTip}
-                  />
-                </div>
-              </div>
-            </div>
-          ),
-        },
-      ],
-    },
-  ];
+  
 
   const treeData = [
     {
@@ -795,13 +689,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               {" "}
               Execute Now
             </Button>
-            <Button
-              style={{
-                width: "6rem",
-                fontFamily: "Open Sans",
-                fontStyle: "normal",
-                height: "2.5rem",
-              }}
+            <Button className="schedule" 
+             
               onClick={() => {
                 setSelectedSchedule(item);
                 setConfigItem(idx);
@@ -1301,7 +1190,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           >
             <Column
               field="sno"
-              header={<span className="SNo-header" showGridlines>S No</span>}
+              style={{ width:"5%" }}
+              header={<span className="SNo-header" >S No</span>}
             />
             <Column
               style={{
@@ -1318,10 +1208,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginRight: "23rem",
+              width:"40%"
               }}
               field="executionOptions" 
               header={
-                <span className="executionOption-header" showGridlines>
+                <span className="executionOption-header">
                   Execution Options
                 </span>
               }
@@ -1332,12 +1223,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 fontFamily: "open Sans",
                 marginleft: "7rem",
                 textAlign: "left",
+                width:"5%"
               }}
               field="actions"
-              header={<span className="actions-header"showGridlines>Actions</span>}
+              header={<span className="actions-header">Actions</span>}
             />
           </DataTable>
-          <AvoModal
+          <AvoModal 
             visible={visible_execute}
             setVisible={setVisible_execute}
             onModalBtnClick={onExecuteBtnClick}
@@ -1418,7 +1310,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             }
             headerTxt="Execute: Regression"
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+            modalSytle={{ width: "50vw",background: "#FFFFFF" }}
           />
           <AvoModal
             visible={visible_schedule}
@@ -1427,7 +1319,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
             headerTxt="Schedule: Regression"
             footerType="Schedule"
-            modalSytle={{ width: "55vw", height: "94vh", background: "#FFFFFF" }}
+            modalSytle={{ width: "55vw",  background: "#FFFFFF" }}
           />
           <AvoModal
             visible={visible_CICD}
