@@ -22,11 +22,6 @@ import {getProjectList} from '../../mindmap/api';
 import { FormInput } from '../../settings/components/AllFormComp';
 import {getDetails_SAUCELABS} from '../../settings/api';
 import {saveSauceLabData} from '../../utility/api';
-import index from 'uuid-random';
-import async from 'async';
-import { name } from 'agenda/dist/agenda/name';
-import { log } from 'handlebars';
-
 import '../../admin/styles/FormComp.scss'
 
 
@@ -76,7 +71,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [browserTypeExe,setBrowserTypeExe] = useState([]); // Contains selected browser id for execution
 	const [execAction,setExecAction] = useState("serial"); 
 	const [execEnv,setExecEnv] = useState("default");
-    const inpRef=useRef(null)
     const [integration,setIntegration] = useState({
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
@@ -110,7 +104,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [browserVersions, setBrowserVersions] = useState([]);
     const [browserDetails,setBrowserDetails] = useState([]);
     const [mobileDetails,setMobileDetails] = useState([]);
-    const [mobilePlatform,setMobilePlatform] = useState([]);
     const [platformVersions,setPlatformVersions] = useState([]);
     const [emulator, setEmulator]= useState([]);
     const [selectedEmulator, setSelectedEmulator]= useState('');
@@ -382,7 +375,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     }
 
     const onEmulatorChange = async (option) => {
-        setMobilePlatform(option.key)
+        // setMobilePlatform(option.key)
         setSelectedEmulator(option.key)
     }
 
