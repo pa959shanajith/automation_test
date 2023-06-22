@@ -113,6 +113,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [selectedNodeKeys, setSelectedNodeKeys] = useState({});
   const [fetechConfig, setFetechConfig] = useState([]);
   const [configItem, setConfigItem] = useState({});
+  const [selectedSchedule, setSelectedSchedule] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -272,7 +273,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     setSmartMode("normal");
     setSelectedICE("");
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
-    var projId = "642d4a250934a8c996e598a0";
+    var projId = getConfigData?.projects[0]?._id;
     var dataforApi = { poolid: "", projectids: [projId] };
     // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
@@ -691,6 +692,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             <Button className="schedule" 
              
               onClick={() => {
+                setSelectedSchedule(item);
                 setConfigItem(idx);
                 setVisible_schedule(true);
               }}
@@ -1016,6 +1018,12 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const onScheduleBtnClick = (btnType) => {
     if(btnType === 'Cancel'){
       setVisible_schedule(false);
+    }
+    if(btnType === 'Schedule'){
+      setVisible_schedule(false);
+      dispatch(getPoolsexe());
+      dispatch(getICE());
+      setVisible_execute(true);
     }
   };
 

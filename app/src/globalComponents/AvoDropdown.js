@@ -10,6 +10,7 @@ const AvoDropdown = ({
   name,
   required = false,
   labelTxt,
+  customeClass = ""
 }) => {
   const [touched, setTouched] = useState(false);
   return (
@@ -19,6 +20,7 @@ const AvoDropdown = ({
         {required && <img src="static/imgs/Required.svg" className="required_icon" />}
       </label>
       <Dropdown
+        className={customeClass}
         value={dropdownValue}
         onChange={(e) => onDropdownChange(e)}
         options={dropdownOptions}

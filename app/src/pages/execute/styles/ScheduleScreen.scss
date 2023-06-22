@@ -52,4 +52,13 @@
             }
         }
     }
+    .with_border {
+        border-right: 1px solid #000000;
+    }
+    .without_border {
+        border: none;
+    }
+    .checkbox_padding {
+        padding-right: 0.7rem;
+    }
 }
