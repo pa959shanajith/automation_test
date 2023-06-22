@@ -1142,3 +1142,21 @@ export const writeZipFileServer = async(data) => {
         return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }
+
+export const userObjectElement_ICE = custObjProps => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/userObjectElement_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { "action": "userObjectElement_ICE", "object": custObjProps },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(err => reject(err));
+    });
+}
