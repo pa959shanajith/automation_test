@@ -98,17 +98,19 @@ const CreateNew = ({importRedirect}) => {
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
-        {(!loading)? <ModuleListDrop/>:null}
         {(!loading)?
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                 </div>
+                <div style={{height:'42.4rem', display:'flex'}}>
+                  <ModuleListDrop  setBlockui={setBlockui}/>
+                </div>
               <div id='mp__canvas' className='mp__canvas'>
                      {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?
                      <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     :<Fragment>
-                        {/* <ExportMapButton/> */}
+                        <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
                      </Fragment>
                     )

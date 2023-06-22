@@ -40,7 +40,6 @@ const ConfigureSetup = ({
   selectedNodeKeys,
   setSelectedNodeKeys,
   dotNotExe,
-  setDotNotExe,
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
@@ -122,6 +121,11 @@ const ConfigureSetup = ({
     const getStateOfAccess = { ...accessibility };
     configTable.forEach((el, ind) => {
       if (el.id === getProjectData?.testsuiteId) {
+        getXpanded.forEach((item, i) => {
+          if(el.key === item.key){
+            getXpanded.splice(i, 1);
+          }
+        });
         const getSuiteId =
           getProjectData?.testsuiteData[getProjectData?.testsuiteId];
         const duplicate = getXpanded.findIndex(
@@ -166,18 +170,14 @@ const ConfigureSetup = ({
     setXpanded(getXpanded);
   }, [getProjectData.testsuiteData]);
 
-  console.log(getProjectData.testsuiteData);
-
   useEffect(() => {
     if (!!Object.keys(dotNotExe).length) {
       const getExecutions = configData?.configureData?.normalExecution;
       const getNotExe = dotNotExe?.executionRequest?.donotexe?.current;
       const nodeObj = {};
-      // const getXpanded = [...xpanded];
+      const getXpanded = [...xpanded];
       getExecutions.forEach((el, ind) => {
         if (Object.keys(getNotExe).includes(el.moduleid)) {
-          console.log(el);
-          console.log(getExecutions);
           nodeObj[ind] = {
             checked: true,
             partialChecked:
@@ -191,16 +191,21 @@ const ConfigureSetup = ({
               };
             });
           }
-          // getXpanded.push({
-          //   testsuiteid: 0,
-          //   key: ind,
-          //   suitescenarios: el?.scenarios.map((item) => item._id),
-          //   suitename: el?.name,
-          //   suiteid: el?.moduleid,
-          // });
+          const duplicate = getXpanded.findIndex(
+            (item) => item?.suiteid === el?.moduleid
+          );
+          if (duplicate === -1) {
+            getXpanded.push({
+              testsuiteid: 0,
+              key: ind.toString(),
+              suitescenarios: el?.scenarios.map((item) => item._id),
+              suitename: el?.name,
+              suiteid: el?.moduleid,
+            });
+          }
         }
       });
-      // setXpanded(getXpanded);
+      setXpanded(getXpanded);
       setSelectedNodeKeys(nodeObj);
     }
   }, [dotNotExe]);

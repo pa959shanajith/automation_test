@@ -9,10 +9,15 @@ var path = require('path');
 var fs = require('fs');
 var xl = require('excel4node');
 var Client = require("node-rest-client").Client;
-var notification = require('../notifications/index')
+var notification = require('../notifications/index');
 var epurl = process.env.DAS_URL;
 var client = new Client();
 const configpath= require('../config/options');
+const archiver = require('archiver');
+const zlib = require('zlib');
+const unzipper = require('unzipper');
+const { Readable } = require('stream');
+
 
 let headers
 module.exports.setReq = async (req) =>
@@ -106,7 +111,7 @@ const getModule = async (d) => {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
 		"moduleid":d.moduleid,
-		"cycleid":d.cycId,
+		"cycleid":d.cycId || null,
 		"name":"getModules"
 	}
 	return utils.fetchData(inputs, "mindmap/getModules", "getModules");
@@ -596,7 +601,7 @@ exports.saveEndtoEndData = function (req, res) {
 	}
 };
 
-exports.excelToMindmap = function (req, res) {
+exports.excelToMindmap = function (req, res){
 	const fnName = "excelToMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
@@ -605,67 +610,220 @@ exports.excelToMindmap = function (req, res) {
 			return res.status(200).send(wb1.SheetNames);
 		}
 		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+
 		var numSheets = myCSV.length / 2;
 		var qObj = [];
 		var err;
 		if (numSheets == 0) {
 			return res.status(200).send("emptySheet");
 		}
-		for (var k = 0; k < numSheets; k++) {
-			var cSheet = myCSV[k * 2 + 1];
+		
+			var cSheet = myCSV[0 * 2 + 1];
 			var cSheetRow = cSheet.split('\n');
-			var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
-			var uniqueIndex = 0;
+			excelrows=[]
 			cSheetRow[0].split(',').forEach(function (e, i) {
-				if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-				if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
-				if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-				if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+				if(i== 0 && e.toLowerCase()!="module") {return res.status(200).send("fail");}
+				if(i== 1 && e.toLowerCase()!="scenario"){return res.status(200).send("fail");}
+				if(i== 2 && e.toLowerCase()!="screen"){return res.status(200).send("fail");}
+				if(i== 3 && e.toLowerCase()!="script"){return res.status(200).send("fail");}
+				if (i==4){return res.status(200).send("fail");}
 			});
-			if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
-				err = true;
-				break;
+			for (let i = 0; i < cSheetRow.length; i++) {
+				row=cSheetRow[i].split(",")
+				excelrows.push(row)
+
+
 			}
-			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
-			for (var i = 1; i < cSheetRow.length; i++) {
-				var row = cSheetRow[i].split(',');
-				if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]=="")) {
-					return res.status(200).send('valueError');
-				}
-				if (row.length < 3) continue;
-				if (row[modIdx] !== '') {
-					e = { id: uuidV4(), name: row[modIdx], type: 0 };
-					qObj.push(e);
-				}
-				if (row[scoIdx] !== '') {
-					lastSco = uniqueIndex; lastScr = -1; scrDict = {};
-					e = { id: uuidV4(), name: row[scoIdx], type: 1 };
-					qObj.push(e);
-					nodeDict[e.id] = uniqueIndex;
-					uniqueIndex++;
-				}
-				if (row[scrIdx] !== '' && lastSco != -1) {
-					var tName = row[scrIdx];
-					var lScr = qObj[lastScr];
-					if (lScr === undefined || (lScr)) {
-						if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
-						lastScr = uniqueIndex;
-						e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
-						qObj.push(e);
-						nodeDict[e.id] = uniqueIndex;
-						uniqueIndex++;
+			var scenarios=[]
+			var modules=[]
+			var dataRows=[]
+			var p_count=[]
+			var q_count=[]
+			for (let p = 0; p < excelrows.length; p++) {
+				if (p==0){continue}
+				if (p == excelrows.length - 1){continue}
+				var data={"name":"","testscenarios":[]}
+				var data1={"name":"","screens":[]}
+				var data2={"name":"","testcases":[]} 
+				for (var q = 0; q < excelrows[p].length; q++) {
+					if (p_count.includes (p) && q_count.includes(q)){
+						continue
 					}
+					if ( q == 0 ){
+						if(excelrows[p][q] !==''){
+							if (modules.includes(excelrows[p][q])){
+								return res.send("duplicateMod");
+							}
+							else{modules.push(excelrows[p][q])
+								data["name"]=excelrows[p][q]}
+						}
+						else{
+							ts = q+1
+							
+							if(excelrows[p][ts] !==''){
+								if (scenarios.includes(excelrows[p][ts])){
+									return res.send("duplicateSce");
+								}
+								scenarios.push(excelrows[p][ts])
+								p_count.push(p)
+								q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"].splice(dataRows[dataRows.length -1]["testscenarios"].length -0,0,{"name":excelrows[p][ts],"screens":[]})
+								ts=ts+1
+								if(excelrows[p][ts] !==''){
+									p_count.push(p)
+									q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+								
+								ts=ts+1
+								if(excelrows[p][ts] !==''){
+									p_count.push(p)
+									q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+										
+								}}
+								else{
+									p_count.push(p)
+									q_count.push(ts)
+									ts=ts+1
+									if(excelrows[p][ts] !==''){
+										p_count.push(p)
+										q_count.push(ts)
+									dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])		
+									}}}
+								else{
+									p_count.push(p)
+									q_count.push(ts)
+									ts=ts+1
+									if(excelrows[p][ts] !==''){
+										p_count.push(p)
+										q_count.push(ts)
+									dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+									ts=ts+1
+									if(excelrows[p][ts] !==''){
+										p_count.push(p)
+										q_count.push(ts)
+									dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+											
+									}else{p_count.push(p)
+										q_count.push(ts)}}
+									else{
+										p_count.push(p)
+										q_count.push(ts)
+										ts=ts+1
+										if(excelrows[p][ts] !==''){
+											p_count.push(p)
+											q_count.push(ts)
+										dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])		
+										}}
+									
+								}
+							
+						}
+						
+					}
+					else if ( q == 1 ){
+						if(excelrows[p][q] !==''){
+							if (scenarios.includes(excelrows[p][q])){
+								return res.send("duplicateSce");
+							}
+							scenarios.push(excelrows[p][q])
+							data1["name"]=excelrows[p][q]
+						}
+						else{
+							ts = q+1
+							p_count.push(p)
+							q_count.push(ts)
+							
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -0,0,{"name":excelrows[p][ts],"testcases":[]})
+							
+							ts=ts+1
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+									
+							}
+						}else{
+								p_count.push(p)
+								q_count.push(ts)
+								ts=ts+1
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+							dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+									
+							}
+							else{p_count.push(p)
+								q_count.push(ts)
+								dataRows.push(data)
+							}}
+							
+						}
+						
+					}
+					else if ( q == 2 ){
+						if(excelrows[p][q] !==''){
+							data2["name"]=excelrows[p][q]
+						}
+						else{
+							
+							ts = q+1							
+							if(excelrows[p][ts] !==''){
+								p_count.push(p)
+								q_count.push(ts)
+								dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].splice(dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"][dataRows[dataRows.length -1]["testscenarios"][dataRows[dataRows.length -1]["testscenarios"].length -1]["screens"].length -1]["testcases"].length -0,0,excelrows[p][ts])
+										
+								}
+							else{
+								p_count.push(p)
+								q_count.push(ts)
+								data["testscenarios"].push(data1)
+								dataRows.push(data)
+							}
+						}
+						
+					}
+					else if (excelrows[p][q] !=='' && q == 3 ){
+						
+						data2["testcases"].push(excelrows[p][q])
+						data1["screens"].push(data2)
+						data["testscenarios"].push(data1)
+						dataRows.push(data)
+					} 
+					else{
+						data1["screens"].push(data2)
+						data["testscenarios"].push(data1)
+						dataRows.push(data)
+					}
+					
 				}
-				if (row[sctIdx] !== '' && lastScr != -1) {
-					e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
-					qObj.push(e);
-					nodeDict[e.id] = uniqueIndex;
-					uniqueIndex++;
-				}
+			
 			}
+		let userid =  req.session.userid;
+		let impPath = path.join(__dirname,'../../assets/ImportMindmap')
+		if (!fs.existsSync(impPath)) {
+			fs.mkdirSync(impPath);
+		  }
+		importFolderPath= impPath+"/"+"excel"
+		if (!fs.existsSync(importFolderPath)) {
+			fs.mkdirSync(importFolderPath);
 		}
-		if (err) res.status(200).send('fail');
-		else res.status(200).send(qObj);
+		let importPath=importFolderPath+"/"+userid+".json"
+		if (fs.existsSync(importPath)) {
+			fs.unlinkSync(importPath)
+		}		
+		writedata=fs.writeFile(importPath, JSON.stringify(dataRows), (err) => {
+			if (err) {
+				res.status(500).send("fail")
+			}
+			else{
+				res.send(result)
+			}
+		})
+
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
@@ -696,7 +854,12 @@ exports.exportToExcel = async (req, res) =>{
 	try {
 		logger.info("Fetching Module details");
 		var d = req.body;
-		var excelMap = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
+		var excelMap=[]
+		var excelMM = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
+		if(excelMM.constructor === Array) {
+			excelMap=excelMM			
+		 }else{
+			excelMap.push(excelMM)}
 		logger.info("Writing Module structure to Excel");
 		var excelDirPath = path.join(__dirname, './../../output');
 		var filePath = path.join(excelDirPath, 'samp234.xlsx');
@@ -718,19 +881,22 @@ exports.exportToExcel = async (req, res) =>{
 		var curr = excelMap;
 
 		//Sorting the positions of the child nodes according to their childindex
-		for (i = 0; i < curr.children.length; i++) {
-			for (j = 0; j < curr.children[i].children.length; j++) {
-				//sort the testcases based on childindex
-				curr.children[i].children[j].children.sort(function(a,b){
+		for (k = 0; k < curr.length; k++) {
+			for (i = 0; i < curr[k].children.length; i++) {
+				for (j = 0; j < curr[k].children[i].children.length; j++) {
+					//sort the testcases based on childindex
+					curr[k].children[i].children[j].children.sort(function(a,b){
+						return parseInt(a.childIndex)-parseInt(b.childIndex)});
+				}
+				//sort the screens based on childindex
+				curr[k].children[i].children.sort(function(a,b){
 					return parseInt(a.childIndex)-parseInt(b.childIndex)});
-			}
-			//sort the screens based on childindex
-			curr.children[i].children.sort(function(a,b){
-				return parseInt(a.childIndex)-parseInt(b.childIndex)});
 		}
+	}
 		//sort the scenarios based on childindex
-		curr.children.sort(function(a,b){
-		return parseInt(a.childIndex)-parseInt(b.childIndex)});
+		for (k = 0; k < curr.length; k++) {
+		curr[k].children.sort(function(a,b){
+		return parseInt(a.childIndex)-parseInt(b.childIndex)});}
 
 		//Set some width for first 4 columns
 		ws.column(1).setWidth(40);
@@ -761,24 +927,50 @@ exports.exportToExcel = async (req, res) =>{
 		ws.cell(1, 4)
 				.string('Script')
 				.style(style);
-
+		var min_mm_idx =1
 		var min_scen_idx = 1;
 		var min_scr_idx = 1;
-		ws.cell(2,1).string(curr.name);
 		var tc_count=0;
-		for (i = 0; i < curr.children.length; i++) {
-			for (j = 0; j < curr.children[i].children.length; j++) {
-				for (k = 0; k < curr.children[i].children[j].children.length; k++) {
-					tc_count++;
-					ws.cell(1 + tc_count,4).string(curr.children[i].children[j].children[k].name);
+		for (l = 0; l < curr.length; l++) {
+			if (curr[l].children.length>0){		
+			for (i = 0; i < curr[l].children.length; i++) {
+				if (curr[l].children[i].children.length>0){
+				for (j = 0; j < curr[l].children[i].children.length; j++) {
+					if(curr[l].children[i].children[j].children.length>0){
+					for (k = 0; k < curr[l].children[i].children[j].children.length; k++) {
+						tc_count++;
+						ws.cell(1 + tc_count,4).string(curr[l].children[i].children[j].children[k].name);
+					}
+					
+					ws.cell(1 + min_scr_idx,3).string(curr[l].children[i].children[j].name);
+					min_scr_idx= tc_count+1;}
+					else{
+						ws.cell(1 + min_scr_idx,3).string(curr[l].children[i].children[j].name);
+						tc_count++
+						min_scr_idx++
+					}
 				}
-				
-				ws.cell(1 + min_scr_idx,3).string(curr.children[i].children[j].name);
-				min_scr_idx= tc_count+1;
-			}
-			ws.cell( 1 + min_scen_idx,2).string(curr.children[i].name);
-			min_scen_idx=tc_count+1;
+				ws.cell( 1 + min_scen_idx,2).string(curr[l].children[i].name);
+				min_scen_idx=tc_count+1;}
+				else{
+					ws.cell( 1 + min_scen_idx,2).string(curr[l].children[i].name);
+					tc_count++
+					min_scen_idx++
+					min_scr_idx++
+				}
 		}
+		ws.cell(1+min_mm_idx,1).string(curr[l].name);
+		min_mm_idx= tc_count+1;}
+		else{
+			ws.cell(1+min_mm_idx,1).string(curr[l].name);
+			tc_count++
+			min_mm_idx++
+			min_scen_idx++
+			min_scr_idx++
+		}
+		
+		
+	}
 		//save it
 		wb.write(filePath,function (err) {
 			if (err) return res.send('fail');
@@ -824,19 +1016,60 @@ exports.exportToGit = async (req, res) => {
 	}
 };
 
+const removeDir = function(path) {
+	if (fs.existsSync(path)) {
+		const files = fs.readdirSync(path);
+		if (files.length > 0) {
+			files.forEach(function(filename) {
+				if (fs.statSync(path + "/" + filename).isDirectory()) {
+					removeDir(path + "/" + filename);
+				} else {
+					fs.unlinkSync(path + "/" + filename);
+				}
+			});
+			fs.rmdirSync(path);
+		} else {
+			fs.rmdirSync(path);
+		}
+	} else {
+		logger.error("Directory path not found.")
+	}
+}
 exports.exportMindmap = async (req, res) => {
 	const fnName = "exportMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		const mindmapId = req.body.mindmapId;
+		
+		const mindmapId = req.body.mindmapId["moduleid"];
+		const exportProjAppType=req.body.mindmapId["exportProjAppType"];
+		const exportedFilePath = path.join(__dirname,'../../assets/ExportMindmap');
+		if (!fs.existsSync(exportedFilePath)) {
+			fs.mkdirSync(exportedFilePath);
+		}
+		var userid=req.session.userid;
 		const inputs= {
 			"mindmapId": mindmapId,
-			"query":"exportMindmap"
+			"query":"exportMindmap",
+			"userid":userid,
+			"exportProjAppType":exportProjAppType
 		}
 		const result = await utils.fetchData(inputs, "mindmap/exportMindmap", fnName);
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
+			let zip_path = exportedFilePath+'/'+userid+'.zip'
+			const archive = archiver('zip', { zlib: { level: 9 }});
+			const stream = fs.createWriteStream(zip_path);
+			stream.on('close', ()=>{
+				removeDir(exportedFilePath+'/'+userid);
+				// res.writeHead(200, {
+				// 	'Content-Type' : 'application/zip',
+				// });
+				var filestream = fs.createReadStream(zip_path);
+				filestream.pipe(res);
+			})
+			archive.directory(exportedFilePath+'/'+userid, false).pipe(stream);
+			archive.finalize();
 			return res.send(result);
 		}
 	} catch(exception) {
@@ -850,17 +1083,201 @@ exports.importMindmap = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const content = req.body;
+		var userid = req.session.userid;
+		var userroleid = req.session.activeRoleId;
 		const inputs= {
-			"mindmap": content,
-			"query":"importMindmap"
+			"projectid": content["projid"],			
+			"query":"importMindmap",						
+			"userid":userid,
+			"role":userroleid
 		}
 		const result = await utils.fetchData(inputs, "mindmap/importMindmap", fnName);
-		res.send(result)
+		if (result == "fail") {
+			return res.send("fail");
+		} else {			
+			let impPath = path.join(__dirname,'../../assets/ImportMindmap/'+userid)
+			if (fs.existsSync(impPath)) {				
+				await fs.rmdirSync(impPath, { recursive: true});
+			}
+			return res.send(result);
+		}
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
 };
+
+exports.writeZipFileServer = async(req,res) => {
+	const fnName = "writeZipFileServer";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		let userid =  req.session.userid;	
+			
+		// Check if request contains a ZIP file
+		if (req.file && path.extname(req.file.originalname) === '.zip') {
+			// Create target directory for extracted files
+			const importZip=path.join(__dirname, '../../assets/ImportMindmap');
+			if (!fs.existsSync(importZip)) {				
+				fs.mkdirSync(importZip);
+			}
+			const targetDir = path.join(__dirname, '../../assets/ImportMindmap/'+userid);
+			if (fs.existsSync(targetDir)) {				
+				await fs.rmdirSync(targetDir,{ recursive: true});
+			}
+			if (!fs.existsSync(targetDir)) {				
+			  fs.mkdirSync(targetDir);
+			}
+			const bufferStream = new Readable();
+			bufferStream.push(req.file.buffer);
+			bufferStream.push(null);
+			// Extract files from ZIP
+			const unzipStream = bufferStream.pipe(unzipper.Parse());
+			await unzipStream.on('entry', (entry) => {
+			  const filePath = path.join(targetDir, entry.path);
+			  if (!entry.path.startsWith('__MACOSX/') && !entry.path.endsWith('/')) {
+				entry.pipe(fs.createWriteStream(filePath));
+			  } else {
+				entry.autodrain();
+			  }
+			});
+			await unzipStream.on('close', async () => {
+				let jsonResponse = {msg : 'Files extracted successfully',appType:''};
+				let jsonModpath=targetDir +'\\'+ 'Modules.json';
+				let jsontscpath=targetDir +'\\'+ 'Testscenarios.json';
+				let jsonscrpath=targetDir +'\\'+ 'screens.json';
+				let jsontcpath=targetDir +'\\'+ 'Testcases.json';
+				let jsondobpath=targetDir +'\\'+ 'Dataobjects.json';
+				if (fs.existsSync(jsonModpath) && fs.existsSync(jsontscpath) && fs.existsSync(jsonscrpath) && fs.existsSync(jsontcpath) ) {
+					fs.readFile(jsontscpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						if (data === ""){data = []}
+						else{
+						let jsonTscData = JSON.parse(data);
+						if(!Array.isArray(jsonTscData)){
+							return res.status(400).send('Invalid file format');}}
+					});
+					fs.readFile(jsondobpath, 'utf8', (err, data) => {
+						 if (err) throw err;
+						 if (data === ""){data = []}
+						 else{
+						let jsonDobData = JSON.parse(data);
+						if(!Array.isArray(jsonDobData) && !""){
+							return res.status(400).send('Invalid file format');}}
+					});
+					fs.readFile(jsonscrpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						if (data === ""){data = []}
+						else{
+						let jsonScrData =JSON.parse(data);
+						if(!Array.isArray(jsonScrData)){
+							return res.status(400).send('Invalid file format');}}
+					});
+					fs.readFile(jsontcpath, 'utf8', (err, data) => {
+						 if (err) throw err;
+						 if (data === ""){data = []}
+						 else{
+						let jsonTcData = JSON.parse(data);
+						if(!Array.isArray(jsonTcData)){
+							return res.status(400).send('Invalid file format');}}
+					});
+					fs.readFile(jsonModpath, 'utf8', (err, data) => {
+						if (err) throw err;
+						if (data === ""){return res.status(400).send('No ModuleData');}
+						else{
+						let jsonData = JSON.parse(data);
+						if(Array.isArray(jsonData) && jsonData.length>0){
+							jsonResponse.msg = 'Files extracted successfully';
+							jsonResponse.appType = jsonData[0].appType ? jsonData[0].appType: '';
+							res.status(200).send(jsonResponse);
+						}
+						else{
+							return res.status(400).send('Invalid file format');
+						}}
+						
+					});
+				
+				}else{
+					return res.status(400).send('Invalid file format');
+				}
+				 
+			  	// res.status(200).send(getJsonResponse);
+			});
+		  } else {
+			// If no ZIP file is present, send error response
+			res.status(400).send('Invalid file format');
+		  }
+		
+	} catch (error) {
+		logger.error("Error occurred in mindmap/"+fnName+":", error);
+		return res.status(500).send("fail");
+	}
+}
+
+
+
+exports.writeFileServer = async (req, res) => {
+	const fnName = "writeFileServer";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		let data = req.body;
+		let userid=req.session.userid;
+		let importFolderJPath = path.join(__dirname,'../../assets/ImportMindmap');
+		let importJsonPath = path.join(__dirname,'../../assets/ImportMindmap')+"/"+"json";
+		let importPath=importJsonPath +"/"+userid+".json"		
+		if (data.status=="start" && data.type=="json"){						
+			if (!fs.existsSync(importFolderJPath)) {
+				fs.mkdirSync(importFolderJPath);
+			}
+			if (!fs.existsSync(importJsonPath)) {
+				fs.mkdirSync(importJsonPath);
+			}
+			if (fs.existsSync(importPath)) {
+				fs.unlinkSync(importPath)
+			  }
+			fs.appendFile(importPath,"[", (err) => { 
+				if(err) { 
+				res.status(500).send('Fail')}
+				else{
+				res.send(result) 
+				}})
+		}
+		else if (data.status=="stop"){
+			fs.appendFile(importPath,"]", (err) => { 
+				if(err) { 
+				res.status(500).send('Fail')}
+				else{
+				res.send(result)
+				}})
+		}
+		else if (data.status=="first"){
+			fs.appendFile(importPath, JSON.stringify(data), (err) => { 
+				if(err) { 
+				res.status(500).send('Fail')}
+				else{
+				res.send(result) 
+				}})
+		}
+		else {			
+			fs.appendFile(importPath,",", (err) => {
+			if(err) { 
+			res.status(500).send('Fail')}
+			else{
+			
+				fs.appendFile(importPath, JSON.stringify(data), (err) => {  
+					if(err) { 
+					res.status(500).send('Fail')}
+					else{
+					res.send(result) 
+					}})
+			}})
+		
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
 exports.gitToMindmap = async (req, res) => {
 	const fnName = "gitToMindmap";
 	logger.info("Inside UI service: " + fnName);
@@ -1014,3 +1431,91 @@ exports.exportToProject = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 }; 
+
+exports.exportToMMSkel = async (req, res) => {
+	const fnName = "exportToMMSkel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const inputs= {
+			"tab":req.body.data.tab,
+		    "projectid":req.body.data.projectid,
+		    "moduleid":req.body.data.moduleid,
+		    "cycleid":null,
+		    "name":"getModules"
+		}
+		var data=[]
+		var output = await getModule(inputs);
+		if (output == "fail") {
+			return res.send("fail");
+		} else {	
+		if(output.constructor === Array) {
+			data=output			
+		 }else{
+			data.push(output)} 
+			mindmapStructure=[]
+			for (i = 0; i < data.length; i++) {
+				var module={"name":"","testscenarios":[]}
+				for (j = 0; j < data[i].children.length; j++) {
+					var scenario={"name":"","screens":[]}
+					for (k = 0; k < data[i].children[j].children.length; k++) {
+						var screen={"name":"","testcases":[]}
+						for (l = 0; l < data[i].children[j].children[k].children.length; l++) {
+							screen["testcases"].push(data[i].children[j].children[k].children[l].name)
+
+						}
+						screen["name"]=data[i].children[j].children[k].name
+						scenario["screens"].push(screen)
+					}
+					scenario["name"]=data[i].children[j].name
+					module["testscenarios"].push(scenario)
+				}
+				module["name"]=data[i].name
+				
+				mindmapStructure.push(module)
+
+			}
+			result=mindmapStructure
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.jsonToMindmap = async (req, res) => {
+	const fnName = "jsonToMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var importproj = req.body["mindmapId"]["importproj"]
+		var importtype=req.body["mindmapId"]["type"]		
+		var userid = req.session.userid;
+		var userroleid = req.session.activeRoleId;
+		const inputs= {
+			"importproj":importproj,
+			"userid":userid,
+			"role":userroleid,
+			"importtype":importtype,
+		}
+		const result = await utils.fetchData(inputs, "mindmap/jsonToMindmap", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			let impPath = path.join(__dirname,'../../assets/ImportMindmap/'+importtype+"/"+userid+".json")
+			if (fs.existsSync(impPath)) {
+				fs.unlinkSync(impPath)
+			}
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.dropTempExpImpColl = async () => {
+	logger.info("Inside UI service dropTempExpImpColl");
+    const fnName= "dropTempExpImpColl"
+	const inputs = { "query": "dropTempExpImpColl" };
+	const result = await utils.fetchData(inputs, "mindmap/dropTempExpImpColl");
+    if (result == "fail") logger.error( fnName + " : Error occured while deleting Temporary collections");
+    else logger.info( fnName + " :Temporary collections got deleted successfully");
+}
