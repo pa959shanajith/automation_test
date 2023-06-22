@@ -4,7 +4,7 @@ import { Card } from 'primereact/card';
 import '../styles/ActionPanelObjects.scss';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from "primereact/inputtext";
-import { userObjectElement_ICE } from '../../design/api';
+import { userObjectElement_ICE } from '../api';
 import { Button } from "primereact/button";
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
