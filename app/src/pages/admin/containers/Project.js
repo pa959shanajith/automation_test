@@ -89,7 +89,7 @@ const ProjectNew = (props) => {
             }
             setSelDomainOptions(data);
             var details = {
-                "web":{"data":"Web","title":"Web","img":"web"},
+                "web":{"data":"Web","title":"Web","img":"Web"},
                 "webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
                 "desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
                 "oebs":{"data":"OEBS","title":"Oracle Apps","img":"oracleApps"},

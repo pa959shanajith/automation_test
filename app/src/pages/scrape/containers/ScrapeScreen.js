@@ -35,6 +35,7 @@ const ScrapeScreen = (props)=>{
     const current_task = useSelector(state=>state.plugin.CT);
     const certificateInfo = useSelector(state=>state.scrape.cert);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
+    const elementPropertiesUpdated= useSelector(state=>state.scrape.elementPropertiesUpdated);
     const selectedModule = useSelector(state=>state.mindmap.selectedModule);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
     const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
@@ -55,7 +56,7 @@ const ScrapeScreen = (props)=>{
     const [displayModal, setDisplayModal] = useState(false);
     const [showTeststeps , setshowTeststeps]=useState([]);
     const [displayTest , setdisplayTest]=useState({});
-    const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]);
+    const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]);
    const[identifierModified,setIdentifierModiefied]=useState(false)
     useEffect(() => {
         // if(Object.keys(current_task).length !== 0) {
@@ -71,7 +72,7 @@ const ScrapeScreen = (props)=>{
 
     }, [current_task])
     useEffect(()=>{
-        if(identifierModified){
+        if(identifierModified||elementPropertiesUpdated){
             fetchScrapeData()
         .then(data => {
             // setIsUnderReview(current_task.status === "underReview")
@@ -79,11 +80,11 @@ const ScrapeScreen = (props)=>{
         .catch(error=> console.log(error));
     // }
     //eslint-disable-next-line
-    dispatch({type: actionTypes.SET_ISENABLEIDENTIFIER, payload:false})
     setIdentifierModiefied(false)
+    dispatch({type: actionTypes.SET_ELEMENT_PROPERTIES, payload:false})
     dispatch({type: actionTypes.SET_LISTOFCHECKEDITEMS, payload: []})
         }
-    },[identifierModified])
+    },[identifierModified,elementPropertiesUpdated])
     useEffect(()=>{
         if (!showObjModal) {
             let selected = 0;
@@ -499,7 +500,7 @@ const saveIdentifier=()=>{
                 setIdentifierModiefied(true)
                 setShowObjModal('')
                 setMsg(MSG.SCRAPE.SUCC_OBJ_IDENTIFIER_LIST);
-                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}])
                 
             }
         })
@@ -507,7 +508,7 @@ const saveIdentifier=()=>{
             console.log(error)
             setShowObjModal('')
                 setMsg("Some Error occured while saving identifier list.");
-                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}])
         }
         )
         
@@ -518,7 +519,7 @@ const dynamicColumns = columns.map((col, i) => {
 
 const footerContent = (
                     <div>
-                        <div style={{position:'absolute',fontStyle:'italic'}}><span style={{color:'red'}}>*</span>Use drag/drop to reorder identifiers.</div>
+                        <div style={{position:'absolute',fontStyle:'italic'}}><span style={{color:'red'}}>*</span>Drag/drop to reorder identifiers.</div>
                         <Button label="No" icon="pi pi-times" onClick={() => setShowObjModal('')} className="p-button-text" />
                         <Button label="Yes" icon="pi pi-check" onClick={() => saveIdentifier()} autoFocus />
                     </div>
@@ -555,7 +556,7 @@ const Header = () => {
         { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name,versionnumber:0 /** version no. not avail. */, appType: props.appType}} />}
         <Dialog header={Header} style={{width:'56vw'}} visible={showObjModal === "identifierlis"}  onHide={() => setShowObjModal('')} footer={footerContent} >
         <div className="card" >
-        <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorder} tableStyle={{ minWidth: '50rem' }} >
+        <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorder} >
                 <Column rowReorder style={{ width: '3rem' }} />
                 {dynamicColumns}
         </DataTable>
