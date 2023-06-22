@@ -116,7 +116,7 @@
      }
      .btn-11{
         position: relative;
-        top: 1rem;
+        top: 0rem;
      }
     
      .btn1{
@@ -144,10 +144,12 @@
         position: relative;
         background: white;
         z-index: 6;
+        bottom: 1rem;
      }
      .check2{
          position: relative;
-         bottom: 5rem;
+         bottom:4.5rem;
+         height: 18rem;
          overflow: auto;
      }
      
@@ -235,8 +237,6 @@
     .user-select-checkbox {
         position: relative;
         top: 0.5rem;
-        height: 18rem;
-        overflow: hidden;
         width: 35rem;
     }
     .selecteduser{
@@ -270,7 +270,7 @@
     }
     .dropdown_role{
         position: relative;
-        bottom: 4.2rem;
+        bottom: 5.2rem;
         left: 21.5rem;
         color: #9E9E9E;
         font-size: 14px;
@@ -278,8 +278,11 @@
         z-index: 9;
     }
     .check-bx3{
-        display: flex;
         align-items: center;
+        display: flex;
+        flex-direction: row;
+        position: relative;
+        bottom: 0.5rem;
 
     }
     .user-role{
@@ -395,13 +398,9 @@
         height: 1.5rem !important;
       }
       .users-list{
-        position: relative;
-        top: 1rem;
-        display: flex;
-        /* float: right; */
-        right: 0rem;
         align-items: center;
-        flex-direction: center;
+        display: flex;
+        flex-direction: row;
       }
 
       .p-multiselect .p-multiselect-label.p-placeholder{

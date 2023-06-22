@@ -41,24 +41,60 @@ const CreateProject = ({ visible, onHide }) => {
   const userInfo = useSelector((state) => state.landing.userinfo);
 
 
+  // const loggedInUser = {
+  //   name: userInfo.username,
+  //   role:userInfo.rolename,
+  //   id: userInfo.user_id
+  // };
 
   const userDetails = async () => {
     try {
       const userData = await getUserDetails("user");
-      console.log(userData);
       const formattedData = userData.map((user) => {
         const [name, id, , primaryRole, firstname, lastname, email] = user;
         return { id, name, primaryRole, firstname, lastname, email };
       });
-
-      setItems(formattedData
-        .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-        .filter(item => item.primaryRole !== "Admin")
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(item => ({
-          ...item, selectedRole: '',
-          initials: getInitials(item.firstname, item.lastname)
-        })));
+      let loggedInUser = null;
+      let newFormattedData = [];
+      for(let item of formattedData){
+        if((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")){
+          if(item.id === userInfo.user_id){
+            loggedInUser = {
+              ...item, selectedRole: "",
+              initials: getInitials(item.firstname, item.lastname)
+            };
+          } else {
+            newFormattedData.push(
+              {
+                ...item, selectedRole: '',
+                initials: getInitials(item.firstname, item.lastname)
+              }
+            )
+          }
+        }
+      }
+      setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
+      setDisplayUser([loggedInUser]);
+      // setItems(formattedData
+      //   .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+      //   .filter(item => item.primaryRole !== "Admin")
+      //   .sort((a, b) => a.name.localeCompare(b.name))
+      //   .filter((item) => {
+      //     console.log('item', item.id);
+      //     console.log('userInfo.user_id', userInfo.user_id);
+      //     console.log('item.id === userInfo.user_id', item.id === userInfo.user_id);
+      //     if(item.id === userInfo.user_id){
+      //       loggedInUser = item;
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   })
+      //   .map(item => ({
+      //     ...item, selectedRole: '',
+      //     initials: getInitials(item.firstname, item.lastname)
+      //   }))
+      // );
     } catch (error) {
       console.error(error);
     }
@@ -72,11 +108,6 @@ const CreateProject = ({ visible, onHide }) => {
     const initials = firstname.charAt(0).toUpperCase() + lastname.charAt(0).toUpperCase();
     return initials;
   }
-
-
-
-
-
 
   const apps = [
     { name: 'Web', code: 'NY', image: 'static/imgs/web.png' },
@@ -94,6 +125,7 @@ const CreateProject = ({ visible, onHide }) => {
     { name: 'Test Lead' },
     { name: 'QA' },
   ];
+
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -153,7 +185,6 @@ const CreateProject = ({ visible, onHide }) => {
     setRefreshData(!refreshData);
   };
 
-
   const handleButtonClick = () => {
     const filteredItems = items.filter(
       (item) => !selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
@@ -164,12 +195,14 @@ const CreateProject = ({ visible, onHide }) => {
       (item) => selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
     );
 
+ 
+
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
       ...assignedUsers
 
+
     ]);
-    console.log(assignedUsers)
     setSelectedCheckboxes([]);
     setSelectAll(false);
   };
@@ -237,7 +270,6 @@ const CreateProject = ({ visible, onHide }) => {
     //   ...selectedRole,
     //   Admin: e.value
     // });
-    console.log(id)
   };
 
   useEffect(() => {
@@ -343,12 +375,14 @@ const CreateProject = ({ visible, onHide }) => {
           </div>
 
           <div className='user-select-checkbox '>
-            <div className='check1'>
-              <Checkbox checked={selectAll} onChange={handleCheckboxChange} value="all" ></Checkbox>
-              <h5 className='label1'> Select All</h5>
-            </div>
-            <div className='dropdown_role'>
-              <h5>Project level role(optional)</h5>
+            <div className=''>
+              <div className='check1'>
+                <Checkbox checked={selectAll} onChange={handleCheckboxChange} value="all" ></Checkbox>
+                <h5 className='label1'> Select All</h5>
+              </div>
+              <div className='dropdown_role'>
+                <h5>Project level role(optional)</h5>
+              </div>
             </div>
             <div className="check2">
               {items.map(item => (
@@ -421,6 +455,8 @@ const CreateProject = ({ visible, onHide }) => {
             </ul>
 
           </div>
+
+          
 
 
         </Card>

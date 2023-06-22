@@ -193,7 +193,9 @@ const DisplayProject = (props) => {
           <span className="All_Project_font" >ALL PROJECTS</span>
           <Tooltip target=".add_btn" position="bottom" content="Create Project"/>
           
-          <button className="pi pi-plus add_btn"  disabled = {(userInfo.rolename)!== "Test Manager"} onClick={handleOpenDialog} />
+          {userInfo.rolename === "Test Manager" ? (
+           <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
+          ) : null}
           <CreateProject visible={visible} onHide={handleCloseDialog} />
           <Tooltip target=".sort_btn" position="bottom" content="Sort Projects"/>
           <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />

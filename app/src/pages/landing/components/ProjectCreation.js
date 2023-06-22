@@ -5,6 +5,8 @@ import '../styles/ProjectCreation.scss';
 import { useNavigate , Link} from 'react-router-dom';
 import CreateProject from './CreateProject';
 import VerticalSteps from './VerticalStpes';
+import { useSelector, useDispatch } from 'react-redux';
+import { loadUserInfoActions } from '../LandingSlice';
 
 
 
@@ -12,6 +14,7 @@ import VerticalSteps from './VerticalStpes';
 const  ProjectCreation=() =>{
     const navigate = useNavigate();
     const [visible, setVisible] = useState(false );
+    const userInfo = useSelector((state) => state.landing.userinfo);
 
 
     const handleClick = () => {
@@ -34,10 +37,11 @@ const  ProjectCreation=() =>{
           <VerticalSteps/>
           </div>
           {/* <div className=" CreateProj-card"> */}
+          {userInfo.rolename === "Test Manager" ? (
             <Card className="CreateProj-card"  id='Createproj-title' title="Do you want to create a new project?" >
               <Button  size="small"  onClick={handleOpenDialog} >Create Project</Button> 
               <CreateProject visible={visible} onHide={handleCloseDialog} /> 
-            </Card>
+            </Card>  ) : null}
           {/* </div> */}
 
           {/* <div  className="gotoadmin-card">  */}
