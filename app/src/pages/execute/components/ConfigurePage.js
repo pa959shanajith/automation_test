@@ -113,6 +113,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [selectedNodeKeys, setSelectedNodeKeys] = useState({});
   const [fetechConfig, setFetechConfig] = useState([]);
   const [configItem, setConfigItem] = useState({});
+  const [selectedSchedule, setSelectedSchedule] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -802,6 +803,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 height: "2.5rem",
               }}
               onClick={() => {
+                setSelectedSchedule(item);
                 setConfigItem(idx);
                 setVisible_schedule(true);
               }}
@@ -1127,6 +1129,12 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const onScheduleBtnClick = (btnType) => {
     if(btnType === 'Cancel'){
       setVisible_schedule(false);
+    }
+    if(btnType === 'Schedule'){
+      setVisible_schedule(false);
+      dispatch(getPoolsexe());
+      dispatch(getICE());
+      setVisible_execute(true);
     }
   };
 
