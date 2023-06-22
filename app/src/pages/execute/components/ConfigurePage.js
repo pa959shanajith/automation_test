@@ -1319,7 +1319,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
             headerTxt="Schedule: Regression"
             footerType="Schedule"
-            modalSytle={{ width: "55vw",  background: "#FFFFFF" }}
+            modalSytle={{ width: "55vw", height: "95vh",  background: "#FFFFFF" }}
           />
           <AvoModal
             visible={visible_CICD}
