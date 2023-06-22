@@ -42,13 +42,12 @@ const VerticalSteps = (props) => {
       const [ProgressStepDetails, setProgressStepDetails] = useState({});
       const [currentStep, setCurrentStep] = useState(null);
 
-    useEffect(async () => {
-       
+    useEffect(()=>{
+      (async () => {
           const ProgressStep = await getProjectIDs({ readme: "progressStep" });
           setProgressStepDetails(ProgressStep);
-          console.log(ProgressStep);
-        
-        },[])
+        })()
+      },[])
 
     useEffect(()=>{
       let findIndexOfStep = ProgressStepDetails?.projectId?.indexOf(activeStep?.id);

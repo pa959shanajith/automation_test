@@ -79,14 +79,14 @@ const CreateProject = ({ visible, onHide }) => {
 
 
   const apps = [
-    { name: 'Web', code: 'NY', image: 'static/imgs/web.png' },
-    { name: 'SAP', code: 'RM', image: 'static/imgs/SAP.svg' },
-    { name: 'Oracle Applications', code: 'LDN', image: 'static/imgs/OEBS.svg' },
-    { name: 'Desktop', code: 'IST', image: 'static/imgs/desktop.png' },
-    { name: 'Web services', code: 'PRS', image: 'static/imgs/webService.png' },
-    { name: 'Mainframe', code: 'PRS', image: '/static/imgs/mainframe.png' },
-    { name: 'Mobile Web', code: 'PRS', image: 'static/imgs/mobileWeb.png' },
-    { name: 'Mobile Applications', code: 'PRS', image: '/static/imgs/mobileApps.png' },
+    { name: 'Web', code: 'Web', image: 'static/imgs/web.png' },
+    { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg' },
+    { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg' },
+    { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png' },
+    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/webService.png' },
+    { name: 'Mainframe', code: 'Mainframe', image: '/static/imgs/mainframe.png' },
+    { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png' },
+    { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png' },
   ];
 
   const roles = [
@@ -257,7 +257,7 @@ const CreateProject = ({ visible, onHide }) => {
 
       var projData = {
         projectName: value,
-        type: selectedApp.name,
+        type: selectedApp.code,
         assignedUsers: filteredUserDetails,
         domain: "banking",
         releases: [{ name: "R1", cycles: [{ name: "C1" }] }],
