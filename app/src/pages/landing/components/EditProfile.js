@@ -178,7 +178,7 @@ const EditProfile = (props) => {
 
     return (
         <>
-            <div className='surface-card m-6'>
+            <div className='surface-card'>
                 {/* <Toast ref={toastWrapperRef} position="bottom-center" /> */}
                 <Dialog header="Profile Information" className="editProfile_dialog" visible={showDialog} style={{ width: '33vw' }} onHide={resetFields} footer={editProfileFooter}>
                     <div className='pt-3'>
