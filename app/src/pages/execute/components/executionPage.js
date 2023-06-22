@@ -9,6 +9,7 @@ import "../styles/ExecutionPage.scss";
 
 const ExecutionPage = () => {
     const [executionQueue, setExecutionQueue] = useState(false);
+    
 
     const getCurrentQueueState = async () => {
         // setLoading('Please Wait...');
@@ -76,15 +77,7 @@ const ExecutionPage = () => {
               {console.log('executionQueue.list', executionQueue.list)}
               {executionQueue && (
                 (executionQueue.list.length > 0) ? (
-                    
-                //   <CheckboxTree
-                //     showNodeIcon={false}
-                //     className='devOps_checkbox_tree'
-                //     nodes={tryVar}
-                //     expanded={executionQueue.expanded}
-                //     onExpand={(expanded) => setExecutionQueue({...executionQueue, expanded: expanded})}
-                //   />
-                <Tree 
+                    <Tree 
                     value={executionQueue.list}
                     selectionMode="multiple"
                     style={{ height: '22.66rem', overflowY: 'auto' }}
