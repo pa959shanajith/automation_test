@@ -145,18 +145,25 @@ const getElementCordinates=(e)=>{
       setElementValues(e.value)
     } 
 const openElementProperties=()=>{
-
+        if(props.object.isCustom){
+            setMsg(MSG.SCRAPE.ERR_ELEMENT_TO_BE_MAPPED);
+            return
+        }
+        else if(props.object.objId===undefined){
+            setMsg(MSG.SCRAPE.ERR_OBJ_CURR_SAVE)
+        }
+        else{
         let element=props.object.xpath.split(';')
         let dataValue=[]
         let elementFinalProperties={
-            xpath:(element[0]==="null"||element[0]==="")?'None':element[0],
-            id:(element[1]==="null"|| element[1]==="")?'None':element[1],
-            rxpath:(element[2]==="null"||element[2]==="")?'None':element[2],
-            name:(element[3]==="null"||element[3]==="")?'None':element[3],
-            classname:(element[5]==="null"||element[5]==="")?'None':element[5],
-            cssselector:(element[12]==="null"||element[12]==="")?'None':element[12],
-            href:(element[11]==="null"||element[11]==="")?'None':element[11],
-            label:(element[10]==="null"||element[10]==="")?'None':element[10],
+            xpath:(element[0]==="null"||element[0]===""||element[0]==="undefined")?'None':element[0],
+            id:(element[1]==="null"|| element[1]===""||(element[1]==="undefined"))?'None':element[1],
+            rxpath:(element[2]==="null"||element[2]===""||(element[2]==="undefined"))?'None':element[2],
+            name:(element[3]==="null"||element[3]===""||(element[3]==="undefined"))?'None':element[3],
+            classname:(element[5]==="null"||element[5]===""||(element[5]==="undefined"))?'None':element[5],
+            cssselector:(element[12]==="null"||element[12]===""||(element[12]==="undefined"))?'None':element[12],
+            href:(element[11]==="null"||element[11]===""||(element[11]==="undefined"))?'None':element[11],
+            label:(element[10]==="null"||element[10]===""||(element[10]==="undefined"))?'None':element[10],
            }
 //     for(const [index,[key, value]] of Object.entries(elementFinalProperties)) {
 //         dataValue.push({id:index+1,key,value,name:defaultNames[key]})
@@ -169,6 +176,7 @@ Object.entries(elementFinalProperties).forEach(([key, value], index) => {
 dataValue.sort((a,b)=>a.id-b.id)
 setElementValues(dataValue)
 setElementProperties(true)
+        }
 }
 
 
@@ -209,13 +217,13 @@ setElementProperties(true)
                     </div> 
                 </div>
             }
-            <span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>
+            {(appType === 'Web' || appType === "MobileWeb")?<span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>:null}
 
         </div>
         {isIdentifierVisible?(props.object.identifier!==undefined)?
         <div className={moveCardUp?'arrow-bottom':'arrow-top'} style={moveCardUp?{position: 'absolute',bottom:cardBottom, padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}:{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:<div className='arrow-top'style={moveCardUp?{position: 'absolute',bottom:cardBottom, padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}:{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{defaultIdentifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:null}
         
-        <Dialog header={"Element Properties"} editMode="cell" style={{width:'63vw'}} visible={elementProperties}  onHide={() =>setElementProperties(false)}  footer={footerContent}>
+        <Dialog header={"Element Properties"} editMode="cell" style={{width:'70vw'}} visible={elementProperties}  onHide={() =>setElementProperties(false)}  footer={footerContent}>
         <div className="card">
             <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
                 <Column rowReorder style={{ width: '3rem' }} />

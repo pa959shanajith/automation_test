@@ -376,6 +376,7 @@ const Messages={
         ERR_CREATE_OBJ: {"CONTENT":"Failed to create object ICE not available.", "VARIANT": VARIANT.ERROR},
         ERR_CHECKBOX_SELECT:{"CONTENT":"Please select Element(s) to re-order identifiers.", "VARIANT": VARIANT.ERROR},
         ERR_OBJ_SAVE: {"CONTENT":"Unsaved Element(s) found. Please save to proceed", "VARIANT": VARIANT.ERROR},
+        ERR_OBJ_CURR_SAVE:{"CONTENT":"Please save current element to proceed", "VARIANT": VARIANT.ERROR},
         ERR_UPDATE_IRIS: {"CONTENT":"Failed to updated IRIS Object Details.", "VARIANT": VARIANT.ERROR},
         ERR_MAPPED_SCRAPE: {"CONTENT":"Mapping scrape data failed..", "VARIANT": VARIANT.ERROR},
         ERR_REPLACE_SCRAPE: {"CONTENT":"Scrape Data Replace Failed.", "VARIANT": VARIANT.ERROR},
@@ -386,7 +387,7 @@ const Messages={
         ERR_WINDOW_NOT_FOUND: { "CONTENT": "Window not found - Please provide valid window name.", "VARIANT": VARIANT.ERROR },
         ERR_HIGHLIGHT_OUT_OF_RANGE:{"CONTENT": "Scraped object's co-ordinates not found within the captured screenshot", "VARIANT": VARIANT.ERROR},
         ERR_NO_NEW_SCRAPE:{"CONTENT": "Please scrape new objects to replace.", "VARIANT": VARIANT.ERROR},
-        
+        ERR_ELEMENT_TO_BE_MAPPED:{"CONTENT":"Please map current element to proceed.","VARIANT": VARIANT.ERROR},
         SUCC_WEBSERVICE_RESP: {"CONTENT":"Web Service response received successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_WS_TEMP_SAVE: {"CONTENT":"WebService Template saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SCREEN_JSON_IMPORT: {"CONTENT":"Screen Json imported successfully.", "VARIANT": VARIANT.SUCCESS},
