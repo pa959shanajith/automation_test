@@ -1179,3 +1179,23 @@ function projectandscenario(projectid, cb) {
 		cb(null, projectDetails);
 	});
 }
+/** This service is to get the execution details for given project and time period */
+exports.fetchExecutionDetail = async (req, res) => {
+	logger.info("Inside UI service: fetchExecutionDetail");
+	var paramDetails = req.body;
+	logger.info(paramDetails);
+	if(paramDetails.authToken==="awdtbkob4g80h-jnlhge43stgjb7hj7g"){
+		var inputs = {
+			"query": "fetchExecutionDetail",
+			"ProjName":paramDetails.ProjName || "Default",			
+			"prefixRegexProjName": paramDetails.prefixRegexProjName || "Default",
+			"startDate":paramDetails.startDate,
+			"endDate":paramDetails.endDate
+		};
+		const result = await utils.fetchData(inputs, "reports/fetchExecutionDetail", "fetchExecutionDetail")
+		return res.send(result);
+	}
+	else{
+		return res.send({ status: 'fail'});
+	};
+}
