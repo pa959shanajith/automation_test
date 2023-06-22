@@ -27,7 +27,7 @@
     }
 
     .normalModule_main_container{
-        height:70% ;
+        height:66% ;
         border-top: 0.5px solid #c7c7c7;
         border-bottom: 0.5px solid #C7C7C7;
         
@@ -73,6 +73,23 @@
         cursor: pointer;
         
     }
+    .inputSearchNorMod{
+        width:14rem;
+        .p-input-icon-left{
+            justify-content: center !important;
+            display: flex !important;
+        }
+        .p-inputtext {
+            width:13rem !important;
+            height: 1.65rem !important;
+        }
+    }
+    .searchAndCheckImg{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
     .moduleLayer_plusIcon img{
         padding-right: 0.1rem;
     
@@ -133,10 +150,10 @@
         background-color:rgba($color: #E9ECEF, $alpha: 0.2) ;
     }
     .moduleName {
-        display: flex;
+        // display: flex;
         overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 91%;
+        // text-overflow: ellipsis;
+        max-width: 13rem;
         max-height: 100%;
         // border: 1px solid rgb(19, 225, 126);
         padding-left: 0.5rem;
@@ -149,7 +166,7 @@
     .moduleName h4{
           font-size: 13px;
           font-family: "open sans";
-          font-weight: 400;
+        //   font-weight: 400;
           color:rgb(8, 8, 8,1);
           padding-left: 0.8rem;
           overflow: hidden;
