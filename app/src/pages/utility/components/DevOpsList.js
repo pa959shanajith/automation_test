@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession} from '../../global';
 import { SearchBox , SearchDropdown, Toggle  } from '@avo/designcomponents';
@@ -19,11 +19,10 @@ import "../styles/DevOps.scss";
 import DropDownList from '../../global/components/DropDownList';
 import { getPools, getICE_list } from '../../execute/api';
 import {getProjectList} from '../../mindmap/api';
-import { FormInput } from '../../admin/components/FormComp';
+import { FormInput } from '../../settings/components/AllFormComp';
 import {getDetails_SAUCELABS} from '../../settings/api';
 import {saveSauceLabData} from '../../utility/api';
-
-
+import '../../admin/styles/FormComp.scss'
 
 
 const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig, projectIdTypesDicts }) => {
@@ -97,11 +96,18 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [osNames, setOsNames] = useState([]);
     const [selectedOS, setSelectedOS] = useState('');
     const [selectedSaucelabBrowser, setSelectedSaucelabBrowser] = useState('');
+    const [selectedMobileVersion, setSelectedMobileVersion] = useState('');
     const [selectedVersion, setSelectedVersion] = useState('');
-
+    const [platforms, setPlatforms] = useState([]);
+    const [selectedPlatforms, setSelectedPlatforms] = useState('');
     const [saucelabBrowsers, setSaucelabBrowsers] = useState({});
     const [browserVersions, setBrowserVersions] = useState([]);
-    const [browserDetails,setBrowserDetails] = useState([])
+    const [browserDetails,setBrowserDetails] = useState([]);
+    const [mobileDetails,setMobileDetails] = useState([]);
+    const [platformVersions,setPlatformVersions] = useState([]);
+    const [emulator, setEmulator]= useState([]);
+    const [selectedEmulator, setSelectedEmulator]= useState('');
+
     const [sauceLab, setSauceLab] = useState(false);
     const [browserlist, setBrowserlist] = useState([
         {
@@ -334,6 +340,45 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setSelectedVersion(option.key)
     }
 
+    const onMobileVersionChange = (option) => {
+        setSelectedMobileVersion(option.text);
+        setSelectedEmulator('')
+        setEmulator([])
+        let findEmulator = mobileDetails[selectedPlatforms][option.key.split(" ")[1]].map((element,index) => ({
+            key: element,
+            text: element,
+            title: element,
+            index: index
+        }))
+        setEmulator(findEmulator);
+        console.log(findEmulator);
+    }
+
+    const onMobilePlatformChange = async (option) => {
+        setSelectedPlatforms(option.key)
+        setSelectedMobileVersion('')
+        setSelectedEmulator('')
+        setEmulator([])
+        let findMobileVersions = Object.keys(mobileDetails[option.key]).map((element, index) => {
+            let each_version = option.key+" "+element 
+            return (
+                {
+                    key:each_version,
+                    text:each_version,
+                    title:each_version,
+                    index: index
+                }
+            )});
+            setPlatformVersions(findMobileVersions);
+            // console.log(findMobileVersions);
+            // setMobilePlatform(findMobileVersions)
+    }
+
+    const onEmulatorChange = async (option) => {
+        // setMobilePlatform(option.key)
+        setSelectedEmulator(option.key)
+    }
+
 
     const copyKeyUrlFunc = (id) => {
         const data = document.getElementById(id).title;
@@ -377,8 +422,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             const data = await getDetails_SAUCELABS()
             if (data.error) { setMsg(data.error); return; }
             if(data !=="empty"){
-                setIsEmpty(false);
+                setIsEmpty(true);
                 setDefaultValues(data);
+            } else {
+                setIsEmpty(false);
             }
             setLoading(false);
         } catch (error) {
@@ -400,6 +447,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setDisplayBasic4(false);
         // open the new dialog
         setLoading('Fetching details...') 
+        SauceLabPayload['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
         let data = await saveSauceLabData({
             SauceLabPayload
         });
@@ -429,7 +477,23 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             });
             setSaucelabBrowsers(arrayBrowser);
             setBrowserDetails(data);
-          } else {
+        }
+        else if (data && data.android && data.iphone){
+            const arrayPlatforms = Object.keys(data).map((element, index) => { 
+                return {
+                    key: element,
+                    text: element,
+                    title: element,
+                    index: index
+                }
+            })
+            setPlatforms(arrayPlatforms);
+
+            setMobileDetails(data);
+            setLoading(false);
+            setDisplayBasic5(true);
+          }
+           else {
             setLoading(false);
             // Data is empty or doesn't have expected properties
             if (data == "unavailableLocalServer"){
@@ -624,6 +688,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         dataExecution.poolid = ""
                         if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
                         else dataExecution.targetUser = selectedICE
+                        dataExecution['executionEnv'] = 'default'
                         CheckStatusAndExecute(dataExecution, iceNameIdMap);
                         onHide(name);
                     }
@@ -979,7 +1044,42 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`} className="action_icons" alt="Edit Icon" title='Schedule'/>&nbsp;&nbsp;&nbsp;
-                                     {showSauceLabs&&<img onClick={() =>{onClick('displayBasic4')}} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
+                                     {showSauceLabs&&<img onClick={() =>{
+                                    onClick('displayBasic4');
+                                    setCurrentKey(item.configurekey);
+                                    setAppType(item.executionRequest.batchInfo[0].appType);
+                                    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
+                                    setCurrentName(item.configurename);
+                                    let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
+                                        return ({
+                                            assignedTime: "",
+                                            releaseid: element.releaseId,
+                                            cycleid: element.cycleId,
+                                            testsuiteid: element.testsuiteId,
+                                            testsuitename: element.testsuiteName,
+                                            projectidts: element.projectId,
+                                            assignedTestScenarioIds: "",
+                                            subTaskId: "",
+                                            versionnumber: element.versionNumber,
+                                            domainName: element.domainName,
+                                            projectName: element.projectName,
+                                            cycleName: element.cycleName
+                                        });                                   
+                                    });
+                                    setCurrentTask({
+                                        testSuiteDetails: testSuiteDetails
+                                    });
+                                    let accessibilityParametersValue = item.executionRequest.batchInfo.map((element) => {
+                                        return (element.suiteDetails[0].accessibilityParameters)
+                                    });
+                                    setAccessibilityParameters(accessibilityParametersValue);
+                                    readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setChangeLable(true);
+                                    setSauceLab(true);
+                                    // setShowIcePopup(false);
+                                    }} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
                                      {/* { showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" title="CI/CD" className="action_icons" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp; */}
                                      { showCICD && <img onClick={!userInfo.isTrial?() =>{
@@ -1079,12 +1179,46 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`}  className="action_icons" title="Schedule" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
-                                     {showSauceLabs&&<img onClick={() =>{onClick('displayBasic4')}} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
+                                     {showSauceLabs&&<img onClick={() =>{
+                                    onClick('displayBasic4');
+                                    setCurrentKey(item.configurekey);
+                                    setAppType(item.executionRequest.batchInfo[0].appType);
+                                    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+                                    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
+                                    setCurrentName(item.configurename);
+                                    let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
+                                        return ({
+                                            assignedTime: "",
+                                            releaseid: element.releaseId,
+                                            cycleid: element.cycleId,
+                                            testsuiteid: element.testsuiteId,
+                                            testsuitename: element.testsuiteName,
+                                            projectidts: element.projectId,
+                                            assignedTestScenarioIds: "",
+                                            subTaskId: "",
+                                            versionnumber: element.versionNumber,
+                                            domainName: element.domainName,
+                                            projectName: element.projectName,
+                                            cycleName: element.cycleName
+                                        });                                   
+                                    });
+                                    setCurrentTask({
+                                        testSuiteDetails: testSuiteDetails
+                                    });
+                                    let accessibilityParametersValue = item.executionRequest.batchInfo.map((element) => {
+                                        return (element.suiteDetails[0].accessibilityParameters)
+                                    });
+                                    setAccessibilityParameters(accessibilityParametersValue);
+                                    readTestSuiteFunct(testSuiteDetails, item);
+                                    fetchData(item.executionRequest.batchInfo[0].projectId);
+                                    setChangeLable(true);
+                                    setSauceLab(true);
+                                    // setShowIcePopup(false);
+                                    }} src="static/imgs/Saucelabs-3.png" className="action_icons" title="Saucelabs" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp;
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
                                      {/* {showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon" title='CI/CD'/>}&nbsp;&nbsp;&nbsp; */}
                                      { showCICD && <img onClick={!userInfo.isTrial?() =>{
                                     onClick('displayBasic4');
-                                    setExecEnv('saucelabs')
                                     setCurrentKey(item.configurekey);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
@@ -1200,16 +1334,25 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <form id='Saucelabs-form'>
                             <div  className='Saucelabs_input'>
                                 <div className="flex flex-row">
-                                    <FormInput textValue={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL" name="Saucelabs-URL" placeholder="Enter Saucelabs Remote URL"/> 
+                                    <FormInput value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL" 
+                                        name="Saucelabs-URL" 
+                                        placeholder="Enter Saucelabs Remote URL" 
+                                        onChange={(event) => {
+                                        setDefaultValues({...defaultValues,SaucelabsURL:event.target.value}) }}
+                                        className = "saucelabs_input"/>
                                 </div>
                                 <div className="flex flex-row">
-                                    <FormInput textValue={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"/>
+                                    <FormInput value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username" onChange={(event) => {
+                                        setDefaultValues({...defaultValues,SaucelabsUsername:event.target.value})}}
+                                        className = "saucelabs_input_URL"/>
                                 </div>
                                 <div className="flex flex-row">
-                                    <FormInput textValue={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"/>
+                                    <FormInput value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key" onChange={(event) => {
+                                        setDefaultValues({...defaultValues,Saucelabskey:event.target.value}) }}
+                                        className = "saucelabs_input_Accesskey"/>
                                 </div>
                                 <div>
-                                {defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
+                                {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
                                 </div>
                             </div>
                         </form>
@@ -1219,6 +1362,19 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onDismiss={() => {setDisplayBasic5(false)}} onHide={() => onHide('displayBasic5')}>
                      
 
+                    {showSauceLabs&&
+                    <>
+                    <div><h6>Platforms</h6></div>
+                    <SearchDropdown
+                    noItemsText={[]}
+                    onChange={onMobilePlatformChange}
+                    options={platforms}
+                    selectedKey={selectedPlatforms}
+                    width='15rem'
+                    placeholder='select Platform'
+                    />
+                    </>}
+                    {!showSauceLabs&&<>
                     <div><h6>Operating System</h6></div>
                     <SearchDropdown
                     noItemsText={[]}
@@ -1228,26 +1384,60 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     width='15rem'
                     placeholder='select OS'
                     />
+                    </>}
+                    {!showSauceLabs&&
+                    <>
                     <div><h6>Browser</h6></div>
                     <SearchDropdown
                     noItemsText={[ ]}
+                    disabled={selectedOS == ''}
                     onChange={onSaucelabBrowserChange}
                     options={saucelabBrowsers}
                     selectedKey={selectedSaucelabBrowser}
                     width='15rem'
                     placeholder='select Browser'
-
                     />
+                    </>}
+                    {showSauceLabs &&
+                    <>
                     <div><h6>Versions</h6></div>
                     <SearchDropdown
                     noItemsText={[ ]}
+                    disabled={selectedPlatforms == ''}
+                    onChange={onMobileVersionChange}
+                    options={platformVersions}
+                    selectedKey={selectedMobileVersion}
+                    width='15rem'
+                    placeholder='select android versions'
+                    />
+                    </>}
+                    
+                    {!showSauceLabs&&
+                    <>
+                    <div><h6>Versions</h6></div>
+                    <SearchDropdown
+                    noItemsText={[ ]}
+                    disabled={selectedSaucelabBrowser == ''}
                     onChange={onVersionChange}
                     options={browserVersions}
                     selectedKey={selectedVersion}
                     width='15rem'
                     placeholder='select Versions'
-                    
                     />
+                    </>}
+                    {showSauceLabs &&
+                    <>
+                    <div><h6>Emulator</h6></div>
+                    <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={onEmulatorChange}
+                    options={emulator}
+                    selectedKey={selectedEmulator}
+                    disabled={selectedMobileVersion == ''}
+                    width='15rem'
+                    placeholder='select Emulator'
+                    />
+                    </>}
                     <div>
                         <div>
                             <div className='adminControl-ice-saucelabs'>
@@ -1289,10 +1479,21 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             else dataExecution.targetUser = selectedICE
 
                             dataExecution['executionEnv'] = 'saucelabs'
-                            dataExecution['platform'] = selectedOS;
-                            dataExecution['version'] = selectedVersion;
-                            dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedSaucelabBrowser)[0].key]
-                            console.log(dataExecution['browserType']);
+                            dataExecution['saucelabDetails'] = defaultValues
+                            if(!showSauceLabs){
+                                dataExecution['platform'] = selectedOS;
+                                dataExecution['browserVersion'] = selectedVersion;
+                                dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedSaucelabBrowser)[0].key]
+                            } else {
+                                dataExecution["browserType"] = ['1']
+                                dataExecution['mobile'] = {
+                                    "platformName": selectedPlatforms,
+                                    "browserName": "Chrome",
+                                    "deviceName": selectedEmulator,
+                                    "platformVersion": selectedMobileVersion.split(" ")[1]
+                                }
+                            }
+                            
                             CheckStatusAndExecute(dataExecution, iceNameIdMap);
                             onHide('displayBasic5');
                         }

@@ -115,12 +115,16 @@ class TestSuiteExecutor {
             "reportType": "functionalTesting",
             "version":"-"
         };
-        if(batchData.executionEnv == 'saucelabs') {
+        if(batchData.executionEnv == 'saucelabs' && batchData.batchInfo.length) {
             execReq['sauce_username'] = batchData.sauce_username
             execReq['sauce_access_key'] = batchData.sauce_access_key
             execReq['remote_url'] = batchData.remote_url
-            execReq['version'] = batchData.version
-            execReq['platform'] = batchData.platform
+            if(batchData.batchInfo[0].appType == 'Web') {
+                execReq['browserVersion'] = batchData.browserVersion
+                execReq['platform'] = batchData.platform
+            } else {
+                execReq["mobile"] = batchData.mobile
+            }
         }
         const gitInfo = batchData.gitInfo;
         if(gitflag){

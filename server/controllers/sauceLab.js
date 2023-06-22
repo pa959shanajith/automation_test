@@ -38,6 +38,7 @@ exports.saveSauceLabData = function (req, res) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
 				if (redisres[1]>0) {
 					var SauceLabDetails = {
+						"action":req.body.SauceLabPayload.query,
 						"SauceLabURL": check_SauceLabURL,
 						"SauceLabusername" : check_SauceLabusername,
 						"SauceLabAccessKey": check_SauceLabAccessKey
@@ -59,7 +60,7 @@ exports.saveSauceLabData = function (req, res) {
 								data = data.value;
 								res.send(data);
 							}
-							}
+						}
 					}
 					redisServer.redisSubServer.on("message",SauceLablogin_listener);
 				} else {
