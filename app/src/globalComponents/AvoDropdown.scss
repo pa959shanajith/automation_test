@@ -12,4 +12,18 @@
             color: #D1272C;
         }
     }
+    .dropdown_week {
+        margin: 0 0.5rem;
+        width: 7rem;
+        .p-dropdown-trigger {
+            width: 2rem;
+        }
+    }
+    .dropdown_day {
+        margin: 0 0.5rem;
+        width: 8rem;
+        .p-dropdown-trigger {
+            width: 2rem;
+        }
+    }
 }

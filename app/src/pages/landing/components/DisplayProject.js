@@ -195,7 +195,9 @@ const DisplayProject = (props) => {
         <div className="flex flex-row All_Project"> 
           <div className="All_Project_font " >ALL PROJECTS</div>
           <div className="add_sort_btn">
-            <button className="pi pi-plus add_btn" disabled={(userInfo.rolename) !== "Test Manager"} onClick={handleOpenDialog} />
+            {userInfo.rolename === "Test Manager" ? (
+            <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
+            ) : null}
             <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
           </div>
         </div>
@@ -208,9 +210,6 @@ const DisplayProject = (props) => {
     dispatch(getStep(defaultProjectId));
 
   }, [defaultProjectId])
-
-  // console.lod(defaultProject.appType);
-  // console.lod(defaultProject.projectName);
 
   return (
     <>

@@ -240,3 +240,28 @@ export const deleteExecutionListId = async(props) => {
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
+
+export const testSuitesScheduler_ICE = async(schedulerData) => {
+    try{
+        const res = await axios(url+"/testSuitesScheduler_ICE", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                param : 'testSuitesScheduler_ICE',
+                userDetails : schedulerData
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}

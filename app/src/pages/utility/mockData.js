@@ -90,3 +90,21 @@ export const scheduleWeeks = [
   { name: 'Sunday', key: 'SUN' },
   { name: 'All', key: 'ALL' }
 ];
+
+export const scheduleMonths = [
+  { name: 'First', code: 'FI' },
+  { name: 'Second', code: 'SE' },
+  { name: 'Third', code: 'TH' },
+  { name: 'Fourth', code: 'FO' },
+  { name: 'Last', code: 'LA' }
+];
+
+export const scheduleWeek = [
+  { name: 'Monday', key: 'MON' },
+  { name: 'Tuesday', key: 'TUE' },
+  { name: 'Wednesday', key: 'WED' },
+  { name: 'Thursday', key: 'THU' },
+  { name: 'Friday', key: 'FRI' },
+  { name: 'Saturday', key: 'SAT' },
+  { name: 'Sunday', key: 'SUN' }
+];
