@@ -9,6 +9,9 @@ import "../styles/ExecutionPage.scss";
 
 const ExecutionPage = () => {
     const [executionQueue, setExecutionQueue] = useState(false);
+  
+
+  
     
 
     const getCurrentQueueState = async () => {
@@ -22,10 +25,12 @@ const ExecutionPage = () => {
             }
         }else {
             let nodesCollection = [];
+            let temp = 0;
             for (let item in queueList) {
                 //To handle empty execution List id key
                 if(queueList && queueList[item] && queueList[item] && queueList[item][0] && queueList[item][0][0]){
                     let nodeItem = {
+                        key: temp++,
                         value: item,
                         label: queueList[item][0][0].configurename,
                         // label: item+'   :   '+queueList[item][0][0].configurename,
@@ -33,8 +38,10 @@ const ExecutionPage = () => {
                     }
                     let nodeItemChildren = [];
                     let nodeItemChildrenIndex = 1;
+                    let nodechildtemp=0;
                     for (let executionNode of queueList[item]) {
                         let executionItem = {
+                            key:`0-${nodechildtemp++}`,
                             value: item+nodeItemChildrenIndex,
                             label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" className='Terminate_Execution' onClick={async () => {
                                     const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
@@ -57,6 +64,8 @@ const ExecutionPage = () => {
                     }
                     nodeItem['children'] = nodeItemChildren;
                     nodesCollection.push(nodeItem);
+                    // console.log(queueList.indexOf(queueList[item]))\
+                    console.log(queueList)
                 }
             }
             setExecutionQueue({
@@ -81,6 +90,7 @@ const ExecutionPage = () => {
                     value={executionQueue.list}
                     selectionMode="multiple"
                     style={{ height: '22.66rem', overflowY: 'auto' }}
+                    
                 />
                 ) : (
                   <p>You have nothing pending to execute. Try to Execute any Configure Key and come here.</p>
