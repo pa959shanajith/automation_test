@@ -266,11 +266,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   var myJsObj = { key: currentKey, executionType: executionTypeInRequest };
   var str = JSON.stringify(myJsObj, null, 4);
 
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
-
   const fetchData = async () => {
     setSmartMode("normal");
     setSelectedICE("");
@@ -296,6 +291,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     populateICElist(arr, true, data1);
     // setLoading(false);
   };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, [configProjectId]);
 
   const populateICElist = (arr, unallocated, iceStatusdata) => {
     var ice = [];
@@ -1022,6 +1022,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const onScheduleBtnClick = (btnType) => {
     if(btnType === 'Cancel'){
       setVisible_schedule(false);
+      setScheduling(false);
     }
     if(btnType === 'Schedule'){
       setVisible_schedule(false);
@@ -1320,7 +1321,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             setVisible={setVisible_schedule}
             onModalBtnClick={onScheduleBtnClick}
             content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
-            headerTxt="Schedule: Regression"
+            headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
             footerType="Schedule"
             modalSytle={{
               width: "55vw",
@@ -1334,41 +1335,25 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             onModalBtnClick={onScheduleBtnClick}
             content={
               <>
-                <div className="legends-container">
-                  <div className="legend">
-                    <span id="status" className="status-available"></span>
-                    <span className="legend-text">Available</span>
-                  </div>
-                  <div className="legend">
-                    <span id="status" className="status-unavailable"></span>
-                    <span className="legend-text2">Unavailable</span>
-                  </div>
-                  <div className="legend">
-                    <span id="status" className="status-dnd"></span>
-                    <span className="legend-text1">Do Not Disturb</span>
-                  </div>
-                </div>
-                <div>
-                  <span
-                    className="execute_dropdown .p-dropdown-label "
-                    title="Token Name"
-                  >
-                    Allocate
-                  </span>
-                  <div className="search_icelist">
-                    <DropDownList
-                      poolType={poolType}
-                      ExeScreen={ExeScreen}
-                      inputErrorBorder={inputErrorBorder}
-                      setInputErrorBorder={setInputErrorBorder}
-                      placeholder={"Search"}
-                      data={availableICE}
-                      smartMode={ExeScreen === true ? smartMode : ""}
-                      selectedICE={selectedICE}
-                      setSelectedICE={setSelectedICE}
-                    />
-                  </div>
-                </div>
+                    <div className="ice_label">Allocate Avo Assure Client</div>
+                    <div className="ice_container">
+                      <div className="ice_status">
+                        <span className="available"></span><span>Available</span>
+                        <span className="unavailable"></span><span>Unavailable</span>
+                        <span className="dnd"></span><span>Do Not Disturb</span>
+                      </div>
+                      <DropDownList
+                        poolType={poolType}
+                        ExeScreen={ExeScreen}
+                        inputErrorBorder={inputErrorBorder}
+                        setInputErrorBorder={setInputErrorBorder}
+                        placeholder={"Search"}
+                        data={availableICE}
+                        smartMode={ExeScreen === true ? smartMode : ""}
+                        selectedICE={selectedICE}
+                        setSelectedICE={setSelectedICE}
+                      />
+                    </div>
               </>
             }
             headerTxt="Allocate Avo Assure Client to Schedule"
@@ -1377,7 +1362,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               width: "55vw",
               height: "45vh",
               background: "#FFFFFF",
+              minWidth: "38rem"
             }}
+            customClass="schedule_modal"
           />
           <AvoModal
             visible={visible_CICD}
@@ -1567,11 +1554,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             <TabMenu model={items}  activeIndex1={activeIndex1}  onTabChange={(e) => handleTabChange(e)} />
             {/* {activeIndex1 === 0 &&(<div className="ConfigurePage_container  m-2">{renderTable()}</div>)}
                 {activeIndex1 === 1 && <executionPage/> } */}
-               
-      
-           
-      
-
           </div>
           )}
         </div>

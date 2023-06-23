@@ -144,7 +144,6 @@ const ScheduleScreen = ({ cardData }) => {
                 onChange={(e) => setStartDate(e.value)}
                 icon="pi pi-fw pi-angle-down"
                 showIcon
-                disabled={selectedSchedule?.key !== "OT"}
               />
             </div>
             <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
@@ -216,7 +215,7 @@ const ScheduleScreen = ({ cardData }) => {
   return (
     <div>
       <ExecutionCard cardData={cardData} />
-      <Tree value={scheduleNodes} className="schedule_tree" />
+      <Tree value={scheduleNodes} expandedKeys={{'0': true}} className="schedule_tree" />
     </div>
   );
 };
