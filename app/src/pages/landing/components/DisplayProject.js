@@ -81,7 +81,6 @@ const DisplayProject = (props) => {
       setProjectsDetails(projectList);
       const arrayNew = projectList.map((element, index) => {
         const lastModified = DateTimeFormat(element.releases[0].modifiedon);
-        console.log(lastModified);
         return {
           key: index,
           projectName: element.name,
@@ -208,7 +207,6 @@ const DisplayProject = (props) => {
 
   useEffect(() => {
     dispatch(getStep(defaultProjectId));
-
   }, [defaultProjectId])
 
   return (

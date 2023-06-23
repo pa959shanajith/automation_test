@@ -5,7 +5,6 @@ import { Tooltip } from 'primereact/tooltip';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { resetPassword } from '../api';
-import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { useDispatch } from 'react-redux';
 import '../styles//ChangePassword.scss';
 
