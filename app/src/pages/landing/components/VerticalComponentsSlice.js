@@ -16,7 +16,6 @@ export const stepsSlice = createSlice({
     },
     getStep: (state, action) => {
       state.id=action.payload
-      console.log(state,action);
     },
   },
 
