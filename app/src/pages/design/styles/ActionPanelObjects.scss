@@ -5,13 +5,8 @@
         position: absolute;
     }
 
-    .p-dialog-header {
-        height: 3rem !important;
+    .p-dialog-header { 
         background: #E2E2ED !important;
-        border-top-right-radius: 4px;
-        padding: 0.3rem 0 !important;
-        height: 3rem !important;
-
     }
 
 }
@@ -168,38 +163,51 @@
 
 .map__object__header {
     .p-dialog-header {
-        padding: 0.6rem 0 !important;
-        height: 3rem !important;
         background: #E2E2ED !important;
-        border-top-right-radius: 4px;
-        // padding: 0.3rem 0 !important;
-        // height: 3rem !important;
     }
-
-    .p-dialog-header-icons {
-        right: 2% !important;
-        position: absolute;
+    .mo_mappedName{
+        background-color: #605BFF;
+        flex: 0 0 80%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding-left: 9px; 
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-
-    .p-dialog-title {
-        margin-left: 1.7% !important;
+    .mo_tagHead{
+        cursor: pointer;
+        background: grey;
+        text-align: center;
+        margin-bottom: 5px;
+        padding: 2px 10px;
+        color: white;
+        width: 60%;
+        border-radius: 5px;
     }
-
-    .text__content {
-        position: absolute;
-        bottom: 76%;
+    .mo_tagItems{
+        border: 1px solid black;
+        border-radius: 5px;
+        margin-bottom: 8px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        overflow: hidden;
+        white-space: nowrap !important;
+        text-overflow: ellipsis;
+    }
+    .mo_nameFlip{
+        flex: 0 0 20%;
+        height: 100%;
+    }
+    .mo_tagItemList{
+        margin: 10px 0 15px;
+        width: 60%
     }
 }
 
-.map__card {
-    height: 56%;
-    display: flex;
-    flex-direction: column;
-    top: 30%;
-    position: absolute;
-    border: 1px solid black;
-    width: 92%;
-}
 
 .captured__text {
     display: flex;
@@ -288,12 +296,7 @@
     }
 
     .p-dialog-header {
-        padding: 0.8rem 0 !important;
-        height: 3rem !important;
         background: #E2E2ED !important;
-        border-top-right-radius: 4px;
-        // padding: 0.3rem 0 !important;
-        // height: 3rem !important;
     }
 
     .p-dialog-title {
@@ -359,11 +362,7 @@
     }
 
     .p-dialog-header {
-        height: 3rem !important;
         background: #E2E2ED !important;
-        border-top-right-radius: 4px;
-        padding: 0.3rem 0 !important;
-        height: 3rem !important;
     }
 
     position: relative;

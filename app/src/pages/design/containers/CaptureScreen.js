@@ -261,7 +261,7 @@ const CaptureModal = (props) => {
                         </div>
                     {/* </ScrollBar> */}
                 </div>,
-                'footer': <button onClick={()=>setShowPop("")}>OK</button>
+                'footer': <Button size="small" onClick={()=>setShowPop("")}>OK</Button>
             })
         }
          else if (dXpath) {
@@ -436,7 +436,7 @@ const CaptureModal = (props) => {
     
     let params = {
         'deletedObj': [],
-        'modifiedObj': [],
+        'modifiedObj': modifiedObjects,
         'addedObj': {...added, view: views},
         'screenId': props.fetchingDetails["_id"],
         'userId': userInfo.user_id,
@@ -465,7 +465,7 @@ const CaptureModal = (props) => {
                   </div>
                   {/* </ScrollBar> */}
                 </div>,
-                footer: <button onClick={() => { setShowPop("") }} >OK</button>
+                footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
               })
               : toastSuccess("Scraped Elements saved successfully.");
             let numOfObj = scrapeItemsL.length;
@@ -718,9 +718,9 @@ const CaptureModal = (props) => {
   )
   const PopupDialog = () => (
     <ModalContainer
+      show={showPop}
       title={showPop.title}
-      modalClass="modal-sm"
-      close={() => setShowPop("")}
+      close={() => setShowPop(false)}
       content={showPop.content}
       footer={showPop.footer}
     />
@@ -728,6 +728,7 @@ const CaptureModal = (props) => {
 
   const ConfirmPopup = () => (
     <ModalContainer
+      show={showConfirmPop}
       title={showConfirmPop.title}
       content={showConfirmPop.content}
       close={() => setShowConfirmPop(false)}
@@ -909,7 +910,7 @@ const CaptureModal = (props) => {
     else if (!isCustom) setNewScrapedData(updNewScrapedData);
     if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
     setScrapeItems(localScrapeItems);
-
+    setCapturedDataToSave([]);
   }
 
   const onCellEditComplete = (e) => {
@@ -922,7 +923,7 @@ const CaptureModal = (props) => {
   }
 
   const cellEditor = (options) => {
-    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+    return <InputText type="text" className="element_name" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} style={{width:"25rem"}} tooltip={options.value}/>;
   };
 
   const addedCustomElement = (addedElements, orderList) => {
@@ -1204,7 +1205,7 @@ const CaptureModal = (props) => {
         </div>
       </Dialog>
       {currentDialog === 'addObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} addCustomElement={addedCustomElement} />}
-      {currentDialog === 'mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+      {currentDialog === 'mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} captureList = {capturedDataToSave}/>}
       {currentDialog === 'replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
       {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} scrapeItems={scrapeItems} capturedDataToSave={capturedDataToSave} setCapturedDataToSave = {setCapturedDataToSave} setNewScrapedData={setNewScrapedData} updateScrapeItems={updateScrapeItems} setOrderList={setOrderList} setSaved={setSaved} setShow={setCurrentDialog} setCaptureData={setCaptureData} />}
       {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
