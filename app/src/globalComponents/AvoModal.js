@@ -16,21 +16,24 @@ const AvoModal = ({
 
   const footerValues = {
     CancelSave: [
-      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Save", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
+      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "Cancel" },
+      { btnTxt: "Save", autoFocus: false, btnType: null, key: "Save", disabled: isDisabled },
     ],
     CancelUpdate: [
-      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Update", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
+      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "Cancel" },
+      { btnTxt: "Update", autoFocus: false, btnType: null, key: "Update", disabled: isDisabled },
     ],
     Execute: [
-      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Execute", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
+      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "Cancel" },
+      { btnTxt: "Execute", autoFocus: false, btnType: null, key: "Execute", disabled: isDisabled },
 
     ],
     Schedule: [
-      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "cancel" },
-      { btnTxt: "Schedule", autoFocus: false, btnType: null, key: "save", disabled: isDisabled },
+      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "Cancel" },
+      { btnTxt: "Schedule", autoFocus: false, btnType: null, key: "Schedule", disabled: isDisabled },
+    ],
+    ScheduleIce: [
+      { btnTxt: "Schedule", autoFocus: false, btnType: null, key: "ScheduleIce", disabled: isDisabled },
     ],
   };
   const footerContent = footerValues[footerType]?.map((el) => (
@@ -39,7 +42,7 @@ const AvoModal = ({
         className={`${el?.key}_button`}
         label={el?.btnTxt}
         {...(el?.btnType && { [el?.btnType]: true })}
-        onClick={() => onModalBtnClick(el?.btnTxt)}
+        onClick={() => onModalBtnClick(el?.key)}
         autoFocus={el?.autoFocus}
         disabled={el.disabled}
       />
