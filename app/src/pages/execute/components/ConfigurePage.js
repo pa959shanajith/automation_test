@@ -58,7 +58,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [checked, setChecked] = useState(false);
   const toast = useRef(null);
   const url = window.location.href.slice(0, -7) + "execAutomation";
-  const [projectId, setprojectId] = useState("");
+  const [configProjectId, setConfigProjectId] = useState("");
   const [selectedProject, setSelectedProject] = useState("");
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
@@ -114,6 +114,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [fetechConfig, setFetechConfig] = useState([]);
   const [configItem, setConfigItem] = useState({});
   const [selectedSchedule, setSelectedSchedule] = useState({});
+  const [scheduling, setScheduling] = useState(null);
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -227,9 +228,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       //     key: Projects.projectId,
       //     value:Projects.projectNames
       //   }]
+      setConfigProjectId(data[0] && data[0]?.id);
       setProjectList(data);
     })();
-  }, [projectId]);
+  }, []);
 
   const [recurrenceType, setRecurrenceType] = useState("");
   const [monthlyRecurrenceWeekValue, setMonthlyRecurrenceWeekValue] =
@@ -273,7 +275,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     setSmartMode("normal");
     setSelectedICE("");
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
-    var projId = getConfigData?.projects[0]?._id;
+    var projId = configProjectId;
     var dataforApi = { poolid: "", projectids: [projId] };
     // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
@@ -665,9 +667,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   };
 
   const tableUpdate = async () => {
-    const getState = [...configList];
+    const getState = [];
     const configurationList = await fetchConfigureList({
-      projectid: getConfigData?.projects[0]?._id,
+      projectid: configProjectId,
     });
     setFetechConfig(configurationList);
     configurationList.forEach((item, idx) => {
@@ -738,10 +740,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   };
 
   useEffect(() => {
-    if (getConfigData?.projects[0]?._id) {
+    if (configProjectId) {
       tableUpdate();
     }
-  }, [getConfigData?.projects[0]?._id]);
+  }, [configProjectId]);
 
   const configModal = (getType, getData = null) => {
     if (getType === "CancelUpdate") {
@@ -839,7 +841,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             appType: "Web",
             domainName: "Banking",
             projectName: getConfigData?.projects[0]?.name,
-            projectId: getConfigData?.projects[0]?._id,
+            projectId: configProjectId,
             releaseId: getConfigData?.projects[0]?.releases[0]?.name,
             cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
             cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
@@ -905,9 +907,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
-        dispatch(storeConfigureKey(executionData))
+        dispatch(storeConfigureKey(executionData)).then(() => {
+          tableUpdate();
+        })
       );
-      // tableUpdate();
       setVisible(false);
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
@@ -940,9 +943,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
             <select
               onChange={(e) => {
-                setprojectId(e.target.value);
+                setConfigProjectId(e.target.value);
               }}
               style={{ width: "10rem", height: "19px" }}
+              value={configProjectId}
             >
               {projectList.map((project, index) => (
                 <option value={project.id} key={index}>
@@ -1023,7 +1027,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setVisible_schedule(false);
       dispatch(getPoolsexe());
       dispatch(getICE());
-      setVisible_execute(true);
+      setScheduling(true);
     }
   };
 
@@ -1177,8 +1181,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     if (!!configList.length) {
       return (
         <>
-        
-          <DataTable showGridlines resizableColumns
+          <DataTable
+            showGridlines
+            resizableColumns
             className="  datatable_list  "
             value={configList}
             globalFilter={searchProfile}
@@ -1190,8 +1195,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           >
             <Column
               field="sno"
-              style={{ width:"5%" }}
-              header={<span className="SNo-header" >S No</span>}
+              style={{ width: "5%" }}
+              header={<span className="SNo-header">S No</span>}
             />
             <Column
               style={{
@@ -1201,16 +1206,15 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
-              
             />
             <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginRight: "23rem",
-              width:"40%"
+                width: "40%",
               }}
-              field="executionOptions" 
+              field="executionOptions"
               header={
                 <span className="executionOption-header">
                   Execution Options
@@ -1223,13 +1227,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 fontFamily: "open Sans",
                 marginleft: "7rem",
                 textAlign: "left",
-                width:"5%"
+                width: "5%",
               }}
               field="actions"
               header={<span className="actions-header">Actions</span>}
             />
           </DataTable>
-          <AvoModal 
+          <AvoModal
             visible={visible_execute}
             setVisible={setVisible_execute}
             onModalBtnClick={onExecuteBtnClick}
@@ -1289,7 +1293,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                       >
                         Execute on
                       </span>
-
                       <div className="search_icelist ">
                         <DropDownList
                           poolType={poolType}
@@ -1310,7 +1313,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             }
             headerTxt="Execute: Regression"
             footerType="Execute"
-            modalSytle={{ width: "50vw",background: "#FFFFFF" }}
+            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
           />
           <AvoModal
             visible={visible_schedule}
@@ -1319,7 +1322,62 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
             headerTxt="Schedule: Regression"
             footerType="Schedule"
-            modalSytle={{ width: "55vw", height: "95vh",  background: "#FFFFFF" }}
+            modalSytle={{
+              width: "55vw",
+              height: "95vh",
+              background: "#FFFFFF",
+            }}
+          />
+          <AvoModal
+            visible={scheduling}
+            setVisible={setScheduling}
+            onModalBtnClick={onScheduleBtnClick}
+            content={
+              <>
+                <div className="legends-container">
+                  <div className="legend">
+                    <span id="status" className="status-available"></span>
+                    <span className="legend-text">Available</span>
+                  </div>
+                  <div className="legend">
+                    <span id="status" className="status-unavailable"></span>
+                    <span className="legend-text2">Unavailable</span>
+                  </div>
+                  <div className="legend">
+                    <span id="status" className="status-dnd"></span>
+                    <span className="legend-text1">Do Not Disturb</span>
+                  </div>
+                </div>
+                <div>
+                  <span
+                    className="execute_dropdown .p-dropdown-label "
+                    title="Token Name"
+                  >
+                    Allocate
+                  </span>
+                  <div className="search_icelist">
+                    <DropDownList
+                      poolType={poolType}
+                      ExeScreen={ExeScreen}
+                      inputErrorBorder={inputErrorBorder}
+                      setInputErrorBorder={setInputErrorBorder}
+                      placeholder={"Search"}
+                      data={availableICE}
+                      smartMode={ExeScreen === true ? smartMode : ""}
+                      selectedICE={selectedICE}
+                      setSelectedICE={setSelectedICE}
+                    />
+                  </div>
+                </div>
+              </>
+            }
+            headerTxt="Allocate Avo Assure Client to Schedule"
+            footerType="ScheduleIce"
+            modalSytle={{
+              width: "55vw",
+              height: "45vh",
+              background: "#FFFFFF",
+            }}
           />
           <AvoModal
             visible={visible_CICD}
@@ -1329,95 +1387,95 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 {renderExecutionCard()}
 
                 <div className="input_CICD ">
-              <div class="container_url">
-                <label for="inputField" class="devopsUrl_label">
-                  Devops Integration URL
-                </label>
-                {/* <input
+                  <div class="container_url">
+                    <label for="inputField" class="devopsUrl_label">
+                      Devops Integration URL
+                    </label>
+                    {/* <input
                   type="text"
                   id="inputField"
                   class="inputtext_CICD"
                   // value={url}
                   
                 /> */}
-                <pre className='grid_download_dialog__content__code cicdpre'>
-                        <code id='api-url' title={url}>
-                    {url}
-                  </code>
-                </pre>
+                    <pre className="grid_download_dialog__content__code cicdpre">
+                      <code id="api-url" title={url}>
+                        {url}
+                      </code>
+                    </pre>
 
-                <Button
-                  icon="pi pi-copy"
-                  className="copy_CICD"
-                  onClick={() => {
-                    copyConfigKey(url);
-                  }}
-                  title={copyToolTip}
-                />
-              </div>
-              <div className="executiontype">
-                <div className="lable_sync">
-                  <label
-                    className="Async_lable"
-                    id="async"
-                    htmlFor="synch"
-                    value="asynchronous"
-                  >
-                    Asynchronous{" "}
-                  </label>
-                  <InputSwitch
-                    className="inputSwitch_CICD"
-                    label=""
-                    inlineLabel={true}
-                    onChange={() =>
-                      executionTypeInRequest == "asynchronous"
-                        ? setExecutionTypeInRequest("synchronous")
-                        : setExecutionTypeInRequest("asynchronous")
-                    }
-                    checked={executionTypeInRequest === "synchronous"}
-                  />
-                  <label
-                    className="sync_label"
-                    id="sync"
-                    htmlFor="synch"
-                    value="synchronous"
-                  >
-                    Synchronous{" "}
-                  </label>
-                </div>
-              </div>
-              <div className="container_devopsLabel" title={str}>
-                <span className="devops_label">DevOps Request Body : </span>
-                <div>
-                  {/* <InputTextarea
+                    <Button
+                      icon="pi pi-copy"
+                      className="copy_CICD"
+                      onClick={() => {
+                        copyConfigKey(url);
+                      }}
+                      title={copyToolTip}
+                    />
+                  </div>
+                  <div className="executiontype">
+                    <div className="lable_sync">
+                      <label
+                        className="Async_lable"
+                        id="async"
+                        htmlFor="synch"
+                        value="asynchronous"
+                      >
+                        Asynchronous{" "}
+                      </label>
+                      <InputSwitch
+                        className="inputSwitch_CICD"
+                        label=""
+                        inlineLabel={true}
+                        onChange={() =>
+                          executionTypeInRequest == "asynchronous"
+                            ? setExecutionTypeInRequest("synchronous")
+                            : setExecutionTypeInRequest("asynchronous")
+                        }
+                        checked={executionTypeInRequest === "synchronous"}
+                      />
+                      <label
+                        className="sync_label"
+                        id="sync"
+                        htmlFor="synch"
+                        value="synchronous"
+                      >
+                        Synchronous{" "}
+                      </label>
+                    </div>
+                  </div>
+                  <div className="container_devopsLabel" title={str}>
+                    <span className="devops_label">DevOps Request Body : </span>
+                    <div>
+                      {/* <InputTextarea
                     className="inputtext_devops"
                     rows={4}
                     cols={30}
                     value={str}
                   /> */}
 
-                  <pre className="grid_download_dialog__content__code executiontypenamepre">
-                    <code
-                      className="executiontypecode"
-                      id="devops-key"
-                      title={str}
-                    >
-                      {str}
-                      {/* {abc} */}
-                    </code>
-                  </pre>
+                      <pre className="grid_download_dialog__content__code executiontypenamepre">
+                        <code
+                          className="executiontypecode"
+                          id="devops-key"
+                          title={str}
+                        >
+                          {str}
+                          {/* {abc} */}
+                        </code>
+                      </pre>
 
-                  <Button
-                    icon="pi pi-copy"
-                    className="copy_devops"
-                    onClick={() => {
-                      copyConfigKey(str);
-                    }}
-                    title={copyToolTip}
-                  />
+                      <Button
+                        icon="pi pi-copy"
+                        className="copy_devops"
+                        onClick={() => {
+                          copyConfigKey(str);
+                        }}
+                        title={copyToolTip}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
               </>
             }
             headerTxt={`CICD: demo123`}
