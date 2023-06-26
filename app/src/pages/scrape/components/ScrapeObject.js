@@ -214,7 +214,7 @@ const openElementProperties=()=>{
                     </div> 
                 </div>
             }
-            {(appType === 'Web' || appType === "MobileWeb"|| props.object.xpath.split(';')[0]!=="iris")?<span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>:null}
+            {((appType === 'Web' || appType === "MobileWeb") && (props.object.xpath.split(';')[0]!=="iris"))?<span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>:null}
 
         </div>
         {isIdentifierVisible?(props.object.identifier!==undefined)?
