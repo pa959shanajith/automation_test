@@ -27,12 +27,14 @@ import {
   getProjectList,
   ExecuteTestSuite_ICE,
   execAutomation,
-  deleteConfigureKey  } from "../api";
+  deleteConfigureKey,
+} from "../api";
 import {
   getAvoAgentAndAvoGrid,
   getModules,
   getProjects,
   storeConfigureKey,
+  testSuitesScheduler_ICE,
   updateTestSuite,
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
@@ -136,10 +138,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   console.log(activeIndex1);
   // console.log(setActiveIndex1(index));
   // console.log(setActiveIndex1);
-  const items = [
-    { label: "Configurations" },
-    { label: "Execution(s)" },
-  ];
+  const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
     console.log(e);
     setActiveIndex1(e.index);
@@ -147,7 +146,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   };
 
   const getConfigData = useSelector((store) => store.configsetup);
-  const getConfigPage = useSelector((store) => store);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -156,9 +154,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   }, []);
 
   useEffect(() => {
-    if (!!getConfigData?.projects.length)
-      dispatch(getModules(getConfigData?.projects));
-  }, [getConfigData?.projects]);
+    if (!!getConfigData?.projects.length && configProjectId) {
+      const params = getConfigData?.projects.filter(
+        (el) => el._id === configProjectId
+      );
+      dispatch(getModules(params));
+    }
+  }, [getConfigData?.projects, configProjectId]);
 
   const parseLogicExecute = (
     eachData,
@@ -258,18 +260,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     });
   };
   const showSuccess_CICD = (btnType) => {
-    if(btnType === 'Cancel'){
+    if (btnType === "Cancel") {
       setVisible_CICD(false);
     }
   };
 
   var myJsObj = { key: currentKey, executionType: executionTypeInRequest };
   var str = JSON.stringify(myJsObj, null, 4);
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
 
   const fetchData = async () => {
     setSmartMode("normal");
@@ -296,6 +293,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     populateICElist(arr, true, data1);
     // setLoading(false);
   };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, [configProjectId]);
 
   const populateICElist = (arr, unallocated, iceStatusdata) => {
     var ice = [];
@@ -371,7 +373,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     setLogoutClicked(true);
     let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
     setProfileTxt(text);
-    console.log(item.configurename)
+    console.log(item.configurename);
     // console.log(configurename)
   };
 
@@ -383,7 +385,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       }, 1500);
     }
   };
-  
 
   const treeData = [
     {
@@ -676,9 +677,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       getState.push({
         sno: idx + 1,
         profileName: item.configurename,
-        executionOptions : (
+        executionOptions: (
           <div className="Buttons_config_button">
-            <Button className="execute_now"
+            <Button
+              className="execute_now"
               onClick={() => {
                 dispatch(getPoolsexe());
                 dispatch(getICE());
@@ -691,8 +693,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               {" "}
               Execute Now
             </Button>
-            <Button className="schedule" 
-             
+            <Button
+              className="schedule"
               onClick={() => {
                 setSelectedSchedule(item);
                 setConfigItem(idx);
@@ -704,7 +706,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               Schedule
             </Button>
 
-            <Button className="CICD" 
+            <Button
+              className="CICD"
               size="small"
               onClick={() => {
                 setVisible_CICD(true);
@@ -889,22 +892,28 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
 
       const dataObj = {
         param: "updateTestSuite_ICE",
-        batchDetails: xpanded?.filter((e) => e.testsuiteid !== 0).map((el) => ({
-          testsuiteid: el?.testsuiteid ? el?.testsuiteid : "" ,
-          testsuitename: el?.suitename,
-          testscenarioids: el?.suitescenarios,
-          getparampaths: !!Object.values(paramPaths).length && Object.values(
-            paramPaths[el?.key].map((el) => el?.value)
-          ),
-          conditioncheck: !!Object.values(checkcondition).length && Object.values(
-            checkcondition[el?.key].map((el) =>
-              el?.value?.code === "T" ? "1" : 0
-            )
-          ),
-          accessibilityParameters: !!Object.values(accessibilityParams).length && Object.values(
-            accessibilityParams[el?.key].map((el) => el?.value)
-          ),
-        })),
+        batchDetails: xpanded
+          ?.filter((e) => e.testsuiteid !== 0)
+          .map((el) => ({
+            testsuiteid: el?.testsuiteid ? el?.testsuiteid : "",
+            testsuitename: el?.suitename,
+            testscenarioids: el?.suitescenarios,
+            getparampaths:
+              !!Object.values(paramPaths).length &&
+              Object.values(paramPaths[el?.key].map((el) => el?.value)),
+            conditioncheck:
+              !!Object.values(checkcondition).length &&
+              Object.values(
+                checkcondition[el?.key].map((el) =>
+                  el?.value?.code === "T" ? "1" : 0
+                )
+              ),
+            accessibilityParameters:
+              !!Object.values(accessibilityParams).length &&
+              Object.values(
+                accessibilityParams[el?.key].map((el) => el?.value)
+              ),
+          })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
         dispatch(storeConfigureKey(executionData)).then(() => {
@@ -935,12 +944,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             padding: 0,
             margin: 0,
             marginLeft: "1rem",
+            paddingTop: "0.5rem",
           }}
         >
           <li>
-            <Link to="/landing"> Home </Link>
-            <span> / </span>
-
+            <label>
+              <b>Project: </b>
+            </label>
             <select
               onChange={(e) => {
                 setConfigProjectId(e.target.value);
@@ -968,10 +978,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     });
   }, [currentSelectedItem?.executionRequest?.browserType[0]]);
 
-  const onHide = (name) => {
-    dialogFuncMap[`${name}`](false);
-  };
-
   const onExecuteBtnClick = async (btnType) => {
     if (showIcePopup) {
       dataExecution.type =
@@ -985,7 +991,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       else dataExecution.targetUser = selectedICE;
 
       CheckStatusAndExecute(dataExecution, iceNameIdMap);
-      // onHide(name);
     } else {
       const temp = await execAutomation(currentKey);
       if (temp.status !== "pass") {
@@ -1002,28 +1007,26 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       } else {
         setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
       }
-      // onHide(name);
     }
-    if(btnType === 'Cancel'){
+    if (btnType === "Cancel") {
       setVisible_execute(false);
     }
-    if(btnType ===  "Execute"){
+    if (btnType === "Execute") {
       toast.current.show({
         severity: "success",
         summary: "Success",
         detail: "Execution has started",
         life: 5000,
       });
-      
-      }
-    
+    }
   };
 
   const onScheduleBtnClick = (btnType) => {
-    if(btnType === 'Cancel'){
+    if (btnType === "Cancel") {
       setVisible_schedule(false);
+      setScheduling(false);
     }
-    if(btnType === 'Schedule'){
+    if (btnType === "Schedule") {
       setVisible_schedule(false);
       dispatch(getPoolsexe());
       dispatch(getICE());
@@ -1031,61 +1034,27 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     }
   };
 
-  const footerContent_Schedule = (
-    <div className="btn-11">
-      <Button label="Cancel" className="Cancle_button" />
-      <Button
-        className="Schedule_button"
-        label="Schedule"
-        onClick={showSuccess_CICD}
-      ></Button>
-    </div>
-  );
-  
+  const onScheduleBtnClickClient = () => {
+    console.log(selectedSchedule);
+    dispatch(
+      testSuitesScheduler_ICE({
+        param: "testSuitesScheduler_ICE",
+        executionData: {
+          source: "schedule",
+          exectionMode: "serial",
+          executionEnv: "default",
+          browserType: selectedSchedule?.executionRequest?.browserType,
+          integration: selectedSchedule?.executionRequest?.integration,
+          batchInfo: selectedSchedule?.executionRequest?.batchInfo,
+          scenarioFlag: false,
+          type: "normal",
+          configureKey: selectedSchedule?.configurekey,
+          configureName: selectedSchedule?.configurename,
+        },
+      })
+    );
+  };
 
-  const tabMenuItems =
-    configList.length > 0
-      ? [
-          ...items,
-          {
-            label: (
-              <div className="search-and-button">
-              <span className="p-input-icon-left">
-              {/* <i className="pi pi-search search-icon"  /> */}
-              {/* <InputText className="serachProfileName"
-                 width='20rem'
-                 value={searchProfile}
-               
-                 onChange={(e)=>setSearchProfile(e.target.value)}
-                 placeholder="Search"
-              /> */}
-              <div className="serachProfileName">
-                <AvoInput 
-          icon="pi pi-search"
-          placeholder="Search"
-          style={{marginleft:"3rem"}}
-          value={searchProfile}
-        
-          onChange={(e)=>setSearchProfile(e.target.value)}
-          inputTxt={searchProfile}
-          setInputTxt={setSearchProfile}
-          inputType="searchIcon"
-        />
-        </div>
-               
-            </span>
-              <Button
-                onClick={() => configModal("CancelSave")}
-                className="addConfig_button"
-                size="small"
-              >
-                Add Configuration
-              </Button>
-              </div>
-            ),
-          },
-        ]
-      : items;
   const checkboxHeaderTemplate = () => {
     return (
       <>
@@ -1108,7 +1077,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   //               : 'Any Agent'}
   //               </div>
   //           </div>
-            
+
   //           <div className="col-3 text_card1"><div className="execute_text">Execution Mode:</div></div>
   //            <div className="col-3 text_value1"><div className="execute_name">{currentSelectedItem &&
   //             currentSelectedItem.executionRequest &&
@@ -1124,7 +1093,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   //     </Card>
   //   );
   // };
-  
+
   const renderExecutionCard = () => {
     return (
       <Card className="execute_card p-card p-card-body">
@@ -1137,7 +1106,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 currentSelectedItem.executionRequest &&
                 currentSelectedItem.executionRequest.avoagents.length > 0
                   ? currentSelectedItem.executionRequest.avoagents[0]
-                  : 'Any Agent'}
+                  : "Any Agent"}
               </div>
             </div>
           </div>
@@ -1149,9 +1118,10 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               <div className="execute_name">
                 {currentSelectedItem &&
                 currentSelectedItem.executionRequest &&
-                currentSelectedItem.executionRequest.integration.isHeadless === true
-                  ? 'Non-Headless'
-                  : 'Headless'}
+                currentSelectedItem.executionRequest.integration.isHeadless ===
+                  true
+                  ? "Non-Headless"
+                  : "Headless"}
               </div>
             </div>
           </div>
@@ -1175,7 +1145,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       </Card>
     );
   };
-  
 
   const renderTable = () => {
     if (!!configList.length) {
@@ -1320,7 +1289,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             setVisible={setVisible_schedule}
             onModalBtnClick={onScheduleBtnClick}
             content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
-            headerTxt="Schedule: Regression"
+            headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
             footerType="Schedule"
             modalSytle={{
               width: "55vw",
@@ -1331,43 +1300,30 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           <AvoModal
             visible={scheduling}
             setVisible={setScheduling}
-            onModalBtnClick={onScheduleBtnClick}
+            onModalBtnClick={onScheduleBtnClickClient}
             content={
               <>
-                <div className="legends-container">
-                  <div className="legend">
-                    <span id="status" className="status-available"></span>
-                    <span className="legend-text">Available</span>
+                <div className="ice_label">Allocate Avo Assure Client</div>
+                <div className="ice_container">
+                  <div className="ice_status">
+                    <span className="available"></span>
+                    <span>Available</span>
+                    <span className="unavailable"></span>
+                    <span>Unavailable</span>
+                    <span className="dnd"></span>
+                    <span>Do Not Disturb</span>
                   </div>
-                  <div className="legend">
-                    <span id="status" className="status-unavailable"></span>
-                    <span className="legend-text2">Unavailable</span>
-                  </div>
-                  <div className="legend">
-                    <span id="status" className="status-dnd"></span>
-                    <span className="legend-text1">Do Not Disturb</span>
-                  </div>
-                </div>
-                <div>
-                  <span
-                    className="execute_dropdown .p-dropdown-label "
-                    title="Token Name"
-                  >
-                    Allocate
-                  </span>
-                  <div className="search_icelist">
-                    <DropDownList
-                      poolType={poolType}
-                      ExeScreen={ExeScreen}
-                      inputErrorBorder={inputErrorBorder}
-                      setInputErrorBorder={setInputErrorBorder}
-                      placeholder={"Search"}
-                      data={availableICE}
-                      smartMode={ExeScreen === true ? smartMode : ""}
-                      selectedICE={selectedICE}
-                      setSelectedICE={setSelectedICE}
-                    />
-                  </div>
+                  <DropDownList
+                    poolType={poolType}
+                    ExeScreen={ExeScreen}
+                    inputErrorBorder={inputErrorBorder}
+                    setInputErrorBorder={setInputErrorBorder}
+                    placeholder={"Search"}
+                    data={availableICE}
+                    smartMode={ExeScreen === true ? smartMode : ""}
+                    selectedICE={selectedICE}
+                    setSelectedICE={setSelectedICE}
+                  />
                 </div>
               </>
             }
@@ -1377,7 +1333,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               width: "55vw",
               height: "45vh",
               background: "#FFFFFF",
+              minWidth: "38rem",
             }}
+            customClass="schedule_modal"
           />
           <AvoModal
             visible={visible_CICD}
@@ -1495,7 +1453,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   marginRight: "13rem",
                   fontWeight: "bold",
                   fontFamily: "open Sans",
-                }} showGridlines
+                }}
+                showGridlines
               >
                 S.No.
               </span>
@@ -1504,7 +1463,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   marginRight: "13rem",
                   fontWeight: "bold",
                   fontFamily: "open Sans",
-                }} showGridlines
+                }}
+                showGridlines
               >
                 Configuration Profile Name
               </span>
@@ -1513,7 +1473,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   marginRight: "18rem",
                   fontWeight: "normal",
                   fontFamily: "open Sans",
-                }} showGridlines
+                }}
+                showGridlines
               >
                 Execution Options
               </span>
@@ -1554,28 +1515,39 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     <>
       <div>
         <Breadcrumbs />
-        <div>
-          {configList.length > 0 ? (
-            <div>
-              <TabMenu className="   tabs tab-menu" activeIndex={activeIndex1} model={tabMenuItems} onTabChange={(e) => handleTabChange(e)} />
-            </div>
-          ) : (
-            // <div>
-            //   <TabMenu className="tabmenu_confige" model={items} />
-            // </div>
-            <div>
-            <TabMenu model={items}  activeIndex1={activeIndex1}  onTabChange={(e) => handleTabChange(e)} />
-            {/* {activeIndex1 === 0 &&(<div className="ConfigurePage_container  m-2">{renderTable()}</div>)}
-                {activeIndex1 === 1 && <executionPage/> } */}
-               
-      
-           
-      
-
+        <div className="grid" style={{ borderBottom: 'solid #dee2e6' }}>
+          <div className="col-12 lg:col-8 xl:col-8 md:col-6 sm:col-12" style={{ marginBottom: '-0.6rem' }}>
+            <TabMenu
+              model={items}
+              className="tabs tab-menu"
+              activeIndex={activeIndex1}
+              onTabChange={(e) => handleTabChange(e)}
+            />
           </div>
-          )}
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+            {!!configList.length ? (
+              <div className="flex flex-row justify-content-between align-items-center">
+                <AvoInput
+                  icon="pi pi-search"
+                  placeholder="Search"
+                  inputTxt={searchProfile}
+                  setInputTxt={setSearchProfile}
+                  inputType="searchIcon"
+                />
+                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small">
+                  Add Configuration
+                </Button>
+              </div>
+            ) : null}
+          </div>
         </div>
-        {activeIndex1 !== 1?<div className="ConfigurePage_container  m-2" showGridlines>{renderTable()} </div>:<ExecutionPage />}
+        {activeIndex1 !== 1 ? (
+          <div className="ConfigurePage_container m-2" showGridlines>
+            {renderTable()}{" "}
+          </div>
+        ) : (
+          <ExecutionPage />
+        )}
         <AvoModal
           visible={visible}
           setVisible={setVisible}
@@ -1610,7 +1582,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           headerTxt="Execution Configuration set up"
           footerType={setupBtn}
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
-          isDisabled={ (!configTxt || !avodropdown?.browser?.length || !Object.keys(selectedNodeKeys)?.length) }
+          isDisabled={
+            !configTxt ||
+            !avodropdown?.browser?.length ||
+            !Object.keys(selectedNodeKeys)?.length
+          }
         />
       </div>
       <Toast ref={toast} position="bottom-center" />
