@@ -725,12 +725,14 @@ const ModuleListDrop = (props) =>{
     return(
         <Fragment>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
-            {warning.modID?<ModalContainer 
+            {warning.modID?<ModalContainer
+                show = {warning.modID} 
+                style={{width:"30%"}}
                 title='Confirmation'
                 close={()=>setWarning(false)}
                 footer={<Footer modID={warning.modID} loadModule={warning.type ==='endtoend' ? loadModuleE2E : loadModule} setWarning={setWarning} />}
                 content={<Content/>} 
-                modalClass='modal-sm'
+                // modalClass='warningPopUp'
             />:null}
              <>
       <div className="CollapseWholeCont">
@@ -764,9 +766,9 @@ const ModuleListDrop = (props) =>{
                            <i className="pi pi-times"  onClick={click_X_Button}></i>
                        </div>)}
                      </div> */}
-                     <i className="pi pi-file-import mindmapImport" onClick={()=>setImportPop(true)}></i>
+                     <i className="pi pi-file-import mindmapImport" title='Import Module' onClick={()=>setImportPop(true)}></i>
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
-                     <img   src="static/imgs/plusNew.png" alt="NewModules" onClick={()=>{ CreateNew()}} /> 
+                     <img   src="static/imgs/plusNew.png" alt="NewModules" title='Create New' onClick={()=>{ CreateNew()}} /> 
                 </div>
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
                       <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
@@ -811,10 +813,10 @@ const ModuleListDrop = (props) =>{
                                                    // </div> */}
                                             <div key={i} data-test="modules" value={e._id} title={e.name} type={e.type}>
                                                     <div className={'EachModNameBox'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  } >
-                                                      {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}
+                                                      {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)} />}
                                                       <img src="static/imgs/moduleIcon.png" style={{width:'20px',height:'20px',marginLeft:'0.5rem'}} alt="modules" />
                                                       <div style={{width:'13rem',textOverflow:'ellipsis',overflow:'hidden'}}>
-                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',}}>{e.name}</h4>
+                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',fontWeight:'300'}}>{e.name}</h4>
                                                       </div>  
                                                     </div>
                                             </div>
@@ -936,12 +938,25 @@ const Content = () => (
 )
 
 //footer for moduleclick warning popup
+// const Footer = (props) => (
+//   <div className='warningPopup'>
+//     <div className='toolbar__module-warning-footer'>
+//         <div className='btn-warning'>
+//           {/* <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button> */}
+//           <Button className='btn-yes' onClick={()=>props.loadModule(props.modID)} label="Yes" />
+//           {/* <button onClick={()=>{props.setWarning(false)}}>No</button> */}
+//           <Button onClick={()=>{props.setWarning(false)}} label="No" />
+//         </div>
+//     </div>
+//   </div>
 const Footer = (props) => (
-    <div className='toolbar__module-warning-footer'>
-        <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button>
-        <button onClick={()=>{props.setWarning(false)}}>No</button>
-    </div>
+  <div className='toolbar__module-warning-footer'>
+      <Button size="small" onClick={()=>{props.setWarning(false)}}>No</Button>
+      <Button size="small" className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</Button>
+  </div>
 )
+
+
 
 
 

@@ -104,7 +104,12 @@ const CanvasEnE =(props)=>{
             tree.links = {}
             tree.dLinks = []
             if(zoom){
-                zoom.scaleTo(1).translateTo([0,0]).defaltEvent(d3.select(`.mp__canvas_svg`))
+                const zoom = d3.zoom();
+                const svg = d3.select(`.mp__canvas_svg`);
+                zoom.scaleTo(svg, 1);
+                zoom.translateTo(svg, 0, 0);
+                svg.node().dispatchEvent(new Event("zoom")); 
+                // zoom.scaleTo(1).translateTo([0,0]).defaltEvent(d3.select(`.mp__canvas_svg`))
                 zoom.on("zoom",null)
             }
             count['modules'] = 1
@@ -198,18 +203,18 @@ const CanvasEnE =(props)=>{
         }
     }
     const nodeClick=(e)=>{
-        e.stopPropagation()
-        setInpBox(false)
-        setCtrlBox(e.target.parentElement.id)
+        // e.stopPropagation()
+        // setInpBox(false)
+        // setCtrlBox(e.target.parentElement.id)
     }
     return (
         <Fragment>
             {/* <Legends isEnE={true}/> */}
-            {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
-            {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            <SaveMapButton createnew={createnew} isEnE={true} verticalLayout={setVerticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
+            {/* {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
+            {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
+            {/* <SaveMapButton createnew={createnew} isEnE={true} verticalLayout={setVerticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/> */}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
-            <NavButton setCtScale={setCtScale} zoom={zoom}/>
+            {/* <NavButton setCtScale={setCtScale} zoom={zoom}/> */}
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
@@ -237,6 +242,18 @@ const CanvasEnE =(props)=>{
     )
 }
 
+// const bindZoomListner = (setCtScale,translate) => {
+//     //need global move
+//     const svg = d3.select(`.mp__canvas_svg`);
+//     const g = d3.select(`.ct-container`);
+//     const zoom  = d3.zoom()
+//         .scaleExtent([0.1, 3])
+//         .on('zoom', (event) => {
+//             g.attr('transform', event.transform);
+//         })
+//     svg.call(zoom)
+//     return zoom
+// }
 const bindZoomListner = (setCtScale,translate) => {
     //need global move
     const svg = d3.select(`.mp__canvas_svg`);
@@ -244,8 +261,19 @@ const bindZoomListner = (setCtScale,translate) => {
     const zoom  = d3.zoom()
         .scaleExtent([0.1, 3])
         .on('zoom', (event) => {
-            g.attr('transform', event.transform);
+            if(!nodeMoving) {
+                g.attr('transform', "translate(" + event.transform.x +','+event.transform.y + ")scale(" +event.transform.k + ")");
+                var cScale = event.transform;
+                setCtScale({x:cScale.x,y:cScale.y,k:cScale.k})
+            } else {
+                const x = g.attr("transform").split(/[()]/)[1].split(',')[0];
+                const y = g.attr("transform").split(/[()]/)[1].split(',')[1];
+                const scale = g.attr("transform").split(/[()]/)[3];
+                // const pos = g.attr("transform");
+                d3.zoomIdentity.scale(scale).translate([x,y]);
+            }
         })
+        if(translate) {svg.call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]));}
     svg.call(zoom)
     return zoom
 }

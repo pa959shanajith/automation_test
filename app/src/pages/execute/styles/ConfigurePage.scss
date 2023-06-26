@@ -308,20 +308,10 @@
   position: relative;
   margin-right: 15rem;
 }
-.addConfig_button {
-  margin: -78px 0 0 48rem;
-  display: flex;
-  cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
-  align-items: center;
-  vertical-align: bottom;
-  text-align: center;
-  overflow: hidden;
-  margin-top: -3rem;
-  height: 2rem;
-  margin-left: 67rem;
-  top: 0.5rem;
+.p-button.p-button-sm.addConfig_button {
+  width: 16rem;
+  margin: 0 0.5rem 0 0;
+  padding: .4375rem .875rem;
 }
 .p-button-edit {
   margin: 0;
