@@ -85,16 +85,23 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         setImportType(e.value)        
         setFiledUpload(undefined)
         setDisableSubmit(true)
+        setProjectValue(null)
         setError('')
-        if(e.target.value==="zip"){ setUploadFileField(false); 
+        if(e.target.value==="zip"){ setUploadFileField(false);
             // resetImportModule();
         }
     }
     const resetImportModule = async(e) => {
       if(uploadFileRef.current)uploadFileRef.current.value = ''
-        changeProject(e)
-        if(projRef.current.props.value) {
-            var moduledata = await getModules({"tab":"tabCreate","projectid":projectId,"moduleid":null,"query":"modLength"})
+        setProjectValue(e.value);
+        var id = '';
+        for(var i = 0; e.target.name.length>i; i++){
+            if (e.value === e.target.name[i].value){
+                id = e.target.name[i].key
+            }
+        }
+        if(id) {
+            var moduledata = await getModules({"tab":"tabCreate","projectid":id,"moduleid":null,"query":"modLength"})
             if (moduledata.length>0){
                 setError('Please select a Project which has no Modules.')                
                 setUploadFileField(false)
@@ -103,7 +110,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 return
             }
         }
-        if(projRef.current.props.value) {setUploadFileField(true)
+        if(id) {setUploadFileField(true)
         setSheetList([])
         setFiledUpload(undefined)
         setError('')  }      
@@ -469,7 +476,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                                     optionLabel="value"
                                     placeholder="Please Select Sheet"
                                     className="imp-inp"
-                                    style={{width:'20rem', marginLeft:'6rem'}}
+                                    style={{width:'20rem', marginLeft:'4rem'}}
                                     defaultValue={'def-val'}
                                     onChange={(e)=>setSheetValue(e.value)}
                                 />

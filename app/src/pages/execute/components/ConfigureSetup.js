@@ -49,7 +49,7 @@ const ConfigureSetup = ({
 
   useEffect(() => {
     const mainTree = [];
-    configData?.configureData[modules].map((el, index) => {
+    configData?.configureData[modules]?.map((el, index) => {
       const childTree = [];
       if (!!el?.scenarios.length) {
         el?.scenarios.forEach((e, ind) => {
