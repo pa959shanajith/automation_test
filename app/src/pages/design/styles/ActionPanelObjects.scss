@@ -495,13 +495,13 @@
 .create-elem{
     display: flex;
     flex-direction: row;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .accordion-actions{
     position: relative;
     left: 36rem;
-    bottom: 1rem;
+    bottom: 3rem;
 }
 .button-add{
     margin-right: 1rem;
@@ -516,4 +516,7 @@
     position: relative;
     bottom: 0.7rem;
     right: 1rem;
+}
+.save-btn{
+    top: 0.7rem;
 }

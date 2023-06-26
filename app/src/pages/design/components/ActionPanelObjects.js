@@ -32,6 +32,7 @@ const ActionPanel = (props) => {
   const [addElementObjects, setAddElementObjects] = useState([]);
   const [addElementSelectObjectType, setAddElementSelectObjectType] = useState(null);
   const [addElementInputValue, setAddElementInputValue] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const [selectCustomObj, setSelectCustomObj] = useState({
     btn1: '',
@@ -66,7 +67,6 @@ const ActionPanel = (props) => {
     { value: "checkbox", typeOfElement: "chkbox", name: "Checkbox" },
     { value: "Element", typeOfElement: "elmnt", name: "Element" }
   ];
-
 
   useEffect(() => {
     if (props.editFlag) {
@@ -104,35 +104,43 @@ const ActionPanel = (props) => {
     //eslint-disable-next-line
   }, [])
 
+  
+  const handleAccordionTabChange = (index) => {
+    setActiveIndex(index);
+  };
+
   const newField = () => {
     let updatedObjects = [...objects];
     let updatedShowFields = [...showFields];
     let newTempId = tempIdCounter + 1;
     updatedObjects.push({ ...customObj, tempId: newTempId });
     updatedShowFields.push(newTempId);
-    // setObjects(updatedObjects);
+    setObjects(updatedObjects);
     setShowFields(updatedShowFields);
     setTempIdCounter(newTempId);
+    setActiveIndex(updatedObjects.length - 1);
   }
 
-  const deleteField = index => {
-    let updatedObjects = [...objects];
-
+  const deleteField = (index) => {
+    const updatedObjects = [...objects];
     updatedObjects.splice(index, 1);
-
+  
     if (objects[index].tempId in customObjList) {
-      let updatedCustomsObjList = { ...customObjList };
+      const updatedCustomsObjList = { ...customObjList };
       delete updatedCustomsObjList[objects[index].tempId];
       setCustomObjList(updatedCustomsObjList);
     }
-    let indexOfId = showFields.indexOf(objects[index].tempId);
+  
+    const indexOfId = showFields.indexOf(objects[index].tempId);
     if (indexOfId >= 0) {
-      let updatedShowFields = [...showFields];
+      const updatedShowFields = [...showFields];
       updatedShowFields.splice(indexOfId, 1);
       setShowFields(updatedShowFields);
     }
-    // setObjects(updatedObjects);
-  }
+  
+    setObjects(updatedObjects);
+    setActiveIndex(activeIndex === index ? -1 : activeIndex);
+  };
 
   const handleInputs = (event, index) => {
     let updatedObjects = [...objects];
@@ -191,7 +199,7 @@ const ActionPanel = (props) => {
             updatedShowFields.splice(indexOfId, 1);
             setShowFields(updatedShowFields);
             setCustomObjList(customObjectsList);
-            onSubmit(customObjectsList);
+            // onSubmit(customObjectsList);
           }
         })
         .catch(error => console.error(error));
@@ -298,19 +306,21 @@ const ActionPanel = (props) => {
         props.setNewScrapedData(updatedNewScrapeData);
         props.updateScrapeItems(localScrapeList)
         // props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
-        props.setCapturedDataToSave((oldCapturedDataToSave) => [...oldCapturedDataToSave, {
-          isCustom: true,
-          ...viewArray[0],
-          tempOrderId: newOrderList[0]
-        }]);
-        props.setCaptureData(oldOrderList => [...oldOrderList, {
-          selectall: updatedNewScrapeData.view[0].custname,
-          objectProperty: updatedNewScrapeData.view[0].tag,
-          browserscrape: 'google chrome',
-          screenshots: "",
-          actions: '',
-          objectDetails: updatedNewScrapeData.view[0]
-        }])
+        props.setCapturedDataToSave((oldCapturedDataToSave) => [...oldCapturedDataToSave, ...viewArray.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
+            isCustom: true,
+            ...viewArray[newlyCreatedElemIndex],
+            tempOrderId: newOrderList[newlyCreatedElemIndex]
+          }))
+        ]);
+        props.setCaptureData(oldOrderList => [...oldOrderList, ...updatedNewScrapeData.view.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
+            selectall: updatedNewScrapeData.view[newlyCreatedElemIndex].custname,
+            objectProperty: updatedNewScrapeData.view[newlyCreatedElemIndex].tag,
+            browserscrape: 'google chrome',
+            screenshots: "",
+            actions: '',
+            objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex]
+          }))
+        ]);
         props.setSaved({ flag: false });
         props.setShow(false);
         // setMsg(MSG.SCRAPE.SUCC_OBJ_CREATE);
@@ -407,10 +417,10 @@ const ActionPanel = (props) => {
   const createElementFooter = (
     <div className='save_clear'>
       <button className='add_object_clear' >Clear</button>
-      <button className='add_object_save' onClick={() => {
-        onSave(0);
-        // onSubmit();
-      }}>Save</button>
+      <button className='add_object_save'  disabled={customObjList.length == 0} onClick={() => {
+        // onSave(0);
+        onSubmit(customObjList);
+      }}>Submit</button>
     </div>
   );
   const handleInputChange = (e) => {
@@ -432,13 +442,14 @@ const ActionPanel = (props) => {
     </div>
   )
 
-  const renderAccordionHeader = (objName) => {
+  const renderAccordionHeader = (objName,index,objects) => {
     return (
       <div className="accordion-header">
-        <div style={{ marginTop: "1rem" }}>{(objName === "") ? "Element 1" : objName}</div>
+        <div style={{ marginTop: "3rem" }}>{(objName === "") ? `Element ${index+1}` : objName}</div>
         <div className="accordion-actions">
+        <Button label="Save" severity="secondary" text className='save-btn' onClick={()=>onSave(index)} />
           <button className=" pi pi-plus button-add" onClick={newField} />
-          <button className=" pi pi-trash button-delete" />
+          <button className=" pi pi-trash button-delete" disabled={objects.length == 1} onClick={()=>deleteField(index)} />
         </div>
       </div>
     );
@@ -503,19 +514,19 @@ const ActionPanel = (props) => {
         </card>
       </Dialog >}
 
-      <Dialog className='create__object__modal' header='Create Element' style={{ height: "40rem", width: "50.06rem" }} visible={props.isOpen === 'createObject'} onHide={props.OnClose} footer={createElementFooter}>
-        <Accordion activeIndex={0}>
+      <Dialog className='create__object__modal' header='Create Element' style={{ height: "40rem", width: "50.06rem", marginRight: "6rem" }} visible={props.isOpen === 'createObject'} onHide={props.OnClose} footer={createElementFooter} position="right">
+        <Accordion activeIndex={activeIndex}>
           {objects.map((object, index) => (
-            <AccordionTab className="accordin__elem" header={renderAccordionHeader(object.objName)}>
+            <AccordionTab className="accordin__elem" key={object.tempId}  header={renderAccordionHeader(object.objName, index, objects)}>
               <div className='create_obj'>
                 <div className='create__left__panel'>
                   <div className='create-elem'>
                     <span className='object__text'>Element Name <span style={{ color: "red" }}> *</span> </span>
-                    <InputText required className='input__text' type='text' name="objName" onChange={(e) => handleInputs(e, 0)} value={object.objName} disabled={!showFields.includes(object.tempId)} />
+                    <InputText required className='input__text' type='text' name="objName" onChange={(e) => handleInputs(e, index)} value={object.objName} disabled={!showFields.includes(object.tempId)} />
                   </div>
                   <div className='create-elem'>
                     <p>Select Element Type <span style={{ color: "red" }}> *</span></p>
-                    <Dropdown value={object.objType} required onChange={(e) => handleType(e, 0)} disabled={!showFields.includes(object.tempId)} options={
+                    <Dropdown value={object.objType} required onChange={(e) => handleType(e, index)} disabled={!showFields.includes(object.tempId)} options={
                       objectTypes.map((objectType, i) => (
                         {
                           code: `${objectType.value}-${objectType.typeOfElement}`,
@@ -525,38 +536,38 @@ const ActionPanel = (props) => {
                     } optionLabel="name"
                       placeholder="Search" className="creat_object_dropdown w-22rem" />
                   </div>
-                  {showFields.includes(object.tempId) &&
+                  {/* {showFields.includes(object.tempId) && */}
                     <>
                       <div className='create-elem'>
                         <span className='object__text'>URL <span style={{ color: "red" }}> *</span></span>
-                        <InputText required className='input__text' type='text' name="url" onChange={(e) => handleInputs(e, 0)} value={object.url} />
+                        <InputText required className='input__text' type='text' name="url" onChange={(e) => handleInputs(e, index)} value={object.url} />
                       </div>
                       <div className='create-elem'>
-                        <span className='object__text'>Name <span style={{ color: "red" }}> *</span></span>
-                        <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, 0)} value={object.name} />
+                        <span className='object__text'>Name Attribute <span style={{ color: "red" }}> *</span></span>
+                        <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
                       </div>
                       <div className='create-elem'>
                         <span className='object__text' >Relative Xpath <span style={{ color: "red" }}> *</span></span>
-                        <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, 0)} value={object.relXpath} />
+                        <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, index)} value={object.relXpath} />
                       </div>
                       <div className='create-elem'>
                         <span className='object__text'>Class Name </span>
-                        <InputText className='input__text' type='text' name="className" onChange={(e) => handleInputs(e, 0)} value={object.className} />
+                        <InputText className='input__text' type='text' name="className" onChange={(e) => handleInputs(e, index)} value={object.className} />
                       </div>
                       <div className='create-elem'>
-                        <span className='object__text'>ID </span>
-                        <InputText required className='input__text' type='text' name="id" onChange={(e) => handleInputs(e, 0)} value={object.id} />
+                        <span className='object__text'>ID Attribute</span>
+                        <InputText required className='input__text' type='text' name="id" onChange={(e) => handleInputs(e, index)} value={object.id} />
                       </div>
                       <div className='create-elem'>
                         <span className='object__text'>Query Selector</span>
-                        <InputText className='input__text' type='text' name="qSelect" onChange={(e) => handleInputs(e, 0)} value={object.qSelect} />
+                        <InputText className='input__text' type='text' name="qSelect" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
                       </div>
                       <div className='create-elem'>
                         <span className='object__text'>Absolute Xpath</span>
-                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, 0)} value={object.absXpath} />
+                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.absXpath} />
                       </div>
                     </>
-                  }
+                  {/* } */}
                 </div>
               </div>
             </AccordionTab>
