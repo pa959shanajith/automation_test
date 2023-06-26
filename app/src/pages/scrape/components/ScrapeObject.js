@@ -164,18 +164,15 @@ const openElementProperties=()=>{
             cssselector:(element[12]==="null"||element[12]===""||(element[12]==="undefined"))?'None':element[12],
             href:(element[11]==="null"||element[11]===""||(element[11]==="undefined"))?'None':element[11],
             label:(element[10]==="null"||element[10]===""||(element[10]==="undefined"))?'None':element[10],
-           }
-//     for(const [index,[key, value]] of Object.entries(elementFinalProperties)) {
-//         dataValue.push({id:index+1,key,value,name:defaultNames[key]})
-// }
-Object.entries(elementFinalProperties).forEach(([key, value], index) => {
-    let currindex=props.object.identifier.filter(element=>element.identifier===key)
-    dataValue.push({id:currindex[0].id,identifier:key,key,value,name:defaultNames[key]})
-}
+        }
+        Object.entries(elementFinalProperties).forEach(([key, value], index) => {
+            let currindex=props.object.identifier.filter(element=>element.identifier===key)
+            dataValue.push({id:currindex[0].id,identifier:key,key,value,name:defaultNames[key]})
+        }
 )
-dataValue.sort((a,b)=>a.id-b.id)
-setElementValues(dataValue)
-setElementProperties(true)
+        dataValue.sort((a,b)=>a.id-b.id)
+        setElementValues(dataValue)
+        setElementProperties(true)
         }
 }
 
@@ -217,7 +214,7 @@ setElementProperties(true)
                     </div> 
                 </div>
             }
-            {(appType === 'Web' || appType === "MobileWeb")?<span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>:null}
+            {((appType === 'Web' || appType === "MobileWeb") && (props.object.xpath.split(';')[0]!=="iris"))?<span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>:null}
 
         </div>
         {isIdentifierVisible?(props.object.identifier!==undefined)?
