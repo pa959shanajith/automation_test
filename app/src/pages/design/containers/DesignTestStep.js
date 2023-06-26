@@ -604,10 +604,10 @@ const DesignModal = (props) => {
     };
 
     const inputEditor = (options) => {
-        return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
     };
     const outputEditor = (options) => {
-        return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
     };
 
     const onRowEditComplete = (e) => {
@@ -694,8 +694,8 @@ const DesignModal = (props) => {
                                 <Column selectionMode="multiple" style={{ width: '3em' ,textAlign: 'center' }} />
                                 <Column field="custname" header="Element Name" editor={(options) => elementEditor(options)} ></Column>
                                 <Column field="keywordVal" header="Keyword" editor={(options) => keywordEditor(options)}  ></Column>
-                                <Column field="inputVal" header="Input" editor={(options) => inputEditor(options)} ></Column>
-                                <Column field="outputVal" header="Output" editor={(options) => outputEditor(options)} ></Column>
+                                <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
+                                <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
                                 <Column field="remarks" header="Remarks" />
                                 <Column rowEditor field="action" header="Actions" bodyStyle={{ textAlign: 'center' }} ></Column>
                             </DataTable>
