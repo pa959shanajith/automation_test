@@ -33,6 +33,7 @@ import {
   getModules,
   getProjects,
   storeConfigureKey,
+  testSuitesScheduler_ICE,
   updateTestSuite,
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
@@ -147,7 +148,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   };
 
   const getConfigData = useSelector((store) => store.configsetup);
-  const getConfigPage = useSelector((store) => store);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -156,9 +156,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   }, []);
 
   useEffect(() => {
-    if (!!getConfigData?.projects.length)
-      dispatch(getModules(getConfigData?.projects));
-  }, [getConfigData?.projects]);
+    if (!!getConfigData?.projects.length && configProjectId) {
+      const params = getConfigData?.projects.filter((el) => el._id === configProjectId);
+      dispatch(getModules(params));
+    }
+  }, [getConfigData?.projects, configProjectId]);
 
   const parseLogicExecute = (
     eachData,
@@ -935,12 +937,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             padding: 0,
             margin: 0,
             marginLeft: "1rem",
+            paddingTop: "0.5rem"
           }}
         >
           <li>
-            <Link to="/landing"> Home </Link>
-            <span> / </span>
-
+            <label><b>Project: </b></label>
             <select
               onChange={(e) => {
                 setConfigProjectId(e.target.value);
@@ -968,10 +969,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     });
   }, [currentSelectedItem?.executionRequest?.browserType[0]]);
 
-  const onHide = (name) => {
-    dialogFuncMap[`${name}`](false);
-  };
-
   const onExecuteBtnClick = async (btnType) => {
     if (showIcePopup) {
       dataExecution.type =
@@ -985,7 +982,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       else dataExecution.targetUser = selectedICE;
 
       CheckStatusAndExecute(dataExecution, iceNameIdMap);
-      // onHide(name);
     } else {
       const temp = await execAutomation(currentKey);
       if (temp.status !== "pass") {
@@ -1002,7 +998,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       } else {
         setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
       }
-      // onHide(name);
     }
     if(btnType === 'Cancel'){
       setVisible_execute(false);
@@ -1032,17 +1027,24 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     }
   };
 
-  const footerContent_Schedule = (
-    <div className="btn-11">
-      <Button label="Cancel" className="Cancle_button" />
-      <Button
-        className="Schedule_button"
-        label="Schedule"
-        onClick={showSuccess_CICD}
-      ></Button>
-    </div>
-  );
-  
+  const onScheduleBtnClickClient = () => {
+    console.log(selectedSchedule);
+    dispatch(testSuitesScheduler_ICE({
+      param: "testSuitesScheduler_ICE",
+      executionData: {
+          source: "schedule",
+          "exectionMode": "serial",
+          "executionEnv": "default",
+          browserType: selectedSchedule?.executionRequest?.browserType,
+          integration: selectedSchedule?.executionRequest?.integration,
+          batchInfo: selectedSchedule?.executionRequest?.batchInfo,
+          scenarioFlag: false,
+          type: "normal",
+          configureKey: selectedSchedule?.configurekey,
+          configureName: selectedSchedule?.configurename
+      }
+  }));
+  };
 
   const tabMenuItems =
     configList.length > 0
@@ -1332,7 +1334,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           <AvoModal
             visible={scheduling}
             setVisible={setScheduling}
-            onModalBtnClick={onScheduleBtnClick}
+            onModalBtnClick={onScheduleBtnClickClient}
             content={
               <>
                     <div className="ice_label">Allocate Avo Assure Client</div>
@@ -1544,7 +1546,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         <div>
           {configList.length > 0 ? (
             <div>
-              <TabMenu className="   tabs tab-menu" activeIndex={activeIndex1} model={tabMenuItems} onTabChange={(e) => handleTabChange(e)} />
+              <TabMenu className="tabs tab-menu" activeIndex={activeIndex1} model={tabMenuItems} onTabChange={(e) => handleTabChange(e)} />
             </div>
           ) : (
             // <div>
@@ -1557,7 +1559,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           </div>
           )}
         </div>
-        {activeIndex1 !== 1?<div className="ConfigurePage_container  m-2" showGridlines>{renderTable()} </div>:<ExecutionPage />}
+        {activeIndex1 !== 1?<div className="ConfigurePage_container m-2" showGridlines>{renderTable()} </div>:<ExecutionPage />}
         <AvoModal
           visible={visible}
           setVisible={setVisible}

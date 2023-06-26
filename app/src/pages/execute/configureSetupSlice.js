@@ -195,8 +195,8 @@ const getModules = createAsyncThunk("config/fetchModules", async (args) => {
     },
     data: {
       tab: "tabAssign",
-      projectid: args[0]?._id,
-      cycleid: args[0]?.releases[0]?.cycles[0]?._id,
+      projectid: !!args?.length ? args[0]?._id : "",
+      cycleid: !!args?.length ? args[0]?.releases[0]?.cycles[0]?._id : "",
     },
     credentials: "include",
   })
@@ -267,6 +267,19 @@ const updateTestSuite = createAsyncThunk("config/updateTestSuite", async (args) 
     .catch((err) => console.log(err));
 });
 
+const testSuitesScheduler_ICE = createAsyncThunk("config/testSuitesScheduler_ICE", async (args) => {
+  return await axios(`${url}/testSuitesScheduler_ICE`, {
+    method: 'POST',
+    headers: {
+    'Content-type': 'application/json',
+    },
+    data: args,
+    credentials: 'include'
+  })
+    .then((response) => response.data)
+    .catch((err) => console.log(err));
+});
+
 export {
   getProjects,
   getModules,
@@ -274,6 +287,7 @@ export {
   readTestSuite,
   updateTestSuite,
   storeConfigureKey,
+  testSuitesScheduler_ICE
 };
 
 const configureSetupSlice = createSlice({
@@ -360,10 +374,20 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(storeConfigureKey.fulfilled, (state, action) => {
       state.loading = false;
-      // state.configureData = action.payload;
       state.error = "";
     });
     builder.addCase(storeConfigureKey.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    });
+    builder.addCase(testSuitesScheduler_ICE.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(testSuitesScheduler_ICE.fulfilled, (state, action) => {
+      state.loading = false;
+      state.error = "";
+    });
+    builder.addCase(testSuitesScheduler_ICE.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message;
     });

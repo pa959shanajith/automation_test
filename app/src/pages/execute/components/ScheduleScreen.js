@@ -130,93 +130,78 @@ const ScheduleScreen = ({ cardData }) => {
     return recurrenceObj[selectedSchedule?.key];
   };
 
-  useEffect(() => {
-    setScheduleNodes([
-      {
-        key: "0",
-        label: (
-          <div className="grid">
-            <div className="col-12">Schedule Options</div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={startDate}
-                placeholder="Enter Start date"
-                onChange={(e) => setStartDate(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-              />
-            </div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={startTime}
-                placeholder="Enter Start Time "
-                onChange={(e) => setStartTime(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-                timeOnly
-              />
-            </div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={endDate}
-                placeholder="Enter End Date"
-                onChange={(e) => setEndDate(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-              />
-            </div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={endTime}
-                placeholder="Enter End Time"
-                onChange={(e) => setEndTime(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-                timeOnly
-              />
-            </div>
-          </div>
-        ),
-        data: "Documents Folder",
-        icon: "pi pi-fw pi-calendar",
-        children: [
-          {
-            key: "0-0",
-            label: (
-              <div className="grid">
-                <div className="col-12">Recurrence Pattern</div>
-                <div className={`col-12 lg:col-3 xl:col-3 md:col-4 sm:col-6 ${ (selectedSchedule?.key !== "OT" && selectedSchedule?.key) ? 'with_border' : 'without_border' }`}>
-                  {schedulePeriod.map((el) => (
-                    <div key={el?.key} className="radioBtn">
-                      <RadioButton
-                        inputId={el?.key}
-                        name="schedule"
-                        value={el}
-                        onChange={(e) => setSelectedSchedule(e.value)}
-                        checked={selectedSchedule?.key === el?.key}
-                      />
-                      <label htmlFor={el?.key} className="ml-2">
-                        {el?.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                {onRecurrenceClick()}
-              </div>
-            ),
-            data: "Work Folder",
-            icon: "pi pi-fw pi-clock",
-          },
-        ],
-      },
-    ]);
-  }, [selectedSchedule, selectedDaily, selectedMonthly, dropdownWeek, dropdownDay]);
-
   return (
-    <div>
+    <>
       <ExecutionCard cardData={cardData} />
-      <Tree value={scheduleNodes} expandedKeys={{'0': true}} className="schedule_tree" />
-    </div>
+      <div className="schedule_container">
+        <div className="grid">
+          <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
+            <Calendar
+              value={startDate}
+              placeholder="Enter Start date"
+              onChange={(e) => setStartDate(e.value)}
+              icon="pi pi-fw pi-angle-down"
+              showIcon
+            />
+          </div>
+          <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
+            <Calendar
+              value={startTime}
+              placeholder="Enter Start Time "
+              onChange={(e) => setStartTime(e.value)}
+              icon="pi pi-fw pi-angle-down"
+              showIcon
+              timeOnly
+            />
+          </div>
+          <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
+            <Calendar
+              value={endDate}
+              placeholder="Enter End Date"
+              onChange={(e) => setEndDate(e.value)}
+              icon="pi pi-fw pi-angle-down"
+              showIcon
+            />
+          </div>
+          <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
+            <Calendar
+              value={endTime}
+              placeholder="Enter End Time"
+              onChange={(e) => setEndTime(e.value)}
+              icon="pi pi-fw pi-angle-down"
+              showIcon
+              timeOnly
+            />
+          </div>
+        </div>
+        <div className="grid">
+          <div className="col-12">Recurrence Pattern</div>
+          <div
+            className={`col-12 lg:col-3 xl:col-3 md:col-4 sm:col-6 ${
+              selectedSchedule?.key !== "OT" && selectedSchedule?.key
+                ? "with_border"
+                : "without_border"
+            }`}
+          >
+            {schedulePeriod.map((el) => (
+              <div key={el?.key} className="radioBtn">
+                <RadioButton
+                  inputId={el?.key}
+                  name="schedule"
+                  value={el}
+                  onChange={(e) => setSelectedSchedule(e.value)}
+                  checked={selectedSchedule?.key === el?.key}
+                />
+                <label htmlFor={el?.key} className="ml-2">
+                  {el?.name}
+                </label>
+              </div>
+            ))}
+          </div>
+          {onRecurrenceClick()}
+        </div>
+      </div>
+    </>
   );
 };
 
