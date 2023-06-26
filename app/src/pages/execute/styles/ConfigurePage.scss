@@ -37,13 +37,14 @@
    
   .p-panel .p-panel-header {
     border: 1px solid #dee2e6;
-    padding: 0.25rem;
+    padding: 1.25rem;
     background: #f8f9fa;
     color: #343a40;
     border-top-right-radius: 6px;
     border-top-left-radius: 6px;
     background: rgba(96, 91, 255, 0.08);
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+  
   }
   .p-datatable>.p-datatable-wrapper {
     overflow: auto;
@@ -88,7 +89,11 @@
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
-
+ .p-panel .p-panel-content {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding: 2.25rem;
+}
 }
 
 .config_content {
@@ -102,9 +107,22 @@
   width: 100% !important;
   background: rgba(96, 91, 255, 0.08);
   box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+  height: 10vh;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
+ .p-tabmenu-nav .p-menuitem-text {
+  line-height: 1;
+  margin-top: 5rem;
+  .p-tabmenu-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    list-style-type: none;
+    margin: 0;
+    padding: -1px;
+    margin-top: 2rem;
+  }
+}
 
 }
 
@@ -133,6 +151,7 @@
       margin-top: 9rem;
       font-family: "Open Sans";
     }
+   
   }
 }
 .datatable_config {
@@ -162,7 +181,7 @@
   position: absolute;
   width: 172px;
   height: 45px;
-  left: calc(50% - 123px);
+  left: calc(46% - 123px);
   background: #605bff;
   border-radius: 10px;
 
@@ -469,33 +488,6 @@
       margin-right: 20rem;
     }
 }
-
-// .p-dropdown-label {
-//   display: block;
-//   white-space: nowrap;
-
-//   flex: 1 1 auto;
-//   width: 17%;
-//   text-overflow: ellipsis;
-//   cursor: pointer;
-//   width: 12rem;
-//   margin-left: -43rem;
-//   margin-right: 20rem;
-// }
-// .p-dropdown {
-//   display: inline-flex;
-//   cursor: pointer;
-//   position: relative;
-//   -webkit-user-select: none;
-//   user-select: none;
-//   margin-top: -3rem;
-//   margin-left: 9rem;
-// }
-// .p-dropdown .p-dropdown-label {
-//   background: transparent;
-//   border: 0 none;
-//   margin-right: 10rem;
-// }
 
 .dialog_Schedule {
   height: 46rem;
@@ -974,10 +966,25 @@
 }
 
 .tabmenu_confige {
+  // .p-tabmenu-nav .p-menuitem-text {
+  //   line-height: 1;
+  //   margin-top: 2rem;
+  // }
   .p-tabmenu-nav .p-menuitem-text {
     line-height: 1;
-    margin-top: -2rem;
+    margin-top: 2rem;
+    .p-tabmenu-nav {
+      display: flex;
+      flex-wrap: nowrap;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      margin-top: 1.5rem;
   }
+   
+
+}
+
 }
 .search_icelist {
   margin-left: 8rem;
@@ -1130,6 +1137,13 @@
 }
 }
 
+.error-toast {
+  color: red;
+}
+.ui-toast-message-error {
+  background-color: red;
+  color: white;
+}
 
 
 
