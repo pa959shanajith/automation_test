@@ -324,6 +324,7 @@ const Messages={
         ERR_NOTIFICATION_CONFIG: {"CONTENT":'Failed to fetch Notification Configuration.', "VARIANT": VARIANT.ERROR},
         ERR_UPDATE_NOTIFICATION_RULES: {"CONTENT":'Failed to Update Notification Rules.', "VARIANT": VARIANT.ERROR},
         ERR_DELETE_SCENARIO: {"CONTENT":'Error while deleting scenarios.', "VARIANT": VARIANT.ERROR},
+        ERR_MULTI_MOD: {"CONTENT":'Multiple modules are found please import single module', "VARIANT": VARIANT.ERROR},
         SUCC_NODE_CREATE: {"CONTENT":"Nodes created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED: {"CONTENT":"Data Exported Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED_NOTIFY:{"CONTENT":"Export file is being prepared kindly wait for few minutes", "VARIANT": VARIANT.SUCCESS},
