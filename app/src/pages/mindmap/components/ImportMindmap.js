@@ -1,5 +1,5 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
-import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap} from '../api';
+import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap, singleExcelToMindmap} from '../api';
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -235,7 +235,8 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                     <option value={'def-val'} disabled>Select Import Format</option>
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
-                    <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
+                    <option value={'excel'}>Multi module Structure only - Excel(.xls,.xlsx)</option>
+                    <option value={'xls'}> Single module Structure only - Excel(.xls,.xlsx)</option>
                     {/* <option value={'git'}>Git (.mm)</option>  */}                    
 					<option value={'json'}>Structure only - Json (.json)</option>
                     <option value={'zip'}>Complete Module(S) (.zip)</option>
@@ -293,7 +294,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
-                        (<>{uploadFileField || (["excel","json"].includes(importType))?<div>
+                        (<>{uploadFileField || (["excel","json","xls"].includes(importType))?<div>
                             <label>Upload File: </label>
                             <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="zip"} type='file' onChange={(e) => upload(e)} ref={uploadFileRef}/>
                             </div>:null}</>)
@@ -366,6 +367,26 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     </div>
                     </Fragment>
                     :null}
+                    {(importType==='xls')?
+                    <Fragment>
+                    <div>
+                        <label>Project: </label>
+                        <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
+                            <option value={'def-val'} disabled>Select Project</option>
+                            {Object.entries(projList).map((e,i)=>
+                            <option value={e[1].id} key={i}>{e[1].name}</option>
+                        )}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Select Sheet: </label>
+                        <select defaultValue={"def-val"} ref={sheetRef}>
+                            <option value="def-val" disabled>Please Select Sheet</option>
+                            {sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
+                        </select>
+                    </div>
+                    </Fragment>
+                    :null}
                 </Fragment>
             }
         </div>
@@ -409,31 +430,27 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
     var mindmapData = importData
     // console.log("ImportProj: " + importProj)
     // setBlockui({content:'Importing ...',show:true})
-    // if(importType === 'excel'){
-    //     let validateNode = true;
-    //     var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheet,"importProj":importProj})
-    //     if(res.error){displayError(res.error);return;}
-    //     else{
-    //         var importexcel = await jsonToMindmap({"data":"importexcel","importproj":importProj})
-    //     if(importexcel.error){displayError(importexcel.error);return;}}
-    //     res.forEach((e, i) =>{
-    //         if (!validNodeDetails(e.name)) validateNode = false;
-    //     });
-    //     if(!validateNode){
-    //         changeImportType({target: {value: "excel"}});
-    //         displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
-    //     }
-
-         
-        
-    // }
-    if(importType === 'pd'){
-        var res =  await pdProcess({'projectid':importProj,'file':importData})
+    if(importType === 'xls'){
+        let validateNode = true;
+        var res = await singleExcelToMindmap({'content':importData,'flag':'data',sheetname: sheet})
         if(res.error){displayError(res.error);return;}
-        var data = getJsonPd(res.data)
-        mindmapData = {createnew:true,importData:{createdby:'pd',data:data}}
+        res.forEach((e, i) =>{
+            if (!validNodeDetails(e.name)) validateNode = false;
+        });
+        if(!validateNode){
+            changeImportType({target: {value: "excel"}});
+            displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
+        }
+        mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
+        
     }
-	// if(importType === 'json'){
+    // if(importType === 'pd'){
+    //     var res =  await pdProcess({'projectid':importProj,'file':importData})
+    //     if(res.error){displayError(res.error);return;}
+    //     var data = getJsonPd(res.data)
+    //     mindmapData = {createnew:true,importData:{createdby:'pd',data:data}}
+    // }
+	// if(importType === 'sel'){
     //     var res =  await pdProcess({'projectid':importProj,'file':importData})
     //     if(res.error){displayError(res.error);return;}
     //     var data = getJsonPd(res.data)
@@ -632,15 +649,15 @@ function read(file) {
     })
 }
 
-// const validNodeDetails = (value) =>{
-//     var nName, flag = !0;
-//     nName = value;
-//     var regex = /^[a-zA-Z0-9_]*$/;;
-//     if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName== 'Screen_0' || nName == 'Scenario_0' || nName == 'Testcase_0') {
-//         flag = !1;
-//     }
-//     return flag;
-// };
+const validNodeDetails = (value) =>{
+    var nName, flag = !0;
+    nName = value;
+    var regex = /^[a-zA-Z0-9_]*$/;;
+    if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName== 'Screen_0' || nName == 'Scenario_0' || nName == 'Testcase_0') {
+        flag = !1;
+    }
+    return flag;
+};
 
 
 ImportMindmap.propTypes={
