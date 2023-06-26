@@ -10,166 +10,8 @@ const initialState = {
   testsuiteData: {},
   testsuiteId: "",
   avoAgentAndGrid: {
-    avoagents: [
-      {
-        Hostname: "WSLKCMP6F-541",
-        _id: "6412bcdd3b886ffbc86bf061",
-        createdon: "3/16/2023, 6:53:17 AM",
-        currentIceCount: "0",
-        host: "sony.avoautomation.com",
-        icecount: 4,
-        recentCall: "5/16/2023, 5:57:15 AM",
-        status: "inactive",
-      },
-      {
-        Hostname: "SIB-LT105551B",
-        _id: "643651c1f27e024480c1d3eb",
-        createdon: "4/12/2023, 6:37:53 AM",
-        currentIceCount: "0",
-        host: "test1.avoautomation.com",
-        icecount: 2,
-        recentCall: "5/10/2023, 2:06:09 AM",
-        status: "active",
-      },
-      {
-        Hostname: "SIBLT112189",
-        _id: "645c5316168533cb8bafd266",
-        createdon: "5/11/2023, 2:29:42 AM",
-        currentIceCount: "0",
-        host: "test1.avoautomation.com",
-        icecount: 5,
-        recentCall: "5/17/2023, 6:01:14 AM",
-        status: "active",
-      },
-    ],
-    avogrids: [
-      {
-        _id: "64228ac0dda41c51fb256095",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "wAD",
-      },
-      {
-        _id: "64228ac7dda41c51fb256096",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "SDVCSD",
-      },
-      {
-        _id: "64228acedda41c51fb256097",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "SDFVC",
-      },
-      {
-        _id: "64228ad7dda41c51fb256098",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "ASDFCAWS",
-      },
-      {
-        _id: "64228adddda41c51fb256099",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "ASDCA",
-      },
-      {
-        _id: "64228ae2dda41c51fb25609a",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "ASDC",
-      },
-      {
-        _id: "64228aeadda41c51fb25609b",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "BVWSR",
-      },
-      {
-        _id: "64228aefdda41c51fb25609c",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "WSEF",
-      },
-      {
-        _id: "64228af6dda41c51fb25609d",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 1,
-          },
-        ],
-        name: "EDFC",
-      },
-      {
-        _id: "642bce1b774fd4ef325eb5a7",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 4,
-          },
-        ],
-        name: "shiva",
-      },
-      {
-        _id: "6437e51e4127a7b20d209d11",
-        agents: [
-          {
-            Hostname: "WSLKCMP6F-541",
-            _id: "6412bcdd3b886ffbc86bf061",
-            icecount: 3,
-          },
-          {
-            Hostname: "SIB-LT105551B",
-            _id: "643651c1f27e024480c1d3eb",
-            icecount: 2,
-          },
-        ],
-        name: "ERp",
-      },
-    ],
+    avoagents: [],
+    avogrids: [],
   },
   error: "",
 };
@@ -309,7 +151,7 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(getProjects.rejected, (state, action) => {
       state.loading = false;
-      state.avoAgentAndGrid = {};
+      state.projects = [];
       state.error = action.error.message;
     });
     builder.addCase(getModules.pending, (state) => {
@@ -322,25 +164,26 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(getModules.rejected, (state, action) => {
       state.loading = false;
-      state.avoAgentAndGrid = {};
+      state.configureData = {};
       state.error = action.error.message;
     });
+    builder.addCase(getAvoAgentAndAvoGrid.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(getAvoAgentAndAvoGrid.fulfilled, (state, action) => {
-      // action.payload.avoagents.unshift({
-      //   name: "Any Agent",
-      //   _id: "1111",
-      // });
-      state.loading = false;
-      state?.avoAgentAndGrid?.avoagents.unshift({
+      action.payload.avoagents.unshift({
         name: "Any Agent",
         _id: "1111",
       });
-      // state.avoAgentAndGrid = action.payload;
-      state.avoAgentAndGrid = state.avoAgentAndGrid;
+      state.loading = false;
+      state.avoAgentAndGrid = action.payload;
       state.error = "";
     });
     builder.addCase(getAvoAgentAndAvoGrid.rejected, (state, action) => {
-      state.avoAgentAndGrid = {};
+      state.avoAgentAndGrid = {
+        avoagents: [],
+        avogrids: [],
+      };
       state.error = action.error.message;
     });
     builder.addCase(readTestSuite.pending, (state) => {
