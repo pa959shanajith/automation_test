@@ -104,7 +104,7 @@ const reducer = (state = initialState , action) => {
                 screenData: action.payload.screendata,
                 deletedNodes: [],
                 moduleList: action.payload.moduledata,
-                selectedModule: {},
+                selectedModule: action.payload.moduleselected,
                 selectedModulelist: [],
                 scenarioList:[],
                 unassignTask:[]
