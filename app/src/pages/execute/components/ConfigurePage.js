@@ -31,6 +31,7 @@ import {
   getAvoAgentAndAvoGrid,
   getModules,
   getProjects,
+  getScheduledDetails_ICE,
   storeConfigureKey,
   testSuitesScheduler_ICE,
   updateTestSuite,
@@ -112,6 +113,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [configItem, setConfigItem] = useState({});
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
+  const [startDate, setStartDate] = useState(null);
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -879,33 +881,68 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setScheduling(false);
     }
     if (btnType === "Schedule") {
-      setVisible_schedule(false);
-      dispatch(getPoolsexe());
-      dispatch(getICE());
-      setScheduling(true);
+      dispatch(
+        testSuitesScheduler_ICE({
+          param: "testSuitesScheduler_ICE",
+          executionData: {
+            source: "schedule",
+            exectionMode: "serial",
+            executionEnv: "default",
+            browserType: selectedSchedule?.executionRequest?.browserType,
+            integration: selectedSchedule?.executionRequest?.integration,
+            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({ ...el, 
+              poolid: "",
+              type: "normal",
+              targetUser: "automationice",
+              iceList: [],
+              date: startDate,
+              time: startDate.getTime(),
+              timestamp: startDate.getTime(),
+              recurringValue: "One Time",
+              recurringString: "One Time",
+              recurringStringOnHover: "One Time",
+              endAfter: "",
+              clientTime: "",
+              clientTimeZone: ""
+            })),
+            scenarioFlag: false,
+            type: "normal",
+            configureKey: selectedSchedule?.configurekey,
+            configureName: selectedSchedule?.configurename,
+          },
+        })
+      ).then(() => {
+        dispatch(
+          getScheduledDetails_ICE({
+            param: "getScheduledDetails_ICE",
+            configKey: fetechConfig[configItem]?.configurekey,
+            configName: fetechConfig[configItem]?.configurename,
+          })
+        );
+      });
     }
   };
 
-  const onScheduleBtnClickClient = () => {
-    console.log(selectedSchedule);
-    dispatch(
-      testSuitesScheduler_ICE({
-        param: "testSuitesScheduler_ICE",
-        executionData: {
-          source: "schedule",
-          exectionMode: "serial",
-          executionEnv: "default",
-          browserType: selectedSchedule?.executionRequest?.browserType,
-          integration: selectedSchedule?.executionRequest?.integration,
-          batchInfo: selectedSchedule?.executionRequest?.batchInfo,
-          scenarioFlag: false,
-          type: "normal",
-          configureKey: selectedSchedule?.configurekey,
-          configureName: selectedSchedule?.configurename,
-        },
-      })
-    );
-  };
+  // const onScheduleBtnClickClient = () => {
+  //   console.log(selectedSchedule);
+  //   dispatch(
+  //     testSuitesScheduler_ICE({
+  //       param: "testSuitesScheduler_ICE",
+  //       executionData: {
+  //         source: "schedule",
+  //         exectionMode: "serial",
+  //         executionEnv: "default",
+  //         browserType: selectedSchedule?.executionRequest?.browserType,
+  //         integration: selectedSchedule?.executionRequest?.integration,
+  //         batchInfo: selectedSchedule?.executionRequest?.batchInfo,
+  //         scenarioFlag: false,
+  //         type: "normal",
+  //         configureKey: selectedSchedule?.configurekey,
+  //         configureName: selectedSchedule?.configurename,
+  //       },
+  //     })
+  //   );
+  // };
 
   const checkboxHeaderTemplate = () => {
     return (
@@ -1111,7 +1148,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             visible={visible_schedule}
             setVisible={setVisible_schedule}
             onModalBtnClick={onScheduleBtnClick}
-            content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
+            content={<ScheduleScreen cardData={fetechConfig[configItem]} startDate={startDate} setStartDate={setStartDate} />}
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
             footerType="Schedule"
             modalSytle={{
@@ -1119,8 +1156,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               height: "95vh",
               background: "#FFFFFF",
             }}
+            isDisabled={!startDate}
           />
-          <AvoModal
+          {/* <AvoModal
             visible={scheduling}
             setVisible={setScheduling}
             onModalBtnClick={onScheduleBtnClickClient}
@@ -1159,7 +1197,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-          />
+          /> */}
           <AvoModal
             visible={visible_CICD}
             setVisible={setVisible_CICD}
