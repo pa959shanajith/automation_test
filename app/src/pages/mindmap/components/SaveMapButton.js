@@ -39,7 +39,25 @@ const SaveMapButton = (props) => {
         </svg>
     )
 }
+// using Redux-Thunk 
+     const updateModuleList = (moduledata) => {
+         return (dispatch) => {
+           dispatch({
+             type: actionTypes.UPDATE_MODULELIST,
+             payload: moduledata
+           });
+         };
+       };
 
+       const selectModule = (moduleselected) => {
+        return (dispatch) => {
+          dispatch({
+            type: actionTypes.SELECT_MODULE,
+            payload: moduleselected
+          });
+        };
+      };
+     
 //mindmap save funtion
 const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList)=>{
     var tab = "endToend"
@@ -173,10 +191,9 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
         moduleid:null
     }
     var moduledata = await getModules(req);
-    // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
     if(savedList){
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-    setTimeout(() => dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected}), 150)
+                dispatch(updateModuleList(moduledata))
+                .then(() => {dispatch(selectModule(moduleselected));});
     }
     return;
 
