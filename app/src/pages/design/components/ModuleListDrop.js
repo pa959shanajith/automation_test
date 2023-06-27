@@ -725,12 +725,14 @@ const ModuleListDrop = (props) =>{
     return(
         <Fragment>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
-            {warning.modID?<ModalContainer 
+            {warning.modID?<ModalContainer
+                show = {warning.modID} 
+                style={{width:"30%"}}
                 title='Confirmation'
                 close={()=>setWarning(false)}
                 footer={<Footer modID={warning.modID} loadModule={warning.type ==='endtoend' ? loadModuleE2E : loadModule} setWarning={setWarning} />}
                 content={<Content/>} 
-                modalClass='modal-sm'
+                // modalClass='warningPopUp'
             />:null}
              <>
       <div className="CollapseWholeCont">
@@ -814,7 +816,7 @@ const ModuleListDrop = (props) =>{
                                                       {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)} />}
                                                       <img src="static/imgs/moduleIcon.png" style={{width:'20px',height:'20px',marginLeft:'0.5rem'}} alt="modules" />
                                                       <div style={{width:'13rem',textOverflow:'ellipsis',overflow:'hidden'}}>
-                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',}}>{e.name}</h4>
+                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',fontWeight:'300'}}>{e.name}</h4>
                                                       </div>  
                                                     </div>
                                             </div>
@@ -936,12 +938,25 @@ const Content = () => (
 )
 
 //footer for moduleclick warning popup
+// const Footer = (props) => (
+//   <div className='warningPopup'>
+//     <div className='toolbar__module-warning-footer'>
+//         <div className='btn-warning'>
+//           {/* <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button> */}
+//           <Button className='btn-yes' onClick={()=>props.loadModule(props.modID)} label="Yes" />
+//           {/* <button onClick={()=>{props.setWarning(false)}}>No</button> */}
+//           <Button onClick={()=>{props.setWarning(false)}} label="No" />
+//         </div>
+//     </div>
+//   </div>
 const Footer = (props) => (
-    <div className='toolbar__module-warning-footer'>
-        <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button>
-        <button onClick={()=>{props.setWarning(false)}}>No</button>
-    </div>
+  <div className='toolbar__module-warning-footer'>
+      <Button size="small" onClick={()=>{props.setWarning(false)}}>No</Button>
+      <Button size="small" className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</Button>
+  </div>
 )
+
+
 
 
 

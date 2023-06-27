@@ -5,7 +5,6 @@ import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Checkbox } from "@mui/material";
 import { Button } from "primereact/button";
 import { Link } from "react-router-dom";
 import { RadioButton } from "primereact/radiobutton";
@@ -13,7 +12,6 @@ import { Tree } from "primereact/tree";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
-import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { useDispatch, useSelector } from "react-redux";
@@ -55,10 +53,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [visible_execute, setVisible_execute] = useState(false);
   const [showIcePopup, setShowIcePopup] = useState(false);
   const [selectedNodeKey, setSelectedNodeKey] = useState(null);
-  const [time, setTime] = useState(null);
-  const [time_limit, setTime_limit] = useState(null);
   const [counter, setCounter] = useState(0);
-  const [checked, setChecked] = useState(false);
   const toast = useRef(null);
   const url = window.location.href.slice(0, -7) + "execAutomation";
   const [configProjectId, setConfigProjectId] = useState("");
@@ -137,14 +132,11 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const [activeIndex1, setActiveIndex1] = useState(0);
-  console.log(activeIndex1);
-  // console.log(setActiveIndex1(index));
-  // console.log(setActiveIndex1);
+
   const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
     console.log(e);
     setActiveIndex1(e.index);
-    // console.log(e.value.label)
   };
 
   const getConfigData = useSelector((store) => store.configsetup);
@@ -236,31 +228,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setProjectList(data);
     })();
   }, []);
+  
 
-  const [recurrenceType, setRecurrenceType] = useState("");
-  const [monthlyRecurrenceWeekValue, setMonthlyRecurrenceWeekValue] =
-    useState("");
 
-  const weekDays = [
-    { name: "Sunday" },
-    { name: "Monday" },
-    { name: "Tuesday" },
-    { name: "Wednesday" },
-    { name: "Thursday" },
-    { name: "Friday" },
-    { name: "Saturday" },
-  ];
-
-  const [selectedWeek, setSelectedWeek] = useState([]);
-
-  const showSuccess_execute = () => {
-    toast.current.show({
-      severity: "success",
-      summary: "Success",
-      detail: "Execution has started",
-      life: 1000,
-    });
-  };
   const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_CICD(false);
@@ -354,20 +324,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     setAvailableICE(ice);
   };
 
-  const handleWeekInputChange = (event) => {
-    setMonthlyRecurrenceWeekValue(event.target.value);
-  };
-  const getRecurrenceType = (event) => {
-    setRecurrenceType(event.target.value);
-  };
-  useEffect(() => {
-    if (recurrenceType === "Weekly") {
-      setSelectedWeek([]);
-    }
-  }, [recurrenceType]);
-  const handleCounterChange = (e) => {
-    setCounter(e.target.value);
-  };
+
 
   const confirm_delete = (event, item) => {
     setDeleteItem(item);
@@ -375,8 +332,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     setLogoutClicked(true);
     let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
     setProfileTxt(text);
-    console.log(item.configurename);
-    // console.log(configurename)
   };
 
   const copyConfigKey = (title) => {
@@ -387,161 +342,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       }, 1500);
     }
   };
-
-  const treeData = [
-    {
-      key: "1",
-      label: "Schedule Options",
-      data: "Events Folder",
-      icon: "pi pi-fw pi-calendar",
-
-      children: [
-        {
-          key: "1-0",
-          label: (
-            <div className="flex-auto">
-              <label
-                htmlFor="calendar-timeonly"
-                className="font-bold block mb-2"
-              >
-                Start Time
-              </label>
-              <Calendar
-                id="calendar-timeonly"
-                value={time}
-                onChange={(e) => setTime(e.value)}
-                timeOnly
-                placeholder="Enter Start Time"
-              />
-            </div>
-          ),
-        },
-      ],
-    },
-
-    {
-      key: "1",
-      label: " Recurrence Pattern",
-      data: "Events Folder",
-      icon: "pi pi-fw pi-calendar",
-
-      children: [
-        {
-          key: "1-0",
-          label: (
-            <div className="recurrence-container">
-              <div className="recurrence-list">
-                <lable>
-                  <RadioButton
-                    value="Daily"
-                    checked={recurrenceType === "Daily"}
-                    onChange={getRecurrenceType}
-                  />
-                  <span className="Daily_lable"> Daily</span>
-                </lable>
-
-                <lable>
-                  <RadioButton
-                    value="Weekly"
-                    checked={recurrenceType === "Weekly"}
-                    onChange={getRecurrenceType}
-                  />
-                  <span className="Weekly_lable"> Weekly</span>
-                </lable>
-
-                <lable>
-                  <RadioButton
-                    type="radio"
-                    value="Monthly"
-                    checked={recurrenceType === "Monthly"}
-                    onChange={getRecurrenceType}
-                  />
-                  <span className="Monthly_lable"> Monthly</span>
-                </lable>
-                <lable>
-                  <RadioButton
-                    type="radio"
-                    value="Yearly"
-                    checked={recurrenceType === "Yearly"}
-                    onChange={getRecurrenceType}
-                  />
-                  <span className="yearly_lable">Yearly</span>
-                </lable>
-              </div>
-              {recurrenceType === "Weekly" && (
-                <div className="weekly-recurrence-list">
-                  <div className=" schedule_input_counter">
-                    <label>Recur every</label>
-                    <InputText
-                      className="input_count"
-                      type="number"
-                      value={counter}
-                      onChange={handleCounterChange}
-                    />
-                    <label>week(s) on:</label>
-                  </div>
-                  <div className="weeks">
-                    {weekDays.map(({ name }, index) => {
-                      return (
-                        <div className="weeks-child">
-                          <lable>
-                            <input
-                              type="checkbox"
-                              value={name}
-                              checked={selectedWeek.includes(name)}
-                              onChange={handleWeekInputChange}
-                            />
-                            <span> {name}</span>
-                          </lable>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          ),
-        },
-      ],
-    },
-    {
-      key: "1",
-      label: "Range of Recurrence",
-      data: "Events Folder",
-      icon: "pi pi-fw pi-calendar",
-
-      children: [
-        {
-          key: "1-0",
-          label: (
-            <div className="schedule_date  ">
-              <div>
-                <RadioButton
-                  value="End Date "
-                  checked={time_limit === "End Date "}
-                />
-                <label className=" end_lable ml-2">End Date </label>
-              </div>
-              <div>
-                <RadioButton
-                  value="End After "
-                  checked={time_limit === "End After"}
-                />
-                <label className=" endAfter_lable ml-2">End After </label>
-              </div>
-              <div>
-                <RadioButton
-                  value="No end date "
-                  checked={time_limit === "No end date"}
-                />
-                <label className=" noEndDate_lable ml-2">No end date</label>
-              </div>
-            </div>
-          ),
-        },
-      ],
-    },
-  ];
 
   const deleteDevOpsConfig = () => {
     // setLoading('Please Wait...');
@@ -609,7 +409,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     ExecuteTestSuite(executionData);
   };
 
-  const ExecuteTestSuite = async (executionData) => {
+  const ExecuteTestSuite = async (executionData,btnType) => {
     if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(
@@ -649,11 +449,43 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       ResetSession.end();
       if (data.status) {
         if (data.status === "fail") {
-          setMsg(MSG.CUSTOM(data["error"], data.variant));
+          // setMsg(MSG.CUSTOM(data["error"], data.variant));
+          if (data.variant === "success") {
+            toast.current.show({
+              severity: 'success',
+              summary: 'Success',
+              detail: data.error,
+              life: 5000
+            });
+          } else {
+            toast.current.show({
+              severity: 'error',
+              summary: 'Error',
+              detail: data.error,
+              life: 5000
+            });
+          }
         } else {
-          setMsg(MSG.CUSTOM(data["message"], data.variant));
+          // setMsg(MSG.CUSTOM(data["message"], data.variant));
+          if (data.variant === "success") {
+            toast.current.show({
+              severity: 'success',
+              summary: 'Success',
+              detail: data.message,
+              life: 5000
+            });
+          } else {
+            toast.current.show({
+              severity: 'error',
+              summary: 'Error',
+              detail: data.message,
+              life: 5000
+            });
+          }
         }
+       
       }
+      
       setBrowserTypeExe([]);
       setModuleInfo([]);
       setExecAction("serial");
@@ -661,7 +493,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     } catch (error) {
       // setLoading(false);
       ResetSession.end();
-      displayError(MSG.EXECUTE.ERR_EXECUTE);
+      // displayError(MSG.EXECUTE.ERR_EXECUTE);
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: (MSG.EXECUTE.ERR_EXECUTE),
+        life: 5000
+      });
       setBrowserTypeExe([]);
       setModuleInfo([]);
       setExecAction("serial");
@@ -864,7 +702,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
         }
       });
 
-      const executionData = {
+      let executionData = {
         type: "",
         poolid: "",
         targetUser: "",
@@ -981,6 +819,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   }, [currentSelectedItem?.executionRequest?.browserType[0]]);
 
   const onExecuteBtnClick = async (btnType) => {
+    if(btnType==="Execute"){
     if (showIcePopup) {
       dataExecution.type =
         ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
@@ -1009,18 +848,31 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       } else {
         setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
       }
+      if(btnType ===  "Execute"){
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Execution has started",
+            life: 5000,
+          });
+          
+          }
+      // onHide(name);
     }
-    if (btnType === "Cancel") {
+  }
+    if(btnType === 'Cancel'){
       setVisible_execute(false);
     }
-    if (btnType === "Execute") {
-      toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Execution has started",
-        life: 5000,
-      });
-    }
+    // if(btnType ===  "Execute"){
+    //   toast.current.show({
+    //     severity: "success",
+    //     summary: "Success",
+    //     detail: "Execution has started",
+    //     life: 5000,
+    //   });
+      
+    //   }
+    
   };
 
   const onScheduleBtnClick = (btnType) => {
@@ -1100,38 +952,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       </>
     );
   };
-  // const renderExecutionCard = () => {
-  //   return (
-  //     <Card className="execute_card p-card p-card-body">
-  //       <p className="m-0">
-  //         <div className="grid executedropdown">
-  //           <div className="col-3 text_card">Avo Agent:</div>
-  //           <div className="col-3 text_value"> <div className="agent_name">
-  //             {currentSelectedItem &&
-  //             currentSelectedItem.executionRequest &&
-  //             currentSelectedItem.executionRequest.avoagents.length > 0
-  //               ? currentSelectedItem.executionRequest.avoagents[0]
-  //               : 'Any Agent'}
-  //               </div>
-  //           </div>
-
-  //           <div className="col-3 text_card1"><div className="execute_text">Execution Mode:</div></div>
-  //            <div className="col-3 text_value1"><div className="execute_name">{currentSelectedItem &&
-  //             currentSelectedItem.executionRequest &&
-  //             currentSelectedItem.executionRequest.integration.isHeadless==true?"Non-Headless":"Headless"}
-  //             </div>
-  //             </div>
-  //           <div className="col-3 text_card3"><div className="browser_text"> Selected Browsers:</div></div>
-  //           <div className="col-3 text_value3"><div className="browser_name">{browserTxt}</div></div>
-  //           <div className="col-3 text_card4"><div className="integration_text"> Integration Type:</div></div>
-  //           <div className="col-3 text_value4"><div className="integration_name">ALM</div></div>
-  //         </div>
-  //       </p>
-  //     </Card>
-  //   );
-  // };
-
-  const renderExecutionCard = () => {
+ 
+   const renderExecutionCard = () => {
     return (
       <Card className="execute_card p-card p-card-body">
         <div className="grid executedropdown">
@@ -1215,7 +1037,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             />
             <Column
               style={{
-                fontWeight: "normal",
+                fontWeight: "bold",
                 fontFamily: "open Sans",
                 marginRight: "23rem",
                 width: "40%",
@@ -1229,7 +1051,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             />
             <Column
               style={{
-                fontWeight: "normal",
+                fontWeight: "bold",
                 fontFamily: "open Sans",
                 marginleft: "7rem",
                 textAlign: "left",
@@ -1242,6 +1064,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
           <AvoModal
             visible={visible_execute}
             setVisible={setVisible_execute}
+            onhide={visible_execute}
             onModalBtnClick={onExecuteBtnClick}
             content={
               <>
@@ -1387,13 +1210,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                     <label for="inputField" class="devopsUrl_label">
                       Devops Integration URL
                     </label>
-                    {/* <input
-                  type="text"
-                  id="inputField"
-                  class="inputtext_CICD"
-                  // value={url}
-                  
-                /> */}
                     <pre className="grid_download_dialog__content__code cicdpre">
                       <code id="api-url" title={url}>
                         {url}
@@ -1443,12 +1259,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   <div className="container_devopsLabel" title={str}>
                     <span className="devops_label">DevOps Request Body : </span>
                     <div>
-                      {/* <InputTextarea
-                    className="inputtext_devops"
-                    rows={4}
-                    cols={30}
-                    value={str}
-                  /> */}
 
                       <pre className="grid_download_dialog__content__code executiontypenamepre">
                         <code
@@ -1457,7 +1267,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                           title={str}
                         >
                           {str}
-                          {/* {abc} */}
+                       
                         </code>
                       </pre>
 
@@ -1492,7 +1302,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   fontWeight: "bold",
                   fontFamily: "open Sans",
                 }}
-                showGridlines
+              
               >
                 S.No.
               </span>
@@ -1502,24 +1312,24 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   fontWeight: "bold",
                   fontFamily: "open Sans",
                 }}
-                showGridlines
+                
               >
                 Configuration Profile Name
               </span>
               <span
                 style={{
                   marginRight: "18rem",
-                  fontWeight: "normal",
+                  fontWeight: "bold",
                   fontFamily: "open Sans",
+                  
                 }}
-                showGridlines
               >
                 Execution Options
               </span>
               <span
                 style={{
                   marginRight: "1rem",
-                  fontWeight: "normal",
+                  fontWeight: "bold",
                   fontFamily: "open Sans",
                 }}
               >

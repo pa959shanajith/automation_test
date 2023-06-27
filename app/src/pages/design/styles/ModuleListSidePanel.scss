@@ -1,5 +1,7 @@
 .CollapseWholeCont{ 
-    height:100%;
+    max-height: 100vh;
+    min-height: 70vh;
+    overflow-y: auto;
     display: flex;
     flex-direction: row-reverse;
 
@@ -10,15 +12,16 @@
     }
                 }
    .Whole_container{
-    height:100%;
+    max-height:100vh;
+    min-height: 80vh;
     // width: 17vw;
     border-bottom: 0.5px solid #C7C7C7;
     background-color: rgb(255, 255, 255);
     z-index: 1;
-    // overflow: auto;
-    overflow-x: visible;
+    overflow: auto;
     .project_name_section{
-        height:7% ;
+        max-height:7% ;
+        min-height: 5%;
         border-bottom: 0.5px solid #575353;
         display: flex;
         justify-content: space-around;
