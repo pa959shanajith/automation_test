@@ -401,7 +401,7 @@ const CaptureModal = (props) => {
                         enable: true
                       });
                       onHighlight();
-                    }}>View Screenshot</span> : "",
+                    }}>View Screenshot</span> : <span>No screenshot available</span>,
                       actions: '',
                       objectDetails:item
                     }
