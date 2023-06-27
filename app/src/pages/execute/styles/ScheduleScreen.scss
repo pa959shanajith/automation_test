@@ -1,33 +1,16 @@
-.schedule_tree {
+.schedule_container {
     margin: 1rem 2rem 0rem 2rem;
-    .p-tree-container {
-        .p-treenode {
-            padding: 0;
-            .p-treenode-content {
-                align-items: flex-start;
+    .p-calendar {
+        .p-inputtext {
+            padding: 0.3rem 0.5rem;
+        }
 
-                .p-treenode-icon {
-                    margin-top: 0.2rem;
-                }
-
-                .p-treenode-label {
-                    width: 100%;
-                }
-
-                .p-calendar {
-                    .p-inputtext {
-                        padding: 0.3rem 0.5rem;
-                    }
-
-                    .p-button {
-                        padding: 0.3rem 0.5rem;
-                        background: white;
-                        color: #dee2e6;
-                        width: 2rem;
-                        border: 1px solid #dee2e6;
-                    }
-                }
-            }
+        .p-button {
+            padding: 0.3rem 0.5rem;
+            background: white;
+            color: #dee2e6;
+            width: 2rem;
+            border: 1px solid #dee2e6;
         }
     }
     .radioBtn {

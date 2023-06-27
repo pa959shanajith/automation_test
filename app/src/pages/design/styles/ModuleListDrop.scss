@@ -36,8 +36,22 @@
 .toolbar__module-box:hover{
     background-color: #f7f7f7;
 }
+.warningPopup{
+.modal__content  {
+    width: 30% ;
+    height: 22%;
+    .modal-body{
+        margin-top: 8%;
+        margin-left: 3%;
+    }
+}
 .toolbar__module-warning-footer .btn-yes{
     margin-right: 0.9375rem;
+}
+.toolbar__module-warning-footer .btn-warning{
+    // margin-top: 11%;
+    margin-left: 32%;
+}
 }
 .searchBox {
     display: flex;
@@ -114,7 +128,7 @@
     height:24px;
     font-family:'LatoWeb';
     font-style:normal;
-    font-weight:600;
+    // font-weight:600;
     font-size:15px;
     line-height:24px;
     margin-left: 14px;
@@ -127,7 +141,7 @@
     height:22px;
     font-family:'LatoWeb';
     font-style:normal;
-    font-weight:600;
+    // font-weight:600;
     font-size:15px;
     line-height:24px;
     margin-left: 14px;
