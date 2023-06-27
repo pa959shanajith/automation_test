@@ -74,7 +74,6 @@ export const browsers = [
 export const selections = ["Non-Headless", "Headless"];
 
 export const schedulePeriod = [
-  { name: 'One Time', key: 'OT' },
   { name: 'Daily', key: 'DY' },
   { name: 'Weekly', key: 'WY' },
   { name: 'Monthly ', key: 'MY' }
