@@ -412,24 +412,24 @@
 
 .legend-text {
   font-size: .9rem;
-  margin-left: 104px;
+  margin-left: 120px;
   position: relative;
-  top: 30px;
+  top: 18px;
 }
 .legend-text1{
   font-size: .9rem;
   margin-left: 104px;
   position: relative;
-  top: 30px;
-  left: -16rem;
+  left: -12.7rem;
+  top: 18px;
 
 }
 .legend-text2{
   font-size: .9rem;
-  margin-left: 104px;
-  position: relative;
-  top: 30px;
-  left: -8rem;
+    left: -6.5rem;
+    margin-left: 104px;
+    position: relative;
+    top: 18px;
 }
 .status-available,
 .status-unavailable,
@@ -452,15 +452,15 @@
   position: relative;
   top: 1rem;
   font-family: "Open Sans";
-  left: 6rem;
+  left: 7.5rem;
 }
 
 .status-unavailable {
   background-color: #ff9f42;
   position: relative;
-  top: 1rem;
+  top: 1.1rem;
   font-family: "Open Sans";
-  left: -2rem;
+  left: 0.1rem;
 }
 
 .status-dnd {
@@ -468,8 +468,15 @@
   position: relative;
   // top: -1rem;
   font-family: "Open Sans";
-  top: 0.9rem;
-  left: -10rem;
+  top: 1.1rem;
+  left: -6.2rem;
+}
+#status {
+  height: 7px;
+  width: 7px;
+  margin: 6px 5px;
+  border-radius: 50%;
+  display: inline-block;
 }
 .execute_dropdown {
   margin-left: 27px;
@@ -530,11 +537,13 @@
   color: #000000;
   background-color: transparent;
   border: none;
-  margin-left: 27.5rem;
+
   margin-top: -3rem;
   left: 12.5rem;
   display: flex;
     top: -1rem;
+    text-align: center;
+    left: 41rem;
     .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
       background: transparent ;
       border-color: transparent ;
@@ -550,15 +559,16 @@
 }
 
 .copy_devops {
-  margin-left: auto;
+  
   color: #000000;
   background-color: transparent;
   border: none;
-  left: 14.9rem;
+  left: 41rem;
   display: flex;
-  margin-right: 19.9rem;
+  
   top: -7rem;
   display: flex;
+ text-align: center;
 }
 
 .container_devopsLabel {
@@ -690,7 +700,7 @@
   font-weight: 600;
 }
 .pencil_button {
-  margin-left: 7rem;
+  margin-left: 2rem;
 }
 
 .datatable_list {
@@ -706,7 +716,7 @@
 .actions-header {
   text-align: left !important;
   position: absolute;
-  margin-left: 8.9rem;
+  margin-left: 3.9rem;
   margin-top: -0.8rem;
   font-weight: bold;
   font-family: "Open Sans";
@@ -714,15 +724,15 @@
 .SNo-header{
   font-weight: bold;
   font-family: "Open Sans";
-  margin-left: 0.4rem;
-  width: 1rem;
+  // margin-left: 0.4rem;
+  // width: 1rem;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
 }
 .executionOption-header {
   // margin-left: 10rem;
-  margin-left: 1.1rem;
+  margin-left: 12.1rem;
   font-weight: bold;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
@@ -1145,5 +1155,53 @@
   color: white;
 }
 
-
+.execute_modal {
+  .p-dialog-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
 
