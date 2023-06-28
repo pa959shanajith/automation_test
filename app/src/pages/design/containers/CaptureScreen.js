@@ -16,11 +16,15 @@ import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
+import ModalContainer from '../../global/components/ModalContainer';
+import { Toast } from 'primereact/toast';
+import { Tooltip } from 'primereact/tooltip';
 
 
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
+  const toast = useRef();
   const objValues = useSelector(state=>state.design.objValue);
   const [visible, setVisible] = useState(false);
   const [showCaptureData, setShowCaptureData] = useState([]);
@@ -60,6 +64,9 @@ const CaptureModal = (props) => {
   const appType= props.appType;
   const [imageHeight,setImageHeight]=useState(0);
   const [activeEye, setActiveEye] = useState(false);
+  const [showConfirmPop, setShowConfirmPop] = useState(false);
+  const [parentData, setParentData] = useState({id:props.fetchingDetails["_id"],name:props.fetchingDetails["name"]});
+  const [idx, setIdx] = useState(0);
 
 
 
@@ -74,12 +81,14 @@ const CaptureModal = (props) => {
 
 useEffect(()=>{
   fetchScrapeData()
-},[])
+},[parentData])
+
+
  useEffect(()=>{
   if(endScrape)
   fetchScrapeData();
   setEndScrape(false)
- },[endScrape])
+ },[parentData,endScrape])
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
@@ -160,7 +169,61 @@ useEffect(()=>{
       setVisible(false);
   }
 
+ 
+  const parentScreen = props.fetchingDetails["parent"]["children"];
+    useEffect(()=>{
+        const parentScreenId = () =>{
+            for (let i = 0; i < parentScreen.length; i++) {
+              if(props.fetchingDetails["name"]===parentScreen[i].name){
+                //  if (props.fetchingDetails["parent"]["children"][idx]["name"] === parentScreen[i].name) {
+                  setIdx(i);
+                      return setParentData({
+                          name: parentScreen[i].name,
+                          id: parentScreen[i]._id,
+                          parentName:props.fetchingDetails["parent"]['name'],
+                          parent_id:props.fetchingDetails["parent"]['_id'],
+                          projectId:parentScreen[i].projectID,
+                        });
+                  // }
+                  }
+            }
+            return 0;
+        }
+        parentScreenId();
+    },[])
 
+
+    const onIncreaseScreen = ()=>{
+      setCapturedDataToSave([]);
+      for (let i = idx; i < parentScreen.length; i++) {
+          if (props.fetchingDetails["parent"]["children"][idx+1]["name"] === parentScreen[i].name) {
+            setParentData({
+                name: parentScreen[i].name,
+                id: parentScreen[i]._id,
+                parentName:props.fetchingDetails["parent"]['name'],
+                parent_id:props.fetchingDetails["parent"]['_id'],
+                projectId:parentScreen[i].projectID,
+            });
+            return setIdx(idx+1);
+          }
+      }
+    }
+
+    const onDecreaseScreen = ()=>{
+      setCapturedDataToSave([]);
+      for (let i = idx; i < parentScreen.length; i--) {
+        if (props.fetchingDetails["parent"]["children"][idx-1]["name"] === parentScreen[i].name) {
+          setParentData({
+              name: parentScreen[i].name,
+              id: parentScreen[i]._id,
+              parentName:props.fetchingDetails["parent"]['name'],
+              parent_id:props.fetchingDetails["parent"]['_id'],
+              projectId:parentScreen[i].projectID,
+          });
+          return setIdx(idx-1);
+        }
+      }
+    }
 
   const handleRowReorder = (event) => {
     setCaptureData(event.value);
@@ -174,6 +237,13 @@ useEffect(()=>{
     }
   };
 
+  const toastSuccess = (SuccMessage) => {
+    toast.current.show({ severity: 'success', summary: 'Success', detail: SuccMessage, life: 10000 });
+}
+
+const toastError = (errMessage) =>{
+  toast.current.show({severity: 'error', summary:'Error', detail: errMessage, life: 1000});
+}
 
   const onSave = (e, confirmed) => {
        
@@ -223,42 +293,43 @@ useEffect(()=>{
             }
         }
 
-        // if (dCustname) {
-        //     continueSave = false;
-        //     setShowPop({
-        //         'type': 'modal',
-        //         'title': 'Save Scrape data',
-        //         'content': <div className="ss__dup_labels">
-        //             Please rename/delete duplicate scraped objects
-        //             <br/><br/>
-        //             Object characterstics are same for:
-        //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-        //                 <div className="ss__dup_scroll">
-        //                 { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-        //                 </div>
-        //             {/* </ScrollBar> */}
-        //         </div>,
-        //         'footer': <button onClick={()=>setShowPop("")}>OK</button>
-        //     })
-        // } else if (dXpath) {
-        //     continueSave = false;
-        //     setShowConfirmPop({
-        //         'title': 'Save Scrape data',
-        //         'content': <div className="ss__dup_labels">
-        //             Object characteristics are same for the below list of objects:
-        //             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-        //                 <div className="ss__dup_scroll">
-        //                 { dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-        //                 </div>
-        //             {/* </ScrollBar> */}
-        //             <br/>
-        //             Do you still want to continue?
-        //         </div>,
-        //         'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
-        //         'continueText': "Continue",
-        //         'rejectText': "Cancel"
-        //     })
-        // }
+        if (dCustname) {
+            continueSave = false;
+            setShowPop({
+                'type': 'modal',
+                'title': 'Save Scrape data',
+                'content': <div className="ss__dup_labels">
+                    Please rename/delete duplicate scraped objects
+                    <br/><br/>
+                    Object characterstics are same for:
+                    {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+                        <div className="ss__dup_scroll">
+                        { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                        </div>
+                    {/* </ScrollBar> */}
+                </div>,
+                'footer': <Button onClick={()=>setShowPop("")}>OK</Button>
+            })
+        }
+         else if (dXpath) {
+            continueSave = false;
+            setShowConfirmPop({
+                'title': 'Save Scrape data',
+                'content': <div className="ss__dup_labels">
+                    Object characteristics are same for the below list of objects:
+                    {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+                        <div className="ss__dup_scroll">
+                        { dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                        </div>
+                    {/* </ScrollBar> */}
+                    <br/>
+                    Do you still want to continue?
+                </div>,
+                'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
+                'continueText': "Continue",
+                'rejectText': "Cancel"
+            })
+        }
     }
 
     if (continueSave) saveScrapedObjects();
@@ -275,7 +346,7 @@ useEffect(()=>{
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
-      scrapeApi.getScrapeDataScreenLevel_ICE("web", props.fetchingDetails["_id"], props.fetchingDetails.projectID, "")
+      scrapeApi.getScrapeDataScreenLevel_ICE("web", parentData.id, parentData.projectId, "")
         .then(data => {
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
@@ -286,7 +357,7 @@ useEffect(()=>{
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
 
             newlyScrapeList=newScrapeList;
-
+           
             setMainScrapedData(data);
             if(capturedDataToSave.length===0)setCapturedDataToSave([...capturedDataToSave,...newScrapeList]);
             setMirror({ scrape: data.mirror, compare: null });
@@ -347,14 +418,14 @@ useEffect(()=>{
                 {
                   selectall: item.custname,
                   objectProperty: item.tag,
-                  screenshots: <span className="btn__screenshot" onClick={()=>{
+                  screenshots:mirror.scrape!=""? <span className="btn__screenshot" onClick={()=>{
                       setScreenshotData({
                       header: item.custname,
                       imageUrl: mirror.scrape || "",
                       enable: true
                     });
                     onHighlight();
-                  }}>View Screenshot</span>,
+                  }}>View Screenshot</span>:<span>No Screenshot</span>,
                   actions: '',
                   objectDetails:item
                 
@@ -365,11 +436,11 @@ useEffect(()=>{
                       selectall: item.custname,
                       objectProperty: item.tag,
                       browserscrape: 'google chrome',
-                      screenshots: <span className="btn__screenshot" onClick={()=>{setScreenshotData({
+                      screenshots: data.mirror!=""? <span className="btn__screenshot" onClick={()=>{setScreenshotData({
                         header: item.custname,
                         imageUrl: data.mirror || "",
                         enable: true
-                      }); onHighlight();}}>View Screenshot</span>,
+                      }); onHighlight();}}>View Screenshot</span>:<span>No Screenshot Available</span>,
                       actions: '',
                       objectDetails:item
                     }
@@ -379,13 +450,11 @@ useEffect(()=>{
         .catch(error => {
           dispatch(disableAction(haveItems));
           dispatch(disableAppend(!haveItems));
-          console.error("error", error);
           setOverlay("");
           reject("fail")
         })
     });
   }
-// {console.log(captureData[0].selectall)}
 
   const saveScrapedObjects = () => {
     let scrapeItemsL = [...capturedDataToSave];
@@ -420,19 +489,23 @@ useEffect(()=>{
         else fetchScrapeData().then(resp=>{
             if (resp === 'success' || typeof(resp) === "object"){
                 typeof(resp)==="object" && resp.length>0 
-                ? <div className="ss__dup_labels">
-                                Scraped data saved successfully.
-                                <br/><br/>
-                                <strong>Warning: Please scrape an IRIS reference object.</strong>
-                                <br/><br/>
-                                Matching objects found for:
-                                {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-                                <div className="ss__dup_scroll">
-                                { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-                                </div>
-                                {/* </ScrollBar> */}
-                            </div>
-                : <div>Scraped Data saved successfull</div>;
+                ? setShowPop({
+                  title: "Saved Scrape Objects",
+                  content: <div className="ss__dup_labels">
+                              Scraped data saved successfully.
+                              <br/><br/>
+                              <strong>Warning: Please scrape an IRIS reference object.</strong>
+                              <br/><br/>
+                              Matching objects found for:
+                              {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+                              <div className="ss__dup_scroll">
+                              { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                              </div>
+                              {/* </ScrollBar> */}
+                          </div>,
+                  footer: <Button onClick={()=>{setShowPop("")}} >OK</Button>       
+              })
+              : toastSuccess("Scraped Elements saved successfully.");
                 let numOfObj = scrapeItemsL.length;
                 // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
             } else console.error(resp);
@@ -486,12 +559,13 @@ useEffect(()=>{
           if (scrapedItemsLength > 0) dispatch(disableAction(true));
           else dispatch(disableAction(false));
           setSaved({ flag: false });
-          // err = {
-          //     'VARIANT':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
-          //         data === 'scheduleModeOn' ?
-          //             MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-          //             MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-          // };
+           err = {
+              'VARIANT':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
+                 data === 'scheduleModeOn' ?
+                      MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                      MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
+
+           };
         } else if (data === "fail")
           err = MSG.SCRAPE.ERR_SCRAPE;
         else if (data === "Terminate") {
@@ -512,6 +586,7 @@ useEffect(()=>{
         // fetchScrapeData();
 
         if (viewString.view.length !== 0) {
+          
           let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
 
           let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
@@ -637,13 +712,13 @@ useEffect(()=>{
 
   const footerCapture = (
     <div className='footer__capture'>
-      <Button className='btn_capture' onMouseDownCapture={() =>{setVisible(false);startScrape(captureButton);}}>Capture</Button>
+      <Button onMouseDownCapture={() =>{setVisible(false);startScrape(captureButton);}}>Capture</Button>
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button className='btn_capture' onMouseDownCapture={() => {setVisible(false);startScrape(captureButton)}}>Capture</Button>
+      <Button onMouseDownCapture={() => {setVisible(false);startScrape(captureButton)}}>Capture</Button>
     </div>
   );
 
@@ -651,8 +726,11 @@ useEffect(()=>{
     <>
       <div>
         <h5 className='dailog_header1'>Capture Elements</h5>
-        <h4 className='dailog_header2'>Signup screen 1</h4>
-        <img className="screen_btn" src="static/imgs/ic-screen-icon.png" />
+        <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
+        <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
+        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ?{opacity: '0.3'}: {opacity: '1'}} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen"  /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length-1) ?{opacity: '0.3'}: {opacity: '1'}} disabled={idx === parentScreen.length-1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        </h4>
+        {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
           <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
           <button className='add__more__btn' onClick={() => {setMasterCapture(false);handleAddMore('add more')}}>Add More</button>
@@ -663,10 +741,12 @@ useEffect(()=>{
   );
 
   const emptyMessage = (
-    <div>
+    <div className='empty_msg1'>
+    <div className='empty_msg'>
       <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
       <p className="not_captured_message">Not Captured</p>
-      <button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</button>
+      <Button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</Button>
+    </div>
     </div>
   );
 
@@ -676,6 +756,51 @@ useEffect(()=>{
     <Button label='Save' onClick={onSave} ></Button>
     </>
   )
+
+  const showConfirmFooter=(
+    <>
+    <Button onClick={showConfirmPop.onClick}>
+        {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
+    </Button>
+    <Button onClick={()=>setShowConfirmPop(false)}>
+        {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
+    </Button>
+    </>
+  )
+
+  const PopupDialog = () => (
+    // <ModalContainer 
+    //     title={showPop.title}
+    //     modalClass="modal-sm"
+    //     close={()=>setShowPop("")}
+    //     content={showPop.content}
+    //     footer={showPop.footer}
+    // />
+    <Dialog className="confirm__popup" header={showPop.title}  visible={showPop} onHide={()=>setShowPop("")} footer={showPop.footer}>
+     {showPop.content}
+    </Dialog>
+);
+
+const ConfirmPopup = () => (
+  // <ModalContainer 
+  //     title={showConfirmPop.title}
+  //     content={showConfirmPop.content}
+  //     close={()=>setShowConfirmPop(false)}
+  //     footer={
+  //         <>
+  //         <button onClick={showConfirmPop.onClick}>
+  //             {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
+  //         </button>
+  //         <button onClick={()=>setShowConfirmPop(false)}>
+  //             {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
+  //         </button>
+  //         </>
+  //     }
+  // />
+  <Dialog header={showConfirmPop.title}  visible={showConfirmPop} onHide={()=>setShowConfirmPop(false)}  footer={showConfirmFooter} >
+    {showConfirmPop.content}
+  </Dialog>
+)
 
   const confirmPopupMsg =(
     <div> <p>Note :This will completely refresh all <strong>Captured Elements</strong> on the screen. In case you want to Capture only additional elements use the <strong>"Add More"</strong> option </p></div>
@@ -817,6 +942,9 @@ useEffect(()=>{
   return (
     <>
      { overlay && <ScreenOverlay content={overlay} />}
+     { showPop && <PopupDialog />}
+     { showConfirmPop && <ConfirmPopup /> }
+     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={footerSave}>
         {showPanel && (<div className="card_modal">
           <Card className='panel_card'>
@@ -902,7 +1030,7 @@ useEffect(()=>{
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-            <Column field="selectall" header="Element Name" body={renderSelectAllCell} bodyClassName="ellipsis-column"></Column>
+            <Column field="selectall" header="Element Name" body={renderSelectAllCell} bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}></Column>
             <Column field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
             <Column field="actions" header="Actions"   body={renderActionsCell}/>
@@ -915,8 +1043,8 @@ useEffect(()=>{
           </Dialog>
         </div>
       </Dialog>
-      <Dialog className={visible === 'capture' ? "compare__object__note" : "compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
-        <div className={visible === 'capture' ? "compare__content__adj" : "compare__object"}>
+      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
+        <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
           </span>
