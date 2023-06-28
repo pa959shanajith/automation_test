@@ -114,6 +114,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
+  const [selectedPattren, setSelectedPattren] = useState(null);
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -878,9 +879,14 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const onScheduleBtnClick = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_schedule(false);
-      setScheduling(false);
     }
     if (btnType === "Schedule") {
+      setScheduling(true);
+    }
+  };
+
+  const onScheduleBtnClickClient = (btnType) => {
+    if(btnType === "ScheduleIce"){
       dispatch(
         testSuitesScheduler_ICE({
           param: "testSuitesScheduler_ICE",
@@ -893,14 +899,14 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({ ...el, 
               poolid: "",
               type: "normal",
-              targetUser: "automationice",
+              targetUser: selectedICE,
               iceList: [],
-              date: startDate,
-              time: startDate.getTime(),
+              date: startDate.toLocaleDateString('en-GB'),
+              time: `${startDate.getHours()}:${startDate.getMinutes()}`,
               timestamp: startDate.getTime(),
-              recurringValue: "One Time",
-              recurringString: "One Time",
-              recurringStringOnHover: "One Time",
+              recurringValue: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
+              recurringString: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
+              recurringStringOnHover: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
               endAfter: "",
               clientTime: "",
               clientTimeZone: ""
@@ -919,30 +925,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             configName: fetechConfig[configItem]?.configurename,
           })
         );
+        setScheduling(false);
       });
     }
+    if (btnType === "Cancel") {
+      setScheduling(false);
+    }
   };
-
-  // const onScheduleBtnClickClient = () => {
-  //   console.log(selectedSchedule);
-  //   dispatch(
-  //     testSuitesScheduler_ICE({
-  //       param: "testSuitesScheduler_ICE",
-  //       executionData: {
-  //         source: "schedule",
-  //         exectionMode: "serial",
-  //         executionEnv: "default",
-  //         browserType: selectedSchedule?.executionRequest?.browserType,
-  //         integration: selectedSchedule?.executionRequest?.integration,
-  //         batchInfo: selectedSchedule?.executionRequest?.batchInfo,
-  //         scenarioFlag: false,
-  //         type: "normal",
-  //         configureKey: selectedSchedule?.configurekey,
-  //         configureName: selectedSchedule?.configurename,
-  //       },
-  //     })
-  //   );
-  // };
 
   const checkboxHeaderTemplate = () => {
     return (
@@ -1148,17 +1137,25 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             visible={visible_schedule}
             setVisible={setVisible_schedule}
             onModalBtnClick={onScheduleBtnClick}
-            content={<ScheduleScreen cardData={fetechConfig[configItem]} startDate={startDate} setStartDate={setStartDate} />}
+            content={
+              <ScheduleScreen
+                cardData={fetechConfig[configItem]}
+                startDate={startDate}
+                setStartDate={setStartDate}
+                selectedPattren={selectedPattren}
+                setSelectedPattren={setSelectedPattren}
+              />
+            }
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
             footerType="Schedule"
             modalSytle={{
-              width: "55vw",
+              width: "75vw",
               height: "95vh",
               background: "#FFFFFF",
             }}
             isDisabled={!startDate}
           />
-          {/* <AvoModal
+          <AvoModal
             visible={scheduling}
             setVisible={setScheduling}
             onModalBtnClick={onScheduleBtnClickClient}
@@ -1197,7 +1194,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-          /> */}
+            isDisabled={!selectedICE}
+          />
           <AvoModal
             visible={visible_CICD}
             setVisible={setVisible_CICD}
@@ -1259,7 +1257,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                   <div className="container_devopsLabel" title={str}>
                     <span className="devops_label">DevOps Request Body : </span>
                     <div>
-
                       <pre className="grid_download_dialog__content__code executiontypenamepre">
                         <code
                           className="executiontypecode"
@@ -1267,7 +1264,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                           title={str}
                         >
                           {str}
-                       
                         </code>
                       </pre>
 
