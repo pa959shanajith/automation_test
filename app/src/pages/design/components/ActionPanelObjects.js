@@ -770,7 +770,7 @@ const ActionPanel = (props) => {
                         <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.absXpath} />
                       </div>
                       <div className='create-elem'>
-                        <span className='object__text'>Css Selector</span>
+                        <span className='object__text'>CSS Selector</span>
                         <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
                       </div>
                     </>
