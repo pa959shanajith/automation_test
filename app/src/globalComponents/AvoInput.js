@@ -31,7 +31,7 @@ const AvoInput = ({
           </div>
         </div>
       )}
-      <>
+      <div className="input_subcontainer">
         <InputText
           {...(htmlFor && { id: htmlFor })}
           placeholder={placeholder}
@@ -47,7 +47,7 @@ const AvoInput = ({
               </small>
           </div>
         )}
-      </>
+      </div>
     </div>
   );
 

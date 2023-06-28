@@ -1,10 +1,10 @@
 @import "../../global/styles/ColorVariables.scss";
 .ct-exportBtn{
-    position: absolute;
     height: 25px;
-    width: 180px;
-    top: calc(100% - 63px);
+    position: absolute;
     right: -82px;
+    top: calc(100% - 671px);
+    width: 180px;
 }
 .disableButton {
     cursor: default;
@@ -65,4 +65,15 @@
         margin-left: 5px;
     }
     
+}
+.exportDialog{
+    background: $whiteColor;
+    .p-dialog-header{
+        background: rgba(96,91,255,.08)!important;
+        font-family: Open Sans!important;
+        font-size: 20px!important;
+        font-style: normal!important;
+        font-weight: 600!important;
+        padding: 1rem!important;
+    }
 }

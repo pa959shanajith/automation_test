@@ -8,17 +8,19 @@ const AvoDropdown = ({
   onDropdownChange,
   placeholder,
   name,
-  required,
+  required = false,
   labelTxt,
+  customeClass = ""
 }) => {
   const [touched, setTouched] = useState(false);
   return (
     <div className="avo_dropdown">
       <label>
         <span>{labelTxt}</span>
-        <img src="static/imgs/Required.svg" className="required_icon" />
+        {required && <img src="static/imgs/Required.svg" className="required_icon" />}
       </label>
       <Dropdown
+        className={customeClass}
         value={dropdownValue}
         onChange={(e) => onDropdownChange(e)}
         options={dropdownOptions}

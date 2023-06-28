@@ -1,30 +1,12 @@
 
-.p-dialog {
-    .p-dialog-header-icon {
-        .add__object__header {
-            display: flex;
-            left: 35rem;
-        }
-
-        .p-dialog-header-icons {
-            right: 2% !important;
-            position: absolute;
-        }
-    }
-}
-
 .add__object__header {
     .p-dialog-header-icons {
         right: 2% !important;
         position: absolute;
     }
-    .p-dialog-header{
-        height: 3rem !important;
-        background: #E2E2ED !important;
-    border-top-right-radius: 4px;
-    padding: 0.3rem 0 !important;
-    height: 3rem !important;
 
+    .p-dialog-header { 
+        background: #E2E2ED !important;
     }
 
 }
@@ -77,6 +59,26 @@
 
     .p-card-body {
         padding: 0 !important;
+        .p-card-content {
+            padding: 0rem;
+            max-height: 13rem !important;
+            overflow-y: auto !important;
+            
+        }
+    }
+
+    .text__added__step {
+        background: rgba(96, 91, 255, .2);
+        border-radius: 3px;
+        color: #605bff;
+        font-family: Open Sans;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        height: 2rem;
+        margin: 0.5rem;
+        position: relative;
+        padding: 0.5rem;
     }
 }
 
@@ -161,38 +163,51 @@
 
 .map__object__header {
     .p-dialog-header {
-        padding: 0.6rem 0 !important;
-        height: 3rem !important;
         background: #E2E2ED !important;
-    border-top-right-radius: 4px;
-    // padding: 0.3rem 0 !important;
-    // height: 3rem !important;
     }
-
-    .p-dialog-header-icons {
-        right: 2% !important;
-        position: absolute;
+    .mo_mappedName{
+        background-color: #605BFF;
+        flex: 0 0 80%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding-left: 9px; 
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-
-    .p-dialog-title {
-        margin-left: 1.7% !important;
+    .mo_tagHead{
+        cursor: pointer;
+        background: grey;
+        text-align: center;
+        margin-bottom: 5px;
+        padding: 2px 10px;
+        color: white;
+        width: 60%;
+        border-radius: 5px;
     }
-
-    .text__content {
-        position: absolute;
-        bottom: 76%;
+    .mo_tagItems{
+        border: 1px solid black;
+        border-radius: 5px;
+        margin-bottom: 8px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        overflow: hidden;
+        white-space: nowrap !important;
+        text-overflow: ellipsis;
+    }
+    .mo_nameFlip{
+        flex: 0 0 20%;
+        height: 100%;
+    }
+    .mo_tagItemList{
+        margin: 10px 0 15px;
+        width: 60%
     }
 }
 
-.map__card {
-    height: 56%;
-    display: flex;
-    flex-direction: column;
-    top: 30%;
-    position: absolute;
-    border: 1px solid black;
-    width: 92%;
-}
 
 .captured__text {
     display: flex;
@@ -259,8 +274,18 @@
 }
 
 .create__object__modal {
+    .p-dialog-content{
+        padding: 0 1.5rem 0rem !important; 
+    }
+    .accordin__elem {
+        .p-accordion-header-link {
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            height: 3rem !important;
+        }
+    }
     .p-dialog-header-icons {
-        right:2% !important;
+        right: 2% !important;
         position: absolute;
     }
 
@@ -271,12 +296,7 @@
     }
 
     .p-dialog-header {
-        padding: 0.8rem 0 !important;
-        height: 3rem !important;
         background: #E2E2ED !important;
-    border-top-right-radius: 4px;
-    // padding: 0.3rem 0 !important;
-    // height: 3rem !important;
     }
 
     .p-dialog-title {
@@ -284,7 +304,7 @@
     }
 
     .input__text {
-        width: 100% !important;
+        width: 22rem;
         height: 2rem;
     }
 
@@ -296,7 +316,8 @@
     }
 
     .object__text {
-        margin-top: 0.7rem;
+        width: 11rem;
+       
     }
 }
 
@@ -310,7 +331,7 @@
     top: 8%;
 
     .creat_object_dropdown {
-        left: 0%;
+        left: 1.5rem;
         height: 2rem;
     }
 
@@ -336,15 +357,12 @@
 
 .compare__object__modal {
     .p-dialog-header-icons {
-       right: 2% !important;
-       position: absolute;
+        right: 2% !important;
+        position: absolute;
     }
-    .p-dialog-header{
-        height: 3rem !important;
+
+    .p-dialog-header {
         background: #E2E2ED !important;
-    border-top-right-radius: 4px;
-    padding: 0.3rem 0 !important;
-    height: 3rem !important;
     }
 
     position: relative;
@@ -383,27 +401,28 @@
     border-radius: 3px;
 }
 
-.footer__compare{
+.footer__compare {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
 }
 
-.clear__btn__cmp{
-  position: relative;
-  top: 0.7rem;
-  width: 24%!important;
-  height: 1.7rem;
-  background: none;
-  border: none;
-  font-size: 12px;
-  font-family: 'Open Sans';
-  cursor: pointer;
-}
-.save__btn__cmp{
+.clear__btn__cmp {
     position: relative;
     top: 0.7rem;
-    width: 24%!important;
+    width: 24% !important;
+    height: 1.7rem;
+    background: none;
+    border: none;
+    font-size: 12px;
+    font-family: 'Open Sans';
+    cursor: pointer;
+}
+
+.save__btn__cmp {
+    position: relative;
+    top: 0.7rem;
+    width: 24% !important;
     height: 1.7rem;
     background: #605BFF;
     border: none;
@@ -457,4 +476,33 @@
     top: 2%;
     position: relative;
     top: 0.2rem;
+}
+
+.create-elem{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.5rem;
+}
+
+.accordion-actions{
+    position: relative;
+    left: 36rem;
+    bottom: 3rem;
+}
+.button-add{
+    margin-right: 1rem;
+    border: none;
+    cursor: pointer;
+}
+.button-delete{
+    border: none;
+    cursor: pointer;
+}
+.save_clear{ 
+    position: relative;
+    bottom: 0.7rem;
+    right: 1rem;
+}
+.save-btn{
+    top: 0.7rem;
 }

@@ -36,8 +36,22 @@
 .toolbar__module-box:hover{
     background-color: #f7f7f7;
 }
+.warningPopup{
+.modal__content  {
+    width: 30% ;
+    height: 22%;
+    .modal-body{
+        margin-top: 8%;
+        margin-left: 3%;
+    }
+}
 .toolbar__module-warning-footer .btn-yes{
     margin-right: 0.9375rem;
+}
+.toolbar__module-warning-footer .btn-warning{
+    // margin-top: 11%;
+    margin-left: 32%;
+}
 }
 .searchBox {
     display: flex;
@@ -114,7 +128,7 @@
     height:24px;
     font-family:'LatoWeb';
     font-style:normal;
-    font-weight:600;
+    // font-weight:600;
     font-size:15px;
     line-height:24px;
     margin-left: 14px;
@@ -127,7 +141,7 @@
     height:22px;
     font-family:'LatoWeb';
     font-style:normal;
-    font-weight:600;
+    // font-weight:600;
     font-size:15px;
     line-height:24px;
     margin-left: 14px;
@@ -181,15 +195,17 @@
     height: 1rem;
 }
 .modNmeE2E{
-    font-size: 0.75rem;
+    font-size:14px;
     overflow: hidden;
     text-overflow:ellipsis ;
-    width: 7rem;
-    height: 1rem;
+    width: 12rem;
+    height: 19px;
     // text-align: left;
     padding-left: 0px;
-    margin-left: -4px;
-    margin-top: 4px;
+    margin-left: 7px;
+    // margin-top: 4px;
+    font-family: "open sans";
+    font-weight: 400 !important;
 }
 .scenarioList{
     height: 21.7rem;
@@ -344,3 +360,9 @@ padding-bottom: 1.5rem;}
 }
 .collapseButtonForModulesDiv :hover{
     background: $iceColor;}
+
+.mindmapImport{
+    position: absolute;
+    left: 14rem;
+    top: 2.7rem;
+}

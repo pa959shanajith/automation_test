@@ -1,202 +1,807 @@
-import {React, useState} from 'react';
+import { React, useState, useEffect, useRef } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Card } from 'primereact/card';
 import '../styles/ActionPanelObjects.scss';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
+import { userObjectElement_ICE } from '../api';
+import { Button } from "primereact/button";
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuid } from 'uuid';
+import { Messages as MSG, VARIANT } from '../../global/components/Messages';
+import RedirectPage from '../../global/components/RedirectPage';
+import { Accordion, AccordionTab } from 'primereact/accordion';
+import { tagList } from './ListVariables';
+import { updateScreen_ICE } from '../api';
+
+
+
+
+
+
 
 
 
 
 const ActionPanel = (props) => {
-    const [selectObjectType, setSelectObjectType] = useState(null);
-    const [selectCustomObj, setSelectCustomObj] = useState({
-      btn1: '',
-      btn2: '',
-      btn3: '',
-      btn4: ''
-    });
-    const [inputValue, setInputValue] = useState('');
-    // const [dropdownValue, setDropdownValue] = useState('');
-    const [displayedValues, setDisplayedValues] = useState([]);
-    const [value, setValue] = useState('');
-    const [selectedSpan, setSelectedSpan] = useState(null);
-    const [items, setItems] = useState([{id:1, name:'q_btn', objname: 'btn1'},
-                                       {id:2, name:'txt_box', objname: 'btn2'},
-                                     {id:3, name:'q_btn', objname: 'btn3'},
-                                    {id:4, name:'txt_box', objname: 'btn4'} ]);
-    const customObjects = [
-      {name:'button', code:'btn'},
-      {name:'textBox', code:'txt'},
-      {name:'inputType',code:'inp'},
-      {name:'button',code:'btnn'}
-    ];                                
-    
-    const objectType = [
-        { name: 'New York', code: 'NY' },
-        { name: 'Rome', code: 'RM' },
-        { name: 'London', code: 'LDN' },
-        { name: 'Istanbul', code: 'IST' },
-        { name: 'Paris', code: 'PRS' }
-    ];
-   
-    const footer =(
-        <div>
-            <button className='add_object_clear' onClick={handleClear}>Clear</button>
-            <button className='add_object_save'>Save</button>
-        </div>
-    )
-    
-    const footerCompare = (
-      <div className='footer_compare'>
-        <button className='clear__btn__cmp'>Clear</button>
-        <button className='save__btn__cmp'>Compare</button>
-      </div>
-    )
+  const [selectObjectType, setSelectObjectType] = useState(null);
+  const toast = useRef();
+  const history = useNavigate();
 
-    const handleInputChange = (e) => {
-      setInputValue(e.target.value);
-    };
+  const customObj = { objName: "", objType: "", url: "", name: "", relXpath: "", absXpath: "", className: "", id: "", qSelect: "" };
+  const [tempIdCounter, setTempIdCounter] = useState(1);
+  const [objects, setObjects] = useState([{ ...customObj, tempId: tempIdCounter }]);
+  const [customObjList, setCustomObjList] = useState({});
+  const [error, setError] = useState({ type: '', tempId: '' });
+  const [showFields, setShowFields] = useState([tempIdCounter]);
+
+  const [addElementTempIdCounter, setAddElementTempIdCounter] = useState(0);
+  const [addElementObjects, setAddElementObjects] = useState([]);
+  const [addElementSelectObjectType, setAddElementSelectObjectType] = useState(null);
+  const [addElementInputValue, setAddElementInputValue] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const [scrapedList, setScrapedList] = useState({});
+  const [customList, setCustomList] = useState({});
+  const [nonCustomList, setNonCustomList] = useState([]);
+  const [selectedTag, setSelectedTag] = useState("");
+  const [selectedItems, setSelectedItems] = useState([]);
   
-    const handleDropdownChange = (e) => {
-      setSelectObjectType(e.value);
-    };
+  const [map, setMap] = useState({});
+  const [showName, setShowName] = useState("");
+  const [selectedItem, setSelectedItem] = useState([]);
+  const [orderLists, setOrderLists] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
 
-    const handleAdd = () => {
-      const newValues = [...displayedValues, inputValue];
-      setDisplayedValues(newValues);
-      setInputValue('');
-      selectObjectType('');
-    };
+  const [selectCustomObj, setSelectCustomObj] = useState({
+    btn1: '',
+    btn2: '',
+    btn3: '',
+    btn4: ''
+  });
+  const [inputValue, setInputValue] = useState('');
+  const [displayedValues, setDisplayedValues] = useState([]);
+  const [value, setValue] = useState('');
+  const [selectedSpan, setSelectedSpan] = useState(null);
+  const customObjects = [
+    { name: 'button', code: 'btn' },
+    { name: 'textBox', code: 'txt' },
+    { name: 'inputType', code: 'inp' },
+    { name: 'button', code: 'btnn' }
+  ];
 
+  const objectTypes = [
+    { value: "a", typeOfElement: "lnk", name: "Link" },
+    { value: "input", typeOfElement: "txtbox", name: "Textbox/Textarea" },
+    { value: "table", typeOfElement: "tbl", name: "Table" },
+    { value: "list", typeOfElement: "lst", name: "List" },
+    { value: "select", typeOfElement: "select", name: "Dropdown" },
+    { value: "img", typeOfElement: "img", name: "Image" },
+    { value: "button", typeOfElement: "btn", name: "Button" },
+    { value: "radiobutton", typeOfElement: "radiobtn", name: "Radiobutton" },
+    { value: "checkbox", typeOfElement: "chkbox", name: "Checkbox" },
+    { value: "Element", typeOfElement: "elmnt", name: "Element" }
+  ];
 
-    const handleSpanClick = (index) => {
-      if (selectedSpan === index) {
-        setSelectedSpan(null);
-      } else {
-        setSelectedSpan(index);
-      }
-    };
+  useEffect(() => {
+    if (props.editFlag) {
+      let customFields = ['decrypt', props.utils.object.xpath, props.utils.object.url, props.utils.object.tag];
 
-    const handleClear=()=>{
-          setSelectCustomObj(null);
-          setSelectObjectType(null);
+      userObjectElement_ICE(customFields)
+        .then(data => {
+          if (data === "unavailableLocalServer")
+            // setMsg(MSG.SCRAPE.ERR_CREATE_OBJ);
+            return null;
+          else if (data === "invalid session") return RedirectPage(history);
+          else if (data === "fail")
+            // setMsg(MSG.SCRAPE.ERR_CREATE_OBJ);
+            return null;
+          else {
+            let custname = props.utils.object.title;
+            let newObj = {
+              objName: custname.slice(0, custname.lastIndexOf("_")),
+              objType: `${data.tag}-${custname.slice(custname.lastIndexOf("_") + 1)}`,
+              url: data.url,
+              name: data.name,
+              relXpath: data.rpath,
+              absXpath: data.apath,
+              className: data.classname,
+              id: data.id,
+              qSelect: data.selector
+            }
+            let obj = [...objects];
+            obj[0] = { ...obj[0], ...newObj };
+            // setObjects(obj);
+          }
+        })
+        .catch(error => console.log(error));
     }
-    
+    //eslint-disable-next-line
+  }, [])
 
-    return (
-     <>
-      <Dialog className='add__object__header'  header='Add Object'  visible={props.isOpen==='addObject'} onHide={props.OnClose} style={{height:"28.06rem", width:"38.06rem"}} position='right' footer={footer}>
-        <div className='card__add_object'>
-      <Card className='add_object__left' title="Add Object">
-      <div>
-        <p className='object__type'>Select Object Type</p>
-        <Dropdown value={selectObjectType} onChange={handleDropdownChange} options={objectType} optionLabel="name" 
-    placeholder="Search" className="w-full md:w-15rem object__dropdown" />
-        <p className='object__type__name'>Enter Element Name</p>
-        <input className='object__type__input' value={inputValue} onChange={handleInputChange} placeholder='Text Input'/>
-        <button className='add_object_btn' onClick={handleAdd}>Add</button>
-      </div>
-      </Card>
-      <Card className='add_object__right' title="Added Objects">
-      {displayedValues.map((value, index) => (
-          <div key={index}>
-            <p>{value}</p>
-          </div>
-        ))}
-      </Card>
-      </div>
-    </Dialog>
+  const handleAccordionTabChange = (index) => {
+    setActiveIndex(index);
+  };
+
+  useEffect(() => {
+    let tempScrapeList = {};
+    let tempCustomList = {};
+    let tempNonCustom = [];
+    let tempOrderList = [];
+    if (props.captureList && props.captureList.length ) {
+      props.captureList.forEach(object => {
+        let elementType = object.tag;
+        elementType = tagList.includes(elementType) ? elementType : 'Element';;
+        if (object.objId) {
+          if (object.isCustom) {
+            if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
+            else tempCustomList[elementType] = [object]
+            if (!tempScrapeList[elementType]) tempScrapeList[elementType] = []
+          }
+          else {
+            tempNonCustom.push(object);
+            if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
+            else tempScrapeList[elementType] = [object]
+          }
+          tempOrderList.push(object.objId);
+        }
+      });
+      setScrapedList(tempScrapeList);
+      setCustomList(tempCustomList);
+      setNonCustomList(tempNonCustom);
+      setOrderLists(tempOrderList);
+    }
+  }, [props.isOpen === 'mapObject']);
+
+  // useEffect(() => {
+
+    const toastErrorMsg = (errorMsg) => {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
+    }
+
+  // }, [errorMsg])
+
+  const newField = () => {
+    let updatedObjects = [...objects];
+    let updatedShowFields = [...showFields];
+    let newTempId = tempIdCounter + 1;
+    updatedObjects.push({ ...customObj, tempId: newTempId });
+    updatedShowFields.push(newTempId);
+    setObjects(updatedObjects);
+    setShowFields(updatedShowFields);
+    setTempIdCounter(newTempId);
+    setActiveIndex(updatedObjects.length - 1);
+  }
+
+  const deleteField = (index) => {
+    const updatedObjects = [...objects];
+    updatedObjects.splice(index, 1);
   
-    { <Dialog className='map__object__header' header="Map Object" style={{height:"28.06rem", width:"38.06rem"}} visible={props.isOpen==='mapObject'} onHide={props.OnClose} footer={footer} > 
-     <p className='text__content'>Please select the object type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
-     <card className='map__card'>
-     <div className='captured__text'>
-      <span>Captured Elements</span>
-      <span className='custom__obj__text'>Custom Elements</span>
-     </div>
-     {items.map((item)=>{
-      return (<div key={item.id} className='object__list'>
-        <img className='drag__dots' src='static/imgs/drag-dots.png'/>
-        <span className='capture__obj'>{item.name}</span>
-        <img className='arrow__right' src='static/imgs/arrow-right.png'/>
-
-        <Dropdown value={selectCustomObj} name={item.objname} onChange={(e) => setSelectCustomObj(e.value)} options={customObjects} optionLabel="name" 
-                placeholder="Select a City" className="w-full md:w-14rem custom__objects" />
-
-      </div>
-      )
-     })}
+    if (objects[index].tempId in customObjList) {
+      const updatedCustomsObjList = { ...customObjList };
+      delete updatedCustomsObjList[objects[index].tempId];
+      setCustomObjList(updatedCustomsObjList);
+    }
   
-     </card>
-    </Dialog>
+    const indexOfId = showFields.indexOf(objects[index].tempId);
+    if (indexOfId >= 0) {
+      const updatedShowFields = [...showFields];
+      updatedShowFields.splice(indexOfId, 1);
+      setShowFields(updatedShowFields);
+    }
+  
+    setObjects(updatedObjects);
+    setActiveIndex(activeIndex === index ? -1 : activeIndex);
+  };
+
+  const handleInputs = (event, index) => {
+    let updatedObjects = [...objects];
+    updatedObjects[index] = { ...updatedObjects[index], [event.target.name]: event.target.value };
+    setObjects(updatedObjects);
+  }
+
+  const onEdit = id => {
+    let indexOfId = showFields.indexOf(id);
+    if (indexOfId < 0) {
+      let updatedShowFields = [...showFields];
+      updatedShowFields.push(id);
+      setShowFields(updatedShowFields)
+    }
+  }
+ 
+
+  const onSave = index => {
+    let object = objects[index];
+    let [tag, elementType] = object.objType.code.split('-');
+    let customFields = ['encrypt'];
+    let errorObj = {};
+
+    if (!object.objName || !object.objType.code || !object.url) {
+      errorObj = { [object.tempId]: !object.objName ? "objName" : !object.objType.code ? "objType" : "url" };
+    } else if (object.name === "" && object.relXpath === "" && object.absXpath === "" && object.className === "" && object.id === "" && object.qSelect === "") {
+      errorObj = { missingField: true }
+      return null
+      // setMsg(MSG.SCRAPE.WARN_ADD_PROPERTY);
+    }
+
+    if (!Object.keys(errorObj).length) {
+      customFields.push(...[object.url, object.name, object.relXpath, object.absXpath, object.className, object.id, object.qSelect, elementType]);
+      userObjectElement_ICE(customFields)
+        .then(data => {
+          if (data === "unavailableLocalServer")
+            // return null;
+            toastErrorMsg(" Failed to create element - ICE not available")
+
+          // setMsg(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`,VARIANT.ERROR));
+
+          else if (data === "Invalid Session")
+            return RedirectPage(history);
+          else if (data === "fail")
+            // return null;
+          // setMsg({VARIANT:VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object`});
+          toastErrorMsg(" Failed to create element - ICE not available")
+          else {
+            let customObject = {
+              custname: `${object.objName}_${elementType}`,
+              tag: tag,
+              url: data.url,
+              xpath: data.xpath,
+              editable: 'yes'
+            };
+            let customObjectsList = { ...customObjList, [object.tempId]: customObject };
+
+            let indexOfId = showFields.indexOf(object.tempId);
+            let updatedShowFields = [...showFields];
+            updatedShowFields.splice(indexOfId, 1);
+            setShowFields(updatedShowFields);
+            setCustomObjList(customObjectsList);
+            // onSubmit(customObjectsList);
+          }
+        })
+        .catch(error => console.error(error));
+    }
+    setError(errorObj)
+  }
+
+
+  const onSubmit = (newCustomObjectsList) => {
+    if (props.editFlag) {
+      let errorFlag = null;
+      let errorObj = {};
+      let custname = customObjList[1].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
+      for (let object of props.scrapeItems) {
+        if (object.title === custname && object.val !== props.utils.object.val) {
+          errorObj = { [customObjList[1].tempId]: "objName", dTitle: custname };
+          errorFlag = 'present';
+          break;
+        }
       }
-     <Dialog className='map__object__header' header="Replace Object" style={{height:"28.06rem", width:"38.06rem"}} visible={props.isOpen==='replaceObject'} onHide={props.OnClose} footer={footer} > 
-     <p className='text__content'>Please select the object type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
-     <card className='map__card'>
-     <div className='captured__text'>
-      <span>Captured Elements</span>
-      <span className='new__captured__text'>Newly Captured Elements</span>
-     </div>
-     {items.map((item)=>{
-      return (<div key={item.id} className='object__list'>
-        <img className='drag__dots' src='static/imgs/drag-dots.png'/>
-        <span className='capture__obj'>{item.name}</span>
-        <img className='arrow__right' src='static/imgs/arrow-right.png'/>
+      if (errorFlag) {
+        setError(errorObj);
+        // setMsg(MSG.CUSTOM(`Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`,VARIANT.ERROR));
+        toastErrorMsg("Object Characteristics are same ")
+      }
+      else {
+        props.utils.modifyScrapeItem(props.utils.object.val, {
+          custname: custname,
+          tag: customObjList[1].tag,
+          url: customObjList[1].url,
+          xpath: customObjList[1].xpath,
+          editable: true
+        }, true);
+        props.setShow(false);
+      }
+    }
+    else {
+      let localScrapeList = [];
+      let viewArray = [];
+      let lastIdx = (props.capturedDataToSave && props.capturedDataToSave.view && props.capturedDataToSave.view.length) ? props.capturedDataToSave.view.length : 0;
 
-        <Dropdown value={selectCustomObj} name={item.objname} onChange={(e) => setSelectCustomObj(e.value)} options={customObjects} optionLabel="name" 
-                placeholder="Select a City" className="w-full md:w-14rem custom__objects" />
 
+      let duplicateDict = {};
+      let tempIdArr = [];
+      let duplicateFlag = false;
+      let errorFlag = null;
+      let errorObj = {};
+      let newOrderList = [];
+      console.log('hello');
+      for (let tempId of Object.keys(newCustomObjectsList)) {
+        let custname = newCustomObjectsList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
+
+        for (let object of props.scrapeItems) {
+          if (object.title === custname) {
+            errorObj = { [tempId]: "objName", dTitle: custname };
+            errorFlag = 'present';
+            break;
+          }
+        }
+
+        if (errorFlag === 'present') break;
+
+        if (custname in duplicateDict) {
+          duplicateDict[custname].push(tempId);
+          tempIdArr.push(...duplicateDict[custname]);
+          duplicateFlag = true;
+        } else duplicateDict[custname] = [tempId]
+
+        let newUUID = uuid();
+        localScrapeList.push({
+          objId: undefined,
+          objIdx: lastIdx,
+          val: newUUID,
+          hide: false,
+          title: custname,
+          url: newCustomObjectsList[tempId].url,
+          tag: newCustomObjectsList[tempId].tag,
+          xpath: newCustomObjectsList[tempId].xpath,
+          editable: true,
+          tempOrderId: newUUID,
+        });
+        viewArray.push({
+          custname: custname,
+          tag: newCustomObjectsList[tempId].tag,
+          url: newCustomObjectsList[tempId].url,
+          xpath: newCustomObjectsList[tempId].xpath,
+          editable: true
+        });
+        newOrderList.push(newUUID);
+        lastIdx++
+      }
+
+      if (errorFlag) {
+        setError(errorObj);
+        // setMsg(MSG.CUSTOM( `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`,VARIANT.ERROR));
+      }
+      else if (duplicateFlag) {
+        tempIdArr.forEach(tempId => errorObj[tempId] = "objName");
+        setError(errorObj);
+        // setMsg(MSG.SCRAPE.ERR_DUPLICATE_OBJ);
+      } else {
+        let updatedNewScrapeData = { ...props.capturedDataToSave };
+        if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
+        else updatedNewScrapeData = { view: [...viewArray] };
+        props.setNewScrapedData(updatedNewScrapeData);
+        props.updateScrapeItems(localScrapeList)
+        // props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
+        props.setCapturedDataToSave((oldCapturedDataToSave) => [...oldCapturedDataToSave, ...viewArray.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
+            isCustom: true,
+            ...viewArray[newlyCreatedElemIndex],
+            tempOrderId: newOrderList[newlyCreatedElemIndex]
+          }))
+        ]);
+        props.setCaptureData(oldOrderList => [...oldOrderList, ...updatedNewScrapeData.view.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
+            selectall: updatedNewScrapeData.view[newlyCreatedElemIndex].custname,
+            objectProperty: updatedNewScrapeData.view[newlyCreatedElemIndex].tag,
+            browserscrape: 'google chrome',
+            screenshots: "",
+            actions: '',
+            objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex]
+          }))
+        ]);
+        props.setSaved({ flag: false });
+        props.setShow(false);
+        // setMsg(MSG.SCRAPE.SUCC_OBJ_CREATE);
+
+      }
+    }
+  }
+
+  const handleType = (event, index) => {
+    let updatedObjects = [...objects];
+    updatedObjects[index].objType = event.value;
+    setObjects(updatedObjects);
+  }
+
+  const resetFields = () => {
+    let emptyFields = [...objects];
+    let showAll = [...showFields];
+    for (let i = 0; i < emptyFields.length; i++) {
+      emptyFields[i] = { ...emptyFields[i], ...customObj };
+      if (!showAll.includes(emptyFields[i].tempId))
+        showAll.push(emptyFields[i].tempId)
+    }
+    // setObjects(emptyFields);
+    setShowFields(showAll);
+    setError({ type: '', tempId: '' });
+  }
+
+  const addElementSaveHandler = () => {
+    let newObjects = [];
+    let newOrderList = [];
+
+    for (let i = 0; i < addElementObjects.length; i++) {
+      let name = addElementObjects[i].objName;
+      let type = addElementObjects[i].objType;
+      let tempId = addElementObjects[i].tempId;
+      let [tag, value] = type.split("-");
+      let custname = `${name.trim()}_${value}`;
+      let newUUID = uuid();
+      newObjects.push({
+        custname: name,
+        objIdx: i,
+        title: name,
+        tag: tag,
+        xpath: "",
+        val: newUUID,
+        isCustom: true,
+        tempOrderId: newUUID,
+      });
+      newOrderList.push(newUUID);
+    }
+    if (newObjects.length > 0) {
+      props.addCustomElement(newObjects, newOrderList);
+    }
+    props.OnClose();
+  }
+
+
+  const handleAddElementInputChange = (e) => {
+    setAddElementInputValue(e.target.value);
+  };
+
+  const handleAddElementDropdownChange = (e) => {
+    setAddElementSelectObjectType(e.value);
+  };
+
+  const handleAddElementAdd = () => {
+    let updatedObjects = {};
+    objectTypes.map(object_type => {
+      if (object_type.value === addElementSelectObjectType) {
+        updatedObjects["objName"] = addElementInputValue;
+        updatedObjects["objType"] = object_type.value + '-' + object_type.typeOfElement;
+        updatedObjects["tempId"] = addElementTempIdCounter + 1;
+
+      }
+    });
+    setAddElementObjects([...addElementObjects, updatedObjects]);
+    setAddElementInputValue('');
+    setAddElementSelectObjectType('');
+    setAddElementTempIdCounter(addElementTempIdCounter + 1);
+  };
+
+  const handleAddElementClear = () => {
+    setAddElementInputValue('');
+    setAddElementSelectObjectType('');
+    setAddElementObjects([]);
+  }
+
+  const addElementfooter = (
+    <div className=''>
+      <Button size="small" onClick={handleAddElementClear} text >Clear</Button> {/*className='add_object_clear'*/}
+      <Button size="small" onClick={addElementSaveHandler}>Save</Button> {/*className='add_object_save' */}
+    </div>
+  )
+
+  const createElementFooter = (
+    <div className='save_clear'>
+      <button className='add_object_clear' >Clear</button>
+      <button className='add_object_save'  onClick={() => { onSubmit(customObjList); }} disabled={objects.length == 0}>Submit</button>
+    </div>
+  );
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSpanClick = (index) => {
+    if (selectedSpan === index) {
+      setSelectedSpan(null);
+    } else {
+      setSelectedSpan(index);
+    }
+  };
+
+  // ----------------------map Element ---------------
+
+  const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
+
+  const onDragOver = event => event.preventDefault();
+
+  const onDrop = (event, currObject) => {
+    if (map[currObject.val]) setErrorMsg("Object already merged");
+    else {
+      let draggedObject = JSON.parse(event.dataTransfer.getData("object"));
+      let mapping = {
+        ...map,
+        [currObject.val]: [draggedObject, currObject],
+        [draggedObject.val]: null
+      }
+      setMap(mapping);
+      setErrorMsg("");
+    }
+  }
+
+  const onUnlink = () => {
+    let mapping = { ...map };
+    for (let customObjVal of selectedItem) {
+      let scrapeObjVal = mapping[customObjVal][0].val
+      delete mapping[customObjVal];
+      delete mapping[scrapeObjVal];
+    }
+    setMap(mapping);
+    setSelectedItem([]);
+    setShowName("");
+  }
+
+  const onShowAllObjects = () => setSelectedTag("");
+
+  const submitMap = () => {
+
+    if (!Object.keys(map).length) {
+      setErrorMsg("Please select atleast one object to Map");
+      return;
+    }
+
+    // let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
+    let appType = props.appType;
+    const screenId = props.fetchingDetails["_id"];
+    const projectId = props.fetchingDetails.projectID;
+    const screenName = props.fetchingDetails["name"];
+    const versionNumber = 0
+
+    let arg = {
+      projectId: projectId,
+      screenId: screenId,
+      screenName: screenName,
+      param: "mapScrapeData",
+      appType: appType,
+      objList: [],
+      orderList: orderLists,
+      versionnumber: 0,
+    };
+
+    let mapping = { ...map };
+    for (let val in mapping) {
+      if (mapping[val]) {
+        arg.objList.push([mapping[val][0].objId, mapping[val][1].objId, mapping[val][1].custname]);
+        arg.orderList.splice(arg.orderList.indexOf(mapping[val][0].objId), 1)
+      }
+    }
+
+    updateScreen_ICE(arg)
+      .then(response => {
+        if (response === "Invalid Session") return RedirectPage(props.history);
+        else props.fetchScrapeData()
+          .then(resp => {
+            if (resp === "success") {
+              props.setShow(false);
+              console.log(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
+            }
+            else console.log(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+          })
+          .catch(err => {
+            console.log(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+            // console.error(err);
+          });
+      })
+      .catch(error => {
+        console.log(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+        console.err(error);
+      })
+  }
+
+  const onCustomClick = (showName, id) => {
+    let updatedSelectedItems = [...selectedItem]
+    let indexOfItem = selectedItem.indexOf(id);
+
+    if (indexOfItem > -1) updatedSelectedItems.splice(indexOfItem, 1);
+    else updatedSelectedItems.push(id);
+
+    setShowName(showName);
+    setSelectedItem(updatedSelectedItems);
+  }
+
+
+  const mapElementFooter = () => (<>
+    {errorMsg && <span data-test="errorMessage" className="mo_errorMsg">{errorMsg}</span>}
+    <Button data-test="showAll" size="small" onClick={onShowAllObjects}>Show All Elements</Button>
+    <Button data-test="unLink" size="small" onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</Button>
+    <Button data-test="submit" size="small" onClick={submitMap}>Submit</Button>
+  </>
+  )
+  const footerCompare = (
+    <div className='footer_compare'>
+      <button className='clear__btn__cmp'>Clear</button>
+      <button className='save__btn__cmp'>Compare</button>
+    </div>
+  )
+
+  const renderAccordionHeader = (objName,index,objects) => {
+    return (
+      <div className="accordion-header">
+        <div style={{ marginTop: "3rem" }}>{(objName === "") ? `Element ${index+1}` : objName}</div>
+        <div className="accordion-actions">
+        <Button label="Save" severity="secondary" text className='save-btn' onClick={()=>onSave(index)} />
+          <button className=" pi pi-plus button-add" onClick={newField} />
+          <button className=" pi pi-trash button-delete" disabled={objects.length == 1} onClick={()=>deleteField(index)} />
+        </div>
       </div>
-      )
-     })}
-  
-     </card>
-    </Dialog>
-
-    <Dialog className='create__object__modal' header='Create Object' style={{height:"28.06rem", width:"50.06rem"}} visible={props.isOpen==='createObject'} onHide={props.OnClose} footer={footer}>
-      <div className='create_obj'>
-      <div className='create__left__panel'>
-      <p>Select Object Type</p>
-      <Dropdown value={selectObjectType} required onChange={(e) => setSelectObjectType(e.value)} options={objectType} optionLabel="name"
-    placeholder="Search" className="w-full creat_object_dropdown w-21rem" />
-    <span className='object__text'>Enter URL <img src="static/imgs/more-info.png"></img></span>
-    <InputText required className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
-    <span className='object__text'>Enter Name <img src="static/imgs/more-info.png"></img></span>
-    <InputText className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
-    <span className='object__text' >Enter Relative Xpath</span>
-    <InputText className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
-    </div>
-    <div className='create__right__panel'>
-    <span>Enter Class Name <img src="static/imgs/more-info.png"></img></span>
-    <InputText className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
-    <span className='object__text'>Enter ID <img src="static/imgs/more-info.png"></img></span>
-    <InputText required className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
-    <span className='object__text'>Enter Query Selector</span>
-    <InputText className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
-    <span className='object__text'>Enter Absolute Xpath</span>
-    <InputText className='input__text' type='text' value={value} onChange={(e) => setValue(e.target.value)} />
-    </div>
-    </div>
-    </Dialog>
-   
-   <Dialog className='compare__object__modal' header="Compare Object:Sign up screen 1" style={{height: "21.06rem",width: "24.06rem"}} visible={props.isOpen==='compareObject'} onHide={props.OnClose} footer={footerCompare}>
-    <div className='compare__object'>
-      <span className='compare__btn'>
-        <p className='compare__text'>List Of Browsers</p>
-      </span>
-      <span className='browser__col'>
-      <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1? 'browser__col__selected': 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan===1 && <img className='sel__tick' src='static/imgs/ic-tick.png'/>}</span>
-        <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2? 'browser__col__selected': 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png'/>Google Chrome {selectedSpan===2 && <img className='sel__tick' src='static/imgs/ic-tick.png'/>}</span>
-        <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3? 'browser__col__selected': 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png'/>Mozilla Firefox {selectedSpan===3 && <img className='sel__tick' src='static/imgs/ic-tick.png'/>}</span>
-        <span onClick={() => handleSpanClick(4)}className={selectedSpan === 4? 'browser__col__selected': 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png'/>Microsoft Edge {selectedSpan===4 && <img className='sel__tick' src='static/imgs/ic-tick.png'/>}</span>
-        </span>
-    </div>
-   </Dialog>
-    
-     
-     </>
     );
+  };
+
+  return (
+    <>
+      <Toast ref={toast} position="bottom-center" baseZIndex={9999}></Toast>
+      <Dialog className='add__object__header' header='Add Element' visible={props.isOpen === 'addObject'} onHide={props.OnClose} style={{ height: "28.06rem", width: "38.06rem" }} position='right' footer={addElementfooter}>
+        <div className='card__add_object'>
+          <Card className='add_object__left'>
+            <div className='flex flex-column'>
+              <div className="pb-3">
+                <label className='text-left pl-4' htmlFor="object__dropdown">Select Element Type</label>
+                <Dropdown value={addElementSelectObjectType} onChange={handleAddElementDropdownChange} options={objectTypes} optionLabel="name"
+                  placeholder="Search" className="w-full md:w-15rem object__dropdown" />
+              </div>
+              <div className="pb-5">
+                <label className='text-left pl-4' htmlFor="Element_name">Enter Element Name</label>
+                <InputText
+                  type="text"
+                  className='Element_name p-inputtext-sm'
+                  value={addElementInputValue}
+                  onChange={handleAddElementInputChange}
+                  placeholder='Text Input'
+                  style={{ width: "15rem", marginLeft: "1.25rem" }} />
+              </div>
+              <div style={{ marginLeft: "13.5rem" }}>
+                <Button icon="pi pi-plus" size="small" onClick={handleAddElementAdd} ></Button>
+              </div>
+            </div>
+          </Card>
+          <Card className='add_object__right' title="Added Elements">
+            {addElementObjects.map((value, index) => (
+              <div key={index} className='' >
+                <p className="text__added__step">{value.objName}</p>
+              </div>
+            ))}
+          </Card>
+        </div >
+      </Dialog >
+
+
+      {<Dialog
+        className='map__object__header'
+        header="Map Object"
+        style={{ height: "28.06rem", width: "38.06rem" }}
+        visible={props.isOpen === 'mapObject'}
+        onHide={props.OnClose}
+        footer={mapElementFooter} >
+        <p className='text__content'>Please select the object type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
+        <div className="flex flex-row">
+          <Card className="ml-4">
+            <p>Captured Elements</p>
+            {selectedTag ? scrapedList[selectedTag] : nonCustomList.map((object, i) => {
+              let mapped = object.val in map;
+
+              return (<div data-test="mapObjectListItem" key={i} title={object.title} className={"ss__mo_listItem" + (mapped ? " mo_mapped" : "")} draggable={mapped ? "false" : "true"} onDragStart={(e) => onDragStart(e, object)}>
+                {object.custname}
+              </div>)
+            })
+            }
+          </Card>
+          <Card className="w-8">
+            <p>Custom Elements</p>
+            <div className="flex flex-column">
+              {Object.keys(customList).map((elementType, i) => (<>
+                <div className="card">
+                  <Accordion activeIndex={0}>
+                    <AccordionTab header={elementType} onTabChange={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>
+                    {/* {selectedTag === elementType &&  */}
+                      <div className="mo_tagItemList">
+                        {customList[elementType].map((object, j) =>
+                          <div
+                            data-test="mapObjectCustomListItem"
+                            key={j} title={object.title}
+                            className={"mo_tagItems" +
+                              (selectedItem.includes(object.val) ? " mo_selectedTag" : "")}
+                            onDragOver={onDragOver}
+                            onDrop={(e) => onDrop(e, object)}
+                          >
+                            {object.val in map ?
+                              <>
+                                <span data-test="mapObjectMappedName" className="mo_mappedName" onClick={() => onCustomClick("", object.val)}>
+                                  {showName === object.val ? object.title : map[object.val][0].title}
+                                </span>
+                                <span data-test="mapObjectFlipName" className="mo_nameFlip" onClick={() => onCustomClick(object.val, object.val)}></span>
+                              </> :
+                              <span data-test="h3">{object.title}</span>}
+                          </div>)}
+                      </div>
+                      {/* } */}
+                    </AccordionTab>
+                  </Accordion>
+                </div>
+                {/* <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>{elementType}</div> */}
+
+              </>))}
+            </div>
+          </Card>
+        </div>
+      </Dialog >}
+
+      <Dialog className='create__object__modal' header='Create Element' style={{ height: "40rem", width: "50.06rem", marginRight: "6rem" }} visible={props.isOpen === 'createObject'} onHide={props.OnClose} footer={createElementFooter} position="right">
+        <Accordion activeIndex={activeIndex}>
+          {objects.map((object, index) => (
+            <AccordionTab className="accordin__elem" key={object.tempId}  header={renderAccordionHeader(object.objName, index, objects)}>
+              <div className='create_obj'>
+                <div className='create__left__panel'>
+                  <div className='create-elem'>
+                    <span className='object__text'>Element Name <span style={{ color: "red" }}> *</span> </span>
+                    <InputText required className='input__text' type='text' name="objName" onChange={(e) => handleInputs(e, index)} value={object.objName} disabled={!showFields.includes(object.tempId)} />
+                  </div>
+                  <div className='create-elem'>
+                    <p>Select Element Type <span style={{ color: "red" }}> *</span></p>
+                    <Dropdown value={object.objType} required onChange={(e) => handleType(e, index)} disabled={!showFields.includes(object.tempId)} options={
+                      objectTypes.map((objectType, i) => (
+                        {
+                          code: `${objectType.value}-${objectType.typeOfElement}`,
+                          name: objectType.name
+                        }
+                      ))
+                    } optionLabel="name"
+                      placeholder="Search" className="creat_object_dropdown w-22rem" />
+                  </div>
+                  {/* {showFields.includes(object.tempId) && */}
+                    <>
+                      <div className='create-elem'>
+                        <span className='object__text'>URL <span style={{ color: "red" }}> *</span></span>
+                        <InputText required className='input__text' type='text' name="url" onChange={(e) => handleInputs(e, index)} value={object.url} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>Name Attribute <span style={{ color: "red" }}> *</span></span>
+                        <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text' >Relative Xpath <span style={{ color: "red" }}> *</span></span>
+                        <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, index)} value={object.relXpath} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>Class Name </span>
+                        <InputText className='input__text' type='text' name="className" onChange={(e) => handleInputs(e, index)} value={object.className} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>ID Attribute</span>
+                        <InputText required className='input__text' type='text' name="id" onChange={(e) => handleInputs(e, index)} value={object.id} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>Query Selector</span>
+                        <InputText className='input__text' type='text' name="qSelect" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>Absolute Xpath</span>
+                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.absXpath} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>Css Selector</span>
+                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
+                      </div>
+                    </>
+                  {/* } */}
+                </div>
+              </div>
+            </AccordionTab>
+
+          ))
+          }
+        </Accordion>
+
+      </Dialog>
+
+      <Dialog className='compare__object__modal' header="Compare Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={props.isOpen === 'compareObject'} onHide={props.OnClose} footer={footerCompare}>
+        <div className='compare__object'>
+          <span className='compare__btn'>
+            <p className='compare__text'>List Of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+      </Dialog>
+
+
+    </>
+  );
 }
 
 export default ActionPanel

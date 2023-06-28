@@ -31,26 +31,24 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const copyNodes = useSelector(state=>state.design.copyNodes)
     const prjList = useSelector(state=>state.design.projectList)
     const initProj = useSelector(state=>state.design.selectedProj)
-    const setselectedProjectNameForDropdown = useSelector(state=>state.design.selectedProj)
+    // const setselectedProjectNameForDropdown = useSelector(state=>state.design.selectedProj)
     const moduleListed = useSelector(state=>state.design.moduleList)
     const selectedModuled = useSelector(state=>state.design.selectedModule)    
     const selectedModulelisted = useSelector(state=>state.design.selectedModulelist)
-    const [modlist,setModList] = useState(moduleList)
+    const [modlist,setModList] = useState(moduleListed)
     const [exportBox,setExportBox] = useState(false);
     const initEnEProj = useSelector(state=>state.design.initEnEProj)
     const [isCreateE2E, setIsCreateE2E] = useState(false)
     const isEnELoad = useSelector(state=>state.design.isEnELoad);
-
-    // const [selectedProjectNameForDropdown,setselectedProjectNameForDropdown] = useState(initProj);
-    // useEffect(() => {
-    //     setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
+    useEffect(() => {
+        setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         
-    //   },[initEnEProj]);
+      },[initEnEProj]);
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch(selectedProj(proj))
-        setselectedProjectNameForDropdown(proj);
+        // setselectedProjectNameForDropdown(proj);
         // if(!isEnELoad){
         //     // dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         //     // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
@@ -66,9 +64,9 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         dispatch(selectedModulelist([]))
         dispatch(screenData(screendata));
         if(screendata)dispatch(screenData(screendata))
-        if(SearchInp){
-            SearchInp.current.value = ""
-        }
+        // if(SearchInp){
+        //     SearchInp.current.value = ""
+        // }
         
         setBlockui({show:false})
         
@@ -85,7 +83,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         // if(!selectedModule._id || selectedModulelist.length==0)return;
         var err = validate([fnameRef,ftypeRef,gitconfigRef,gitBranchRef,gitVerRef])
         if(err)return
-        let selectedModuleVar;
+        let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
         setExportBox(false)
         setBlockui({show:true,content:'Exporting Mindmap ...'})
         var ftype = ftypeRef.current.value
@@ -93,8 +91,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             toJSON(selectedModuleVar,fnameRef.current.value,displayError,setBlockui);
         }
         
-        // if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
-        // if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
+        if(ftype === 'excel') toExcel(selectedProj,selectedModulelisted.length>0?selectedModulelisted[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelisted.length>0?selectedModulelisted[0]:selectedModuled});
     }
     const validate = (arr) =>{
         var err = false;
@@ -155,21 +153,22 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             footer={<Footer clickExport={clickExport}/>}
             content={<Container isEndtoEnd={"endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName isAssign={isAssign}/>} 
             />:null} 
-                    
-        <div className='toolbar__header'>    
-            <label data-test="projectLabel">Project:</label>
-            <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
-                {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
-            </select>
-            <span data-test="headerMenu" className='toolbar__header-menus'>
-                <i className={"fa fa-crop fa-lg"+' active-map'} title="Select" onClick={clickSelectBox}></i>
-                <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
-                <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
-            </span>
-            {!isEnELoad ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
+        <div style={{display:'flex'}}>
+            <div style={{background:"white", width: '17rem'}}>
+                <label data-test="projectLabel" className='projectLabel'>Project:</label>
+                <select data-test="projectSelect" className='projectSelect' value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
+                    {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
+                </select> 
+            </div>     
+            <div className='toolbar__header'>    
+                <span data-test="headerMenu" className='toolbar__header-menus'>
+                    <i className={"fa fa-crop fa-lg"+' active-map'} title="Select" onClick={clickSelectBox}></i>
+                    <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
+                    <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
+                </span>
+                {!isEnELoad ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
+            </div>
         </div>
-        
-
         </Fragment>
     )
 }

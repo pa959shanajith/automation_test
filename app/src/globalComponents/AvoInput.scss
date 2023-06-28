@@ -1,6 +1,12 @@
 .avo_input {
     width: 100%;
     .input_container {
+        .input_subcontainer {
+            width: 100%;
+            .p-inputtext {
+                width: 100%;
+            }
+        }
         width: 100%;
         .validation_container {
             height: 1rem;
@@ -23,19 +29,23 @@
         }
     }
     .input_container.inputRow {
-        margin: 1.25rem 0 1.25rem 0;
+        margin: 1.2rem 0 0.2rem 0;
         display: flex;
         align-items: center;
         flex-direction: row;
         .p-inputtext {
             padding: 0.4rem 0.4rem;
+            width: 100%;
         }
     }
     .input_container.inputRow_for_E2E_popUp {
-        margin: 0.7rem 0 1.25rem 0;
+        margin: 0.7rem 0 1rem 0;
         display: flex;
         align-items: center;
         flex-direction: row;
+        .icons_container{
+              width: 5rem;
+        }
         .p-inputtext {
             width: 17rem;
             padding: 0.4rem 0.4rem;
@@ -53,6 +63,8 @@
     }
     .icons_container {
         display: flex;
+        margin-top: -1rem;
+        width: 18rem;
     }
     .configinfo_icon {
         padding: 0 0 0 0.3rem;

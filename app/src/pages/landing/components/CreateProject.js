@@ -17,6 +17,7 @@ import { loadUserInfoActions } from '../LandingSlice';
 
 
 
+
 const CreateProject = ({ visible, onHide }) => {
   const [value, setValue] = useState('');
   const [selectedApp, setSelectedApp] = useState(null);
@@ -34,29 +35,65 @@ const CreateProject = ({ visible, onHide }) => {
   const [projectData, setProjectData] = useState([]);
   const dispatch = useDispatch();
   const [refreshData, setRefreshData] = useState(false);
-  const toastSuccess = useRef(null);
-  const toastError = useRef(null);
-  const toastContainerRef = useRef(null);
+  const userInfo = useSelector((state) => state.landing.userinfo);
+  const [isInvalidProject, setIsInvalidProject] = useState(false);
 
 
+  // const loggedInUser = {
+  //   name: userInfo.username,
+  //   role:userInfo.rolename,
+  //   id: userInfo.user_id
+  // };
 
+ 
   const userDetails = async () => {
     try {
       const userData = await getUserDetails("user");
-      console.log(userData);
       const formattedData = userData.map((user) => {
         const [name, id, , primaryRole, firstname, lastname, email] = user;
         return { id, name, primaryRole, firstname, lastname, email };
       });
-
-      setItems(formattedData
-        .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-        .filter(item => item.primaryRole !== "Admin")
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(item => ({
-          ...item, selectedRole: '',
-          initials: getInitials(item.firstname, item.lastname)
-        })));
+      let loggedInUser = null;
+      let newFormattedData = [];
+      for (let item of formattedData) {
+        if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
+          if (item.id === userInfo.user_id) {
+            loggedInUser = {
+              ...item, selectedRole: "",
+              initials: getInitials(item.firstname, item.lastname)
+            };
+          } else {
+            newFormattedData.push(
+              {
+                ...item, selectedRole: '',
+                initials: getInitials(item.firstname, item.lastname)
+              }
+            )
+          }
+        }
+      }
+      setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
+      setDisplayUser([loggedInUser]);
+      // setItems(formattedData
+      //   .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+      //   .filter(item => item.primaryRole !== "Admin")
+      //   .sort((a, b) => a.name.localeCompare(b.name))
+      //   .filter((item) => {
+      //     console.log('item', item.id);
+      //     console.log('userInfo.user_id', userInfo.user_id);
+      //     console.log('item.id === userInfo.user_id', item.id === userInfo.user_id);
+      //     if(item.id === userInfo.user_id){
+      //       loggedInUser = item;
+      //       return false;
+      //     } else {
+      //       return true;
+      //     }
+      //   })
+      //   .map(item => ({
+      //     ...item, selectedRole: '',
+      //     initials: getInitials(item.firstname, item.lastname)
+      //   }))
+      // );
     } catch (error) {
       console.error(error);
     }
@@ -71,20 +108,15 @@ const CreateProject = ({ visible, onHide }) => {
     return initials;
   }
 
-
-
-
-
-
   const apps = [
-    { name: 'Web', code: 'NY', image: 'static/imgs/web.png' },
-    { name: 'Sap', code: 'RM', image: 'static/imgs/SAP.png' },
-    { name: 'Oebs', code: 'LDN', image: 'static/imgs/OEBS.png' },
-    { name: 'DeskTop', code: 'IST', image: 'static/imgs/desktop.png' },
-    { name: 'Webservices', code: 'PRS', image: 'static/imgs/webService.png' },
-    { name: 'Mainframe', code: 'PRS', image: '/static/imgs/mainframe.png' },
-    { name: 'Mobile Web', code: 'PRS', image: 'static/imgs/mobileWeb.png' },
-    { name: 'Mobile Apps', code: 'PRS', image: '/static/imgs/mobileApps.png' },
+    { name: 'Web', code: 'Web', image: 'static/imgs/web.png' },
+    { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg' },
+    { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg' },
+    { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png' },
+    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/webService.png' },
+    { name: 'Mainframe', code: 'Mainframe', image: '/static/imgs/mainframe.png' },
+    { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png' },
+    { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png' },
   ];
 
   const roles = [
@@ -92,6 +124,7 @@ const CreateProject = ({ visible, onHide }) => {
     { name: 'Test Lead' },
     { name: 'QA' },
   ];
+
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -151,7 +184,6 @@ const CreateProject = ({ visible, onHide }) => {
     setRefreshData(!refreshData);
   };
 
-
   const handleButtonClick = () => {
     const filteredItems = items.filter(
       (item) => !selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
@@ -162,12 +194,14 @@ const CreateProject = ({ visible, onHide }) => {
       (item) => selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
     );
 
+
+
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
       ...assignedUsers
 
+
     ]);
-    console.log(assignedUsers)
     setSelectedCheckboxes([]);
     setSelectAll(false);
   };
@@ -235,7 +269,6 @@ const CreateProject = ({ visible, onHide }) => {
     //   ...selectedRole,
     //   Admin: e.value
     // });
-    console.log(id)
   };
 
   useEffect(() => {
@@ -244,6 +277,16 @@ const CreateProject = ({ visible, onHide }) => {
     setDisplayUser([])
     userDetails()
   }, [refreshData])
+
+  // const toastErrorMsg = (errMsg) => {
+  //   toastError.current.show({severity: "error",summary: "Invalid Project Name", detail:"Special characters are not allowed in the project name", life: 10000,});
+  // }
+
+  const handleValueChange = (event) => {
+    setValue(event.target.value);
+    setIsInvalidProject(event.target.value === "invalid_name_spl");
+  };
+
 
   const handleCreate = async () => {
     if (value !== "" && selectedApp !== "" && displayUser.length !== 0) {
@@ -255,7 +298,7 @@ const CreateProject = ({ visible, onHide }) => {
 
       var projData = {
         projectName: value,
-        type: selectedApp.name,
+        type: selectedApp.code,
         assignedUsers: filteredUserDetails,
         domain: "banking",
         releases: [{ name: "R1", cycles: [{ name: "C1" }] }],
@@ -264,24 +307,20 @@ const CreateProject = ({ visible, onHide }) => {
       const project = await userCreateProject_ICE(projData);
 
       if (project === "invalid_name_spl") {
-        toastError.current.show({
-          severity: "error",
-          summary: "Invalid Project Name",
-          detail: "Special characters are not allowed in the project name",
-          life: 3000,
-        });
+        setIsInvalidProject(true);
+        return;
       }
-      else {
-        toastSuccess.current.show({
-          severity: "success",
-          summary: "Project Created Successfully",
-          detail: "Project Created Successfully",
-          life: 1000,
-        });
-        dispatch(loadUserInfoActions.savedNewProject(true))
-        onHide();
-        setRefreshData(!refreshData);
-      }
+      setIsInvalidProject(false)
+      toast.current.show({
+        severity: "success",
+        summary: "Project Created Successfully",
+        detail: "Project Created Successfully",
+        life: 5000,
+      });
+  
+      dispatch(loadUserInfoActions.savedNewProject(true));
+      onHide();
+      setRefreshData(!refreshData);
     }
   };
 
@@ -310,21 +349,18 @@ const CreateProject = ({ visible, onHide }) => {
 
   return (
     <>
-      <div ref={toastContainerRef} className="toast-container" />
-      <Toast
-        ref={toastError}
-        position="top-right"
-      // className="custom-toast"
-      />
+      <Toast ref={toast} position="bottom-right" baseZindex={10000}/>
       <Dialog className='Project-Dialog' header="Create Project" visible={visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>
         <Card className='project-name-1'>
           <div className='pro-name1'>
             < h5 className='proj__name'> Project Name <span className="imp-cls"> * </span> </h5>
-            <InputText className="proj-input" value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter Project Name" />
+            <InputText  className={`proj-input ${isInvalidProject ? 'p-invalid' : ''}`} value={value}  onChange={handleValueChange} placeholder="Enter Project Name" />
+            {isInvalidProject && (
+          <small className="p-error error-msg">Special characters are not allowed in the project name</small> )}
             <div className='dropdown-1'>
               <h5 className='application__name'>Application Type <span className="imp-cls"> * </span></h5>
               <Dropdown value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name"
-                placeholder="Select a appType" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " />
+                placeholder="Select an Application Type" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " />
             </div>
           </div>
 
@@ -341,12 +377,14 @@ const CreateProject = ({ visible, onHide }) => {
           </div>
 
           <div className='user-select-checkbox '>
-            <div className='check1'>
-              <Checkbox checked={selectAll} onChange={handleCheckboxChange} value="all" ></Checkbox>
-              <h5 className='label1'> Select All</h5>
-            </div>
-            <div className='dropdown_role'>
-              <h5>Project level role(optional)</h5>
+            <div className=''>
+              <div className='check1'>
+                <Checkbox checked={selectAll} onChange={handleCheckboxChange} value="all" ></Checkbox>
+                <h5 className='label1'> Select All</h5>
+              </div>
+              <div className='dropdown_role'>
+                <h5>Project level role(optional)</h5>
+              </div>
             </div>
             <div className="check2">
               {items.map(item => (
@@ -354,34 +392,20 @@ const CreateProject = ({ visible, onHide }) => {
                 <div key={item.id} className="users-list">
                   <Checkbox className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id} checked={selectedCheckboxes.some((cb) => cb.id === item.id)} onChange={handleCheckboxChange} />
                   <h5 htmlFor={`checkbox-${item.id}`} className="label-2 ml-2 mr-2 mt-2 mb-2" title={item.email} >
-
-                    <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '27px', height: '26px' }} >{item.initials}</Avatar></span>
-
-                    <span className='user-name'> {item.name}</span>
-                    <span className='user-role'>{item.primaryRole}</span>
-
-                    <span className='tooltip'></span>
+                    <div className='user-info' >
+                      <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '27px', height: '26px' }} >{item.initials}</Avatar></span>
+                      <div className='name_And_Role'>
+                        <span className='user-name'> {item.name}</span>
+                        <span className='user-role'>{item.primaryRole}</span>
+                        <span className='tooltip'></span>
+                      </div>
+                    </div>
 
                   </h5>
-                  <Dropdown value={(item.selectedRole) ? item.selectedRole : ''} onChange={(e) => handleRoleChange(e, item.id)} options={roles} optionLabel="name"
-                    // valueTemplate={(option) => {
-                    //   return (
-                    //     <>
-                    //       {option && (
-                    //         <div className="selected-role">
-                    //           <span>{option.name}</span>
-                    //           <button
-                    //             className="cancel-selection"
-                    //             onClick={handleCancelSelection}
-                    //           >
-                    //             &#10005;
-                    //           </button>
-                    //         </div>
-                    //       )}
-                    //     </>
-                    //   );
-                    // }}
-                    placeholder="Select a Role" className="role-dropdown" />
+                  <div className='role__dd'>
+                    <Dropdown value={(item.selectedRole) ? item.selectedRole : ''} onChange={(e) => handleRoleChange(e, item.id)} options={roles} optionLabel="name"
+                      placeholder="Select a Role" className="role-dropdown" />
+                  </div>
 
                 </div>
 
@@ -416,33 +440,25 @@ const CreateProject = ({ visible, onHide }) => {
           <div className='check-bx3'>
             <ul>
               {displayUser.map((checkboxId) => (
-                <>
+                <div className="selected_users__list">
                   <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id} value={checkboxId.id} checked={selectedAssignedCheckboxes.some((ab) => ab.id === checkboxId.id)}
                     onChange={handleAssignedCheckboxChange}
                   >{checkboxId} </Checkbox>
-                  <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 ">
-                    <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '27px', height: '26px' }} >{checkboxId.initials}</Avatar></span>
-                    <span className='asgnd-name'> {checkboxId.name} </span>
-                    <span className='asgnd-role'>{!checkboxId.selectedRole.name ? checkboxId.primaryRole : checkboxId.selectedRole.name}</span>
-
+                  <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 " title={checkboxId.email}>
+                    <div className="nameRole_user">
+                      <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '26px', height: '23px', fontSize: "13px" }} >{checkboxId.initials}</Avatar></span>
+                      <span className='asgnd-name'> {checkboxId.name} </span>
+                      <span className='asgnd-role'>{!checkboxId.selectedRole.name ? checkboxId.primaryRole : checkboxId.selectedRole.name}</span>
+                    </div>
                   </h5>
-                </>
+                </div>
 
               ))}
             </ul>
-
           </div>
-
-
         </Card>
       </Dialog>
-      <Toast ref={toastSuccess} position="bottom-right" />
-      <Toast
-        ref={toastError}
-        position="bottom-center"
-
-      />
-
+    
     </>
   )
 }

@@ -72,10 +72,10 @@
     .card11{
         .p-card-body{
             margin: 0rem;
-            overflow-y: auto;
-            height: auto;
-            min-height: 25rem;
-            overflow-x: hidden;
+            // overflow-y: auto;
+            // height: auto;
+            // min-height: 25rem;
+            // overflow-x: hidden;
         }
     }  
     .card11{
@@ -116,7 +116,7 @@
      }
      .btn-11{
         position: relative;
-        top: 1rem;
+        top: 0rem;
      }
     
      .btn1{
@@ -142,11 +142,14 @@
      }
      .check1{
         position: relative;
+        background: white;
         bottom: 1rem;
      }
      .check2{
          position: relative;
-         bottom: 5rem;
+         bottom:4.5rem;
+         height: 18rem;
+         overflow: auto;
      }
      
     .card{
@@ -192,7 +195,7 @@
      }
     .role-dropdown{
         float: right;
-        width: 16.18rem;
+        width: 13rem;
         height: 2em;
         position: relative;
         left: 1rem;
@@ -233,6 +236,7 @@
     .user-select-checkbox {
         position: relative;
         top: 0.5rem;
+        width: 35rem;
     }
     .selecteduser{
         width: 28rem;
@@ -261,19 +265,23 @@
     }
     .checkbox-2{
         position: relative;
-        bottom: 1rem;
+        bottom: 0.5rem;
     }
     .dropdown_role{
         position: relative;
         bottom: 5.2rem;
-        left: 19rem;
+        left: 21.5rem;
         color: #9E9E9E;
         font-size: 14px;
         font-family: 'Open sans' !important;
+        // z-index: 9;
     }
     .check-bx3{
+        align-items: center;
+        display: flex;
+        flex-direction: row;
         position: relative;
-        bottom: 1rem;
+        bottom: 0.5rem;
 
     }
     .user-role{
@@ -285,8 +293,10 @@
         font-family: 'Open Sans';
         font-style: normal;
         font-weight: 400;
-        font-size: 14px;
+        left: 0.2rem;
         width: 7rem;
+
+   
     }
     
     .assigned-checkbox{
@@ -294,26 +304,23 @@
         bottom: 2rem;
     }
     .asgnd-name{
-        position: relative;
-        bottom: 6rem;
-        left: 3.4rem;
-        width: 12rem;
+        width: 15rem;
         font-family: 'Open Sans';
         font-style: normal;
         font-weight: 400;
         font-size: 14px;
+        margin-left: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .asgnd-role{
-    position: relative;
-    bottom: 6.1rem;
-    left: 3.4rem;
     color: darkgrey;
     font-size: 12px;
     font-family: 'Open Sans';
    font-style: normal;
    font-weight: 400;
-    font-size: 14px;
-    width: 7rem;
+    width: 17rem;
     }
     .label-3{
         display: flex;
@@ -321,51 +328,54 @@
         width: 5rem;
         margin-bottom: -3rem;
     }
-    .tooltip {
-        position: relative;
-        display: inline-block;
-      }
+    // .tooltip {
+    //     position: relative;
+    //     display: inline-block;
+    //   }
       
-      .tooltip::before,
-      .tooltip::after {
-        position: absolute;
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-      }
+    //   .tooltip::before,
+    //   .tooltip::after {
+    //     position: absolute;
+    //     visibility: hidden;
+    //     opacity: 0;
+    //     transition: opacity 0.3s ease-in-out;
+    //   }
       
-      .tooltip::before {
-        content: attr(title);
-        background-color: #333;
-        color: #fff;
-        padding: 5px;
-        font-size: 14px;
-        border-radius: 5px;
-        z-index: 1;
-      }
+    //   .tooltip::before {
+    //     content: attr(title);
+    //     background-color: #333;
+    //     color: #fff;
+    //     padding: 5px;
+    //     font-size: 14px;
+    //     border-radius: 5px;
+    //     // z-index: 1;
+    //   }
       
-      .tooltip::after {
-        content: "";
-        border: 5px solid transparent;
-        border-top-color: #333;
-        z-index: 2;
-      }
+    //   .tooltip::after {
+    //     content: "";
+    //     border: 5px solid transparent;
+    //     border-top-color: #333;
+    //     // z-index: 2;
+    //   }
       
-      .tooltip:hover::before,
-      .tooltip:hover::after {
-        visibility: visible;
-        opacity: 1;
-      }
+    //   .tooltip:hover::before,
+    //   .tooltip:hover::after {
+    //     visibility: visible;
+    //     opacity: 1;
+    //   }
 
       .user-name{
-        width: 16rem;
-        position: relative;
-        left: 2.2rem;
         bottom: 1rem;
-        font-family: 'Open Sans';
+        font-family: "Open Sans";
+        font-size: 14px;
         font-style: normal;
         font-weight: 400;
-        font-size: 14px;
+        left: 2.2rem;
+        position: relative;
+        width: 9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .user-av{
         width: 1.5rem !important;
@@ -381,18 +391,15 @@
       }
 
       .asgnd-avatar{
-        position: relative;
-        bottom: 4rem !important;
-        left: 1.2rem !important;
         right: 0rem !important;
         font-size: 0.85rem !important;
         width: 1.5rem !important;
         height: 1.5rem !important;
       }
       .users-list{
-        position: relative;
-        top: 1rem;
-        margin-bottom: -3.5rem;
+        align-items: center;
+        display: flex;
+        flex-direction: row;
       }
 
       .p-multiselect .p-multiselect-label.p-placeholder{
@@ -409,10 +416,48 @@
    .imp-cls{
     color: red;
    }
-//    .custom-toast {
-//     position: absolute;
-//     z-index: 99999999;
-//   }
-    
+   .user-info {
+    align-items: center;
+    /* align-items: center; */
+    display: flex;
+    flex-direction: center;
+    position: relative;
+    right: 1rem;
+    top: 2rem;
+  }
+  .name_And_Role{
+    display: flex;
+    flex-direction: row;
+    /* bottom: 3rem; */
+    position: relative;
+    border: -2rem;
+    bottom: -2rem;
+    top: 2rem;
+    right: 1.5rem;
+  }
+  .role__dd{
+    flex-shrink: 0;
+    position: relative;
+    left: 13rem;
+    top: 7rem;
+}
+.nameRole_user{
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    width: 15rem;
+    bottom: 3.8rem;
+}
+.selected_users__list{
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.error-msg{
+    position: absolute;
+    right: 24rem!important;
+    top: 4rem!important
+}
+  
     
     

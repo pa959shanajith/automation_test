@@ -6,14 +6,7 @@
   margin-left: 50rem;
 }
 
-.profile{
-position: fixed;
-    bottom: 44.3rem;
-    right: 0.5rem;
-}
-
 .custom-tieredmenu {
-  // background-color: #FAFAFB !important;
   background:linear-gradient(180deg,#EDECEC 15%,#fafafb 13%)!important;
   border-radius: 8px !important;
   width: 13.5rem !important;
@@ -22,19 +15,10 @@ position: fixed;
   position: absolute;
   top: 2.6rem;
   right: 0.2rem;
-
-  // .p-menuitem-icon,
-  // .p-menuitem-text {
-  //   color: #ffffff !important;
-  // }
-
   .p-menuitem-link:not(.p-disabled):hover {
     background: #bec2be !important;
   }
-
-  // .p-submenu-list {
-  //   background-color: #030229 !important;
-  // }
+  
 }
 
 .ProfileDisplay  {
@@ -42,10 +26,8 @@ position: fixed;
   margin-bottom: 0.8rem;
   margin-right: 0.5rem;
   margin-top: 1rem;
-  // color: #ffffff;
 }
 .tooltipEmailId{
-  // max-width: 12rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

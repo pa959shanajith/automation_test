@@ -5,7 +5,6 @@ import { Tooltip } from 'primereact/tooltip';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { resetPassword } from '../api';
-import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { useDispatch } from 'react-redux';
 import '../styles//ChangePassword.scss';
 
@@ -127,7 +126,7 @@ const ChangePassword = (props) => {
         </>)
     return (
         <>
-            <div className='surface-card m-6'>
+            <div className='surface-card'>
                 <Toast ref={toastWrapperRef} position="bottom-center" />
                 <Dialog header="Change Password" className="changePassword_dialog" visible={showDialog} style={{ width: '30vw' }} onHide={resetFields} footer={changePasswordFooter}>
                     <div className='pt-3'>

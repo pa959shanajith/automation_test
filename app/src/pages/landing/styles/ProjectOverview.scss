@@ -16,18 +16,24 @@
   margin-left:13rem ;
 }
 .tab-menu{
-  .p-tabmenu-nav {
-margin:2rem 0rem 0rem 0rem ;
   .p-menuitem-link
   {
   padding: 0.9rem !important;  
   box-shadow: none !important;
   font-family: 'Open Sans' !important;
   font-style: normal !important;
-  font-weight: 400 !important;
+  font-weight: bold !important;
   font-size: 18px !important;
   line-height: 21px !important;
   color: #030229;
   }
 }
+.DefaultProject{
+  display: flex;
+  font-size: 24px;
+  font-weight: 500;
+  color: #030229;
+}
+.DefaultProjectName{
+margin-left: 0.5rem;
 }

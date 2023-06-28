@@ -1,0 +1,82 @@
+.schedule_container {
+    margin: 1rem 2rem 0rem 2rem;
+    .p-calendar {
+        width: 100%;
+        .p-inputtext {
+            padding: 0.3rem 0.5rem;
+        }
+
+        .p-button {
+            padding: 0.3rem 0.5rem;
+            background: white;
+            color: #dee2e6;
+            width: 2rem;
+            border: 1px solid #dee2e6;
+            .p-button-icon {
+                color: #495057;
+            }
+        }
+    }
+    .make_recurring {
+        padding: .3rem .5rem;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        color: #495057;
+        text-align: left;
+        .p-button-label {
+            font-weight: 400;
+        }
+    }
+    .p-button.make_recurring.p-button-info:enabled:hover {
+        background: #fff;
+        color: #495057;
+    }
+    .btn_container {
+        padding: 0.5rem 0;
+        .recurring_btn {
+            margin-left: 1rem;
+        }
+    }
+    .avo_input {
+        .p-input-icon-left {
+            width: 100%;
+        }
+    }
+}
+
+.recurrence_container {
+    max-width: 50%;
+    .radioBtn {
+        padding-bottom: 1rem;
+    }
+    .dailyContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        .radioBtndaily {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.4rem;
+            .every_day {
+                width: 3rem;
+            }
+            .day_week {
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+    .with_border {
+        border-right: 1px solid #000000;
+    }
+    .without_border {
+        border: none;
+    }
+    .checkbox_padding {
+        padding: 0.7rem;
+    }
+}

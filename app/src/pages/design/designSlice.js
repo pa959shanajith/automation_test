@@ -20,7 +20,7 @@ const initialState = {
     toDeleteScenarios: [],
     appType:undefined,
     savedList:false,
-  ScrapeData : [],
+    ScrapeData : [],
     disableAction: false,
     disableAppend: false,
     compareFlag: false,
@@ -45,6 +45,9 @@ const initialState = {
     TestCases: [],
     modified: {},
     saveEnable: false,
+    enableExport:false,
+    exportProjname:"",
+    enableExportMindmapButton:true
 }
 
 export const designSlice = createSlice({
@@ -93,8 +96,15 @@ export const designSlice = createSlice({
     scenarioList:(state, action)=>{
       state.scenarioList = action.payload
     },
-    importData:(state, action)=>{
-      state.importData = action.payload
+    setImportData:(state, action)=>{
+      var res = action.payload
+      return {
+        selectedProj : res.selectProj,
+        selectedModule : res.selectModule,
+        screenData : res.screenData,
+        moduleList : res.moduleList,
+        importData : res.importData
+      }
     },
     unassignTask:(state, action)=>{
       state.unassignTask = action.payload
@@ -102,20 +112,23 @@ export const designSlice = createSlice({
     toDeleteScenarios: (state, action)=>{
       state.toDeleteScenarios = action.payload
     },
-    appType:(state, action)=>{
+    AppType:(state, action)=>{
       state.appType = action.payload
     },
     savedList:(state, action)=>{
       state.savedList = action.payload
     },
     saveMindMap: (state, action) => {
-      state.screenData = action.payload.screenData;
-      state.deletedNodes = [];
-      state.moduleList = action.payload.moduleData;
-      state.selectedModule = {};
-      state.selectedModuleList = [];
-      state.scenarioList = [];
-      state.unassignTask = [];
+      return{
+        ...state,
+        screenData: action.payload.screendata,
+        deletedNodes: [],
+        moduleList: action.payload.moduledata,
+        selectedModule: action.payload.moduleselected,
+        selectedModulelist: [],
+        scenarioList:[],
+        unassignTask:[]
+    }
     },
     ScrapeData:(state, action) =>{
       state.ScrapeData = action.payload;
@@ -142,13 +155,22 @@ export const designSlice = createSlice({
       state.TestCases = action.payload;
     },
     Modified:(state, action)=>{
-      state.Modified = action.payload;
+      state.modified = action.payload;
     },
     SaveEnable:(state, action)=>{
-      state.SaveEnable = action.payload;
+      state.saveEnable = action.payload;
     },
     objValue:(state, action)=>{
       state.objValue = action.payload
+    },
+    EnableExport:(state, action)=>{
+      state.enableExport = action.payload
+    },
+    ExportProjname:(state, action)=>{
+      state.exportProjname = action.payload
+    },
+    EnableExportMindmapButton:(state, action)=>{
+      state.enableExportMindmapButton = action.payload
     },
   },
 })
@@ -166,13 +188,13 @@ selectNodes,
 copyNodes,
 deletedNodes,
 scenarioList,
-importData,
+setImportData,
 unassignTask,
 toDeleteScenarios,
 appType,
 savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
 TestCases,
 Modified,
-SaveEnable,objValue} = designSlice.actions
+SaveEnable,objValue,EnableExport,ExportProjname,EnableExportMindmapButton} = designSlice.actions
 
 export default designSlice.reducer

@@ -733,6 +733,30 @@ export const getNotificationGroups = async(props) => {
         return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
     }
 }
+export const saveE2EDataPopup = async(HardCodedApiDataForE2E) => {
+    try{
+        const res = await axios(url+'/saveEndtoEndData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: HardCodedApiDataForE2E,
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+            console.log("res.data",res.data)
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
+    }
+}
 
 
 /* Component
@@ -1047,4 +1071,116 @@ export const exportScreenToExcel = (type, screenId, projectId, testCaseId) =>	{
         })
         .catch(error=>reject(error))
     })
+}
+
+export const exportToMMSkel = async(data) => {
+    try{
+        const res = await axios(url+'/exportToMMSkel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
+    }
+}
+export const jsonToMindmap = async(moduleId) => {
+    try{
+        const res = await axios(url+'/jsonToMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+                mindmapId:moduleId
+            },
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
+export const writeFileServer = async(data) => {
+    try{
+        const res = await axios(url+'/writeFileServer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
+
+export const writeZipFileServer = async(data) => {
+    try{
+        const res = await axios(url+'/writeZipFileServer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
+
+export const userObjectElement_ICE = custObjProps => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/userObjectElement_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { "action": "userObjectElement_ICE", "object": custObjProps },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(err => reject(err));
+    });
 }

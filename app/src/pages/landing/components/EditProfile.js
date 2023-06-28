@@ -14,7 +14,6 @@ import '../styles/EditProfile.scss';
 
 
 const EditProfile = (props) => {
-    const [profileImage, setProfileImage] = useState(null);
     const [initials, setInitials] = useState('');
     const { showDialogBox, setShowDialogBox } = props;
     const [showDialog, setShowDialog] = useState(showDialogBox);
@@ -23,25 +22,19 @@ const EditProfile = (props) => {
     const dispatch = useDispatch();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [prevPassword, setPrevPassword] = useState("");
     const [email, setEmail] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [newConfirmPassword, setNewConfirmPassword] = useState("");
     const [isEmail, setIsEmail] = useState(true);
     const [isFirstName, setIsFirstName] = useState(true);
     const [isLastName, setIsLastName] = useState(true);
-    const [isPrevPassword, setIsPrevPassword] = useState(true);
-    const [isNewPassword, setIsNewPassword] = useState(true);
-    const [isNewConfirmPassword, setIsNewConfirmPassword] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [changePass, setChangePass] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
+    const [errorMsg, setErrorMsg] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
     const [base64String, setBase64String] = useState('');
 
 
     const chooseOptions = { icon: 'pi pi-camera', label: ' ' };
     const onFileUpload = (event) => {
-
         const file = event.files[0];
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -53,6 +46,18 @@ const EditProfile = (props) => {
             reader.readAsDataURL(file);
         }
     };
+
+    useEffect(() => {
+        if (errorMsg) {
+            toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
+        }
+    }, [errorMsg]);
+
+    useEffect(() => {
+        if (successMsg) {
+            toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 5000 });
+        }
+    }, [successMsg]);
 
 
     useEffect(() => {
@@ -81,6 +86,10 @@ const EditProfile = (props) => {
         event.preventDefault();
         var check = true;
         setLoading("Updating User...");
+        setErrorMsg('');
+        setSuccessMsg('');
+        let errorMsg = "";
+        let successMsg = "";
         if (!validate(firstName, "name", setIsFirstName)) {
             check = false;
         }
@@ -92,8 +101,14 @@ const EditProfile = (props) => {
         }
         if (!check) {
             setLoading(false);
+            { errorMsg = 'Enter Correct Details'; }
             // setMsg(MSG.SETTINGS.ERR_INVALID_INFO);
             return;
+        }
+        if (errorMsg) setErrorMsg(errorMsg);
+        if (successMsg) {
+            setSuccessMsg(successMsg);
+            resetFields();
         }
 
         let userObj = {
@@ -114,15 +129,19 @@ const EditProfile = (props) => {
                 var data = await manageUserDetails("update", userObj);
                 setLoading(false);
                 if (data === 'success') {
+                    successMsg = 'Profile changed successfully';
                     dispatch(loadUserInfoActions.setUserInfo(userdetail))
                 } else if (data === "exists") {
+                    successMsg = 'User already Exists.';
                     // setMsg(MSG.ADMIN.WARN_USER_EXIST);
                 } else if (data === "fail") {
+                    successMsg = 'Failed to update user.",';
                     // setMsg(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
                     console.log("failed to update user");
                 }
                 else if (/^2[0-4]{8}$/.test(data)) {
                     if (JSON.parse(JSON.stringify(data)[1])) {
+                        successMsg = 'Failed to update user. Invalid Request!",';
                         // setMsg(MSG.CUSTOM("Failed to update user. Invalid Request!",VARIANT.ERROR));
                         return;
                     }
@@ -138,12 +157,15 @@ const EditProfile = (props) => {
                     if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
                     if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
                     // setMsg(MSG.CUSTOM("Following values are invalid: "+errfields.join(", ")+" "+hints,VARIANT.WARNING));
+                    errorMsg = 'Following values are invalid: "+errfields.join(", ")+" "+hints'; 
                 } else {
+                    errorMsg = 'Something went wrong!';
                     // setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     click();
                 }
             }
             catch (error) {
+                errorMsg = 'Something went wrong!';
                 // setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                 console.log("Error:", error);
                 click();
@@ -178,13 +200,13 @@ const EditProfile = (props) => {
 
     return (
         <>
-            <div className='surface-card m-6'>
-                {/* <Toast ref={toastWrapperRef} position="bottom-center" /> */}
+            <div className='surface-card'>
+                <Toast ref={toastWrapperRef} position="bottom-center" />
                 <Dialog header="Profile Information" className="editProfile_dialog" visible={showDialog} style={{ width: '33vw' }} onHide={resetFields} footer={editProfileFooter}>
                     <div className='pt-3'>
                         <div className='profileImage'>
                             <Avatar image={base64String}
-                                // label={userInfo.userimage ? initials : ''}
+                                label={!userInfo.userimage ? initials : base64String}
                                 size='xlarge' title="User Profile" shape='circle'
                             />
                             <FileUpload className="userImage"
@@ -212,7 +234,7 @@ const EditProfile = (props) => {
                                 />
                             </div>
                             <div className='pt-2'>
-                                <label htmlFor="name">Second Name</label>
+                                <label htmlFor="name">Last Name</label>
                                 <InputText
                                     style={{ width: '30vw',height:'5vh' }}
                                     // id="name"
@@ -241,8 +263,7 @@ const EditProfile = (props) => {
                                     id="primary Role"
                                     value={userInfo.rolename}
                                     type="text"
-                                    readOnly
-                                    disable={true}
+                                    disabled={true}
                                 />
                             </div>
 
@@ -254,8 +275,7 @@ const EditProfile = (props) => {
                                     id="Registered Date"
                                     value={userInfo.createdon.slice(5,16)}
                                     type="text"
-                                    readOnly
-                                    disable={true}
+                                    disabled={true}
                                 />
                             </div>
                         </div>

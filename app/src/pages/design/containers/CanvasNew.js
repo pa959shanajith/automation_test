@@ -24,6 +24,7 @@ import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { ContextMenu } from 'primereact/contextMenu';
 import { deletedNodes } from '../designSlice';
+import { showGenuis } from '../../global/globalSlice';
 
 
 /*Component Canvas
@@ -72,6 +73,7 @@ const CanvasNew = (props) => {
     const [endToEndDelConfirm,setEndToEndDelConfirm] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true);
     const appType = "Web"
+    const proj = useSelector(state=>state.design.selectedProj)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -227,7 +229,7 @@ const CanvasNew = (props) => {
         { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
-        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>},
+        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command:()=>{confirm1()}},
         { label: 'Debug',icon:<img src="static/imgs/execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> },
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
@@ -512,15 +514,15 @@ const CanvasNew = (props) => {
   };
 
   const accept = () => {
-    // dispatch({type:actionTypesGlobal.OPEN_GENIUS,payload:{
-    //   showGenuisWindow:true,
-    //   geniusWindowProps:{
-    //     selectedProject:{key: proj,text: ""},
-    //     selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
-    //     selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
-    //     geniusFromMindmap:true
-    //   }
-    // }}) 
+    dispatch(showGenuis({
+      showGenuisWindow:true,
+      geniusWindowProps:{
+        selectedProject:{key: proj,text: ""},
+        selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
+        selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
+        geniusFromMindmap:true
+      }
+    })) 
   }
 
   const reject = () => {}

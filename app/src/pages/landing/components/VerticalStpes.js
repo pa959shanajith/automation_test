@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState,useEffect} from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -13,13 +13,14 @@ import { useNavigate } from "react-router-dom";
 import { useSelector,useDispatch  } from 'react-redux';
 import { updateSteps } from './VerticalComponentsSlice';
 import { disable } from 'agenda/dist/job/disable';
-
+import { getProjectIDs } from "../api"
+import { selectedProj } from '../../design/designSlice';
 // this component renders the "get started Box" in the landing page with the help of MUI framework
 
-function VerticalSteps(params) {
-       const dispatch= useDispatch ();
-        const activeStep= useSelector((state)=>state.steps)
-      
+const VerticalSteps = (props) => {
+    const dispatch= useDispatch ();
+    const activeStep= useSelector((state)=>state.steps);
+    const project = useSelector((state)=>state.landing.defaultSelectProject);
     const navigate = useNavigate();
     const steps = [
     {
@@ -38,8 +39,26 @@ function VerticalSteps(params) {
         title:'Report'
     },
     ];
-    
-    
+
+      const [ProgressStepDetails, setProgressStepDetails] = useState({});
+      const [currentStep, setCurrentStep] = useState(null);
+
+    useEffect(()=>{
+      (async () => {
+          const ProgressStep = await getProjectIDs({ readme: "progressStep" });
+          setProgressStepDetails(ProgressStep);
+        })()
+      },[])
+
+    useEffect(()=>{
+      let findIndexOfStep = ProgressStepDetails?.projectId?.indexOf(activeStep?.id);
+      if (ProgressStepDetails && ProgressStepDetails.progressStep && findIndexOfStep !== -1)
+      {let findStep= ProgressStepDetails?.progressStep[findIndexOfStep]
+      setCurrentStep(findStep);
+      dispatch(updateSteps(findStep))
+      }
+    },[activeStep?.id])
+
 
   
 
@@ -47,6 +66,7 @@ function VerticalSteps(params) {
     if(value==="Design"){
       dispatch(updateSteps(1))
       navigate("/design");
+      dispatch(selectedProj(project.projectId))
     }
     else if(value==="Execute"){
           dispatch(updateSteps(2))
@@ -64,8 +84,7 @@ function VerticalSteps(params) {
     <Card className='verticalcard' >
       <h2 className= "GetStd">Get Started</h2>
       <Box > 
-        <Stepper  className='Stepper' activeStep = {activeStep.value} orientation="vertical">
-          {console.log("activeStep",activeStep.value)}
+        <Stepper  className='Stepper' activeStep = {currentStep} orientation="vertical">
           {steps.map((step, index) => ( 
             <Step key={step.label}>
               <StepLabel  className='stepLabel'>
@@ -77,16 +96,14 @@ function VerticalSteps(params) {
                         <Typography className='description'>{step.description}</Typography>
                      </Box>
                      <Box className='buttonNav'>
-                        <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'}
-                           value={step.title}
-                             onClick={(e)=>handleNext(e.target.value)}
-                                  disabled={
-                                    (step.title==="Execute" && activeStep.value < 1) || (step.title==="Report" && activeStep.value < 2)
-                                    } >{step.title}</Button>
+                     <Button className={step.title==='Execute'?'verticalbuttonE':step.title==='Report'?'verticalbuttonR':'verticalbutton'}
+                              value={step.title}
+                              onClick={(e)=>handleNext(e.target.value)}
+                              disabled={
+                                        (step.title==="Execute" && activeStep.value < 1) || (step.title==="Report" && activeStep.value < 2)} >{step.title}</Button>
                         <NavigateNextIcon className='verticalicon'/>
                      </Box>
                 </Box>
-               
               </StepLabel>
             </Step>
           ))}
