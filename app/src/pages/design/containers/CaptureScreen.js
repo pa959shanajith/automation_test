@@ -68,6 +68,8 @@ const CaptureModal = (props) => {
   const [showConfirmPop, setShowConfirmPop] = useState(false);
   const [modified, setModified] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
+  const [deleted, setDeleted] = useState([]);
+  const[deletedItems,setDeletedItems]=useState(false)
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -78,7 +80,9 @@ const CaptureModal = (props) => {
   const [cardBottom, setCardBottom] = useState(null)
   const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
   const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
-
+  const[showIdentifierOrder,setShowIdentifierOrder]=useState(false)
+  const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]);
+  const[identifierModified,setIdentifierModiefied]=useState(false)
 
 
   const imageRef1 = useRef(null);
@@ -94,12 +98,13 @@ const CaptureModal = (props) => {
     fetchScrapeData()
   }, [])
   useEffect(() => {
-    if (endScrape || elementPropertiesUpdated) {
+    if (endScrape || elementPropertiesUpdated||identifierModified) {
       fetchScrapeData();
       setEndScrape(false)
+      setIdentifierModiefied(false)
       setElementPropertiesUpdated(false)
     }
-  }, [endScrape, elementPropertiesUpdated])
+  }, [endScrape, elementPropertiesUpdated,identifierModified])
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
@@ -312,7 +317,7 @@ const CaptureModal = (props) => {
             newlyScrapeList=newScrapeList;
 
             setMainScrapedData(data);
-            if (capturedDataToSave.length >= 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
+            if (capturedDataToSave.length === 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
             setMirror({ scrape: data.mirror, compare: null });
             setNewScrapedData([]);
             setScrapeItems(newScrapeList);
@@ -396,7 +401,7 @@ const CaptureModal = (props) => {
                         enable: true
                       });
                       onHighlight();
-                    }}>View Screenshot</span> : "",
+                    }}>View Screenshot</span> : <span>No screenshot available</span>,
                       actions: '',
                       objectDetails:item
                     }
@@ -412,6 +417,38 @@ const CaptureModal = (props) => {
         })
     });
   }
+  const onDelete = (e, confirmed) => {
+    if (mainScrapedData.reuse && !confirmed) {
+        return;
+    }
+    let deletedArr = [...deleted];
+    let scrapeItemsL = [...captureData];
+    let newOrderList = [];
+    var capturedDataAfterSave = scrapeItemsL.filter(function(item) {
+      
+      return !selectedCapturedElement.find(function(objFromB) {
+        if(item.objectDetails.objId === objFromB.objectDetails.objId){
+          deletedArr.push(item.objectDetails.objId)
+          return true
+        }
+      })
+    })
+    let notused=scrapeItemsL.filter(item=>{
+      if(deletedArr.includes(item.objectDetails.objId)){
+        return false
+      }
+      else{
+        newOrderList.push(item.objectDetails.objId)
+      }
+    })
+    let newCapturedDataToSave=capturedDataAfterSave.map(item=>item.objectDetails)
+    setCaptureData(capturedDataAfterSave)
+    setDeleted(deletedArr)
+    setOrderList(newOrderList)
+    setCapturedDataToSave(newCapturedDataToSave)
+    setSelectedCapturedElement([])
+    toast.current.show({severity:'success', summary: 'Success', detail:'Element deleted successfully', life: 5000});
+}
 // {console.log(captureData[0].selectall)}
 
   const saveScrapedObjects = () => {
@@ -435,7 +472,7 @@ const CaptureModal = (props) => {
     }
     
     let params = {
-        'deletedObj': [],
+        'deletedObj': deleted,
         'modifiedObj': modifiedObjects,
         'addedObj': {...added, view: views},
         'screenId': props.fetchingDetails["_id"],
@@ -637,14 +674,11 @@ const CaptureModal = (props) => {
   const renderActionsCell = (rowData) => {
     return (
       <div>
-        <img src="static/imgs/ic-edit.png"
-          style={{ height: "20px", width: "20px" }}
-          className="edit__icon" onClick={() => handleEdit(rowData)} />
         <img
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px" }}
           className="delete__icon" onClick={() => handleDelete(rowData)} />
-        <img src="static/imgs/ic-edit.png"
+        <img src="static/imgs/ic-edit.png" title="view/edit element properties"
           style={{ height: "20px", width: "20px" }}
           className="edit__icon" onClick={() => openElementProperties(rowData)} />
       </div>
@@ -712,6 +746,8 @@ const CaptureModal = (props) => {
 
   const footerSave = (
     <>
+    {selectedCapturedElement?.length>0?<Button label="Element Identifier Order"onClick={()=>setShowIdentifierOrder(true)} ></Button>:null}
+    {selectedCapturedElement?.length>0?<Button label='Delete' onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
     <Button label='Save' onClick={onSave} ></Button>
     </>
@@ -1041,6 +1077,66 @@ const CaptureModal = (props) => {
     setElementValues(dataValue)
     setElementProperties(true)
   }
+  const Header = () => {
+    return (
+        <div>Element Identifier Order<span style={{color:'red'}}>*</span></div>
+    );
+  };
+  const columns = [
+     
+    {field:'id',header:'Priority'},
+    { field: 'name', header: 'Identifier' },
+  ];
+  const dynamicColumns = columns.map((col, i) => {
+    return <Column key={col.field} columnKey={col.field} field={col.field} header={col.header} />;
+  });
+  const onRowReorderIdentifier=(e)=>{
+    const reorderedProducts=e.value.map((element, idx) => {
+    element.id = idx + 1
+    return element
+  })
+    setIdentifierList(reorderedProducts)
+  
+  }
+  const footerContentIdentifier = (
+    <div>
+        <div style={{position:'absolute',fontStyle:'italic'}}><span style={{color:'red'}}>*</span>Drag/drop to reorder identifiers.</div>
+        <Button label="Cancel" onClick={() => setShowIdentifierOrder(false)} className="p-button-text" />
+        <Button label="Save" onClick={() => saveIdentifier()} autoFocus />
+    </div>
+  )
+  const saveIdentifier=()=>{
+    const finalScrapedItems=selectedCapturedElement.map(element=>element.objectDetails.objId)
+    let identifierListUpdated=identifierList.map(({id,identifier})=>({id,identifier}))
+    let params = {
+        'objectIds':finalScrapedItems,
+        'identifiers':identifierListUpdated,
+        'param':'updatedIdentifier',
+        'userId': userInfo.user_id,
+        'roleId': userInfo.role,
+        
+        // 'identifier'
+    }
+    scrapeApi.updateScreen_ICE(params)
+        .then(response => {
+            console.log(response)
+            if(response == "Success"){
+                setIdentifierModiefied(true)
+                setShowIdentifierOrder(false)
+                toast.current.show({severity:'success', summary: 'Success', detail:'Element Identifier order updated successfully.', life: 5000});
+                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}])
+                
+            }
+        })
+        .catch(error => {
+            console.log(error)
+            setShowIdentifierOrder(false)
+            toast.current.show({severity:'success', summary: 'Success', detail:'Some Error occured while saving identifier list.', life: 5000});
+            setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}])
+        }
+        )
+        
+  }
 
   return (
     <>
@@ -1222,6 +1318,15 @@ const CaptureModal = (props) => {
             <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
             <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
           </DataTable>
+        </div>
+      </Dialog>
+      {/* Element reorder */}
+      <Dialog header={Header} style={{width:'52vw',marginRight:'3rem'}} position="right" visible={showIdentifierOrder}  onHide={() => setShowIdentifierOrder(false)} footer={footerContentIdentifier} >
+        <div className="card" >
+        <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
+                <Column rowReorder style={{ width: '3rem' }} />
+                {dynamicColumns}
+        </DataTable>
         </div>
       </Dialog>
     </>

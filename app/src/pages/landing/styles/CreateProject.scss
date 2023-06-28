@@ -143,7 +143,6 @@
      .check1{
         position: relative;
         background: white;
-        z-index: 6;
         bottom: 1rem;
      }
      .check2{
@@ -275,7 +274,7 @@
         color: #9E9E9E;
         font-size: 14px;
         font-family: 'Open sans' !important;
-        z-index: 9;
+        // z-index: 9;
     }
     .check-bx3{
         align-items: center;
@@ -329,41 +328,41 @@
         width: 5rem;
         margin-bottom: -3rem;
     }
-    .tooltip {
-        position: relative;
-        display: inline-block;
-      }
+    // .tooltip {
+    //     position: relative;
+    //     display: inline-block;
+    //   }
       
-      .tooltip::before,
-      .tooltip::after {
-        position: absolute;
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
-      }
+    //   .tooltip::before,
+    //   .tooltip::after {
+    //     position: absolute;
+    //     visibility: hidden;
+    //     opacity: 0;
+    //     transition: opacity 0.3s ease-in-out;
+    //   }
       
-      .tooltip::before {
-        content: attr(title);
-        background-color: #333;
-        color: #fff;
-        padding: 5px;
-        font-size: 14px;
-        border-radius: 5px;
-        z-index: 1;
-      }
+    //   .tooltip::before {
+    //     content: attr(title);
+    //     background-color: #333;
+    //     color: #fff;
+    //     padding: 5px;
+    //     font-size: 14px;
+    //     border-radius: 5px;
+    //     // z-index: 1;
+    //   }
       
-      .tooltip::after {
-        content: "";
-        border: 5px solid transparent;
-        border-top-color: #333;
-        z-index: 2;
-      }
+    //   .tooltip::after {
+    //     content: "";
+    //     border: 5px solid transparent;
+    //     border-top-color: #333;
+    //     // z-index: 2;
+    //   }
       
-      .tooltip:hover::before,
-      .tooltip:hover::after {
-        visibility: visible;
-        opacity: 1;
-      }
+    //   .tooltip:hover::before,
+    //   .tooltip:hover::after {
+    //     visibility: visible;
+    //     opacity: 1;
+    //   }
 
       .user-name{
         bottom: 1rem;
@@ -453,6 +452,11 @@
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
+}
+.error-msg{
+    position: absolute;
+    right: 24rem!important;
+    top: 4rem!important
 }
   
     
