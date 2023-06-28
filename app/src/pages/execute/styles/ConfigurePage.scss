@@ -37,13 +37,14 @@
    
   .p-panel .p-panel-header {
     border: 1px solid #dee2e6;
-    padding: 0.25rem;
+    padding: 1.25rem;
     background: #f8f9fa;
     color: #343a40;
     border-top-right-radius: 6px;
     border-top-left-radius: 6px;
     background: rgba(96, 91, 255, 0.08);
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+  
   }
   .p-datatable>.p-datatable-wrapper {
     overflow: auto;
@@ -88,7 +89,11 @@
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
-
+ .p-panel .p-panel-content {
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  padding: 2.25rem;
+}
 }
 
 .config_content {
@@ -102,9 +107,22 @@
   width: 100% !important;
   background: rgba(96, 91, 255, 0.08);
   box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+  height: 10vh;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
+ .p-tabmenu-nav .p-menuitem-text {
+  line-height: 1;
+  margin-top: 5rem;
+  .p-tabmenu-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    list-style-type: none;
+    margin: 0;
+    padding: -1px;
+    margin-top: 2rem;
+  }
+}
 
 }
 
@@ -133,6 +151,7 @@
       margin-top: 9rem;
       font-family: "Open Sans";
     }
+   
   }
 }
 .datatable_config {
@@ -162,7 +181,7 @@
   position: absolute;
   width: 172px;
   height: 45px;
-  left: calc(50% - 123px);
+  left: calc(46% - 123px);
   background: #605bff;
   border-radius: 10px;
 
@@ -289,20 +308,10 @@
   position: relative;
   margin-right: 15rem;
 }
-.addConfig_button {
-  margin: -78px 0 0 48rem;
-  display: flex;
-  cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
-  align-items: center;
-  vertical-align: bottom;
-  text-align: center;
-  overflow: hidden;
-  margin-top: -3rem;
-  height: 2rem;
-  margin-left: 67rem;
-  top: 0.5rem;
+.p-button.p-button-sm.addConfig_button {
+  width: 16rem;
+  margin: 0 0.5rem 0 0;
+  padding: .4375rem .875rem;
 }
 .p-button-edit {
   margin: 0;
@@ -403,24 +412,24 @@
 
 .legend-text {
   font-size: .9rem;
-  margin-left: 104px;
+  margin-left: 120px;
   position: relative;
-  top: 30px;
+  top: 18px;
 }
 .legend-text1{
   font-size: .9rem;
   margin-left: 104px;
   position: relative;
-  top: 30px;
-  left: -16rem;
+  left: -12.7rem;
+  top: 18px;
 
 }
 .legend-text2{
   font-size: .9rem;
-  margin-left: 104px;
-  position: relative;
-  top: 30px;
-  left: -8rem;
+    left: -6.5rem;
+    margin-left: 104px;
+    position: relative;
+    top: 18px;
 }
 .status-available,
 .status-unavailable,
@@ -443,15 +452,15 @@
   position: relative;
   top: 1rem;
   font-family: "Open Sans";
-  left: 6rem;
+  left: 7.5rem;
 }
 
 .status-unavailable {
   background-color: #ff9f42;
   position: relative;
-  top: 1rem;
+  top: 1.1rem;
   font-family: "Open Sans";
-  left: -2rem;
+  left: 0.1rem;
 }
 
 .status-dnd {
@@ -459,8 +468,15 @@
   position: relative;
   // top: -1rem;
   font-family: "Open Sans";
-  top: 0.9rem;
-  left: -10rem;
+  top: 1.1rem;
+  left: -6.2rem;
+}
+#status {
+  height: 7px;
+  width: 7px;
+  margin: 6px 5px;
+  border-radius: 50%;
+  display: inline-block;
 }
 .execute_dropdown {
   margin-left: 27px;
@@ -479,33 +495,6 @@
       margin-right: 20rem;
     }
 }
-
-// .p-dropdown-label {
-//   display: block;
-//   white-space: nowrap;
-
-//   flex: 1 1 auto;
-//   width: 17%;
-//   text-overflow: ellipsis;
-//   cursor: pointer;
-//   width: 12rem;
-//   margin-left: -43rem;
-//   margin-right: 20rem;
-// }
-// .p-dropdown {
-//   display: inline-flex;
-//   cursor: pointer;
-//   position: relative;
-//   -webkit-user-select: none;
-//   user-select: none;
-//   margin-top: -3rem;
-//   margin-left: 9rem;
-// }
-// .p-dropdown .p-dropdown-label {
-//   background: transparent;
-//   border: 0 none;
-//   margin-right: 10rem;
-// }
 
 .dialog_Schedule {
   height: 46rem;
@@ -548,11 +537,13 @@
   color: #000000;
   background-color: transparent;
   border: none;
-  margin-left: 27.5rem;
+
   margin-top: -3rem;
   left: 12.5rem;
   display: flex;
     top: -1rem;
+    text-align: center;
+    left: 41rem;
     .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
       background: transparent ;
       border-color: transparent ;
@@ -568,15 +559,16 @@
 }
 
 .copy_devops {
-  margin-left: auto;
+  
   color: #000000;
   background-color: transparent;
   border: none;
-  left: 14.9rem;
+  left: 41rem;
   display: flex;
-  margin-right: 19.9rem;
+  
   top: -7rem;
   display: flex;
+ text-align: center;
 }
 
 .container_devopsLabel {
@@ -708,7 +700,7 @@
   font-weight: 600;
 }
 .pencil_button {
-  margin-left: 7rem;
+  margin-left: 2rem;
 }
 
 .datatable_list {
@@ -724,7 +716,7 @@
 .actions-header {
   text-align: left !important;
   position: absolute;
-  margin-left: 8.9rem;
+  margin-left: 3.9rem;
   margin-top: -0.8rem;
   font-weight: bold;
   font-family: "Open Sans";
@@ -732,15 +724,15 @@
 .SNo-header{
   font-weight: bold;
   font-family: "Open Sans";
-  margin-left: 0.4rem;
-  width: 1rem;
+  // margin-left: 0.4rem;
+  // width: 1rem;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
 }
 .executionOption-header {
   // margin-left: 10rem;
-  margin-left: 1.1rem;
+  margin-left: 12.1rem;
   font-weight: bold;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
@@ -984,10 +976,25 @@
 }
 
 .tabmenu_confige {
+  // .p-tabmenu-nav .p-menuitem-text {
+  //   line-height: 1;
+  //   margin-top: 2rem;
+  // }
   .p-tabmenu-nav .p-menuitem-text {
     line-height: 1;
-    margin-top: -2rem;
+    margin-top: 2rem;
+    .p-tabmenu-nav {
+      display: flex;
+      flex-wrap: nowrap;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      margin-top: 1.5rem;
   }
+   
+
+}
+
 }
 .search_icelist {
   margin-left: 8rem;
@@ -1140,6 +1147,61 @@
 }
 }
 
+.error-toast {
+  color: red;
+}
+.ui-toast-message-error {
+  background-color: red;
+  color: white;
+}
 
-
+.execute_modal {
+  .p-dialog-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
 

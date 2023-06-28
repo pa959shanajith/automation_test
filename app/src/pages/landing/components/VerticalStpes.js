@@ -14,12 +14,13 @@ import { useSelector,useDispatch  } from 'react-redux';
 import { updateSteps } from './VerticalComponentsSlice';
 import { disable } from 'agenda/dist/job/disable';
 import { getProjectIDs } from "../api"
+import { selectedProj } from '../../design/designSlice';
 // this component renders the "get started Box" in the landing page with the help of MUI framework
 
 const VerticalSteps = (props) => {
-       const dispatch= useDispatch ();
-        const activeStep= useSelector((state)=>state.steps)
-      
+    const dispatch= useDispatch ();
+    const activeStep= useSelector((state)=>state.steps);
+    const project = useSelector((state)=>state.landing.defaultSelectProject);
     const navigate = useNavigate();
     const steps = [
     {
@@ -65,6 +66,7 @@ const VerticalSteps = (props) => {
     if(value==="Design"){
       dispatch(updateSteps(1))
       navigate("/design");
+      dispatch(selectedProj(project.projectId))
     }
     else if(value==="Execute"){
           dispatch(updateSteps(2))

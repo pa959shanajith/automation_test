@@ -24,7 +24,7 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
-  // const selectProj = useSelector(state=>state.plugin.PN)
+  const selectProj = useSelector(state=>state.landing.defaultSelectProject);
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
     'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))
@@ -59,7 +59,7 @@ const MindmapHome = () => {
       const data = parseProjList(res)
       var req={
         tab:"endToend",
-        projectid:res.projectId[0],
+        projectid:selectProj?selectProj.projectId:res.projectId[0],
         version:0,
         cycId: null,
         modName:"",

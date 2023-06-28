@@ -4,14 +4,14 @@ import "./AvoModal.scss";
 
 const AvoModal = ({
   visible,
-  setVisible,
   content,
   headerClass = null,
   footerType = null,
   headerTxt,
   modalSytle,
   onModalBtnClick = () => {},
-  isDisabled = false
+  isDisabled = false,
+  customClass = ""
 }) => {
 
   const footerValues = {
@@ -53,7 +53,7 @@ const AvoModal = ({
     <Dialog
       header={headerTxt}
       visible={visible}
-      className="modalClass"
+      className={`modalClass ${customClass}`}
       style={modalSytle}
       onHide={() => onModalBtnClick('Cancel')}
       {...(headerClass ? { headerClassName: headerClass } : {})}

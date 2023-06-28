@@ -49,7 +49,7 @@ const ConfigureSetup = ({
 
   useEffect(() => {
     const mainTree = [];
-    configData?.configureData[modules].map((el, index) => {
+    configData?.configureData && configData?.configureData[modules]?.map((el, index) => {
       const childTree = [];
       if (!!el?.scenarios.length) {
         el?.scenarios.forEach((e, ind) => {
@@ -172,7 +172,7 @@ const ConfigureSetup = ({
 
   useEffect(() => {
     if (!!Object.keys(dotNotExe).length) {
-      const getExecutions = configData?.configureData?.normalExecution;
+      const getExecutions = configData?.configureData ? configData?.configureData[modules] : [];
       const getNotExe = dotNotExe?.executionRequest?.donotexe?.current;
       const nodeObj = {};
       const getXpanded = [...xpanded];

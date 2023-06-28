@@ -1,25 +1,32 @@
-import { useEffect, useState } from "react";
-import { Tree } from "primereact/tree";
+import { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { RadioButton } from "primereact/radiobutton";
+import { OverlayPanel } from 'primereact/overlaypanel';
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
-import { scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
+import { Button } from 'primereact/button';
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
+import { getScheduledDetails_ICE } from "../configureSetupSlice";
+import { scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
+import AvoInput from "../../../globalComponents/AvoInput";
 
-const ScheduleScreen = ({ cardData }) => {
+const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [selectedDaily, setSelectedDaily] = useState(null);
   const [selectedMonthly, setSelectedMonthly] = useState(null);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
-  const [scheduleNodes, setScheduleNodes] = useState(null);
   const [dropdownWeek, setDropdownWeek] = useState(null);
   const [dropdownDay, setDropdownDay] = useState(null);
+  const [tableFilter, setTableFilter] = useState("");
+  const getScheduledList = useSelector((store) => store.configsetup);
+  const dispatch = useDispatch();
+
+  const recurrance = useRef(null);
 
   const scheduleDaily = [
     { name: <span>Every <InputText className="every_day" /> day(s).</span>, key: 'day' },
@@ -66,7 +73,6 @@ const ScheduleScreen = ({ cardData }) => {
 
   const onRecurrenceClick = () => {
     let recurrenceObj = {
-      OT: <></>,
       DY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 dailyContainer">
           {scheduleDaily.map((el) => (
@@ -86,7 +92,7 @@ const ScheduleScreen = ({ cardData }) => {
         </div>
       ),
       WY: (
-        <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap">
+        <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
             Recur every <InputText /> week(s) on:
           </div>
@@ -131,62 +137,43 @@ const ScheduleScreen = ({ cardData }) => {
   };
 
   useEffect(() => {
-    setScheduleNodes([
-      {
-        key: "0",
-        label: (
-          <div className="grid">
-            <div className="col-12">Schedule Options</div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={startDate}
-                placeholder="Enter Start date"
-                onChange={(e) => setStartDate(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-                disabled={selectedSchedule?.key !== "OT"}
-              />
-            </div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={startTime}
-                placeholder="Enter Start Time "
-                onChange={(e) => setStartTime(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-                timeOnly
-              />
-            </div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={endDate}
-                placeholder="Enter End Date"
-                onChange={(e) => setEndDate(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-              />
-            </div>
-            <div className="col-12 lg:col-5 xl:col-5 md:col-6 sm:col-12">
-              <Calendar
-                value={endTime}
-                placeholder="Enter End Time"
-                onChange={(e) => setEndTime(e.value)}
-                icon="pi pi-fw pi-angle-down"
-                showIcon
-                timeOnly
-              />
-            </div>
-          </div>
-        ),
-        data: "Documents Folder",
-        icon: "pi pi-fw pi-calendar",
-        children: [
-          {
-            key: "0-0",
-            label: (
+    dispatch(
+      getScheduledDetails_ICE({
+        param: "getScheduledDetails_ICE",
+        configKey: cardData?.configurekey,
+        configName: cardData?.configurename,
+      })
+    );
+  }, []);
+
+  return (
+    <>
+      <ExecutionCard cardData={cardData} />
+      <div className="schedule_container">
+        <div className="grid">
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+            <Button
+              icon="pi pi-sync"
+              label={
+                selectedSchedule?.key
+                  ? selectedSchedule?.name
+                  : "Make Recurring"
+              }
+              onClick={(e) => recurrance.current.toggle(e)}
+              iconPos="right"
+              severity="info"
+              className="make_recurring"
+            />
+            <OverlayPanel ref={recurrance} className="recurrence_container">
               <div className="grid">
                 <div className="col-12">Recurrence Pattern</div>
-                <div className={`col-12 lg:col-3 xl:col-3 md:col-4 sm:col-6 ${ (selectedSchedule?.key !== "OT" && selectedSchedule?.key) ? 'with_border' : 'without_border' }`}>
+                <div
+                  className={`${
+                    selectedSchedule?.key
+                      ? "with_border col-12 lg:col-3 xl:col-3 md:col-4 sm:col-6 "
+                      : "without_border col-12"
+                  }`}
+                >
                   {schedulePeriod.map((el) => (
                     <div key={el?.key} className="radioBtn">
                       <RadioButton
@@ -204,20 +191,54 @@ const ScheduleScreen = ({ cardData }) => {
                 </div>
                 {onRecurrenceClick()}
               </div>
-            ),
-            data: "Work Folder",
-            icon: "pi pi-fw pi-clock",
-          },
-        ],
-      },
-    ]);
-  }, [selectedSchedule, selectedDaily, selectedMonthly, dropdownWeek, dropdownDay]);
-
-  return (
-    <div>
-      <ExecutionCard cardData={cardData} />
-      <Tree value={scheduleNodes} className="schedule_tree" />
-    </div>
+            </OverlayPanel>
+          </div>
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+            <Calendar
+              value={startDate}
+              placeholder="Enter Start date"
+              onChange={(e) => setStartDate(e.value)}
+              showIcon
+            />
+          </div>
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+            <Calendar
+              value={startTime}
+              placeholder="Enter Start Time "
+              onChange={(e) => setStartTime(e.value)}
+              icon="pi pi-fw pi-clock"
+              showIcon
+              timeOnly
+            />
+          </div>
+        </div>
+        <div className="grid align-items-center btn_container">
+          <div className="col-12 lg:col-6 xl:col-6 md:col-6 sm:col-6 flex">
+            <Button label="Scheduled Taks" size="small" />
+            <Button label="Recurring Taks" size="small" className="recurring_btn" />
+          </div>
+          <div className="col-12 lg:col-6 xl:col-6 md:col-6 sm:col-6">
+            <AvoInput
+              icon="pi pi-search"
+              placeholder="Search"
+              inputTxt={tableFilter}
+              setInputTxt={setTableFilter}
+              inputType="searchIcon"
+            />
+          </div>
+        </div>
+        <DataTable
+          value={getScheduledList?.scheduledList}
+          tableStyle={{ minWidth: "50rem" }}
+          globalFilter={tableFilter}
+        >
+          <Column field="scheduledon" header="Date & Time"></Column>
+          <Column field="target" header="Host"></Column>
+          <Column field="recurringpattern" header="Schedule Type"></Column>
+          <Column field="status" header="Status"></Column>
+        </DataTable>
+      </div>
+    </>
   );
 };
 
