@@ -356,7 +356,7 @@ const CreateProject = ({ visible, onHide }) => {
             < h5 className='proj__name'> Project Name <span className="imp-cls"> * </span> </h5>
             <InputText  className={`proj-input ${isInvalidProject ? 'p-invalid' : ''}`} value={value}  onChange={handleValueChange} placeholder="Enter Project Name" />
             {isInvalidProject && (
-          <small className="p-error error-msg">Special characters are not allowed in the project name</small> )}
+          <small className="p-error error-message">Special characters are not allowed in the project name</small> )}
             <div className='dropdown-1'>
               <h5 className='application__name'>Application Type <span className="imp-cls"> * </span></h5>
               <Dropdown value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name"
@@ -432,11 +432,11 @@ const CreateProject = ({ visible, onHide }) => {
             </div>
 
           </div>
+          <div className='user-list-container' style={{ height: '18rem', overflowY: 'auto' }}>
           <div className='checkbox-2'>
             <Checkbox value='all' checked={selectallAssaigned} onChange={handleAssignedCheckboxChange}></Checkbox>
             <h5 className='label1'> Select All</h5>
           </div>
-
           <div className='check-bx3'>
             <ul>
               {displayUser.map((checkboxId) => (
@@ -455,6 +455,7 @@ const CreateProject = ({ visible, onHide }) => {
 
               ))}
             </ul>
+          </div>
           </div>
         </Card>
       </Dialog>
