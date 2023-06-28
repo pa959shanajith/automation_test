@@ -45,8 +45,9 @@ import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import ScheduleScreen from "./ScheduleScreen";
 import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
+import ExecutionCard from "./ExecutionCard";
 
-const ConfigurePage = ({ setShowConfirmPop }) => {
+const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [visible, setVisible] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
@@ -514,10 +515,17 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       projectid: configProjectId,
     });
     setFetechConfig(configurationList);
-    configurationList.forEach((item, idx) => {
+    configurationList.forEach((item, idx) => {   
       getState.push({
         sno: idx + 1,
-        profileName: item.configurename,
+        // profileName: item.configurename,
+        profileName: (
+          <span
+            title={item.configurename} // Add title attribute for tooltip with full text
+            >
+            {item.configurename}
+          </span>
+        ),
         executionOptions: (
           <div className="Buttons_config_button">
             <Button
@@ -528,6 +536,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
                 setCurrentSelectedItem(item);
+                setConfigItem(idx);
+                console.log(fetechConfig, configItem)
               }}
               size="small"
             >
@@ -553,9 +563,17 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               onClick={() => {
                 setVisible_CICD(true);
                 setCurrentKey(item.configurekey);
+                setConfigItem(idx);
               }}
             >
               CI/CD
+            </Button>
+            <Button
+              className="CICD"
+              size="small"
+             
+            >
+              SouceLab
             </Button>
           </div>
         ),
@@ -942,57 +960,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     );
   };
  
-   const renderExecutionCard = () => {
-    return (
-      <Card className="execute_card p-card p-card-body">
-        <div className="grid executedropdown">
-          <div className="col-6">
-            <div className="text_card">Avo Agent:</div>
-            <div className="text_value">
-              <div className="agent_name">
-                {currentSelectedItem &&
-                currentSelectedItem.executionRequest &&
-                currentSelectedItem.executionRequest.avoagents.length > 0
-                  ? currentSelectedItem.executionRequest.avoagents[0]
-                  : "Any Agent"}
-              </div>
-            </div>
-          </div>
-          <div className="col-6">
-            <div className="text_card1">
-              <div className="execute_text">Execution Mode:</div>
-            </div>
-            <div className="text_value1">
-              <div className="execute_name">
-                {currentSelectedItem &&
-                currentSelectedItem.executionRequest &&
-                currentSelectedItem.executionRequest.integration.isHeadless ===
-                  true
-                  ? "Non-Headless"
-                  : "Headless"}
-              </div>
-            </div>
-          </div>
-          <div className="col-6">
-            <div className="text_card3">
-              <div className="browser_text">Selected Browsers:</div>
-            </div>
-            <div className="text_value3">
-              <div className="browser_name">{browserTxt}</div>
-            </div>
-          </div>
-          <div className="col-6">
-            <div className="text_card4">
-              <div className="integration_text">Integration Type:</div>
-            </div>
-            <div className="text_value4">
-              <div className="integration_name">ALM</div>
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-  };
 
   const renderTable = () => {
     if (!!configList.length) {
@@ -1013,17 +980,18 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             <Column
               field="sno"
               style={{ width: "5%" }}
-              header={<span className="SNo-header">S No</span>}
+              header={<span className="SNo-header">S No</span> }
             />
-            <Column
+          <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
-              }}
-              field="profileName"
-              header={checkboxHeaderTemplate}
-            />
+                width:"50%"
+               }}
+                 field="profileName"
+             header={checkboxHeaderTemplate}
+/>
             <Column
               style={{
                 fontWeight: "bold",
@@ -1057,7 +1025,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             onModalBtnClick={onExecuteBtnClick}
             content={
               <>
-                {renderExecutionCard()}
+               {<ExecutionCard cardData={fetechConfig[configItem]} />}
                 <div className="radioButtonContainer">
                   <RadioButton
                     value="Execute with Avo Assure Agent/ Grid"
@@ -1094,7 +1062,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                       <div className="legend">
                         <span id="status" className="status-available"></span>
                         <span className="legend-text">Available</span>
-                      </div>
+                  </div>
                       <div className="legend">
                         <span id="status" className="status-unavailable"></span>
                         <span className="legend-text2">Unavailable</span>
@@ -1112,26 +1080,28 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                         Execute on
                       </span>
                       <div className="search_icelist ">
-                        <DropDownList
-                          poolType={poolType}
-                          ExeScreen={ExeScreen}
-                          inputErrorBorder={inputErrorBorder}
-                          setInputErrorBorder={setInputErrorBorder}
-                          placeholder={"Search"}
-                          data={availableICE}
-                          smartMode={ExeScreen === true ? smartMode : ""}
-                          selectedICE={selectedICE}
-                          setSelectedICE={setSelectedICE}
-                        />
-                      </div>
-                    </div>
+                  <DropDownList
+                    poolType={poolType}
+                    ExeScreen={ExeScreen}
+                    inputErrorBorder={inputErrorBorder}
+                    setInputErrorBorder={setInputErrorBorder}
+                    placeholder={"Search"}
+                    data={availableICE}
+                    smartMode={ExeScreen === true ? smartMode : ""}
+                    selectedICE={selectedICE}
+                    setSelectedICE={setSelectedICE}
+                  />
+                  </div>
+                </div>
                   </div>
                 )}
               </>
             }
-            headerTxt="Execute: Regression"
+            headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+            modalSytle={{ width: "50vw", background: "#FFFFFF", height:"70%" }}
+            
+           
           />
           <AvoModal
             visible={visible_schedule}
@@ -1201,7 +1171,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             setVisible={setVisible_CICD}
             content={
               <>
-                {renderExecutionCard()}
+                 <ExecutionCard cardData={fetechConfig[configItem]} />
 
                 <div className="input_CICD ">
                   <div class="container_url">
@@ -1280,7 +1250,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 </div>
               </>
             }
-            headerTxt={`CICD: demo123`}
+            headerTxt={`CICD: ${fetechConfig[configItem]?.configurename}`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
             onModalBtnClick={showSuccess_CICD}
           />

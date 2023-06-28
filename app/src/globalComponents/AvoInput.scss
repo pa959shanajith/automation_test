@@ -39,10 +39,13 @@
         }
     }
     .input_container.inputRow_for_E2E_popUp {
-        margin: 0.7rem 0 1.25rem 0;
+        margin: 0.7rem 0 1rem 0;
         display: flex;
         align-items: center;
         flex-direction: row;
+        .icons_container{
+              width: 5rem;
+        }
         .p-inputtext {
             width: 17rem;
             padding: 0.4rem 0.4rem;

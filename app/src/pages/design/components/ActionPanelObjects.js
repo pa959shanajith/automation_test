@@ -23,6 +23,7 @@ import { updateScreen_ICE } from '../api';
 
 
 
+
 const ActionPanel = (props) => {
   const [selectObjectType, setSelectObjectType] = useState(null);
   const toast = useRef();
@@ -153,11 +154,13 @@ const ActionPanel = (props) => {
     }
   }, [props.isOpen === 'mapObject']);
 
-  useEffect(() => {
+  // useEffect(() => {
+
     const toastErrorMsg = (errorMsg) => {
       toast.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
     }
-  }, [errorMsg])
+
+  // }, [errorMsg])
 
   const newField = () => {
     let updatedObjects = [...objects];
@@ -206,6 +209,7 @@ const ActionPanel = (props) => {
       setShowFields(updatedShowFields)
     }
   }
+ 
 
   const onSave = index => {
     let object = objects[index];
@@ -226,14 +230,17 @@ const ActionPanel = (props) => {
       userObjectElement_ICE(customFields)
         .then(data => {
           if (data === "unavailableLocalServer")
-            return null;
+            // return null;
+            toastErrorMsg(" Failed to create element - ICE not available")
+
           // setMsg(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`,VARIANT.ERROR));
 
           else if (data === "Invalid Session")
             return RedirectPage(history);
           else if (data === "fail")
-            return null;
+            // return null;
           // setMsg({VARIANT:VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object`});
+          toastErrorMsg(" Failed to create element - ICE not available")
           else {
             let customObject = {
               custname: `${object.objName}_${elementType}`,
@@ -273,6 +280,7 @@ const ActionPanel = (props) => {
       if (errorFlag) {
         setError(errorObj);
         // setMsg(MSG.CUSTOM(`Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`,VARIANT.ERROR));
+        toastErrorMsg("Object Characteristics are same ")
       }
       else {
         props.utils.modifyScrapeItem(props.utils.object.val, {
@@ -374,6 +382,7 @@ const ActionPanel = (props) => {
         props.setSaved({ flag: false });
         props.setShow(false);
         // setMsg(MSG.SCRAPE.SUCC_OBJ_CREATE);
+
       }
     }
   }
@@ -467,10 +476,7 @@ const ActionPanel = (props) => {
   const createElementFooter = (
     <div className='save_clear'>
       <button className='add_object_clear' >Clear</button>
-      <button className='add_object_save'  disabled={customObjList.length == 0} onClick={() => {
-        // onSave(0);
-        onSubmit(customObjList);
-      }}>Submit</button>
+      <button className='add_object_save'  onClick={() => { onSubmit(customObjList); }} disabled={objects.length == 0}>Submit</button>
     </div>
   );
   const handleInputChange = (e) => {
@@ -615,7 +621,7 @@ const ActionPanel = (props) => {
 
   return (
     <>
-      <Toast ref={toast} position="bottom-center" baseZIndex={1000}></Toast>
+      <Toast ref={toast} position="bottom-center" baseZIndex={9999}></Toast>
       <Dialog className='add__object__header' header='Add Element' visible={props.isOpen === 'addObject'} onHide={props.OnClose} style={{ height: "28.06rem", width: "38.06rem" }} position='right' footer={addElementfooter}>
         <div className='card__add_object'>
           <Card className='add_object__left'>
@@ -744,7 +750,7 @@ const ActionPanel = (props) => {
                         <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
                       </div>
                       <div className='create-elem'>
-                        <span className='object__text' >Relative Xpath <span style={{ color: "red" }}> *</span></span>
+                        <span className='object__text' >Relative Xpath</span>
                         <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, index)} value={object.relXpath} />
                       </div>
                       <div className='create-elem'>
@@ -762,6 +768,10 @@ const ActionPanel = (props) => {
                       <div className='create-elem'>
                         <span className='object__text'>Absolute Xpath</span>
                         <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.absXpath} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>CSS Selector</span>
+                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
                       </div>
                     </>
                   {/* } */}
