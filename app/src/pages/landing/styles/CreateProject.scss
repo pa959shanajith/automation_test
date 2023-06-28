@@ -265,7 +265,7 @@
     }
     .checkbox-2{
         position: relative;
-        bottom: 0.5rem;
+        // bottom: 0.5rem;
     }
     .dropdown_role{
         position: relative;
@@ -281,7 +281,7 @@
         display: flex;
         flex-direction: row;
         position: relative;
-        bottom: 0.5rem;
+        // bottom: 0.5rem;
 
     }
     .user-role{
@@ -453,9 +453,9 @@
     align-items: center;
     margin-bottom: 1rem;
 }
-.error-msg{
+.error-message{
     position: absolute;
-    right: 24rem!important;
+    right: 49rem!important;
     top: 4rem!important
 }
   
