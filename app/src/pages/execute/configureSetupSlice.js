@@ -14,6 +14,7 @@ const initialState = {
     avogrids: [],
   },
   error: "",
+  scheduledList: []
 };
 
 const getProjects = createAsyncThunk("config/fetchProjects", async () => {
@@ -122,6 +123,19 @@ const testSuitesScheduler_ICE = createAsyncThunk("config/testSuitesScheduler_ICE
     .catch((err) => console.log(err));
 });
 
+const getScheduledDetails_ICE = createAsyncThunk("config/getScheduledDetails_ICE", async (args) => {
+  return await axios(`${url}/getScheduledDetails_ICE`, {
+    method: 'POST',
+    headers: {
+    'Content-type': 'application/json',
+    },
+    data: args,
+    credentials: 'include'
+  })
+    .then((response) => response.data)
+    .catch((err) => console.log(err));
+});
+
 export {
   getProjects,
   getModules,
@@ -129,7 +143,8 @@ export {
   readTestSuite,
   updateTestSuite,
   storeConfigureKey,
-  testSuitesScheduler_ICE
+  testSuitesScheduler_ICE,
+  getScheduledDetails_ICE
 };
 
 const configureSetupSlice = createSlice({
@@ -232,6 +247,19 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(testSuitesScheduler_ICE.rejected, (state, action) => {
       state.loading = false;
+      state.error = action.error.message;
+    });
+    builder.addCase(getScheduledDetails_ICE.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getScheduledDetails_ICE.fulfilled, (state, action) => {
+      state.loading = false;
+      state.scheduledList = action.payload;
+      state.error = "";
+    });
+    builder.addCase(getScheduledDetails_ICE.rejected, (state, action) => {
+      state.loading = false;
+      state.scheduledList = [];
       state.error = action.error.message;
     });
   },

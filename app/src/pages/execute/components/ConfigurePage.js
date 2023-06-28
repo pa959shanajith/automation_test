@@ -31,6 +31,7 @@ import {
   getAvoAgentAndAvoGrid,
   getModules,
   getProjects,
+  getScheduledDetails_ICE,
   storeConfigureKey,
   testSuitesScheduler_ICE,
   updateTestSuite,
@@ -44,8 +45,9 @@ import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import ScheduleScreen from "./ScheduleScreen";
 import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
+import ExecutionCard from "./ExecutionCard";
 
-const ConfigurePage = ({ setShowConfirmPop }) => {
+const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [visible, setVisible] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
@@ -112,6 +114,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
   const [configItem, setConfigItem] = useState({});
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
+  const [startDate, setStartDate] = useState(null);
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -511,10 +514,17 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       projectid: configProjectId,
     });
     setFetechConfig(configurationList);
-    configurationList.forEach((item, idx) => {
+    configurationList.forEach((item, idx) => {   
       getState.push({
         sno: idx + 1,
-        profileName: item.configurename,
+        // profileName: item.configurename,
+        profileName: (
+          <span
+            title={item.configurename} // Add title attribute for tooltip with full text
+            >
+            {item.configurename}
+          </span>
+        ),
         executionOptions: (
           <div className="Buttons_config_button">
             <Button
@@ -525,6 +535,8 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
                 setCurrentSelectedItem(item);
+                setConfigItem(idx);
+                console.log(fetechConfig, configItem)
               }}
               size="small"
             >
@@ -550,9 +562,17 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               onClick={() => {
                 setVisible_CICD(true);
                 setCurrentKey(item.configurekey);
+                setConfigItem(idx);
               }}
             >
               CI/CD
+            </Button>
+            <Button
+              className="CICD"
+              size="small"
+             
+            >
+              SouceLab
             </Button>
           </div>
         ),
@@ -879,33 +899,68 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
       setScheduling(false);
     }
     if (btnType === "Schedule") {
-      setVisible_schedule(false);
-      dispatch(getPoolsexe());
-      dispatch(getICE());
-      setScheduling(true);
+      dispatch(
+        testSuitesScheduler_ICE({
+          param: "testSuitesScheduler_ICE",
+          executionData: {
+            source: "schedule",
+            exectionMode: "serial",
+            executionEnv: "default",
+            browserType: selectedSchedule?.executionRequest?.browserType,
+            integration: selectedSchedule?.executionRequest?.integration,
+            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({ ...el, 
+              poolid: "",
+              type: "normal",
+              targetUser: "automationice",
+              iceList: [],
+              date: startDate,
+              time: startDate.getTime(),
+              timestamp: startDate.getTime(),
+              recurringValue: "One Time",
+              recurringString: "One Time",
+              recurringStringOnHover: "One Time",
+              endAfter: "",
+              clientTime: "",
+              clientTimeZone: ""
+            })),
+            scenarioFlag: false,
+            type: "normal",
+            configureKey: selectedSchedule?.configurekey,
+            configureName: selectedSchedule?.configurename,
+          },
+        })
+      ).then(() => {
+        dispatch(
+          getScheduledDetails_ICE({
+            param: "getScheduledDetails_ICE",
+            configKey: fetechConfig[configItem]?.configurekey,
+            configName: fetechConfig[configItem]?.configurename,
+          })
+        );
+      });
     }
   };
 
-  const onScheduleBtnClickClient = () => {
-    console.log(selectedSchedule);
-    dispatch(
-      testSuitesScheduler_ICE({
-        param: "testSuitesScheduler_ICE",
-        executionData: {
-          source: "schedule",
-          exectionMode: "serial",
-          executionEnv: "default",
-          browserType: selectedSchedule?.executionRequest?.browserType,
-          integration: selectedSchedule?.executionRequest?.integration,
-          batchInfo: selectedSchedule?.executionRequest?.batchInfo,
-          scenarioFlag: false,
-          type: "normal",
-          configureKey: selectedSchedule?.configurekey,
-          configureName: selectedSchedule?.configurename,
-        },
-      })
-    );
-  };
+  // const onScheduleBtnClickClient = () => {
+  //   console.log(selectedSchedule);
+  //   dispatch(
+  //     testSuitesScheduler_ICE({
+  //       param: "testSuitesScheduler_ICE",
+  //       executionData: {
+  //         source: "schedule",
+  //         exectionMode: "serial",
+  //         executionEnv: "default",
+  //         browserType: selectedSchedule?.executionRequest?.browserType,
+  //         integration: selectedSchedule?.executionRequest?.integration,
+  //         batchInfo: selectedSchedule?.executionRequest?.batchInfo,
+  //         scenarioFlag: false,
+  //         type: "normal",
+  //         configureKey: selectedSchedule?.configurekey,
+  //         configureName: selectedSchedule?.configurename,
+  //       },
+  //     })
+  //   );
+  // };
 
   const checkboxHeaderTemplate = () => {
     return (
@@ -916,57 +971,6 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
     );
   };
  
-   const renderExecutionCard = () => {
-    return (
-      <Card className="execute_card p-card p-card-body">
-        <div className="grid executedropdown">
-          <div className="col-6">
-            <div className="text_card">Avo Agent:</div>
-            <div className="text_value">
-              <div className="agent_name">
-                {currentSelectedItem &&
-                currentSelectedItem.executionRequest &&
-                currentSelectedItem.executionRequest.avoagents.length > 0
-                  ? currentSelectedItem.executionRequest.avoagents[0]
-                  : "Any Agent"}
-              </div>
-            </div>
-          </div>
-          <div className="col-6">
-            <div className="text_card1">
-              <div className="execute_text">Execution Mode:</div>
-            </div>
-            <div className="text_value1">
-              <div className="execute_name">
-                {currentSelectedItem &&
-                currentSelectedItem.executionRequest &&
-                currentSelectedItem.executionRequest.integration.isHeadless ===
-                  true
-                  ? "Non-Headless"
-                  : "Headless"}
-              </div>
-            </div>
-          </div>
-          <div className="col-6">
-            <div className="text_card3">
-              <div className="browser_text">Selected Browsers:</div>
-            </div>
-            <div className="text_value3">
-              <div className="browser_name">{browserTxt}</div>
-            </div>
-          </div>
-          <div className="col-6">
-            <div className="text_card4">
-              <div className="integration_text">Integration Type:</div>
-            </div>
-            <div className="text_value4">
-              <div className="integration_name">ALM</div>
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-  };
 
   const renderTable = () => {
     if (!!configList.length) {
@@ -987,17 +991,18 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             <Column
               field="sno"
               style={{ width: "5%" }}
-              header={<span className="SNo-header">S No</span>}
+              header={<span className="SNo-header">S No</span> }
             />
-            <Column
+          <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
-              }}
-              field="profileName"
-              header={checkboxHeaderTemplate}
-            />
+                width:"50%"
+               }}
+                 field="profileName"
+             header={checkboxHeaderTemplate}
+/>
             <Column
               style={{
                 fontWeight: "bold",
@@ -1031,7 +1036,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
             onModalBtnClick={onExecuteBtnClick}
             content={
               <>
-                {renderExecutionCard()}
+               {<ExecutionCard cardData={fetechConfig[configItem]} />}
                 <div className="radioButtonContainer">
                   <RadioButton
                     value="Execute with Avo Assure Agent/ Grid"
@@ -1068,7 +1073,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                       <div className="legend">
                         <span id="status" className="status-available"></span>
                         <span className="legend-text">Available</span>
-                      </div>
+                  </div>
                       <div className="legend">
                         <span id="status" className="status-unavailable"></span>
                         <span className="legend-text2">Unavailable</span>
@@ -1086,32 +1091,34 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                         Execute on
                       </span>
                       <div className="search_icelist ">
-                        <DropDownList
-                          poolType={poolType}
-                          ExeScreen={ExeScreen}
-                          inputErrorBorder={inputErrorBorder}
-                          setInputErrorBorder={setInputErrorBorder}
-                          placeholder={"Search"}
-                          data={availableICE}
-                          smartMode={ExeScreen === true ? smartMode : ""}
-                          selectedICE={selectedICE}
-                          setSelectedICE={setSelectedICE}
-                        />
-                      </div>
-                    </div>
+                  <DropDownList
+                    poolType={poolType}
+                    ExeScreen={ExeScreen}
+                    inputErrorBorder={inputErrorBorder}
+                    setInputErrorBorder={setInputErrorBorder}
+                    placeholder={"Search"}
+                    data={availableICE}
+                    smartMode={ExeScreen === true ? smartMode : ""}
+                    selectedICE={selectedICE}
+                    setSelectedICE={setSelectedICE}
+                  />
+                  </div>
+                </div>
                   </div>
                 )}
               </>
             }
-            headerTxt="Execute: Regression"
+            headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+            modalSytle={{ width: "50vw", background: "#FFFFFF", height:"70%" }}
+            
+           
           />
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}
             onModalBtnClick={onScheduleBtnClick}
-            content={<ScheduleScreen cardData={fetechConfig[configItem]} />}
+            content={<ScheduleScreen cardData={fetechConfig[configItem]} startDate={startDate} setStartDate={setStartDate} />}
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
             footerType="Schedule"
             modalSytle={{
@@ -1119,8 +1126,9 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               height: "95vh",
               background: "#FFFFFF",
             }}
+            isDisabled={!startDate}
           />
-          <AvoModal
+          {/* <AvoModal
             visible={scheduling}
             setVisible={setScheduling}
             onModalBtnClick={onScheduleBtnClickClient}
@@ -1159,13 +1167,13 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-          />
+          /> */}
           <AvoModal
             visible={visible_CICD}
             setVisible={setVisible_CICD}
             content={
               <>
-                {renderExecutionCard()}
+                 <ExecutionCard cardData={fetechConfig[configItem]} />
 
                 <div className="input_CICD ">
                   <div class="container_url">
@@ -1246,7 +1254,7 @@ const ConfigurePage = ({ setShowConfirmPop }) => {
                 </div>
               </>
             }
-            headerTxt={`CICD: demo123`}
+            headerTxt={`CICD: ${fetechConfig[configItem]?.configurename}`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
             onModalBtnClick={showSuccess_CICD}
           />
