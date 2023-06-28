@@ -1,6 +1,7 @@
- 
+@import "../../global/styles/ColorVariables.scss";
     .list1{
         margin: 1em 1em 1em 1em;
+        font: $f6_regular;
     }
     .project-name-1{
         .p-card-body{
@@ -453,6 +454,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
+    font:$f1_regular;
 }
   
     

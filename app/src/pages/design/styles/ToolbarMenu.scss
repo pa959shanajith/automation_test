@@ -14,6 +14,7 @@
     font-weight: 700;
     position: relative;
     margin: 2px 8px 0 0;
+    font: $f7_semibold;
 }
 .projectSelect{
     width: 160px;
@@ -23,6 +24,7 @@
     padding: 2px;
     outline-style: none;
     box-shadow: none;
+    font: $f6_regular;
 }
 .toolbar__header-menus{
     display: inline-block;

@@ -1,12 +1,8 @@
+@import "../../global/styles/ColorVariables.scss";
 .verticalcard{
     width: 70%;
     height: 50% ;
-
-    
-
 }
-
-
 .stepLabel{
     height:2.3rem;
 }
@@ -16,6 +12,7 @@
     margin-left: 3%;
     padding-top: 1rem;
     padding-bottom: 2%;
+    font: $f4_bold;
 }
 .verticalicon{
     position: relative;
@@ -25,6 +22,7 @@
 .label{
     font-size: 0.97rem;
     font-weight: 600;
+    font: $f6_semibold;
 }
 .titleDescBut{
     display: flex;
@@ -39,6 +37,7 @@
 }
 .description{
     font-size: 13px !important;
+    font: $f7_regular !important;
     // padding: 0.1rem 0;
     
 }
@@ -48,6 +47,7 @@
 }
 .buttonNav{
     align-items: center;
+    font: $f7_semibold;
 }
 .HeaderName{
     margin-bottom: 0em !important;

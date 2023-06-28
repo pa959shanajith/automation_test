@@ -192,6 +192,7 @@
     left: 36em;
     background: #605BFF;
     border-radius: 8px;
+    font: $f7_semibold;
     &:hover{
         background: #605BFF !important;
         border-radius: 8px !important;
@@ -202,6 +203,7 @@
     left: 36em;
     background: #605BFF;
     border-radius: 8px;
+    font: $f7_semibold;
     &:hover{
         background: #605BFF !important;
         border-radius: 8px !important;
@@ -236,12 +238,17 @@
         font-weight: 900;
         font-size: 32px;
         line-height: 44px;
+        font: $f5_semibold;
+    }
+    #module_normal{
+        font: $f6_regular;
     }
 }
 .space{
     position: relative;
     left: 18em;
     width: 20rem;
+    font: $f6_semibold;
 }
 #p_card{
     .p-card-body{
