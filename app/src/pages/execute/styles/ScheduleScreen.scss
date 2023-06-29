@@ -40,6 +40,11 @@
         }
     }
     .avo_input {
+        position: relative;
+        top: 3rem;
+        z-index: 2;
+        width: 30%;
+        left: 70%;
         .p-input-icon-left {
             width: 100%;
         }
@@ -48,6 +53,23 @@
 
 .recurrence_container {
     max-width: 50%;
+    .p-calendar {
+        width: 20rem;
+        .p-inputtext {
+            padding: 0.3rem 0.5rem;
+        }
+
+        .p-button {
+            padding: 0.3rem 0.5rem;
+            background: white;
+            color: #dee2e6;
+            width: 2rem;
+            border: 1px solid #dee2e6;
+            .p-button-icon {
+                color: #495057;
+            }
+        }
+    }
     .radioBtn {
         padding-bottom: 1rem;
     }

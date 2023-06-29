@@ -8,6 +8,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { TabPanel, TabView } from "primereact/tabview";
 import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
@@ -15,8 +16,7 @@ import { getScheduledDetails_ICE } from "../configureSetupSlice";
 import { scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
 
-const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
-  const [selectedSchedule, setSelectedSchedule] = useState(null);
+const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, setSelectedPattren }) => {
   const [selectedDaily, setSelectedDaily] = useState(null);
   const [selectedMonthly, setSelectedMonthly] = useState(null);
   const [startTime, setStartTime] = useState(null);
@@ -133,7 +133,7 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
         </div>
       ),
     };
-    return recurrenceObj[selectedSchedule?.key];
+    return recurrenceObj[selectedPattren?.key];
   };
 
   useEffect(() => {
@@ -150,14 +150,12 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
     <>
       <ExecutionCard cardData={cardData} />
       <div className="schedule_container">
-        <div className="grid">
+        <div className="grid" style={{ marginBottom: "-2rem" }}>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
             <Button
               icon="pi pi-sync"
               label={
-                selectedSchedule?.key
-                  ? selectedSchedule?.name
-                  : "Make Recurring"
+                selectedPattren?.key ? selectedPattren?.name : "Make Recurring"
               }
               onClick={(e) => recurrance.current.toggle(e)}
               iconPos="right"
@@ -169,7 +167,7 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
                 <div className="col-12">Recurrence Pattern</div>
                 <div
                   className={`${
-                    selectedSchedule?.key
+                    selectedPattren?.key
                       ? "with_border col-12 lg:col-3 xl:col-3 md:col-4 sm:col-6 "
                       : "without_border col-12"
                   }`}
@@ -180,8 +178,8 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
                         inputId={el?.key}
                         name="schedule"
                         value={el}
-                        onChange={(e) => setSelectedSchedule(e.value)}
-                        checked={selectedSchedule?.key === el?.key}
+                        onChange={(e) => setSelectedPattren(e.value)}
+                        checked={selectedPattren?.key === el?.key}
                       />
                       <label htmlFor={el?.key} className="ml-2">
                         {el?.name}
@@ -190,6 +188,14 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
                   ))}
                 </div>
                 {onRecurrenceClick()}
+                <div className="col-12">
+                  <Calendar
+                    value={startDate}
+                    placeholder="Enter Start date"
+                    onChange={(e) => setStartDate(e.value)}
+                    showIcon
+                  />
+                </div>
               </div>
             </OverlayPanel>
           </div>
@@ -212,31 +218,39 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate }) => {
             />
           </div>
         </div>
-        <div className="grid align-items-center btn_container">
-          <div className="col-12 lg:col-6 xl:col-6 md:col-6 sm:col-6 flex">
-            <Button label="Scheduled Taks" size="small" />
-            <Button label="Recurring Taks" size="small" className="recurring_btn" />
-          </div>
-          <div className="col-12 lg:col-6 xl:col-6 md:col-6 sm:col-6">
-            <AvoInput
-              icon="pi pi-search"
-              placeholder="Search"
-              inputTxt={tableFilter}
-              setInputTxt={setTableFilter}
-              inputType="searchIcon"
-            />
-          </div>
-        </div>
-        <DataTable
-          value={getScheduledList?.scheduledList}
-          tableStyle={{ minWidth: "50rem" }}
-          globalFilter={tableFilter}
-        >
-          <Column field="scheduledon" header="Date & Time"></Column>
-          <Column field="target" header="Host"></Column>
-          <Column field="recurringpattern" header="Schedule Type"></Column>
-          <Column field="status" header="Status"></Column>
-        </DataTable>
+        <AvoInput
+          icon="pi pi-search"
+          placeholder="Search"
+          inputTxt={tableFilter}
+          setInputTxt={setTableFilter}
+          inputType="searchIcon"
+        />
+        <TabView>
+          <TabPanel header="Scheduled Taks">
+            <DataTable
+              value={getScheduledList?.scheduledList}
+              tableStyle={{ minWidth: "50rem" }}
+              globalFilter={tableFilter}
+            >
+              <Column field="scheduledon" header="Date & Time"></Column>
+              <Column field="target" header="Host"></Column>
+              <Column field="recurringpattern" header="Schedule Type"></Column>
+              <Column field="status" header="Status"></Column>
+            </DataTable>
+          </TabPanel>
+          <TabPanel header="Recurring Taks">
+            <DataTable
+              value={getScheduledList?.scheduledList}
+              tableStyle={{ minWidth: "50rem" }}
+              globalFilter={tableFilter}
+            >
+              <Column field="scheduledon" header="Date & Time"></Column>
+              <Column field="target" header="Host"></Column>
+              <Column field="recurringpattern" header="Schedule Type"></Column>
+              <Column field="status" header="Status"></Column>
+            </DataTable>
+          </TabPanel>
+        </TabView>
       </div>
     </>
   );
