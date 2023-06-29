@@ -10,8 +10,8 @@ import ActionPanel from '../components/ActionPanelObjects';
 import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue } from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
-import { v4 as uuid } from 'uuid'; 
-import{ScreenOverlay } from '../../global';
+import { v4 as uuid } from 'uuid';
+import { ScreenOverlay } from '../../global';
 import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
@@ -19,14 +19,14 @@ import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import ModalContainer from '../../global/components/ModalContainer';
 import { Toast } from 'primereact/toast';
 import { InputText } from "primereact/inputtext";
-
+import { Tooltip } from 'primereact/tooltip';
 
 
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
   const toast = useRef();
-  const objValues = useSelector(state=>state.design.objValue);
+  const objValues = useSelector(state => state.design.objValue);
   const [visible, setVisible] = useState(false);
   const [showCaptureData, setShowCaptureData] = useState([]);
   const [showPanel, setShowPanel] = useState(true);
@@ -50,7 +50,7 @@ const CaptureModal = (props) => {
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
   const [captureData, setCaptureData] = useState([]);
   const [screenshotData, setScreenshotData] = useState([]);
-  const[endScrape,setEndScrape]=useState(false)
+  const [endScrape, setEndScrape] = useState(false)
   const [showObjModal, setShowObjModal] = useState(false);
   const userInfo = useSelector((state) => state.landing.userinfo);
   const [showPop, setShowPop] = useState("");
@@ -59,17 +59,17 @@ const CaptureModal = (props) => {
   const [masterCapture, setMasterCapture] = useState(false);
   const [showNote, setShowNote] = useState(false);
   const [screenshotY, setScreenshotY] = useState(null);
-	const [mirrorHeight, setMirrorHeight] = useState("0px");
+  const [mirrorHeight, setMirrorHeight] = useState("0px");
   const [dsRatio, setDsRatio] = useState(1);
   const [highlight, setHighlight] = useState(false);
-  const appType= props.appType;
-  const [imageHeight,setImageHeight]=useState(0);
+  const appType = props.appType;
+  const [imageHeight, setImageHeight] = useState(0);
   const [activeEye, setActiveEye] = useState(false);
   const [showConfirmPop, setShowConfirmPop] = useState(false);
   const [modified, setModified] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
   const [deleted, setDeleted] = useState([]);
-  const[deletedItems,setDeletedItems]=useState(false)
+  const [deletedItems, setDeletedItems] = useState(false)
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -80,9 +80,11 @@ const CaptureModal = (props) => {
   const [cardBottom, setCardBottom] = useState(null)
   const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
   const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
-  const[showIdentifierOrder,setShowIdentifierOrder]=useState(false)
-  const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]);
-  const[identifierModified,setIdentifierModiefied]=useState(false)
+  const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
+  const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
+  const [identifierModified, setIdentifierModiefied] = useState(false);
+  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] });
+  const [idx, setIdx] = useState(0);
 
 
   const imageRef1 = useRef(null);
@@ -91,20 +93,21 @@ const CaptureModal = (props) => {
   const imageRef4 = useRef(null);
 
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
-  const[selectedCapturedElement,setSelectedCapturedElement] = useState(null);
+  const [selectedCapturedElement, setSelectedCapturedElement] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
+  let addMore = useRef(false);
 
   useEffect(() => {
     fetchScrapeData()
-  }, [])
+  }, [parentData])
   useEffect(() => {
-    if (endScrape || elementPropertiesUpdated||identifierModified) {
+    if (endScrape || elementPropertiesUpdated || identifierModified) {
       fetchScrapeData();
       setEndScrape(false)
       setIdentifierModiefied(false)
       setElementPropertiesUpdated(false)
     }
-  }, [endScrape, elementPropertiesUpdated,identifierModified])
+  }, [parentData, endScrape, elementPropertiesUpdated, identifierModified])
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
@@ -181,11 +184,65 @@ const CaptureModal = (props) => {
   }
 
 
-  const handleBrowserClose = () =>{
-      setVisible(false);
+  const handleBrowserClose = () => {
+    setVisible(false);
   }
 
 
+  const parentScreen = props.fetchingDetails["parent"]["children"];
+  useEffect(() => {
+    const parentScreenId = () => {
+      for (let i = 0; i < parentScreen.length; i++) {
+        if (props.fetchingDetails["name"] === parentScreen[i].name) {
+          //  if (props.fetchingDetails["parent"]["children"][idx]["name"] === parentScreen[i].name) {
+          setIdx(i);
+          return setParentData({
+            name: parentScreen[i].name,
+            id: parentScreen[i]._id,
+            parentName: props.fetchingDetails["parent"]['name'],
+            parent_id: props.fetchingDetails["parent"]['_id'],
+            projectId: parentScreen[i].projectID,
+          });
+          // }
+        }
+      }
+      return 0;
+    }
+    parentScreenId();
+  }, [])
+
+
+  const onIncreaseScreen = () => {
+    setCapturedDataToSave([]);
+    for (let i = idx; i < parentScreen.length; i++) {
+      if (props.fetchingDetails["parent"]["children"][idx + 1]["name"] === parentScreen[i].name) {
+        setParentData({
+          name: parentScreen[i].name,
+          id: parentScreen[i]._id,
+          parentName: props.fetchingDetails["parent"]['name'],
+          parent_id: props.fetchingDetails["parent"]['_id'],
+          projectId: parentScreen[i].projectID,
+        });
+        return setIdx(idx + 1);
+      }
+    }
+  }
+
+  const onDecreaseScreen = () => {
+    setCapturedDataToSave([]);
+    for (let i = idx; i < parentScreen.length; i--) {
+      if (props.fetchingDetails["parent"]["children"][idx - 1]["name"] === parentScreen[i].name) {
+        setParentData({
+          name: parentScreen[i].name,
+          id: parentScreen[i]._id,
+          parentName: props.fetchingDetails["parent"]['name'],
+          parent_id: props.fetchingDetails["parent"]['_id'],
+          projectId: parentScreen[i].projectID,
+        });
+        return setIdx(idx - 1);
+      }
+    }
+  }
 
   const handleRowReorder = (event) => {
     setCaptureData(event.value);
@@ -199,15 +256,24 @@ const CaptureModal = (props) => {
     }
   };
 
-  const toastSuccess = (SuccMessage) => {
-    toast.current.show({ severity: 'success', summary: 'Success', detail: SuccMessage, life: 10000 });
+  const toastError = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
   }
 
+  const toastSuccess = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+  }
 
   const onSave = (e, confirmed) => {
-       
+
     let continueSave = true;
-    
+
     // if (mainScrapedData.reuse && !confirmed) {
     //     setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen has been reused. Are you sure you want to save scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onSave(null, true);}})
     //     return;
@@ -222,76 +288,76 @@ const CaptureModal = (props) => {
     let scrapeItemsL = [...capturedDataToSave];
 
     if (scrapeItemsL.length > 0) {
+      for (let scrapeItem of scrapeItemsL) {
+        if (uniqueCusts.includes(scrapeItem.custname)) {
+          dCustname = true;
+          scrapeItem.duplicate = true;
+          dCusts.push(scrapeItem.custname);
+        }
+        else {
+          scrapeItem.duplicate = false;
+          uniqueCusts.push(scrapeItem.custname);
+        }
+      }
+      if (!dCustname) {
         for (let scrapeItem of scrapeItemsL) {
-            if (uniqueCusts.includes(scrapeItem.custname)) {
-                dCustname = true;
-                scrapeItem.duplicate = true;
-                dCusts.push(scrapeItem.custname);
-            }
-            else {
-                scrapeItem.duplicate = false;
-                uniqueCusts.push(scrapeItem.custname);
-            }
-        }
-        if (!dCustname) {
-            for (let scrapeItem of scrapeItemsL) {
-                if (scrapeItem.xpath === "" || scrapeItem.xpath === undefined) continue;
-                let xpath = scrapeItem.xpath;
-                if (props.appType === 'MobileWeb') xpath = xpath.split(";")[2];
+          if (scrapeItem.xpath === "" || scrapeItem.xpath === undefined) continue;
+          let xpath = scrapeItem.xpath;
+          if (props.appType === 'MobileWeb') xpath = xpath.split(";")[2];
 
-                if (uniqueXPaths.includes(xpath)) {
-                    dXpath = true;
-                    scrapeItem.duplicate = true;
-                    dCusts2.push(scrapeItem.custname);
-                }
-                else {
-                    scrapeItem.duplicate = false;
-                    uniqueXPaths.push(xpath);
-                }
-            }
+          if (uniqueXPaths.includes(xpath)) {
+            dXpath = true;
+            scrapeItem.duplicate = true;
+            dCusts2.push(scrapeItem.custname);
+          }
+          else {
+            scrapeItem.duplicate = false;
+            uniqueXPaths.push(xpath);
+          }
         }
+      }
 
-        if (dCustname) {
-            continueSave = false;
-            setShowPop({
-                'type': 'modal',
-                'title': 'Save Scrape data',
-                'content': <div className="ss__dup_labels">
-                    Please rename/delete duplicate scraped objects
-                    <br/><br/>
-                    Object characterstics are same for:
-                    {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-                        <div className="ss__dup_scroll">
-                        { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-                        </div>
-                    {/* </ScrollBar> */}
-                </div>,
-                'footer': <Button size="small" onClick={()=>setShowPop("")}>OK</Button>
-            })
-        }
-         else if (dXpath) {
-            continueSave = false;
-            setShowConfirmPop({
-                'title': 'Save Scrape data',
-                'content': <div className="ss__dup_labels">
-                    Object characteristics are same for the below list of objects:
-                    {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-                        <div className="ss__dup_scroll">
-                        { dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-                        </div>
-                    {/* </ScrollBar> */}
-                    <br/>
-                    Do you still want to continue?
-                </div>,
-                'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
-                'continueText': "Continue",
-                'rejectText': "Cancel"
-            })
-        }
+      if (dCustname) {
+        continueSave = false;
+        setShowPop({
+          'type': 'modal',
+          'title': 'Save Scrape data',
+          'content': <div className="ss__dup_labels">
+            Please rename/delete duplicate scraped objects
+            <br /><br />
+            Object characterstics are same for:
+            {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+            <div className="ss__dup_scroll">
+              {dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+            </div>
+            {/* </ScrollBar> */}
+          </div>,
+          'footer': <Button size="small" onClick={() => setShowPop("")}>OK</Button>
+        })
+      }
+      else if (dXpath) {
+        continueSave = false;
+        setShowConfirmPop({
+          'title': 'Save Scrape data',
+          'content': <div className="ss__dup_labels">
+            Object characteristics are same for the below list of objects:
+            {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+            <div className="ss__dup_scroll">
+              {dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+            </div>
+            {/* </ScrollBar> */}
+            <br />
+            Do you still want to continue?
+          </div>,
+          'onClick': () => { setShowConfirmPop(false); saveScrapedObjects(); },
+          'continueText': "Continue",
+          'rejectText': "Cancel"
+        })
+      }
     }
 
     if (continueSave) saveScrapedObjects();
-}
+  }
 
 
   const fetchScrapeData = () => {
@@ -304,7 +370,7 @@ const CaptureModal = (props) => {
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
-      scrapeApi.getScrapeDataScreenLevel_ICE("web", props.fetchingDetails["_id"], props.fetchingDetails.projectID, "")
+      scrapeApi.getScrapeDataScreenLevel_ICE("web", parentData.id, parentData.projectId, "")
         .then(data => {
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
@@ -313,11 +379,16 @@ const CaptureModal = (props) => {
           else if (typeof data === "object" && props.appType !== "Webservice") {
             haveItems = data.view.length !== 0;
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
+            newlyScrapeList = newScrapeList
 
-            newlyScrapeList=newScrapeList;
+            if (!addMore.current) {
+              if (newlyScrapeList.length > 0 && capturedDataToSave.length >= 0) {
+                setCapturedDataToSave([...newScrapeList]);
+                viewString = newScrapeList;
+              }
+            }
 
             setMainScrapedData(data);
-            if (capturedDataToSave.length === 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
             setMirror({ scrape: data.mirror, compare: null });
             setNewScrapedData([]);
             setScrapeItems(newScrapeList);
@@ -373,45 +444,46 @@ const CaptureModal = (props) => {
           resolve("success");
           let newData = (viewString.length > 0 && !elementPropertiesUpdated) ? viewString.map((item) => {
             return (
-                {
-                  selectall: item.custname,
-                  objectProperty: item.tag,
-                  screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={()=>{
-                      setScreenshotData({
-                      header: item.custname,
-                      imageUrl: mirror.scrape || "",
-                      enable: true
-                    });
-                    onHighlight();
-                  }}>View Screenshot</span> : "",
-                  actions: '',
-                  objectDetails:item
-                
-                }
-              )}):newlyScrapeList.map((item) => {
-                return (
-                    {
-                      selectall: item.custname,
-                      objectProperty: item.tag,
-                      browserscrape: 'google chrome',
-                      screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={()=>{
-                        setScreenshotData({
-                        header: item.custname,
-                        imageUrl: mirror.scrape || "",
-                        enable: true
-                      });
-                      onHighlight();
-                    }}>View Screenshot</span> : <span>No screenshot available</span>,
-                      actions: '',
-                      objectDetails:item
-                    }
-                  )})
+              {
+                selectall: item.custname,
+                objectProperty: item.tag,
+                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
+                  setScreenshotData({
+                    header: item.custname,
+                    imageUrl: mirror.scrape || "",
+                    enable: true
+                  });
+                  onHighlight();
+                }}>View Screenshot</span> : <span>No Screenshot</span>,
+                actions: '',
+                objectDetails: item
+
+              }
+            )
+          }) : newlyScrapeList.map((item) => {
+            return (
+              {
+                selectall: item.custname,
+                objectProperty: item.tag,
+                browserscrape: 'google chrome',
+                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
+                  setScreenshotData({
+                    header: item.custname,
+                    imageUrl: mirror.scrape || "",
+                    enable: true
+                  });
+                  onHighlight();
+                }}>View Screenshot</span> : <span>No screenshot available</span>,
+                actions: '',
+                objectDetails: item
+              }
+            )
+          })
           setCaptureData(newData);
         })
         .catch(error => {
           dispatch(disableAction(haveItems));
           dispatch(disableAppend(!haveItems));
-          console.error("error", error);
           setOverlay("");
           reject("fail")
         })
@@ -419,37 +491,37 @@ const CaptureModal = (props) => {
   }
   const onDelete = (e, confirmed) => {
     if (mainScrapedData.reuse && !confirmed) {
-        return;
+      return;
     }
     let deletedArr = [...deleted];
     let scrapeItemsL = [...captureData];
     let newOrderList = [];
-    var capturedDataAfterSave = scrapeItemsL.filter(function(item) {
-      
-      return !selectedCapturedElement.find(function(objFromB) {
-        if(item.objectDetails.objId === objFromB.objectDetails.objId){
+    var capturedDataAfterSave = scrapeItemsL.filter(function (item) {
+
+      return !selectedCapturedElement.find(function (objFromB) {
+        if (item.objectDetails.objId === objFromB.objectDetails.objId) {
           deletedArr.push(item.objectDetails.objId)
           return true
         }
       })
     })
-    let notused=scrapeItemsL.filter(item=>{
-      if(deletedArr.includes(item.objectDetails.objId)){
+    let notused = scrapeItemsL.filter(item => {
+      if (deletedArr.includes(item.objectDetails.objId)) {
         return false
       }
-      else{
+      else {
         newOrderList.push(item.objectDetails.objId)
       }
     })
-    let newCapturedDataToSave=capturedDataAfterSave.map(item=>item.objectDetails)
+    let newCapturedDataToSave = capturedDataAfterSave.map(item => item.objectDetails)
     setCaptureData(capturedDataAfterSave)
     setDeleted(deletedArr)
     setOrderList(newOrderList)
     setCapturedDataToSave(newCapturedDataToSave)
     setSelectedCapturedElement([])
-    toast.current.show({severity:'success', summary: 'Success', detail:'Element deleted successfully', life: 5000});
-}
-// {console.log(captureData[0].selectall)}
+    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+  }
+  // {console.log(captureData[0].selectall)}
 
   const saveScrapedObjects = () => {
     let scrapeItemsL = [...capturedDataToSave];
@@ -457,36 +529,36 @@ const CaptureModal = (props) => {
     let views = [];
     let orderList = [];
     let modifiedObjects = Object.values(modified);
-    setCapturedDataToSave([]);
 
     for (let scrapeItem of scrapeItemsL) {
-      if(!Array.isArray(scrapeItem)) {
+      if (!Array.isArray(scrapeItem)) {
         if (!scrapeItem.objId) {
-          if (scrapeItem.isCustom) views.push({custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId});
-          else views.push({...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId});
+          if (scrapeItem.isCustom) views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+          else views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
           orderList.push(scrapeItem.tempOrderId);
         }
         else orderList.push(scrapeItem.objId);
       }
-        
+
     }
-    
+
     let params = {
-        'deletedObj': deleted,
-        'modifiedObj': modifiedObjects,
-        'addedObj': {...added, view: views},
-        'screenId': props.fetchingDetails["_id"],
-        'userId': userInfo.user_id,
-        'roleId': userInfo.role,
-        'param': 'saveScrapeData',
-        'orderList': orderList
+      'deletedObj': deleted,
+      'modifiedObj': modifiedObjects,
+      'addedObj': { ...added, view: views },
+      'screenId': props.fetchingDetails["_id"],
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+      'param': 'saveScrapeData',
+      'orderList': orderList
     }
 
     scrapeApi.updateScreen_ICE(params)
-    .then(response => {
+      .then(response => {
         if (response === "Invalid Session") return null;
         else fetchScrapeData().then(resp => {
           if (resp === 'success' || typeof (resp) === "object") {
+
             typeof (resp) === "object" && resp.length > 0
               ? setShowPop({
                 title: "Saved Scrape Objects",
@@ -507,12 +579,11 @@ const CaptureModal = (props) => {
               : toastSuccess("Scraped Elements saved successfully.");
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
-          } else console.error(resp);
-        })
-        .catch(error => console.error(error));
-    })
-    .catch(error => console.error(error))
-}
+          } else { console.error(resp); addMore.current = true; }
+        }).catch(error => console.error(error));
+      })
+      .catch(error => console.error(error))
+  }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
     let screenViewObject = {};
@@ -527,26 +598,27 @@ const CaptureModal = (props) => {
     setOverlay(blockMsg);
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
-        if(capturedDataToSave.length!==0 && masterCapture){
+        if (capturedDataToSave.length !== 0 && masterCapture) {
           let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
-            let deleted=capturedDataToSave.map(item=>item.objId);
-            setCaptureData([]);
-            setCapturedDataToSave([]);
-         let params = {
-                    'deletedObj': deleted,
-                    'modifiedObj':[],
-                    'addedObj': {...added, view: []},
-                    'screenId': props.fetchingDetails["_id"],
-                    'userId': userInfo.user_id,
-                    'roleId': userInfo.role,
-                    'param': 'saveScrapeData',
-                    'orderList': []
-                }
-                scrapeApi.updateScreen_ICE(params)
-                .then(response => {
-               console.log('done')})
-               .catch(error=>console.log(error))
-              }
+          let deleted = capturedDataToSave.map(item => item.objId);
+          setCaptureData([]);
+          setCapturedDataToSave([]);
+          let params = {
+            'deletedObj': deleted,
+            'modifiedObj': [],
+            'addedObj': { ...added, view: [] },
+            'screenId': props.fetchingDetails["_id"],
+            'userId': userInfo.user_id,
+            'roleId': userInfo.role,
+            'param': 'saveScrapeData',
+            'orderList': []
+          }
+          scrapeApi.updateScreen_ICE(params)
+            .then(response => {
+              console.log('done')
+            })
+            .catch(error => console.log(error))
+        }
         let err = null;
         setOverlay("");
         // ResetSession.end();
@@ -558,12 +630,13 @@ const CaptureModal = (props) => {
           if (scrapedItemsLength > 0) dispatch(disableAction(true));
           else dispatch(disableAction(false));
           setSaved({ flag: false });
-          // err = {
-          //     'VARIANT':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
-          //         data === 'scheduleModeOn' ?
-          //             MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-          //             MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-          // };
+          err = {
+            'VARIANT': data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
+              data === 'scheduleModeOn' ?
+                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
+
+          };
         } else if (data === "fail")
           err = MSG.SCRAPE.ERR_SCRAPE;
         else if (data === "Terminate") {
@@ -584,6 +657,7 @@ const CaptureModal = (props) => {
         // fetchScrapeData();
 
         if (viewString.view.length !== 0) {
+
           let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
 
           let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
@@ -598,7 +672,20 @@ const CaptureModal = (props) => {
 
           setNewScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
-          masterCapture?setCapturedDataToSave([...scrapeItemList]):setCapturedDataToSave([...capturedDataToSave,...scrapeItemList])
+
+          if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
+            setCapturedDataToSave([...scrapeItemList])
+          }
+          else {
+            if (capturedDataToSave.length > 0) { //when click on addmore
+              addMore.current = true;
+              setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+            }
+            else { // when captured data is empty  
+              addMore.current = false;
+              setCapturedDataToSave([...scrapeItemList]);
+            }
+          }
           updateScrapeItems(scrapeItemList);
           setScrapedURL(updatedNewScrapeData.scrapedurl);
           setMirror({ scrape: viewString.mirror, compare: null });
@@ -607,7 +694,6 @@ const CaptureModal = (props) => {
           if (viewString.view.length > 0) setSaved({ flag: false });
           setEndScrape(true)
 
-          
         }
       })
       .catch(error => {
@@ -616,12 +702,8 @@ const CaptureModal = (props) => {
         // setMsg(MSG.SCRAPE.ERR_SCRAPE);
         console.error("Fail to Load design_ICE. Cause:", error);
       });
-    
+
   }
-
- 
-
-  
 
   const updateScrapeItems = newList => {
     setScrapeItems([...scrapeItems, ...newList])
@@ -632,45 +714,45 @@ const CaptureModal = (props) => {
   };
 
 
-    const handleDelete = (rowData) => {
-      const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
-      setCaptureData(updatedData);
-    };
+  const handleDelete = (rowData) => {
+    const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
+    setCaptureData(updatedData);
+  };
 
-    const handleEdit = (rowData) =>{
-      const updatedData = captureData.map((item) => {
-        if (item.selectall === rowData.selectall) {
-          return { ...item, editing: true };
-        }
-        return item;
-      });
-      setCaptureData(updatedData);
-    }
-
-    const handleSelectAllChange = (rowData, newValue) => {
-      const updatedData = captureData.map((item) => {
-        if (item.selectall === rowData.selectall) {
-          return { ...item, selectall: newValue };
-        }
-        return item;
-      });
-      setCaptureData(updatedData);
-    };
-  
-    const renderSelectAllCell = (rowData) => {
-      if (rowData.editing) {
-        return (
-          <input
-            type="text"
-            value={rowData.selectall}
-            onChange={(e) => handleSelectAllChange(rowData, e.target.value)}
-          />
-        );
+  const handleEdit = (rowData) => {
+    const updatedData = captureData.map((item) => {
+      if (item.selectall === rowData.selectall) {
+        return { ...item, editing: true };
       }
-      return rowData.selectall;
-    };
+      return item;
+    });
+    setCaptureData(updatedData);
+  }
 
-    
+  const handleSelectAllChange = (rowData, newValue) => {
+    const updatedData = captureData.map((item) => {
+      if (item.selectall === rowData.selectall) {
+        return { ...item, selectall: newValue };
+      }
+      return item;
+    });
+    setCaptureData(updatedData);
+  };
+
+  const renderSelectAllCell = (rowData) => {
+    if (rowData.editing) {
+      return (
+        <input
+          type="text"
+          value={rowData.selectall}
+          onChange={(e) => handleSelectAllChange(rowData, e.target.value)}
+        />
+      );
+    }
+    return rowData.selectall;
+  };
+
+
   const renderActionsCell = (rowData) => {
     return (
       <div>
@@ -687,7 +769,6 @@ const CaptureModal = (props) => {
   };
 
 
- 
   const handleMouseLeaveRow = () => {
     setHoveredRow(null);
   };
@@ -705,17 +786,17 @@ const CaptureModal = (props) => {
   //   }
   //   return null;
   // };
-  
+
 
   const footerCapture = (
     <div className='footer__capture'>
-      <Button className='btn_capture' onMouseDownCapture={() =>{setVisible(false);startScrape(captureButton);}}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton); }}>Capture</Button>
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button className='btn_capture' onMouseDownCapture={() => {setVisible(false);startScrape(captureButton)}}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton) }}>Capture</Button>
     </div>
   );
 
@@ -723,11 +804,14 @@ const CaptureModal = (props) => {
     <>
       <div>
         <h5 className='dailog_header1'>Capture Elements</h5>
-        <h4 className='dailog_header2'>Signup screen 1</h4>
-        <img className="screen_btn" src="static/imgs/ic-screen-icon.png" />
+        <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
+        <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
+        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        </h4>
+        {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
           <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
-          <button className='add__more__btn' onClick={() => {setMasterCapture(false);handleAddMore('add more')}}>Add More</button>
+          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }}>Add More</button>
           <button className="btn-capture" onClick={() => setShowNote(true)}>Capture Elements</button>
         </div> : <button className='btn_panel__single' onClick={togglePanel}>Action Panel</button>}
       </div>
@@ -739,17 +823,19 @@ const CaptureModal = (props) => {
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Not Captured</p>
-        <button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</button>
+        <Button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</Button>
       </div>
     </div>
   );
 
+  const setAddmoreHandler = () => addMore.current = addMore.current && false;
+
   const footerSave = (
     <>
-    {selectedCapturedElement?.length>0?<Button label="Element Identifier Order"onClick={()=>setShowIdentifierOrder(true)} ></Button>:null}
-    {selectedCapturedElement?.length>0?<Button label='Delete' onClick={onDelete} ></Button>:null}
-    <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} ></Button>
+      {selectedCapturedElement?.length > 0 ? <Button label="Element Identifier Order" onClick={() => setShowIdentifierOrder(true)} ></Button> : null}
+      {selectedCapturedElement?.length > 0 ? <Button label='Delete' onClick={onDelete} ></Button> : null}
+      <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)}></Button>
+      <Button label='Save' onClick={onSave} ></Button>
     </>
   )
   const PopupDialog = () => (
@@ -770,32 +856,32 @@ const CaptureModal = (props) => {
       close={() => setShowConfirmPop(false)}
       footer={
         <>
-          <button onClick={showConfirmPop.onClick}>
+          <Button onClick={showConfirmPop.onClick}>
             {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
-          </button>
-          <button onClick={() => setShowConfirmPop(false)}>
+          </Button>
+          <Button onClick={() => setShowConfirmPop(false)}>
             {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
-          </button>
+          </Button>
         </>
       }
     />
   )
 
-  const confirmPopupMsg =(
+  const confirmPopupMsg = (
     <div> <p>Note :This will completely refresh all <strong>Captured Elements</strong> on the screen. In case you want to Capture only additional elements use the <strong>"Add More"</strong> option </p></div>
   )
   const onHighlight = () => {
-    capturedDataToSave.map((object)=>{
+    capturedDataToSave.map((object) => {
       if (objValues.val === object.val) setActiveEye(true);
-    else if (activeEye) setActiveEye(false);
-    })  
+      else if (activeEye) setActiveEye(false);
+    })
     let objVal = selectedCapturedElement[0].objectDetails;
     dispatch(objValue(objVal));
   }
 
-  useEffect(()=>{
-    if (mirror.scrape){
-		   let mirrorImg = new Image();
+  useEffect(() => {
+    if (mirror.scrape) {
+      let mirrorImg = new Image();
 
       mirrorImg.onload = function () {
         // let aspect_ratio = mirrorImg.height / mirrorImg.width;
@@ -810,7 +896,7 @@ const CaptureModal = (props) => {
         setDsRatio(ds_ratio);
       }
       mirrorImg.src = `data:image/PNG;base64,${mirror.scrape}`;
-  }
+    }
     else {
       setMirrorHeight("0px");
       setDsRatio(1);
@@ -820,83 +906,83 @@ const CaptureModal = (props) => {
   }, [mirror])
 
 
-  useEffect(()=>{
-		if (objValues.val !== null){
-			let ScrapedObject = objValues;
+  useEffect(() => {
+    if (objValues.val !== null) {
+      let ScrapedObject = objValues;
 
-			let top=0; let left=0; let height=0; let width=0;
-			let displayHighlight = true;
-			if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True'){
-				setHighlight(false)
-				// setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
-			} else if (ScrapedObject.height && ScrapedObject.width) {
-				if (ScrapedObject.viewTop != undefined) {
-					if (ScrapedObject.viewTop < imageHeight) {
-						// perform highlight
-						top = ScrapedObject.viewTop * dsRatio
-					}
-					else {
-						// popup error message
-						displayHighlight=false
-					}
-				}
-				else {
-					if (ScrapedObject.top < imageHeight) {
-						// perform highlight
-						top = ScrapedObject.top * dsRatio;
-					}
-					else {
-						// popup error message
-						displayHighlight=false
-					}
-				}
-				// ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
-				left = ScrapedObject.left * dsRatio;
-				height = ScrapedObject.height * dsRatio;
-				width = ScrapedObject.width * dsRatio;
+      let top = 0; let left = 0; let height = 0; let width = 0;
+      let displayHighlight = true;
+      if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True') {
+        setHighlight(false)
+        // setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
+      } else if (ScrapedObject.height && ScrapedObject.width) {
+        if (ScrapedObject.viewTop != undefined) {
+          if (ScrapedObject.viewTop < imageHeight) {
+            // perform highlight
+            top = ScrapedObject.viewTop * dsRatio
+          }
+          else {
+            // popup error message
+            displayHighlight = false
+          }
+        }
+        else {
+          if (ScrapedObject.top < imageHeight) {
+            // perform highlight
+            top = ScrapedObject.top * dsRatio;
+          }
+          else {
+            // popup error message
+            displayHighlight = false
+          }
+        }
+        // ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
+        left = ScrapedObject.left * dsRatio;
+        height = ScrapedObject.height * dsRatio;
+        width = ScrapedObject.width * dsRatio;
 
-				if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1){
-					top = top + 112;
-					left = left + 15;	
-				} 
-				else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD'){
-					top = top + 2;
-					left = left + 3;
-				}
-				else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD'){
-					top = top + 35;
-					left = left-36;
-				}
-				// if (highlight){setHighlight} else{setHighlight(false)}
-				if(displayHighlight){
-					setHighlight({
-						top: `${Math.round(top)}px`, 
-						left: `${Math.round(left)}px`, 
-						height: `${Math.round(height)}px`, 
-						width: `${Math.round(width)}px`, 
-						backgroundColor: "yellow", 
-						border: "1px solid red", 
-						opacity: "0.7"
-					});
-				}
-				else {
-					setHighlight(false);
-					// setMsg(Messages.SCRAPE.ERR_HIGHLIGHT_OUT_OF_RANGE);
-				}
-				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
-			} else setHighlight(false);
-			if(!ScrapedObject.xpath.startsWith('iris')){
-				scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
-					.then(data => {
-						if (data === "Invalid Session") return null;
-						if (data === "fail") return null;
-					})
-					.catch(error => console.error("Error while highlighting. ERROR::::", error));
-			}
-		}
-		else setHighlight(false);
-		//eslint-disable-next-line
-	}, [objValues])
+        if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1) {
+          top = top + 112;
+          left = left + 15;
+        }
+        else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD') {
+          top = top + 2;
+          left = left + 3;
+        }
+        else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD') {
+          top = top + 35;
+          left = left - 36;
+        }
+        // if (highlight){setHighlight} else{setHighlight(false)}
+        if (displayHighlight) {
+          setHighlight({
+            top: `${Math.round(top)}px`,
+            left: `${Math.round(left)}px`,
+            height: `${Math.round(height)}px`,
+            width: `${Math.round(width)}px`,
+            backgroundColor: "yellow",
+            border: "1px solid red",
+            opacity: "0.7"
+          });
+        }
+        else {
+          setHighlight(false);
+          // setMsg(Messages.SCRAPE.ERR_HIGHLIGHT_OUT_OF_RANGE);
+        }
+        // highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
+      } else setHighlight(false);
+      if (!ScrapedObject.xpath.startsWith('iris')) {
+        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
+          .then(data => {
+            if (data === "Invalid Session") return null;
+            if (data === "fail") return null;
+          })
+          .catch(error => console.error("Error while highlighting. ERROR::::", error));
+      }
+    }
+    else setHighlight(false);
+    //eslint-disable-next-line
+  }, [objValues])
 
 
 
@@ -946,7 +1032,6 @@ const CaptureModal = (props) => {
     else if (!isCustom) setNewScrapedData(updNewScrapedData);
     if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
     setScrapeItems(localScrapeItems);
-    setCapturedDataToSave([]);
   }
 
   const onCellEditComplete = (e) => {
@@ -959,7 +1044,7 @@ const CaptureModal = (props) => {
   }
 
   const cellEditor = (options) => {
-    return <InputText type="text" className="element_name" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} style={{width:"25rem"}} tooltip={options.value}/>;
+    return <InputText type="text" className="element_name" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} style={{ width: "25rem" }} tooltip={options.value} tooltipOptions={{ position: 'bottom' }} />;
   };
 
   const addedCustomElement = (addedElements, orderList) => {
@@ -1079,70 +1164,70 @@ const CaptureModal = (props) => {
   }
   const Header = () => {
     return (
-        <div>Element Identifier Order<span style={{color:'red'}}>*</span></div>
+      <div>Element Identifier Order<span style={{ color: 'red' }}>*</span></div>
     );
   };
   const columns = [
-     
-    {field:'id',header:'Priority'},
+
+    { field: 'id', header: 'Priority' },
     { field: 'name', header: 'Identifier' },
   ];
   const dynamicColumns = columns.map((col, i) => {
     return <Column key={col.field} columnKey={col.field} field={col.field} header={col.header} />;
   });
-  const onRowReorderIdentifier=(e)=>{
-    const reorderedProducts=e.value.map((element, idx) => {
-    element.id = idx + 1
-    return element
-  })
+  const onRowReorderIdentifier = (e) => {
+    const reorderedProducts = e.value.map((element, idx) => {
+      element.id = idx + 1
+      return element
+    })
     setIdentifierList(reorderedProducts)
-  
+
   }
   const footerContentIdentifier = (
     <div>
-        <div style={{position:'absolute',fontStyle:'italic'}}><span style={{color:'red'}}>*</span>Drag/drop to reorder identifiers.</div>
-        <Button label="Cancel" onClick={() => setShowIdentifierOrder(false)} className="p-button-text" />
-        <Button label="Save" onClick={() => saveIdentifier()} autoFocus />
+      <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Drag/drop to reorder identifiers.</div>
+      <Button label="Cancel" onClick={() => setShowIdentifierOrder(false)} className="p-button-text" />
+      <Button label="Save" onClick={() => saveIdentifier()} autoFocus />
     </div>
   )
-  const saveIdentifier=()=>{
-    const finalScrapedItems=selectedCapturedElement.map(element=>element.objectDetails.objId)
-    let identifierListUpdated=identifierList.map(({id,identifier})=>({id,identifier}))
+  const saveIdentifier = () => {
+    const finalScrapedItems = selectedCapturedElement.map(element => element.objectDetails.objId)
+    let identifierListUpdated = identifierList.map(({ id, identifier }) => ({ id, identifier }))
     let params = {
-        'objectIds':finalScrapedItems,
-        'identifiers':identifierListUpdated,
-        'param':'updatedIdentifier',
-        'userId': userInfo.user_id,
-        'roleId': userInfo.role,
-        
-        // 'identifier'
+      'objectIds': finalScrapedItems,
+      'identifiers': identifierListUpdated,
+      'param': 'updatedIdentifier',
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+
+      // 'identifier'
     }
     scrapeApi.updateScreen_ICE(params)
-        .then(response => {
-            console.log(response)
-            if(response == "Success"){
-                setIdentifierModiefied(true)
-                setShowIdentifierOrder(false)
-                toast.current.show({severity:'success', summary: 'Success', detail:'Element Identifier order updated successfully.', life: 5000});
-                setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}])
-                
-            }
-        })
-        .catch(error => {
-            console.log(error)
-            setShowIdentifierOrder(false)
-            toast.current.show({severity:'success', summary: 'Success', detail:'Some Error occured while saving identifier list.', life: 5000});
-            setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}])
+      .then(response => {
+        console.log(response)
+        if (response == "Success") {
+          setIdentifierModiefied(true)
+          setShowIdentifierOrder(false)
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element Identifier order updated successfully.', life: 5000 });
+          setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
+
         }
-        )
-        
+      })
+      .catch(error => {
+        console.log(error)
+        setShowIdentifierOrder(false)
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Some Error occured while saving identifier list.', life: 5000 });
+        setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
+      }
+      )
+
   }
 
   return (
     <>
-      { overlay && <ScreenOverlay content={overlay} />}
-      { showPop && <PopupDialog />}
-      { showConfirmPop && <ConfirmPopup /> }
+      {overlay && <ScreenOverlay content={overlay} />}
+      {showPop && <PopupDialog />}
+      {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={footerSave}>
         {showPanel && (<div className="card_modal">
@@ -1166,7 +1251,7 @@ const CaptureModal = (props) => {
                 </div>)}
               </div>
               <div className='upgrade__block'>
-              <p className='insprint__text'>Upgrade Analyzer</p>
+                <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png"></img>
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
                   <img className='add_obj' src="static/imgs/ic-compare.png"></img>
@@ -1183,7 +1268,7 @@ const CaptureModal = (props) => {
                 </div>)}
               </div>
               <div className='utility__block'>
-              <p className='insprint__text'>Capture from PDF</p>
+                <p className='insprint__text'>Capture from PDF</p>
                 <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png"></img>
                 <span className='insprint_auto'>
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
@@ -1196,7 +1281,7 @@ const CaptureModal = (props) => {
                 </div>)}
               </div>
               <div className='createManual__block'>
-              <p className='insprint__text'>Create Manually</p>
+                <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png"></img>
                 <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
@@ -1210,11 +1295,11 @@ const CaptureModal = (props) => {
               </div>
               <div className='imp_exp__block'>
                 <span className='insprint_auto'>
-                  <span className='import__block' onClick={() =>setShowObjModal("importModal")}>
+                  <span className='import__block' onClick={() => setShowObjModal("importModal")}>
                     <img className='add_obj' src="static/imgs/ic-import.png" />
                     <p className='imp__text'>Import Screen</p>
                   </span>
-                  <span className='export__block' onClick={() =>setShowObjModal("exportModal")}>
+                  <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
                     <img className='add_obj' src="static/imgs/ic-export.png" />
                     <p className='imp__text'>Export Screen</p>
                   </span>
@@ -1251,7 +1336,9 @@ const CaptureModal = (props) => {
             <Column field="selectall" header="Element Name"
               editor={(options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
-              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}>
+              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+              bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
+              body={renderSelectAllCell}>
             </Column>
             <Column field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
@@ -1265,8 +1352,8 @@ const CaptureModal = (props) => {
           </Dialog>
         </div>
       </Dialog>
-      <Dialog className={visible === 'capture' ? "compare__object__note" : "compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
-        <div className={visible === 'capture' ? "compare__content__adj" : "compare__object"}>
+      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
+        <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
           </span>
@@ -1287,6 +1374,7 @@ const CaptureModal = (props) => {
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+        
       <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
@@ -1300,13 +1388,67 @@ const CaptureModal = (props) => {
           </span>
         </div>
       </Dialog>
-      {currentDialog === 'addObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} addCustomElement={addedCustomElement} />}
-      {currentDialog === 'mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} captureList = {capturedDataToSave}/>}
-      {currentDialog === 'replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-      {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} scrapeItems={scrapeItems} capturedDataToSave={capturedDataToSave} setCapturedDataToSave = {setCapturedDataToSave} setNewScrapedData={setNewScrapedData} updateScrapeItems={updateScrapeItems} setOrderList={setOrderList} setSaved={setSaved} setShow={setCurrentDialog} setCaptureData={setCaptureData} />}
-      {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+
+      {currentDialog === 'addObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        addCustomElement={addedCustomElement}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'mapObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        captureList={capturedDataToSave}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        setShow={setCurrentDialog}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'replaceObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'createObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        scrapeItems={scrapeItems}
+        capturedDataToSave={capturedDataToSave}
+        setCapturedDataToSave={setCapturedDataToSave}
+        setNewScrapedData={setNewScrapedData}
+        updateScrapeItems={updateScrapeItems}
+        setOrderList={setOrderList}
+        setSaved={setSaved}
+        setShow={setCurrentDialog}
+        setCaptureData={setCaptureData}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'compareObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
       {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
-      {showObjModal === "importModal" && <ImportModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web" fetchingDetails={props.fetchingDetails} />}
+      {showObjModal === "importModal" && <ImportModal
+        fetchScrapeData={fetchScrapeData}
+        setOverlay={setOverlay}
+        setShow={setShowObjModal}
+        appType="Web"
+        fetchingDetails={props.fetchingDetails}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
       {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
       {/* //Element properties  */}
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
@@ -1321,12 +1463,12 @@ const CaptureModal = (props) => {
         </div>
       </Dialog>
       {/* Element reorder */}
-      <Dialog header={Header} style={{width:'52vw',marginRight:'3rem'}} position="right" visible={showIdentifierOrder}  onHide={() => setShowIdentifierOrder(false)} footer={footerContentIdentifier} >
+      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => setShowIdentifierOrder(false)} footer={footerContentIdentifier} >
         <div className="card" >
-        <DataTable  value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
-                <Column rowReorder style={{ width: '3rem' }} />
-                {dynamicColumns}
-        </DataTable>
+          <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
+            <Column rowReorder style={{ width: '3rem' }} />
+            {dynamicColumns}
+          </DataTable>
         </div>
       </Dialog>
     </>

@@ -1,3 +1,4 @@
+.report_landing{
 .report{
     background: #F5F5F5;
 }
@@ -254,13 +255,13 @@
 .buttonReports{
     background: #fff;
     border-radius: 10px;
-    height: 70px;
-    left: 20px;
-    position: relative;
-    top: 42px;
-    width: 1671px;
-    padding: 1rem;
     display: flex;
+    justify-content: center;
+    left: 0.5rem;
+    padding: 0.5rem;
+    position: relative;
+    top: 2rem;
+    width: 94.8rem;
 }
 
 .projectDropDown{
@@ -271,4 +272,50 @@
     display:inline-flex;
     position: relative;
     top: 4rem; 
+    color:#8E8E8E;
+    // background: #F5F5F5 !important;
+}
+.Projectreport{
+    display: flex;
+    position: relative;
+    top: 1rem;
+    left: 0.39rem;
+    // background: #F5F5F5 !important;
+}
+.report-search{
+    left: 32rem;
+    position: relative!important;
+    top: 1rem;
+    width: 0.5rem;
+}
+.report_btn{
+    top: 2.5rem;
+    left: 0.5rem;
+}
+.report_search_input{
+    width: 32rem;
+    height: 2.5rem;
+}
+.report_border{
+    background: #F5F5F5 !important;
+    // .p-dropdown:not(.p-disabled):hover{
+    //     border-color: transparent !important;
+    // }
+}
+.Report_Image{
+    display: flex;
+    justify-content: center;
+    position: relative;
+    top: 3rem;
+    height: 24rem;
+}
+.projectSelectreport{
+    box-shadow: none;
+    outline-style: none;
+    padding: 0.2rem;
+    position: relative;
+    width: 10rem;
+    left: 4.5rem;
+    bottom: 0.4rem;
+}
 }

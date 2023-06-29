@@ -1,6 +1,7 @@
- 
+@import "../../global/styles/ColorVariables.scss";
     .list1{
         margin: 1em 1em 1em 1em;
+        font: $f6_regular;
     }
     .project-name-1{
         .p-card-body{
@@ -265,7 +266,7 @@
     }
     .checkbox-2{
         position: relative;
-        bottom: 0.5rem;
+        // bottom: 0.5rem;
     }
     .dropdown_role{
         position: relative;
@@ -281,7 +282,7 @@
         display: flex;
         flex-direction: row;
         position: relative;
-        bottom: 0.5rem;
+        // bottom: 0.5rem;
 
     }
     .user-role{
@@ -452,10 +453,11 @@
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
+    font:$f1_regular;
 }
-.error-msg{
+.error-message{
     position: absolute;
-    right: 24rem!important;
+    right: 49rem!important;
     top: 4rem!important
 }
   
