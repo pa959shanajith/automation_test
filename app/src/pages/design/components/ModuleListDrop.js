@@ -22,6 +22,7 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
 import AvoInput from "../../../globalComponents/AvoInput";
 import SaveMapButton from "./SaveMapButton";
+import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
 // import { Icon } from 'primereact/icon';
 
 
@@ -343,13 +344,14 @@ const ModuleListDrop = (props) =>{
 
     const LongContentDemo = () => {
         const [newProjectList, setNewProjectList] = useState([]);
+        const[overlay,setOverlay]=useState("")
         // const [storedSelectedProj, setStoredSelectedProj] = useState('');
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [transferBut, setTransferBut] = useState([]);
         const [inputE2EData, setInputE2EData] = useState('');
         const [newModSceList, setNewModSceList] = useState([]);
         const [selectedProject, setSelectedProject] = useState(null);
-        console.log("selectedProjectDrop",selectedProject)
+        const [loadingOfTree, setLoadingOfTree] = useState(true);
         // const forCatchingCheckBoxSelDemo = useMemo(()=> CheckboxSelectionDemo())
         useEffect(() => {
           (async () => {
@@ -388,10 +390,13 @@ const ModuleListDrop = (props) =>{
               });
             }
             setNewProjectList(projectCollection);
+            setSelectedProject(projectCollection[0].id)
+            setLoadingOfTree(false)
           })();
         }, []);
         useEffect(() => {
           (async() => {
+            setOverlay("Loading modules and Scenarios...")
             const moduleList = await getModules({
               tab: 'endToend',
               projectid: selectedProject,
@@ -419,15 +424,21 @@ const ModuleListDrop = (props) =>{
               }
             }
             setNewModSceList(moduleCollections)
-            console.log("moduleCollection",moduleCollections)
-            console.log("selectedProjectDrop2",selectedProject)
+            if(moduleCollections.length)setOverlay("")
+
           })();
         }, [selectedProject]);
+        const deleteScenarioselected = (ScenarioSelectedIndex)=>{
+          let newTrans = transferBut;
+          newTrans.splice(ScenarioSelectedIndex, 1);
+          setTransferBut(newTrans);
+         }
         
-        console.log("newProjectList",newProjectList)
+        
+        
         const handleArrowBut =()=>{
-             setTransferBut(selectedKeys)
-            
+            setTransferBut(selectedKeys);
+            setSelectedKeys([]);
         }
         const pushingEnENmInArr ={
             "id": 0,
@@ -453,9 +464,8 @@ const ModuleListDrop = (props) =>{
     //    console.log("readingdataE2E",HardCodedApiDataForE2E.map[1].name)
     //    console.log("readingdataE2EName",HardCodedApiDataForE2E)
     //    console.log("length of transferbut",transferBut.length)
-      
+         
         const dataOnSaveButton =async()=>{
-            console.log("dataOnClickSaveButton",transferBut);
             let HardCodedApiDataForE2E = {
                 "action": "/saveEndtoEndData",
                 "write": 10,
@@ -503,200 +513,42 @@ const ModuleListDrop = (props) =>{
                     }
                 )
             }
-            // const HardCodedApiDataForE2E = {
-            //     "action": "/saveEndtoEndData",
-            //     "write": 10,
-            //     "map": [
-            //         {
-            //             "id": 0,
-            //             "childIndex": 0,
-            //             "_id": null,
-            //             "oid": null,
-            //             "name": "",
-            //             "type": "endtoend",
-            //             "pid": null,
-            //             "pid_c": null,
-            //             "task": null,
-            //             "renamed": false,
-            //             "orig_name": null,
-            //             "taskexists": null,
-            //             "state": "created",
-            //             "cidxch": null
-            //         },
-            //         {
-            //             "id": 1,
-            //             "childIndex": 1,
-            //             "_id": "641831913b886ffbc86bf169",
-            //             "oid": null,
-            //             "name": "Scenario_Endgame1",
-            //             "type": "scenarios",
-            //             "pid": 0,
-            //             "task": null,
-            //             "renamed": false,
-            //             "orig_name": null,
-            //             "taskexists": null,
-            //             "state": "created",
-            //             "cidxch": "true"
-            //         },
-            //         {
-            //             "id": 2,
-            //             "childIndex": 2,
-            //             "_id": "641831913b886ffbc86bf168",
-            //             "oid": null,
-            //             "name": "Scenario_EndGame",
-            //             "type": "scenarios",
-            //             "pid": 0,
-            //             "task": null,
-            //             "renamed": false,
-            //             "orig_name": null,
-            //             "taskexists": null,
-            //             "state": "created",
-            //             "cidxch": "true"
-            //         },
-            //         {
-            //             "id": 3,
-            //             "childIndex": 3,
-            //             "_id": "6417ff373b886ffbc86bf101",
-            //             "oid": null,
-            //             "name": "Scenario_IronMan",
-            //             "type": "scenarios",
-            //             "pid": 0,
-            //             "task": null,
-            //             "renamed": false,
-            //             "orig_name": null,
-            //             "taskexists": null,
-            //             "state": "created",
-            //             "cidxch": "true"
-            //         }
-            //     ],
-            //     "deletednode": [],
-            //     "unassignTask": [],
-            //     "prjId": "6417fca33b886ffbc86bf0df",
-            //     "createdthrough": "Web",
-            //     "relId": null
-            // }
-            console.log("inputE2EData",inputE2EData)
-            console.log("HardCodedApiDataForE2E",HardCodedApiDataForE2E);
+           
 
             const saveE2E_sce = await saveE2EDataPopup(HardCodedApiDataForE2E) 
             if(saveE2E_sce.error){displayError(saveE2E_sce.error);return}
           
         }
 
-           
-        const CheckboxSelectionDemo = () => {
-      
-          const handleCheckboxChange = (e, modIndx, sceIdx,  modName, sceName,moduleId,scenarioId) => {
-            const selectedScenario = `${modIndx}-${sceIdx}`;
-            if (e.checked) {
-              setSelectedKeys([...selectedKeys, {
-                   modIndx, sceIdx, modName, sceName, selectedScenario,moduleId,scenarioId
-              }]);
-              // setStoredSelectedKeys([...selectedKeys, {
-              //   projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
-              // }]);
-            } else {
-              setSelectedKeys(selectedKeys.filter((key) => key.selectedScenario !== selectedScenario));
-              // setStoredSelectedKeys(selectedKeys.filter((key) => key.selectedScenario !== selectedScenario));
-            }
-          };
-      
-          const handleTransferScenarios = () => {
-            // Logic to transfer selected scenarios to the right box
-            // You can access the selected scenarios using `selectedKeys` state
-            const selectedScenarios = selectedKeys.map((key) => ({
-              projIdx: parseInt(key.split('-')[0]),
-              moduleIdx: parseInt(key.split('-')[1]),
-              scenarioIdx: parseInt(key.split('-')[2])
-            }));
-      
-            // TODO: Perform the necessary actions with the selected scenarios
-      
-            setSelectedKeys([]); // Clear the selected scenarios after transferring
-          };
-           console.log("newProjectList",newProjectList)
-           
-          return (
-            <div>
-              {/* <Tree
-                value={newProjectList.map((project, projIdx) => ({
-                  key: projIdx,
-                  label: (
-                    <div className="labelOfArray">
-                      <img src="static/imgs/projectSideIcon.png" alt="modules" />
-                      {project.name}
-                    </div>
-                  ),
-                  children: project.moduleList.map((module, moduleIdx) => ({
-                    key: `${projIdx}-${moduleIdx}`,
-                    label: (
-                      <div className="labelOfArray">
-                        <img src="static/imgs/moduleIcon.png" alt="modules" />
-                        {module.name}
-                      </div>
-                    ),
-                    children: module.scenarioList.map((scenario, scenarioIdx) => ({
-                      key: `${projIdx}-${moduleIdx}-${scenarioIdx}`,
-                      label: (
-                        <label style={{alignItem:'center',justifyContent:'center'}}>
-                          <Checkbox
-                            onChange={(e) => handleCheckboxChange(e, projIdx, moduleIdx, scenarioIdx, project.name, module.name, scenario.name,project.id,module.id,scenario.id)}
-                            checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${projIdx}-${moduleIdx}-${scenarioIdx}`)}
-                          />
-                          <>
-                          </>
-                          <img style={{width:'18px',height:'16px'}} src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-                          {scenario.name}
-                        </label>
-                      )
-                    }))
-                  }))
-                }))}
-                selectionMode="multiple"
-                // selectionKeys={selectedKeys}
-                style={{ height: '22.66rem', overflowY: 'auto' }}
-                // onSelectionChange={(e) => setSelectedKeys(e.value)}
-              /> */}
-                 <Tree 
-              value={
-                newModSceList.map((module,modIndx)=>({
-                  key: modIndx,
-                  label: (
-                    <div className="labelOfArray">
-                      <img src="static/imgs/moduleIcon.png" alt="modules" />
-                      <div className='labelOfArrayText'>{module.name}</div>
-                     
-                    </div>
-                  ),
-                  children: module.scenarioList.map((scenario, sceIdx) => ({
-                    key: sceIdx,
-                    label: (
-                      <label style={{alignItem:'center',justifyContent:'center'}}>
-                        <Checkbox
-                          onChange={(e) => handleCheckboxChange(e, modIndx, sceIdx, module.name, scenario.name,module.id,scenario.id)}
-                          checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${modIndx}-${sceIdx}`)}
-                        />
-                        <>
-                        </>
-                        <img style={{width:'18px',height:'16px'}} src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-                        {scenario.name}
-                      </label>
-                    )
-
-                })
-                
-                )
-              }))}
-                selectionMode="multiple"
-              
-              />
-              {console.log("scenario",scenarioList)}
-              {console.log("ModuleLst",moduleList)}
-              {/* <button onClick={handleTransferScenarios}>Transfer Scenarios</button> */}
-            </div>
-          );
+        const handleCheckboxChange = (e, modIndx, sceIdx,  modName, sceName,moduleId,scenarioId) => {
+          const selectedScenario = `${modIndx}-${sceIdx}`;
+          if (e.checked) {
+            setSelectedKeys([...selectedKeys, {
+                 modIndx, sceIdx, modName, sceName, selectedScenario,moduleId,scenarioId
+            }]);
+            // setStoredSelectedKeys([...selectedKeys, {
+            //   projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
+            // }]);
+          } else {
+            setSelectedKeys(selectedKeys.filter((key) => key.selectedScenario !== selectedScenario));
+            // setStoredSelectedKeys(selectedKeys.filter((key) => key.selectedScenario !== selectedScenario));
+          }
         };
-        //  const MemorizedCheckboxSelectionDemo = React.memo(CheckboxSelectionDemo)
+    
+        const handleTransferScenarios = () => {
+          // Logic to transfer selected scenarios to the right box
+          // You can access the selected scenarios using `selectedKeys` state
+          const selectedScenarios = selectedKeys.map((key) => ({
+            projIdx: parseInt(key.split('-')[0]),
+            moduleIdx: parseInt(key.split('-')[1]),
+            scenarioIdx: parseInt(key.split('-')[2])
+          }));
+    
+          // TODO: Perform the necessary actions with the selected scenarios
+    
+          setSelectedKeys([]); // Clear the selected scenarios after transferring
+        };
+       
             const footerContent = (
               <div>
                   <Button label="Cancel"  onClick={() => setShowE2EPopup(false)} className="p-button-text" />
@@ -704,6 +556,11 @@ const ModuleListDrop = (props) =>{
                   {/* <SaveMapButton  isEnE={true}   /> */}
               </div>
             );
+            const projectItems = newProjectList.map((projectDrp, prjIdxDrp) => {
+              return {label: projectDrp.name,
+              value: projectDrp.id}
+              
+            })
         return (
           <div className="E2E_container">
             <div className="card flex justify-content-center">
@@ -735,22 +592,18 @@ const ModuleListDrop = (props) =>{
                       <Card title="Select Scenarios" className="leftCard">
                      <div className="DrpoDown_search_Tree">
                           <div className="card flex justify-content-center">
+                            {/* dropDown of projects */}
                             <Dropdown
                               value={selectedProject}
+                              name={projectItems}
                               onChange={(e) => setSelectedProject(e.value)}
-                              options={newProjectList.map((projectDrp, prjIdxDrp) => ({
-                                label: projectDrp.name,
-                                value: projectDrp.id
-                              }))}
+                              options={projectItems}
+                              
                               placeholder="Select a Project"
                             />
                             {console.log("selectedProjectDrop", selectedProject)}
                           </div>
                         <div className="headlineSearchInput">
-                          {/* <div className="headlineRequired">
-                            <h5 style={{ fontSize: '14px' }}></h5>
-                            <img src="static/imgs/Required.svg" className="required_icon" />
-                          </div> */}
                           <span className="p-input-icon-left">
                             <i className="pi pi-search" />
                             <InputText
@@ -761,13 +614,50 @@ const ModuleListDrop = (props) =>{
                           </span>
                         </div>
                          {/* <MemorizedCheckboxSelectionDemo/> */}
-                        <CheckboxSelectionDemo />
+                        {/* <CheckboxSelectionDemo /> */}
+                        <div>
+                          {overlay && <ScreenOverlay content={overlay} />}
+                            <Tree
+                              value={
+                                newModSceList.map((module, modIndx) => ({
+                                  key: modIndx,
+                                  label: (
+                                    <div className="labelOfArray">
+                                      <img src="static/imgs/moduleIcon.png" alt="modules" />
+                                      <div className='labelOfArrayText'>{module.name}</div>
+
+                                    </div>
+                                  ),
+                                  children: module.scenarioList.map((scenario, sceIdx) => ({
+                                    key: sceIdx,
+                                    label: (
+                                      <label style={{ alignItem: 'center', justifyContent: 'center' }}>
+                                        <Checkbox
+                                          onChange={(e) => handleCheckboxChange(e, modIndx, sceIdx, module.name, scenario.name, module.id, scenario.id)}
+                                          checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${modIndx}-${sceIdx}`)}
+                                        />
+                                        <>
+                                        </>
+                                        <img style={{ width: '18px', height: '16px' }} src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
+                                        {scenario.name}
+                                      </label>
+                                    )
+
+                                  })
+
+                                  )
+                                }))}
+                            // selectionMode="multiple"
+
+                            />
+                          {/* <button onClick={handleTransferScenarios}>Transfer Scenarios</button> */}
+                        </div>
                       </div>
                       </Card>
                     </div>
                     <div className="centerButtons">
                       <div className="centerButtonsIndiVisual">
-                        <Button label=">" onClick={handleArrowBut} outlined />
+                        <Button disabled={!selectedKeys.length>0} label=">" onClick={handleArrowBut} outlined />
                         {/* <Button label="<" outlined /> */}
                       </div>
                     </div>
@@ -785,17 +675,16 @@ const ModuleListDrop = (props) =>{
                             />
                           </span>
                       </div>
+                     { console.log("transferBut",transferBut)}
                       <div className="ScenairoList">
-                              { transferBut.map((ScenarioSelected)=>{
-                                    return(
-                                    <>
-                                      <div className="EachScenarioNameBox" >
-                                         <div key={ScenarioSelected.scenarioIdx} className="ScenarioName" ><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" /><h4>{ScenarioSelected.sceName}</h4><i className="pi pi-times"></i></div>
-                                         
-                                      </div>
-                                    </>
-                                    )
-                              })}
+                        {transferBut.map((ScenarioSelected, ScenarioSelectedIndex)=>{
+                          return(
+                            <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
+                                <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
+                                    <h4>{ScenarioSelected.sceName}</h4><div className="modIconSce"><h5>(<img  src="static/imgs/moduleIcon.png" alt="modules" /><h3>{ScenarioSelected.modName})</h3></h5></div>{console.log("ScenarioSelectedIndex",ScenarioSelectedIndex)}</div><Button icon="pi pi-times" onClick={()=>{deleteScenarioselected(ScenarioSelectedIndex);}} rounded severity="danger" aria-label="Cancel" /></div>
+                            </div>
+                          )
+                        })}
                       </div>
                       </Card>
                       
@@ -823,7 +712,7 @@ const ModuleListDrop = (props) =>{
              <>
       <div className="CollapseWholeCont">
        <div className="collapseBut" style={{height:"9%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'16rem',zIndex:'2',}}>
-             <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); console.log("collapseWhole",collapseWhole)}}/> 
+             <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); }}/> 
           </div>
        <div className="Whole_container" style={{width: collapseWhole? "17rem":"0.6rem",transitionDuration: '0.7s ',display: !collapseWhole? "none":"" }}>
            {/* <div className="project_name_section">
