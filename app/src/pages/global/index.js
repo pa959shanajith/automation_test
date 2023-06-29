@@ -7,6 +7,7 @@ import ModalContainer from './components/ModalContainer';
 import ChangePassword from './components/ChangePassword';
 import ScrollBar from './components/ScrollBar';
 import ResetSession from './components/ResetSession';
+import Thumbnail from './components/Thumbnail';
 
 export { 
         ProgressBar,
@@ -19,5 +20,6 @@ export {
         ModalContainer,
         ChangePassword,
         ScrollBar,
-        ResetSession, 
+        ResetSession,
+        Thumbnail,
     };

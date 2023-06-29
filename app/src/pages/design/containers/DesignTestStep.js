@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserDetails, getNotificationGroups } from '../api';
-import { Messages as MSG,ScreenOverlay, setMsg,RedirectPage} from "../../global";
+import { Messages as MSG,ScreenOverlay, setMsg,RedirectPage,ModalContainer,Thumbnail} from "../../global";
 import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
 import * as DesignApi from "../api";
 import { Dialog } from 'primereact/dialog';
@@ -15,10 +15,12 @@ import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import { InputText } from 'primereact/inputtext';
+import Select from "react-select";
 
 
 const DesignModal = (props) => {
     const toast = useRef();
+    const testcaseDropdownRef = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.landing.userinfo);
@@ -46,15 +48,22 @@ const DesignModal = (props) => {
     const [pastedTC, setPastedTC] = useState([]);
     const [showPopup, setShow] = useState({});
     const [debugEnable, setDebugEnable] = useState(false);
-    const [newtestcase, setnewtestcase] = useState([]);
     const [keyword, setKeyword] = useState('');
     const [testCaseIDsList, setTestCaseIDsList] = useState([]);
     const [testcaseList, setTestcaseList] = useState([]);
     const [dependencyTestCaseFlag, setDependencyTestCaseFlag] = useState(false);
     const [deleteTestDialog, setDeleteTestDialog] = useState(false);
     const [testCase, setTestCase] = useState(null)
-    const[selectedTestCases,setSelectedTestCases]=useState(null);
+    const [selectedTestCases,setSelectedTestCases]=useState(null);
+    const [selectedOptions, setSelectedOptions] = useState(null);
+    const [disableStep, setDisableStep] = useState(true);
     const [idx, setIdx] = useState(0);
+    const [imported, setImported] = useState(false);
+    const [showConfirmPop, setShowConfirmPop] = useState(false);
+    const [screenLavelTestSteps, setScreenLevelTastSteps] = useState([]);
+    const [newtestcase, setnewtestcase] = useState([screenLavelTestSteps.testCases]);
+    const [rowExpandedName,setRowExpandedName] = useState({name:'',id:''});
+    const [selectedTestCase, setSelectedTestCase] = useState(null);
     let runClickAway = true;
     const emptyRowData = {
         "stepNo": '',
@@ -71,25 +80,26 @@ const DesignModal = (props) => {
         "addTestCaseDetails": "",
         "addTestCaseDetailsInfo": ""
     };
+    let screenLevelTestCases=[]
     const parentScreen = props.fetchingDetails["parent"]["children"];
-    useEffect(()=>{
-        const parentScreenId = () =>{
-            for (var i = 0; i < parentScreen.length; i++) {
-                if (props.fetchingDetails["name"] === parentScreen[i].name) {
-                    setIdx(i);
-                    return setShow({
-                        name: parentScreen[i].name,
-                        id: parentScreen[i]._id,
-                        parentName:props.fetchingDetails["parent"]['name'],
-                        parent_id:props.fetchingDetails["parent"]['_id'], 
-                        projectId:parentScreen[i].projectID, 
-                    });
-                }
-            }
-            return 0;
-        }
-        parentScreenId();
-    },[parentScreen, props.fetchingDetails,idx])
+    // useEffect(()=>{
+    //     const parentScreenId = () =>{
+    //         for (var i = 0; i < parentScreen.length; i++) {
+    //             if (props.fetchingDetails["name"] === parentScreen[i].name) {
+    //                 setIdx(i);
+    //                 return setShow({
+    //                     name: parentScreen[i].name,
+    //                     id: parentScreen[i]._id,
+    //                     parentName:props.fetchingDetails["parent"]['name'],
+    //                     parent_id:props.fetchingDetails["parent"]['_id'], 
+    //                     projectId:parentScreen[i].projectID, 
+    //                 });
+    //             }
+    //         }
+    //         return 0;
+    //     }
+    //     parentScreenId();
+    // },[parentScreen, props.fetchingDetails,idx])
     useEffect(() => {
         if (draggedFlag) {
             setStepSelect({ edit: false, check: [], highlight: [] });
@@ -119,14 +129,14 @@ const DesignModal = (props) => {
     }, [saveEnable]);
 
     useEffect(() => {
-        if (props.imported) {
+        if (imported) {
             fetchTestCases()
             .then(data=>{
                 if (data==="success") 
                     setMsg(MSG.DESIGN.SUCC_TC_IMPORT);
                 else 
                     setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
-                props.setImported(false)
+                setImported(false)
                 setStepSelect({edit: false, check: [], highlight: []});
                 setChanged(false);
                 // headerCheckRef.current.indeterminate = false;
@@ -134,12 +144,26 @@ const DesignModal = (props) => {
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
         //eslint-disable-next-line
-    }, [props.imported]);
+    }, [imported]);
+    const ConfirmPopups = () => (
+        <ModalContainer 
+            title={showConfirmPop.title}
+            content={showConfirmPop.content}
+            close={()=>setShowConfirmPop(false)}
+            footer={
+                <>
+                <button onClick={showConfirmPop.onClick}>Yes</button>
+                <button onClick={()=>setShowConfirmPop(false)}>No</button>
+                </>
+            }
+        />
+    )
 
     useEffect(() => {
         if (Object.keys(userInfo).length) {
             //  && Object.keys(props.current_task).length) {
-            fetchTestCases()
+            for(var i = 0 ; i<parentScreen.length; i++){
+                fetchTestCases(i)
                 .then(data => {
                     data !== "success" &&
                         setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
@@ -152,9 +176,11 @@ const DesignModal = (props) => {
                     // setIsUnderReview(props.current_task.status === "underReview")
                 })
                 .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
+            }
+            setScreenLevelTastSteps(screenLevelTestCases)
         }
         //eslint-disable-next-line
-    }, [userInfo, props.current_task]);
+    }, [userInfo, setScreenLevelTastSteps]);
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -191,14 +217,14 @@ const DesignModal = (props) => {
         //eslint-disable-next-line
     }, []);
 
-    const fetchTestCases = () => {
+    const fetchTestCases = (j) => {
         return new Promise((resolve, reject) => {
             // let { testCaseName, versionnumber, screenName, screenId, projectId, testCaseId, appType } = props.current_task;
             let deleteObjectFlag = false;
 
             setOverlay("Loading...");
 
-            DesignApi.readTestCase_ICE(userInfo, props.fetchingDetails["_id"], props.fetchingDetails["name"], 0 /** versionNumber */, props.fetchingDetails["parent"]["name"])
+            DesignApi.readTestCase_ICE(userInfo, props.fetchingDetails['parent']['children'][j]["_id"], props.fetchingDetails['parent']['children'][j]["name"], 0 /** versionNumber */, props.fetchingDetails["parent"]["name"])
                 .then(data => {
                     if (data === "Invalid Session") return;
 
@@ -217,21 +243,64 @@ const DesignModal = (props) => {
                     // setHideSubmit(data.testcase.length === 0);
                     // setReusedTC(data.reuse);
 
-                    DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectID, props.fetchingDetails["_id"])
+                    DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectID, props.fetchingDetails['parent']['children'][j]["_id"])
                         .then(scriptData => {
                             if (scriptData === "Invalid Session") return;
 
                             setTestScriptData(scriptData.view);
                             // props.setMirror(scriptData.mirror);
 
-                            DesignApi.getKeywordDetails_ICE(props.appType)
-                                .then(keywordData => {
-                                    if (keywordData === "Invalid Session") return;
+                            // DesignApi.getKeywordDetails_ICE(props.appType)
+                            //     .then(keywordData => {
+                            //         if (keywordData === "Invalid Session") return;
 
-                                    setKeywordList(keywordData);
+                            //         setKeywordList(keywordData);
+                            DesignApi.getKeywordDetails_ICE(props.appType)
+                            .then(keywordData => {
+                                if (keywordData === "Invalid Session") return RedirectPage(navigate);
+                                let sortedKeywordList = {};
+                                for(let object in keywordData) {
+                                    let firstList = [];
+                                    let secondList = [];
+                                    for(let keyword in keywordData[object]){
+                                        if(keywordData[object][keyword]['ranking']){
+                                            firstList[keywordData[object][keyword]['ranking'] - 1] = ({
+                                                [keyword] : keywordData[object][keyword]
+                                            });
+                                        } else {
+                                            secondList.push(({
+                                                [keyword] :keywordData[object][keyword]
+                                            }));
+                                        }
+                                    };
+                                    // console.log('firstList', firstList);
+                                    // console.log('secondList', secondList);
+                                    secondList = [...firstList, ...secondList];
+                                    // console.log('secondList2', secondList);
+                                    
+                                    let keyWordObject = {};
+                                    // secondList = secondList.forEach((keyword) => {
+                                    //     keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0]
+                                    // });
+                                    
+                                    for(let keyword of secondList){
+                                        if(keyword&& Object.keys(keyword)[0] && Object.values(keyword)[0])
+                                            keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0];
+                                        // console.log('Object.keys(keyword)[0]', Object.keys(keyword)[0]);
+                                        // console.log('Object.values(keyword)[0]', Object.values(keyword)[0]);
+                                    }
+                                    // console.log('keyWordObject', keyWordObject);
+                                    // sortedKeywordList[object] = secondList.reduce((kerwordobjects, currentKeyword) => {
+                                    //     return ({...kerwordobjects, [Object.keys(currentKeyword)[0]]: Object.values(currentKeyword)[0]})
+                                    // }, {});
+                                    // console.log('sortedKeywordList[object]', sortedKeywordList[object]);
+                                    // sortedKeywordList[object] = { ...secondList };
+                                    sortedKeywordList[object] = keyWordObject;
+                                }
+                                setKeywordList(sortedKeywordList);
                                     let testcaseArray = [];
                                     if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
-                                        testcaseArray.push(emptyRowData);
+                                        // testcaseArray.push(emptyRowData);
                                         // props.setDisableActionBar(true);
                                         setOverlay("");
                                     } else {
@@ -256,12 +325,12 @@ const DesignModal = (props) => {
                                         setOverlay("");
                                     }
                                     setDraggable(false);
-                                    setTestCaseData(testcaseArray);
-                                    setnewtestcase(testcaseArray);
-                                    console.log(testcaseArray)
+                                    screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id})
+                                    console.log("screen", screenLevelTestCases)
+                                    setTestCaseData([...testCaseData,testcaseArray]);
+                                    setnewtestcase([...newtestcase, testcaseArray]); 
                                     setPastedTC([]);
                                     setObjNameList(getObjNameList(props.appType, scriptData.view));
-                                    console.log(getObjNameList(props.appType, scriptData.view))
                                     let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                     resolve(msg);
                                 })
@@ -304,13 +373,19 @@ const DesignModal = (props) => {
     const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
             if (reusedTC && !confirmed) {
-                props.setShowConfirmPop({ 'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': () => { props.setShowConfirmPop(false); saveTestCases(null, true) } });
+                setShowConfirmPop({ 'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': () => { setShowConfirmPop(false); saveTestCases(null, true) } });
                 return;
             }
-            let screenId = props.fetchingDetails['parent']['_id'];
-            let testCaseId = props.fetchingDetails['_id'];
-            let testCaseName = props.fetchingDetails.testCaseName;
+            let testCaseId = '';
+            let testCaseName = '';
             let versionnumber = 0;
+            let screenId = props.fetchingDetails['parent']['_id'];
+            for (var k=0; screenLavelTestSteps.length>k;k++){
+                if(screenLavelTestSteps[k].name === rowExpandedName.name){
+                       testCaseName = screenLavelTestSteps[k].name;
+                       testCaseId = screenLavelTestSteps[k].id
+                }
+            }
 
 
             // let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
@@ -346,7 +421,7 @@ const DesignModal = (props) => {
                             else testCases[i].inputVal[0] = testCases[i].inputVal[0].replace(/[\n\r]/g, '##');
                         }
                     }
-                    if (!testCases[i].url) testCases[i].url = "";
+                    // if (!testCases[i].url) testCases[i].url = "";
                     
                     // if (!testCases[i].cord) testCases[i].cord = "";
 
@@ -354,7 +429,7 @@ const DesignModal = (props) => {
 
                 if (!errorFlag) {
                     if(props.fetchingDetails['name'] === showPopup.name){
-                        DesignApi.updateTestCase_ICE(props.fetchingDetails['_id'], props.fetchingDetails['name'], testCases, userInfo, 0 /**versionnumber*/, import_status, pastedTC)
+                        DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, 0 /**versionnumber*/, import_status, pastedTC)
                         .then(data => {
                             if (data === "Invalid Session") return;
                             if (data === "success") {
@@ -362,7 +437,7 @@ const DesignModal = (props) => {
                                     let scrape_data = {};
                                     // let { appType, projectId, testCaseId, versionnumber } = props.current_task;
 
-                                    DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails['parent']['_id'], props.fetchingDetails.projectID, props.fetchingDetails['_id'])
+                                    DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails['parent']['_id'], props.fetchingDetails.projectID, testCaseId)
                                         .then(res => {
                                             scrape_data = res;
                                             let modifiedObjects = [];
@@ -376,7 +451,7 @@ const DesignModal = (props) => {
                                                 'deletedObj': [],
                                                 'modifiedObj': modifiedObjects,
                                                 'addedObj': {...scrape_data, view: []},
-                                                'testCaseId': props.fetchingDetails["_id"],
+                                                'testCaseId': testCaseId,
                                                 'userId': userInfo.user_id,
                                                 'roleId': userInfo.role,
                                                 'versionnumber': versionnumber,
@@ -443,12 +518,27 @@ const DesignModal = (props) => {
     }
 
     const addRow = () => {
-        if(props.fetchingDetails["name"] === showPopup.name){
-            let oldTestCases = [...newtestcase]
-            let emptyRowDataIndex={...emptyRowData,stepNo:String(oldTestCases.length+1)}
-            let emptyAddedRow=[...oldTestCases,emptyRowDataIndex]
-            setnewtestcase(emptyAddedRow)
-        }
+        let oldScreenLevelTestSTeps=[...screenLavelTestSteps]
+        // let newData = [];
+        // for(var n=0; screenLavelTestSteps.length>n;n++){
+        //     if(screenLavelTestSteps[n].name === rowExpandedName){
+        //         let oldTestCases = [...screenLavelTestSteps[n].testCases]
+        //         let emptyRowDataIndex={...emptyRowData,stepNo:String(oldTestCases.length+1)}
+        //         let emptyAddedRow=[...oldTestCases,emptyRowDataIndex]
+        //         newData.push(emptyAddedRow)
+        //     }
+        // }
+        // console.log("data",newData)
+        let testCaseUpdated = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
+        console.log(testCaseUpdated);
+        let emptyRowDataIndex = { ...emptyRowData, stepNo: String(testCaseUpdated.testCases.length + 1) };
+        let data = [...testCaseUpdated.testCases, emptyRowDataIndex];
+        let updatedTestCase = { ...testCaseUpdated, testCases: data };
+        screenLavelTestSteps.find((screen, index) =>
+        screen.name === rowExpandedName.name?oldScreenLevelTestSTeps.splice(index, 1, updatedTestCase):oldScreenLevelTestSTeps)
+        setScreenLevelTastSteps(oldScreenLevelTestSTeps);
+            console.log("date",screenLavelTestSteps)
+        //         let emptyAddedRow=[...oldTestCases,emptyRowDataIndex]
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
@@ -512,9 +602,9 @@ const DesignModal = (props) => {
         }
     };
 
-    const toggleTableVisibility = () => {
+    const toggleTableVisibility = (e) => {
         setShowTable(true);
-
+        console.log(e)
     };
     const handleAdd = () => {
         const update = { ...testCases };
@@ -542,6 +632,119 @@ const DesignModal = (props) => {
         toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 10000 });
     }
 
+    const history = useNavigate();
+    const hiddenInput = useRef(null);
+
+    const exportTestCase =  () => {
+        let testCaseId = props.fetchingDetails['_id'];
+        let testCaseName = props.fetchingDetails['name'];
+        // let versionnumber = fetchingDetails.versionnumber;
+        
+        DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, 0)
+        .then(response => {
+                if (response === "Invalid Session") return RedirectPage(history);
+                
+                let responseData;
+                if (typeof response === 'object') responseData = JSON.stringify(response.testcase, null, 2);
+                let filename = testCaseName + ".json";
+
+                let testCaseBlob = new Blob([responseData], {
+                    type: "text/json"
+                })
+
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+                        type: "text/json;charset=utf-8"
+                    }), filename);
+                }
+                else {
+                    let a = document.createElement('a');
+                    a.download = filename;
+                    a.href = window.URL.createObjectURL(testCaseBlob);
+                    a.target = '_blank';
+                    // document.body.appendChild(a);
+                    a.click();
+                    // document.body.removeChild(a);
+                  } 
+            })
+            .catch(error => console.error("ERROR::::", error));
+    }
+    const onInputChange = (event) => {
+        let testCaseId = props.fetchingDetails['_id'];
+        let testCaseName = props.fetchingDetails['name'];
+        // let versionnumber = fetchingDetails.versionnumber;
+        // let appType = appType;
+        let import_status = true;
+        let flag = false;
+
+        let file = event.target.files[0];
+        let reader = new FileReader();
+        reader.onload = function (e) {
+            try{
+                hiddenInput.current.value = '';
+                if (file.name.split('.').pop().toLowerCase() === "json") {
+                    setOverlay("Loading...");
+                    let resultString = JSON.parse(reader.result);
+                    if (!Array.isArray(resultString)) 
+                        throw MSG.DESIGN.ERR_FILE_FORMAT
+                    for (let i = 0; i < resultString.length; i++) {
+                        if (!resultString[i].appType)
+                            throw MSG.DESIGN.ERR_JSON_IMPORT
+                        if (
+                            resultString[i].appType.toLowerCase() !== "generic" && 
+                            resultString[i].appType.toLowerCase() !== "pdf" &&
+                            resultString[i].appType !== props.appType
+                        ) 
+                            throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
+                    }
+                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, 0, import_status)
+                        .then(data => {
+                            setOverlay("");
+                            if (data === "Invalid Session") RedirectPage(history);
+                            if (data === "success") setImported(true);
+                        })
+                        .catch(error => {
+                            setOverlay("");
+                            console.error("ERROR::::", error)
+                        });
+                    
+                } else throw  setMsg(MSG.DESIGN.ERR_FILE_FORMAT);
+            }
+            catch(error){
+                setOverlay("");
+                if (typeof(error)==="object") setMsg(error);
+                else setMsg(MSG.DESIGN.ERR_TC_JSON_IMPORT)
+                console.error(error);
+            }
+        }
+        reader.readAsText(file);
+    }
+
+    const importTestCase = (overWrite) => {
+        
+        let testCaseId = props.fetchingDetails['_id'];
+        let testCaseName = props.fetchingDetails['name'];
+        // let versionnumber = fetchingDetails.versionnumber;
+        if(overWrite) setShowConfirmPop(false);
+
+        
+        DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName , 0 )
+        .then(response => {
+                if (response === "Invalid Session") RedirectPage(history);
+                if (response.testcase && response.testcase.length === 0 || overWrite) {
+                    // hiddenInput.current.click();
+                    // document.getElementById("importTestCaseField").click();
+                }
+                else{
+                    setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
+                }
+            })
+        .catch(error => console.error("ERROR::::", error));
+    }
+    const lowerList = [
+        {'title': 'Import Test Case', 'tooltip':'Import TestCase', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase()},
+        {'title': 'Export Test Case', 'tooltip':'Export TestCase', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportTestCase(),}
+    ]
     const headerTemplate = (
         <>
             <div>
@@ -549,8 +752,12 @@ const DesignModal = (props) => {
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
                 <div className='btn__grp'>
-                    <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' outlined></Button>
-                    <Button size='small' label='Add Test Step' onClick={()=>addRow()}></Button>
+                {/* {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} tooltip={icon.tooltip} img={icon.img} action={icon.action} disable={icon.disable}/>)}
+                    <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/> */}
+                    <Button size='small' icon='pi pi-file-import' title='Import Test Steps' onClick={()=>importTestCase(props.fetchingDetails)} outlined/>
+                    <Button size='small' icon='pi pi-file-export'  title='Export Test Steps' onClick={()=>exportTestCase(props.fetchingDetails)} outlined/>
+                    <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' title='Debug' outlined></Button>
+                    <Button size='small' label='Add Test Step' title='Add Test Step' onClick={()=>addRow()}></Button>
                 </div>
             </div>
         </>
@@ -559,8 +766,8 @@ const DesignModal = (props) => {
     const footerTemplate = (
         <>
             <div className='btn__grp'>
-               <Button size='small' label='Save' onClick={saveTestCases}></Button>
-              {selectedTestCases &&  <Button size='small' label='Delete' onClick={()=>setDeleteTestDialog(true)}></Button>}
+               <Button size='small' label='Save' title='Save' onClick={saveTestCases} outlined></Button>
+              {selectedTestCases &&  <Button size='small' label='Delete' title='Delete' onClick={()=>setDeleteTestDialog(true)}></Button>}
             </div>
         </>
     );
@@ -581,59 +788,194 @@ const DesignModal = (props) => {
             <Button label="Debug" size='small' onClick={() => debugTestCases('1')} autoFocus />
         </div>
     );
+    const [objName, setObjName] = useState(null);
+    const [objType, setObjType] = useState(null);
     
     const elementEditor = (options) => {
         return (
             <Dropdown
                 value={options.value}
                 options={objNameList}
-                onChange={(e) => {options.editorCallback(e.value);setKeywordListTable(getKeywords(e.value).keywords);setKeyword(getKeywords(e.value).keywords[0])}}
+                onChange={(e) => {options.editorCallback(e.value);setKeywordListTable(getKeywords(e.value).keywords);setKeyword(getKeywords(e.value).keywords[0]);setObjName(e.value);setObjType(getKeywords(e.value).obType); const caseData = getKeywords(e.target.value)
+                    const placeholders = getRowPlaceholders(caseData.obType, caseData.keywords[0]);
+                    setInput("");
+                    setOutput("");
+                    // setKeywordList(caseData.keywords);
+                    setObjType(caseData.obType);
+                    setOutputPlaceholder(placeholders.outputval);
+                    setInputPlaceholder(placeholders.inputval);}}
                 placeholder="Select a custname"
             />
         );
     };
+    const [startIndex, setStartIndex] = useState(0);
+    const [endIndex, setEndIndex] = useState(10);
+    const [inputPlaceholder, setInputPlaceholder] = useState('');
+    const [outputPlaceholder, setOutputPlaceholder] = useState('');
+    const [input, setInput] = useState('');
+    const [output, setOutput] = useState('');
+    const [ ID, setID] = useState(0);
+    const [focused, setFocused] = useState(true);
+    const [keywords, setKeywords] = useState(null);
+    const [allkeyword, setAllKeyword] = useState([]);
+
+    const onKeySelect = event => {
+        if (event.value === 'show all') {
+            setEndIndex(keywordListTable.length);
+        }
+        else{
+            // const placeholders = getRowPlaceholders(objType, event.value);
+            // setOutputPlaceholder(placeholders.outputval);
+            // setInputPlaceholder(placeholders.inputval);
+            setKeywords(event.value);
+            setSelectedOptions(event);
+            setAllKeyword(optionKeyword);
+            // testcaseDropdownRef.current.focus();
+            testcaseDropdownRef.current.blur();
+            document.dispatchEvent(new KeyboardEvent('keypress', { key: " " }));
+        }
+    };
+    const submitChanges = event => {
+        if (event.keyCode === 13){
+            console.log({rowIdx: ID, operation: "row", objName: objName, keyword: keywords, inputVal: input, outputVal: output, appType: props.appType });
+            // setStepSelect(oldState=>({...oldState, highlight: []}));
+        }
+        else if (event.keyCode === 27) {
+            // setStepSelect(oldState=>({...oldState, highlight: []}));
+        }
+    }
+    useEffect(()=>{
+        if(screenLavelTestSteps.length>0){
+            const testCase = screenLavelTestSteps.map((testCase)=>{return testCase.testCases})
+            let caseData = null;
+            let placeholders = null;
+            let data = null;
+            if(testCase.length>0){
+                for(var i = 0; testCase.length>i; i++){
+                    let obj = !testCase[i].custname ? objNameList[0] : testCase[i].custname;
+                    caseData = getKeywords(obj)
+                    data=obj;
+                }
+            }
+            // let obj = !testCase.custname ? objNameList : testCase.custname;
+            // caseData = getKeywords(obj)
+            setObjName(data);
+            let key = (!caseData.keywords.includes(testCase.keywordVal) || !testCase.custname) ? caseData.keywords[0] : testCase.keywordVal;
+            placeholders = getRowPlaceholders(caseData.obType, key);
+            setObjType(caseData.obType);
+            setKeywordListTable(caseData.keywords)
+            setOutputPlaceholder(placeholders.outputval);
+            setInputPlaceholder(placeholders.inputval);
+        }
+    },[getKeywords, getRowPlaceholders, objNameList, screenLavelTestSteps])
+    const optionKeyword = keywordListTable?.slice(startIndex, endIndex + 1).map((keyword, i) => {
+        if (i < endIndex) {
+            return {
+                value: keyword,
+                label: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "",
+                tooltip: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""
+            }
+        }
+        else {
+            return {
+                value: "show all",
+                label: "Show All"
+            }
+        }});
+console.log(optionKeyword)
+        const getOptionLabel = (option) => {
+            return (
+              <div title={option.tooltip}>
+                {option.label}
+              </div>
+            );
+          };
+
+        const customStyles = {
+            menuList: (base) => ({
+              ...base,
+              FontSize: 100,
+              width: 200,
+              fontSize: 14,
+              background: "white",
+              height:200,
+            }),
+            menuPortal: base => ({ 
+                ...base, 
+                zIndex: 9999
+             }),
+            menu: base => ({ 
+                ...base, 
+                zIndex: 9999 
+            }),
+            control: (base) => ({
+              ...base,
+              height: 25,
+              minHeight: 35,
+              width: 150
+            }),
+            option: (base) =>({
+                ...base,
+                padding: "3px",
+              fontFamily: "Lato Web",
+            })
+          };
     const keywordEditor = (options) => {
+        // setKeywordListTable(getKeywords(options.rowData.custname).keywords)
+        // setObjName(options.rowData.custname);
+        // setObjType(getKeywords(options.rowData.custname).obType)
+        // // setKeyword(getKeywords(options.rowData.custname).keywords[0])
+        setFocused(true);
         return (
-            <Dropdown
-                value={keyword.length>0?keyword:options.value}
-                options={keywordListTable.length>0?keywordListTable:getKeywords(options.rowData.custname).keywords}
-                onChange={(e) => {options.editorCallback(e.value);setKeyword([]);}}
-                placeholder="Select a keywords"
-            />
+            // <Dropdown
+            //     value={keyword.length>0?keyword:options.value}
+            //     options={keywordListTable.length>0?keywordListTable:getKeywords(options.rowData.custname).keywords}
+            //     onChange={(e) => {options.editorCallback(e.value);setKeyword([]);}}
+            //     placeholder="Select a keywords"
+            // />
+            // <Select className='select-option' value={selectedOptions} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e.value)}} onKeyDown={submitChanges} title={keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""} closeMenuOnSelect={false} options={optionKeyword} menuPortalTarget={document.body} getOptionLabel={getOptionLabel} styles={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
+            <div>
+                        <span className="keyword_col" title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""} >
+                            {focused ?
+                                <>
+                                    <Select className='select-option' value={selectedOptions} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""}  closeMenuOnSelect={false} options={optionKeyword} menuPortalTarget={document.body} getOptionLabel={getOptionLabel} styles={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
+                                </> :
+                                <div className="d__row_text" title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""}>{keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "--"}</div>}
+                           </span>
+                    </div>
         );
     };
 
     const inputEditor = (options) => {
-        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => {options.editorCallback(e.target.value);setInput(e.target.value)}} placeholder={inputPlaceholder} />;
     };
     const outputEditor = (options) => {
-        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => {options.editorCallback(e.target.value);setOutput(e.target.value)}} placeholder={outputPlaceholder} />;
     };
 
     const onRowEditComplete = (e) => {
-        if(props.fetchingDetails["name"] === showPopup.name){
-            let testcase = [...newtestcase];
-            let { newData, index } = e;
-            testcase[index] = newData;
-            setnewtestcase(testcase); 
-        }
+        let testcase = [...newtestcase];
+        let { newData, index } = e;
+        testcase[index] = newData;
+        setID(index)
+        setnewtestcase(testcase); 
+        setFocused(false);
+        
     };
         
     const deleteProduct = () => {
-        if(props.fetchingDetails["name"] === showPopup.name){
-            let testcases = newtestcase.filter(function(objFromA) {
-                return !selectedTestCases.find(function(objFromB) {
-                    return objFromA.stepNo === objFromB.stepNo
+        let testcases = newtestcase.filter(function(objFromA) {
+            return !selectedTestCases.find(function(objFromB) {
+                return objFromA.stepNo === objFromB.stepNo
                 
-                })
             })
+        })
         
-            setnewtestcase(testcases);
-            setDeleteTestDialog(false);
-            setTestCase(emptyRowData);
-            setSelectedTestCases(null)
-            setMsg(MSG.CUSTOM('success full deleted test steps'));
-        }
+        setnewtestcase(testcases);
+        setDeleteTestDialog(false);
+        setTestCase(emptyRowData);
+        setSelectedTestCases(null)
+        setMsg(MSG.CUSTOM('success full deleted test steps'));
     };
         const hideDeleteProductDialog = () => {
             setDeleteTestDialog(false);
@@ -646,27 +988,12 @@ const DesignModal = (props) => {
             </React.Fragment>
         );
         const reorderTestCases=(e)=>{
-            if(props.fetchingDetails["name"] === showPopup.name){
                 const reorderedTestcase=e.value
                 const newReorderedTestCases=reorderedTestcase.map((testcase,idx)=>{
                     return {...testcase, [testcase.stepNo]:idx+1}
                 })
                 setnewtestcase(newReorderedTestCases)
-            }
         }
-
-        // const onCellEditComplete = (e) => {
-        //     let { rowData, newValue, field } = e;
-        //     let editedTestCases=[...newtestcase]
-        //     const updatedRowData = {...rowData,  [field]: newValue };
-        //     editedTestCases.splice(e.rowIndex, 1, updatedRowData);
-        //     setnewtestcase(editedTestCases);
-        // };
-        // const cellEditor = (options) => {
-        //     if (options.field === 'custname') return elementEditor(options);
-        //     else if (options.field === 'keywordVal') return keywordEditor(options);
-        //     else return textEditor(options);
-        //   };
 
     const DependentTestCaseDialogHideHandler = () => {
         setVisibleDependentTestCaseDialog(false);
@@ -675,33 +1002,76 @@ const DesignModal = (props) => {
         setTestCaseIDsList([]);
         setAddedTestCase([]);
     }
+    const allowExpansion = (rowData) => {
+        return rowData.testCases.length > 0;
+    };
+    const [expandedRows, setExpandedRows] = useState(null);
+    const onRowExpand = (event) => {
+        let _expandedRow={}
+        screenLavelTestSteps.forEach(testcase=>{if(event.data.id===testcase.id){
+            _expandedRow[`${testcase.id}`]=false
+        }
+        else{
+        _expandedRow[`${testcase.id}`]=null
+        }}
+        )
+        setExpandedRows(_expandedRow)
+        setRowExpandedName({name:event.data.name,id:event.data.id});
+        toast.current.show({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
+    };
 
+    const onRowCollapse = (event) => {
+        setRowExpandedName({});
+        toast.current.show({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
+    };
+    
+    const rowExpansionTemplate = (data) => {
+        return (
+            <div className="p-1">
+                    <DataTable
+                        value={data.testCases.length>0?data.testCases:[]}
+                        selectionMode="checkbox" selection={selectedTestCases}
+                        onSelectionChange={(e) => setSelectedTestCases(e.value)}  
+                        emptyMessage={newtestcase.length === 0?emptyMessage:null} onRowEditComplete={onRowEditComplete}
+                        rowReorder editMode="row" reorderableRows onRowReorder={(e) => reorderTestCases(e)} resizableColumns showGridlines size='small' >
+                            <Column style={{ width: '3em' ,textAlign: 'center' }} rowReorder />
+                            <Column selectionMode="multiple" style={{ width: '3em' ,textAlign: 'center' }} />
+                            <Column field="custname" header="Element Name" editor={(options) => elementEditor(options)} ></Column>
+                            <Column field="keywordVal" header="Keyword" editor={(options) => keywordEditor(options)}  ></Column>
+                            <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
+                            <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
+                            <Column field="remarks" header="Remarks" />
+                            <Column rowEditor field="action" header="Actions" bodyStyle={{ textAlign: 'center' }} ></Column>
+                    </DataTable>
+            </div>
+        );
+    }
+    
+    const rowTog=(e)=>{
+        let _expandedRow={}
+        if(Object.keys(e.data).length){
+            screenLavelTestSteps.forEach(testcase=>{if(selectedTestCase.id===testcase.id){
+                _expandedRow[`${testcase.id}`]=true
+            }})
+        }
+    setExpandedRows(_expandedRow)
+    }
     return (
         <>
         {overlay && <ScreenOverlay content={overlay} />}
+        { showConfirmPop && ConfirmPopups() }
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} footer={footerTemplate} >
                 <div className='toggle__tab'>
-                <Accordion multiple activeIndex={[idx]}>
-                {parentScreen.map((item)=><AccordionTab header={item.name} onClick={toggleTableVisibility}>
-                            <DataTable
-                                value={newtestcase.length>0 ?newtestcase:[]}
-                                selectionMode="checkbox" selection={selectedTestCases}
-                                onSelectionChange={(e) => setSelectedTestCases(e.value)}  
-                                emptyMessage={newtestcase.length === 0?emptyMessage:null} onRowEditComplete={onRowEditComplete}
-                                rowReorder editMode="row" reorderableRows onRowReorder={(e) => reorderTestCases(e)} resizableColumns showGridlines size='small' >
-                                <Column style={{ width: '3em' ,textAlign: 'center' }} rowReorder />
-                                <Column selectionMode="multiple" style={{ width: '3em' ,textAlign: 'center' }} />
-                                <Column field="custname" header="Element Name" editor={(options) => elementEditor(options)} ></Column>
-                                <Column field="keywordVal" header="Keyword" editor={(options) => keywordEditor(options)}  ></Column>
-                                <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
-                                <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
-                                <Column field="remarks" header="Remarks" />
-                                <Column rowEditor field="action" header="Actions" bodyStyle={{ textAlign: 'center' }} ></Column>
-                            </DataTable>
-                        </AccordionTab>)}
-                    </Accordion>
-                </div> 
+                    <Toast ref={toast} />
+                    <DataTable value={screenLavelTestSteps.length>0?screenLavelTestSteps:[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
+                            onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
+                            onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
+                            dataKey="id" tableStyle={{ minWidth: '60rem' }}>
+                        <Column expander={allowExpansion} style={{ width: '5rem' }} />
+                        <Column field="name" header="Name" sortable />
+                    </DataTable>
+                </div>
             </Dialog>
 
             <Dialog className="debug__object__modal" header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
