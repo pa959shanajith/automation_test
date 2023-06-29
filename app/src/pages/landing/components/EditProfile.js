@@ -227,7 +227,7 @@ const EditProfile = (props) => {
                                 <label htmlFor="name">First Name</label>
                                 <InputText
                                     style={{ width: '30vw',height:'5vh' }}
-                                    // id="name"
+                                    id="edit_input"
                                     value={firstName}
                                     type="text"
                                     onChange={(event) => { setFirstName(event.target.value) }}
@@ -237,7 +237,7 @@ const EditProfile = (props) => {
                                 <label htmlFor="name">Last Name</label>
                                 <InputText
                                     style={{ width: '30vw',height:'5vh' }}
-                                    // id="name"
+                                    id="edit_input"
                                     value={lastName}
                                     type="text"
                                     onChange={(event) => { setLastName(event.target.value) }}
@@ -249,7 +249,7 @@ const EditProfile = (props) => {
                                 <label htmlFor="Email">Email </label>
                                 <InputText
                                     style={{ width: '30vw',height:'5vh' }}
-                                    // id="email"
+                                    id="edit_input"
                                     value={email}
                                     type="email"
                                     onChange={(event) => { setEmail(event.target.value) }} />
@@ -260,7 +260,7 @@ const EditProfile = (props) => {
                                 <label htmlFor="Primary Role">Primary Role </label>
                                 <InputText
                                     style={{ width: '30vw',height:'5vh' }}
-                                    id="primary Role"
+                                    id="edit_input"
                                     value={userInfo.rolename}
                                     type="text"
                                     disabled={true}
@@ -272,7 +272,7 @@ const EditProfile = (props) => {
                                 <label htmlFor="Registered Date">Registered Date </label>
                                 <InputText
                                     style={{ width: '30vw',height:'5vh' }}
-                                    id="Registered Date"
+                                    id="edit_input"
                                     value={userInfo.createdon.slice(5,16)}
                                     type="text"
                                     disabled={true}

@@ -1,13 +1,18 @@
+@import "../../global/styles/ColorVariables.scss";
 .editProfile_dialog {
     .p-dialog-header {
         color: #030229;
         background-color: #F0EFFF !important;
         padding: 1rem !important;
+        font: $f5_semibold !important;
     }
 
     .p-dialog-footer {
         background: #FAFAFA !important;
         padding: 0.5rem !important;
+        .p-button{
+        font: $f7_semibold !important;
+        }
     }
 
     .p-dialog-content {
@@ -25,6 +30,7 @@
             font-size: medium;
             font-weight: 500;
             margin-bottom: 0.25rem;
+            font: $f7_semibold;
         }
     }
 
@@ -53,14 +59,13 @@
         padding-top: 1rem;
         position: relative;
         left: 9rem;
-    //     display: grid;
-    // flex-direction: unset;
-    // justify-content: center;
-        // width: 100px;
         .p-avatar {
             width: 6rem !important;
             height: 6rem !important;
             font-size: 2rem !important;
         }
+    }
+    #edit_input{
+        font: $f6_regular;
     }
 }

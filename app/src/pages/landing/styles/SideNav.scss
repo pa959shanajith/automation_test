@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .sidebar_container{
     display: flex;
     .sidebar {
@@ -39,6 +40,7 @@
                 .link_text{
                     font-size: 0.7rem;
                     text-align: center;
+                    font:$f8_regular;
                 }
             }
             &:hover{
@@ -54,6 +56,7 @@
             .link_text{
                 font-size: 0.7rem;
                 text-align: center;
+                font:$f8_regular;
             }
         }
         .active{
@@ -61,6 +64,7 @@
             color: rgb(150, 4, 187);
             border-radius: 0.2rem;
             border-bottom: none;
+            font:$f8_semibold;
         }
     }
 }
