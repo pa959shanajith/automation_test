@@ -190,7 +190,8 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
         // link.click();
         // document.body.removeChild(link);
         // window.location.href = window.location.origin+"/downloadAgent";
-        window.location.href = "https://driver.avoautomation.com/driver/avoagent.exe";
+        // window.location.href = "https://driver.avoautomation.com/driver/avoagent.exe";
+        window.location.href = "https://downloads.avoassure.ai/driver/avoagent.exe";
 
 
         // const link = document.createElement('a');
