@@ -24,18 +24,18 @@ const VerticalSteps = (props) => {
     const navigate = useNavigate();
     const steps = [
     {
-        label: 'Create Test Flow(s) using Design Studio',
-        description: `Create test flow of your software and Design your test cases. `,
+        label: activeStep.value  > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows',
+        description: ` Visualize testcases through mindmaps, capture elements and design test steps. `,
         title:'Design'
     },
     {
-        label: 'Configure & Execute Test Flow(s)                                        ',
-        description:' Create execution profiles for executing your test flows.',
+        label: ' Configure and test execution profiles',
+        description:'  Trigger test execution locally, via DevOps pipeline/cloud test provider or schedule it',
         title:'Execute'
     },
     {
-        label: 'View Test Reports                                                                 ',
-        description: ` Analyze the results of test flows execution.`,
+        label: 'View Test Reports ',
+        description: `View and analyze executed test automations.`,
         title:'Report'
     },
     ];
