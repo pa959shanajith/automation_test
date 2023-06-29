@@ -496,6 +496,7 @@ if (cluster.isMaster) {
 		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
 		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
+		app.post('/checkExportName', auth.protect, mindmap.checkExportName);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
