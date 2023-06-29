@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import "../styles/ModuleListSidePanel.scss";
 import ImportMindmap from'../components/ImportMindmap.js';
-import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist} from '../designSlice';
+import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist, moduleList} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -343,10 +343,13 @@ const ModuleListDrop = (props) =>{
 
     const LongContentDemo = () => {
         const [newProjectList, setNewProjectList] = useState([]);
-        const [storedSelectedKeys, setStoredSelectedKeys] = useState([]);
+        // const [storedSelectedProj, setStoredSelectedProj] = useState('');
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [transferBut, setTransferBut] = useState([]);
         const [inputE2EData, setInputE2EData] = useState('');
+        const [newModSceList, setNewModSceList] = useState([]);
+        const [selectedProject, setSelectedProject] = useState(null);
+        console.log("selectedProjectDrop",selectedProject)
         // const forCatchingCheckBoxSelDemo = useMemo(()=> CheckboxSelectionDemo())
         useEffect(() => {
           (async () => {
@@ -387,6 +390,40 @@ const ModuleListDrop = (props) =>{
             setNewProjectList(projectCollection);
           })();
         }, []);
+        useEffect(() => {
+          (async() => {
+            const moduleList = await getModules({
+              tab: 'endToend',
+              projectid: selectedProject,
+              version: 0,
+              cycId: null,
+              modName: '',
+              moduleid: null
+            });
+            let moduleCollections = [];
+            for (let modu of moduleList) {
+              if (modu.type === 'basic') {
+                let scenarioCollections = [];
+                const scenDatas = await populateScenarios(modu._id);
+                for (let scenarioDatas of scenDatas) {
+                  scenarioCollections.push({
+                    id: scenarioDatas._id,
+                    name: scenarioDatas.name
+                  });
+                }
+                moduleCollections.push({
+                  id: modu._id,
+                  name: modu.name,
+                  scenarioList: scenarioCollections
+                });
+              }
+            }
+            setNewModSceList(moduleCollections)
+            console.log("moduleCollection",moduleCollections)
+            console.log("selectedProjectDrop2",selectedProject)
+          })();
+        }, [selectedProject]);
+        
         console.log("newProjectList",newProjectList)
         const handleArrowBut =()=>{
              setTransferBut(selectedKeys)
@@ -409,7 +446,6 @@ const ModuleListDrop = (props) =>{
             "cidxch": null}
         // transferBut[0]= pushingEnENmInArr
         // console.log("inputE2EData",inputE2EData)
-        console.log("transferBut[1]",transferBut)
       
         
     //      HardCodedApiDataForE2E.map[0].name =inputE2EData
@@ -546,13 +582,15 @@ const ModuleListDrop = (props) =>{
             if(saveE2E_sce.error){displayError(saveE2E_sce.error);return}
           
         }
+
+           
         const CheckboxSelectionDemo = () => {
       
-          const handleCheckboxChange = (e, projIdx, moduleIdx, scenarioIdx, projName, modName, sceName,projectId,moduleId,scenarioId) => {
-            const selectedScenario = `${projIdx}-${moduleIdx}-${scenarioIdx}`;
+          const handleCheckboxChange = (e, modIndx, sceIdx,  modName, sceName,moduleId,scenarioId) => {
+            const selectedScenario = `${modIndx}-${sceIdx}`;
             if (e.checked) {
               setSelectedKeys([...selectedKeys, {
-                  projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario,projectId,moduleId,scenarioId
+                   modIndx, sceIdx, modName, sceName, selectedScenario,moduleId,scenarioId
               }]);
               // setStoredSelectedKeys([...selectedKeys, {
               //   projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
@@ -577,9 +615,10 @@ const ModuleListDrop = (props) =>{
             setSelectedKeys([]); // Clear the selected scenarios after transferring
           };
            console.log("newProjectList",newProjectList)
+           
           return (
             <div>
-              <Tree
+              {/* <Tree
                 value={newProjectList.map((project, projIdx) => ({
                   key: projIdx,
                   label: (
@@ -617,7 +656,42 @@ const ModuleListDrop = (props) =>{
                 // selectionKeys={selectedKeys}
                 style={{ height: '22.66rem', overflowY: 'auto' }}
                 // onSelectionChange={(e) => setSelectedKeys(e.value)}
+              /> */}
+                 <Tree 
+              value={
+                newModSceList.map((module,modIndx)=>({
+                  key: modIndx,
+                  label: (
+                    <div className="labelOfArray">
+                      <img src="static/imgs/moduleIcon.png" alt="modules" />
+                      <div className='labelOfArrayText'>{module.name}</div>
+                     
+                    </div>
+                  ),
+                  children: module.scenarioList.map((scenario, sceIdx) => ({
+                    key: sceIdx,
+                    label: (
+                      <label style={{alignItem:'center',justifyContent:'center'}}>
+                        <Checkbox
+                          onChange={(e) => handleCheckboxChange(e, modIndx, sceIdx, module.name, scenario.name,module.id,scenario.id)}
+                          checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${modIndx}-${sceIdx}`)}
+                        />
+                        <>
+                        </>
+                        <img style={{width:'18px',height:'16px'}} src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
+                        {scenario.name}
+                      </label>
+                    )
+
+                })
+                
+                )
+              }))}
+                selectionMode="multiple"
+              
               />
+              {console.log("scenario",scenarioList)}
+              {console.log("ModuleLst",moduleList)}
               {/* <button onClick={handleTransferScenarios}>Transfer Scenarios</button> */}
             </div>
           );
@@ -637,7 +711,7 @@ const ModuleListDrop = (props) =>{
                 className="Project-Dialog"
                 header="Create End to End Flow"
                 visible={showE2EPopup}
-                style={{ width: '74.875rem', height: '100%', backgroundColor: '#605BFF' }}
+                style={{ width: '74.875rem', height: '100%', backgroundColor: '#f2f2ff' }}
                 onHide={() => setShowE2EPopup(false)}
                 footer={footerContent}
               >
@@ -658,23 +732,37 @@ const ModuleListDrop = (props) =>{
                   </div>
                   <div className="centralTwinBox">
                     <div className="leftBox">
-                      <Card className="leftCard">
-                        <div className="headlineSearchInput">
-                          <div className="headlineRequired">
-                            <h5 style={{ fontSize: '14px' }}>Select Scenarios</h5>
-                            <img src="static/imgs/Required.svg" className="required_icon" />
+                      <Card title="Select Scenarios" className="leftCard">
+                     <div className="DrpoDown_search_Tree">
+                          <div className="card flex justify-content-center">
+                            <Dropdown
+                              value={selectedProject}
+                              onChange={(e) => setSelectedProject(e.value)}
+                              options={newProjectList.map((projectDrp, prjIdxDrp) => ({
+                                label: projectDrp.name,
+                                value: projectDrp.id
+                              }))}
+                              placeholder="Select a Project"
+                            />
+                            {console.log("selectedProjectDrop", selectedProject)}
                           </div>
+                        <div className="headlineSearchInput">
+                          {/* <div className="headlineRequired">
+                            <h5 style={{ fontSize: '14px' }}></h5>
+                            <img src="static/imgs/Required.svg" className="required_icon" />
+                          </div> */}
                           <span className="p-input-icon-left">
                             <i className="pi pi-search" />
                             <InputText
                               placeholder="Search Scenarios by name"
-                              style={{ width: '32rem', height: '2.2rem' }}
+                              style={{ width: '32.67rem', height: '2.2rem',marginTop:'1.5%',marginBottom:'1.5%' }}
                               className="inputContainer"
                             />
                           </span>
                         </div>
                          {/* <MemorizedCheckboxSelectionDemo/> */}
                         <CheckboxSelectionDemo />
+                      </div>
                       </Card>
                     </div>
                     <div className="centerButtons">
@@ -684,17 +772,15 @@ const ModuleListDrop = (props) =>{
                       </div>
                     </div>
                     <div className="rightBox">
-                      <Card className="rightCard">
+                      <Card title="Selected Scenarios" className="rightCard">
                       <div className="headlineSearchInputOfRightBox">
-                          <div className="headlineRequiredOfRightBox">
-                            <h5 style={{ fontSize: '14px' }}>Selected Scenarios</h5>
+                          {/* <div className="headlineRequiredOfRightBox">
                             <img src="static/imgs/Required.svg" className="required_icon" />
-                          </div>
+                          </div> */}
                           <span className="p-input-icon-left">
                             <i className="pi pi-search" />
                             <InputText
                               placeholder="Search Scenarios by name"
-                              style={{ width: '31rem', height: '2.2rem' }}
                               className="inputContainer"
                             />
                           </span>
@@ -725,12 +811,14 @@ const ModuleListDrop = (props) =>{
     return(
         <Fragment>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
-            {warning.modID?<ModalContainer 
+            {warning.modID?<ModalContainer
+                show = {warning.modID} 
+                style={{width:"30%"}}
                 title='Confirmation'
                 close={()=>setWarning(false)}
                 footer={<Footer modID={warning.modID} loadModule={warning.type ==='endtoend' ? loadModuleE2E : loadModule} setWarning={setWarning} />}
                 content={<Content/>} 
-                modalClass='modal-sm'
+                // modalClass='warningPopUp'
             />:null}
              <>
       <div className="CollapseWholeCont">
@@ -764,9 +852,9 @@ const ModuleListDrop = (props) =>{
                            <i className="pi pi-times"  onClick={click_X_Button}></i>
                        </div>)}
                      </div> */}
-                     <i className="pi pi-file-import mindmapImport" onClick={()=>setImportPop(true)}></i>
+                     <i className="pi pi-file-import mindmapImport" title='Import Module' onClick={()=>setImportPop(true)}></i>
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
-                     <img   src="static/imgs/plusNew.png" alt="NewModules" onClick={()=>{ CreateNew()}} /> 
+                     <img   src="static/imgs/plusNew.png" alt="NewModules" title='Create New' onClick={()=>{ CreateNew()}} /> 
                 </div>
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
                       <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
@@ -811,10 +899,10 @@ const ModuleListDrop = (props) =>{
                                                    // </div> */}
                                             <div key={i} data-test="modules" value={e._id} title={e.name} type={e.type}>
                                                     <div className={'EachModNameBox'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  } >
-                                                      {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}
+                                                      {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)} />}
                                                       <img src="static/imgs/moduleIcon.png" style={{width:'20px',height:'20px',marginLeft:'0.5rem'}} alt="modules" />
                                                       <div style={{width:'13rem',textOverflow:'ellipsis',overflow:'hidden'}}>
-                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',}}>{e.name}</h4>
+                                                      <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',fontWeight:'300'}}>{e.name}</h4>
                                                       </div>  
                                                     </div>
                                             </div>
@@ -936,12 +1024,25 @@ const Content = () => (
 )
 
 //footer for moduleclick warning popup
+// const Footer = (props) => (
+//   <div className='warningPopup'>
+//     <div className='toolbar__module-warning-footer'>
+//         <div className='btn-warning'>
+//           {/* <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button> */}
+//           <Button className='btn-yes' onClick={()=>props.loadModule(props.modID)} label="Yes" />
+//           {/* <button onClick={()=>{props.setWarning(false)}}>No</button> */}
+//           <Button onClick={()=>{props.setWarning(false)}} label="No" />
+//         </div>
+//     </div>
+//   </div>
 const Footer = (props) => (
-    <div className='toolbar__module-warning-footer'>
-        <button className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</button>
-        <button onClick={()=>{props.setWarning(false)}}>No</button>
-    </div>
+  <div className='toolbar__module-warning-footer'>
+      <Button size="small" onClick={()=>{props.setWarning(false)}}>No</Button>
+      <Button size="small" className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</Button>
+  </div>
 )
+
+
 
 
 

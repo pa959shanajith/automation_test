@@ -24,7 +24,7 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
-  // const selectProj = useSelector(state=>state.plugin.PN)
+  const selectProj = useSelector(state=>state.landing.defaultSelectProject);
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
     'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))
@@ -59,7 +59,7 @@ const MindmapHome = () => {
       const data = parseProjList(res)
       var req={
         tab:"endToend",
-        projectid:res.projectId[0],
+        projectid:selectProj?selectProj.projectId:res.projectId[0],
         version:0,
         cycId: null,
         modName:"",
@@ -92,7 +92,7 @@ const MindmapHome = () => {
             <Card  id='p_card' className='Module'>
               <span className='cardText'>
                 <h3 id='module'>Start by creating a Mindmap</h3>
-                <p>Normal and E2E Modules</p>
+                <p id='module_normal'>Normal and E2E Modules</p>
               </span>
               <Button className='createBatton' title='Create Mindmap' onClick={handleModule} label='Create Mindmap'/>
               <img className='createBattonImg' src='static\imgs\Normal_Module.png' alt='Create Mindmap'/>
@@ -101,7 +101,7 @@ const MindmapHome = () => {
             <Card id='p_card' className='avoGenius' >
               <span className='cardText'>
                 <h3 id='module'>Start by triggering Avo Genius</h3>
-                <p>Used Avo Genius for create mindmap</p>
+                <p id='module_normal'>Used Avo Genius for create mindmap</p>
               </span>
               <Button className='geniusBatton' title='Start Avo Genius' onClick={handleGenius} label='Start Avo Genius'/>
               <img className='avoGeniusImg' src='static\imgs\AvoGenius.png' alt='Start Avo Genius'/>

@@ -25,6 +25,7 @@
     cursor: default;
     word-wrap: break-word;
     padding-top: 2px;
+    font: $f6_regular;
 }
 .ct-node .ct-nodeBubble {
     stroke-width: 1px;
@@ -41,6 +42,7 @@
 .ct-actionButton>text{
     font-size: 17px;
     fill: $whiteColor;
+    font: $f7_semibold;
 }
 #ct-advanceOptionAction>rect{
     fill: $primaryColor;
@@ -72,10 +74,12 @@
     top: 1rem;
     background: #605BFF;
     border-radius: 4px;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    font-family: 'Open Sans' !important;
+    // font-size: 14px !important;
+    // font-weight: 600 !important;
+    // font-family: 'Open Sans' !important;
+    font: $f7_semibold !important;
 }
+
 
 .Scenario_dialog{
     .p-dialog-header {
@@ -85,6 +89,7 @@
    font-style: normal !important;
    font-weight: 600 !important; 
    font-size: 20px !important;
+   font: $f5_semibold !important;
      }
      .p-dialog-content{
         padding: 1.5rem !important;
@@ -101,6 +106,7 @@
     color: #605BFF;
     border: none;
     font-weight: 600;
+    font:$f7_semibold;
 }
 .toolbar_scenario{
     margin-top: 0.5rem;
@@ -113,6 +119,7 @@
 
 .p-contextmenu{
     width: 17.5rem !important;
+    font: $f6_regular;
 }
 
 .p-column-title{
@@ -121,12 +128,14 @@
     font-family: 'Open Sans' !important;
     display: flex;
     align-items: flex-start;
+    font: $f6_semibold;
 }
 .scenario_inp{
     height: 2.5rem;
     width: 15rem;
     position: relative;
     right: 3rem;
+    font: $f6_regular;
 }
 .scenario-header{
     padding: 0.7rem !important;

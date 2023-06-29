@@ -19,7 +19,7 @@ import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import ModalContainer from '../../global/components/ModalContainer';
 import { Toast } from 'primereact/toast';
 import { InputText } from "primereact/inputtext";
-
+import { Tooltip } from 'primereact/tooltip';
 
 
 
@@ -68,6 +68,8 @@ const CaptureModal = (props) => {
   const [showConfirmPop, setShowConfirmPop] = useState(false);
   const [modified, setModified] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
+  const [deleted, setDeleted] = useState([]);
+  const [deletedItems, setDeletedItems] = useState(false)
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -78,7 +80,11 @@ const CaptureModal = (props) => {
   const [cardBottom, setCardBottom] = useState(null)
   const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
   const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
-
+  const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
+  const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
+  const [identifierModified, setIdentifierModiefied] = useState(false);
+  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] });
+  const [idx, setIdx] = useState(0);
 
 
   const imageRef1 = useRef(null);
@@ -93,14 +99,15 @@ const CaptureModal = (props) => {
 
   useEffect(() => {
     fetchScrapeData()
-  }, [])
+  }, [parentData])
   useEffect(() => {
-    if (endScrape || elementPropertiesUpdated) {
+    if (endScrape || elementPropertiesUpdated || identifierModified) {
       fetchScrapeData();
       setEndScrape(false)
+      setIdentifierModiefied(false)
       setElementPropertiesUpdated(false)
     }
-  }, [endScrape, elementPropertiesUpdated])
+  }, [parentData, endScrape, elementPropertiesUpdated, identifierModified])
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
@@ -182,6 +189,60 @@ const CaptureModal = (props) => {
   }
 
 
+  const parentScreen = props.fetchingDetails["parent"]["children"];
+  useEffect(() => {
+    const parentScreenId = () => {
+      for (let i = 0; i < parentScreen.length; i++) {
+        if (props.fetchingDetails["name"] === parentScreen[i].name) {
+          //  if (props.fetchingDetails["parent"]["children"][idx]["name"] === parentScreen[i].name) {
+          setIdx(i);
+          return setParentData({
+            name: parentScreen[i].name,
+            id: parentScreen[i]._id,
+            parentName: props.fetchingDetails["parent"]['name'],
+            parent_id: props.fetchingDetails["parent"]['_id'],
+            projectId: parentScreen[i].projectID,
+          });
+          // }
+        }
+      }
+      return 0;
+    }
+    parentScreenId();
+  }, [])
+
+
+  const onIncreaseScreen = () => {
+    setCapturedDataToSave([]);
+    for (let i = idx; i < parentScreen.length; i++) {
+      if (props.fetchingDetails["parent"]["children"][idx + 1]["name"] === parentScreen[i].name) {
+        setParentData({
+          name: parentScreen[i].name,
+          id: parentScreen[i]._id,
+          parentName: props.fetchingDetails["parent"]['name'],
+          parent_id: props.fetchingDetails["parent"]['_id'],
+          projectId: parentScreen[i].projectID,
+        });
+        return setIdx(idx + 1);
+      }
+    }
+  }
+
+  const onDecreaseScreen = () => {
+    setCapturedDataToSave([]);
+    for (let i = idx; i < parentScreen.length; i--) {
+      if (props.fetchingDetails["parent"]["children"][idx - 1]["name"] === parentScreen[i].name) {
+        setParentData({
+          name: parentScreen[i].name,
+          id: parentScreen[i]._id,
+          parentName: props.fetchingDetails["parent"]['name'],
+          parent_id: props.fetchingDetails["parent"]['_id'],
+          projectId: parentScreen[i].projectID,
+        });
+        return setIdx(idx - 1);
+      }
+    }
+  }
 
   const handleRowReorder = (event) => {
     setCaptureData(event.value);
@@ -309,7 +370,7 @@ const CaptureModal = (props) => {
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
-      scrapeApi.getScrapeDataScreenLevel_ICE("web", props.fetchingDetails["_id"], props.fetchingDetails.projectID, "")
+      scrapeApi.getScrapeDataScreenLevel_ICE("web", parentData.id, parentData.projectId, "")
         .then(data => {
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
@@ -393,7 +454,7 @@ const CaptureModal = (props) => {
                     enable: true
                   });
                   onHighlight();
-                }}>View Screenshot</span> : "",
+                }}>View Screenshot</span> : <span>No Screenshot</span>,
                 actions: '',
                 objectDetails: item
 
@@ -412,7 +473,7 @@ const CaptureModal = (props) => {
                     enable: true
                   });
                   onHighlight();
-                }}>View Screenshot</span> : "",
+                }}>View Screenshot</span> : <span>No screenshot available</span>,
                 actions: '',
                 objectDetails: item
               }
@@ -423,12 +484,44 @@ const CaptureModal = (props) => {
         .catch(error => {
           dispatch(disableAction(haveItems));
           dispatch(disableAppend(!haveItems));
-          console.error("error", error);
           setOverlay("");
           reject("fail")
         })
     });
   }
+  const onDelete = (e, confirmed) => {
+    if (mainScrapedData.reuse && !confirmed) {
+      return;
+    }
+    let deletedArr = [...deleted];
+    let scrapeItemsL = [...captureData];
+    let newOrderList = [];
+    var capturedDataAfterSave = scrapeItemsL.filter(function (item) {
+
+      return !selectedCapturedElement.find(function (objFromB) {
+        if (item.objectDetails.objId === objFromB.objectDetails.objId) {
+          deletedArr.push(item.objectDetails.objId)
+          return true
+        }
+      })
+    })
+    let notused = scrapeItemsL.filter(item => {
+      if (deletedArr.includes(item.objectDetails.objId)) {
+        return false
+      }
+      else {
+        newOrderList.push(item.objectDetails.objId)
+      }
+    })
+    let newCapturedDataToSave = capturedDataAfterSave.map(item => item.objectDetails)
+    setCaptureData(capturedDataAfterSave)
+    setDeleted(deletedArr)
+    setOrderList(newOrderList)
+    setCapturedDataToSave(newCapturedDataToSave)
+    setSelectedCapturedElement([])
+    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+  }
+  // {console.log(captureData[0].selectall)}
 
   const saveScrapedObjects = () => {
     let scrapeItemsL = [...capturedDataToSave];
@@ -450,7 +543,7 @@ const CaptureModal = (props) => {
     }
 
     let params = {
-      'deletedObj': [],
+      'deletedObj': deleted,
       'modifiedObj': modifiedObjects,
       'addedObj': { ...added, view: views },
       'screenId': props.fetchingDetails["_id"],
@@ -459,6 +552,7 @@ const CaptureModal = (props) => {
       'param': 'saveScrapeData',
       'orderList': orderList
     }
+
     scrapeApi.updateScreen_ICE(params)
       .then(response => {
         if (response === "Invalid Session") return null;
@@ -536,12 +630,13 @@ const CaptureModal = (props) => {
           if (scrapedItemsLength > 0) dispatch(disableAction(true));
           else dispatch(disableAction(false));
           setSaved({ flag: false });
-          // err = {
-          //     'VARIANT':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
-          //         data === 'scheduleModeOn' ?
-          //             MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-          //             MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-          // };
+          err = {
+            'VARIANT': data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
+              data === 'scheduleModeOn' ?
+                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
+
+          };
         } else if (data === "fail")
           err = MSG.SCRAPE.ERR_SCRAPE;
         else if (data === "Terminate") {
@@ -562,6 +657,7 @@ const CaptureModal = (props) => {
         // fetchScrapeData();
 
         if (viewString.view.length !== 0) {
+
           let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
 
           let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
@@ -660,14 +756,11 @@ const CaptureModal = (props) => {
   const renderActionsCell = (rowData) => {
     return (
       <div>
-        <img src="static/imgs/ic-edit.png"
-          style={{ height: "20px", width: "20px" }}
-          className="edit__icon" onClick={() => handleEdit(rowData)} />
         <img
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px" }}
           className="delete__icon" onClick={() => handleDelete(rowData)} />
-        <img src="static/imgs/ic-edit.png"
+        <img src="static/imgs/ic-edit.png" title="view/edit element properties"
           style={{ height: "20px", width: "20px" }}
           className="edit__icon" onClick={() => openElementProperties(rowData)} />
       </div>
@@ -697,13 +790,13 @@ const CaptureModal = (props) => {
 
   const footerCapture = (
     <div className='footer__capture'>
-      <Button className='btn_capture' onMouseDownCapture={() => { setVisible(false); startScrape(captureButton); }}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton); }}>Capture</Button>
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button className='btn_capture' onMouseDownCapture={() => { setVisible(false); startScrape(captureButton) }}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton) }}>Capture</Button>
     </div>
   );
 
@@ -711,8 +804,11 @@ const CaptureModal = (props) => {
     <>
       <div>
         <h5 className='dailog_header1'>Capture Elements</h5>
-        <h4 className='dailog_header2'>Signup screen 1</h4>
-        <img className="screen_btn" src="static/imgs/ic-screen-icon.png" />
+        <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
+        <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
+        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        </h4>
+        {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
           <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
           <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }}>Add More</button>
@@ -727,7 +823,7 @@ const CaptureModal = (props) => {
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Not Captured</p>
-        <button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</button>
+        <Button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</Button>
       </div>
     </div>
   );
@@ -736,8 +832,10 @@ const CaptureModal = (props) => {
 
   const footerSave = (
     <>
+      {selectedCapturedElement?.length > 0 ? <Button label="Element Identifier Order" onClick={() => setShowIdentifierOrder(true)} ></Button> : null}
+      {selectedCapturedElement?.length > 0 ? <Button label='Delete' onClick={onDelete} ></Button> : null}
       <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)}></Button>
-      <Button label='Save' onClick={() => { setAddmoreHandler(); onSave() }} ></Button>
+      <Button label='Save' onClick={onSave} ></Button>
     </>
   )
   const PopupDialog = () => (
@@ -758,12 +856,12 @@ const CaptureModal = (props) => {
       close={() => setShowConfirmPop(false)}
       footer={
         <>
-          <button onClick={showConfirmPop.onClick}>
+          <Button onClick={showConfirmPop.onClick}>
             {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
-          </button>
-          <button onClick={() => setShowConfirmPop(false)}>
+          </Button>
+          <Button onClick={() => setShowConfirmPop(false)}>
             {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
-          </button>
+          </Button>
         </>
       }
     />
@@ -1064,6 +1162,66 @@ const CaptureModal = (props) => {
     setElementValues(dataValue)
     setElementProperties(true)
   }
+  const Header = () => {
+    return (
+      <div>Element Identifier Order<span style={{ color: 'red' }}>*</span></div>
+    );
+  };
+  const columns = [
+
+    { field: 'id', header: 'Priority' },
+    { field: 'name', header: 'Identifier' },
+  ];
+  const dynamicColumns = columns.map((col, i) => {
+    return <Column key={col.field} columnKey={col.field} field={col.field} header={col.header} />;
+  });
+  const onRowReorderIdentifier = (e) => {
+    const reorderedProducts = e.value.map((element, idx) => {
+      element.id = idx + 1
+      return element
+    })
+    setIdentifierList(reorderedProducts)
+
+  }
+  const footerContentIdentifier = (
+    <div>
+      <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Drag/drop to reorder identifiers.</div>
+      <Button label="Cancel" onClick={() => setShowIdentifierOrder(false)} className="p-button-text" />
+      <Button label="Save" onClick={() => saveIdentifier()} autoFocus />
+    </div>
+  )
+  const saveIdentifier = () => {
+    const finalScrapedItems = selectedCapturedElement.map(element => element.objectDetails.objId)
+    let identifierListUpdated = identifierList.map(({ id, identifier }) => ({ id, identifier }))
+    let params = {
+      'objectIds': finalScrapedItems,
+      'identifiers': identifierListUpdated,
+      'param': 'updatedIdentifier',
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+
+      // 'identifier'
+    }
+    scrapeApi.updateScreen_ICE(params)
+      .then(response => {
+        console.log(response)
+        if (response == "Success") {
+          setIdentifierModiefied(true)
+          setShowIdentifierOrder(false)
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element Identifier order updated successfully.', life: 5000 });
+          setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
+
+        }
+      })
+      .catch(error => {
+        console.log(error)
+        setShowIdentifierOrder(false)
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Some Error occured while saving identifier list.', life: 5000 });
+        setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
+      }
+      )
+
+  }
 
   return (
     <>
@@ -1178,7 +1336,9 @@ const CaptureModal = (props) => {
             <Column field="selectall" header="Element Name"
               editor={(options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
-              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}>
+              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+              bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
+              body={renderSelectAllCell}>
             </Column>
             <Column field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
@@ -1192,8 +1352,8 @@ const CaptureModal = (props) => {
           </Dialog>
         </div>
       </Dialog>
-      <Dialog className={visible === 'capture' ? "compare__object__note" : "compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
-        <div className={visible === 'capture' ? "compare__content__adj" : "compare__object"}>
+      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
+        <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
           </span>
@@ -1214,6 +1374,7 @@ const CaptureModal = (props) => {
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+        
       <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
@@ -1227,6 +1388,7 @@ const CaptureModal = (props) => {
           </span>
         </div>
       </Dialog>
+
       {currentDialog === 'addObject' && <ActionPanel
         isOpen={currentDialog}
         OnClose={handleClose}
@@ -1297,6 +1459,15 @@ const CaptureModal = (props) => {
             {/* <column ></column> */}
             <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
             <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
+          </DataTable>
+        </div>
+      </Dialog>
+      {/* Element reorder */}
+      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => setShowIdentifierOrder(false)} footer={footerContentIdentifier} >
+        <div className="card" >
+          <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
+            <Column rowReorder style={{ width: '3rem' }} />
+            {dynamicColumns}
           </DataTable>
         </div>
       </Dialog>

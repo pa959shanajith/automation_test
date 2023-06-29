@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .analysis_container{
     display: flex;
     flex-direction: row;
@@ -24,10 +25,12 @@
     &__text{
         margin: 0.1rem 0rem 0rem 0.5rem;
         font-weight: 600;
+        font: $f5_semibold;
     }
     &__Execution_text{
         margin-left: 1rem;
         font-weight: 600;
+        font: $f5_semibold;
     }
 }
 
@@ -64,6 +67,7 @@
     flex-direction: column;
     flex-wrap: wrap;
     align-content: center;
+    font: $f6_regular;
     >img {
         margin-left: 1rem;
         height: 7rem;
