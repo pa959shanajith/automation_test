@@ -86,6 +86,7 @@
 
 
 .datatable__col {
+  overflow: auto;
   .p-datatable .p-datatable-thead>tr>th {
     background: rgba(96, 91, 255, 0.1) !important;
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
@@ -174,6 +175,7 @@
   position: relative;
   left: 3%;
   font-size: 1.5rem;
+  cursor: pointer;
     &:hover{
       background: #e9ecef;
       border-color: transparent;
@@ -255,6 +257,7 @@
 .dailog_box {
   .p-dialog-content {
     padding: 0 0 !important;
+    overflow: hidden;
   }
 
   .p-dialog-header {
@@ -583,14 +586,15 @@
 }
 
 .screenshot_pop{
-  width: 500px!important;
+  width: 39rem!important;
+  height: 25rem!important;
   .p-dialog-header {
     background: #E2E2ED !important;
-    height: 3rem !important;
+    height: 4rem !important;
   }
   .p-dialog-header-icons{
   position: relative;
-  bottom: 1rem;
+  // bottom: 1rem;
   }
 }
 .screenshot_pop__content{
@@ -674,11 +678,18 @@
     color: black;
     padding: 0.8rem;
 }
-// .header__popup{
-//   .p-dialog-header {
-//     background: #E2E2ED !important;
-//   }
-// }
+.header__popup{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 8rem;
+}
+
+.header__screenshot__eye{
+  display: inline-flex;
+}
+
+
 //Styles related to element properties 
 .p-dialog .p-dialog-footer {
   padding:0.5rem

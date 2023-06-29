@@ -70,7 +70,7 @@ const DisplayProject = (props) => {
       output = "Last modified " + hours + hours_ago +" ago";
     }
     else if (years == 0 && months >= 1) {
-      output = "Last modified " + months + months_ago +" ago";
+      output = "Last modified " + inputDate.slice(5,11);
     }
     else {
       output = "Last modified " + years + years_ago + " ago";
