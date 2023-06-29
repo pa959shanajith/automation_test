@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .UserProfileContainer{
 .card {
   background: var(--surface-card);
@@ -9,16 +10,24 @@
 .custom-tieredmenu {
   background:linear-gradient(180deg,#EDECEC 15%,#fafafb 13%)!important;
   border-radius: 8px !important;
-  width: 13.5rem !important;
+  width: 13.8rem !important;
   position: relative;
   z-index: 1;
   position: absolute;
   top: 2.6rem;
   right: 0.2rem;
+  font: $f6_regular !important;
   .p-menuitem-link:not(.p-disabled):hover {
     background: #bec2be !important;
+    font: $f6_regular !important;
   }
   
+}
+.user_name{
+  font: $f6_semibold;
+}
+.user_role{
+  font: $f7_regular;
 }
 
 .ProfileDisplay  {
@@ -35,6 +44,7 @@
   position: relative;
   cursor: pointer;
   color: #495057;
+  font: $f7_regular;
   }
 .p-avatar.p-avatar-image{
   border:2px solid white !important;

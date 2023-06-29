@@ -741,9 +741,9 @@ const ModuleListDrop = (props) =>{
                            <i className="pi pi-times"  onClick={click_X_Button}></i>
                        </div>)}
                      </div> */}
-                     <i className="pi pi-file-import mindmapImport" onClick={()=>setImportPop(true)}></i>
+                     <i className="pi pi-file-import mindmapImport" title='Import Module' onClick={()=>setImportPop(true)}></i>
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
-                     <img   src="static/imgs/plusNew.png" alt="NewModules" onClick={()=>{ CreateNew()}} /> 
+                     <img   src="static/imgs/plusNew.png" alt="NewModules" title='Create New' onClick={()=>{ CreateNew()}} /> 
                 </div>
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
                       <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
@@ -788,7 +788,7 @@ const ModuleListDrop = (props) =>{
                                                    // </div> */}
                                             <div key={i} data-test="modules" value={e._id} title={e.name} type={e.type}>
                                                     <div className={'EachModNameBox'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E && isE2EOpen)?   {backgroundColor:'#EFE6FF'}:{}  } >
-                                                      {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") }  />}
+                                                      {<input type="checkbox" className="checkBox" style={{marginTop:'3px'}} value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)} />}
                                                       <img src="static/imgs/moduleIcon.png" style={{width:'20px',height:'20px',marginLeft:'0.5rem'}} alt="modules" />
                                                       <div style={{width:'13rem',textOverflow:'ellipsis',overflow:'hidden'}}>
                                                       <h4 className="moduleName" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',fontWeight:'300'}}>{e.name}</h4>

@@ -23,6 +23,7 @@ import { updateScreen_ICE } from '../api';
 
 
 
+
 const ActionPanel = (props) => {
   const [selectObjectType, setSelectObjectType] = useState(null);
   const toast = useRef();
@@ -39,16 +40,14 @@ const ActionPanel = (props) => {
   const [addElementObjects, setAddElementObjects] = useState([]);
   const [addElementSelectObjectType, setAddElementSelectObjectType] = useState(null);
   const [addElementInputValue, setAddElementInputValue] = useState('');
-
+  const [activeIndex, setActiveIndex] = useState("");
   const [scrapedList, setScrapedList] = useState({});
   const [customList, setCustomList] = useState({});
   const [nonCustomList, setNonCustomList] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
-  
   const [map, setMap] = useState({});
   const [showName, setShowName] = useState("");
-  const [selectedItem, setSelectedItem] = useState([]);
   const [orderLists, setOrderLists] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -81,7 +80,6 @@ const ActionPanel = (props) => {
     { value: "checkbox", typeOfElement: "chkbox", name: "Checkbox" },
     { value: "Element", typeOfElement: "elmnt", name: "Element" }
   ];
-
 
   useEffect(() => {
     if (props.editFlag) {
@@ -119,12 +117,16 @@ const ActionPanel = (props) => {
     //eslint-disable-next-line
   }, [])
 
+  const handleAccordionTabChange = (index) => {
+    setActiveIndex(index);
+  };
+
   useEffect(() => {
     let tempScrapeList = {};
     let tempCustomList = {};
     let tempNonCustom = [];
     let tempOrderList = [];
-    if (props.captureList.length) {
+    if (props.captureList && props.captureList.length ) {
       props.captureList.forEach(object => {
         let elementType = object.tag;
         elementType = tagList.includes(elementType) ? elementType : 'Element';;
@@ -147,13 +149,15 @@ const ActionPanel = (props) => {
       setNonCustomList(tempNonCustom);
       setOrderLists(tempOrderList);
     }
-  }, [props.isOpen === 'mapObject']);
+  }, []);
 
-  useEffect(() => {
+  // useEffect(() => {
+
     const toastErrorMsg = (errorMsg) => {
       toast.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
     }
-  }, [errorMsg])
+
+  // }, [errorMsg])
 
   const newField = () => {
     let updatedObjects = [...objects];
@@ -161,29 +165,32 @@ const ActionPanel = (props) => {
     let newTempId = tempIdCounter + 1;
     updatedObjects.push({ ...customObj, tempId: newTempId });
     updatedShowFields.push(newTempId);
-    // setObjects(updatedObjects);
+    setObjects(updatedObjects);
     setShowFields(updatedShowFields);
     setTempIdCounter(newTempId);
+    setActiveIndex(updatedObjects.length - 1);
   }
 
-  const deleteField = index => {
-    let updatedObjects = [...objects];
-
+  const deleteField = (index) => {
+    const updatedObjects = [...objects];
     updatedObjects.splice(index, 1);
-
+  
     if (objects[index].tempId in customObjList) {
-      let updatedCustomsObjList = { ...customObjList };
+      const updatedCustomsObjList = { ...customObjList };
       delete updatedCustomsObjList[objects[index].tempId];
       setCustomObjList(updatedCustomsObjList);
     }
-    let indexOfId = showFields.indexOf(objects[index].tempId);
+  
+    const indexOfId = showFields.indexOf(objects[index].tempId);
     if (indexOfId >= 0) {
-      let updatedShowFields = [...showFields];
+      const updatedShowFields = [...showFields];
       updatedShowFields.splice(indexOfId, 1);
       setShowFields(updatedShowFields);
     }
-    // setObjects(updatedObjects);
-  }
+  
+    setObjects(updatedObjects);
+    setActiveIndex(activeIndex === index ? -1 : activeIndex);
+  };
 
   const handleInputs = (event, index) => {
     let updatedObjects = [...objects];
@@ -199,6 +206,7 @@ const ActionPanel = (props) => {
       setShowFields(updatedShowFields)
     }
   }
+ 
 
   const onSave = index => {
     let object = objects[index];
@@ -219,14 +227,17 @@ const ActionPanel = (props) => {
       userObjectElement_ICE(customFields)
         .then(data => {
           if (data === "unavailableLocalServer")
-            return null;
+            // return null;
+            toastErrorMsg(" Failed to create element - ICE not available")
+
           // setMsg(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`,VARIANT.ERROR));
 
           else if (data === "Invalid Session")
             return RedirectPage(history);
           else if (data === "fail")
-            return null;
+            // return null;
           // setMsg({VARIANT:VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object`});
+          toastErrorMsg(" Failed to create element - ICE not available")
           else {
             let customObject = {
               custname: `${object.objName}_${elementType}`,
@@ -242,7 +253,7 @@ const ActionPanel = (props) => {
             updatedShowFields.splice(indexOfId, 1);
             setShowFields(updatedShowFields);
             setCustomObjList(customObjectsList);
-            onSubmit(customObjectsList);
+            // onSubmit(customObjectsList);
           }
         })
         .catch(error => console.error(error));
@@ -266,6 +277,7 @@ const ActionPanel = (props) => {
       if (errorFlag) {
         setError(errorObj);
         // setMsg(MSG.CUSTOM(`Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`,VARIANT.ERROR));
+        toastErrorMsg("Object Characteristics are same ")
       }
       else {
         props.utils.modifyScrapeItem(props.utils.object.val, {
@@ -349,22 +361,25 @@ const ActionPanel = (props) => {
         props.setNewScrapedData(updatedNewScrapeData);
         props.updateScrapeItems(localScrapeList)
         // props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
-        props.setCapturedDataToSave((oldCapturedDataToSave) => [...oldCapturedDataToSave, {
-          isCustom: true,
-          ...viewArray[0],
-          tempOrderId: newOrderList[0]
-        }]);
-        props.setCaptureData(oldOrderList => [...oldOrderList, {
-          selectall: updatedNewScrapeData.view[0].custname,
-          objectProperty: updatedNewScrapeData.view[0].tag,
-          browserscrape: 'google chrome',
-          screenshots: "",
-          actions: '',
-          objectDetails: updatedNewScrapeData.view[0]
-        }])
+        props.setCapturedDataToSave((oldCapturedDataToSave) => [...oldCapturedDataToSave, ...viewArray.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
+            isCustom: true,
+            ...viewArray[newlyCreatedElemIndex],
+            tempOrderId: newOrderList[newlyCreatedElemIndex]
+          }))
+        ]);
+        props.setCaptureData(oldOrderList => [...oldOrderList, ...updatedNewScrapeData.view.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
+            selectall: updatedNewScrapeData.view[newlyCreatedElemIndex].custname,
+            objectProperty: updatedNewScrapeData.view[newlyCreatedElemIndex].tag,
+            browserscrape: 'google chrome',
+            screenshots: "",
+            actions: '',
+            objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex]
+          }))
+        ]);
         props.setSaved({ flag: false });
         props.setShow(false);
         // setMsg(MSG.SCRAPE.SUCC_OBJ_CREATE);
+
       }
     }
   }
@@ -458,10 +473,7 @@ const ActionPanel = (props) => {
   const createElementFooter = (
     <div className='save_clear'>
       <button className='add_object_clear' >Clear</button>
-      <button className='add_object_save' onClick={() => {
-        onSave(0);
-        // onSubmit();
-      }}>Save</button>
+      <button className='add_object_save'  onClick={() => { onSubmit(customObjList); }} disabled={objects.length == 0}>Submit</button>
     </div>
   );
   const handleInputChange = (e) => {
@@ -483,7 +495,7 @@ const ActionPanel = (props) => {
   const onDragOver = event => event.preventDefault();
 
   const onDrop = (event, currObject) => {
-    if (map[currObject.val]) setErrorMsg("Object already merged");
+    if (map[currObject.val]) props.toastError("Object already merged");
     else {
       let draggedObject = JSON.parse(event.dataTransfer.getData("object"));
       let mapping = {
@@ -492,19 +504,18 @@ const ActionPanel = (props) => {
         [draggedObject.val]: null
       }
       setMap(mapping);
-      setErrorMsg("");
     }
   }
 
   const onUnlink = () => {
     let mapping = { ...map };
-    for (let customObjVal of selectedItem) {
+    for (let customObjVal of selectedItems) {
       let scrapeObjVal = mapping[customObjVal][0].val
       delete mapping[customObjVal];
       delete mapping[scrapeObjVal];
     }
     setMap(mapping);
-    setSelectedItem([]);
+    setSelectedItems([]);
     setShowName("");
   }
 
@@ -513,16 +524,16 @@ const ActionPanel = (props) => {
   const submitMap = () => {
 
     if (!Object.keys(map).length) {
-      setErrorMsg("Please select atleast one object to Map");
+      props.toastError("Please select atleast one object to Map");
       return;
     }
 
     // let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
-    let appType = props.appType;
+    let appType = props.appType ? props.appType : "web"; //props.appType;
     const screenId = props.fetchingDetails["_id"];
     const projectId = props.fetchingDetails.projectID;
     const screenName = props.fetchingDetails["name"];
-    const versionNumber = 0
+    const versionNumber = 0;
 
     let arg = {
       projectId: projectId,
@@ -549,36 +560,35 @@ const ActionPanel = (props) => {
         else props.fetchScrapeData()
           .then(resp => {
             if (resp === "success") {
+              props.toastSuccess(MSG.SCRAPE.SUCC_MAPPED_SCRAPED);
               props.setShow(false);
-              console.log(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
             }
-            else console.log(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+            else props.toastError(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
           })
           .catch(err => {
-            console.log(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+            props.toastError(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
             // console.error(err);
           });
       })
       .catch(error => {
-        console.log(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
-        console.err(error);
+        props.toastError(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+        props.toastError(error);
       })
   }
 
   const onCustomClick = (showName, id) => {
-    let updatedSelectedItems = [...selectedItem]
-    let indexOfItem = selectedItem.indexOf(id);
+    let updatedSelectedItems = [...selectedItems]
+    let indexOfItem = selectedItems.indexOf(id);
 
     if (indexOfItem > -1) updatedSelectedItems.splice(indexOfItem, 1);
     else updatedSelectedItems.push(id);
 
     setShowName(showName);
-    setSelectedItem(updatedSelectedItems);
+    setSelectedItems(updatedSelectedItems);
   }
 
 
   const mapElementFooter = () => (<>
-    {errorMsg && <span data-test="errorMessage" className="mo_errorMsg">{errorMsg}</span>}
     <Button data-test="showAll" size="small" onClick={onShowAllObjects}>Show All Elements</Button>
     <Button data-test="unLink" size="small" onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</Button>
     <Button data-test="submit" size="small" onClick={submitMap}>Submit</Button>
@@ -591,35 +601,50 @@ const ActionPanel = (props) => {
     </div>
   )
 
-  const renderAccordionHeader = (objName) => {
+  const renderAccordionHeader = (objName,index,objects) => {
     return (
       <div className="accordion-header">
-        <div style={{ marginTop: "1rem" }}>{(objName === "") ? "Element 1" : objName}</div>
+        <div style={{ marginTop: "3rem" }}>{(objName === "") ? `Element ${index+1}` : objName}</div>
         <div className="accordion-actions">
+        <Button label="Save" severity="secondary" text className='save-btn' onClick={()=>onSave(index)} />
           <button className=" pi pi-plus button-add" onClick={newField} />
-          <button className=" pi pi-trash button-delete" />
+          <button className=" pi pi-trash button-delete" disabled={objects.length == 1} onClick={()=>deleteField(index)} />
         </div>
       </div>
     );
   };
 
+
+  const onTabChanging = (e) => {
+    setSelectedTag(e.originalEvent.currentTarget.innerText);
+    console.log("OnTabChange", e);
+    console.log("OnTabChange", e.originalEvent.currentTarget.innerText);
+  }
+
   return (
     <>
-      <Toast ref={toast} position="bottom-center" baseZIndex={1000}></Toast>
-      <Dialog className='add__object__header' header='Add Element' visible={props.isOpen === 'addObject'} onHide={props.OnClose} style={{ height: "28.06rem", width: "38.06rem" }} position='right' footer={addElementfooter}>
+      <Toast ref={toast} position="bottom-center" baseZIndex={1200}></Toast>
+      <Dialog
+        className='add__object__header'
+        header='Add Element'
+        visible={props.isOpen === 'addObject'}
+        onHide={props.OnClose}
+        style={{ height: "28.06rem", width: "38.06rem", marginRight: "15rem" }}
+        position='right'
+        footer={addElementfooter}>
         <div className='card__add_object'>
           <Card className='add_object__left'>
             <div className='flex flex-column'>
               <div className="pb-3">
                 <label className='text-left pl-4' htmlFor="object__dropdown">Select Element Type</label>
                 <Dropdown value={addElementSelectObjectType} onChange={handleAddElementDropdownChange} options={objectTypes} optionLabel="name"
-                  placeholder="Search" className="w-full md:w-15rem object__dropdown" />
+                  placeholder="Search" className="w-full mt-1 md:w-15rem object__dropdown" />
               </div>
               <div className="pb-5">
                 <label className='text-left pl-4' htmlFor="Element_name">Enter Element Name</label>
                 <InputText
                   type="text"
-                  className='Element_name p-inputtext-sm'
+                  className='Element_name p-inputtext-sm mt-1'
                   value={addElementInputValue}
                   onChange={handleAddElementInputChange}
                   placeholder='Text Input'
@@ -643,42 +668,47 @@ const ActionPanel = (props) => {
 
       {<Dialog
         className='map__object__header'
-        header="Map Object"
-        style={{ height: "28.06rem", width: "38.06rem" }}
+        header={"Map Element"}
+        style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
+        position='right'
         visible={props.isOpen === 'mapObject'}
         onHide={props.OnClose}
-        footer={mapElementFooter} >
-        <p className='text__content'>Please select the object type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
-        <div className="flex flex-row">
-          <Card className="ml-4">
-            <p>Captured Elements</p>
-            {selectedTag ? scrapedList[selectedTag] : nonCustomList.map((object, i) => {
-              let mapped = object.val in map;
+        footer={mapElementFooter}
+      >
 
-              return (<div data-test="mapObjectListItem" key={i} title={object.title} className={"ss__mo_listItem" + (mapped ? " mo_mapped" : "")} draggable={mapped ? "false" : "true"} onDragStart={(e) => onDragStart(e, object)}>
-                {object.custname}
-              </div>)
-            })
-            }
-          </Card>
-          <Card className="w-8">
-            <p>Custom Elements</p>
-            <div className="flex flex-column">
-              {Object.keys(customList).map((elementType, i) => (<>
-                <div className="card">
-                  <Accordion activeIndex={0}>
-                    <AccordionTab header={elementType} onTabChange={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>
-                    {/* {selectedTag === elementType &&  */}
-                      <div className="mo_tagItemList">
-                        {customList[elementType].map((object, j) =>
-                          <div
-                            data-test="mapObjectCustomListItem"
+        <p> Please select the Element type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
+        <div className="map_element_content ">
+          <div className="captured_elements">
+            <span className="header">Captured Elements</span>
+            <div className="list">
+              {(selectedTag ? scrapedList[selectedTag] : nonCustomList).map((object, i) => {
+                let mapped = object.val in map;
+
+                return (<div data-test="mapObjectListItem" key={i} title={object.title} className={"ss__mo_listItem" + (mapped ? " mo_mapped" : "")} draggable={mapped ? "false" : "true"} onDragStart={(e) => onDragStart(e, object)}>
+                  {object.custname}
+                </div>)
+              })
+              }
+            </div>
+          </div>
+
+          <div className="custom_element">
+            <span className="header">Custom Elements</span>
+            <div className="container">
+              {Object.keys(customList).map((elementType, i) => (
+                <>
+                  <Accordion activeIndex={activeIndex} onTabOpen={(e) => { setActiveIndex(e.index); onTabChanging(e) }} onTabClose={() => { setActiveIndex(""); setSelectedTag("") }}>
+                    <AccordionTab header={elementType} >
+                      {<div className="mo_tagItemList">
+
+                        {customList[elementType].map((object, j) => (
+
+                          <div data-test="mapObjectCustomListItem"
                             key={j} title={object.title}
-                            className={"mo_tagItems" +
-                              (selectedItem.includes(object.val) ? " mo_selectedTag" : "")}
+                            className={"mo_tagItems" + (selectedItems.includes(object.val) ? " mo_selectedTag" : "")}
                             onDragOver={onDragOver}
-                            onDrop={(e) => onDrop(e, object)}
-                          >
+                            onDrop={(e) => onDrop(e, object)}>
+
                             {object.val in map ?
                               <>
                                 <span data-test="mapObjectMappedName" className="mo_mappedName" onClick={() => onCustomClick("", object.val)}>
@@ -686,34 +716,41 @@ const ActionPanel = (props) => {
                                 </span>
                                 <span data-test="mapObjectFlipName" className="mo_nameFlip" onClick={() => onCustomClick(object.val, object.val)}></span>
                               </> :
-                              <span data-test="h3">{object.title}</span>}
-                          </div>)}
+                              <span data-test="h3" className='pl-1'>{object.title}</span>}
+
+                          </div>))}
                       </div>
-                      {/* } */}
+                      }
                     </AccordionTab>
                   </Accordion>
-                </div>
-                {/* <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>{elementType}</div> */}
 
-              </>))}
+                  {/* <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>{elementType}</div> */}
+
+                </>))}
             </div>
-          </Card>
+          </div>
         </div>
       </Dialog >}
 
-      <Dialog className='create__object__modal' header='Create Element' style={{ height: "40rem", width: "50.06rem" }} visible={props.isOpen === 'createObject'} onHide={props.OnClose} footer={createElementFooter}>
-        <Accordion activeIndex={0}>
+      <Dialog
+        className='create__object__modal' header='Create Element'
+        style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
+        position='right'
+        visible={props.isOpen === 'createObject'}
+        onHide={props.OnClose}
+        footer={createElementFooter}>
+        <Accordion activeIndex={activeIndex}>
           {objects.map((object, index) => (
-            <AccordionTab className="accordin__elem" header={renderAccordionHeader(object.objName)}>
+            <AccordionTab className="accordin__elem" key={object.tempId}  header={renderAccordionHeader(object.objName, index, objects)}>
               <div className='create_obj'>
                 <div className='create__left__panel'>
                   <div className='create-elem'>
                     <span className='object__text'>Element Name <span style={{ color: "red" }}> *</span> </span>
-                    <InputText required className='input__text' type='text' name="objName" onChange={(e) => handleInputs(e, 0)} value={object.objName} disabled={!showFields.includes(object.tempId)} />
+                    <InputText required className='input__text' type='text' name="objName" onChange={(e) => handleInputs(e, index)} value={object.objName} disabled={!showFields.includes(object.tempId)} />
                   </div>
                   <div className='create-elem'>
                     <p>Select Element Type <span style={{ color: "red" }}> *</span></p>
-                    <Dropdown value={object.objType} required onChange={(e) => handleType(e, 0)} disabled={!showFields.includes(object.tempId)} options={
+                    <Dropdown value={object.objType} required onChange={(e) => handleType(e, index)} disabled={!showFields.includes(object.tempId)} options={
                       objectTypes.map((objectType, i) => (
                         {
                           code: `${objectType.value}-${objectType.typeOfElement}`,
@@ -723,38 +760,42 @@ const ActionPanel = (props) => {
                     } optionLabel="name"
                       placeholder="Search" className="creat_object_dropdown w-22rem" />
                   </div>
-                  {showFields.includes(object.tempId) &&
+                  {/* {showFields.includes(object.tempId) && */}
                     <>
                       <div className='create-elem'>
                         <span className='object__text'>URL <span style={{ color: "red" }}> *</span></span>
-                        <InputText required className='input__text' type='text' name="url" onChange={(e) => handleInputs(e, 0)} value={object.url} />
+                        <InputText required className='input__text' type='text' name="url" onChange={(e) => handleInputs(e, index)} value={object.url} />
                       </div>
                       <div className='create-elem'>
-                        <span className='object__text'>Name <span style={{ color: "red" }}> *</span></span>
-                        <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, 0)} value={object.name} />
+                        <span className='object__text'>Name Attribute <span style={{ color: "red" }}> *</span></span>
+                        <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
                       </div>
                       <div className='create-elem'>
-                        <span className='object__text' >Relative Xpath <span style={{ color: "red" }}> *</span></span>
-                        <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, 0)} value={object.relXpath} />
+                        <span className='object__text' >Relative Xpath</span>
+                        <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, index)} value={object.relXpath} />
                       </div>
                       <div className='create-elem'>
                         <span className='object__text'>Class Name </span>
-                        <InputText className='input__text' type='text' name="className" onChange={(e) => handleInputs(e, 0)} value={object.className} />
+                        <InputText className='input__text' type='text' name="className" onChange={(e) => handleInputs(e, index)} value={object.className} />
                       </div>
                       <div className='create-elem'>
-                        <span className='object__text'>ID </span>
-                        <InputText required className='input__text' type='text' name="id" onChange={(e) => handleInputs(e, 0)} value={object.id} />
+                        <span className='object__text'>ID Attribute</span>
+                        <InputText required className='input__text' type='text' name="id" onChange={(e) => handleInputs(e, index)} value={object.id} />
                       </div>
                       <div className='create-elem'>
                         <span className='object__text'>Query Selector</span>
-                        <InputText className='input__text' type='text' name="qSelect" onChange={(e) => handleInputs(e, 0)} value={object.qSelect} />
+                        <InputText className='input__text' type='text' name="qSelect" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
                       </div>
                       <div className='create-elem'>
                         <span className='object__text'>Absolute Xpath</span>
-                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, 0)} value={object.absXpath} />
+                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.absXpath} />
+                      </div>
+                      <div className='create-elem'>
+                        <span className='object__text'>CSS Selector</span>
+                        <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
                       </div>
                     </>
-                  }
+                  {/* } */}
                 </div>
               </div>
             </AccordionTab>
@@ -765,7 +806,13 @@ const ActionPanel = (props) => {
 
       </Dialog>
 
-      <Dialog className='compare__object__modal' header="Compare Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={props.isOpen === 'compareObject'} onHide={props.OnClose} footer={footerCompare}>
+      <Dialog
+        className='compare__object__modal'
+        header="Compare Object:Sign up screen 1"
+        style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
+        position='right'
+        visible={props.isOpen === 'compareObject'}
+        onHide={props.OnClose} footer={footerCompare}>
         <div className='compare__object'>
           <span className='compare__btn'>
             <p className='compare__text'>List Of Browsers</p>
@@ -784,4 +831,4 @@ const ActionPanel = (props) => {
   );
 }
 
-export default ActionPanel
+export default ActionPanel;

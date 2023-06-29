@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .Topbar_Menu{
     .Header_size {
     position: relative;
@@ -23,11 +24,14 @@
     line-height: 2.4rem;
     position: relative;
     right: 35rem;
+    top: 0.5rem;
+    font: $f6_regular;
 }
 
 .active {
     color: #605BFF;
     border-bottom: 2px solid #605BFF;
+    font: $f6_semibold;
 }
 .activeLanding{
     color: transparent;
@@ -37,7 +41,7 @@
 {
     position: absolute;
     z-index: 4;
-    top: 43rem;
+    top: 41rem;
     left: 92rem;
     border-radius: 3rem;
     padding: 1rem;
@@ -49,10 +53,26 @@
     position: absolute;
     right: 1.5rem;
     bottom: 2.2rem;
+    // .p-menu .p-submenu-header{
+    //     font: $f6_semibold !important;
+    // }
+    // .p-menuitem{
+    //     font: $f6_regular !important;
+    // }
 }
 .needHelp_img{
     height:1rem;
     width: 1.2rem;
+    cursor: pointer;
+}
+#needHelp_font{
+    .p-submenu-header{
+        font: $f6_semibold !important;
+    }
+    .p-menuitem-text{
+        font: $f6_regular !important;  
+    }
+
 }
 }
 

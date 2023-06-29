@@ -8,7 +8,9 @@ import '../styles/ExportMapButton.scss'
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { dispatch } from 'd3';
-
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
 /*Component ExportMapButton
   use: renders ExportMapButton and popups for selection on click 
 */
@@ -92,7 +94,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
         setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);
         setExportFile(false)
         
-        var ftype = ftypeRef.current.value
+        var ftype = ftypeRef.current.props.value
         var fname=projectList[selectedProj]["name"];
         var exportProjId=projectList[selectedProj]["id"];
         var exportProjAppType=projectList[selectedProj]["apptypeName"];
@@ -104,13 +106,9 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     }
     return(
         <Fragment>
-            {exportBox?<ModalContainer
-            title='Export MindMap'
-            close={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}
-            footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} 
-            expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}/>} 
-            />:null}
+            <Dialog className='exportDialog' header='Export MindMap' onHide={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}  visible={exportBox} style={{ width: '50vw' }} footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>} >
+                    <Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport} />
+            </Dialog>
             <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)} >
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
@@ -125,9 +123,9 @@ const validate = (arr) =>{
     var err = false;
     arr.forEach((e)=>{
         if(e.current){
-            e.current.style.borderColor = 'black'
-            if(!e.current.value || e.current.value ==='def-option'){
-                e.current.style.borderColor = 'red'
+            // e.current.style.borderColor = 'black'
+            if(!e.current.props.value || e.current.props.value ==='def-option'){
+                // e.current.style.borderColor = 'red'
                 err = true
             }
         }
@@ -137,15 +135,18 @@ const validate = (arr) =>{
 
 
 const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,setExpType,setError,selectedProj,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile,getExportFile,showMessage,enableExport}) =>{
-    
+    const [selectedExport, setSelectedExport] = useState(null);
+    const [projectValue, setProjectValue] = useState(null);
     const changeExport = (e) => {
         
         setExpType(e.target.value);
         setCurrProjId(e.target.value);
         resetImportModule(e.target.value);
+        setProjectValue(e.value)
     }
     const changeExportFile=(e) =>{
         setExpType(e.target.value);
+        setSelectedExport(e.value)
     }
     const resetImportModule = async(selProj) => {
           if(selProj) {
@@ -161,13 +162,13 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
                
       }
     const check=(e)=>{
-      if (e.target.id=="select export to project"&& e.target.checked){
+      if (e.target.id==="select export to project"&& e.target.checked){
         document.getElementById("Export To File").checked=false;
         setExpType(null)
         setExportProject(true)
         setExportFile(false)
       }
-      if (e.target.id=="Export To File" && e.target.checked){
+      if (e.target.id==="Export To File" && e.target.checked){
         document.getElementById("select export to project").checked=false;
         setExportProject(false)
         setCurrProjId(null)
@@ -176,42 +177,92 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
       }
 
     }
+    const exportItem = [
+        { name: 'Select Import Format', code: 'NY', value:'def-val', disabled:true },
+        { name: 'Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'excel',disabled:!isEndtoEnd?false:true},
+        { name: 'Structure only - Json (.json)', code: 'LDN', value:'custom', disabled:isAssign?false:true },
+        { name: 'Complete Module(S) (.zip)', code: 'IST', value:'json' , disabled:!isEndtoEnd?false:true}
+    ]
+    const exportProjectItem = Object.entries(projectList).map((e)=>{
+                    let appTypeName = ''
+                    for (let projects in projectList) {
+                        if(projectList[projects].id === selectedProj) {
+                            appTypeName = projectList[projects]['apptypeName']
+                            break;
+                        }
+                    }
+                    if(e[1].apptypeName === appTypeName)return { name:e[1].name, value:e[1].id, key:e[0]}      
+        })
+        console.log(exportProjectItem)
     return(
         <div>
             <div>
                 <div className='export-rec-row'>
-             <label> <input type="radio" id ="select export to project"  checked ={exportProject} onChange={check}/> Copy To Project </label>
-               {exportProject && <select defaultValue={'def-option'} disabled={exportFile} ref={ftypeRef} onChange={changeExport}>
-                <option value={'def-val-project'}>Select Project</option>
-                            {(()=>{
+             <label htmlFor='ExportProject'> <input type="radio" id ="select export to project"  checked ={exportProject} onChange={check}/> Copy To Project </label>
+               {exportProject && <>
+               <Dropdown
+                    inputId="ExportProject"
+                    name="project"
+                    ref={ftypeRef}
+                    value={projectValue}
+                    options={exportProjectItem}
+                    optionLabel="name"
+                    placeholder="Select Project"
+                    className="imp-inp"
+                    disabled={exportFile}
+                    style={{width:'20rem', marginLeft:'4rem'}}
+                    defaultValue={'def-option'}
+                    onChange={(e)=>changeExport(e)}
+                />
+            {/* //    <select defaultValue={'def-option'} disabled={exportFile} ref={ftypeRef} onChange={changeExport}>
+            //     <option value={'def-val-project'}>Select Project</option>
+            //                 {(()=>{
+                                 */}
                                 
-                                
-                                let appTypeName = ''
-                                for (let projects in projectList) {
-                                    if(projectList[projects].id == selectedProj) {
-                                        appTypeName = projectList[projects]['apptypeName']
-                                        break;
-                                    }
-                                }
+            {/* //                     let appTypeName = ''
+            //                     for (let projects in projectList) {
+            //                         if(projectList[projects].id == selectedProj) {
+            //                             appTypeName = projectList[projects]['apptypeName']
+            //                             break;
+            //                         }
+            //                     }
 
-                                return Object.entries(projectList).map((e)=>{
-                                        if(e[1].apptypeName == appTypeName)return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
-                                })
-                            })()       
-                            }
-                        </select>}</div>
+            //                     return Object.entries(projectList).map((e)=>{
+            //                             if(e[1].apptypeName == appTypeName)return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
+            //                     })
+            //                 })()       
+            //                 }
+            //             </select> */}
+                       </> }
+                    </div>
                 <div className='export-rec-row'>
-                <label ><input type="radio" id ="Export To File" onChange={check}/> Export To File </label>
-                {exportFile && <select defaultValue={'def-option'} disabled={exportProject} ref={ftypeRef} onChange={changeExportFile}>
-                    <option value={""} >Select Export Format</option>
-                    {isAssign && <option value={'custom'}>Structure only - Json (.json)</option>}
-                    {!isEndtoEnd &&
-                    <>
-                    <option value={'excel'}>Structure only- Excel (.xlx,.xlsx)</option>
-                    {/* <option value={'git'}disabled={selectedModulelist.length>1}>Git (.mm)</option> */}
-                    <option value={'json'}>Complete Module (.zip)</option>
-                    </>}
-                </select>}
+                <label htmlFor='Export'><input type="radio" id ="Export To File" onChange={check}/> Export To File </label>
+                {exportFile && <>
+                            <Dropdown
+                                inputId="Export"
+                                name="export"
+                                ref={ftypeRef}
+                                value={selectedExport}
+                                options={exportItem}
+                                optionLabel="name"
+                                placeholder="Select Export Format"
+                                className="imp-inp"
+                                disabled={exportProject}
+                                style={{width:'20rem', marginLeft:'4rem'}}
+                                defaultValue={'def-option'}
+                                onChange={(e)=>changeExportFile(e)}
+                            />
+                        {/* // <select defaultValue={'def-option'} disabled={exportProject} ref={ftypeRef} onChange={changeExportFile}>
+                        //     <option value={""} >Select Export Format</option>
+                        //     {isAssign && <option value={'custom'}>Structure only - Json (.json)</option>}
+                        //     {!isEndtoEnd && */}
+                        {/* //     <>
+                        //     <option value={'excel'}>Structure only- Excel (.xlx,.xlsx)</option>
+                        //     //<option value={'git'}disabled={selectedModulelist.length>1}>Git (.mm)</option>
+                        //     <option value={'json'}>Complete Module (.zip)</option>
+                        //     </>} */}
+                        {/* // </select>} */}
+                        </>}
                 </div>
             </div>
             {(expType === 'git')?
@@ -249,11 +300,9 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
 }
 const Footer = ({clickExport,clickExportProj,error,exportProject,enableExportMindmapButton}) => {
     return ((exportProject)? <div>
-       {error && <span style={{color:"red"}}>Please select a project which has no modules</span>}
-       <button disabled={ error} onClick={clickExportProj} >Export Project</button>
-       </div>:(!exportProject && enableExportMindmapButton)? <div><button onClick={clickExport}>Export</button> </div>:null
-       
-     
+       {error && <span style={{color:"red", position: 'absolute',left: '3rem'}}>Please select a project which has no modules</span>}
+       <Button disabled={ error} onClick={clickExportProj} label='Export Project' />
+       </div>:(!exportProject && enableExportMindmapButton)? <div><Button onClick={clickExport} label ='Export'/> </div>:null
       )} 
        
 

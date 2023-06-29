@@ -34,6 +34,7 @@ const CreateNew = ({importRedirect}) => {
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
   const isEnELoad = useSelector(state=>state.design.isEnELoad);
+  const Proj = useSelector(state=>state.landing.defaultSelectProject);
   
 
  
@@ -65,7 +66,7 @@ const CreateNew = ({importRedirect}) => {
             dispatch(selectedProj(selectProj?selectProj:res.projectId[0])) 
             var req={
                 tab:"endToend" || "tabCreate",
-                projectid:res.projectId[0],
+                projectid:Proj?Proj.projectId:res.projectId[0],
                 version:0,
                 cycId: null,
                 modName:"",
