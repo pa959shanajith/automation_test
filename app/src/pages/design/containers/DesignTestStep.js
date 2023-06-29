@@ -16,6 +16,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import { InputText } from 'primereact/inputtext';
 import Select from "react-select";
+import { ConfirmDialog } from 'primereact/confirmdialog';
 
 
 const DesignModal = (props) => {
@@ -64,9 +65,10 @@ const DesignModal = (props) => {
     const [newtestcase, setnewtestcase] = useState([screenLavelTestSteps.testCases]);
     const [rowExpandedName,setRowExpandedName] = useState({name:'',id:''});
     const [selectedTestCase, setSelectedTestCase] = useState(null);
+    const [visible, setVisible] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
-        "stepNo": '',
+        "stepNo": '1',
         "objectName": ' ',
         "custname": '',
         "keywordVal": '',
@@ -82,24 +84,7 @@ const DesignModal = (props) => {
     };
     let screenLevelTestCases=[]
     const parentScreen = props.fetchingDetails["parent"]["children"];
-    // useEffect(()=>{
-    //     const parentScreenId = () =>{
-    //         for (var i = 0; i < parentScreen.length; i++) {
-    //             if (props.fetchingDetails["name"] === parentScreen[i].name) {
-    //                 setIdx(i);
-    //                 return setShow({
-    //                     name: parentScreen[i].name,
-    //                     id: parentScreen[i]._id,
-    //                     parentName:props.fetchingDetails["parent"]['name'],
-    //                     parent_id:props.fetchingDetails["parent"]['_id'], 
-    //                     projectId:parentScreen[i].projectID, 
-    //                 });
-    //             }
-    //         }
-    //         return 0;
-    //     }
-    //     parentScreenId();
-    // },[parentScreen, props.fetchingDetails,idx])
+
     useEffect(() => {
         if (draggedFlag) {
             setStepSelect({ edit: false, check: [], highlight: [] });
@@ -130,18 +115,22 @@ const DesignModal = (props) => {
 
     useEffect(() => {
         if (imported) {
-            fetchTestCases()
-            .then(data=>{
-                if (data==="success") 
-                    setMsg(MSG.DESIGN.SUCC_TC_IMPORT);
-                else 
-                    setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
-                setImported(false)
-                setStepSelect({edit: false, check: [], highlight: []});
-                setChanged(false);
-                // headerCheckRef.current.indeterminate = false;
-            })
-            .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
+            for(var i = 0 ; i<parentScreen.length; i++){
+                fetchTestCases(i)
+                .then(data=>{
+                    if (data==="success") 
+                        // setMsg(MSG.DESIGN.SUCC_TC_IMPORT);
+                        toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:3000})
+                    else 
+                        // setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                        toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:2000})
+                    setImported(false)
+                    setStepSelect({edit: false, check: [], highlight: []});
+                    setChanged(false);
+                    // headerCheckRef.current.indeterminate = false;
+                })
+                .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
+            }
         }
         //eslint-disable-next-line
     }, [imported]);
@@ -158,7 +147,13 @@ const DesignModal = (props) => {
             }
         />
     )
-
+    useEffect(()=>{
+        let _expandedRow={}
+        _expandedRow[`${props.fetchingDetails['_id']}`]=true
+        setExpandedRows(_expandedRow)
+        setRowExpandedName({name:props.fetchingDetails['name'], id:props.fetchingDetails['_id']})
+        setSelectedTestCase({name:props.fetchingDetails['name'], id:props.fetchingDetails['_id']})
+    },[])
     useEffect(() => {
         if (Object.keys(userInfo).length) {
             //  && Object.keys(props.current_task).length) {
@@ -166,7 +161,7 @@ const DesignModal = (props) => {
                 fetchTestCases(i)
                 .then(data => {
                     data !== "success" &&
-                        setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                        toast.current.show({severity:'warn',summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT,life:2000});
                     //     setEdit(false);
                     // setStepSelect({ edit: false, check: [], highlight: [] });
                     // // headerCheckRef.current.indeterminate = false;
@@ -326,7 +321,7 @@ const DesignModal = (props) => {
                                     }
                                     setDraggable(false);
                                     screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id})
-                                    console.log("screen", screenLevelTestCases)
+                                    // console.log("screen", screenLevelTestCases)
                                     setTestCaseData([...testCaseData,testcaseArray]);
                                     setnewtestcase([...newtestcase, testcaseArray]); 
                                     setPastedTC([]);
@@ -340,8 +335,8 @@ const DesignModal = (props) => {
                                     setTestScriptData(null);
                                     setKeywordList(null);
                                     setObjNameList(null);
-                                    setMsg("Error getObjectType method! \r\n ", error);
-                                    setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                                    console.error("Error getObjectType method! \r\n ", error);
+                                    toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT,life:2000});
                                     reject("fail");
                                 });
                     })
@@ -351,8 +346,8 @@ const DesignModal = (props) => {
                         setTestScriptData(null);
                         setKeywordList(null);
                         setObjNameList(null);
-                        setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                        setMsg("Error getObjectType method! \r\n " + (error));
+                        toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT, life:2000});
+                        console.error("Error getObjectType method! \r\n " + (error));
                         reject("fail");
                     });
             })
@@ -362,8 +357,8 @@ const DesignModal = (props) => {
                 setTestScriptData(null);
                 setKeywordList(null);
                 setObjNameList(null);
-                setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                setMsg("Error getTestScriptData method! \r\n " + (error));
+                toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT, life:2000});
+                console.error("Error getTestScriptData method! \r\n " + (error));
                 reject("fail");
             });
         });
@@ -393,8 +388,9 @@ const DesignModal = (props) => {
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
                 let errorFlag = false;
-                let testCases = [...newtestcase]
-
+                let testCases = [];
+                let findData = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
+                testCases = [...findData.testCases]
                 for (let i = 0; i < testCases.length; i++) {
                     // let step = i + 1
                     // testCases[i].stepNo = step;
@@ -428,7 +424,6 @@ const DesignModal = (props) => {
                 }
 
                 if (!errorFlag) {
-                    if(props.fetchingDetails['name'] === showPopup.name){
                         DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, 0 /**versionnumber*/, import_status, pastedTC)
                         .then(data => {
                             if (data === "Invalid Session") return;
@@ -468,23 +463,27 @@ const DesignModal = (props) => {
                                                     .then(msg=>{
                                                         setChanged(false);
                                                         msg === "success"
-                                                        ? setMsg(MSG.DESIGN.SUCC_TC_SAVE)
-                                                        : setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND)
+                                                        ? toast.current.show({severity:"success", summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT , life:3000})
+                                                        : toast.current.show({severity:"warn", summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:2000})
                                                     })
                                                     .catch(error => {
-                                                        setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                                                        setMsg("Error: Fetch TestCase Failed ::::", error)
+                                                        // setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                                                        toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
+                                                        console.error("Error: Fetch TestCase Failed ::::", error)
                                                     });
-                                                } else setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                                                } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
+                                                // setMsg(MSG.DESIGN.ERR_SAVE_TC);
                                             })
                                             .catch(error => {
-                                                setMsg(MSG.DESIGN.ERR_SAVE_TC);
-                                                setMsg("Error::::", error)
+                                                // setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                                                toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
+                                                console.error("Error::::", error)
                                             })
                                 })
                                 .catch(error=> {
-                                    setMsg(MSG.DESIGN.ERR_SAVE_TC);
-                                    setMsg("Error:::::", error)
+                                    // setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                                    toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
+                                    console.error("Error:::::", error)
                                 });
                             }
                             else{
@@ -492,24 +491,27 @@ const DesignModal = (props) => {
                                 .then(data=>{
                                     setChanged(false);
                                     data === "success" 
-                                    ? setMsg(MSG.DESIGN.SUCC_TC_SAVE) 
-                                    : setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                                    ? toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT, life:3000}) 
+                                    : toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT, life:2000})
                                 })
                                 .catch(error=>{
-                                    setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                                    setMsg("Error: Fetch TestCase Failed ::::", error)
+                                    // setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                                    toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
+                                    console.error("Error: Fetch TestCase Failed ::::", error)
                                 });
                             }
-                        } else setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                        } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
+                        // setMsg(MSG.DESIGN.ERR_SAVE_TC);
                     })
                     .catch(error => { 
-                        setMsg(MSG.DESIGN.ERR_SAVE_TC);
-                        setMsg("Error::::", error);
+                        // setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                        toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_UNDEFINED_SID_TID.CONTENT , life:2000})
+                        console.error("Error::::", error);
                     });
                     errorFlag = false;
-                    }
                 }
-            } else setMsg(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
+            } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_UNDEFINED_SID_TID.CONTENT , life:2000}) 
+            // setMsg(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
         }
         setStepSelect({edit: false, check: [], highlight: []});
         // headerCheckRef.current.indeterminate = false;
@@ -519,26 +521,14 @@ const DesignModal = (props) => {
 
     const addRow = () => {
         let oldScreenLevelTestSTeps=[...screenLavelTestSteps]
-        // let newData = [];
-        // for(var n=0; screenLavelTestSteps.length>n;n++){
-        //     if(screenLavelTestSteps[n].name === rowExpandedName){
-        //         let oldTestCases = [...screenLavelTestSteps[n].testCases]
-        //         let emptyRowDataIndex={...emptyRowData,stepNo:String(oldTestCases.length+1)}
-        //         let emptyAddedRow=[...oldTestCases,emptyRowDataIndex]
-        //         newData.push(emptyAddedRow)
-        //     }
-        // }
-        // console.log("data",newData)
         let testCaseUpdated = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
         console.log(testCaseUpdated);
         let emptyRowDataIndex = { ...emptyRowData, stepNo: String(testCaseUpdated.testCases.length + 1) };
         let data = [...testCaseUpdated.testCases, emptyRowDataIndex];
         let updatedTestCase = { ...testCaseUpdated, testCases: data };
-        screenLavelTestSteps.find((screen, index) =>
-        screen.name === rowExpandedName.name?oldScreenLevelTestSTeps.splice(index, 1, updatedTestCase):oldScreenLevelTestSTeps)
+        let index=screenLavelTestSteps.findIndex(screen=>screen.name === rowExpandedName.name)
+        oldScreenLevelTestSTeps.splice(index, 1, updatedTestCase)
         setScreenLevelTastSteps(oldScreenLevelTestSTeps);
-            console.log("date",screenLavelTestSteps)
-        //         let emptyAddedRow=[...oldTestCases,emptyRowDataIndex]
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
@@ -555,9 +545,9 @@ const DesignModal = (props) => {
         if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
 
         // globalSelectedBrowserType = selectedBrowserType;5
-
+        let findTestCaseId = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
         if (dependencyTestCaseFlag) testcaseID = testCaseIDsList;
-        else testcaseID.push(props.fetchingDetails['_id']);
+        else testcaseID.push(findTestCaseId);
         setOverlay('Debug in Progress. Please Wait...');
         // ResetSession.start();
         DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
@@ -582,6 +572,7 @@ const DesignModal = (props) => {
                     dispatch(Modified(rows));
                     dispatch(SaveEnable(!saveEnable))
                     setMsg(MSG.DESIGN.SUCC_DEBUG);
+                    toast.current.show({severity: 'success',summary: 'Success', detail:MSG.DESIGN.SUCC_DEBUG.CONTENT, life:3000})
                 } else {
                     setMsg(data);
                 }										
@@ -590,7 +581,8 @@ const DesignModal = (props) => {
                 setOverlay("");
                 // ResetSession.end();
                 setMsg(MSG.DESIGN.ERR_DEBUG);
-                setMsg("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+                toast.current.show({severity:'error',summary: 'Error', detail:MSG.DESIGN.ERR_DEBUG.CONTENT, life:2000})
+                console.log("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
             });
     };
 
@@ -636,8 +628,9 @@ const DesignModal = (props) => {
     const hiddenInput = useRef(null);
 
     const exportTestCase =  () => {
-        let testCaseId = props.fetchingDetails['_id'];
-        let testCaseName = props.fetchingDetails['name'];
+        let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+        let testCaseId = findTestCaseData.id;
+        let testCaseName = findTestCaseData.name;
         // let versionnumber = fetchingDetails.versionnumber;
         
         DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, 0)
@@ -669,108 +662,121 @@ const DesignModal = (props) => {
             })
             .catch(error => console.error("ERROR::::", error));
     }
-    const onInputChange = (event) => {
-        let testCaseId = props.fetchingDetails['_id'];
-        let testCaseName = props.fetchingDetails['name'];
-        // let versionnumber = fetchingDetails.versionnumber;
-        // let appType = appType;
-        let import_status = true;
-        let flag = false;
 
-        let file = event.target.files[0];
-        let reader = new FileReader();
-        reader.onload = function (e) {
-            try{
-                hiddenInput.current.value = '';
-                if (file.name.split('.').pop().toLowerCase() === "json") {
-                    setOverlay("Loading...");
-                    let resultString = JSON.parse(reader.result);
-                    if (!Array.isArray(resultString)) 
-                        throw MSG.DESIGN.ERR_FILE_FORMAT
-                    for (let i = 0; i < resultString.length; i++) {
-                        if (!resultString[i].appType)
-                            throw MSG.DESIGN.ERR_JSON_IMPORT
-                        if (
-                            resultString[i].appType.toLowerCase() !== "generic" && 
-                            resultString[i].appType.toLowerCase() !== "pdf" &&
-                            resultString[i].appType !== props.appType
-                        ) 
-                            throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
-                    }
-                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, 0, import_status)
-                        .then(data => {
-                            setOverlay("");
-                            if (data === "Invalid Session") RedirectPage(history);
-                            if (data === "success") setImported(true);
-                        })
-                        .catch(error => {
-                            setOverlay("");
-                            console.error("ERROR::::", error)
-                        });
-                    
-                } else throw  setMsg(MSG.DESIGN.ERR_FILE_FORMAT);
-            }
-            catch(error){
-                setOverlay("");
-                if (typeof(error)==="object") setMsg(error);
-                else setMsg(MSG.DESIGN.ERR_TC_JSON_IMPORT)
-                console.error(error);
-            }
-        }
-        reader.readAsText(file);
-    }
-
-    const importTestCase = (overWrite) => {
-        
-        let testCaseId = props.fetchingDetails['_id'];
-        let testCaseName = props.fetchingDetails['name'];
-        // let versionnumber = fetchingDetails.versionnumber;
-        if(overWrite) setShowConfirmPop(false);
-
-        
-        DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName , 0 )
-        .then(response => {
-                if (response === "Invalid Session") RedirectPage(history);
-                if (response.testcase && response.testcase.length === 0 || overWrite) {
-                    // hiddenInput.current.click();
-                    // document.getElementById("importTestCaseField").click();
-                }
-                else{
-                    setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
-                }
-            })
-        .catch(error => console.error("ERROR::::", error));
-    }
-    const lowerList = [
-        {'title': 'Import Test Case', 'tooltip':'Import TestCase', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase()},
-        {'title': 'Export Test Case', 'tooltip':'Export TestCase', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportTestCase(),}
-    ]
     const headerTemplate = (
         <>
             <div>
                 <h5 className='dailog_header1'>Design Test Step</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
-                <div className='btn__grp'>
-                {/* {lowerList.map((icon, i) => <Thumbnail key={i} title={icon.title} tooltip={icon.tooltip} img={icon.img} action={icon.action} disable={icon.disable}/>)}
-                    <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/> */}
-                    <Button size='small' icon='pi pi-file-import' title='Import Test Steps' onClick={()=>importTestCase(props.fetchingDetails)} outlined/>
-                    <Button size='small' icon='pi pi-file-export'  title='Export Test Steps' onClick={()=>exportTestCase(props.fetchingDetails)} outlined/>
+            </div>
+        </>
+    );
+    const bodyHeader = ()=>{
+        let bodyData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+        const onInputChange = (event) => {
+            let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+            let testCaseId = findTestCaseData.id;
+            let testCaseName = findTestCaseData.name;
+            // let versionnumber = fetchingDetails.versionnumber;
+            // let appType = appType;
+            let import_status = true;
+            let flag = false;
+    
+            let file = event.target.files[0];
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                try{
+                    hiddenInput.current.value = '';
+                    if (file.name.split('.').pop().toLowerCase() === "json") {
+                        setOverlay("Loading...");
+                        let resultString = JSON.parse(reader.result);
+                        if (!Array.isArray(resultString)) 
+                            throw MSG.DESIGN.ERR_FILE_FORMAT
+                        for (let i = 0; i < resultString.length; i++) {
+                            if (!resultString[i].appType)
+                                throw MSG.DESIGN.ERR_JSON_IMPORT
+                            if (
+                                resultString[i].appType.toLowerCase() !== "generic" && 
+                                resultString[i].appType.toLowerCase() !== "pdf" &&
+                                resultString[i].appType !== props.appType
+                            ) 
+                                throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
+                        }
+                        DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, 0, import_status)
+                            .then(data => {
+                                setOverlay("");
+                                if (data === "Invalid Session") RedirectPage(history);
+                                if (data === "success") setImported(true);
+                            })
+                            .catch(error => {
+                                setOverlay("");
+                                console.error("ERROR::::", error)
+                            });
+                        
+                    } else throw  toast.current.show({severity:'error', summary:"Error", detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT, life:2000});
+                }
+                catch(error){
+                    setOverlay("");
+                    if (typeof(error)==="object") setMsg(error);
+                    else toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_TC_JSON_IMPORT.CONTENT, life:2000})
+                    // setMsg(MSG.DESIGN.ERR_TC_JSON_IMPORT)
+                    console.error(error);
+                }
+            }
+            reader.readAsText(file);
+        }
+    
+        const importTestCase = (overWrite) => {
+            
+            let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+            let testCaseId = findTestCaseData.id;
+            let testCaseName = findTestCaseData.name;
+            // let versionnumber = fetchingDetails.versionnumber;
+            if(overWrite) setShowConfirmPop(false);
+    
+            
+            DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName , 0 )
+            .then(response => {
+                    if (response === "Invalid Session") RedirectPage(history);
+                    // eslint-disable-next-line no-mixed-operators
+                    if (response.testcase && response.testcase.length === 0 || overWrite) {
+                        hiddenInput.current.click();
+                        // document.getElementById("importTestCaseField").click();
+                    }
+                    else{
+                        setVisible(true);
+                    }
+                })
+            .catch(error => console.error("ERROR::::", error));
+        }
+        return (
+            <>
+                <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
+                    header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
+            {bodyData && <div>
+                {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
+                    <i className='pi pi-file-import' style={{marginTop:'0.9rem'}} title='Import Test Steps' onClick={()=>importTestCase()} />
+                    <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
+                    <i className='pi pi-file-export' style={{marginTop:'0.9rem'}} title='Export Test Steps' onClick={()=>exportTestCase()} />
+                    <i className='pi pi-plus' style={{marginTop:'0.9rem'}} title='Add Test Step' onClick={()=>addRow()} />
+                    <i className='pi pi-save' style={{marginTop:'0.9rem'}} title='Save' onClick={()=>saveTestCases} />
+                    <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
                     <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' title='Debug' outlined></Button>
-                    <Button size='small' label='Add Test Step' title='Add Test Step' onClick={()=>addRow()}></Button>
-                </div>
-            </div>
-        </>
-    );
+                </div>:null}
+            </div>}
+            </>
+        );
+    }
 
-    const footerTemplate = (
-        <>
-            <div className='btn__grp'>
-               <Button size='small' label='Save' title='Save' onClick={saveTestCases} outlined></Button>
-              {selectedTestCases &&  <Button size='small' label='Delete' title='Delete' onClick={()=>setDeleteTestDialog(true)}></Button>}
-            </div>
-        </>
-    );
+    // const footerTemplate = (
+    //     <>
+    //         <div className='btn__grp'>
+    //            <Button size='small' label='Save' title='Save' onClick={saveTestCases} outlined></Button>
+    //           {selectedTestCases &&  <Button size='small' label='Delete' title='Delete' onClick={()=>setDeleteTestDialog(true)}></Button>}
+    //         </div>
+    //     </>
+    // );
 
     const emptyMessage = (
         <div className='empty__msg1'>
@@ -882,7 +888,7 @@ const DesignModal = (props) => {
                 label: "Show All"
             }
         }});
-console.log(optionKeyword)
+
         const getOptionLabel = (option) => {
             return (
               <div title={option.tooltip}>
@@ -954,28 +960,31 @@ console.log(optionKeyword)
     };
 
     const onRowEditComplete = (e) => {
-        let testcase = [...newtestcase];
+
+        let testcase = [...screenLavelTestSteps];
         let { newData, index } = e;
-        testcase[index] = newData;
+        let testCaseUpdate = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
+        testCaseUpdate.testCases[index] = newData
+        // testcase[index] = newData;
         setID(index)
-        setnewtestcase(testcase); 
+        setScreenLevelTastSteps(testcase); 
         setFocused(false);
-        
     };
         
     const deleteProduct = () => {
-        let testcases = newtestcase.filter(function(objFromA) {
+        let findData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+        let testcases = findData.testCases.filter(function(objFromA) {
             return !selectedTestCases.find(function(objFromB) {
                 return objFromA.stepNo === objFromB.stepNo
                 
             })
         })
         
-        setnewtestcase(testcases);
+        setScreenLevelTastSteps(testcases);
         setDeleteTestDialog(false);
         setTestCase(emptyRowData);
         setSelectedTestCases(null)
-        setMsg(MSG.CUSTOM('success full deleted test steps'));
+        toast.current.show({severity:'success', summary:'Success',detail:'success full deleted test steps', life:3000});
     };
         const hideDeleteProductDialog = () => {
             setDeleteTestDialog(false);
@@ -988,11 +997,16 @@ console.log(optionKeyword)
             </React.Fragment>
         );
         const reorderTestCases=(e)=>{
-                const reorderedTestcase=e.value
-                const newReorderedTestCases=reorderedTestcase.map((testcase,idx)=>{
-                    return {...testcase, [testcase.stepNo]:idx+1}
-                })
-                setnewtestcase(newReorderedTestCases)
+            let oldData = [...screenLavelTestSteps];
+            let findData = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
+            const reorderedTestcase = e.value;
+            const newReorderedTestCases = reorderedTestcase.map((testcase, idx) => {
+            return { ...testcase, stepNo: idx + 1 };
+            });
+            findData.testCases = newReorderedTestCases;
+            let index = screenLavelTestSteps.findIndex((screen) => screen.name === rowExpandedName.name);
+            oldData.splice(index, 1, findData);
+            setScreenLevelTastSteps(oldData);
         }
 
     const DependentTestCaseDialogHideHandler = () => {
@@ -1017,12 +1031,12 @@ console.log(optionKeyword)
         )
         setExpandedRows(_expandedRow)
         setRowExpandedName({name:event.data.name,id:event.data.id});
-        toast.current.show({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
+        // toast.current.show({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
     };
 
     const onRowCollapse = (event) => {
         setRowExpandedName({});
-        toast.current.show({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
+        // toast.current.show({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
     };
     
     const rowExpansionTemplate = (data) => {
@@ -1058,18 +1072,18 @@ console.log(optionKeyword)
     }
     return (
         <>
+        {/* <Toast ref={toast} position="bottom-center" /> */}
         {overlay && <ScreenOverlay content={overlay} />}
-        { showConfirmPop && ConfirmPopups() }
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)} footer={footerTemplate} >
+            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)}>
                 <div className='toggle__tab'>
-                    <Toast ref={toast} />
                     <DataTable value={screenLavelTestSteps.length>0?screenLavelTestSteps:[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>
                         <Column expander={allowExpansion} style={{ width: '5rem' }} />
                         <Column field="name" header="Name" sortable />
+                        <Column body={bodyHeader}/>
                     </DataTable>
                 </div>
             </Dialog>
