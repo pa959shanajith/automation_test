@@ -296,8 +296,15 @@
                                                     height: 20px;
                                                 }
                                                 .labelOfArrayText{
-                                                    padding-left: 1rem;
+                                                    padding-left: 0.5rem;
                                                 }
+                                            }
+                                        }
+                                        .p-tree-toggler{
+                                            height: 1rem;
+                                            width: 1rem;
+                                            .pi{
+                                                font-size: 0.8rem;
                                             }
                                         }
                                     }
@@ -423,27 +430,64 @@
                         display: flex;
                         overflow: hidden;
                         text-overflow: ellipsis;
-                        max-width: 91%;
+                        max-width: 97%;
                         max-height: 100%;
                         // border: 1px solid rgb(19, 225, 126);
                         padding-left: 1rem;
                         align-items: center;
-                    }
-
-                    .ScenarioName img {
+                        justify-content: space-between;
+                    
+                    .sceNme_Icon{
+                        display: flex;
+                        align-items: center;
+                        width: 19rem;
+                    img{
                         height: 25px;
                         width: 25px;
+                        margin-top: 2px;
                     }
-
-                    .ScenarioName h4 {
-                        font-size: 13px;
+                    h4{
+                        font-size: 15.5px;
                         font-family: "open sans";
                         font-weight: 400;
                         color: rgb(8, 8, 8, 1);
                         padding-left: 0.8rem;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        width: 9rem;
                     }
+                   
+                    .modIconSce {
+                        display: flex;
+                        h5{display: flex;
+                          font-size: 11px;
+                        img{
+                      
+                            height: 15px;
+                            width: 15px;
+                            // margin-top: 3px;
+                            }
+                        h3{
+                                font-size: 11px;
+                                font-family: "open sans";
+                                font-weight: 200;
+                                color: rgb(8, 8, 8, 1);
+                                // padding-left: 0.5rem;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                width: 9rem;
+                                margin-top: 1px;
+                            }
+                        }
+
+                    }
+                   }
+                   .p-button.p-button-icon-only.p-button-rounded{
+                    height:0.1rem;
+                    width: 1.6rem;
+                    margin-right: 0.5rem;
+                   }
+                   }
 
                     .ScenarioName i {
                         padding-left: 71%;
