@@ -47,6 +47,12 @@ const VerticalSteps = (props) => {
       (async () => {
           const ProgressStep = await getProjectIDs({ readme: "progressStep" });
           setProgressStepDetails(ProgressStep);
+          let findIndexOfStep = ProgressStep?.projectId?.indexOf(activeStep?.id);
+          if (ProgressStep && ProgressStep.progressStep && findIndexOfStep !== -1) {
+            let findStep= ProgressStep?.progressStep[findIndexOfStep]
+            setCurrentStep(findStep);
+            dispatch(updateSteps(findStep))
+            }
         })()
       },[])
 
@@ -82,7 +88,7 @@ const VerticalSteps = (props) => {
 
   return (
     <Card className='verticalcard' >
-      <h2 className= "GetStd">Get Started</h2>
+      <h2 className= "GetStd">{(activeStep.value > 0) ? "Welcome Back !" : "Get Started"}</h2>
       <Box > 
         <Stepper  className='Stepper' activeStep = {currentStep} orientation="vertical">
           {steps.map((step, index) => ( 

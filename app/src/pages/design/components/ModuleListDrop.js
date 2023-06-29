@@ -870,7 +870,7 @@ const ModuleListDrop = (props) =>{
                          <div className='inputSearchNorMod'>           
                                <span className="p-input-icon-left">
                                          <i className="pi pi-search" />
-                                         <InputText placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
+                                         <InputText placeholder="Search" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}} title=' Search for module'/>
                                 </span>
                          </div>    
          
@@ -937,7 +937,7 @@ const ModuleListDrop = (props) =>{
                     <div className='inputSearchNorMod'>           
                                <span className="p-input-icon-left">
                                          <i className="pi pi-search" />
-                                         <InputText placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                         <InputText placeholder="Search " ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)} title=' Search for  E2E module'/>
                                 </span>
                          </div> 
                     </div>      
