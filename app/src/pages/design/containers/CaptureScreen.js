@@ -95,6 +95,7 @@ const CaptureModal = (props) => {
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
+  let addMore = useRef(false);
 
   useEffect(() => {
     fetchScrapeData()
@@ -255,12 +256,18 @@ const CaptureModal = (props) => {
     }
   };
 
-  const toastSuccess = (SuccMessage) => {
-    toast.current.show({ severity: 'success', summary: 'Success', detail: SuccMessage, life: 10000 });
+  const toastError = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
   }
 
-  const toastError = (errMessage) => {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 1000 });
+  const toastSuccess = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -372,11 +379,16 @@ const CaptureModal = (props) => {
           else if (typeof data === "object" && props.appType !== "Webservice") {
             haveItems = data.view.length !== 0;
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
+            newlyScrapeList = newScrapeList
 
-            newlyScrapeList = newScrapeList;
+            if (!addMore.current) {
+              if (newlyScrapeList.length > 0 && capturedDataToSave.length >= 0) {
+                setCapturedDataToSave([...newScrapeList]);
+                viewString = newScrapeList;
+              }
+            }
 
             setMainScrapedData(data);
-            if (capturedDataToSave.length === 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
             setMirror({ scrape: data.mirror, compare: null });
             setNewScrapedData([]);
             setScrapeItems(newScrapeList);
@@ -517,7 +529,6 @@ const CaptureModal = (props) => {
     let views = [];
     let orderList = [];
     let modifiedObjects = Object.values(modified);
-    setCapturedDataToSave([]);
 
     for (let scrapeItem of scrapeItemsL) {
       if (!Array.isArray(scrapeItem)) {
@@ -547,6 +558,7 @@ const CaptureModal = (props) => {
         if (response === "Invalid Session") return null;
         else fetchScrapeData().then(resp => {
           if (resp === 'success' || typeof (resp) === "object") {
+
             typeof (resp) === "object" && resp.length > 0
               ? setShowPop({
                 title: "Saved Scrape Objects",
@@ -567,9 +579,8 @@ const CaptureModal = (props) => {
               : toastSuccess("Scraped Elements saved successfully.");
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
-          } else console.error(resp);
-        })
-          .catch(error => console.error(error));
+          } else { console.error(resp); addMore.current = true; }
+        }).catch(error => console.error(error));
       })
       .catch(error => console.error(error))
   }
@@ -661,7 +672,20 @@ const CaptureModal = (props) => {
 
           setNewScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
-          masterCapture ? setCapturedDataToSave([...scrapeItemList]) : setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+
+          if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
+            setCapturedDataToSave([...scrapeItemList])
+          }
+          else {
+            if (capturedDataToSave.length > 0) { //when click on addmore
+              addMore.current = true;
+              setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+            }
+            else { // when captured data is empty  
+              addMore.current = false;
+              setCapturedDataToSave([...scrapeItemList]);
+            }
+          }
           updateScrapeItems(scrapeItemList);
           setScrapedURL(updatedNewScrapeData.scrapedurl);
           setMirror({ scrape: viewString.mirror, compare: null });
@@ -669,7 +693,6 @@ const CaptureModal = (props) => {
 
           if (viewString.view.length > 0) setSaved({ flag: false });
           setEndScrape(true)
-
 
         }
       })
@@ -681,10 +704,6 @@ const CaptureModal = (props) => {
       });
 
   }
-
-
-
-
 
   const updateScrapeItems = newList => {
     setScrapeItems([...scrapeItems, ...newList])
@@ -750,7 +769,6 @@ const CaptureModal = (props) => {
   };
 
 
-
   const handleMouseLeaveRow = () => {
     setHoveredRow(null);
   };
@@ -810,6 +828,8 @@ const CaptureModal = (props) => {
     </div>
   );
 
+  const setAddmoreHandler = () => addMore.current = addMore.current && false;
+
   const footerSave = (
     <>
       {selectedCapturedElement?.length > 0 ? <Button label="Element Identifier Order" onClick={() => setShowIdentifierOrder(true)} ></Button> : null}
@@ -846,51 +866,6 @@ const CaptureModal = (props) => {
       }
     />
   )
-
-  // const showConfirmFooter=(
-  //   <>
-  //   <Button onClick={showConfirmPop.onClick}>
-  //       {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
-  //   </Button>
-  //   <Button onClick={()=>setShowConfirmPop(false)}>
-  //       {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
-  //   </Button>
-  //   </>
-  // )
-
-  //   const PopupDialog = () => (
-  //     // <ModalContainer 
-  //     //     title={showPop.title}
-  //     //     modalClass="modal-sm"
-  //     //     close={()=>setShowPop("")}
-  //     //     content={showPop.content}
-  //     //     footer={showPop.footer}
-  //     // />
-  //     <Dialog className="confirm__popup" header={showPop.title}  visible={showPop} onHide={()=>setShowPop("")} footer={showPop.footer}>
-  //      {showPop.content}
-  //     </Dialog>
-  // );
-
-  // const ConfirmPopup = () => (
-  //   // <ModalContainer 
-  //   //     title={showConfirmPop.title}
-  //   //     content={showConfirmPop.content}
-  //   //     close={()=>setShowConfirmPop(false)}
-  //   //     footer={
-  //   //         <>
-  //   //         <button onClick={showConfirmPop.onClick}>
-  //   //             {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
-  //   //         </button>
-  //   //         <button onClick={()=>setShowConfirmPop(false)}>
-  //   //             {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
-  //   //         </button>
-  //   //         </>
-  //   //     }
-  //   // />
-  //   <Dialog header={showConfirmPop.title}  visible={showConfirmPop} onHide={()=>setShowConfirmPop(false)}  footer={showConfirmFooter} >
-  //     {showConfirmPop.content}
-  //   </Dialog>
-  // )
 
   const confirmPopupMsg = (
     <div> <p>Note :This will completely refresh all <strong>Captured Elements</strong> on the screen. In case you want to Capture only additional elements use the <strong>"Add More"</strong> option </p></div>
@@ -1057,7 +1032,6 @@ const CaptureModal = (props) => {
     else if (!isCustom) setNewScrapedData(updNewScrapedData);
     if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
     setScrapeItems(localScrapeItems);
-    setCapturedDataToSave([]);
   }
 
   const onCellEditComplete = (e) => {
@@ -1070,7 +1044,7 @@ const CaptureModal = (props) => {
   }
 
   const cellEditor = (options) => {
-    return <InputText type="text" className="element_name" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} style={{ width: "25rem" }} tooltip={options.value} />;
+    return <InputText type="text" className="element_name" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} style={{ width: "25rem" }} tooltip={options.value} tooltipOptions={{ position: 'bottom' }} />;
   };
 
   const addedCustomElement = (addedElements, orderList) => {
@@ -1400,6 +1374,7 @@ const CaptureModal = (props) => {
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+        
       <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
@@ -1413,13 +1388,67 @@ const CaptureModal = (props) => {
           </span>
         </div>
       </Dialog>
-      {currentDialog === 'addObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} addCustomElement={addedCustomElement} />}
-      {currentDialog === 'mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} captureList={capturedDataToSave} />}
-      {currentDialog === 'replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-      {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} scrapeItems={scrapeItems} capturedDataToSave={capturedDataToSave} setCapturedDataToSave={setCapturedDataToSave} setNewScrapedData={setNewScrapedData} updateScrapeItems={updateScrapeItems} setOrderList={setOrderList} setSaved={setSaved} setShow={setCurrentDialog} setCaptureData={setCaptureData} />}
-      {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+
+      {currentDialog === 'addObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        addCustomElement={addedCustomElement}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'mapObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        captureList={capturedDataToSave}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        setShow={setCurrentDialog}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'replaceObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'createObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        scrapeItems={scrapeItems}
+        capturedDataToSave={capturedDataToSave}
+        setCapturedDataToSave={setCapturedDataToSave}
+        setNewScrapedData={setNewScrapedData}
+        updateScrapeItems={updateScrapeItems}
+        setOrderList={setOrderList}
+        setSaved={setSaved}
+        setShow={setCurrentDialog}
+        setCaptureData={setCaptureData}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'compareObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
       {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
-      {showObjModal === "importModal" && <ImportModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web" fetchingDetails={props.fetchingDetails} />}
+      {showObjModal === "importModal" && <ImportModal
+        fetchScrapeData={fetchScrapeData}
+        setOverlay={setOverlay}
+        setShow={setShowObjModal}
+        appType="Web"
+        fetchingDetails={props.fetchingDetails}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
       {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
       {/* //Element properties  */}
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
