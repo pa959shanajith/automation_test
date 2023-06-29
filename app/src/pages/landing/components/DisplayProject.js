@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useRef} from "react";
 import "../styles/DisplayProject.scss";
 import { Panel } from "primereact/panel";
 import { InputText } from "primereact/inputtext";
@@ -23,8 +23,12 @@ const DisplayProject = (props) => {
   const [selectedsortItems, setSelectedsortItems] = useState(null)
   const userInfo = useSelector((state) => state.landing.userinfo);
   const createdProject = useSelector((state) => state.landing.savedNewProject);
+  const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
+  const [showTooltip, setShowTooltip] = useState(false);
   // const defaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
   const dispatch = useDispatch();
+
+  const imageRefadd = useRef(null);
 
 
   const sortItems = [
@@ -33,6 +37,15 @@ const DisplayProject = (props) => {
     { label: "Alphabetical", value: "name", icon: selectedsortItems === 'Alphabetical' ? 'pi pi-check' : '', command: () => sortByName('Alphabetical') },
   ];
 
+  const handleTooltipToggle = () => {
+    const rect = imageRefadd.current.getBoundingClientRect();
+    setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave1 = () => {
+    setShowTooltip(false);
+  };
 
   useEffect(() => {
     if (filteredProjects && filteredProjects.length > 0) {
@@ -193,16 +206,27 @@ const DisplayProject = (props) => {
     return (
       <>
         <Tooltip target=".add_btn" position="bottom" content="Create Project" />
-        <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
+        {/* <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
+         */}
         <CreateProject visible={visible} onHide={handleCloseDialog} />
         {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color" />}
         <div className="flex flex-row All_Project"> 
           <div className="All_Project_font" >ALL PROJECTS</div>
           <div className="add_sort_btn">
             {userInfo.rolename === "Test Manager" ? (
-            <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
+            <button className="pi pi-plus add_btn" onClick={handleOpenDialog}  />
+           
+            
             ) : null}
-            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
+            {/* <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} /> */}
+            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu}  ref={imageRefadd} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}/>
+            {showTooltip && (
+              <div className='card__add' style={{ position: 'absolute', left: `${cardPosition.left - 80}px`, top: `${cardPosition.top- -20}px`, display: 'block' }}>
+                <h3> Sort projects</h3>
+                <p className='text__insprint__info1'>Click here to sort projects.</p>
+              
+              </div>
+            )}
           </div>
         </div>
       </>
@@ -219,7 +243,7 @@ const DisplayProject = (props) => {
       <Panel className="Project-Panel" headerTemplate={allProjectTemplate} >
         <div className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
-          <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} />
+          <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject}  title=" Search all projects."/>
         </div>
         <div className="project-list project">
           {filteredProjects.map((project) => (

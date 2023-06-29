@@ -16,8 +16,11 @@ const StaticElements = ({children}) => {
         <div className="login_container">
             <div className="split_left">
                 <h1>Hello,</h1>
-                <h2>Welcome to Avo  Assure</h2>
-                <h3>Login to experience Intelligence</h3>
+                <h2>Welcome to Avo  Assure!</h2>
+                <h3>
+  Experience the <span style={{color:"white"}}>next-gen</span> test automation platform
+</h3>
+
                 <img className="" src="static/imgs/animated_login.gif" alt="Login" />
             </div>
             <div className="split_right">

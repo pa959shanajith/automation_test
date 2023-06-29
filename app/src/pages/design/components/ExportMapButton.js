@@ -124,8 +124,13 @@ const validate = (arr) =>{
     arr.forEach((e)=>{
         if(e.current){
             // e.current.style.borderColor = 'black'
-            if(!e.current.props.value || e.current.props.value ==='def-option'){
-                // e.current.style.borderColor = 'red'
+            if(e.current.props){
+                if(e.current.props.value === 'def-option' || e.current.props.value === ''){
+                    err = true
+                }
+            }
+            else if(!e.current.value || e.current.props.value ==='def-option'){
+                e.current.style.borderColor = 'red'
                 err = true
             }
         }
