@@ -115,7 +115,13 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
+  const [startTime, setStartTime] = useState(null);
   const [selectedPattren, setSelectedPattren] = useState(null);
+  const [selectedDaily, setSelectedDaily] = useState(null);
+  const [selectedMonthly, setSelectedMonthly] = useState(null);
+  const [dropdownWeek, setDropdownWeek] = useState(null);
+  const [dropdownDay, setDropdownDay] = useState(null);
+  const [scheduleOption, setScheduleOption] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -132,8 +138,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
-
   const [activeIndex1, setActiveIndex1] = useState(0);
+  const timeinfo = useRef(null);
+  const scheduleinfo  = useRef(null);
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
@@ -894,12 +901,33 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     
   };
 
+  useEffect(() => {
+    if(scheduleOption?.monthday < 0 || scheduleOption?.monthday > 12){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-12)' });
+    }
+    if(scheduleOption?.everymonth < 0 || scheduleOption?.everymonth > 12){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-12)' });
+    }
+    if(scheduleOption?.everyday < 0 || scheduleOption?.everyday > 30){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-30)' });
+    }
+    if(scheduleOption?.monthweek < 0 || scheduleOption?.monthweek > 30){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-30)' });
+    }
+  }, [scheduleOption]);
+
   const onScheduleBtnClick = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_schedule(false);
+      setStartDate(null);
+      setStartTime(null);
     }
     if (btnType === "Schedule") {
-      setScheduling(true);
+      if((new Date(startTime) < new Date(Date.now() + (5 * 60 * 1000))) && (new Date(startDate).getTime() < new Date(startTime).getTime())) {
+        timeinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Schedule time must be 5 mins more than current time.' });
+      } else {
+        setScheduling(true);
+      }
     }
   };
 
@@ -919,8 +947,8 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
               type: "normal",
               targetUser: selectedICE,
               iceList: [],
-              date: startDate.toLocaleDateString('en-GB'),
-              time: `${startDate.getHours()}:${startDate.getMinutes()}`,
+              date: startDate.toLocaleDateString('es-CL'),
+              time: `${startTime.getHours()}:${startTime.getMinutes()}`,
               timestamp: startDate.getTime(),
               recurringValue: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
               recurringString: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
@@ -951,6 +979,13 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     }
   };
 
+  const onScheduleChange = (e) => {
+    setScheduleOption({
+      ...scheduleOption,
+      [e.target.name]: e.target.value
+    })
+  };
+
   const checkboxHeaderTemplate = () => {
     return (
       <>
@@ -960,7 +995,6 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     );
   };
  
-
   const renderTable = () => {
     if (!!configList.length) {
       return (
@@ -1103,6 +1137,8 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             
            
           />
+          <Toast ref={timeinfo} />
+          <Toast ref={scheduleinfo} />
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}
@@ -1112,18 +1148,30 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                 cardData={fetechConfig[configItem]}
                 startDate={startDate}
                 setStartDate={setStartDate}
+                startTime={startTime}
+                setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
+                isDisabled={!startDate}
+                onSchedule={onScheduleBtnClick}
+                selectedDaily={selectedDaily}
+                selectedMonthly={selectedMonthly}
+                dropdownWeek={dropdownWeek}
+                dropdownDay={dropdownDay} 
+                setSelectedDaily={setSelectedDaily}
+                setSelectedMonthly={setSelectedMonthly}
+                setDropdownWeek={setDropdownWeek}
+                setDropdownDay={setDropdownDay}
+                scheduleOption={scheduleOption}
+                onScheduleChange={onScheduleChange}
               />
             }
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
-            footerType="Schedule"
             modalSytle={{
               width: "75vw",
               height: "95vh",
               background: "#FFFFFF",
             }}
-            isDisabled={!startDate}
           />
           <AvoModal
             visible={scheduling}
