@@ -70,7 +70,7 @@ const MenubarDemo = (props) => {
 
   const start = (
     <NavLink to="/landing" className="activeLanding">
-      <img alt="logo" src="static/imgs/logo.png" onError={(e) => e.target.src = "static/imgs/logo.png"} height="30" className="mr-2"></img>
+      <img alt="logo" src="static/imgs/logo.png" onError={(e) => e.target.src = "static/imgs/logo.png"} height="30" className="mr-2" title="Go to Home"></img>
     </NavLink>
   );
 
@@ -92,7 +92,7 @@ const MenubarDemo = (props) => {
       <Menubar className='Header_size' start={start} end={end} />
       <div className="card needHelp flex justify-content-center bg-white shadow-2">
         <img className='needHelp_img' src="static/imgs/need_help.png" alt="need_Help" onClick={(event) => needHelpmenuLeft.current.toggle(event)} aria-controls="popup_menu_left" aria-haspopup/>
-        <Menu className='needHelp_Menu w-13rem top-50' model={needHelpItems} popup ref={needHelpmenuLeft}/>
+        <Menu className='needHelp_Menu w-13rem top-50'id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft}/>
       </div>
     </div>
   );

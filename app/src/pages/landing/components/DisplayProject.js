@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useRef} from "react";
 import "../styles/DisplayProject.scss";
 import { Panel } from "primereact/panel";
 import { InputText } from "primereact/inputtext";
@@ -23,8 +23,12 @@ const DisplayProject = (props) => {
   const [selectedsortItems, setSelectedsortItems] = useState(null)
   const userInfo = useSelector((state) => state.landing.userinfo);
   const createdProject = useSelector((state) => state.landing.savedNewProject);
+  const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
+  const [showTooltip, setShowTooltip] = useState(false);
   // const defaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
   const dispatch = useDispatch();
+
+  const imageRefadd = useRef(null);
 
 
   const sortItems = [
@@ -33,6 +37,15 @@ const DisplayProject = (props) => {
     { label: "Alphabetical", value: "name", icon: selectedsortItems === 'Alphabetical' ? 'pi pi-check' : '', command: () => sortByName('Alphabetical') },
   ];
 
+  const handleTooltipToggle = () => {
+    const rect = imageRefadd.current.getBoundingClientRect();
+    setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave1 = () => {
+    setShowTooltip(false);
+  };
 
   useEffect(() => {
     if (filteredProjects && filteredProjects.length > 0) {
@@ -51,25 +64,29 @@ const DisplayProject = (props) => {
     var timeDifference = currentDate.getTime() - previousDate.getTime();
     var seconds = Math.floor(timeDifference / 1000) % 60;
     var minutes = Math.floor(timeDifference / (1000 * 60)) % 60;
+    var minute_ago= minutes > 1 ?  " minutes" : " minute";
     var hours = Math.floor(timeDifference / (1000 * 60 * 60)) % 24;
+    var hours_ago= hours > 1 ?  " hours" : " hour";
     var days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
     var months = Math.floor(days / 30);
+    var months_ago= months > 1 ?  " months" : " month";
     var years = Math.floor(months / 12);
+    var years_ago= years > 1 ?  " years" : " year";
     var output = "";
     if (years == 0 && months == 0 && hours == 0 && minutes == 0 && seconds >= 0) {
       output = "Created now";
     }
     else if (years == 0 && months == 0 && hours == 0 && minutes >= 1) {
-      output = "Last modified " + minutes + "min ago";
+      output = "Last modified " + minutes + minute_ago +" ago";
     }
     else if (years == 0 && months == 0 && hours >= 1) {
-      output = "Last modified " + hours + "h ago";
+      output = "Last modified " + hours + hours_ago +" ago";
     }
     else if (years == 0 && months >= 1) {
-      output = "Last modified " + months + "months ago";
+      output = "Last modified " + inputDate.slice(5,11);
     }
     else {
-      output = "Last modified " + years + "y ago";
+      output = "Last modified " + years + years_ago + " ago";
     }
 
     return output;
@@ -182,22 +199,34 @@ const DisplayProject = (props) => {
     dispatch(loadUserInfoActions.setDefaultProject(defaultProject));
   }, [defaultProjectId, filteredProjects]);
 
+
   useEffect(() => { if (getProjectLists && getProjectLists.length > 0) { setDefaultProjectId(getProjectLists[0].projectId); } }, [getProjectLists]);
 
   const allProjectTemplate = () => {
     return (
       <>
         <Tooltip target=".add_btn" position="bottom" content="Create Project" />
-        <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
+        {/* <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
+         */}
         <CreateProject visible={visible} onHide={handleCloseDialog} />
         {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color" />}
         <div className="flex flex-row All_Project"> 
-          <div className="All_Project_font " >ALL PROJECTS</div>
+          <div className="All_Project_font" >ALL PROJECTS</div>
           <div className="add_sort_btn">
             {userInfo.rolename === "Test Manager" ? (
-            <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
+            <button className="pi pi-plus add_btn" onClick={handleOpenDialog}  />
+           
+            
             ) : null}
-            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
+            {/* <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} /> */}
+            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu}  ref={imageRefadd} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}/>
+            {showTooltip && (
+              <div className='card__add' style={{ position: 'absolute', left: `${cardPosition.left - 80}px`, top: `${cardPosition.top- -20}px`, display: 'block' }}>
+                <h3> Sort projects</h3>
+                <p className='text__insprint__info1'>Click here to sort projects.</p>
+              
+              </div>
+            )}
           </div>
         </div>
       </>
@@ -214,7 +243,7 @@ const DisplayProject = (props) => {
       <Panel className="Project-Panel" headerTemplate={allProjectTemplate} >
         <div className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
-          <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} />
+          <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject}  title=" Search all projects."/>
         </div>
         <div className="project-list project">
           {filteredProjects.map((project) => (

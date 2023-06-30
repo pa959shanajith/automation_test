@@ -47,8 +47,8 @@ const UserDemo = (props) => {
                                 label={ !userInfo.userimage ? initials :''}
                                 onClick={handleUserMenu} size="xlarge" shape="circle"/>
                                 <div className="flex flex-column">
-                                    <span className="font-bold c">{userInfo.username}</span>
-                                    <span className="text-sm c">{userInfo.rolename}</span>
+                                    <span className="font-bold user_name">{userInfo.username}</span>
+                                    <span className="text-sm user_role">{userInfo.rolename}</span>
                                     <Tooltip target=".tooltipEmailId" position="left" content={userInfo.email_id}/>
                                     <span className="text-sm max-w-12rem tooltipEmailId">{userInfo.email_id}</span>
                                 </div>
