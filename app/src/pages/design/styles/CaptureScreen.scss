@@ -163,7 +163,7 @@
   position:relative;
   right:16%;
   font-size: 1.5rem;
-  cursor: pointer;
+  cursor: pointer !important;
      &:hover{
       background: #e9ecef;
       border-color: transparent;
@@ -175,7 +175,7 @@
   position: relative;
   left: 3%;
   font-size: 1.5rem;
-  cursor: pointer;
+  cursor: pointer !important;
     &:hover{
       background: #e9ecef;
       border-color: transparent;
@@ -685,11 +685,20 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 8rem;
+  max-width: 25rem;
 }
 
 .header__screenshot__eye{
   display: inline-flex;
+}
+
+.ss_eye_icon{
+  cursor: pointer;
+  height: 2rem;
+  width: 1.5rem;
+  /* left: 2rem; */
+  right: 0.5rem;
+  position: relative;
 }
 
 

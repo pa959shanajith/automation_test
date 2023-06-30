@@ -99,3 +99,9 @@ button:focus, input[type="submit"]:focus{
 .modal-mmd{
     min-width: 450px;
 }
+
+.modalcontainer__header{
+    .p-dialog-header{
+        background: #E2E2ED !important;
+    }
+}
