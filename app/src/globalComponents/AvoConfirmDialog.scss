@@ -1,10 +1,15 @@
+@import "../pages/global/styles/ColorVariables.scss";
 .Logout_modal{
     .p-dialog-content{
       padding: 1.5rem !important;
       border-radius: 0.4rem 0.4rem 0 0 !important;
+      font: $f6_regular !important;
     }
     .p-dialog-footer{
       padding: 0.5rem !important;
       background: white !important;
+      .p-button{
+        font: $f7_semibold !important;
+        }
     }
   }

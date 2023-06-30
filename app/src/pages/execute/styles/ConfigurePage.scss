@@ -1007,7 +1007,7 @@
     display: block;
     font-size: 14px;
     margin-top: 2px;
-    max-height: 11vh;
+    max-height: 30vh;
     position: absolute;
     right: 20.5rem;
     width: calc(51% - 5rem);
@@ -1017,10 +1017,14 @@
 
     input {
       width: 20vw;
+      height: 1.7rem;
+      justify-content: center;
+      text-align: start;
+  }
 
     }
  
-}
+
 
 .execute_card {
   background: #f7f7f7;
