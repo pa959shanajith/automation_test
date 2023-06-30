@@ -1,5 +1,5 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
-import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap, singleExcelToMindmap ,checkExportName} from '../api';
+import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap, singleExcelToMindmap ,checkExportVer} from '../api';
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -115,7 +115,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         setComMsgRef("");
         gitVerRef.current.value= 'def-val'
         setGitExportDetails([]);
-        var res = await checkExportName({"query":"importgit","projectId": expProjRef.current.value})
+        var res = await checkExportVer({"query":"importgit","projectId": expProjRef.current.value})
             if(res.error){displayError(res.error);return;}
             setGitExportDetails(res);setDisableSubmit(false)}
                    

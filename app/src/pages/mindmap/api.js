@@ -848,9 +848,9 @@ export const singleExcelToMindmap = async(data) => {
         return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
     }
 }
-export const checkExportName = async(data) => {
+export const checkExportVer = async(data) => {
     try{
-        const res = await axios(url+'/checkExportName', {
+        const res = await axios(url+'/checkExportVer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

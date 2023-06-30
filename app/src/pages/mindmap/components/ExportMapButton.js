@@ -3,7 +3,7 @@ import {ModalContainer, Messages as MSG, setMsg,ResetSession,VARIANT} from '../.
 import * as actionTypes from '../state/action';
 import {useSelector,useDispatch} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit,exportToProject,getModules,exportToMMSkel,checkExportName} from '../api';
+import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit,exportToProject,getModules,exportToMMSkel,checkExportVer} from '../api';
 import '../styles/ExportMapButton.scss'
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -151,7 +151,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
     const changeExportFile=async(e) =>{
         setExpType(e.target.value);
         if (e.target.value == "git"){
-            const res= await checkExportName({"exportname":"exportname","query":"exportgit","projectId":selectedProj})
+            const res= await checkExportVer({"exportname":"exportname","query":"exportgit","projectId":selectedProj})
             setExportVer(res);
         }
     }

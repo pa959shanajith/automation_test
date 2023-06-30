@@ -1610,15 +1610,15 @@ exports.singleExcelToMindmap = function (req, res) {
 		return res.status(500).send("fail");
 	}
 };
-exports.checkExportName = async (req, res) => {
-	const fnName = "checkExportName";
+exports.checkExportVer = async (req, res) => {
+	const fnName = "checkExportVer";
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const exportname= req.body.exportname;
 		const query = req.body.query;
 		const projectId = req.body.projectId || "default"
 		const inputs= { "exportname":exportname,"query": query,"projectId":projectId}
-		const result = await utils.fetchData(inputs, "git/checkExportName", fnName);
+		const result = await utils.fetchData(inputs, "git/checkExportVer", fnName);
 		if (result == "fail") {
 			return res.send('fail');}
 		else {
