@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { exportScreenToExcel, getScrapeDataScreenLevel_ICE } from '../api';
 import ModalContainer from '../../global/components/ModalContainer';
+import { Button } from 'primereact/button';
 
 
 const ExportModal = props => {
@@ -42,7 +43,7 @@ const ExportModal = props => {
     
     const Footer = () => {
         return(
-            <button data-test="export" onClick={onExport}>Export</button>
+            <Button data-test="export" size="small" onClick={onExport} label="Export"></Button>
         )
     }
     
@@ -152,11 +153,13 @@ const ExportModal = props => {
     
     return(
         <ModalContainer 
+        show ={props.show==="exportModal"}
         title={'Export'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
         content={<Content/>}
         footer={<Footer/>}
+        width = "35rem"
     />
     )
     

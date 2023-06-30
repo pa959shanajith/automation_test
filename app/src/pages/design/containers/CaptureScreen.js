@@ -46,7 +46,6 @@ const CaptureModal = (props) => {
   const [orderList, setOrderList] = useState([]);
   const [saved, setSaved] = useState({ flag: true });
   const [mainScrapedData, setMainScrapedData] = useState({});
-  const [captureButton, setCaptureButton] = useState("chrome");
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
   const [captureData, setCaptureData] = useState([]);
   const [screenshotData, setScreenshotData] = useState([]);
@@ -70,6 +69,7 @@ const CaptureModal = (props) => {
   const [editingCell, setEditingCell] = useState(null);
   const [deleted, setDeleted] = useState([]);
   const [deletedItems, setDeletedItems] = useState(false)
+  const[browserName,setBrowserName]=useState(null)
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -253,6 +253,30 @@ const CaptureModal = (props) => {
       setSelectedSpan(null);
     } else {
       setSelectedSpan(index);
+      switch (index) {
+
+        case 1:
+
+          setBrowserName("explorer")
+
+          break;
+
+        case 2:
+
+          setBrowserName("chrome")
+
+          break;
+
+        case 3:
+
+          setBrowserName("mozilla")
+
+          break;
+
+        case 4:
+          setBrowserName("chromium")
+          break;
+      }
     }
   };
 
@@ -265,9 +289,9 @@ const CaptureModal = (props) => {
 
   const toastSuccess = (erroMessage) => {
     if (erroMessage.CONTENT) {
-      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Success', detail: erroMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: erroMessage, life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -450,11 +474,12 @@ const CaptureModal = (props) => {
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
                   setScreenshotData({
                     header: item.custname,
-                    imageUrl: mirror.scrape || "",
+                    imageUrl: data.mirror || "",
                     enable: true
                   });
                   onHighlight();
-                }}>View Screenshot</span> : <span>No Screenshot</span>,
+                  setHighlight(true);
+                }}>View Screenshot</span> : <span>No Screenshot Available</span>,
                 actions: '',
                 objectDetails: item
 
@@ -473,6 +498,7 @@ const CaptureModal = (props) => {
                     enable: true
                   });
                   onHighlight();
+                  setHighlight(true);
                 }}>View Screenshot</span> : <span>No screenshot available</span>,
                 actions: '',
                 objectDetails: item
@@ -598,6 +624,44 @@ const CaptureModal = (props) => {
     setOverlay(blockMsg);
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
+        let err = null;
+        setOverlay("");
+        // ResetSession.end();
+        if (data === "Invalid Session") return null;
+        else if (data === "Response Body exceeds max. Limit.")
+          err = { 'variant': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' };
+        else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
+          let scrapedItemsLength = scrapeItems.length;
+          if (scrapedItemsLength > 0) dispatch(disableAction(true));
+          else dispatch(disableAction(false));
+          setSaved({ flag: false });
+          toastError({
+            'VARIANT': data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
+              data === 'scheduleModeOn' ?
+                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
+
+          });
+          return
+        } else if (data === "fail")
+          toastError("Error while performing Scrape");
+        else if (data === "Terminate") {
+          setOverlay("");
+          toastError("Scrape Terminated."); 
+        }
+        else if (data === "wrongWindowName")
+          toastError("Window not found - Please provide valid window name.");
+        else if (data === "ExecutionOnlyAllowed")
+          toastError("ICE is connected in 'Execution Only' mode. Other actions are not permitted.");
+
+
+        if (err) {
+          // setMsg(err);
+          return false;
+        }
+
+        let viewString = data;
+        // fetchScrapeData();
         if (capturedDataToSave.length !== 0 && masterCapture) {
           let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
           let deleted = capturedDataToSave.map(item => item.objId);
@@ -619,43 +683,6 @@ const CaptureModal = (props) => {
             })
             .catch(error => console.log(error))
         }
-        let err = null;
-        setOverlay("");
-        // ResetSession.end();
-        if (data === "Invalid Session") return null;
-        else if (data === "Response Body exceeds max. Limit.")
-          err = { 'variant': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' };
-        else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
-          let scrapedItemsLength = scrapeItems.length;
-          if (scrapedItemsLength > 0) dispatch(disableAction(true));
-          else dispatch(disableAction(false));
-          setSaved({ flag: false });
-          err = {
-            'VARIANT': data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
-              data === 'scheduleModeOn' ?
-                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-
-          };
-        } else if (data === "fail")
-          err = MSG.SCRAPE.ERR_SCRAPE;
-        else if (data === "Terminate") {
-          setOverlay("");
-          err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
-        }
-        else if (data === "wrongWindowName")
-          err = MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
-        else if (data === "ExecutionOnlyAllowed")
-          err = MSG.GENERIC.WARN_EXECUTION_ONLY;
-
-        if (err) {
-          // setMsg(err);
-          return false;
-        }
-
-        let viewString = data;
-        // fetchScrapeData();
-
         if (viewString.view.length !== 0) {
 
           let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
@@ -699,7 +726,7 @@ const CaptureModal = (props) => {
       .catch(error => {
         setOverlay("");
         // ResetSession.end();
-        // setMsg(MSG.SCRAPE.ERR_SCRAPE);
+        toastError("Error while performing Scrape");
         console.error("Fail to Load design_ICE. Cause:", error);
       });
 
@@ -790,13 +817,13 @@ const CaptureModal = (props) => {
 
   const footerCapture = (
     <div className='footer__capture'>
-      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton); }}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton) }}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
     </div>
   );
 
@@ -806,7 +833,8 @@ const CaptureModal = (props) => {
         <h5 className='dailog_header1'>Capture Elements</h5>
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
-        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
+        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
         {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
@@ -874,9 +902,11 @@ const CaptureModal = (props) => {
     capturedDataToSave.map((object) => {
       if (objValues.val === object.val) setActiveEye(true);
       else if (activeEye) setActiveEye(false);
+      setHighlight(true);
     })
     let objVal = selectedCapturedElement[0].objectDetails;
     dispatch(objValue(objVal));
+    setHighlight(true);
   }
 
   useEffect(() => {
@@ -885,12 +915,12 @@ const CaptureModal = (props) => {
 
       mirrorImg.onload = function () {
         // let aspect_ratio = mirrorImg.height / mirrorImg.width;
-        let aspect_ratio = mirrorImg.width / mirrorImg.height;
-        let ds_width = 650;
-        let ds_height = ds_width * aspect_ratio;
-        let ds_ratio = 800 / mirrorImg.width;
-        if (ds_height > 300) ds_height = 300;
-        ds_height += 45; // popup header size included
+        let aspect_ratio = mirrorImg.height / mirrorImg.width;
+				let ds_width = 500;
+				let ds_height = ds_width * aspect_ratio;
+				let ds_ratio = 490 / mirrorImg.width;
+				if (ds_height > 300) ds_height = 300;
+				ds_height += 45; // popup header size included
         setMirrorHeight(ds_height);
         setImageHeight(mirrorImg.height)
         setDsRatio(ds_ratio);
@@ -989,14 +1019,19 @@ const CaptureModal = (props) => {
 
   const headerScreenshot = (
     <>
-      <div className='header__popup'>
-        {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
-        <div>
+    <div className='header__screenshot__eye'>
+    <div>
           <img data-test="eyeIcon" className="ss_eye_icon"
             onClick={onHighlight}
-            src={activeEye ? "static/imgs/ic-highlight-element-inactive.png" : ""}
-            alt="eyeIcon" />
+            src={activeEye ? 
+              "static/imgs/eye-active.svg" : 
+              "static/imgs/eye_disabled.svg"} 
+          />
         </div>
+      <div className='header__popup'>
+      <Tooltip target=".header__popup" position='bottom'>{screenshotData.header}</Tooltip>
+       <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
+      </div>
       </div>
     </>
   )
@@ -1344,7 +1379,7 @@ const CaptureModal = (props) => {
             <Column field="screenshots" header="Screenshots"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
-          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false }) }} style={{ height: `${mirrorHeight}px` }}>
+          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
             <div className="screenshot_pop__content" >
               {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
               <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
@@ -1442,6 +1477,7 @@ const CaptureModal = (props) => {
       {showObjModal === "importModal" && <ImportModal
         fetchScrapeData={fetchScrapeData}
         setOverlay={setOverlay}
+        show={showObjModal}
         setShow={setShowObjModal}
         appType="Web"
         fetchingDetails={props.fetchingDetails}
@@ -1449,7 +1485,7 @@ const CaptureModal = (props) => {
         toastError={toastError}
       />}
 
-      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
+      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} />}
       {/* //Element properties  */}
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
         <div className="card">
