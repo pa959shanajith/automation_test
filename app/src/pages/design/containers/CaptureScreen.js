@@ -478,7 +478,8 @@ const CaptureModal = (props) => {
                     enable: true
                   });
                   onHighlight();
-                }}>View Screenshot</span> : <span>No Screenshot</span>,
+                  setHighlight(true);
+                }}>View Screenshot</span> : <span>No Screenshot Available</span>,
                 actions: '',
                 objectDetails: item
 
@@ -497,6 +498,7 @@ const CaptureModal = (props) => {
                     enable: true
                   });
                   onHighlight();
+                  setHighlight(true);
                 }}>View Screenshot</span> : <span>No screenshot available</span>,
                 actions: '',
                 objectDetails: item
@@ -831,6 +833,7 @@ const CaptureModal = (props) => {
         <h5 className='dailog_header1'>Capture Elements</h5>
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
+        <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
         {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
@@ -899,9 +902,11 @@ const CaptureModal = (props) => {
     capturedDataToSave.map((object) => {
       if (objValues.val === object.val) setActiveEye(true);
       else if (activeEye) setActiveEye(false);
+      setHighlight(true);
     })
     let objVal = selectedCapturedElement[0].objectDetails;
     dispatch(objValue(objVal));
+    setHighlight(true);
   }
 
   useEffect(() => {
@@ -1015,14 +1020,17 @@ const CaptureModal = (props) => {
   const headerScreenshot = (
     <>
     <div className='header__screenshot__eye'>
-      <div className='header__popup'>
-        {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
-        <div>
+    <div>
           <img data-test="eyeIcon" className="ss_eye_icon"
             onClick={onHighlight}
-            src={activeEye ? "static/imgs/ic-highlight-element-inactive.png" : ""}
-            alt="eyeIcon" />
+            src={activeEye ? 
+              "static/imgs/eye-active.svg" : 
+              "static/imgs/eye_disabled.svg"} 
+          />
         </div>
+      <div className='header__popup'>
+      <Tooltip target=".header__popup" position='bottom'>{screenshotData.header}</Tooltip>
+       <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
       </div>
       </div>
     </>
@@ -1371,7 +1379,7 @@ const CaptureModal = (props) => {
             <Column field="screenshots" header="Screenshots"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
-          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
+          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
             <div className="screenshot_pop__content" >
               {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
               <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
@@ -1469,6 +1477,7 @@ const CaptureModal = (props) => {
       {showObjModal === "importModal" && <ImportModal
         fetchScrapeData={fetchScrapeData}
         setOverlay={setOverlay}
+        show={showObjModal}
         setShow={setShowObjModal}
         appType="Web"
         fetchingDetails={props.fetchingDetails}
@@ -1476,7 +1485,7 @@ const CaptureModal = (props) => {
         toastError={toastError}
       />}
 
-      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
+      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} />}
       {/* //Element properties  */}
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
         <div className="card">
