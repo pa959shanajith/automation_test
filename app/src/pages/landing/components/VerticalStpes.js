@@ -54,15 +54,15 @@ const VerticalSteps = (props) => {
             dispatch(updateSteps(findStep))
             }
         })()
-      },[])
+      },[project])
 
     useEffect(()=>{
       let findIndexOfStep = ProgressStepDetails?.projectId?.indexOf(activeStep?.id);
-      if (ProgressStepDetails && ProgressStepDetails.progressStep && findIndexOfStep !== -1)
-      {let findStep= ProgressStepDetails?.progressStep[findIndexOfStep]
-      setCurrentStep(findStep);
-      dispatch(updateSteps(findStep))
-      }
+      if (ProgressStepDetails && ProgressStepDetails.progressStep && findIndexOfStep !== -1) {
+        let findStep= ProgressStepDetails?.progressStep[findIndexOfStep]
+        setCurrentStep(findStep);
+        dispatch(updateSteps(findStep))
+        }
     },[activeStep?.id])
 
 
