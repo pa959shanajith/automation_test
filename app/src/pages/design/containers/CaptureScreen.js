@@ -46,7 +46,6 @@ const CaptureModal = (props) => {
   const [orderList, setOrderList] = useState([]);
   const [saved, setSaved] = useState({ flag: true });
   const [mainScrapedData, setMainScrapedData] = useState({});
-  const [captureButton, setCaptureButton] = useState("chrome");
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
   const [captureData, setCaptureData] = useState([]);
   const [screenshotData, setScreenshotData] = useState([]);
@@ -70,6 +69,7 @@ const CaptureModal = (props) => {
   const [editingCell, setEditingCell] = useState(null);
   const [deleted, setDeleted] = useState([]);
   const [deletedItems, setDeletedItems] = useState(false)
+  const[browserName,setBrowserName]=useState(null)
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -95,6 +95,7 @@ const CaptureModal = (props) => {
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState(null);
   const [isHovered, setIsHovered] = useState(false);
+  let addMore = useRef(false);
 
   useEffect(() => {
     fetchScrapeData()
@@ -252,15 +253,45 @@ const CaptureModal = (props) => {
       setSelectedSpan(null);
     } else {
       setSelectedSpan(index);
+      switch (index) {
+
+        case 1:
+
+          setBrowserName("explorer")
+
+          break;
+
+        case 2:
+
+          setBrowserName("chrome")
+
+          break;
+
+        case 3:
+
+          setBrowserName("mozilla")
+
+          break;
+
+        case 4:
+          setBrowserName("chromium")
+          break;
+      }
     }
   };
 
-  const toastSuccess = (SuccMessage) => {
-    toast.current.show({ severity: 'success', summary: 'Success', detail: SuccMessage, life: 10000 });
+  const toastError = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
   }
 
-  const toastError = (errMessage) => {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 1000 });
+  const toastSuccess = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Success', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: erroMessage, life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -372,11 +403,16 @@ const CaptureModal = (props) => {
           else if (typeof data === "object" && props.appType !== "Webservice") {
             haveItems = data.view.length !== 0;
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
+            newlyScrapeList = newScrapeList
 
-            newlyScrapeList = newScrapeList;
+            if (!addMore.current) {
+              if (newlyScrapeList.length > 0 && capturedDataToSave.length >= 0) {
+                setCapturedDataToSave([...newScrapeList]);
+                viewString = newScrapeList;
+              }
+            }
 
             setMainScrapedData(data);
-            if (capturedDataToSave.length === 0) setCapturedDataToSave([...capturedDataToSave, ...newScrapeList]);
             setMirror({ scrape: data.mirror, compare: null });
             setNewScrapedData([]);
             setScrapeItems(newScrapeList);
@@ -438,11 +474,12 @@ const CaptureModal = (props) => {
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
                   setScreenshotData({
                     header: item.custname,
-                    imageUrl: mirror.scrape || "",
+                    imageUrl: data.mirror || "",
                     enable: true
                   });
                   onHighlight();
-                }}>View Screenshot</span> : <span>No Screenshot</span>,
+                  setHighlight(true);
+                }}>View Screenshot</span> : <span>No Screenshot Available</span>,
                 actions: '',
                 objectDetails: item
 
@@ -461,6 +498,7 @@ const CaptureModal = (props) => {
                     enable: true
                   });
                   onHighlight();
+                  setHighlight(true);
                 }}>View Screenshot</span> : <span>No screenshot available</span>,
                 actions: '',
                 objectDetails: item
@@ -517,7 +555,6 @@ const CaptureModal = (props) => {
     let views = [];
     let orderList = [];
     let modifiedObjects = Object.values(modified);
-    setCapturedDataToSave([]);
 
     for (let scrapeItem of scrapeItemsL) {
       if (!Array.isArray(scrapeItem)) {
@@ -547,6 +584,7 @@ const CaptureModal = (props) => {
         if (response === "Invalid Session") return null;
         else fetchScrapeData().then(resp => {
           if (resp === 'success' || typeof (resp) === "object") {
+
             typeof (resp) === "object" && resp.length > 0
               ? setShowPop({
                 title: "Saved Scrape Objects",
@@ -567,9 +605,8 @@ const CaptureModal = (props) => {
               : toastSuccess("Scraped Elements saved successfully.");
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
-          } else console.error(resp);
-        })
-          .catch(error => console.error(error));
+          } else { console.error(resp); addMore.current = true; }
+        }).catch(error => console.error(error));
       })
       .catch(error => console.error(error))
   }
@@ -587,6 +624,44 @@ const CaptureModal = (props) => {
     setOverlay(blockMsg);
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
+        let err = null;
+        setOverlay("");
+        // ResetSession.end();
+        if (data === "Invalid Session") return null;
+        else if (data === "Response Body exceeds max. Limit.")
+          err = { 'variant': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' };
+        else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
+          let scrapedItemsLength = scrapeItems.length;
+          if (scrapedItemsLength > 0) dispatch(disableAction(true));
+          else dispatch(disableAction(false));
+          setSaved({ flag: false });
+          toastError({
+            'VARIANT': data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
+              data === 'scheduleModeOn' ?
+                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
+
+          });
+          return
+        } else if (data === "fail")
+          toastError("Error while performing Scrape");
+        else if (data === "Terminate") {
+          setOverlay("");
+          toastError("Scrape Terminated."); 
+        }
+        else if (data === "wrongWindowName")
+          toastError("Window not found - Please provide valid window name.");
+        else if (data === "ExecutionOnlyAllowed")
+          toastError("ICE is connected in 'Execution Only' mode. Other actions are not permitted.");
+
+
+        if (err) {
+          // setMsg(err);
+          return false;
+        }
+
+        let viewString = data;
+        // fetchScrapeData();
         if (capturedDataToSave.length !== 0 && masterCapture) {
           let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
           let deleted = capturedDataToSave.map(item => item.objId);
@@ -608,43 +683,6 @@ const CaptureModal = (props) => {
             })
             .catch(error => console.log(error))
         }
-        let err = null;
-        setOverlay("");
-        // ResetSession.end();
-        if (data === "Invalid Session") return null;
-        else if (data === "Response Body exceeds max. Limit.")
-          err = { 'variant': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' };
-        else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
-          let scrapedItemsLength = scrapeItems.length;
-          if (scrapedItemsLength > 0) dispatch(disableAction(true));
-          else dispatch(disableAction(false));
-          setSaved({ flag: false });
-          err = {
-            'VARIANT': data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
-              data === 'scheduleModeOn' ?
-                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-
-          };
-        } else if (data === "fail")
-          err = MSG.SCRAPE.ERR_SCRAPE;
-        else if (data === "Terminate") {
-          setOverlay("");
-          err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
-        }
-        else if (data === "wrongWindowName")
-          err = MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
-        else if (data === "ExecutionOnlyAllowed")
-          err = MSG.GENERIC.WARN_EXECUTION_ONLY;
-
-        if (err) {
-          // setMsg(err);
-          return false;
-        }
-
-        let viewString = data;
-        // fetchScrapeData();
-
         if (viewString.view.length !== 0) {
 
           let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
@@ -661,7 +699,20 @@ const CaptureModal = (props) => {
 
           setNewScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
-          masterCapture ? setCapturedDataToSave([...scrapeItemList]) : setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+
+          if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
+            setCapturedDataToSave([...scrapeItemList])
+          }
+          else {
+            if (capturedDataToSave.length > 0) { //when click on addmore
+              addMore.current = true;
+              setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+            }
+            else { // when captured data is empty  
+              addMore.current = false;
+              setCapturedDataToSave([...scrapeItemList]);
+            }
+          }
           updateScrapeItems(scrapeItemList);
           setScrapedURL(updatedNewScrapeData.scrapedurl);
           setMirror({ scrape: viewString.mirror, compare: null });
@@ -670,21 +721,16 @@ const CaptureModal = (props) => {
           if (viewString.view.length > 0) setSaved({ flag: false });
           setEndScrape(true)
 
-
         }
       })
       .catch(error => {
         setOverlay("");
         // ResetSession.end();
-        // setMsg(MSG.SCRAPE.ERR_SCRAPE);
+        toastError("Error while performing Scrape");
         console.error("Fail to Load design_ICE. Cause:", error);
       });
 
   }
-
-
-
-
 
   const updateScrapeItems = newList => {
     setScrapeItems([...scrapeItems, ...newList])
@@ -750,7 +796,6 @@ const CaptureModal = (props) => {
   };
 
 
-
   const handleMouseLeaveRow = () => {
     setHoveredRow(null);
   };
@@ -772,13 +817,13 @@ const CaptureModal = (props) => {
 
   const footerCapture = (
     <div className='footer__capture'>
-      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton); }}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button onMouseDownCapture={() => { setVisible(false); startScrape(captureButton) }}>Capture</Button>
+      <Button onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
     </div>
   );
 
@@ -788,7 +833,8 @@ const CaptureModal = (props) => {
         <h5 className='dailog_header1'>Capture Elements</h5>
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
-        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
+        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
         {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
@@ -809,6 +855,8 @@ const CaptureModal = (props) => {
       </div>
     </div>
   );
+
+  const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
   const footerSave = (
     <>
@@ -847,51 +895,6 @@ const CaptureModal = (props) => {
     />
   )
 
-  // const showConfirmFooter=(
-  //   <>
-  //   <Button onClick={showConfirmPop.onClick}>
-  //       {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
-  //   </Button>
-  //   <Button onClick={()=>setShowConfirmPop(false)}>
-  //       {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
-  //   </Button>
-  //   </>
-  // )
-
-  //   const PopupDialog = () => (
-  //     // <ModalContainer 
-  //     //     title={showPop.title}
-  //     //     modalClass="modal-sm"
-  //     //     close={()=>setShowPop("")}
-  //     //     content={showPop.content}
-  //     //     footer={showPop.footer}
-  //     // />
-  //     <Dialog className="confirm__popup" header={showPop.title}  visible={showPop} onHide={()=>setShowPop("")} footer={showPop.footer}>
-  //      {showPop.content}
-  //     </Dialog>
-  // );
-
-  // const ConfirmPopup = () => (
-  //   // <ModalContainer 
-  //   //     title={showConfirmPop.title}
-  //   //     content={showConfirmPop.content}
-  //   //     close={()=>setShowConfirmPop(false)}
-  //   //     footer={
-  //   //         <>
-  //   //         <button onClick={showConfirmPop.onClick}>
-  //   //             {showConfirmPop.continueText ? showConfirmPop.continueText : "Yes"}
-  //   //         </button>
-  //   //         <button onClick={()=>setShowConfirmPop(false)}>
-  //   //             {showConfirmPop.rejectText ? showConfirmPop.rejectText : "No"}
-  //   //         </button>
-  //   //         </>
-  //   //     }
-  //   // />
-  //   <Dialog header={showConfirmPop.title}  visible={showConfirmPop} onHide={()=>setShowConfirmPop(false)}  footer={showConfirmFooter} >
-  //     {showConfirmPop.content}
-  //   </Dialog>
-  // )
-
   const confirmPopupMsg = (
     <div> <p>Note :This will completely refresh all <strong>Captured Elements</strong> on the screen. In case you want to Capture only additional elements use the <strong>"Add More"</strong> option </p></div>
   )
@@ -899,9 +902,11 @@ const CaptureModal = (props) => {
     capturedDataToSave.map((object) => {
       if (objValues.val === object.val) setActiveEye(true);
       else if (activeEye) setActiveEye(false);
+      setHighlight(true);
     })
     let objVal = selectedCapturedElement[0].objectDetails;
     dispatch(objValue(objVal));
+    setHighlight(true);
   }
 
   useEffect(() => {
@@ -910,12 +915,12 @@ const CaptureModal = (props) => {
 
       mirrorImg.onload = function () {
         // let aspect_ratio = mirrorImg.height / mirrorImg.width;
-        let aspect_ratio = mirrorImg.width / mirrorImg.height;
-        let ds_width = 650;
-        let ds_height = ds_width * aspect_ratio;
-        let ds_ratio = 800 / mirrorImg.width;
-        if (ds_height > 300) ds_height = 300;
-        ds_height += 45; // popup header size included
+        let aspect_ratio = mirrorImg.height / mirrorImg.width;
+				let ds_width = 500;
+				let ds_height = ds_width * aspect_ratio;
+				let ds_ratio = 490 / mirrorImg.width;
+				if (ds_height > 300) ds_height = 300;
+				ds_height += 45; // popup header size included
         setMirrorHeight(ds_height);
         setImageHeight(mirrorImg.height)
         setDsRatio(ds_ratio);
@@ -1014,14 +1019,19 @@ const CaptureModal = (props) => {
 
   const headerScreenshot = (
     <>
-      <div className='header__popup'>
-        {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
-        <div>
+    <div className='header__screenshot__eye'>
+    <div>
           <img data-test="eyeIcon" className="ss_eye_icon"
             onClick={onHighlight}
-            src={activeEye ? "static/imgs/ic-highlight-element-inactive.png" : ""}
-            alt="eyeIcon" />
+            src={activeEye ? 
+              "static/imgs/eye-active.svg" : 
+              "static/imgs/eye_disabled.svg"} 
+          />
         </div>
+      <div className='header__popup'>
+      <Tooltip target=".header__popup" position='bottom'>{screenshotData.header}</Tooltip>
+       <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
+      </div>
       </div>
     </>
   )
@@ -1057,7 +1067,6 @@ const CaptureModal = (props) => {
     else if (!isCustom) setNewScrapedData(updNewScrapedData);
     if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
     setScrapeItems(localScrapeItems);
-    setCapturedDataToSave([]);
   }
 
   const onCellEditComplete = (e) => {
@@ -1070,7 +1079,7 @@ const CaptureModal = (props) => {
   }
 
   const cellEditor = (options) => {
-    return <InputText type="text" className="element_name" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} style={{ width: "25rem" }} tooltip={options.value} />;
+    return <InputText type="text" className="element_name" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} style={{ width: "25rem" }} tooltip={options.value} tooltipOptions={{ position: 'bottom' }} />;
   };
 
   const addedCustomElement = (addedElements, orderList) => {
@@ -1370,7 +1379,7 @@ const CaptureModal = (props) => {
             <Column field="screenshots" header="Screenshots"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
-          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false }) }} style={{ height: `${mirrorHeight}px` }}>
+          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
             <div className="screenshot_pop__content" >
               {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
               <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
@@ -1400,6 +1409,7 @@ const CaptureModal = (props) => {
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+        
       <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
@@ -1413,14 +1423,69 @@ const CaptureModal = (props) => {
           </span>
         </div>
       </Dialog>
-      {currentDialog === 'addObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} addCustomElement={addedCustomElement} />}
-      {currentDialog === 'mapObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} captureList={capturedDataToSave} />}
-      {currentDialog === 'replaceObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
-      {currentDialog === 'createObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} scrapeItems={scrapeItems} capturedDataToSave={capturedDataToSave} setCapturedDataToSave={setCapturedDataToSave} setNewScrapedData={setNewScrapedData} updateScrapeItems={updateScrapeItems} setOrderList={setOrderList} setSaved={setSaved} setShow={setCurrentDialog} setCaptureData={setCaptureData} />}
-      {currentDialog === 'compareObject' && <ActionPanel isOpen={currentDialog} OnClose={handleClose} />}
+
+      {currentDialog === 'addObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        addCustomElement={addedCustomElement}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'mapObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        captureList={capturedDataToSave}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        setShow={setCurrentDialog}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'replaceObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'createObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        scrapeItems={scrapeItems}
+        capturedDataToSave={capturedDataToSave}
+        setCapturedDataToSave={setCapturedDataToSave}
+        setNewScrapedData={setNewScrapedData}
+        updateScrapeItems={updateScrapeItems}
+        setOrderList={setOrderList}
+        setSaved={setSaved}
+        setShow={setCurrentDialog}
+        setCaptureData={setCaptureData}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {currentDialog === 'compareObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
       {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
-      {showObjModal === "importModal" && <ImportModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType="Web" fetchingDetails={props.fetchingDetails} />}
-      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} />}
+      {showObjModal === "importModal" && <ImportModal
+        fetchScrapeData={fetchScrapeData}
+        setOverlay={setOverlay}
+        show={showObjModal}
+        setShow={setShowObjModal}
+        appType="Web"
+        fetchingDetails={props.fetchingDetails}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+      />}
+
+      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} />}
       {/* //Element properties  */}
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
         <div className="card">

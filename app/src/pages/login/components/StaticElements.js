@@ -14,22 +14,25 @@ import { FooterTwo as Footer } from '../../global';
 const StaticElements = ({ children }) => {
 
     return (
-        <div className='flex flex-column'>
-            <div className="login_container">
-                <div className="split_left">
-                    <h1>Hello,</h1>
-                    <h2>Welcome to Avo  Assure</h2>
-                    <h3>Login to experience Intelligence</h3>
-                    <img className="" src="static/imgs/animated_login.gif" alt="Login" />
-                </div>
-                <div className="split_right">
-                    <div className="right_side_login">
-                        <img className="icon_img" src="static/imgs/AssureLogo_horizonal.svg"></img>
-                        {children}
-                    </div>
+     <div className='flex flex-column'>
+        <div className="login_container">
+            <div className="split_left">
+                <h1>Hello,</h1>
+                <h2>Welcome to Avo  Assure!</h2>
+                <h3>
+  Experience the <span style={{color:"white"}}>next-gen</span> test automation platform
+</h3>
+
+                <img className="" src="static/imgs/animated_login.gif" alt="Login" />
+            </div>
+            <div className="split_right">
+                <div className="right_side_login">
+                    <img className="icon_img" src="static/imgs/AssureLogo_horizonal.svg"></img>
+                    {children}
                 </div>
             </div>
             <div><Footer /></div>
+        </div>
         </div>
     );
 

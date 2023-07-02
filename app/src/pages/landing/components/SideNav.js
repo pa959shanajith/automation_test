@@ -25,31 +25,31 @@ const SideNav = () =>{
         {
             path: "/landing",
             name: "My Project(s)",
-            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="My Project(s)"  data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="Create/View all your projects."  data-pr-position="right" height="25px" />,
             disabled: false
         },
         {
             path: "/integration",
             name: "Integration",
-            icon: <img src={tabSelected==="/integration" ? "static/imgs/integration_icon_selected.svg"  :"static/imgs/integration_icon.svg"} className="icon" data-pr-tooltip="Integration"  data-pr-position="right" height="25px"/>,
+            icon: <img src={tabSelected==="/integration" ? "static/imgs/integration_icon_selected.svg"  :"static/imgs/integration_icon.svg"} className="icon" data-pr-tooltip=" Configure Avo Assure to integrate with external systems"  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         {
             path: "/reports",
             name: "Reports",
-            icon: <img src={tabSelected==="/reports" ? "static/imgs/report_icon_selected.svg" :"static/imgs/report_icon.svg"} className="icon" data-pr-tooltip="Reports"  data-pr-position="right" height="25px"/>,
+            icon: <img src={tabSelected==="/reports" ? "static/imgs/report_icon_selected.svg" :"static/imgs/report_icon.svg"} className="icon" data-pr-tooltip=" View and analyze executed test automations."  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         {
             path: "/settings",
             name: "Settings",
-            icon: <img src={tabSelected==="/settings" ? "static/imgs/settings_icon_selected.svg" : "static/imgs/settings_icon.svg"} className="icon" data-pr-tooltip="Settings"  data-pr-position="right" height="25px"/>,
+            icon: <img src={tabSelected==="/settings" ? "static/imgs/settings_icon_selected.svg" : "static/imgs/settings_icon.svg"} className="icon" data-pr-tooltip=" Manage/Create users, agents and other advanced configurations"  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         {
             path: "/itdm",
             name: "ITDM",
-            icon: <img src= {tabSelected==="/itdm" ? "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="ITDM"  data-pr-position="right" height="25px"/>,
+            icon: <img src= {tabSelected==="/itdm" ? "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Avo’s intelligent Test Data Management (iTDM) solution offers production-like, relevant, and compliant data with a few clicks. It streamlines the entire test data management process making testing cost-effective and faster."  data-pr-position="right" height="25px"/>,
             disabled: true
         },
     ]

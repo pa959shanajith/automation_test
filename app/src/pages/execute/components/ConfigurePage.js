@@ -815,7 +815,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               onChange={(e) => {
                 setConfigProjectId(e.target.value);
               }}
-              style={{ width: "10rem", height: "19px" }}
+              style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
             >
               {projectList.map((project, index) => (
@@ -1101,9 +1101,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             }
             headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF", height: "70%" }}
-
-
+            modalSytle={{ width: "50vw", background: "#FFFFFF", height:"85%" }}
+            
+           
           />
           <AvoModal
             visible={visible_schedule}

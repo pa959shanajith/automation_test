@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { excelToScreen, updateScreen_ICE } from '../../design/api';
 // import { Dialog } from 'primereact/dialog';
 import ModalContainer from '../../global/components/ModalContainer';
+import { Button } from 'primereact/button';
 
 
 const ImportModal = props => {
@@ -138,6 +139,7 @@ const ImportModal = props => {
     console.log(props.fetchingDetails)
     return(
         <ModalContainer 
+        show={props.show==="importModal"}
         title={'Import'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
@@ -236,7 +238,7 @@ const Footer = ({onImport,error}) => {
     return(
         <>
         <span>{error}</span>
-        <button data-test="export" onClick={onImport}>Import</button>
+        <Button data-test="export" size="small" onClick={onImport} label='Import'></Button>
         </>
     )
 }

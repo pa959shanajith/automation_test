@@ -192,7 +192,7 @@ const Login = () => {
                                         className='user_input'
                                         value={username}
                                         onChange={handleUsername}
-                                        placeholder='Enter your username'
+                                        placeholder='Enter username'
                                         type="text"
                                         
                                     />
@@ -209,7 +209,7 @@ const Login = () => {
                                         value={password}
                                         className='user_input'
                                         onChange={handlePassword}
-                                        placeholder='Password'
+                                        placeholder='Enter password'
                                         type={showPassword ? "type" : "password"}
                                     />
                                     {password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={() => { setShowPassword(!showPassword) }}>
@@ -223,28 +223,28 @@ const Login = () => {
                                 <Button id="login" label='Login' size="small" disabled={disableLoginButton} ></Button>
                             </div>
                             <div className='link mb-5'>
-                                <a onClick={forgotPasswordLinkHandler} >Forgot Username & Password </a>
+                                <a onClick={forgotPasswordLinkHandler} > Forgot Username/Password? </a>
                             </div>
                             <div className='link mb-3'>
-                                <a onClick={singleSignOnHandler} >Use Single Sign-On </a>
+                                <a onClick={singleSignOnHandler} >Login with SSO/SAML</a>
                             </div>
-                            <span className="text-sm">Don't have an account? Contact your admin to create account.</span>
+                            <span className="text-sm"> Don't have an account? Contact admin to create an account.</span>
                         </form>
                     </>}
 
                 {showForgotPasswordScreen && <>
-                    <h2>Forgot Username or Password</h2>
-                    <span>Provide your registered e-mail to send a link to reset your Password or to retrieve Username  </span>
+                    <h2>Forgot Username/Password?</h2>
+                    <span> Provide registered email address to retrieve username/receive password resent link.  </span>
                     <form onSubmit={forgotUsernameOrPasswordSubmitHandler}>
                         <div className='flex flex-column'>
-                            <label className='text-left' htmlFor="email">Email address</label>
+                            <label className='text-left' htmlFor="email">Email Address</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
                                 <InputText
                                     id="email"
                                     value={email}
                                     onChange={emailHandler}
-                                    placeholder='Enter your email address'
+                                    placeholder='Enter email address'
                                     className='forgetPassword_user_input'
                                 />
                             </div>
@@ -257,13 +257,14 @@ const Login = () => {
                 </>}
 
                 {singleSignOnScreen && <>
-                    <h2>Avo Assure - login with SAML SSO</h2>
+                    <h2>Login with SSO/SAML</h2>
+                    <span> Enter user ID associated with SSO/SAML account.</span>
                     <form>
                         <div className='flex flex-column'>
-                            <label className='text-left' htmlFor="username">Username</label>
+                            <label className='text-left' htmlFor="username">User ID</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
-                                <InputText id="username" className='forgetPassword_user_input' placeholder='Username' />
+                                <InputText id="username" className='forgetPassword_user_input' placeholder='Enter user id' />
                             </div>
                         </div>
                         <div className='login_btn mb-5'>
