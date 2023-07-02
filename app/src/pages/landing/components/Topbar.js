@@ -90,9 +90,11 @@ const MenubarDemo = (props) => {
   return (
     <div className='Topbar_Menu'>
       <Menubar className='Header_size' start={start} end={end} />
+      <div className='Need_Help_menu'>
       <div className="card needHelp flex justify-content-center bg-white shadow-2">
         <img className='needHelp_img' src="static/imgs/need_help.png" alt="need_Help" onClick={(event) => needHelpmenuLeft.current.toggle(event)} aria-controls="popup_menu_left" aria-haspopup/>
-        <Menu className='needHelp_Menu w-13rem top-50'id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft}/>
+        <Menu className='needHelp_Menu'id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft}/>
+      </div>
       </div>
     </div>
   );

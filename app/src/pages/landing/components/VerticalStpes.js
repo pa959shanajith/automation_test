@@ -20,7 +20,14 @@ import { selectedProj } from '../../design/designSlice';
 const VerticalSteps = (props) => {
     const dispatch= useDispatch ();
     const activeStep= useSelector((state)=>state.steps);
-    const project = useSelector((state)=>state.landing.defaultSelectProject);
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    let project = reduxDefaultselectedProject;
+
+    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+    if (localStorageDefaultProject) {
+      project = JSON.parse(localStorageDefaultProject);
+    }
+
     const navigate = useNavigate();
     const steps = [
     {

@@ -2,6 +2,7 @@ import React, { useEffect ,useState } from 'react';
 import '../styles/StaticElements.scss';
 import Topbar from './Topbar';
 import SideNavBar from './SideNav';
+import {FooterTwo as Footer} from '../../global';
 import { useLocation } from 'react-router-dom';
 
 
@@ -23,7 +24,10 @@ const StaticElements = ({children}) => {
             <div className="sidebar_sidepanel_homepage">
                 { showSideNavBar && <SideNavBar />}
                 {children}
+                <div><Footer/></div>
             </div>
+            
+
     )
 }
 export default StaticElements;

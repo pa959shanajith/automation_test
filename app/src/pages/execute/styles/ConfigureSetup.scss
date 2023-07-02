@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .config_setup {
   width: 100%;
   margin: 0;
@@ -39,10 +40,8 @@
           .p-treetable-header {
             background: #ffffff;
             border-width: 1px;
-            font-family: "Open Sans";
             color: #030229;
-            font-size: 1rem;
-            font-weight: 400;
+            font: $f6_regular;
             .config_text {
               width: 50%;
               .p-input-icon-left {
@@ -86,7 +85,7 @@
           .p-treetable-thead>tr>th {
             background: #F3F2FF;
             padding: 0.8rem 0.8rem;
-            font-size: 0.875rem;
+            // font-size: 0.875rem;
             color: #030229;
             border: none;
             white-space: nowrap;
@@ -95,22 +94,23 @@
             position: sticky;
             top: 0;
             z-index: 1;
+            font: $f6_semibold !important;
           }
 
           .p-treetable-tbody>tr>td {
             padding: 0.4rem 0.4rem;
-            font-size: 1rem;
             color: #030229;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font: $f6_regular;
             .p-multiselect {
               width: 100%;
               padding: 0.3rem 0.3rem;
-              font-size: 0.875rem;  
+              font: $f6_regular;
               .p-multiselect-label {
                 padding: 0;
-                font-size: 0.875rem;       
+                font: $f6_regular;
               }
               .p-multiselect-label.p-placeholder {
                 padding: 0.3rem 0.3rem;
@@ -118,7 +118,7 @@
             }
             .p-inputtext {
               padding: 0.3rem 0.3rem;
-              font-size: 0.875rem;
+              font: $f6_regular;
             }
             .p-inputtext-sm {
               width: 100%;
@@ -178,13 +178,14 @@
             display: flex;
             flex-direction: column;
             justify-content: space-around;
+            font: $f7_semibold;
             .p-multiselect .p-multiselect-label.p-placeholder {
               text-align: left;
               line-height: 0.5rem;
             }
             .p-inputtext {
               padding: 0.4rem 0.4rem;
-              font-size: 0.875rem;
+              font: $f6_regular;
             }
             .p-dropdown {
               width: 100%;
@@ -198,10 +199,8 @@
                 width: 50%;
                 padding: 0.5rem 0 0.5rem 0;
                 .p-button-label {
-                  font-family: "Open Sans";
                   color: #030229;
-                  font-size: 0.875rem;
-                  font-weight: 400;
+                  font: $f7_semibold;
                 }
               }
             }

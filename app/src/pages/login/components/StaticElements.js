@@ -1,6 +1,7 @@
 import React from 'react';
 import "../styles/StaticElements.scss";
 import { Toast } from 'primereact/toast';
+import { FooterTwo as Footer } from '../../global';
 
 
 /*
@@ -10,22 +11,25 @@ import { Toast } from 'primereact/toast';
     Todo: none
 */
 
-const StaticElements = ({children}) => {
+const StaticElements = ({ children }) => {
 
     return (
-        <div className="login_container">
-            <div className="split_left">
-                <h1>Hello,</h1>
-                <h2>Welcome to Avo  Assure</h2>
-                <h3>Login to experience Intelligence</h3>
-                <img className="" src="static/imgs/animated_login.gif" alt="Login" />
-            </div>
-            <div className="split_right">
-                <div className="right_side_login">
-                    <img className="icon_img" src="static/imgs/AssureLogo_horizonal.svg"></img>
-                    {children}
+        <div className='flex flex-column'>
+            <div className="login_container">
+                <div className="split_left">
+                    <h1>Hello,</h1>
+                    <h2>Welcome to Avo  Assure</h2>
+                    <h3>Login to experience Intelligence</h3>
+                    <img className="" src="static/imgs/animated_login.gif" alt="Login" />
+                </div>
+                <div className="split_right">
+                    <div className="right_side_login">
+                        <img className="icon_img" src="static/imgs/AssureLogo_horizonal.svg"></img>
+                        {children}
+                    </div>
                 </div>
             </div>
+            <div><Footer /></div>
         </div>
     );
 

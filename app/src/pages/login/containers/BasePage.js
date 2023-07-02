@@ -122,6 +122,7 @@ const BasePage = () => {
     }, []);
 
     const loadProfile = userinfo => {
+        localStorage.setItem('userInfo',JSON.stringify(userinfo));
         window.localStorage.navigateScreen = userinfo.page;
         dispatch(loadUserInfoActions.setDateFormat(userinfo.dateformat));
         dispatch(loadUserInfoActions.setRole(userinfo.rolename));

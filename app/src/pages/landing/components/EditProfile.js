@@ -18,7 +18,7 @@ const EditProfile = (props) => {
     const { showDialogBox, setShowDialogBox } = props;
     const [showDialog, setShowDialog] = useState(showDialogBox);
     const toastWrapperRef = useRef(null);
-    const userInfo = useSelector((state) => state.landing.userinfo);
+    let userInfo = useSelector((state) => state.landing.userinfo);
     const dispatch = useDispatch();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");

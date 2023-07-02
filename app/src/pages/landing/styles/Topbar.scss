@@ -41,8 +41,8 @@
 {
     position: absolute;
     z-index: 4;
-    top: 41rem;
-    left: 92rem;
+    bottom: 4rem;
+    right: 2rem;
     border-radius: 3rem;
     padding: 1rem;
     .p-menu {
@@ -65,11 +65,11 @@
     width: 1.2rem;
     cursor: pointer;
 }
-#needHelp_font{
-    .p-submenu-header{
+.Need_Help_menu{
+    .p-menu .p-submenu-header{
         font: $f6_semibold !important;
     }
-    .p-menuitem-text{
+    .p-menuitem-tex.p-menu .p-menuitem-link .p-menuitem-text {
         font: $f6_regular !important;  
     }
 
