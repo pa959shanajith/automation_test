@@ -278,6 +278,18 @@
                             }
 
                         }
+                        .overlay4ModSce{
+                            font: $f6_regular;
+                            align-items: center;
+                            margin-top: 8rem;
+                            width: 17rem;
+                            height: 2rem;
+                            border: 1px solid black;
+                            display: flex;
+                            justify-content: center;
+                            border-radius: 0.5rem;
+                            background-color: #f2f2ff;
+                        }
                         
                         .p-tree {
                             height: 20.9rem;
@@ -443,7 +455,7 @@
                     .sceNme_Icon{
                         display: flex;
                         align-items: center;
-                        width: 19rem;
+                        width: 29rem;
                     img{
                         height: 25px;
                         width: 25px;
@@ -462,6 +474,32 @@
                    
                     .modIconSce {
                         display: flex;
+                        width: 30%;
+                        h5{display: flex;
+                          font-size: 11px;
+                        img{
+                      
+                            height: 15px;
+                            width: 15px;
+                            // margin-top: 3px;
+                            }
+                        h3{
+                                font-size: 11px;
+                                font-family: "open sans";
+                                font-weight: 200;
+                                color: rgb(8, 8, 8, 1);
+                                // padding-left: 0.5rem;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                width: 9rem;
+                                margin-top: 1px;
+                            }
+                        }
+
+                    }
+                    .projIconSce{
+                        display: flex;
+                        width: 30%;
                         h5{display: flex;
                           font-size: 11px;
                         img{
