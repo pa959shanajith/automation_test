@@ -206,8 +206,8 @@ const DisplayProject = (props) => {
     return (
       <>
         <Tooltip target=".add_btn" position="bottom" content="Create Project" />
-        {/* <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
-         */}
+         <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
+         
         <CreateProject visible={visible} onHide={handleCloseDialog} />
         {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color" />}
         <div className="flex flex-row All_Project"> 
@@ -219,14 +219,8 @@ const DisplayProject = (props) => {
             
             ) : null}
             {/* <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} /> */}
-            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu}  ref={imageRefadd} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}/>
-            {showTooltip && (
-              <div className='card__add' style={{ position: 'absolute', left: `${cardPosition.left - 80}px`, top: `${cardPosition.top- -20}px`, display: 'block' }}>
-                <h3> Sort projects</h3>
-                <p className='text__insprint__info1'>Click here to sort projects.</p>
-              
-              </div>
-            )}
+            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
+           
           </div>
         </div>
       </>

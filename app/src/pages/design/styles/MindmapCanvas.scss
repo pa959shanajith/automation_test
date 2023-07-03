@@ -150,3 +150,19 @@
     display: flex;
     justify-content: flex-start;
 }
+.card__insprint {
+    height: 23%;
+    width: 32%;
+    position: absolute;
+    z-index: 1;
+    background-color: #495057;
+    border-radius: 8px;
+    padding: 0.8rem 0.8rem;
+    color: white;
+    font-family: 'Open Sans';
+    font-size: 14px;
+  }
+  
+  .text__insprint__info {
+    padding: 1.2rem 0;
+  }

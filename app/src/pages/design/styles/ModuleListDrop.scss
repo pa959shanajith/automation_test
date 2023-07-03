@@ -366,3 +366,19 @@ padding-bottom: 1.5rem;}
     left: 14rem;
     top: 2.7rem;
 }
+.card__add {
+    height: 11%;
+    width: 13%;
+    position: absolute;
+    z-index: 1;
+    background-color: #495057;
+    border-radius: 5px;
+    padding: 0.8rem 0.8rem 0.2rem;
+    color: white;
+    font-family: 'Open Sans';
+    font-size: 14px;
+  }
+  .text__tooltip__info1 {
+    padding: 0.2rem 0;
+    line-height: 2.3; 
+  }
