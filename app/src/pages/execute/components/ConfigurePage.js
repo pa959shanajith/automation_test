@@ -1,19 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { TabMenu } from "primereact/tabmenu";
 import { v4 as uuid } from "uuid";
-import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Link } from "react-router-dom";
 import { RadioButton } from "primereact/radiobutton";
-import { Tree } from "primereact/tree";
-import { InputText } from "primereact/inputtext";
-import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import { Toast } from "primereact/toast";
-import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { ConfirmPopup } from "primereact/confirmpopup";
 import { useDispatch, useSelector } from "react-redux";
 import "../styles/ConfigurePage.scss";
 import AvoModal from "../../../globalComponents/AvoModal";
@@ -54,8 +49,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
   const [showIcePopup, setShowIcePopup] = useState(false);
-  const [selectedNodeKey, setSelectedNodeKey] = useState(null);
-  const [counter, setCounter] = useState(0);
   const toast = useRef(null);
   const url = window.location.href.slice(0, -7) + "execAutomation";
   const [configProjectId, setConfigProjectId] = useState("");
@@ -116,9 +109,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [selectedPattren, setSelectedPattren] = useState(null);
   const [selectedDaily, setSelectedDaily] = useState(null);
+  const [selectedWeek, setselectedWeek] = useState([]);
   const [selectedMonthly, setSelectedMonthly] = useState(null);
   const [dropdownWeek, setDropdownWeek] = useState(null);
   const [dropdownDay, setDropdownDay] = useState(null);
@@ -138,7 +133,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState(0);
   const [activeIndex1, setActiveIndex1] = useState(0);
   const timeinfo = useRef(null);
   const scheduleinfo  = useRef(null);
@@ -796,12 +790,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     } else setVisible(false);
   };
 
-  const onNodeSelect = (e) => {
-    if (e && e.node && e.node.key) {
-      setSelectedNodeKey(e.node.key);
-    }
-  };
-
   const Breadcrumbs = () => {
     return (
       <nav>
@@ -933,6 +921,47 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const onScheduleBtnClickClient = (btnType) => {
+    const getPattren = () => {
+      let getKey = selectedPattren?.key ? selectedPattren?.key : "OT";
+      let pattrenObj = {
+        OT: {
+          recurringValue: "One Time",
+          recurringString: "One Time",
+          recurringStringOnHover: "One Time",
+        },
+        DY: {
+          recurringValue: scheduleOption?.everyday
+            ? `0 0 */${scheduleOption.everyday} * *`
+            : "0 0 * * 1-5",
+          recurringString: "Every Day",
+          recurringStringOnHover: scheduleOption?.everyday
+            ? `Occurs every ${scheduleOption.everyday} days`
+            : "Occurs every weekday",
+        },
+        WY: {
+          recurringValue: `0 0 * * ${selectedWeek
+            .map((el) => el.key)
+            .toString()}`,
+          recurringString: "Every Week",
+          recurringStringOnHover: `Occurs on every  ${selectedWeek.map(
+            (el) => el.name
+          )}`,
+        },
+        MY: {
+          recurringValue:
+            selectedMonthly?.key === "daymonth"
+              ? `0 0 * * ${scheduleOption?.monthday} /${scheduleOption?.monthweek}`
+              : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
+          recurringString: "Every Month",
+          recurringStringOnHover:
+            selectedMonthly?.key === "daymonth"
+              ? `Occurs on ${scheduleOption?.monthday}th day of every ${scheduleOption?.monthweek} month`
+              : `Occurs on ${dropdownWeek?.name} ${dropdownDay?.name} of every ${scheduleOption?.everymonth} month`,
+        },
+      };
+      return pattrenObj[getKey];
+    };
+
     if (btnType === "ScheduleIce") {
       dispatch(
         testSuitesScheduler_ICE({
@@ -949,15 +978,15 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               type: "normal",
               targetUser: selectedICE,
               iceList: [],
-              date: startDate.toLocaleDateString('es-CL'),
+              date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startDate.getTime(),
-              recurringValue: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
-              recurringString: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
-              recurringStringOnHover: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
-              endAfter: "",
-              clientTime: "",
-              clientTimeZone: ""
+              timestamp: startDate ? startDate.getTime() : "",
+              recurringValue: getPattren().recurringValue,
+              recurringString: getPattren().recurringString,
+              recurringStringOnHover: getPattren().recurringStringOnHover,
+              endAfter: startDate ? "" : endDate.toLocaleDateString('es-CL'),
+              clientTime: startDate ? "" : `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
+              clientTimeZone: startDate ? "" : `GMT+${Math.abs(new Date().getTimezoneOffset()/60)}`,
             })),
             scenarioFlag: false,
             type: "normal",
@@ -974,6 +1003,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           })
         );
         setScheduling(false);
+        setStartDate(null);
+        setEndDate(null);
+        setStartTime(null);
+        setScheduleOption({});
       });
     }
     if (btnType === "Cancel") {
@@ -986,6 +1019,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       ...scheduleOption,
       [e.target.name]: e.target.value
     })
+  };
+
+  const onWeekChange = (e) => {
+    let selectedWeeks = [...selectedWeek];
+
+    if (e.checked)
+      selectedWeeks.push(e.value);
+    else
+      selectedWeeks = selectedWeeks.filter(category => category.key !== e.value.key);
+
+    setselectedWeek(selectedWeeks);
   };
 
   const checkboxHeaderTemplate = () => {
@@ -1150,13 +1194,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 cardData={fetechConfig[configItem]}
                 startDate={startDate}
                 setStartDate={setStartDate}
+                endDate={endDate}
+                setEndDate={setEndDate}
                 startTime={startTime}
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
-                isDisabled={!startDate}
+                isDisabled={!startDate && (!selectedPattren?.key || !endDate)}
                 onSchedule={onScheduleBtnClick}
                 selectedDaily={selectedDaily}
+                selectedWeek={selectedWeek}
                 selectedMonthly={selectedMonthly}
                 dropdownWeek={dropdownWeek}
                 dropdownDay={dropdownDay} 
@@ -1166,6 +1213,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setDropdownDay={setDropdownDay}
                 scheduleOption={scheduleOption}
                 onScheduleChange={onScheduleChange}
+                onWeekChange={onWeekChange}
               />
             }
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
