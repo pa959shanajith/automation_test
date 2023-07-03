@@ -23,9 +23,11 @@ const UserDemo = (props) => {
     const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
     const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
     const [initials, setInitials] = useState('');
-    const userInfo = useSelector((state) => state.landing.userinfo);
+    let userInfo = useSelector((state) => state.landing.userinfo);
 
     
+    userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
     const handleUserMenu = () => {
         setShowUserMenu(!showUserMenu);
     };
