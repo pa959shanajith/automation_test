@@ -383,6 +383,50 @@ const CaptureModal = (props) => {
     if (continueSave) saveScrapedObjects();
   }
 
+const elementTypeProp =(elementProperty) =>{
+  switch(elementProperty) {
+    case "abbr" || "acronym" || "aside" || "body" || "data" || "dd" || "dfn" || "div" || "embed" || "figure" || "footer" || "frame" || "head" ||
+          "iframe" || "kbd" || "main" || "meta" || "noscript" || "object" || "output" || "param" || "progress" || "rt" || "samp" || "section" || "span"
+          || "style" || "td" || "template" :
+       return "Content";
+
+    case "a" || "link":
+       return "Link";
+
+    case "address" || "article" || "b" || "bdi" || "bdo" || "big" || "blockquote" || "caption" || "center" || "cite" || "code" || "del" || "details" 
+         || "dt" || "em" || "figcaption" ||  "h1" || "h2" || "h3" || "h4" || "h5" || "h6" || "header" || "i" || "ins" || "label" || "legend" || "mark" 
+         || "noframes" || "p" || "pre" || "q" || "rp" || "ruby" || "s" || "small" || "strike" || "strong" || "sub" || "summary" || "sup" || "th" || "time"
+         || "title" || "tt" || "u":
+      return "Text";
+
+    case "button" :
+      return "Button";
+      
+    case "img" || "map" || "picture" || "svg" :
+      return "Image";
+
+    case "col" || "colgroup" || "nav" :
+      return "Navigation Menus";
+
+    case "datalist" || "select" :
+      return "Dropdown";
+
+    case "dir" || "dl" || "li" || "ol" || "optgroup" || "option" || "ul" :
+      return "List";
+
+    case "form" || "fieldset" :
+      return "Forms";
+      
+    case "input" || "textarea" :
+      return "Textbox/Textarea";
+      
+    case "table" || "tbody" || "tfoot" || "thead" || "tr":
+      return "Table";
+
+    default:
+      return "Element";
+   }
+}
 
   const fetchScrapeData = () => {
     return new Promise((resolve, reject) => {
@@ -470,7 +514,7 @@ const CaptureModal = (props) => {
             return (
               {
                 selectall: item.custname,
-                objectProperty: item.tag,
+                objectProperty: elementTypeProp(item.tag),
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
                   setScreenshotData({
                     header: item.custname,
@@ -489,7 +533,7 @@ const CaptureModal = (props) => {
             return (
               {
                 selectall: item.custname,
-                objectProperty: item.tag,
+                objectProperty: elementTypeProp(item.tag),
                 browserscrape: 'google chrome',
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
                   setScreenshotData({
@@ -1028,9 +1072,9 @@ const CaptureModal = (props) => {
               "static/imgs/eye_disabled.svg"} 
           />
         </div>
-      <div className='header__popup'>
-      <Tooltip target=".header__popup" position='bottom'>{screenshotData.header}</Tooltip>
-       <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
+      <div className='header__popup screenshot_headerName'>
+        <Tooltip target=".screenshot_headerName" content={screenshotData.header} position='bottom' ></Tooltip>
+        <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
       </div>
       </div>
     </>
@@ -1373,7 +1417,7 @@ const CaptureModal = (props) => {
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
-              body={renderSelectAllCell}>
+            >
             </Column>
             <Column field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
@@ -1485,7 +1529,7 @@ const CaptureModal = (props) => {
         toastError={toastError}
       />}
 
-      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} />}
+      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError}/>}
       {/* //Element properties  */}
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
         <div className="card">
