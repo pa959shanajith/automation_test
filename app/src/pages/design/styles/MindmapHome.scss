@@ -269,9 +269,9 @@
     left: 0;
     justify-content: flex-end;
     color: $primaryColor;
-    background-color: transparent;
+    background-color: white;
     font-family: $avoFont ;
-    z-index: 0;
+    z-index: 3;
     padding: 10px;
     box-shadow: #00000014 0 -1px 0;
     margin-top: 1px;
@@ -285,7 +285,8 @@
 }
 
 .footer-logo_two{
-    margin-left:6px;
+    position: relative;
+    left: 0rem;
     height: 18px; 
 }
 

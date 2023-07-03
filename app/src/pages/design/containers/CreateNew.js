@@ -34,10 +34,13 @@ const CreateNew = ({importRedirect}) => {
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
   const isEnELoad = useSelector(state=>state.design.isEnELoad);
-  const Proj = useSelector(state=>state.landing.defaultSelectProject);
-  
+  const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+  let Proj = reduxDefaultselectedProject;
 
- 
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+    Proj = JSON.parse(localStorageDefaultProject);
+  }
 
   // useEffect(()=>{
   //   if(selectProj && prjList[selectProj]){
