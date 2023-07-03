@@ -8,7 +8,13 @@ import { useSelector } from 'react-redux';
 
 const ProjectOverview = ({ }) => {
     const [activeIndex, setActiveIndex] = useState(0);
-    const defaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    let defaultselectedProject = reduxDefaultselectedProject;
+
+    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+    if (localStorageDefaultProject) {
+        defaultselectedProject = JSON.parse(localStorageDefaultProject);
+    }
     const items = [
         { label: 'Overview' },
         { label: 'Analysis' },

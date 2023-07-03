@@ -184,7 +184,7 @@ const Login = () => {
                     <>
                         <form onSubmit={loginSubmitHandler}>
                             <div className='flex flex-column'>
-                                <label className='text-left' htmlFor="username">Username</label>
+                                <label className='text-left Login_Font' htmlFor="username">Username</label>
                                 <div className="p-input-icon-left mb-5 mt-2">
                                     <i className='pi pi-user' />
                                     <InputText
@@ -201,7 +201,7 @@ const Login = () => {
 
                             <div className='flex flex-column'>
                                 <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
-                                <label className='text-left' htmlFor="password">Password</label>
+                                <label className='text-left Login_Font' htmlFor="password">Password</label>
                                 <div className="p-input-icon-left mb-5 mt-2">
                                     <i className='pi pi-lock' />
                                     <InputText
@@ -220,7 +220,7 @@ const Login = () => {
                             </div>
 
                             <div className='mb-5'>
-                                <Button id="login" label='Login' size="small" disabled={disableLoginButton} ></Button>
+                                <Button className='Btn' id="login" label='Login' size="small" disabled={disableLoginButton} ></Button>
                             </div>
                             <div className='link mb-5'>
                                 <a onClick={forgotPasswordLinkHandler} > Forgot Username/Password? </a>
@@ -228,16 +228,16 @@ const Login = () => {
                             <div className='link mb-3'>
                                 <a onClick={singleSignOnHandler} >Login with SSO/SAML</a>
                             </div>
-                            <span className="text-sm"> Don't have an account? Contact admin to create an account.</span>
+                            <span className="text-sm Contact_Admin_link"> Don't have an account? Contact admin to create an account.</span>
                         </form>
                     </>}
 
                 {showForgotPasswordScreen && <>
-                    <h2>Forgot Username/Password?</h2>
-                    <span> Provide registered email address to retrieve username/receive password resent link.  </span>
+                    <span className='Forgot_Header'>Forgot Username/Password?</span>
+                    <span className='Password_reset_link'> Provide registered email address to retrieve username/receive password resent link.  </span>
                     <form onSubmit={forgotUsernameOrPasswordSubmitHandler}>
                         <div className='flex flex-column'>
-                            <label className='text-left' htmlFor="email">Email Address</label>
+                            <label className='text-left Login_Font' htmlFor="email">Email Address</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
                                 <InputText
@@ -250,26 +250,26 @@ const Login = () => {
                             </div>
                         </div>
                         <div className='login_btn mb-5'>
-                            <Button id="back" label='Back' size="small" onClick={backButtonHandler} disabled={false} text ></Button>
-                            <Button id="submit" label='Submit' size="small" disabled={!email} ></Button>
+                            <Button className='Btn' id="back" label='Back' size="small" onClick={backButtonHandler} disabled={false} text ></Button>
+                            <Button className='Btn' id="submit" label='Submit' size="small" disabled={!email} ></Button>
                         </div>
                     </form>
                 </>}
 
                 {singleSignOnScreen && <>
-                    <h2>Login with SSO/SAML</h2>
-                    <span> Enter user ID associated with SSO/SAML account.</span>
+                    <span className='Forgot_Header'>Login with SSO/SAML</span>
+                    <span className='Password_reset_link'> Enter user ID associated with SSO/SAML account.</span>
                     <form>
                         <div className='flex flex-column'>
-                            <label className='text-left' htmlFor="username">User ID</label>
+                            <label className='text-left Login_Font' htmlFor="username">User ID</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
                                 <InputText id="username" className='forgetPassword_user_input' placeholder='Enter user id' />
                             </div>
                         </div>
                         <div className='login_btn mb-5'>
-                            <Button id="back" label='Back' size="small" onClick={backButtonHandler} disabled={false} text ></Button>
-                            <Button id="submit" label='Submit' size="small" disabled={false} ></Button>
+                            <Button className='Btn' id="back" label='Back' size="small" onClick={backButtonHandler} disabled={false} text ></Button>
+                            <Button className='Btn' id="submit" label='Submit' size="small" disabled={false} ></Button>
                         </div>
                     </form>
                 </>}

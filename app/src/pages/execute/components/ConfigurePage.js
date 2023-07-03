@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import "../styles/ConfigurePage.scss";
 import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
+import {FooterTwo as Footer} from '../../global';
 import {
   fetchConfigureList,
   getPools,
@@ -47,7 +48,7 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
 import ExecutionCard from "./ExecutionCard";
 
-const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
+const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
@@ -115,7 +116,13 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
+  const [startTime, setStartTime] = useState(null);
   const [selectedPattren, setSelectedPattren] = useState(null);
+  const [selectedDaily, setSelectedDaily] = useState(null);
+  const [selectedMonthly, setSelectedMonthly] = useState(null);
+  const [dropdownWeek, setDropdownWeek] = useState(null);
+  const [dropdownDay, setDropdownDay] = useState(null);
+  const [scheduleOption, setScheduleOption] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
@@ -132,8 +139,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
-
   const [activeIndex1, setActiveIndex1] = useState(0);
+  const timeinfo = useRef(null);
+  const scheduleinfo  = useRef(null);
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
@@ -230,7 +238,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
       setProjectList(data);
     })();
   }, []);
-  
+
 
 
   const showSuccess_CICD = (btnType) => {
@@ -411,7 +419,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     ExecuteTestSuite(executionData);
   };
 
-  const ExecuteTestSuite = async (executionData,btnType) => {
+  const ExecuteTestSuite = async (executionData, btnType) => {
     if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(
@@ -431,8 +439,8 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     executionData["integration"] = integration;
     executionData["batchInfo"] =
       currentSelectedItem &&
-      currentSelectedItem.executionRequest &&
-      currentSelectedItem.executionRequest.batchInfo
+        currentSelectedItem.executionRequest &&
+        currentSelectedItem.executionRequest.batchInfo
         ? currentSelectedItem.executionRequest.batchInfo
         : [];
     executionData["scenarioFlag"] =
@@ -485,9 +493,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             });
           }
         }
-       
+
       }
-      
+
       setBrowserTypeExe([]);
       setModuleInfo([]);
       setExecAction("serial");
@@ -515,14 +523,14 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
       projectid: configProjectId,
     });
     setFetechConfig(configurationList);
-    configurationList.forEach((item, idx) => {   
+    configurationList.forEach((item, idx) => {
       getState.push({
         sno: idx + 1,
         // profileName: item.configurename,
         profileName: (
           <span
             title={item.configurename} // Add title attribute for tooltip with full text
-            >
+          >
             {item.configurename}
           </span>
         ),
@@ -571,7 +579,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             <Button
               className="CICD"
               size="small"
-             
+
             >
               SouceLab
             </Button>
@@ -838,48 +846,48 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   }, [currentSelectedItem?.executionRequest?.browserType[0]]);
 
   const onExecuteBtnClick = async (btnType) => {
-    if(btnType==="Execute"){
-    if (showIcePopup) {
-      dataExecution.type =
-        ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
-      dataExecution.poolid = "";
+    if (btnType === "Execute") {
+      if (showIcePopup) {
+        dataExecution.type =
+          ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
+        dataExecution.poolid = "";
 
-      if ((ExeScreen === true ? smartMode : "") !== "normal")
-        dataExecution.targetUser = Object.keys(selectedICE).filter(
-          (icename) => selectedICE[icename]
-        );
-      else dataExecution.targetUser = selectedICE;
-
-      CheckStatusAndExecute(dataExecution, iceNameIdMap);
-    } else {
-      const temp = await execAutomation(currentKey);
-      if (temp.status !== "pass") {
-        if (temp.error && temp.error.CONTENT) {
-          setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
-        } else {
-          setMsg(
-            MSG.CUSTOM(
-              "Error While Adding Configuration to the Queue",
-              VARIANT.ERROR
-            )
+        if ((ExeScreen === true ? smartMode : "") !== "normal")
+          dataExecution.targetUser = Object.keys(selectedICE).filter(
+            (icename) => selectedICE[icename]
           );
-        }
+        else dataExecution.targetUser = selectedICE;
+
+        CheckStatusAndExecute(dataExecution, iceNameIdMap);
       } else {
-        setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
-      }
-      if(btnType ===  "Execute"){
+        const temp = await execAutomation(currentKey);
+        if (temp.status !== "pass") {
+          if (temp.error && temp.error.CONTENT) {
+            setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
+          } else {
+            setMsg(
+              MSG.CUSTOM(
+                "Error While Adding Configuration to the Queue",
+                VARIANT.ERROR
+              )
+            );
+          }
+        } else {
+          setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+        }
+        if (btnType === "Execute") {
           toast.current.show({
             severity: "success",
             summary: "Success",
             detail: "Execution has started",
             life: 5000,
           });
-          
-          }
-      // onHide(name);
+
+        }
+        // onHide(name);
+      }
     }
-  }
-    if(btnType === 'Cancel'){
+    if (btnType === 'Cancel') {
       setVisible_execute(false);
     }
     // if(btnType ===  "Execute"){
@@ -889,22 +897,43 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     //     detail: "Execution has started",
     //     life: 5000,
     //   });
-      
+
     //   }
-    
+
   };
+
+  useEffect(() => {
+    if(scheduleOption?.monthday < 0 || scheduleOption?.monthday > 12){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-12)' });
+    }
+    if(scheduleOption?.everymonth < 0 || scheduleOption?.everymonth > 12){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-12)' });
+    }
+    if(scheduleOption?.everyday < 0 || scheduleOption?.everyday > 30){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-30)' });
+    }
+    if(scheduleOption?.monthweek < 0 || scheduleOption?.monthweek > 30){
+      scheduleinfo?.current?.show({ severity: 'error', summary: 'Error', detail: 'Invalid input (should be between 1-30)' });
+    }
+  }, [scheduleOption]);
 
   const onScheduleBtnClick = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_schedule(false);
+      setStartDate(null);
+      setStartTime(null);
     }
     if (btnType === "Schedule") {
-      setScheduling(true);
+      if((new Date(startTime) < new Date(Date.now() + (5 * 60 * 1000))) && (new Date(startDate).getTime() < new Date(startTime).getTime())) {
+        timeinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Schedule time must be 5 mins more than current time.' });
+      } else {
+        setScheduling(true);
+      }
     }
   };
 
   const onScheduleBtnClickClient = (btnType) => {
-    if(btnType === "ScheduleIce"){
+    if (btnType === "ScheduleIce") {
       dispatch(
         testSuitesScheduler_ICE({
           param: "testSuitesScheduler_ICE",
@@ -914,13 +943,14 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             executionEnv: "default",
             browserType: selectedSchedule?.executionRequest?.browserType,
             integration: selectedSchedule?.executionRequest?.integration,
-            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({ ...el, 
+            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
+              ...el,
               poolid: "",
               type: "normal",
               targetUser: selectedICE,
               iceList: [],
-              date: startDate.toLocaleDateString('en-GB'),
-              time: `${startDate.getHours()}:${startDate.getMinutes()}`,
+              date: startDate.toLocaleDateString('es-CL'),
+              time: `${startTime.getHours()}:${startTime.getMinutes()}`,
               timestamp: startDate.getTime(),
               recurringValue: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
               recurringString: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
@@ -951,6 +981,13 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     }
   };
 
+  const onScheduleChange = (e) => {
+    setScheduleOption({
+      ...scheduleOption,
+      [e.target.name]: e.target.value
+    })
+  };
+
   const checkboxHeaderTemplate = () => {
     return (
       <>
@@ -960,7 +997,6 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     );
   };
  
-
   const renderTable = () => {
     if (!!configList.length) {
       return (
@@ -980,18 +1016,18 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             <Column
               field="sno"
               style={{ width: "5%" }}
-              header={<span className="SNo-header">S No</span> }
+              header={<span className="SNo-header">S No</span>}
             />
-          <Column
+            <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
-                width:"50%"
-               }}
-                 field="profileName"
-             header={checkboxHeaderTemplate}
-/>
+                width: "50%"
+              }}
+              field="profileName"
+              header={checkboxHeaderTemplate}
+            />
             <Column
               style={{
                 fontWeight: "bold",
@@ -1025,7 +1061,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             onModalBtnClick={onExecuteBtnClick}
             content={
               <>
-               {<ExecutionCard cardData={fetechConfig[configItem]} />}
+                {<ExecutionCard cardData={fetechConfig[configItem]} />}
                 <div className="radioButtonContainer">
                   <RadioButton
                     value="Execute with Avo Assure Agent/ Grid"
@@ -1062,7 +1098,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                       <div className="legend">
                         <span id="status" className="status-available"></span>
                         <span className="legend-text">Available</span>
-                  </div>
+                      </div>
                       <div className="legend">
                         <span id="status" className="status-unavailable"></span>
                         <span className="legend-text2">Unavailable</span>
@@ -1080,19 +1116,19 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                         Execute on
                       </span>
                       <div className="search_icelist ">
-                  <DropDownList
-                    poolType={poolType}
-                    ExeScreen={ExeScreen}
-                    inputErrorBorder={inputErrorBorder}
-                    setInputErrorBorder={setInputErrorBorder}
-                    placeholder={"Search"}
-                    data={availableICE}
-                    smartMode={ExeScreen === true ? smartMode : ""}
-                    selectedICE={selectedICE}
-                    setSelectedICE={setSelectedICE}
-                  />
-                  </div>
-                </div>
+                        <DropDownList
+                          poolType={poolType}
+                          ExeScreen={ExeScreen}
+                          inputErrorBorder={inputErrorBorder}
+                          setInputErrorBorder={setInputErrorBorder}
+                          placeholder={"Search"}
+                          data={availableICE}
+                          smartMode={ExeScreen === true ? smartMode : ""}
+                          selectedICE={selectedICE}
+                          setSelectedICE={setSelectedICE}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
               </>
@@ -1103,6 +1139,8 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             
            
           />
+          <Toast ref={timeinfo} />
+          <Toast ref={scheduleinfo} />
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}
@@ -1112,18 +1150,30 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                 cardData={fetechConfig[configItem]}
                 startDate={startDate}
                 setStartDate={setStartDate}
+                startTime={startTime}
+                setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
+                isDisabled={!startDate}
+                onSchedule={onScheduleBtnClick}
+                selectedDaily={selectedDaily}
+                selectedMonthly={selectedMonthly}
+                dropdownWeek={dropdownWeek}
+                dropdownDay={dropdownDay} 
+                setSelectedDaily={setSelectedDaily}
+                setSelectedMonthly={setSelectedMonthly}
+                setDropdownWeek={setDropdownWeek}
+                setDropdownDay={setDropdownDay}
+                scheduleOption={scheduleOption}
+                onScheduleChange={onScheduleChange}
               />
             }
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
-            footerType="Schedule"
             modalSytle={{
               width: "75vw",
               height: "95vh",
               background: "#FFFFFF",
             }}
-            isDisabled={!startDate}
           />
           <AvoModal
             visible={scheduling}
@@ -1171,7 +1221,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             setVisible={setVisible_CICD}
             content={
               <>
-                 <ExecutionCard cardData={fetechConfig[configItem]} />
+                <ExecutionCard cardData={fetechConfig[configItem]} />
 
                 <div className="input_CICD ">
                   <div class="container_url">
@@ -1268,7 +1318,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   fontWeight: "bold",
                   fontFamily: "open Sans",
                 }}
-              
+
               >
                 S.No.
               </span>
@@ -1278,7 +1328,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   fontWeight: "bold",
                   fontFamily: "open Sans",
                 }}
-                
+
               >
                 Configuration Profile Name
               </span>
@@ -1287,7 +1337,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   marginRight: "18rem",
                   fontWeight: "bold",
                   fontFamily: "open Sans",
-                  
+
                 }}
               >
                 Execution Options
@@ -1358,6 +1408,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
         {activeIndex1 !== 1 ? (
           <div className="ConfigurePage_container m-2" showGridlines>
             {renderTable()}{" "}
+            <div><Footer/></div>
           </div>
         ) : (
           <ExecutionPage />

@@ -1,3 +1,4 @@
+@import "../pages/global/styles/ColorVariables.scss";
 .avo_input {
     width: 100%;
     .input_container {
@@ -12,10 +13,12 @@
             height: 1rem;
             .txt_valid {
                 visibility: hidden;
+                font: $f8_regular;
             }
             .txt_invalid {
                 visibility: visible;
                 color: #D1272C;
+                font: $f8_regular;
             }
         }
     }
@@ -36,6 +39,7 @@
         .p-inputtext {
             padding: 0.4rem 0.4rem;
             width: 100%;
+            font:$f7_semibold;
         }
     }
     .input_container.inputRow_for_E2E_popUp {
@@ -53,7 +57,7 @@
     }
     .p-inputtext {
         padding: 0.4rem 0.4rem;
-        font-size: 0.875rem;
+        font: $f6_regular;
     }
 
     .p-input-icon-left {
@@ -65,6 +69,7 @@
         display: flex;
         margin-top: -1rem;
         width: 18rem;
+        font:$f7_semibold ;
     }
     .configinfo_icon {
         padding: 0 0 0 0.3rem;

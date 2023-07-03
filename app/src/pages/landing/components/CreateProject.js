@@ -35,7 +35,7 @@ const CreateProject = ({ visible, onHide }) => {
   const [projectData, setProjectData] = useState([]);
   const dispatch = useDispatch();
   const [refreshData, setRefreshData] = useState(false);
-  const userInfo = useSelector((state) => state.landing.userinfo);
+  let userInfo = useSelector((state) => state.landing.userinfo);
   const [isInvalidProject, setIsInvalidProject] = useState(false);
 
 
@@ -47,6 +47,7 @@ const CreateProject = ({ visible, onHide }) => {
 
  
   const userDetails = async () => {
+    userInfo = JSON.parse(localStorage.getItem('userInfo'));
     try {
       const userData = await getUserDetails("user");
       const formattedData = userData.map((user) => {
@@ -57,7 +58,7 @@ const CreateProject = ({ visible, onHide }) => {
       let newFormattedData = [];
       for (let item of formattedData) {
         if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
-          if (item.id === userInfo.user_id) {
+          if(item.id ===  userInfo.user_id) {
             loggedInUser = {
               ...item, selectedRole: "",
               initials: getInitials(item.firstname, item.lastname)

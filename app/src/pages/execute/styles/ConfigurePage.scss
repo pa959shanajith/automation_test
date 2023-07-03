@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ConfigurePage_container {
   display: flex;
   flex-direction: row;
@@ -5,8 +6,6 @@
   height: 96vh;
   padding-bottom: 10rem;
   padding-top: 0rem;
-  font-family: "OpenSans";
-  font-weight: normal;
   //width:125%;
   .m-2 {
     margin: 0.5rem !important;
@@ -31,8 +30,7 @@
                 text-overflow: ellipsis;
                 position: sticky;
                 top: 0;
-                z-index: 1;
-       
+                z-index: 1;  
    }
    
   .p-panel .p-panel-header {
@@ -184,12 +182,7 @@
   left: calc(46% - 123px);
   background: #605bff;
   border-radius: 10px;
-
-  font-family: "Open Sans";
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 19px;
+  font: $f7_semibold;
   width: 15rem;
   height: 2rem;
 
@@ -206,6 +199,7 @@
   /* white */
 
   color: #ffffff;
+  font: $f7_semibold;
 }
 .datatable-container {
   width: 100%;
@@ -215,7 +209,7 @@
   width: 9rem;
   font-Family: Open Sans;
   font-Style: normal;
-   margin-Left: 0.5rem;
+  margin-Left: 0.5rem;
   height: 2rem
 }
 .schedule{
