@@ -21,7 +21,6 @@
 }
 .ct-node .ct-nodeLabel {
     display: block;
-    font-size: 12px;
     cursor: default;
     word-wrap: break-word;
     padding-top: 2px;
@@ -40,7 +39,6 @@
     width: 80px;
 }
 .ct-actionButton>text{
-    font-size: 17px;
     fill: $whiteColor;
     font: $f7_semibold;
 }
@@ -74,9 +72,6 @@
     top: 1rem;
     background: #605BFF;
     border-radius: 4px;
-    // font-size: 14px !important;
-    // font-weight: 600 !important;
-    // font-family: 'Open Sans' !important;
     font: $f7_semibold !important;
 }
 
@@ -85,10 +80,6 @@
     .p-dialog-header {
     background: #e9ecef !important;
     padding: 1rem !important;
-    font-family: 'Open Sans' !important;
-   font-style: normal !important;
-   font-weight: 600 !important; 
-   font-size: 20px !important;
    font: $f5_semibold !important;
      }
      .p-dialog-content{
@@ -100,12 +91,9 @@
 .add_row_btn{
     width: 6rem;
     height: 2rem;
-    font-size: 14px;
-    font-family: 'Open Sans';
     background: white;
     color: #605BFF;
     border: none;
-    font-weight: 600;
     font:$f7_semibold;
 }
 .toolbar_scenario{
@@ -123,9 +111,6 @@
 }
 
 .p-column-title{
-    font-size: 14px !important;
-    font-weight: 400 !important;
-    font-family: 'Open Sans' !important;
     display: flex;
     align-items: flex-start;
     font: $f6_semibold;
