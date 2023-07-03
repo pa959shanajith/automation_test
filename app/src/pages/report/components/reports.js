@@ -11,6 +11,7 @@ import '../styles/reports.scss';
 import ReportTestTable from './ReportTestTable';
 import { RadioButton } from "primereact/radiobutton";
 import { InputText } from 'primereact/inputtext';
+import { NavLink } from 'react-router-dom';
 // import ExecutionprofileTable from './ExecutionprofileTable';
 
 
@@ -152,7 +153,7 @@ const reports = () => {
                             <label data-test="projectLabel" className='Projectreport'>Sort:</label>
                             <select data-test="projectSelect" className='projectSelectreport' value={selectedItem} onChange={handleClicked} options={sort} optionLabel="name"/>
                             {activeIndex === "Functional Test" && <div className="grid ml-2" >
-                                {reportData.map((data) => <div className='xl:col-3 md:col-6 sm:col-12'><Card key={data.key} className='testCards' ><p onMouseDownCapture={handleData}>{data.key}</p></Card></div>)}
+                                {reportData.map((data) => <div className='xl:col-3 md:col-6 sm:col-12'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" activeClassName="active">{data.key}</NavLink></Card></div>)}
                             </div>}
                             {activeIndex === "Accessibility Test" && <div className="grid ml-2" >
                                 {reportData.map((data) => <div className='xl:col-3 md:col-6 sm:col-12'><Card key={data.key} className='testCards' ><p>Accessibility Test</p></Card></div>)}
