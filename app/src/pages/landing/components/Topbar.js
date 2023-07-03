@@ -10,6 +10,20 @@ const MenubarDemo = (props) => {
   const [showExtraheaderItem, setShowExtraheaderItem] = useState(false);
   const location = useLocation();
   const needHelpmenuLeft = useRef(null);
+  const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
+  const [showTooltip_help, setShowTooltip_help] = useState(false);
+  const imageRefhelp = useRef(null);
+
+  const handleTooltipToggle = () => {
+    const rect = imageRefhelp.current.getBoundingClientRect();
+    setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
+    setShowTooltip_help(true);
+  };
+
+  const handleMouseLeave1 = () => {
+    setShowTooltip_help(false);
+  };
+
 
   const needHelpItems = [
     {
@@ -92,9 +106,14 @@ const MenubarDemo = (props) => {
       <Menubar className='Header_size' start={start} end={end} />
       <div className='Need_Help_menu'>
       <div className="card needHelp flex justify-content-center bg-white shadow-2">
-        <img className='needHelp_img' src="static/imgs/need_help.png" alt="need_Help" onClick={(event) => needHelpmenuLeft.current.toggle(event)} aria-controls="popup_menu_left" aria-haspopup/>
-        <Menu className='needHelp_Menu'id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft}/>
-      </div>
+        <img className='needHelp_img'  ref={imageRefhelp} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()} src="static/imgs/need_help.png" alt="need_Help" onClick={(event) => needHelpmenuLeft.current.toggle(event)} aria-controls="popup_menu_left" aria-haspopup />
+        {showTooltip_help && (<div className='card__insprint1' style={{ position: 'absolute',  right: `${cardPosition.right - 1500}px`, top: `${cardPosition.top- 890}px`, display: 'block' }}>
+                  <h3> Need help?</h3>
+                  <p className='text__insprint__info'>View Training videos documents.</p>
+                 
+                </div>)}
+        <Menu className='needHelp_Menu w-13rem top-50'id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft}/>
+        </div>
       </div>
     </div>
   );

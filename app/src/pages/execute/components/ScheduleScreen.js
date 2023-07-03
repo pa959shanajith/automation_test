@@ -8,6 +8,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Toast } from 'primereact/toast';
 import { TabPanel, TabView } from "primereact/tabview";
 import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
@@ -16,12 +17,27 @@ import { getScheduledDetails_ICE } from "../configureSetupSlice";
 import { scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
 
-const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, setSelectedPattren }) => {
-  const [selectedDaily, setSelectedDaily] = useState(null);
-  const [selectedMonthly, setSelectedMonthly] = useState(null);
-  const [startTime, setStartTime] = useState(null);
-  const [dropdownWeek, setDropdownWeek] = useState(null);
-  const [dropdownDay, setDropdownDay] = useState(null);
+const ScheduleScreen = ({
+  cardData,
+  startDate,
+  setStartDate,
+  startTime,
+  setStartTime,
+  selectedPattren,
+  setSelectedPattren,
+  isDisabled,
+  onSchedule,
+  selectedDaily,
+  selectedMonthly,
+  dropdownWeek,
+  dropdownDay,
+  setSelectedDaily,
+  setSelectedMonthly,
+  setDropdownWeek,
+  setDropdownDay,
+  scheduleOption,
+  onScheduleChange
+}) => {
   const [tableFilter, setTableFilter] = useState("");
   const getScheduledList = useSelector((store) => store.configsetup);
   const dispatch = useDispatch();
@@ -29,15 +45,42 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, se
   const recurrance = useRef(null);
 
   const scheduleDaily = [
-    { name: <span>Every <InputText className="every_day" /> day(s).</span>, key: 'day' },
-    { name: 'Every Weekday.', key: 'weekend' },
+    {
+      name: (
+        <span>
+          Every{" "}
+          <InputText
+            className="every_day"
+            name="everyday"
+            value={scheduleOption.everyday}
+            onChange={(e) => onScheduleChange(e)}
+          />{" "}
+          day(s).
+        </span>
+      ),
+      key: "day",
+    },
+    { name: "Every Weekday.", key: "weekend" },
   ];
   const scheduleMonthly = [
     {
       name: (
         <span>
-          Day <InputText className="every_day" /> of every{" "}
-          <InputText className="every_day" /> month(s).
+          Day{" "}
+          <InputText
+            className="every_day"
+            name="monthweek"
+            value={scheduleOption.monthweek}
+            onChange={(e) => onScheduleChange(e)}
+          />{" "}
+          of every{" "}
+          <InputText
+            className="every_day"
+            name="monthday"
+            value={scheduleOption.monthday}
+            onChange={(e) => onScheduleChange(e)}
+          />{" "}
+          month(s).
         </span>
       ),
       key: "daymonth",
@@ -64,7 +107,14 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, se
             required={false}
             customeClass="dropdown_day"
           />{" "}
-          of every <InputText className="every_day" /> month(s).
+          of every{" "}
+          <InputText
+            className="every_day"
+            name="everymonth"
+            value={scheduleOption.everymonth}
+            onChange={(e) => onScheduleChange(e)}
+          />{" "}
+          month(s).
         </span>
       ),
       key: "dayweek",
@@ -151,6 +201,28 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, se
       <ExecutionCard cardData={cardData} />
       <div className="schedule_container">
         <div className="grid" style={{ marginBottom: "-2rem" }}>
+          <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+            <Calendar
+              value={startDate}
+              placeholder="Enter Start date"
+              onChange={(e) => {
+                setStartDate(e.value);
+                setStartTime(new Date());
+              }}
+              minDate={new Date()}
+              showIcon
+            />
+          </div>
+          <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+            <Calendar
+              value={startTime}
+              placeholder="Enter Start Time "
+              onChange={(e) => setStartTime(e.value)}
+              icon="pi pi-fw pi-clock"
+              showIcon
+              timeOnly
+            />
+          </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
             <Button
               icon="pi pi-sync"
@@ -191,7 +263,7 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, se
                 <div className="col-12">
                   <Calendar
                     value={startDate}
-                    placeholder="Enter Start date"
+                    placeholder="Enter End date"
                     onChange={(e) => setStartDate(e.value)}
                     showIcon
                   />
@@ -199,22 +271,12 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, se
               </div>
             </OverlayPanel>
           </div>
-          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            <Calendar
-              value={startDate}
-              placeholder="Enter Start date"
-              onChange={(e) => setStartDate(e.value)}
-              showIcon
-            />
-          </div>
-          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            <Calendar
-              value={startTime}
-              placeholder="Enter Start Time "
-              onChange={(e) => setStartTime(e.value)}
-              icon="pi pi-fw pi-clock"
-              showIcon
-              timeOnly
+          <div className="col-12 lg:col-2 xl:col-2 md:col-6 sm:col-12 flex justify-content-end">
+            <Button
+              className="schedule_btn"
+              onClick={() => onSchedule("Schedule")}
+              disabled={isDisabled}
+              label="Schedule"
             />
           </div>
         </div>
@@ -228,7 +290,16 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, se
         <TabView>
           <TabPanel header="Scheduled Taks">
             <DataTable
-              value={getScheduledList?.scheduledList}
+              value={getScheduledList?.scheduledList
+                .map((el) => ({
+                  ...el,
+                  scheduledon: `${new Date(
+                    el.scheduledon
+                  ).toLocaleDateString()}, ${new Date(
+                    el.scheduledon
+                  ).getUTCHours()}:${new Date(el.scheduledon).getUTCMinutes()}`,
+                }))
+                .filter((el) => el?.status !== "recurring")}
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
@@ -240,7 +311,16 @@ const ScheduleScreen = ({ cardData, startDate, setStartDate, selectedPattren, se
           </TabPanel>
           <TabPanel header="Recurring Taks">
             <DataTable
-              value={getScheduledList?.scheduledList}
+              value={getScheduledList?.scheduledList
+                .map((el) => ({
+                  ...el,
+                  scheduledon: `${new Date(
+                    el.scheduledon
+                  ).toLocaleDateString()}, ${new Date(
+                    el.scheduledon
+                  ).getUTCHours()}:${new Date(el.scheduledon).getUTCMinutes()}`,
+                }))
+                .filter((el) => el?.status === "recurring")}
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
