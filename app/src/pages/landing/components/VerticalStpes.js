@@ -20,22 +20,29 @@ import { selectedProj } from '../../design/designSlice';
 const VerticalSteps = (props) => {
     const dispatch= useDispatch ();
     const activeStep= useSelector((state)=>state.steps);
-    const project = useSelector((state)=>state.landing.defaultSelectProject);
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    let project = reduxDefaultselectedProject;
+
+    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+    if (localStorageDefaultProject) {
+      project = JSON.parse(localStorageDefaultProject);
+    }
+
     const navigate = useNavigate();
     const steps = [
     {
-        label: 'Create Test Flow(s) using Design Studio',
-        description: `Create test flow of your software and Design your test cases. `,
+        label: activeStep.value  > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows',
+        description: ` Visualize testcases through mindmaps, capture elements and design test steps. `,
         title:'Design'
     },
     {
-        label: 'Configure & Execute Test Flow(s)                                        ',
-        description:' Create execution profiles for executing your test flows.',
+        label: ' Configure and test execution profiles',
+        description:'  Trigger test execution locally, via DevOps pipeline/cloud test provider or schedule it',
         title:'Execute'
     },
     {
-        label: 'View Test Reports                                                                 ',
-        description: ` Analyze the results of test flows execution.`,
+        label: 'View Test Reports ',
+        description: `View and analyze executed test automations.`,
         title:'Report'
     },
     ];
@@ -47,16 +54,22 @@ const VerticalSteps = (props) => {
       (async () => {
           const ProgressStep = await getProjectIDs({ readme: "progressStep" });
           setProgressStepDetails(ProgressStep);
+          let findIndexOfStep = ProgressStep?.projectId?.indexOf(activeStep?.id);
+          if (ProgressStep && ProgressStep.progressStep && findIndexOfStep !== -1) {
+            let findStep= ProgressStep?.progressStep[findIndexOfStep]
+            setCurrentStep(findStep);
+            dispatch(updateSteps(findStep))
+            }
         })()
-      },[])
+      },[project])
 
     useEffect(()=>{
       let findIndexOfStep = ProgressStepDetails?.projectId?.indexOf(activeStep?.id);
-      if (ProgressStepDetails && ProgressStepDetails.progressStep && findIndexOfStep !== -1)
-      {let findStep= ProgressStepDetails?.progressStep[findIndexOfStep]
-      setCurrentStep(findStep);
-      dispatch(updateSteps(findStep))
-      }
+      if (ProgressStepDetails && ProgressStepDetails.progressStep && findIndexOfStep !== -1) {
+        let findStep= ProgressStepDetails?.progressStep[findIndexOfStep]
+        setCurrentStep(findStep);
+        dispatch(updateSteps(findStep))
+        }
     },[activeStep?.id])
 
 
@@ -82,7 +95,7 @@ const VerticalSteps = (props) => {
 
   return (
     <Card className='verticalcard' >
-      <h2 className= "GetStd">Get Started</h2>
+      <h2 className= "GetStd">{(activeStep.value > 0) ? "Welcome Back !" : "Get Started"}</h2>
       <Box > 
         <Stepper  className='Stepper' activeStep = {currentStep} orientation="vertical">
           {steps.map((step, index) => ( 

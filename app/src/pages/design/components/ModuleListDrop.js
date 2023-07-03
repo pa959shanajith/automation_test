@@ -22,6 +22,7 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
 import AvoInput from "../../../globalComponents/AvoInput";
 import SaveMapButton from "./SaveMapButton";
+import { Tooltip } from 'primereact/tooltip';
 import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
 // import { Icon } from 'primereact/icon';
 
@@ -75,6 +76,21 @@ const ModuleListDrop = (props) =>{
     const [showE2EPopup, setShowE2EPopup] = useState(false);
     const [configTxt, setConfigTxt] = useState("");
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
+
+    const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
+  const [showTooltip, setShowTooltip] = useState(false);
+
+    const imageRefadd = useRef(null);
+
+    const handleTooltipToggle = () => {
+      const rect = imageRefadd.current.getBoundingClientRect();
+      setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
+      setShowTooltip(true);
+    };
+  
+    const handleMouseLeave1 = () => {
+      setShowTooltip(false);
+    };
    
     useEffect(()=> {
         if(!searchForNormal && !isCreateE2E ) {
@@ -775,8 +791,11 @@ const ModuleListDrop = (props) =>{
                      </div> */}
                      <i className="pi pi-file-import mindmapImport" title='Import Module' onClick={()=>setImportPop(true)}></i>
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
-                     <img   src="static/imgs/plusNew.png" alt="NewModules" title='Create New' onClick={()=>{ CreateNew()}} /> 
-                </div>
+                     <Tooltip target=".custom-target-icon" content=" Create module" position="bottom" />
+                     <img  className="custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  /> 
+                   
+                  
+             </div>
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
                       <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
                                     if (!allModSelected) {
@@ -791,7 +810,7 @@ const ModuleListDrop = (props) =>{
                          <div className='inputSearchNorMod'>           
                                <span className="p-input-icon-left">
                                          <i className="pi pi-search" />
-                                         <InputText placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
+                                         <InputText placeholder="Search" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}} title=' Search for module'/>
                                 </span>
                          </div>    
          
@@ -858,7 +877,7 @@ const ModuleListDrop = (props) =>{
                     <div className='inputSearchNorMod'>           
                                <span className="p-input-icon-left">
                                          <i className="pi pi-search" />
-                                         <InputText placeholder="Search Modules" ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)}/>
+                                         <InputText placeholder="Search " ref={SearchInpEnE} onChange={(e)=>searchModule_E2E(e.target.value)} title=' Search for  E2E module'/>
                                 </span>
                          </div> 
                     </div>      

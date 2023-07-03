@@ -9,7 +9,7 @@ const ExecutionCard = ({ cardData }) => {
     <Card className="card_execute">
       <div className="grid">
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
-          <div>Avo Agent: {cardData?.executionRequest?.avoagents[0]}</div>
+          <div>Avo Agent: {cardData?.executionRequest?.avoagents[0] ? cardData?.executionRequest?.avoagents[0] : 'Any Agent'}</div>
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
           <div>

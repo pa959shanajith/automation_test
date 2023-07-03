@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { excelToScreen, updateScreen_ICE } from '../../design/api';
 // import { Dialog } from 'primereact/dialog';
 import ModalContainer from '../../global/components/ModalContainer';
+import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
 
 
 const ImportModal = props => {
@@ -28,7 +30,8 @@ const ImportModal = props => {
 
     const onImport = async() => {
         setOverlay('Importing ...')
-        var err = validate([fileUpload,sheetRef,importFormat])
+         var err = validate([fileUpload,sheetRef,importFormat])
+         console.log(err);
         if(err)return
         var file = fileUpload.current.files[0]
         if(!file)return;
@@ -37,24 +40,24 @@ const ImportModal = props => {
             try{
                 const result =  await read(file)
                 var res = await excelToScreen({'content':result,'flag':'data','sheetname':val,'screenid':screenId,'projectid':projectId })
-                if(res.error){setMsg(MSG.MINDMAP.ERR_FETCH_DATA);setOverlay("");return;}
-                else if(res=='fail'){setMsg(MSG.MINDMAP.ERR_EXCEL_SHEET);setOverlay("");return;}
+                if(res.error){props.toastError('Error fetching data from file.');setOverlay("");return;}
+                else if(res=='fail'){props.toastError('Excel sheet is either empty or invalid.');setOverlay("");return;}
                 else{
                     fetchScrapeData()
                     .then(resp => {
                         if (resp === "success") {
                             props.setShow(false);
-                            setMsg(MSG.SCRAPE.SUCC_SCREEN_EXCEL_IMPORT)
+                           props.toastSuccess("Screen Excel imported successfully");
                         }
-                        else setMsg(MSG.SCRAPE.ERR_EXCEL_IMPORT)
+                        else props.toastError("ERR_EXCEL_IMPORT");
                     })
                     .catch(err => {
-                        setMsg(MSG.SCRAPE.ERR_EXCEL_IMPORT)
+                        props.toastError("ERR_EXCEL_IMPORT");
                         // console.error(err);
                     });
                 }
             }catch(err){
-            setMsg(MSG.MINDMAP.ERR_FETCH_DATA)
+            props.toastError('Error fetching data from file.')
             console.error(err)
             } 
         }
@@ -66,11 +69,11 @@ const ImportModal = props => {
                         setOverlay("Loading...")
                         let resultString = JSON.parse(reader.result);
                         if (!('appType' in resultString))
-                            setMsg(MSG.SCRAPE.ERR_JSON_IMPORT);
+                            props.toastError("Incorrect JSON imported. Please check the contents.");
                         else if (resultString.appType !== props.appType)
-                            setMsg(MSG.SCRAPE.ERR_NO_MATCH_APPTYPE);
+                        props.toastError("Project application type and Imported JSON application type doesn't match, please check.");
                         else if (resultString.view.length === 0)
-                            setMsg(MSG.SCRAPE.ERR_NO_OBJ_IMPORT);
+                        props.toastError("The file has no objects to import, please check.");
                         else {
                             let objList = {};
                             if ('body' in resultString) {
@@ -94,27 +97,27 @@ const ImportModal = props => {
                             updateScreen_ICE(arg)
                                 .then(data => {
                                     if (data === "Invalid Session") return RedirectPage(history);
-                                    else if (data === "fail") setMsg(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
+                                    else if (data === "fail") props.toastError("Failed to import Screen JSON.");
                                     else fetchScrapeData().then(response => {
                                             if (response === "success")
-                                                setMsg(MSG.SCRAPE.SUCC_SCREEN_JSON_IMPORT) 
+                                                props.toastSuccess("Screen Json imported successfully.") 
                                                 props.setShow(false);
                                             setOverlay("");
                                     });
                                 })
                                 .catch(error => {
                                     setOverlay("");
-                                    setMsg(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
+                                    props.toastError("Failed to import Screen JSON.");
                                     console.error(error)
                                 });
                         }
-                    } else setMsg(MSG.SCRAPE.ERR_FILE_FORMAT);
+                    } else props.toastError("Please Check the file format you have uploaded.");
                     setOverlay("");
                 }
                 catch(error){
                     setOverlay("");
                     if (typeof(error)==="object") setMsg(error);
-                    else setMsg(MSG.SCRAPE.ERR_SCREEN_IMPORT);
+                    else props.toastError("Failed to import Screen JSON.");
                     console.error(error);
                 }
             }
@@ -126,10 +129,17 @@ const ImportModal = props => {
         var err = false;
         arr.forEach((e)=>{
             if(e.current){
-                e.current.style.borderColor = 'black'
-                if(!e.current.value || e.current.value ==='def-option'){
-                    e.current.style.borderColor = 'red'
-                    err = true
+                if(e.current.props) {
+                    if(!e.current.props.value || e.current.props.value ==='def-option'){
+                        err = true
+                    }
+                }
+                else{
+                    e.current.style.borderColor = 'black'
+                    if(!e.current.value || e.current.value ==='def-option'){
+                        e.current.style.borderColor = 'red'
+                        err = true
+                    }
                 }
             }
         })
@@ -138,6 +148,7 @@ const ImportModal = props => {
     console.log(props.fetchingDetails)
     return(
         <ModalContainer 
+        show={props.show==="importModal"}
         title={'Import'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
@@ -203,12 +214,13 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
         <div className='mp__import-popup'>
             <div>
             <label>Import As: </label>
-                <select defaultValue={"def-val"} data-test="addObjectTypeSelect" className="imp-inp" onChange={handleType} ref={importFormat}>
+                {/* <select defaultValue={"def-val"} data-test="addObjectTypeSelect" className="imp-inp" onChange={handleType} ref={importFormat}>
                     <option disabled value="def-val">Select Import Format</option>
                     { importTypes.map( (e) =>
                         <option key={e.value} value={`${e.value}`}>{e.name}</option>
                     ) }
-                </select>
+                </select> */}
+                <Dropdown className="imp-inp" onChange={handleType} ref={importFormat} placeholder="Select Import Format" value={importType} options={importTypes} optionLabel="name" style={{width:'20rem', marginLeft:'2.6rem', marginBottom:'1.5rem'}}/>
             <div>
                 <label>Upload File: </label>
                 <input disabled={importType=="def-val"} accept={acceptType[importType]} type='file' onChange={upload} ref={fileUpload}/>
@@ -236,7 +248,7 @@ const Footer = ({onImport,error}) => {
     return(
         <>
         <span>{error}</span>
-        <button data-test="export" onClick={onImport}>Import</button>
+        <Button data-test="export" size="small" onClick={onImport} label='Import'></Button>
         </>
     )
 }

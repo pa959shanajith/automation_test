@@ -15,7 +15,7 @@ import {Dialog} from 'primereact/dialog';
 
 const ModalContainer = (props) => {
     return(
-        <Dialog header={props.title} visible={props.show} onHide={props.close} footer={props.footer} >
+        <Dialog className='modalcontainer__header' header={props.title} visible={props.show} onHide={props.close} footer={props.footer} style={{width:`${props.width}`}}>
             <div className=''> 
                 {props.content}
             </div>         
