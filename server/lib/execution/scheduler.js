@@ -196,8 +196,9 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
             agenda.define(scheduleId, async (job, done) => {	
                 let result;	
                 execIds['scheduleId'] = scheduleId;	
-                result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData, execIds, userInfo, "SCHEDULE", batchExecutionData.batchInfo[0].poolid);	
-                schedFlag = result['message'];	
+                // result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData, execIds, userInfo, "SCHEDULE", batchExecutionData.batchInfo[0].poolid);
+                result = queue.Execution_Queue.execAutomation({ body: { key: batchExecutionData.configureKey, execType: 'SCHEDULE', scheduleId: scheduleId }});	
+                schedFlag = result['message'];
                 done();	
             });	
             // triggerring the agenda job with schedule option(one time).	
