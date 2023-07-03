@@ -223,11 +223,7 @@ const DisplayProject = (props) => {
           <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
             {userInfo.rolename === "Test Manager" ? (
             <button className="pi pi-plus add_btn" onClick={handleOpenDialog}  />
-           
-            
             ) : null}
-            {/* <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} /> */}
-            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
            
           </div>
         </div>
