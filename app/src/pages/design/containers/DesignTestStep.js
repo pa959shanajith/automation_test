@@ -668,7 +668,7 @@ const DesignModal = (props) => {
             <div>
                 <h5 className='dailog_header1'>Design Test Step</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
-                <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
+                <img className="screen_btn_test" src="static/imgs/bi_code-square.svg" alt='screen icon' />
             </div>
         </>
     );
@@ -810,7 +810,7 @@ const DesignModal = (props) => {
                     setObjType(caseData.obType);
                     setOutputPlaceholder(placeholders.outputval);
                     setInputPlaceholder(placeholders.inputval);}}
-                placeholder="Select a custname"
+                placeholder="Select a element"
             />
         );
     };
@@ -834,10 +834,10 @@ const DesignModal = (props) => {
             // setOutputPlaceholder(placeholders.outputval);
             // setInputPlaceholder(placeholders.inputval);
             setKeywords(event.value);
-            setSelectedOptions(event);
+            setSelectedOptions(event.value);
             setAllKeyword(optionKeyword);
-            // testcaseDropdownRef.current.focus();
-            testcaseDropdownRef.current.blur();
+            testcaseDropdownRef.current.focus();
+            // testcaseDropdownRef.current.blur();
             document.dispatchEvent(new KeyboardEvent('keypress', { key: " " }));
         }
     };
@@ -933,22 +933,19 @@ const DesignModal = (props) => {
         // // setKeyword(getKeywords(options.rowData.custname).keywords[0])
         setFocused(true);
         return (
-            // <Dropdown
-            //     value={keyword.length>0?keyword:options.value}
-            //     options={keywordListTable.length>0?keywordListTable:getKeywords(options.rowData.custname).keywords}
-            //     onChange={(e) => {options.editorCallback(e.value);setKeyword([]);}}
-            //     placeholder="Select a keywords"
-            // />
+            <Dropdown
+                className='select-option' value={selectedOptions} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""}  closeMenuOnSelect={true} options={optionKeyword} menuPortalTarget={document.body} optionLabel={getOptionLabel} style={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'
+            />
             // <Select className='select-option' value={selectedOptions} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e.value)}} onKeyDown={submitChanges} title={keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""} closeMenuOnSelect={false} options={optionKeyword} menuPortalTarget={document.body} getOptionLabel={getOptionLabel} styles={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
-            <div>
-                        <span className="keyword_col" title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""} >
-                            {focused ?
-                                <>
-                                    <Select className='select-option' value={selectedOptions} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""}  closeMenuOnSelect={false} options={optionKeyword} menuPortalTarget={document.body} getOptionLabel={getOptionLabel} styles={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
-                                </> :
-                                <div className="d__row_text" title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""}>{keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "--"}</div>}
-                           </span>
-                    </div>
+            // <div>
+            //             <span className="keyword_col" title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""} >
+            //                 {focused ?
+            //                     <>
+            //                         <Select className='select-option' value={selectedOptions} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""}  closeMenuOnSelect={false} options={optionKeyword} menuPortalTarget={document.body} getOptionLabel={getOptionLabel} styles={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
+            //                     </> :
+            //                     <div className="d__row_text" title={keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""}>{keywordList[objType] && keywords !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "--"}</div>}
+            //                </span>
+            //         </div>
         );
     };
 
@@ -960,14 +957,18 @@ const DesignModal = (props) => {
     };
 
     const onRowEditComplete = (e) => {
-
-        let testcase = [...screenLavelTestSteps];
         let { newData, index } = e;
-        let testCaseUpdate = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
-        testCaseUpdate.testCases[index] = newData
-        // testcase[index] = newData;
-        setID(index)
-        setScreenLevelTastSteps(testcase); 
+        let testCaseUpdate = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
+        let updatedTestCases = [...testCaseUpdate.testCases];
+        updatedTestCases[index] = newData;
+        let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
+        if (screen.name === rowExpandedName.name) {
+            return { ...screen, testCases: updatedTestCases };
+        }
+        return screen;
+        });
+        setID(index);
+        setScreenLevelTastSteps(updatedScreenLevelTestSteps);
         setFocused(false);
     };
         
@@ -1081,9 +1082,9 @@ const DesignModal = (props) => {
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>
-                        <Column expander={allowExpansion} style={{ width: '5rem' }} />
-                        <Column field="name" header="Name" sortable />
-                        <Column body={bodyHeader}/>
+                        <Column expander={allowExpansion} style={{ width: '5rem',background: 'white' }} />
+                        <Column field="name" style={{background: 'white' }}/>
+                        <Column body={bodyHeader} style={{ background: 'white' }}/>
                     </DataTable>
                 </div>
             </Dialog>
@@ -1095,10 +1096,10 @@ const DesignModal = (props) => {
                             <p className='debug__otp__text'>Choose Browsers</p>
                         </span>
                         <span className='browser__col'>
-                            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chorme.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+                            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' alt='explorer'/>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
+                            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' alt='chrome' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
+                            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' alt='firefox' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
+                            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' alt='edge' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
                         </span>
                     </div>
                     <div>

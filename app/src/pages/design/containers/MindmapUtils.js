@@ -199,8 +199,124 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         }
     };
     childCounter(1, tree);
-    var newHeight = d3.max(levelCount) * 90;
-    const d3Tree = d3.tree().size([newHeight * 2, cSize[0]/3]);
+    if(tree.type!== "endtoend"){
+        var newHeight = d3.max(levelCount) * 90;
+        const d3Tree = d3.tree().size([newHeight * 2, cSize[0]/3]);
+        const hierarchyLayout = d3.hierarchy(tree);
+        const data = d3Tree(hierarchyLayout);
+        data.each((node, idx) => {
+            node.id = idx;
+          });
+        const dNodesArray = data.descendants();
+        const dLinks = data.links();
+        const dNodes = dNodesArray.map((d, idx) => {
+            const generateId = (parentId, childIndex) => childIndex;
+          
+            const mapChildren = (children, parentId) => {
+              return children.map((child, childIdx) => {
+                const newChild = {
+                  ...child.data,
+                  x: child.x,
+                  y: child.y,
+                  id: child.id ? child.id : generateId(parentId, childIdx + 1),
+                  parent: {
+                    ...child.parent.data,
+                    id: child.parent.data.id ? child.parent.data.id : parentId,
+                    // parent: child.parent.parent.data? child.parent.parent.data:null // Use the parent's ID as the unique identifier
+                  }
+                };
+          
+                if (child.children) {
+                  newChild.children = mapChildren(child.children, newChild.id); // Pass the child's ID as the parent ID for the recursive call
+                }
+          
+                return newChild;
+              });
+            };
+          
+            const newData = {
+                ...d.data,
+                x: d.x,
+                y: d.y,
+                id: idx,
+                parent: d.parent ? {
+                  ...d.parent.data,
+                  id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0),
+                  parent: d.parent.parent ? { ...d.parent.parent.data } : null
+                } : null
+              };
+          
+            if (d.children) {
+              newData.children = mapChildren(d.children, newData.id); // Pass the parent's ID as the initial parent ID for children mapping
+            }
+          
+            return newData;
+          });
+          dNodes.forEach((d,ind)=>{
+            if (verticalLayout) {
+                    d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                    sections[d.type] = d.y;
+            } else {
+                    d.y = d.x;
+                    d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                    sections[d.type] = d.x;
+            }
+            d.id = ind
+            count[d.type] += 1; 
+            d.x = dNodesArray[ind].x
+            d.y = dNodesArray[ind].y
+            // d.parent = dNodesArray[ind].parent?dNodesArray[ind].parent.data:null
+            var node = addNode(d);
+            nodeDisplay[d.id] = node
+            nodeDisplay[d.id].task = false;
+            nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
+            if(isAssign){
+                if (d.task != null) {
+                    //[]convert from date string to %d-%m-%y
+                    ['startdate','enddate'].forEach((e)=>{
+                        if (d.task[e] != '' && d.task[e].indexOf('-')==-1) {
+                            var t=new Date(d.task[e]);
+                            d.task[e]=t.getDate()+"-"+(t.getMonth()+1)+"-"+t.getFullYear();
+                        }
+                    })
+                    if (d.task.cycleid == cycleID) {
+                        nodeDisplay[d.id].task = true;
+                        nodeDisplay[d.id].taskOpacity = 1;
+                    }
+                    if(d.type=="screens" || d.type=="testcases"){
+                        if (d.task.cycleid !=cycleID) {
+                            nodeDisplay[d.id].task = true;
+                            nodeDisplay[d.id].taskOpacity = 0.5;
+                        }
+                    }
+                    if(d.parent && d.parent.type == 'endtoend'){
+                        nodeDisplay[d.id].task = true;
+                        nodeDisplay[d.id].taskOpacity = 1;
+                    }
+                }//showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
+                else if (d.taskexists && d.type !="modules" && d.type !="scenarios") {
+                    nodeDisplay[d.id].task = true;
+                    nodeDisplay[d.id].taskOpacity = 0.5;
+                    }
+                }
+            })
+        dLinks.forEach(function(d) {
+            d.id = uuid();
+            var lid = 'link-' + d.source.id + '-' + d.target.id
+            var link = addLink(d.source, d.target,verticalLayout);
+            linkDisplay[lid] = link
+            linkDisplay[lid].hidden = (d.source.revertChild || d.source.revertChild1) || false;
+        });
+        if (verticalLayout){
+            translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y-100]
+        } else{
+            translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+        }
+        foldtree(tree)
+        return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
+    }else{
+    var newHeights = d3.max(levelCount) * 90;
+    const d3Tree = d3.tree().size([newHeights * 2, cSize[0]/9]);
     const hierarchyLayout = d3.hierarchy(tree);
     const data = d3Tree(hierarchyLayout);
     data.each((node, idx) => {
@@ -208,7 +324,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
       });
     const dNodesArray = data.descendants();
     const dLinks = data.links();
-  const dNodes = dNodesArray.map((d, idx) => {
+    const dNodes = dNodesArray.map((d, idx) => {
         const generateId = (parentId, childIndex) => childIndex;
       
         const mapChildren = (children, parentId) => {
@@ -250,73 +366,189 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         }
       
         return newData;
-      });
+        });
+        dNodes.forEach((d,ind)=>{
+            if (verticalLayout) {
+                    d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                    sections[d.type] = d.y;
+            } else {
+                    d.y = d.x;
+                    d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                    sections[d.type] = d.x;
+            }
+            d.id = ind
+            count[d.type] += 1; 
+            d.x = dNodesArray[ind].x
+            d.y = dNodesArray[ind].y
+            // d.parent = dNodesArray[ind].parent?dNodesArray[ind].parent.data:null
+            var node = addNode(d);
+            nodeDisplay[d.id] = node
+            nodeDisplay[d.id].task = false;
+            nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
+            if(isAssign){
+                if (d.task != null) {
+                    //[]convert from date string to %d-%m-%y
+                    ['startdate','enddate'].forEach((e)=>{
+                        if (d.task[e] != '' && d.task[e].indexOf('-')==-1) {
+                            var t=new Date(d.task[e]);
+                            d.task[e]=t.getDate()+"-"+(t.getMonth()+1)+"-"+t.getFullYear();
+                        }
+                    })
+                    if (d.task.cycleid == cycleID) {
+                        nodeDisplay[d.id].task = true;
+                        nodeDisplay[d.id].taskOpacity = 1;
+                    }
+                    if(d.type=="screens" || d.type=="testcases"){
+                        if (d.task.cycleid !=cycleID) {
+                            nodeDisplay[d.id].task = true;
+                            nodeDisplay[d.id].taskOpacity = 0.5;
+                        }
+                    }
+                    if(d.parent && d.parent.type == 'endtoend'){
+                        nodeDisplay[d.id].task = true;
+                        nodeDisplay[d.id].taskOpacity = 1;
+                    }
+                }//showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
+                else if (d.taskexists && d.type !="modules" && d.type !="scenarios") {
+                    nodeDisplay[d.id].task = true;
+                    nodeDisplay[d.id].taskOpacity = 0.5;
+                    }
+                }
+            })
+        dLinks.forEach(function(d) {
+            d.id = uuid();
+            var lid = 'link-' + d.source.id + '-' + d.target.id
+            var link = addLink(d.source, d.target,verticalLayout);
+            linkDisplay[lid] = link
+            linkDisplay[lid].hidden = (d.source.revertChild || d.source.revertChild1) || false;
+        });
+        if (verticalLayout){
+            translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
+        } else{
+            translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+        }
+        foldtree(tree)
+        return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
+    
+    }
+    // var newHeight = d3.max(levelCount) * 90;
+    // const d3Tree = d3.tree().size([newHeight * 2, cSize[0]/3]);
+    // const hierarchyLayout = d3.hierarchy(tree);
+    // const data = d3Tree(hierarchyLayout);
+    // data.each((node, idx) => {
+    //     node.id = idx;
+    //   });
+    // const dNodesArray = data.descendants();
+    // const dLinks = data.links();
+    // const dNodes = dNodesArray.map((d, idx) => {
+    //     const generateId = (parentId, childIndex) => childIndex;
+      
+    //     const mapChildren = (children, parentId) => {
+    //       return children.map((child, childIdx) => {
+    //         const newChild = {
+    //           ...child.data,
+    //           x: child.x,
+    //           y: child.y,
+    //           id: child.id ? child.id : generateId(parentId, childIdx + 1),
+    //           parent: {
+    //             ...child.parent.data,
+    //             id: child.parent.data.id ? child.parent.data.id : parentId,
+    //             // parent: child.parent.parent.data? child.parent.parent.data:null // Use the parent's ID as the unique identifier
+    //           }
+    //         };
+      
+    //         if (child.children) {
+    //           newChild.children = mapChildren(child.children, newChild.id); // Pass the child's ID as the parent ID for the recursive call
+    //         }
+      
+    //         return newChild;
+    //       });
+    //     };
+      
+    //     const newData = {
+    //         ...d.data,
+    //         x: d.x,
+    //         y: d.y,
+    //         id: idx,
+    //         parent: d.parent ? {
+    //           ...d.parent.data,
+    //           id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0),
+    //           parent: d.parent.parent ? { ...d.parent.parent.data } : null
+    //         } : null
+    //       };
+      
+    //     if (d.children) {
+    //       newData.children = mapChildren(d.children, newData.id); // Pass the parent's ID as the initial parent ID for children mapping
+    //     }
+      
+    //     return newData;
+    //   });
       
     // dNodes.sort(function(a, b) {
     //     return a.childIndex - b.childIndex;
     // });  
-    dNodes.forEach((d,ind)=>{
-        if (verticalLayout) {
-                d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-                sections[d.type] = d.y;
-        } else {
-                d.y = d.x;
-                d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-                sections[d.type] = d.x;
-        }
-        d.id = ind
-        count[d.type] += 1; 
-        d.x = dNodesArray[ind].x
-        d.y = dNodesArray[ind].y
-        // d.parent = dNodesArray[ind].parent?dNodesArray[ind].parent.data:null
-        var node = addNode(d);
-        nodeDisplay[d.id] = node
-        nodeDisplay[d.id].task = false;
-        nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
-        if(isAssign){
-            if (d.task != null) {
-                //[]convert from date string to %d-%m-%y
-                ['startdate','enddate'].forEach((e)=>{
-                    if (d.task[e] != '' && d.task[e].indexOf('-')==-1) {
-                        var t=new Date(d.task[e]);
-                        d.task[e]=t.getDate()+"-"+(t.getMonth()+1)+"-"+t.getFullYear();
-                    }
-                })
-                if (d.task.cycleid == cycleID) {
-                    nodeDisplay[d.id].task = true;
-                    nodeDisplay[d.id].taskOpacity = 1;
-                }
-                if(d.type=="screens" || d.type=="testcases"){
-                    if (d.task.cycleid !=cycleID) {
-                        nodeDisplay[d.id].task = true;
-                        nodeDisplay[d.id].taskOpacity = 0.5;
-                    }
-                }
-                if(d.parent && d.parent.type == 'endtoend'){
-                    nodeDisplay[d.id].task = true;
-                    nodeDisplay[d.id].taskOpacity = 1;
-                }
-            }//showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
-            else if (d.taskexists && d.type !="modules" && d.type !="scenarios") {
-                nodeDisplay[d.id].task = true;
-                nodeDisplay[d.id].taskOpacity = 0.5;
-                }
-            }
-        })
-    dLinks.forEach(function(d) {
-        d.id = uuid();
-        var lid = 'link-' + d.source.id + '-' + d.target.id
-        var link = addLink(d.source, d.target,verticalLayout);
-        linkDisplay[lid] = link
-        linkDisplay[lid].hidden = (d.source.revertChild || d.source.revertChild1) || false;
-    });
-    if (verticalLayout){
-        translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
-    } else{
-        translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
-    }
-    foldtree(tree)
-    return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
+    // dNodes.forEach((d,ind)=>{
+    //     if (verticalLayout) {
+    //             d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+    //             sections[d.type] = d.y;
+    //     } else {
+    //             d.y = d.x;
+    //             d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+    //             sections[d.type] = d.x;
+    //     }
+    //     d.id = ind
+    //     count[d.type] += 1; 
+    //     d.x = dNodesArray[ind].x
+    //     d.y = dNodesArray[ind].y
+    //     // d.parent = dNodesArray[ind].parent?dNodesArray[ind].parent.data:null
+    //     var node = addNode(d);
+    //     nodeDisplay[d.id] = node
+    //     nodeDisplay[d.id].task = false;
+    //     nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
+    //     if(isAssign){
+    //         if (d.task != null) {
+    //             //[]convert from date string to %d-%m-%y
+    //             ['startdate','enddate'].forEach((e)=>{
+    //                 if (d.task[e] != '' && d.task[e].indexOf('-')==-1) {
+    //                     var t=new Date(d.task[e]);
+    //                     d.task[e]=t.getDate()+"-"+(t.getMonth()+1)+"-"+t.getFullYear();
+    //                 }
+    //             })
+    //             if (d.task.cycleid == cycleID) {
+    //                 nodeDisplay[d.id].task = true;
+    //                 nodeDisplay[d.id].taskOpacity = 1;
+    //             }
+    //             if(d.type=="screens" || d.type=="testcases"){
+    //                 if (d.task.cycleid !=cycleID) {
+    //                     nodeDisplay[d.id].task = true;
+    //                     nodeDisplay[d.id].taskOpacity = 0.5;
+    //                 }
+    //             }
+    //             if(d.parent && d.parent.type == 'endtoend'){
+    //                 nodeDisplay[d.id].task = true;
+    //                 nodeDisplay[d.id].taskOpacity = 1;
+    //             }
+    //         }//showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
+    //         else if (d.taskexists && d.type !="modules" && d.type !="scenarios") {
+    //             nodeDisplay[d.id].task = true;
+    //             nodeDisplay[d.id].taskOpacity = 0.5;
+    //             }
+    //         }
+    //     })
+    // dLinks.forEach(function(d) {
+    //     d.id = uuid();
+    //     var lid = 'link-' + d.source.id + '-' + d.target.id
+    //     var link = addLink(d.source, d.target,verticalLayout);
+    //     linkDisplay[lid] = link
+    //     linkDisplay[lid].hidden = (d.source.revertChild || d.source.revertChild1) || false;
+    // });
+    // if (verticalLayout){
+    //     translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]
+    // } else{
+    //     translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+    // }
+    // foldtree(tree)
+    // return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
 }
 
 export const createNewMap = (verticalLayout,types,name,sections) => {
