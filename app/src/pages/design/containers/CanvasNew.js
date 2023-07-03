@@ -107,18 +107,18 @@ const CanvasNew = (props) => {
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(false);
     const [visibleDesignStep, setVisibleDesignStep] = useState(false);
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
-    const [showTooltip, setShowTooltip] = useState(false);
+    const [showTooltip, setShowTooltip] = useState("");
 
     const imageRef = useRef(null);
 
-    const handleTooltipToggle = () => {
+    const handleTooltipToggle = (nodeType) => {
       const rect = imageRef.current.getBoundingClientRect();
       setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
-      setShowTooltip(true);
+      setShowTooltip(nodeType);
     };
   
     const handleMouseLeave1 = () => {
-      setShowTooltip(false);
+      setShowTooltip("");
     };
     
     useEffect(() => {
@@ -1075,7 +1075,7 @@ const footerContentScreen =(
                 return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} d={link[1].d}></path>)
                 })}
                 {Object.entries(nodes).map((node)=>
-                    <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} ref={imageRef} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}>
+                    <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} ref={imageRef} onMouseEnter={() => handleTooltipToggle(node[1].type)} onMouseLeave={() => handleMouseLeave1()}>
                        <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                    
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={
@@ -1085,17 +1085,6 @@ const footerContentScreen =(
                           
                           </div>
                         } y="50">{node[1].name}</text>
-                        {/* {showTooltip && (
-              <div className='card__add' style={{ position: 'absolute', right: `${cardPosition.right - 1200}px`, top: `${cardPosition.top- 700}px`, display: 'blyock' }}>
-                <h3> Sort projects</h3>
-                <p className='text__insprint__info1'>Click here to sort projects.</p>
-              
-              </div>
-            )} */}
-                        <title val={node[0]} className="ct-node-title">{<div className='card__add'>
-                            <h3> {node[1].name}</h3>
-                            <p className='text__insprint__info1'>Click here to sort projects.</p>
-                          </div>}</title>
                         {(node[1].type!=='testcases')?
                         <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                         :null}
@@ -1114,62 +1103,144 @@ const footerContentScreen =(
             {Object.entries(links).map((link)=>{
             return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} d={link[1].d}></path>)
             })}
-            {Object.entries(nodes).map((node)=>
+            {Object.entries(nodes).map((node, nodeIdx)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}  ></image>
-                    <text className="ct-nodeLabel" textAnchor="middle" x="20" title={<div className='card__add'>
-                            <h3> {node[1].name}</h3>
-                            <p className='text__insprint__info1'>Click here to sort projects.</p>
-                          </div>} y="50">{node[1].name}</text>
-                          <title val={node[0]} >
-                          {showTooltip && (
-              <div className='card__add' style={{ position: 'absolute', left: `${cardPosition.left - 80}px`, top: `${cardPosition.top- -20}px`, display: 'block' }}>
-                <h3>  {node[1].name}</h3>
-                {/* <p className='text__insprint__info1'>Click here to sort projects.</p> */}
-              
-              </div>
-            )}
-                          </title>
-                          {/* {showTooltip && (
-  <g>
-    <rect
-      x={verticalLayout ? -80 : cardPosition.left - 80}
-      y={verticalLayout ? cardPosition.top - 380 : -3120}
-      width="400"
-      height="80"
-      rx="4"
-      ry="4"
-      fill="#495057"
-      stroke="#ccc"
-      strokeWidth="1"
-      className="tooltip-background"
-    ></rect>
-    <text
-      x={verticalLayout ? 20 : cardPosition.left + 20}
-      y={verticalLayout ? cardPosition.top - 360 : -3000}
-      className="tooltip-text"
-    >
-     <h3> {node[1].name}</h3>
-    </text>
-    <text
-      x={verticalLayout ? 20 : cardPosition.left + 20}
-      y={verticalLayout ? cardPosition.top - 340 : -3080} 
-      className="tooltip-subtext"
-    >
-      Click here to add screen(s) or record a testcase using Avo Genius (Smart Recorder).
-    </text>
-  </g>
-)} */}
+                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle(nodeIdx)} onMouseLeave={() => handleMouseLeave1()}  ></image>
+                    <text className="ct-nodeLabel" textAnchor="middle" x="20" 
+                    
+                           y="50">{node[1].name}</text>
+                          
+{/* 
+<title val={node[0]} className="ct-node-title">
 
-                    {/* <title val={node[0]} className="ct-node-title">
-                      {<div className='card__add'>
-                        
-                            <h3> {node[1].name}</h3>
-                            <p className='text__insprint__info1'>Click here to sort projects.</p>
-                            
-                          </div>}
-                       
-                          </title> */}
+</title> */}
+<g val={node[0]} className="ct-node-title">
+  {showTooltip !== "" && (
+      ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="4"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+            Click here to sort projects.
+          </text>
+        </g>
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="10"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.right + 80}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.right + 80}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+           Click here to add screen(s) or record a testcase using Avo Genius (Smart Recorder)
+          </text>
+        </g>
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="4"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 40}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+          Click here to add test steps folder, capture element, rename or delete screen
+          </text>
+        </g>
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="4"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 40}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+          Click here to design test step(s), rename or delete test steps folder.
+          </text>
+        </g>
+      ))
+  )}
+</g>
+
+
+
+
+
+
                              
                     {(node[1].type!=='testcases')?
                     <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
