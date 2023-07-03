@@ -533,23 +533,50 @@
 .schedule_date {
   gap: 2rem;
 }
+// .copy_CICD {
+//   color: #000000;
+//   background-color: transparent;
+//   border: none;
+
+//   margin-top: -3rem;
+//   left: 12.5rem;
+//   display: flex;
+//     top: -1rem;
+//     text-align: center;
+//     left: 43rem;
+//     .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
+//       background: transparent ;
+//       border-color: transparent ;
+//       color: black ;
+//   }
+// }
 .copy_CICD {
   color: #000000;
   background-color: transparent;
   border: none;
-
   margin-top: -3rem;
   left: 12.5rem;
   display: flex;
-    top: -1rem;
-    text-align: center;
-    left: 41rem;
-    .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
-      background: transparent ;
-      border-color: transparent ;
-      color: black ;
+  top: -1rem;
+  text-align: center;
+  left: 43rem;
+  .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
+          background: transparent ;
+          border-color: transparent ;
+          color: black ;
+      }
+}
+
+
+@media (max-width: 768px) {
+  .copy_CICD {
+    position: sticky;
+    top: 1rem;
+    right: 1rem;
   }
 }
+
+
 
 .inputtext_devops {
   display: flex;
@@ -563,7 +590,7 @@
   color: #000000;
   background-color: transparent;
   border: none;
-  left: 41rem;
+  left: 43rem;
   display: flex;
   
   top: -7rem;
@@ -959,7 +986,9 @@
   white-space: pre-wrap;
   background-color: #b8d8ff;
   margin-left: 44px;
-  margin-right: 8.5rem;
+  // margin-right: 11.5rem;
+  width: 78vh;
+
 }
 .executiontypenamepre {
   width: 78vh;
