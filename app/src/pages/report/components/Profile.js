@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Breadcrumbs, Link } from '@mui/material';
 import AvoInput from "../../../globalComponents/AvoInput";
+import "./Profile.scss";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
   const products = [
     {
       id: "1000",
-      name: "Execution No: E1",
+      name: "Add Execution No: E1",
       dateTime: "22 Aug 2022, 12:54:15 PM",
       browser: "chrome",
       module: 100,
@@ -16,7 +18,7 @@ const Profile = () => {
     },
     {
       id: "1000",
-      name: "Execution No: E1",
+      name: "Check Execution No: E1",
       dateTime: "22 Aug 2022, 12:54:15 PM",
       browser: "chrome",
       module: 100,
@@ -24,7 +26,7 @@ const Profile = () => {
     },
     {
       id: "1000",
-      name: "Execution No: E1",
+      name: "Remove Execution No: E2",
       dateTime: "22 Aug 2022, 12:54:15 PM",
       browser: "chrome",
       module: 100,
@@ -32,7 +34,7 @@ const Profile = () => {
     },
     {
       id: "1000",
-      name: "Execution No: E1",
+      name: "Test Execution No: E3",
       dateTime: "22 Aug 2022, 12:54:15 PM",
       browser: "chrome",
       module: 100,
@@ -40,7 +42,7 @@ const Profile = () => {
     },
     {
       id: "1000",
-      name: "Execution No: E1",
+      name: "Final Execution No: E4",
       dateTime: "22 Aug 2022, 12:54:15 PM",
       browser: "chrome",
       module: 100,
@@ -58,26 +60,34 @@ const Profile = () => {
 
   const tableHeader = () => {
     return (
-      <div className="flex justify-content-between">
-        <div>Execution List</div>
-        <div style={{ width: "10%" }}>
-          <AvoInput
-            icon="pi pi-search"
-            placeholder="Search"
-            inputTxt={searchScenario}
-            setInputTxt={setSearchScenario}
-            inputType="searchIcon"
-          />
+      <div className="flex flex-column">
+        <div className="exeprofile_txt">Execution Profile 1</div>
+        <div className="flex justify-content-between align-items-center">
+          <div>Execution List</div>
+          <div className="search_container">
+            <AvoInput
+              icon="pi pi-search"
+              placeholder="Search"
+              inputTxt={searchScenario}
+              setInputTxt={setSearchScenario}
+              inputType="searchIcon"
+            />
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <>
+    <div className="profile_container">
+      <Breadcrumbs>
+        <Link>Home</Link>
+        <Link>Reports</Link>
+        <Link>Executions</Link>
+      </Breadcrumbs>
       <DataTable
         value={products}
-        tableStyle={{ minWidth: "50rem" }}
+        tableStyle={{ minWidth: "50rem"}}
         header={tableHeader}
         globalFilter={searchScenario}
       >
@@ -89,13 +99,13 @@ const Profile = () => {
             {...(col.field === "testScenario"
               ? { filter: true, filterPlaceholder: "Search by name" }
               : {})}
-            {...((col.field === "name" || col.field === "dateTime")
+            {...(col.field === "name" || col.field === "dateTime"
               ? { sortable: true }
               : {})}
           />
         ))}
       </DataTable>
-    </>
+    </div>
   );
 };
 
