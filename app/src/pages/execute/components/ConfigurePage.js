@@ -111,7 +111,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [selectedPattren, setSelectedPattren] = useState(null);
+  const [selectedPattren, setSelectedPattren] = useState({});
   const [selectedDaily, setSelectedDaily] = useState(null);
   const [selectedWeek, setselectedWeek] = useState([]);
   const [selectedMonthly, setSelectedMonthly] = useState(null);
@@ -980,13 +980,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               iceList: [],
               date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startDate ? startDate.getTime() : "",
+              timestamp: startDate ? startDate.getTime().toString() : endDate.getTime().toString(),
               recurringValue: getPattren().recurringValue,
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
-              endAfter: startDate ? "" : endDate.toLocaleDateString('es-CL'),
-              clientTime: startDate ? "" : `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
-              clientTimeZone: startDate ? "" : `GMT+${Math.abs(new Date().getTimezoneOffset()/60)}`,
+              endAfter: startDate ? "" : "3 Months",
+              clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
+              clientTimeZone: "+0530",
             })),
             scenarioFlag: false,
             type: "normal",
@@ -1007,10 +1007,24 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         setEndDate(null);
         setStartTime(null);
         setScheduleOption({});
+        setSelectedDaily(null);
+        setselectedWeek([]);
+        setSelectedMonthly(null);
+        setDropdownWeek(null);
+        setSelectedPattren({});
       });
     }
     if (btnType === "Cancel") {
       setScheduling(false);
+      setStartDate(null);
+      setEndDate(null);
+      setStartTime(null);
+      setScheduleOption({});
+      setSelectedDaily(null);
+      setselectedWeek([]);
+      setSelectedMonthly(null);
+      setDropdownWeek(null);
+      setSelectedPattren({});
     }
   };
 
@@ -1180,8 +1194,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
             modalSytle={{ width: "50vw", background: "#FFFFFF", height:"85%" }}
-            
-           
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
@@ -1200,7 +1212,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
-                isDisabled={!startDate && (!selectedPattren?.key || !endDate)}
+                isDisabled={!startDate && (!selectedPattren?.key || !endDate || !startTime)}
                 onSchedule={onScheduleBtnClick}
                 selectedDaily={selectedDaily}
                 selectedWeek={selectedWeek}
