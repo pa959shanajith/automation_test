@@ -236,9 +236,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                 } else {
                     let executionRequest = '' 
                     if(batchExecutionData['configurekey'] && batchExecutionData['configurekey'] != '' && batchExecutionData['configurename'] && batchExecutionData['configurename'] != '' ){
+                        if (batchExecutionData['scheduleId'] && batchExecutionData['scheduleId'] != '' && batchExecutionData['execType'] && batchExecutionData['execType'] != '') {
+                            type = batchExecutionData['execType'];
+                        }
                         executionRequest = await this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                         return executionRequest;
                     }
+
                     response['status'] = "pass";
                     response["message"] = "ICE not selected."
                     response['variant'] = "info";
@@ -597,6 +601,14 @@ module.exports.Execution_Queue = class Execution_Queue {
         if("executionType" in req.body) {
             executionData.executionData.executiontype = req.body.executionType;
         }
+
+        // check for execType is scheduling or not
+        if ('execType' in req.body && 'scheduleId' in req.body) {
+            executionData.executionData.execType = req.body.execType;
+            executionData.executionData.scheduleId = req.body.scheduleId;
+            response["message"] = "Execution will be started on " + executionData.executionData.avoagents[0];
+        }
+
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
         const gettingTestSuiteIds = await suitFunctions.ExecuteTestSuite_ICE({

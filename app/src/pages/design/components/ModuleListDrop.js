@@ -76,7 +76,8 @@ const ModuleListDrop = (props) =>{
     const [showE2EPopup, setShowE2EPopup] = useState(false);
     const [configTxt, setConfigTxt] = useState("");
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
-
+    const [E2EName,setE2EName] = useState('')
+    const [editE2ERightBoxData,setEditE2ERightBoxData] = useState([])
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -362,14 +363,28 @@ const ModuleListDrop = (props) =>{
             return;
         }
     }
+      const handleEditE2E=()=>{
+           setE2EName(moduleSelect.name)
+           const editE2EData  = moduleSelect.children.map((item)=>{
+            return{
+                sceName:item.name,
+                scenarioId: item._id,
+                modNme:'',
+                projectname:''
+              }
+
+           })
+           setEditE2ERightBoxData(editE2EData);
+
+      }
     // ///////////// _____ E2E popUp_____ ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    const LongContentDemo = () => {
+    const LongContentDemo = (props) => {
         const [newProjectList, setNewProjectList] = useState([]);
         const[overlayforModSce,setOverlayforModSce]=useState(false)
         // const [storedSelectedProj, setStoredSelectedProj] = useState('');
         const [selectedKeys, setSelectedKeys] = useState([]);
-        const [transferBut, setTransferBut] = useState([]);
+        const [transferBut, setTransferBut] = useState( E2EName? editE2ERightBoxData : [] );
         const [inputE2EData, setInputE2EData] = useState('');
         const [newModSceList, setNewModSceList] = useState([]);
         const [selectedProject, setSelectedProject] = useState(null);
@@ -414,7 +429,6 @@ const ModuleListDrop = (props) =>{
               });
             }
             setNewProjectList(projectCollection);
-            console.log("projNme",proj)
             setSelectedProject(proj)
           })();
         }, []);
@@ -431,10 +445,8 @@ const ModuleListDrop = (props) =>{
             });
             const projectNameforScenario = projectList.find(item => item.id === selectedProject)
 
-            console.log("moduleLists",moduleList)
             let moduleCollections = [];
             for (let modu of moduleList) {
-              console.log("modu",moduleList)
               if (modu.type === 'basic') {
                 let scenarioCollections = [];
                 const scenDatas = await populateScenarios(modu._id);
@@ -454,7 +466,6 @@ const ModuleListDrop = (props) =>{
             }
             setNewModSceList(moduleCollections)
             setFilterModSceList(moduleCollections);
-            console.log("scenarioList",moduleCollections)
             if(moduleCollections.length)setOverlayforModSce(false)
 
             //  var filter = moduleCollections.scenarioList.find((e)=>e.name.toUpperCase().indexOf(searchScenarioLeftBox.toUpperCase())!==-1)
@@ -482,6 +493,7 @@ const ModuleListDrop = (props) =>{
           // let array = [...selectedKeys]
             // setTransferBut=[...transferBut,array]
             setTransferBut((oldTransferBut) => [...oldTransferBut, ...selectedKeys]);
+
             setSelectedKeys([]);
         }
         const pushingEnENmInArr ={
@@ -514,9 +526,9 @@ const ModuleListDrop = (props) =>{
                     {
                         "id": 0,
                         "childIndex": 0,
-                        "_id": null,
+                        "_id": E2EName? moduleSelect._id : null,
                         "oid": null,
-                        "name": inputE2EData,
+                        "name": E2EName? E2EName : inputE2EData,
                         "type": "endtoend",
                         "pid": null,
                         "pid_c": null,
@@ -524,7 +536,7 @@ const ModuleListDrop = (props) =>{
                         "renamed": false,
                         "orig_name": null,
                         "taskexists": null,
-                        "state": "created",
+                        "state": E2EName? "saved" : "created",
                         "cidxch": null
                     }
                 ],
@@ -603,6 +615,7 @@ const ModuleListDrop = (props) =>{
               value: projectDrp.id}
               )
             })
+
             const changeProject = (e) =>{
               setSelectedProject(e.value)
               const selectedProjForSce = newProjectList.find(project=> project.id === e.value);
@@ -615,7 +628,7 @@ const ModuleListDrop = (props) =>{
             <div className="card flex justify-content-center">
               <Dialog
                 className="Project-Dialog"
-                header="Create End to End Flow"
+                header= {E2EName? "Edit End to End Flow" : "Create End to End Flow"} 
                 visible={showE2EPopup}
                 style={{ width: '74.875rem', height: '100%', backgroundColor: '#f2f2ff' }}
                 onHide={() => setShowE2EPopup(false)}
@@ -631,7 +644,7 @@ const ModuleListDrop = (props) =>{
                         placeholder="Enter End to End Module Name"
                         customClass="inputRow_for_E2E_popUp"
                         inputType="lablelRowReqInfo"
-                        inputTxt={inputE2EData}
+                        inputTxt={E2EName? E2EName:inputE2EData} 
                         setInputTxt={setInputE2EData}
                       />
                     </div>
@@ -646,7 +659,7 @@ const ModuleListDrop = (props) =>{
                                 <i className="pi pi-search" />
                                 <InputText type="text"
                                   placeholder="Search Scenarios"
-                                  style={{ width: '13rem', height: '2.2rem', marginRight:'0.4rem', marginBottom: '1%' }}
+                                  style={{ width: '15rem', height: '2.2rem', marginRight:'0.2rem', marginBottom: '1%' }}
                                   className="inputContainer" onChange={(e)=>handleSearchScenarioLeftBox(e.target.value)}
                                 />
                               </span>
@@ -728,18 +741,17 @@ const ModuleListDrop = (props) =>{
                             />
                           </span>
                       </div>
-                     { console.log("transferBut",transferBut)}
                       <div className="ScenairoList">
-                        {transferBut.map((ScenarioSelected, ScenarioSelectedIndex)=>{
-                          return(
-                            <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
+                          {transferBut.map((ScenarioSelected, ScenarioSelectedIndex) => {
+                            return (
+                              <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
                                 <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-                                    <h4>{ScenarioSelected.sceName}</h4><div className="modIconSce"><h5>(<img  src="static/imgs/moduleIcon.png" alt="modules" /><h3>{ScenarioSelected.modName})</h3></h5></div>
-                                    <div className="projIconSce"><h5>(<img  src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{ScenarioSelected.projectname})</h3></h5></div>
-                                    {console.log("transferButMap",transferBut)}</div><Button icon="pi pi-times" onClick={()=>{deleteScenarioselected(ScenarioSelectedIndex);}} rounded text severity="danger" aria-label="Cancel" /></div>
-                            </div>
-                          )
-                        })}
+                                  <h4>{ScenarioSelected.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{ScenarioSelected.modName})</h3></h5></div>
+                                  <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{ScenarioSelected.projectname})</h3></h5></div>
+                                  </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(ScenarioSelectedIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
+                              </div>
+                            )
+                          })}
                       </div>
                       </Card>
                       
@@ -873,7 +885,7 @@ const ModuleListDrop = (props) =>{
                         </div>)}
                      </div > */}
                       <img   src="static/imgs/plusNew.png" onClick={()=>setShowE2EPopup(true)}  alt="PlusButtonOfE2E" /> 
-                      {showE2EPopup&&<LongContentDemo/>}
+                      {showE2EPopup&&<LongContentDemo setShowE2EOpen={setShowE2EPopup} module={moduleSelect}/>}
                 </div>
                    {/* <div className='searchBox pxBlack'>
                                        <img style={{marginLeft:'1.3rem',width:'1rem',}} src="static/imgs/checkBoxIcon.png" alt="AddButton" />
@@ -907,7 +919,11 @@ const ModuleListDrop = (props) =>{
                                                     <div key={i}  data-test="individualModules" name={e.name} value={e._id} type={e.type} className={'EachModNameBox'+((moduleSelect._id===e._id)?" selected":"")} 
                                                           style={moduleSelect._id===e._id?  {backgroundColor:'#EFE6FF'}:{} }   onClick={(e)=>selectModules(e)} title={e.name} >
                                                           <div style={{textOverflow:'ellipsis', width:'9rem',overflow:'hidden',textAlign:'left', height:'1.3rem', display:'flex',alignItems:"center",width:'99%'}}> 
-                                                          <img style={{}} src="static/imgs/checkBoxIcon.png" alt="AddButton" /><img src="static/imgs/E2EModuleSideIcon.png" style={{marginLeft:'10px',width:'20px',height:'20px'}} alt="modules" /><span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span> <div  ></div></div>
+                                                          <img  src="static/imgs/checkBoxIcon.png" alt="AddButton" /><img src="static/imgs/E2EModuleSideIcon.png" style={{marginLeft:'10px',width:'20px',height:'20px'}} alt="modules" />
+                                                          <span style={{textOverflow:'ellipsis'}} className='modNmeE2E'>{e.name}</span>
+                                                          <div ></div></div>
+                                                          <img  src="static/imgs/edit-icon.png" onClick={()=>{setShowE2EPopup(true); handleEditE2E()}} disabled={moduleSelect._id===e._id? true : false}
+                                                           style={{width:'20px',height:'20px'}} alt="AddButton" /> 
                                                     
                                                     </div>
                                                     </>
