@@ -369,9 +369,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     index: index
                 }
             )});
-            setPlatformVersions(findMobileVersions);
-            // console.log(findMobileVersions);
-            // setMobilePlatform(findMobileVersions)
+            setPlatformVersions(findMobileVersions.sort((a, b) => {
+                return Number(a.key.split(' ')[1]) - Number(b.key.split(' ')[1])
+            }));
     }
 
     const onEmulatorChange = async (option) => {
@@ -1359,7 +1359,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <Button id='Saucelabs_submit' label="Submit" onClick={()=>handleSubmit(defaultValues)} />
                 </Dialog>                 
 
-                <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onDismiss={() => {setDisplayBasic5(false)}} onHide={() => onHide('displayBasic5')}>
+                <Dialog id='SauceLab_Integration' header='SauceLab Integration' visible={displayBasic5} onDismiss={() => {setDisplayBasic5(false)}} onHide={() => onHide('displayBasic5')}>
                      
 
                     {showSauceLabs&&
@@ -1372,10 +1372,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectedKey={selectedPlatforms}
                     width='15rem'
                     placeholder='select Platform'
+                    calloutMaxHeight='12rem'
                     />
                     </>}
                     {!showSauceLabs&&<>
-                    <div><h6>Operating System</h6></div>
+                    <div><h6>Operating Systems</h6></div>
                     <SearchDropdown
                     noItemsText={[]}
                     onChange={onOsChange}
@@ -1383,11 +1384,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectedKey={selectedOS}
                     width='15rem'
                     placeholder='select OS'
+                    calloutMaxHeight='12rem'
                     />
                     </>}
                     {!showSauceLabs&&
                     <>
-                    <div><h6>Browser</h6></div>
+                    <div><h6>Browsers</h6></div>
                     <SearchDropdown
                     noItemsText={[ ]}
                     disabled={selectedOS == ''}
@@ -1396,6 +1398,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectedKey={selectedSaucelabBrowser}
                     width='15rem'
                     placeholder='select Browser'
+                    calloutMaxHeight='12rem'
                     />
                     </>}
                     {showSauceLabs &&
@@ -1408,7 +1411,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     options={platformVersions}
                     selectedKey={selectedMobileVersion}
                     width='15rem'
-                    placeholder='select android versions'
+                    placeholder='select android version'
+                    calloutMaxHeight='12rem'
                     />
                     </>}
                     
@@ -1423,6 +1427,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectedKey={selectedVersion}
                     width='15rem'
                     placeholder='select Versions'
+                    calloutMaxHeight='12rem'
                     />
                     </>}
                     {showSauceLabs &&
@@ -1436,6 +1441,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     disabled={selectedMobileVersion == ''}
                     width='15rem'
                     placeholder='select Emulator'
+                    calloutMaxHeight='12rem'
                     />
                     </>}
                     <div>
@@ -1501,7 +1507,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         autoFocus />
                             
             
-            <Button id='Saucelabs_cancel' className='Saucelabs_cancel'label="cancel"  onClick={onCancelSauce}/>
+            <Button id='Saucelabs_cancel' className='Saucelabs_cancel'label="Cancel"  onClick={onCancelSauce}/>
 
                     </Dialog>
 
