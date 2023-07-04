@@ -43,8 +43,8 @@ const initialState = {
     actionError: [],
     copiedTestCases: {},
     TestCases: [],
-    modified: {},
-    saveEnable: false,
+    Modified: {},
+    SaveEnable: false,
     enableExport:false,
     exportProjname:"",
     enableExportMindmapButton:true
@@ -155,10 +155,10 @@ export const designSlice = createSlice({
       state.TestCases = action.payload;
     },
     Modified:(state, action)=>{
-      state.modified = action.payload;
+      state.Modified = action.payload;
     },
     SaveEnable:(state, action)=>{
-      state.saveEnable = action.payload;
+      state.SaveEnable = action.payload;
     },
     objValue:(state, action)=>{
       state.objValue = action.payload

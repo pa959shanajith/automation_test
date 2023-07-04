@@ -145,11 +145,18 @@
   }
 }
 
-.screen_btn_test {
+.screen_btn {
   height: 4vh;
   position: relative;
+  right: 0.5rem;
   top: 0.4rem;
-  right: 1.5rem;
+}
+
+.btn_test_screen {
+  height: 3.2vh;
+  position: relative;
+    /* right: 0.5rem; */
+  top: 1rem;
 }
 .screen__name{
   white-space: nowrap;

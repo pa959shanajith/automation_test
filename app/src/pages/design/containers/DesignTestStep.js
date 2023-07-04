@@ -458,19 +458,21 @@ const DesignModal = (props) => {
                                             .then(data1 => {
                                                 if (data1 === "Invalid Session") return ;
                                                 
-                                                if (data1 === "Success") {            
-                                                    fetchTestCases()
-                                                    .then(msg=>{
-                                                        setChanged(false);
-                                                        msg === "success"
-                                                        ? toast.current.show({severity:"success", summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT , life:3000})
-                                                        : toast.current.show({severity:"warn", summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:2000})
-                                                    })
-                                                    .catch(error => {
-                                                        // setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                                                        toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                                        console.error("Error: Fetch TestCase Failed ::::", error)
-                                                    });
+                                                if (data1 === "Success") {    
+                                                    for(var i = 0; parentScreen.length>i;i++) {
+                                                        fetchTestCases(i)
+                                                        .then(msg=>{
+                                                            setChanged(false);
+                                                            msg === "success"
+                                                            ? toast.current.show({severity:"success", summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT , life:3000})
+                                                            : toast.current.show({severity:"warn", summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:2000})
+                                                        })
+                                                        .catch(error => {
+                                                            // setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                                                            toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
+                                                            console.error("Error: Fetch TestCase Failed ::::", error)
+                                                        });
+                                                    }        
                                                 } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
                                                 // setMsg(MSG.DESIGN.ERR_SAVE_TC);
                                             })
@@ -487,18 +489,20 @@ const DesignModal = (props) => {
                                 });
                             }
                             else{
-                                fetchTestCases()
-                                .then(data=>{
-                                    setChanged(false);
-                                    data === "success" 
-                                    ? toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT, life:3000}) 
-                                    : toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT, life:2000})
-                                })
-                                .catch(error=>{
-                                    // setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                                    toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                    console.error("Error: Fetch TestCase Failed ::::", error)
-                                });
+                                for (var i = 0; parentScreen.length>i; i++){
+                                    fetchTestCases(i)
+                                    .then(data=>{
+                                        setChanged(false);
+                                        data === "success" 
+                                        ? toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT, life:3000}) 
+                                        : toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT, life:2000})
+                                    })
+                                    .catch(error=>{
+                                        // setMsg(MSG.DESIGN.ERR_FETCH_TC);
+                                        toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
+                                        console.error("Error: Fetch TestCase Failed ::::", error)
+                                    });
+                                }
                             }
                         } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
                         // setMsg(MSG.DESIGN.ERR_SAVE_TC);
@@ -575,6 +579,7 @@ const DesignModal = (props) => {
                     toast.current.show({severity: 'success',summary: 'Success', detail:MSG.DESIGN.SUCC_DEBUG.CONTENT, life:3000})
                 } else {
                     setMsg(data);
+                    toast.current.show({severity: 'success',summary: 'Success', detail:data, life:3000})
                 }										
             })
             .catch(error => {
@@ -668,7 +673,7 @@ const DesignModal = (props) => {
             <div>
                 <h5 className='dailog_header1'>Design Test Step</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
-                <img className="screen_btn_test" src="static/imgs/bi_code-square.svg" alt='screen icon' />
+                <img className="btn_test_screen" src="static/imgs/bi_code-square.svg" alt='screen icon' />
             </div>
         </>
     );
@@ -760,7 +765,7 @@ const DesignModal = (props) => {
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
                     <i className='pi pi-file-export' style={{marginTop:'0.9rem'}} title='Export Test Steps' onClick={()=>exportTestCase()} />
                     <i className='pi pi-plus' style={{marginTop:'0.9rem'}} title='Add Test Step' onClick={()=>addRow()} />
-                    <i className='pi pi-save' style={{marginTop:'0.9rem'}} title='Save' onClick={()=>saveTestCases} />
+                    <i className='pi pi-save' style={{marginTop:'0.9rem'}} title='Save' onClick={()=>saveTestCases()} />
                     <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
                     <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' title='Debug' outlined></Button>
                 </div>:null}
@@ -877,7 +882,8 @@ const DesignModal = (props) => {
     const optionKeyword = keywordListTable?.slice(startIndex, endIndex + 1).map((keyword, i) => {
         if (i < endIndex) {
             return {
-                value: keyword,
+                // value: keyword,
+                value:keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "",
                 label: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "",
                 tooltip: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""
             }
@@ -973,15 +979,21 @@ const DesignModal = (props) => {
     };
         
     const deleteProduct = () => {
-        let findData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
-        let testcases = findData.testCases.filter(function(objFromA) {
-            return !selectedTestCases.find(function(objFromB) {
-                return objFromA.stepNo === objFromB.stepNo
-                
-            })
-        })
-        
-        setScreenLevelTastSteps(testcases);
+        let findData = screenLavelTestSteps.find(screen => screen.name === rowExpandedName.name);
+
+        if (findData) {
+        let testcases = findData.testCases.filter(objFromA => {
+            return !selectedTestCases.find(objFromB => objFromA.stepNo === objFromB.stepNo);
+        });
+        let updatedScreenLavelTestSteps = screenLavelTestSteps.map(screen => {
+            if (screen.name === rowExpandedName.name) {
+            return { ...screen, testCases:  testcases.length === 0 ? [emptyRowData] : testcases };
+            } else {
+            return screen;
+            }
+        });
+        setScreenLevelTastSteps(updatedScreenLavelTestSteps);
+        }
         setDeleteTestDialog(false);
         setTestCase(emptyRowData);
         setSelectedTestCases(null)

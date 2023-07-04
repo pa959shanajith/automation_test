@@ -13,10 +13,10 @@ const Footer = () => {
         <div className="main-footer">
             <div className="main-footer-content">
             <span className="right-text">
-                <img src='static/imgs/Copyright.svg' alt='copyright'/> Copyright {new Date().getFullYear()} Avo Automation - <span className='terms'>Terms of Use</span>
+                <img src='static/imgs/Copyright.svg' className='copyImg' alt='copyright'/> Copyright {new Date().getFullYear()} Avo Automation - <span className='terms'>Terms of Use</span>
             </span>
             <span className="left-text">
-                Avo Assure v23.1.1
+                Avo Assure v23.2.1
             </span>
             </div>
         </div>
