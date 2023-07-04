@@ -383,6 +383,50 @@ const CaptureModal = (props) => {
     if (continueSave) saveScrapedObjects();
   }
 
+const elementTypeProp =(elementProperty) =>{
+  switch(elementProperty) {
+    case "abbr" || "acronym" || "aside" || "body" || "data" || "dd" || "dfn" || "div" || "embed" || "figure" || "footer" || "frame" || "head" ||
+          "iframe" || "kbd" || "main" || "meta" || "noscript" || "object" || "output" || "param" || "progress" || "rt" || "samp" || "section" || "span"
+          || "style" || "td" || "template" :
+       return "Content";
+
+    case "a" || "link":
+       return "Link";
+
+    case "address" || "article" || "b" || "bdi" || "bdo" || "big" || "blockquote" || "caption" || "center" || "cite" || "code" || "del" || "details" 
+         || "dt" || "em" || "figcaption" ||  "h1" || "h2" || "h3" || "h4" || "h5" || "h6" || "header" || "i" || "ins" || "label" || "legend" || "mark" 
+         || "noframes" || "p" || "pre" || "q" || "rp" || "ruby" || "s" || "small" || "strike" || "strong" || "sub" || "summary" || "sup" || "th" || "time"
+         || "title" || "tt" || "u":
+      return "Text";
+
+    case "button" :
+      return "Button";
+      
+    case "img" || "map" || "picture" || "svg" :
+      return "Image";
+
+    case "col" || "colgroup" || "nav" :
+      return "Navigation Menus";
+
+    case "datalist" || "select" :
+      return "Dropdown";
+
+    case "dir" || "dl" || "li" || "ol" || "optgroup" || "option" || "ul" :
+      return "List";
+
+    case "form" || "fieldset" :
+      return "Forms";
+      
+    case "input" || "textarea" :
+      return "Textbox/Textarea";
+      
+    case "table" || "tbody" || "tfoot" || "thead" || "tr":
+      return "Table";
+
+    default:
+      return "Element";
+   }
+}
 
   const fetchScrapeData = () => {
     return new Promise((resolve, reject) => {
@@ -470,7 +514,7 @@ const CaptureModal = (props) => {
             return (
               {
                 selectall: item.custname,
-                objectProperty: item.tag,
+                objectProperty: elementTypeProp(item.tag),
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
                   setScreenshotData({
                     header: item.custname,
@@ -489,7 +533,7 @@ const CaptureModal = (props) => {
             return (
               {
                 selectall: item.custname,
-                objectProperty: item.tag,
+                objectProperty: elementTypeProp(item.tag),
                 browserscrape: 'google chrome',
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
                   setScreenshotData({
@@ -1028,9 +1072,9 @@ const CaptureModal = (props) => {
               "static/imgs/eye_disabled.svg"} 
           />
         </div>
-      <div className='header__popup'>
-      <Tooltip target=".header__popup" position='bottom'>{screenshotData.header}</Tooltip>
-       <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
+      <div className='header__popup screenshot_headerName'>
+        <Tooltip target=".screenshot_headerName" content={screenshotData.header} position='bottom' ></Tooltip>
+        <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
       </div>
       </div>
     </>
@@ -1270,73 +1314,77 @@ const CaptureModal = (props) => {
             <div className="action_panelCard">
               <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
-                <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" title=' Automate test cases of inflight features well within the sprint before application ready'></img>
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj' title="add object" src="static/imgs/ic-add-object.png"></img>
+                  <img className='add_obj' title=" Add a placeholder element by specifying element type." src="static/imgs/ic-add-object.png"></img>
                   <p>Add Element</p>
                 </span>
                 <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj' title='map object' src="static/imgs/ic-map-object.png"></img>
+                  <img className='map_obj' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png"></img>
                   <p>Map Element</p>
                 </span>
-                {isInsprintHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isInsprintHovered &&
+                 
+                (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>InSprint Automation</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
-                </div>)}
+                </div>)
+                } */}
               </div>
               <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
-                <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" title='Easily upgrade Test Automation as application changes'></img>
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
-                  <img className='add_obj' src="static/imgs/ic-compare.png"></img>
+                  <img className='add_obj' src="static/imgs/ic-compare.png" title='Analyze screen to compare existing and newly captured element properties.'></img>
                   <p>Compare Element</p>
                 </span>
                 <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
-                  <img className='map_obj' src="static/imgs/ic-replace.png"></img>
+                  <img className='map_obj' src="static/imgs/ic-replace.png" title=' Replace the existing elements with the newly captured elements.'></img>
                   <p>Replace Element</p>
                 </span>
-                {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Upgrade Analyzer</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a href='docs.avoautomation.com'>Learn More</a>
-                </div>)}
+                </div>)} */}
               </div>
               <div className='utility__block'>
                 <p className='insprint__text'>Capture from PDF</p>
-                <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" title='Capture the elements from a PDF.'></img>
                 <span className='insprint_auto'>
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
                   <p>PDF Utility</p>
                 </span>
-                {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Capture from PDF</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
-                </div>)}
+                </div>)} */}
               </div>
               <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
-                <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" title=' Create element manually by specifying properties.'></img>
                 <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
-                {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Create Manually</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
-                </div>)}
+                </div>)} */}
               </div>
               <div className='imp_exp__block'>
                 <span className='insprint_auto'>
                   <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                    <img className='add_obj' src="static/imgs/ic-import.png" />
+                    <img className='add_obj' src="static/imgs/ic-import.png" title=' Import elements from json or excel file exported from same/other screens.' />
                     <p className='imp__text'>Import Screen</p>
                   </span>
                   <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
-                    <img className='add_obj' src="static/imgs/ic-export.png" />
+                    <img className='add_obj' src="static/imgs/ic-export.png"  title=' Export captured elements as json or excel file to be reused across screens/projects.'/>
                     <p className='imp__text'>Export Screen</p>
+
                   </span>
                 </span>
               </div>
@@ -1373,7 +1421,7 @@ const CaptureModal = (props) => {
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
-              body={renderSelectAllCell}>
+            >
             </Column>
             <Column field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshots"></Column>
@@ -1485,7 +1533,7 @@ const CaptureModal = (props) => {
         toastError={toastError}
       />}
 
-      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} />}
+      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError}/>}
       {/* //Element properties  */}
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
         <div className="card">

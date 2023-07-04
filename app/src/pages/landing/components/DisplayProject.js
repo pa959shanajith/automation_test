@@ -7,7 +7,7 @@ import { Menu } from "primereact/menu";
 import { Tooltip } from 'primereact/tooltip';
 import { fetchProjects } from "../api"
 import { useSelector, useDispatch } from 'react-redux';
-import { updateSteps, getStep } from './VerticalComponentsSlice';
+import { getStep } from './VerticalComponentsSlice';
 import { loadUserInfoActions } from '../LandingSlice';
 
 
@@ -21,14 +21,15 @@ const DisplayProject = (props) => {
   const [projectsDetails, setProjectsDetails] = useState([]);
   const [getProjectLists, setProjectList] = useState([]);
   const [selectedsortItems, setSelectedsortItems] = useState(null)
-  const userInfo = useSelector((state) => state.landing.userinfo);
+  let userInfo = useSelector((state) => state.landing.userinfo);
+  userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const createdProject = useSelector((state) => state.landing.savedNewProject);
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
   const [showTooltip, setShowTooltip] = useState(false);
   // const defaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
   const dispatch = useDispatch();
-
   const imageRefadd = useRef(null);
+
 
 
   const sortItems = [
@@ -52,6 +53,7 @@ const DisplayProject = (props) => {
       setDefaultProjectId(filteredProjects[0].projectId);
     }
   }, [filteredProjects]);
+
 
   const DateTimeFormat = (inputDate) => {
     const convertedDate = new Date(inputDate);
@@ -124,13 +126,14 @@ const DisplayProject = (props) => {
         } else {
           const arraynew = ProjectList.map((element, index) => {
             const lastModified = DateTimeFormat(element.releases[0].modifiedon);
+            const modified_Date = element.releases[0].modifiedon;
             return (
               {
                 key: index,
                 projectName: element.name,
                 modifiedName: element.firstname,
                 modifiedDate: lastModified,
-                modifieDateProject: element.releases[0].modifiedon,
+                modifieDateProject: modified_Date,
                 createdDate: element.releases[0].createdon,
                 appType: element.type,
                 projectId: element._id,
@@ -196,40 +199,35 @@ const DisplayProject = (props) => {
   useEffect(() => {
     const selectedProject = filteredProjects.find(project => project.projectId === defaultProjectId);
     setDefaultProject(selectedProject);
-    dispatch(loadUserInfoActions.setDefaultProject(defaultProject));
-  }, [defaultProjectId, filteredProjects]);
+
+    if (selectedProject) {
+      localStorage.setItem('DefaultProject', JSON.stringify(selectedProject));
+      dispatch(loadUserInfoActions.setDefaultProject(selectedProject));
+    }
+  }, [defaultProjectId, filteredProjects,  dispatch]);
 
 
   useEffect(() => { if (getProjectLists && getProjectLists.length > 0) { setDefaultProjectId(getProjectLists[0].projectId); } }, [getProjectLists]);
 
   const allProjectTemplate = () => {
     return (
-      <>
+      <div className="Project_header">
         <Tooltip target=".add_btn" position="bottom" content="Create Project" />
-        {/* <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
-         */}
+         <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
+         
         <CreateProject visible={visible} onHide={handleCloseDialog} />
         {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color" />}
         <div className="flex flex-row All_Project"> 
           <div className="All_Project_font" >ALL PROJECTS</div>
           <div className="add_sort_btn">
+          <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
             {userInfo.rolename === "Test Manager" ? (
             <button className="pi pi-plus add_btn" onClick={handleOpenDialog}  />
-           
-            
             ) : null}
-            {/* <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} /> */}
-            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu}  ref={imageRefadd} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}/>
-            {showTooltip && (
-              <div className='card__add' style={{ position: 'absolute', left: `${cardPosition.left - 80}px`, top: `${cardPosition.top- -20}px`, display: 'block' }}>
-                <h3> Sort projects</h3>
-                <p className='text__insprint__info1'>Click here to sort projects.</p>
-              
-              </div>
-            )}
+           
           </div>
         </div>
-      </>
+      </div>
     )
   };
 
@@ -240,14 +238,14 @@ const DisplayProject = (props) => {
 
   return (
     <>
-      <Panel className="Project-Panel" headerTemplate={allProjectTemplate} >
+      <Panel className="Project_Display" headerTemplate={allProjectTemplate} >
         <div className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
           <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject}  title=" Search all projects."/>
         </div>
         <div className="project-list project">
           {filteredProjects.map((project) => (
-            <div key={project.projectId} >
+            <div title={project.projectName + "\n" + project.modifiedDate + " by " + project.modifiedName} key={project.projectId} >
               <button
                 className={project.projectId === defaultProjectId ? 'default-project project-card' : 'project-card'}
                 onClick={() => {
@@ -255,16 +253,24 @@ const DisplayProject = (props) => {
                     setDefaultProjectId(project.projectId);
                   }
                 }}>
+                <div className="Project_Display_Nav">
+                <div className="ProjectApp_Name">
                 {project.appType === "5db0022cf87fdec084ae49b6" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
                 {project.appType === "5db0022cf87fdec084ae49b2" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
                 {project.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
                 {project.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
                 {project.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
-                {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='15' />)}
-                {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='18' />)}
+                {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
                 {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
-                <h2 className="projectInside" title={project.projectName + "\n" + project.modifiedDate + " by " + project.modifiedName}>{project.projectName}</h2>
-                <h2 className="projectInsideLast" >{project.modifiedDate} by {project.modifiedName}</h2>
+                <div className="Project_name">
+                <p id="projectInside">{project.projectName}</p>
+                </div>
+                </div>
+                <div className="projectInsideLast">
+                <p id="Last_modifie">{project.modifiedDate} by {project.modifiedName}</p>
+                </div>
+                </div>
               </button>
             </div>))}
         </div>

@@ -41,8 +41,8 @@
 {
     position: absolute;
     z-index: 4;
-    top: 41rem;
-    left: 92rem;
+    bottom: 4rem;
+    right: 2rem;
     border-radius: 3rem;
     padding: 1rem;
     .p-menu {
@@ -53,26 +53,50 @@
     position: absolute;
     right: 1.5rem;
     bottom: 2.2rem;
-    // .p-menu .p-submenu-header{
-    //     font: $f6_semibold !important;
-    // }
-    // .p-menuitem{
-    //     font: $f6_regular !important;
-    // }
 }
 .needHelp_img{
     height:1rem;
     width: 1.2rem;
     cursor: pointer;
 }
-#needHelp_font{
-    .p-submenu-header{
+.Need_Help_menu{
+    .p-menu .p-submenu-header{
         font: $f6_semibold !important;
     }
-    .p-menuitem-text{
+    .p-menuitem-tex.p-menu .p-menuitem-link .p-menuitem-text {
         font: $f6_regular !important;  
     }
 
 }
 }
-
+.card__insprint1 {
+    height: 4rem;
+    width: 80%;
+    position: absolute;
+    z-index: 1;
+    background-color: #495057;
+    border-radius: 2px;
+    padding: 1rem 16rem 5rem 1rem;
+    color: white;
+    font-family: 'Open Sans';
+    font-size: 14px;
+  }
+  
+  .text__insprint__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .text__insprint__title,
+  .text__insprint__info {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+//   .text__insprint__info {
+//     margin-top: 0.1rem;
+//   }
+  
+  

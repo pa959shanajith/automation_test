@@ -1,5 +1,8 @@
 .schedule_container {
     margin: 1rem 2rem 0rem 2rem;
+    .schedule_options {
+        margin-bottom: -1.5rem;
+    }
     .p-calendar {
         width: 100%;
         .p-inputtext {
@@ -47,6 +50,22 @@
         left: 70%;
         .p-input-icon-left {
             width: 100%;
+        }
+    }
+    .schedule_btn {
+        padding: 0.3rem 1rem;
+        width: 100%;
+    }
+    .p-datatable-wrapper {
+        height: 44vh;
+        .p-datatable-thead>tr>th {
+            color: #030229;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
     }
 }
