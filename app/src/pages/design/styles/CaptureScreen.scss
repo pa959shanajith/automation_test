@@ -86,6 +86,7 @@
 
 
 .datatable__col {
+  // overflow-y: scroll;
   overflow: auto;
   .p-datatable .p-datatable-thead>tr>th {
     background: rgba(96, 91, 255, 0.1) !important;
@@ -134,6 +135,8 @@
 }
 
 .card-table {
+  overflow: auto;
+  max-height: 24rem;
   position: relative;
   top: 1rem;
 
@@ -144,9 +147,8 @@
 
 .screen_btn {
   height: 4vh;
-  margin-right: -0.5rem;
   position: relative;
-  top: 0.3rem;
+  top: 0.4rem;
   right: 1.5rem;
 }
 .screen__name{
@@ -255,6 +257,7 @@
 
 
 .dailog_box {
+  overflow: hidden;
   .p-dialog-content {
     padding: 0 0 !important;
     overflow: hidden;

@@ -107,18 +107,18 @@ const CanvasNew = (props) => {
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(false);
     const [visibleDesignStep, setVisibleDesignStep] = useState(false);
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
-    const [showTooltip, setShowTooltip] = useState(false);
+    const [showTooltip, setShowTooltip] = useState("");
 
     const imageRef = useRef(null);
 
-    const handleTooltipToggle = () => {
+    const handleTooltipToggle = (nodeType) => {
       const rect = imageRef.current.getBoundingClientRect();
       setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
-      setShowTooltip(true);
+      setShowTooltip(nodeType);
     };
   
     const handleMouseLeave1 = () => {
-      setShowTooltip(false);
+      setShowTooltip("");
     };
     
     useEffect(() => {
@@ -233,7 +233,7 @@ const CanvasNew = (props) => {
     
     const menuItemsModule = [
         { label: 'Add Testcase',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([]);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
@@ -241,7 +241,7 @@ const CanvasNew = (props) => {
     ];
     const menuItemsScenario = [
         { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command:()=>{confirm1()}},
         { label: 'Debug',icon:<img src="static/imgs/execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> },
@@ -252,7 +252,7 @@ const CanvasNew = (props) => {
     ];
     const menuItemsScreen = [
         { label: 'Add Test steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
-        { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{setVisibleCaptureElement(true);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Debug',icon:<img src="static/imgs/execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> },
@@ -557,7 +557,7 @@ const CanvasNew = (props) => {
         setInputValue("");
         setShowInput(true);
       };
-  
+
         const addRowScreen = () => {
           const newRowScreen = { id: addScreen.length + 1, value : inputValScreen , isEditing:false};
           setAddScreen((prevData) => [...prevData, newRowScreen]);
@@ -867,10 +867,12 @@ const CanvasNew = (props) => {
       header: <Checkbox className='scenario-check' onChange={headerCheckboxClickedScreen} checked={selectedRowsScreen.length === addScreen.length && addScreen.length !== 0} />,
       body: (rowDataScreen) => <Checkbox onChange={(event) => rowCheckboxClickedScreen(event, rowDataScreen)} checked={selectedRowsScreen.includes(rowDataScreen.id)} />,
       style: { width: '50px' },
+     
     },
     {
       field: "addScreen",
       header: "Add Screen",
+      headerClassName: 'scenario-header',
       body: (rowDataScreen) => {
         if (showInputScreen && rowDataScreen.id === addScreen.length) {
           return (
@@ -916,8 +918,8 @@ const CanvasNew = (props) => {
            <div className='row_data_align'> {rowDataScreen.value}</div>
             {hoveredRow === rowDataScreen.id && (
               <div className='icons_class'>
-                <i className="pi pi-pencil" onClick={()=>handleEditScreens(rowDataScreen)} style={{position:'relative', left:'10rem', bottom:'1rem',cursor:'pointer'}} />
-                <i className="pi pi-trash"  onClick={() => handleDeleteScreen(rowDataScreen)} style={{position:'relative', left:'11rem',bottom:'1rem',cursor:'pointer' }}/>
+                <i className="pi pi-pencil" onClick={()=>handleEditScreens(rowDataScreen)} style={{position:'relative', left:'10rem', bottom:'1rem',cursor:'pointer',cursor:'pointer',cursor:'pointer'}} />
+                <i className="pi pi-trash"  onClick={() => handleDeleteScreen(rowDataScreen)} style={{position:'relative', left:'11rem',bottom:'1rem',cursor:'pointer',cursor:'pointer',cursor:'pointer' }}/>
               </div>
             )}
           </div>
@@ -933,11 +935,12 @@ const CanvasNew = (props) => {
       field: "checkbox",
       header: <Checkbox className='scenario-check' onChange={headerCheckboxClickedTestStep} checked={selectedRowsTeststep.length === addTestStep.length && addTestStep.length !== 0} />,
       body: (rowDataTestStep) => <Checkbox onChange={(event) => rowCheckboxClickedTestStep(event, rowDataTestStep)} checked={selectedRowsTeststep.includes(rowDataTestStep.id)} />,
-      style: { width: '50px' },
+      
     },
     {
       field: "addTestStep",
       header: "Add Test Step",
+      headerClassName: 'scenario-header',
       body: (rowDataTestStep) => {
         if (showInputTestStep && rowDataTestStep.id === addTestStep.length) {
           return (
@@ -982,8 +985,8 @@ const CanvasNew = (props) => {
        <div className='row_data_align'> {rowDataTestStep.value}</div>
         {hoveredRow === rowDataTestStep.id && (
           <div className='icons_class'>
-            <i className="pi pi-pencil" onClick={()=>handleEditTestCases(rowDataTestStep)} style={{position:'relative', left:'10rem', bottom:'1rem'}} />
-            <i className="pi pi-trash"  onClick={() => handleDeleteTestStep(rowDataTestStep)} style={{position:'relative', left:'11rem',bottom:'1rem' }}/>
+            <i className="pi pi-pencil" onClick={()=>handleEditTestCases(rowDataTestStep)} style={{position:'relative', left:'10rem', bottom:'1rem',cursor:'pointer'}} />
+            <i className="pi pi-trash"  onClick={() => handleDeleteTestStep(rowDataTestStep)} style={{position:'relative', left:'11rem',bottom:'1rem' ,cursor:'pointer'}}/>
           </div>
         )}
       </div>
@@ -1023,11 +1026,14 @@ const footerContentScreen =(
         <div style={{ height: '100%', overflow: 'auto' }}>
             <DataTable value={addScenario} tableStyle={{ minWidth: '20rem' }} headerCheckboxSelection={true} scrollable scrollHeight="calc(100% - 38px)" > 
               {columns.map((col)=>(
-              <Column field={col.field} header={col.header} body={col.body} headerClassName={col.headerClassName}></Column>
+              <Column field={col.field} header={col.header} body={col.body} headerClassName={col.headerClassName} 
+              headerStyle={col.field==='checkbox'?{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }:null} 
+              bodyStyle={ col.field==='checkbox'?{textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }:null}
+              style={col.field==='checkbox'?{ minWidth: '3rem' }:null}></Column>
               ))}   
           
             </DataTable>
-            <button className='add_row_btn' onClick={() => addRowScenario()} >+ Add Row </button> 
+            <button className='add_row_btn'  disabled={addScenario.length > 0 && inputValue===""} style={(addScenario.length > 0 && inputValue==="") ? {opacity: '0.5', cursor: 'no-drop'} : {opacity: '1', cursor: 'pointer'}} onClick={() =>addRowScenario()} >+ Add Row </button> 
             </div>
             </Dialog>
 
@@ -1036,10 +1042,13 @@ const footerContentScreen =(
             <div style={{ height: '100%', overflow: 'auto' }}>
             <DataTable value={addScreen}  tableStyle={{ minWidth: '20rem' }}  headerCheckboxSelection={true} scrollable scrollHeight="calc(100% - 38px)" >
               {columnsScreen.map((col)=>(
-              <Column field={col.field} header={col.header} body={col.body}  style={{ width: '3rem' }} ></Column>
+              <Column field={col.field} header={col.header} body={col.body} headerClassName={col.headerClassName}  
+              headerStyle={col.field==='checkbox'?{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }:null} 
+              bodyStyle={ col.field==='checkbox'?{textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }:null}
+              style={col.field==='checkbox'?{ minWidth: '3rem' }:null}></Column>
               ))}    
             </DataTable>
-            <button className='add_row_btn' onClick={() =>addRowScreen ()} >+ Add Row </button> 
+            <button className='add_row_btn' disabled={addScreen.length > 0 && inputValScreen===""} style={(addScreen.length > 0 && inputValScreen==="") ? {opacity: '0.5', cursor: 'no-drop'} : {opacity: '1', cursor: 'pointer'}} onClick={() =>addRowScreen()} >+ Add Row </button> 
             </div>
             </Dialog>
 
@@ -1048,10 +1057,13 @@ const footerContentScreen =(
             <div style={{ height: '100%', overflow: 'auto' }}>
             <DataTable value={addTestStep} tableStyle={{ minWidth: '20rem' }} headerCheckboxSelection={true} scrollable scrollHeight="calc(100% - 38px)">
               {columnsTestStep.map((col)=>(
-              <Column field={col.field} header={col.header} body={col.body} ></Column>
+              <Column field={col.field} header={col.header} body={col.body} headerClassName={col.headerClassName} 
+              headerStyle={col.field==='checkbox'?{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }:null} 
+              bodyStyle={ col.field==='checkbox'?{textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }:null}
+              style={col.field==='checkbox'?{ minWidth: '3rem' }:null}></Column>
               ))}  
             </DataTable>
-            <button className='add_row_btn' onClick={() =>addRowTestStep ()} >+ Add Row </button> 
+            <button className='add_row_btn'  disabled={addTestStep.length > 0 && inputValTestStep===""} style={(addTestStep.length > 0 && inputValTestStep==="") ? {opacity: '0.5', cursor: 'no-drop'} : {opacity: '1', cursor: 'pointer'}} onClick={() =>addRowTestStep()} >+ Add Row </button> 
             </div>
             </Dialog>
              <ConfirmDialog />
@@ -1075,7 +1087,7 @@ const footerContentScreen =(
                 return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} d={link[1].d}></path>)
                 })}
                 {Object.entries(nodes).map((node)=>
-                    <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} ref={imageRef} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}>
+                    <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} ref={imageRef} onMouseEnter={() => handleTooltipToggle(node[1].type)} onMouseLeave={() => handleMouseLeave1()}>
                        <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                    
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={
@@ -1085,17 +1097,6 @@ const footerContentScreen =(
                           
                           </div>
                         } y="50">{node[1].name}</text>
-                        {/* {showTooltip && (
-              <div className='card__add' style={{ position: 'absolute', right: `${cardPosition.right - 1200}px`, top: `${cardPosition.top- 700}px`, display: 'blyock' }}>
-                <h3> Sort projects</h3>
-                <p className='text__insprint__info1'>Click here to sort projects.</p>
-              
-              </div>
-            )} */}
-                        <title val={node[0]} className="ct-node-title">{<div className='card__add'>
-                            <h3> {node[1].name}</h3>
-                            <p className='text__insprint__info1'>Click here to sort projects.</p>
-                          </div>}</title>
                         {(node[1].type!=='testcases')?
                         <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                         :null}
@@ -1114,62 +1115,144 @@ const footerContentScreen =(
             {Object.entries(links).map((link)=>{
             return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} d={link[1].d}></path>)
             })}
-            {Object.entries(nodes).map((node)=>
+            {Object.entries(nodes).map((node, nodeIdx)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()}  ></image>
-                    <text className="ct-nodeLabel" textAnchor="middle" x="20" title={<div className='card__add'>
-                            <h3> {node[1].name}</h3>
-                            <p className='text__insprint__info1'>Click here to sort projects.</p>
-                          </div>} y="50">{node[1].name}</text>
-                          <title val={node[0]} >
-                          {showTooltip && (
-              <div className='card__add' style={{ position: 'absolute', left: `${cardPosition.left - 80}px`, top: `${cardPosition.top- -20}px`, display: 'block' }}>
-                <h3>  {node[1].name}</h3>
-                {/* <p className='text__insprint__info1'>Click here to sort projects.</p> */}
-              
-              </div>
-            )}
-                          </title>
-                          {/* {showTooltip && (
-  <g>
-    <rect
-      x={verticalLayout ? -80 : cardPosition.left - 80}
-      y={verticalLayout ? cardPosition.top - 380 : -3120}
-      width="400"
-      height="80"
-      rx="4"
-      ry="4"
-      fill="#495057"
-      stroke="#ccc"
-      strokeWidth="1"
-      className="tooltip-background"
-    ></rect>
-    <text
-      x={verticalLayout ? 20 : cardPosition.left + 20}
-      y={verticalLayout ? cardPosition.top - 360 : -3000}
-      className="tooltip-text"
-    >
-     <h3> {node[1].name}</h3>
-    </text>
-    <text
-      x={verticalLayout ? 20 : cardPosition.left + 20}
-      y={verticalLayout ? cardPosition.top - 340 : -3080} 
-      className="tooltip-subtext"
-    >
-      Click here to add screen(s) or record a testcase using Avo Genius (Smart Recorder).
-    </text>
-  </g>
-)} */}
+                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle(nodeIdx)} onMouseLeave={() => handleMouseLeave1()}  ></image>
+                    <text className="ct-nodeLabel" textAnchor="middle" x="20" 
+                    
+                           y="50">{node[1].name}</text>
+                          
+{/* 
+<title val={node[0]} className="ct-node-title">
 
-                    {/* <title val={node[0]} className="ct-node-title">
-                      {<div className='card__add'>
-                        
-                            <h3> {node[1].name}</h3>
-                            <p className='text__insprint__info1'>Click here to sort projects.</p>
-                            
-                          </div>}
-                       
-                          </title> */}
+</title> */}
+<g val={node[0]} className="ct-node-title">
+  {showTooltip !== "" && (
+      ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="4"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+            Click here to sort projects.
+          </text>
+        </g>
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="10"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.right + 80}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.right + 80}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+           Click here to add screen(s) or record a testcase using Avo Genius (Smart Recorder)
+          </text>
+        </g>
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="4"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 40}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+          Click here to add test steps folder, capture element, rename or delete screen
+          </text>
+        </g>
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
+        <g>
+          <rect
+            x={verticalLayout ? -80 : cardPosition.left - 80}
+            y={verticalLayout ? cardPosition.top - 720 : -3120}
+            width="400"
+            height="80"
+            rx="4"
+            ry="4"
+            fill="#495057"
+            stroke="#ccc"
+            strokeWidth="1"
+            className="tooltip-background"
+          ></rect>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 20}
+            y={verticalLayout ? cardPosition.top - 700 : -3060}
+            className="tooltip-text"
+          >
+            {node[1].name}
+          </text>
+          <text
+            x={verticalLayout ? 20 : cardPosition.left + 40}
+            y={verticalLayout ? cardPosition.top - 680 : -3040}
+            className="tooltip-subtext"
+          >
+          Click here to design test step(s), rename or delete test steps folder.
+          </text>
+        </g>
+      ))
+  )}
+</g>
+
+
+
+
+
+
                              
                     {(node[1].type!=='testcases')?
                     <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
