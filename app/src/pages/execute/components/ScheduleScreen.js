@@ -14,7 +14,7 @@ import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
 import { getScheduledDetailsOnDate_ICE, getScheduledDetails_ICE } from "../configureSetupSlice";
-import { scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
+import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
 import AvoModal from "../../../globalComponents/AvoModal";
 
@@ -288,11 +288,14 @@ const ScheduleScreen = ({
                 </div>
                 {onRecurrenceClick()}
                 <div className="col-12">
-                  <Calendar
-                    value={endDate}
-                    placeholder="Enter End date"
-                    onChange={(e) => setEndDate(e.value)}
-                    showIcon
+                  <AvoDropdown
+                    dropdownValue={endDate}
+                    onDropdownChange={(e) => setEndDate(e.value)}
+                    dropdownOptions={endMonths}
+                    name="endmonth"
+                    placeholder="End After"
+                    required={false}
+                    customeClass="dropdown_enddate"
                   />
                 </div>
               </div>
@@ -376,12 +379,16 @@ const ScheduleScreen = ({
         onModalBtnClick={onStatusBtnClick}
         content={
           <DataTable
-              value={getScheduledList?.scheduledStatusList}
+              value={getScheduledList?.scheduledStatusList.map((el) => ({
+                ...el,
+                scenariodetails: "Test_Scenario12",
+                testsuitenames: ""
+              }))}
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="status" header="Test Suite"></Column>
-              <Column field="status" header="Scenario Name"></Column>
+              <Column field="testsuitenames" header="Test Suite"></Column>
+              <Column field="scenariodetails" header="Scenario Name"></Column>
               <Column field="status" header="Status"></Column>
             </DataTable>
         }

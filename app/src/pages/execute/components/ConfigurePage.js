@@ -976,17 +976,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               ...el,
               poolid: "",
               type: "normal",
-              targetUser: selectedICE,
-              iceList: [],
+              ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
               date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startDate ? startDate.getTime().toString() : endDate.getTime().toString(),
+              timestamp: startTime.getTime().toString(),
               recurringValue: getPattren().recurringValue,
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
-              endAfter: startDate ? "" : "3 Months",
+              endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
+              scheduleThrough: showIcePopup ? "client" : "agent"
             })),
             scenarioFlag: false,
             type: "normal",
@@ -1081,7 +1081,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
-                width: "50%"
+                width: "50%",
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
@@ -1193,7 +1193,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             }
             headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF", height:"85%" }}
+            modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
@@ -1212,13 +1212,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
-                isDisabled={!startDate && (!selectedPattren?.key || !endDate || !startTime)}
+                isDisabled={
+                  !startDate &&
+                  (!selectedPattren?.key || !endDate || !startTime)
+                }
                 onSchedule={onScheduleBtnClick}
                 selectedDaily={selectedDaily}
                 selectedWeek={selectedWeek}
                 selectedMonthly={selectedMonthly}
                 dropdownWeek={dropdownWeek}
-                dropdownDay={dropdownDay} 
+                dropdownDay={dropdownDay}
                 setSelectedDaily={setSelectedDaily}
                 setSelectedMonthly={setSelectedMonthly}
                 setDropdownWeek={setDropdownWeek}
@@ -1241,40 +1244,69 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             onModalBtnClick={onScheduleBtnClickClient}
             content={
               <>
-                <div className="ice_label">Allocate Avo Assure Client</div>
-                <div className="ice_container">
-                  <div className="ice_status">
-                    <span className="available"></span>
-                    <span>Available</span>
-                    <span className="unavailable"></span>
-                    <span>Unavailable</span>
-                    <span className="dnd"></span>
-                    <span>Do Not Disturb</span>
-                  </div>
-                  <DropDownList
-                    poolType={poolType}
-                    ExeScreen={ExeScreen}
-                    inputErrorBorder={inputErrorBorder}
-                    setInputErrorBorder={setInputErrorBorder}
-                    placeholder={"Search"}
-                    data={availableICE}
-                    smartMode={ExeScreen === true ? smartMode : ""}
-                    selectedICE={selectedICE}
-                    setSelectedICE={setSelectedICE}
+                <div className="radioButtonContainer">
+                  <RadioButton
+                    value="Execute with Avo Assure Agent/ Grid"
+                    onChange={(e) => {
+                      setShowIcePopup(false);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Agent/ Grid"
+                    }
                   />
+                  <label className="executeRadio_label_grid ml-2 mr-2">
+                    Execute with Avo Assure Agent/ Grid
+                  </label>
+                  <RadioButton
+                    value="Execute with Avo Assure Client"
+                    onChange={(e) => {
+                      setShowIcePopup(true);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Client"
+                    }
+                  />
+                  <label className=" executeRadio_label_clint ml-2 mr-2">
+                    Execute with Avo Assure Client
+                  </label>
                 </div>
+                {showIcePopup && (
+                  <div className="ice_container">
+                    <div className="ice_status">
+                      <span className="available"></span>
+                      <span>Available</span>
+                      <span className="unavailable"></span>
+                      <span>Unavailable</span>
+                      <span className="dnd"></span>
+                      <span>Do Not Disturb</span>
+                    </div>
+                    <DropDownList
+                      poolType={poolType}
+                      ExeScreen={ExeScreen}
+                      inputErrorBorder={inputErrorBorder}
+                      setInputErrorBorder={setInputErrorBorder}
+                      placeholder={"Search"}
+                      data={availableICE}
+                      smartMode={ExeScreen === true ? smartMode : ""}
+                      selectedICE={selectedICE}
+                      setSelectedICE={setSelectedICE}
+                    />
+                  </div>
+                )}
               </>
             }
             headerTxt="Allocate Avo Assure Client to Schedule"
             footerType="ScheduleIce"
             modalSytle={{
-              width: "55vw",
-              height: "45vh",
+              width: "45vw",
+              height: "55vh",
               background: "#FFFFFF",
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-            isDisabled={!selectedICE}
+            // isDisabled={!selectedICE}
           />
           <AvoModal
             visible={visible_CICD}
