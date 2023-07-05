@@ -1452,6 +1452,8 @@ const footerSave = (
             tableStyle={{ minWidth: '50rem' }}
             headerCheckboxToggleAllDisabled={false}
             emptyMessage={emptyMessage}
+            scrollable 
+            scrollHeight="400px"
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
