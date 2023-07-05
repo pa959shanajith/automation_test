@@ -837,3 +837,18 @@
     bottom: -4rem;
     position: relative;
 }
+.cloud-test-provider{
+    appearance: none;
+    font-size: 11px;
+    padding: 0px 6px;
+    border-radius: 35px; 
+    color: #333;
+    width: fit-content;
+    height: 3.5vh;
+    margin-right: 13px;
+    text-align: center;
+    color: #633693;
+    font-weight: 600;
+    cursor: pointer; 
+    outline: none; 
+}
