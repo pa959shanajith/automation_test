@@ -8,7 +8,6 @@ import { Checkbox } from "primereact/checkbox";
 import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Toast } from 'primereact/toast';
 import { TabPanel, TabView } from "primereact/tabview";
 import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
@@ -21,6 +20,8 @@ const ScheduleScreen = ({
   cardData,
   startDate,
   setStartDate,
+  endDate,
+  setEndDate,
   startTime,
   setStartTime,
   selectedPattren,
@@ -36,7 +37,9 @@ const ScheduleScreen = ({
   setDropdownWeek,
   setDropdownDay,
   scheduleOption,
-  onScheduleChange
+  onScheduleChange,
+  selectedWeek,
+  onWeekChange
 }) => {
   const [tableFilter, setTableFilter] = useState("");
   const getScheduledList = useSelector((store) => store.configsetup);
@@ -52,7 +55,7 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="everyday"
-            value={scheduleOption.everyday}
+            value={scheduleOption?.everyday}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           day(s).
@@ -70,14 +73,14 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="monthweek"
-            value={scheduleOption.monthweek}
+            value={scheduleOption?.monthweek}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           of every{" "}
           <InputText
             className="every_day"
             name="monthday"
-            value={scheduleOption.monthday}
+            value={scheduleOption?.monthday}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           month(s).
@@ -111,7 +114,7 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="everymonth"
-            value={scheduleOption.everymonth}
+            value={scheduleOption?.everymonth}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           month(s).
@@ -153,8 +156,8 @@ const ScheduleScreen = ({
                   inputId={el?.key}
                   name="daily"
                   value={el}
-                  onChange={(e) => setSelectedDaily(e.value)}
-                  checked={selectedDaily?.key === el?.key}
+                  onChange={onWeekChange}
+                  checked={selectedWeek.some((item) => item.key === el.key)}
                 />
                 <label htmlFor={el?.key} className="ml-2">
                   {el?.name}
@@ -200,7 +203,7 @@ const ScheduleScreen = ({
     <>
       <ExecutionCard cardData={cardData} />
       <div className="schedule_container">
-        <div className="grid" style={{ marginBottom: "-2rem" }}>
+        <div className="grid schedule_options">
           <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
             <Calendar
               value={startDate}
@@ -209,6 +212,7 @@ const ScheduleScreen = ({
                 setStartDate(e.value);
                 setStartTime(new Date());
               }}
+              disabled={selectedPattren?.key}
               minDate={new Date()}
               showIcon
             />
@@ -250,7 +254,12 @@ const ScheduleScreen = ({
                         inputId={el?.key}
                         name="schedule"
                         value={el}
-                        onChange={(e) => setSelectedPattren(e.value)}
+                        onChange={(e) => {
+                          setStartTime(new Date());
+                          setStartDate(null);
+                          setSelectedPattren(e.value);
+                        }
+                        }
                         checked={selectedPattren?.key === el?.key}
                       />
                       <label htmlFor={el?.key} className="ml-2">
@@ -262,9 +271,9 @@ const ScheduleScreen = ({
                 {onRecurrenceClick()}
                 <div className="col-12">
                   <Calendar
-                    value={startDate}
+                    value={endDate}
                     placeholder="Enter End date"
-                    onChange={(e) => setStartDate(e.value)}
+                    onChange={(e) => setEndDate(e.value)}
                     showIcon
                   />
                 </div>

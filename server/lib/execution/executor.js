@@ -490,7 +490,10 @@ class TestSuiteExecutor {
         executionRequest.executionListId = batchExecutionData.executionListId;
         executionRequest.isHeadless = batchExecutionData.isHeadless;
 
-        if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
+        if (execType == "SCHEDULE") {
+            executionRequest.scheduleId = batchExecutionData.scheduleId;
+            executionRequest.execType = batchExecutionData.execType;
+        }
         const result = await this.executionRequestToICE(executionRequest, execType, userInfo);
         return result;
     };
@@ -500,7 +503,7 @@ class TestSuiteExecutor {
             dataFromIce.exce_data = dataFromIce.exec_req;
         let execReq = dataFromIce.exce_data.execReq;
         let event = dataFromIce.exce_data.event;
-        let status = dataFromIce.status,execType = 'ACTIVE';
+        let status = dataFromIce.status,execType = execReq.execType || 'ACTIVE';
         let userInfo = {
             'icename':'CICDICE',
             'invokinguser': '267ad96f374e4b06344f039c',
@@ -562,11 +565,13 @@ class TestSuiteExecutor {
                 }
             } else if (status === "started") {
                 await _this.updateExecutionStatus([executionid], { starttime: data.startTime });
+                if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
             } else if (status === "finished") {
                 const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);
                 const testsuite = execReq.suitedetails[testsuiteIndex];
                 const exeStatus = data.executionStatus ? "pass" : "fail";
                 await _this.updateExecutionStatus([executionid], { endtime: data.endTime, status: exeStatus });
+                if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Completed", batchId);
                 if (reportType != "accessiblityTestingOnly")
                     notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
             }

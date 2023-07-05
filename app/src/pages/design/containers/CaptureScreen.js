@@ -1314,73 +1314,77 @@ const elementTypeProp =(elementProperty) =>{
             <div className="action_panelCard">
               <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
-                <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" title=' Automate test cases of inflight features well within the sprint before application ready'></img>
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj' title="add object" src="static/imgs/ic-add-object.png"></img>
+                  <img className='add_obj' title=" Add a placeholder element by specifying element type." src="static/imgs/ic-add-object.png"></img>
                   <p>Add Element</p>
                 </span>
                 <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj' title='map object' src="static/imgs/ic-map-object.png"></img>
+                  <img className='map_obj' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png"></img>
                   <p>Map Element</p>
                 </span>
-                {isInsprintHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isInsprintHovered &&
+                 
+                (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>InSprint Automation</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
-                </div>)}
+                </div>)
+                } */}
               </div>
               <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
-                <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" title='Easily upgrade Test Automation as application changes'></img>
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
-                  <img className='add_obj' src="static/imgs/ic-compare.png"></img>
+                  <img className='add_obj' src="static/imgs/ic-compare.png" title='Analyze screen to compare existing and newly captured element properties.'></img>
                   <p>Compare Element</p>
                 </span>
                 <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
-                  <img className='map_obj' src="static/imgs/ic-replace.png"></img>
+                  <img className='map_obj' src="static/imgs/ic-replace.png" title=' Replace the existing elements with the newly captured elements.'></img>
                   <p>Replace Element</p>
                 </span>
-                {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Upgrade Analyzer</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a href='docs.avoautomation.com'>Learn More</a>
-                </div>)}
+                </div>)} */}
               </div>
               <div className='utility__block'>
                 <p className='insprint__text'>Capture from PDF</p>
-                <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" title='Capture the elements from a PDF.'></img>
                 <span className='insprint_auto'>
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
                   <p>PDF Utility</p>
                 </span>
-                {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Capture from PDF</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
-                </div>)}
+                </div>)} */}
               </div>
               <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
-                <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png"></img>
+                <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" title=' Create element manually by specifying properties.'></img>
                 <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
-                {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Create Manually</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
-                </div>)}
+                </div>)} */}
               </div>
               <div className='imp_exp__block'>
                 <span className='insprint_auto'>
                   <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                    <img className='add_obj' src="static/imgs/ic-import.png" />
+                    <img className='add_obj' src="static/imgs/ic-import.png" title=' Import elements from json or excel file exported from same/other screens.' />
                     <p className='imp__text'>Import Screen</p>
                   </span>
                   <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
-                    <img className='add_obj' src="static/imgs/ic-export.png" />
+                    <img className='add_obj' src="static/imgs/ic-export.png"  title=' Export captured elements as json or excel file to be reused across screens/projects.'/>
                     <p className='imp__text'>Export Screen</p>
+
                   </span>
                 </span>
               </div>
