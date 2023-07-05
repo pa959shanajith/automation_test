@@ -261,7 +261,6 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(testSuitesScheduler_ICE.fulfilled, (state, action) => {
       state.loading = false;
-      console.log(action);
       state.error = "";
     });
     builder.addCase(testSuitesScheduler_ICE.rejected, (state, action) => {

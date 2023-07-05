@@ -337,11 +337,11 @@ const ScheduleScreen = ({
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="scheduledon" header="Start Date & Time"></Column>
-              <Column field="target" header="Envrionment"></Column>
-              <Column field="scheduletype" header="Recurrance Type"></Column>
-              <Column field="endafter" header="End After"></Column>
-              <Column field="status" header="Status"></Column>
+              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
+              <Column align="center" field="target" header="Envrionment"></Column>
+              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
+              <Column align="center" field="endafter" header="End After"></Column>
+              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
           <TabPanel header="Recurring Taks">
@@ -363,11 +363,11 @@ const ScheduleScreen = ({
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="scheduledon" header="Start Date & Time"></Column>
-              <Column field="target" header="Envrionment"></Column>
-              <Column field="scheduletype" header="Recurrance Type"></Column>
-              <Column field="endafter" header="End After"></Column>
-              <Column field="status" header="Status"></Column>
+              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
+              <Column align="center" field="target" header="Envrionment"></Column>
+              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
+              <Column align="center" field="endafter" header="End After"></Column>
+              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
         </TabView>
@@ -387,9 +387,9 @@ const ScheduleScreen = ({
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="testsuitenames" header="Test Suite"></Column>
-              <Column field="scenariodetails" header="Scenario Name"></Column>
-              <Column field="status" header="Status"></Column>
+              <Column align="center" field="testsuitenames" header="Test Suite"></Column>
+              <Column align="center" field="scenariodetails" header="Scenario Name"></Column>
+              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
         }
         headerTxt="Execution Status"

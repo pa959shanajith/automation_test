@@ -45,6 +45,7 @@ import ExecutionCard from "./ExecutionCard";
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
+  const [visible_setup, setVisible_setup] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
@@ -351,6 +352,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // setLoading('Please Wait...');
     setTimeout(async () => {
       const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
+      setLogoutClicked(false);
       if (deletedConfig.error) {
         if (deletedConfig.error.CONTENT) {
           setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
@@ -363,33 +365,33 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           );
         }
       } else {
-        const configurationList = await fetchConfigureList({
-          projectid: selectedProject,
-        });
-        if (configurationList.error) {
-          if (configurationList.error.CONTENT) {
-            setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
-          } else {
-            setMsg(
-              MSG.CUSTOM(
-                "Error While Fetching Execute Configuration List",
-                VARIANT.ERROR
-              )
-            );
-          }
-        } else {
-          const integrationData = configurationList.map((item, idx) => {
-            setIntegration(item.executionRequest.integration);
-          });
-          setConfigList(configurationList);
-        }
-        setMsg(
-          MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
-        );
+        tableUpdate();
+        // const configurationList = await fetchConfigureList({
+        //   projectid: selectedProject,
+        // });
+        // if (configurationList.error) {
+        //   if (configurationList.error.CONTENT) {
+        //     setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
+        //   } else {
+        //     setMsg(
+        //       MSG.CUSTOM(
+        //         "Error While Fetching Execute Configuration List",
+        //         VARIANT.ERROR
+        //       )
+        //     );
+        //   }
+        // } else {
+        //   const integrationData = configurationList.map((item, idx) => {
+        //     setIntegration(item.executionRequest.integration);
+        //   });
+        //   setConfigList(configurationList);
+        // }
+        // setMsg(
+        //   MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
+        // );
       }
       // setLoading(false);
     }, 500);
-    setShowConfirmPop(false);
   };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
@@ -644,7 +646,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       setModules("normalExecution");
       setSelectedNodeKeys({});
     }
-    setVisible(true);
+    setVisible_setup(true);
     setSetupBtn(getType);
   };
 
@@ -781,13 +783,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           tableUpdate();
         })
       );
-      setVisible(false);
+      setVisible_setup(false);
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
-      setVisible(false);
+      setVisible_setup(false);
       setDotNotExe({});
       setSelectedNodeKeys({});
-    } else setVisible(false);
+    } else setVisible_setup(false);
   };
 
   const Breadcrumbs = () => {
@@ -1506,8 +1508,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           <ExecutionPage />
         )}
         <AvoModal
-          visible={visible}
-          setVisible={setVisible}
+          visible={visible_setup}
+          setVisible={setVisible_setup}
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup
