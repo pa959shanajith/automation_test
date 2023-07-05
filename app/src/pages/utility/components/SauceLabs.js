@@ -178,7 +178,9 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                 }
             )
         });
-        setPlatformVersions(findMobileVersions);
+        setPlatformVersions(findMobileVersions.sort((a, b) => {
+            return Number(a.key.split(' ')[1]) - Number(b.key.split(' ')[1])
+        }));
     }
 
     const onMobileVersionChange = (option) => {
@@ -213,10 +215,11 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             selectedKey={selectedPlatforms}
                             width='15rem'
                             placeholder='select Platform'
+                            calloutMaxHeight='12rem'
                         />
                     </>}
                 {!showSauceLabs && <>
-                    <div><h6>Operating System</h6></div>
+                    <div><h6>Operating Systems</h6></div>
                     <SearchDropdown
                         noItemsText={[]}
                         onChange={onOsChange}
@@ -224,11 +227,12 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                         selectedKey={selectedOS}
                         width='15rem'
                         placeholder='select OS'
+                        calloutMaxHeight='12rem'
                     />
                 </>}
                 {!showSauceLabs &&
                     <>
-                        <div><h6>Browser</h6></div>
+                        <div><h6>Browsers</h6></div>
                         <SearchDropdown
                             noItemsText={[]}
                             disabled={selectedOS == ''}
@@ -237,6 +241,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             selectedKey={selectedSaucelabBrowser}
                             width='15rem'
                             placeholder='select Browser'
+                            calloutMaxHeight='12rem'
                         />
                     </>}
                 {showSauceLabs &&
@@ -250,6 +255,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             selectedKey={selectedMobileVersion}
                             width='15rem'
                             placeholder='select android versions'
+                            calloutMaxHeight='12rem'
                         />
                     </>}
 
@@ -264,6 +270,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             selectedKey={selectedVersion}
                             width='15rem'
                             placeholder='select Versions'
+                            calloutMaxHeight='12rem'
                         />
                     </>}
                 {showSauceLabs &&
@@ -277,6 +284,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             disabled={selectedMobileVersion == ''}
                             width='15rem'
                             placeholder='select Emulator'
+                            calloutMaxHeight='12rem'
                         />
                     </>}
                 <div>
@@ -355,7 +363,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                     autoFocus />
 
 
-                <Button id='Saucelabs_cancel' className='Saucelabs_cancel' label="cancel" onClick={() => onHide('displayBasic5')} />
+                <Button id='Saucelabs_cancel' className='Saucelabs_cancel' label="Cancel" onClick={() => onHide('displayBasic5')} />
 
             </Dialog>
         </>
