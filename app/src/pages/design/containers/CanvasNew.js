@@ -275,7 +275,7 @@ const CanvasNew = (props) => {
     const createMultipleNode = (e,mnode)=>{
         setMultipleNode(false)
         if (mnode.length === 0){
-            displayError(MSG.MINDMAP.ERR_NO_NODES_CREATE);
+            displayError(MSG.MINDMAP.ERR_NO_NODES_CREATE.CONTENT);
             return;
         }
         setBlockui({show:true,content:'Creating Nodes...'})
@@ -297,7 +297,7 @@ const CanvasNew = (props) => {
         setdLinks(cdLinks)
         setdNodes(cdNodes)
         setBlockui({show:false})
-        displayError(MSG.MINDMAP.SUCC_NODE_CREATE);
+        displayError(MSG.MINDMAP.SUCC_NODE_CREATE.CONTENT);
     }
     const clickAddNode=(e)=>{
         var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
@@ -1075,7 +1075,7 @@ const footerContentScreen =(
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
             <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />
             <ContextMenu model={menuItemsTestSteps} ref={menuRef_Teststep}/>
-            {props.GeniusDialog?null:<NavButton setCtScale={setCtScale} zoom={zoom}/>}
+            {props.GeniusDialog?null:<NavButton setCtScale={setCtScale} ctScale={ctScale} zoom={zoom}/>}
             {/* <Legends/> */}
             {props.GeniusDialog?<Legends />:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
@@ -1259,8 +1259,8 @@ const footerContentScreen =(
                     :null}
                     {(node[1].type!=='modules')?
                     <circle 
-                    onMouseUpCapture={(e)=>moveNode(e,'KeyUp')}
-                    onMouseDownCapture={(e)=>moveNode(e,'KeyDown')}
+                    onMouseUp={(e)=>moveNode(e,'KeyUp')}
+                    onMouseDown={(e)=>moveNode(e,'KeyDown')}
                     cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
                     className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
                     :null}

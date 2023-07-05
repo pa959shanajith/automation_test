@@ -40,7 +40,7 @@
     }
 
     .E2E_main_container {
-        height: 30%;
+        height: 34%;
         border-bottom: 1px solid rgb(91, 89, 89);
     }
 
@@ -111,7 +111,7 @@
     }
 
     .moduleLayer_plusIcon img {
-        padding-right: 0.1rem;
+        padding-right: 0.7rem;
 
     }
 
@@ -147,7 +147,7 @@
     }
 
     .NorModuleList {
-        max-height: 85%;
+        max-height: 83%;
         // border: 1px solid black;
         overflow-y: auto;
     }
@@ -207,11 +207,11 @@
 }
 
 ////////////////////E2E Work flow css
-.Project-Dialog {
-    .modalClass .p-dialog-header {
-        // background: rgba(96,91,255,.08);
-    }
-}
+// .Project-Dialog {
+//     .modalClass .p-dialog-header {
+//         // background: rgba(96,91,255,.08);
+//     }
+// }
 
 .mainCentralContainer {
     width: 100%;
@@ -422,7 +422,7 @@
                             font-weight: 400;
                         }
 
-                        .ArrowImg {}
+                        // .ArrowImg {}
 
                     }
                 }
