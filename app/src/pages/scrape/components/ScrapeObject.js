@@ -68,7 +68,7 @@ const showIdentifierCard=(e)=>{
     setIsIdentifierVisible(true)
 }
 const textEditor = (options) => {
-    return <InputText type="text" style={{width:'300px'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+    return <InputText type="text" style={{width:'80%'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
 };
 const saveElementProperties=()=>{
     let actualXpath=props.object.xpath.split(';')
