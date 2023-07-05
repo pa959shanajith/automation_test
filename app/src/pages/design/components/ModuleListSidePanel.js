@@ -180,7 +180,7 @@ const ModuleListSidePanel =()=>{
         // if(moduleSelect._id === modID){
            
         // }
-        dispatch(selectedModule({}))
+        // dispatch(selectedModule({}))
         var req={
             tab:"createTab",
             projectid:proj,
@@ -263,7 +263,7 @@ const ModuleListSidePanel =()=>{
             
             
         // }
-        dispatch(selectedModule({}))
+        // dispatch(selectedModule({}))
         var req={
             tab:"endToend",
             projectid:proj,

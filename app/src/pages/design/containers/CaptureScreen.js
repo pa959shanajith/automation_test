@@ -1,5 +1,6 @@
 import { React, useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux"
+import { useNavigate } from 'react-router-dom';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import '../styles/CaptureScreen.scss';
@@ -7,11 +8,11 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue } from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
-import { ScreenOverlay } from '../../global';
+import { RedirectPage, ScreenOverlay } from '../../global';
 import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
@@ -25,8 +26,11 @@ import { Tooltip } from 'primereact/tooltip';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
+  const history=useNavigate()
   const toast = useRef();
   const objValues = useSelector(state => state.design.objValue);
+  const compareSuccessful = useSelector(state => state.design.compareSuccessful);
+  const compareFlag = useSelector(state=>state.design.compareFlag);
   const [visible, setVisible] = useState(false);
   const [showCaptureData, setShowCaptureData] = useState([]);
   const [showPanel, setShowPanel] = useState(true);
@@ -93,7 +97,7 @@ const CaptureModal = (props) => {
   const imageRef4 = useRef(null);
 
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
-  const [selectedCapturedElement, setSelectedCapturedElement] = useState(null);
+  const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
   let addMore = useRef(false);
 
@@ -101,13 +105,19 @@ const CaptureModal = (props) => {
     fetchScrapeData()
   }, [parentData])
   useEffect(() => {
-    if (endScrape || elementPropertiesUpdated || identifierModified) {
+    if(compareSuccessful){
+      toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements updated successfuly.', life: 10000 });
+
+    }
+    if (endScrape || elementPropertiesUpdated || identifierModified||compareSuccessful) {
       fetchScrapeData();
       setEndScrape(false)
       setIdentifierModiefied(false)
       setElementPropertiesUpdated(false)
+      dispatch(CompareElementSuccessful(false))
+      
     }
-  }, [parentData, endScrape, elementPropertiesUpdated, identifierModified])
+  }, [parentData, endScrape, elementPropertiesUpdated, identifierModified,compareSuccessful])
 
   const togglePanel = () => {
     setShowPanel(!showPanel);
@@ -443,7 +453,7 @@ const elementTypeProp =(elementProperty) =>{
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
 
-          if (data === "Invalid Session") return null;
+          if (data === "Invalid Session") return RedirectPage(history);
           else if (typeof data === "object" && props.appType !== "Webservice") {
             haveItems = data.view.length !== 0;
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
@@ -625,7 +635,7 @@ const elementTypeProp =(elementProperty) =>{
 
     scrapeApi.updateScreen_ICE(params)
       .then(response => {
-        if (response === "Invalid Session") return null;
+        if (response === "Invalid Session") return RedirectPage(history);
         else fetchScrapeData().then(resp => {
           if (resp === 'success' || typeof (resp) === "object") {
 
@@ -660,6 +670,7 @@ const elementTypeProp =(elementProperty) =>{
     let blockMsg = 'Capturing in progress. Please Wait...';
     if (compareFlag) {
       blockMsg = 'Comparing objects in progress...';
+      handleClose()
     };
     if (replaceFlag) {
       blockMsg = 'Capture and Replace Object in progress...';
@@ -671,41 +682,61 @@ const elementTypeProp =(elementProperty) =>{
         let err = null;
         setOverlay("");
         // ResetSession.end();
-        if (data === "Invalid Session") return null;
+        if (data === "Invalid Session") return RedirectPage(history);
         else if (data === "Response Body exceeds max. Limit.")
-          err = { 'variant': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' };
+          err = 'Scraped data exceeds max. Limit.' ;
         else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
           let scrapedItemsLength = scrapeItems.length;
           if (scrapedItemsLength > 0) dispatch(disableAction(true));
           else dispatch(disableAction(false));
           setSaved({ flag: false });
-          toastError({
-            'VARIANT': data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
+          err =
+
               data === 'scheduleModeOn' ?
                 MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
                 MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
 
-          });
-          return
+          
         } else if (data === "fail")
-          toastError("Error while performing Scrape");
+          err = MSG.SCRAPE.ERR_SCRAPE;
         else if (data === "Terminate") {
           setOverlay("");
-          toastError("Scrape Terminated."); 
+          err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
         }
         else if (data === "wrongWindowName")
-          toastError("Window not found - Please provide valid window name.");
+          err = MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
         else if (data === "ExecutionOnlyAllowed")
-          toastError("ICE is connected in 'Execution Only' mode. Other actions are not permitted.");
-
+          err = MSG.GENERIC.WARN_EXECUTION_ONLY;
 
         if (err) {
-          // setMsg(err);
+          toastError(err)
           return false;
         }
-
+        //COMPARE & UPDATE SCRAPE OPERATION
+        if (data.action === "compare") {
+          if (data.status === "SUCCESS") {
+              let compareObj = generateCompareObject(data, capturedDataToSave.filter(object => object.xpath.substring(0, 4)==="iris"));
+              let [newScrapeList, newOrderList] = generateScrapeItemList(0, mainScrapedData);
+          //     setScrapeItems(newScrapeList);
+              setOrderList(newOrderList);
+              dispatch(CompareFlag(true));
+          //     setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
+              dispatch(CompareData(data));
+              dispatch(CompareObj(compareObj));
+              
+          // } else {
+          //     if (data.status === "EMPTY_OBJECT")
+          //         setMsg(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
+          //     else
+          //         setMsg(MSG.SCRAPE.ERR_COMPARE_OBJ);
+          
+          }
+        }
+        else if (data.action === "replace") {
+          
+       }
+else{
         let viewString = data;
-        // fetchScrapeData();
         if (capturedDataToSave.length !== 0 && masterCapture) {
           let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
           let deleted = capturedDataToSave.map(item => item.objId);
@@ -727,6 +758,8 @@ const elementTypeProp =(elementProperty) =>{
             })
             .catch(error => console.log(error))
         }
+        // fetchScrapeData();
+
         if (viewString.view.length !== 0) {
 
           let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
@@ -766,11 +799,12 @@ const elementTypeProp =(elementProperty) =>{
           setEndScrape(true)
 
         }
+      }
       })
       .catch(error => {
         setOverlay("");
         // ResetSession.end();
-        toastError("Error while performing Scrape");
+        toastError(MSG.SCRAPE.ERR_SCRAPE);
         console.error("Fail to Load design_ICE. Cause:", error);
       });
 
@@ -861,7 +895,8 @@ const elementTypeProp =(elementProperty) =>{
 
   const footerCapture = (
     <div className='footer__capture'>
-      <Button onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
+      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>
+      
     </div>
   )
 
@@ -900,16 +935,23 @@ const elementTypeProp =(elementProperty) =>{
     </div>
   );
 
-  const setAddmoreHandler = () => addMore.current = addMore.current && false;
+const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
-  const footerSave = (
+const elementIdentifier=()=>{
+  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]:
+  selectedCapturedElement[0].objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
+  setIdentifierList(identifierList)
+  setShowIdentifierOrder(true)
+}  
+const footerSave = (
     <>
-      {selectedCapturedElement?.length > 0 ? <Button label="Element Identifier Order" onClick={() => setShowIdentifierOrder(true)} ></Button> : null}
-      {selectedCapturedElement?.length > 0 ? <Button label='Delete' onClick={onDelete} ></Button> : null}
-      <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)}></Button>
-      <Button label='Save' onClick={onSave} ></Button>
+    {selectedCapturedElement.length>0?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
+    {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
+    <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
+    <Button label='Save' onClick={onSave} ></Button>
     </>
   )
+  
   const PopupDialog = () => (
     <ModalContainer
       show={showPop}
@@ -1048,7 +1090,7 @@ const elementTypeProp =(elementProperty) =>{
       if (!ScrapedObject.xpath.startsWith('iris')) {
         scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
           .then(data => {
-            if (data === "Invalid Session") return null;
+            if (data === "Invalid Session") return RedirectPage(history);
             if (data === "fail") return null;
           })
           .catch(error => console.error("Error while highlighting. ERROR::::", error));
@@ -1516,13 +1558,16 @@ const elementTypeProp =(elementProperty) =>{
         toastError={toastError}
       />}
 
-      {currentDialog === 'compareObject' && <ActionPanel
-        isOpen={currentDialog}
-        OnClose={handleClose}
-        toastSuccess={toastSuccess}
-        toastError={toastError}
-      />}
+      {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
+       isOpen={currentDialog} 
+       OnClose={handleClose} 
+      startScrape={startScrape} 
+      mainScrapedData={mainScrapedData} 
+      fetchingDetails={props.fetchingDetails} 
+      orderList={orderList}/>}
 
+
+      
       {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
       {showObjModal === "importModal" && <ImportModal
         fetchScrapeData={fetchScrapeData}
@@ -1720,3 +1765,49 @@ function getProcessedBody(body, type) {
 
   return processedBody;
 }
+function getCompareScrapeItem(scrapeObject) {
+  return {
+      ObjId: scrapeObject._id,
+      val: uuid(),
+      tag: scrapeObject.tag,
+      title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
+      custname: scrapeObject.custname,
+      top: scrapeObject.top,
+      left: scrapeObject.left,
+      height: scrapeObject.height,
+      width: scrapeObject.width,
+      xpath: scrapeObject.xpath,
+      url: scrapeObject.url,
+      checked: false
+  }
+}
+function generateCompareObject(data, irisObjects){
+  let compareObj = {};
+  if (data.view[0].changedobject.length > 0) {
+      let localList = [];
+      for (let i = 0; i < data.view[0].changedobject.length; i++) {
+          let scrapeItem = getCompareScrapeItem(data.view[0].changedobject[i]);
+          localList.push(scrapeItem);
+      }
+      compareObj.changedObj = localList;
+  }
+  if (data.view[1].notchangedobject.length > 0) {
+      let localList = [];
+      for (let i = 0; i < data.view[1].notchangedobject.length; i++) {
+          let scrapeItem = getCompareScrapeItem(data.view[1].notchangedobject[i])
+          localList.push(scrapeItem);
+      }   
+      compareObj.notChangedObj = localList;
+  }
+  if (data.view[2].notfoundobject.length > 0 || irisObjects.length > 0) {
+      let localList = [];
+      if (data.view[2].notfoundobject.length > 0) {
+          for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
+              let scrapeItem = getCompareScrapeItem(data.view[2].notfoundobject[i])
+              localList.push(scrapeItem);
+          }
+      }
+      compareObj.notFoundObj = [...localList, ...irisObjects];
+  }
+  return compareObj;
+} 

@@ -9,6 +9,7 @@ import ScrollBar from './components/ScrollBar';
 import FooterTwo from './components/FooterTwo';
 import ResetSession from './components/ResetSession';
 import Thumbnail from './components/Thumbnail';
+import Footer from './components/FooterTwo';
 
 export { 
         ProgressBar,
@@ -24,4 +25,5 @@ export {
         ScrollBar,
         ResetSession,
         Thumbnail,
+        Footer,
     };
