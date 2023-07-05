@@ -1,7 +1,7 @@
 @import "../../global/styles/ColorVariables.scss";
 .CollapseWholeCont{ 
-    max-height: 100vh;
-    min-height: 70vh;
+    max-height: 84vh;
+    min-height: 60vh;
     overflow-y: auto;
     display: flex;
     flex-direction: row-reverse;
@@ -40,7 +40,7 @@
     }
 
     .E2E_main_container {
-        height: 30%;
+        height: 34%;
         border-bottom: 1px solid rgb(91, 89, 89);
     }
 
@@ -153,7 +153,7 @@
     }
 
     .NorModuleListE2E {
-        max-height: 65%;
+        max-height: 69%;
         // border: 1px solid black;
         overflow-y: auto;
     }
