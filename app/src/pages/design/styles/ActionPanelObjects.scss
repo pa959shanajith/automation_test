@@ -495,19 +495,18 @@
 
 .clear__btn__cmp {
     position: relative;
-    top: 0.7rem;
+
     width: 24% !important;
     height: 1.7rem;
     background: none;
     border: none;
-    font-size: 12px;
+    font-size: 14px;
     font-family: 'Open Sans';
     cursor: pointer;
 }
 
 .save__btn__cmp {
     position: relative;
-    top: 0.7rem;
     width: 24% !important;
     height: 1.7rem;
     background: #605BFF;
@@ -515,7 +514,7 @@
     color: white;
     font-size: 12px;
     font-family: 'Open Sans';
-    border-radius: 2px;
+    border-radius: 4px;
     cursor: pointer;
 }
 
@@ -594,4 +593,80 @@
 }
 .save-btn{
     top: 0.7rem;
+}
+
+
+  .accordin__compare{
+
+        .p-accordion-header-link {
+
+            padding: 0.3rem;
+
+            margin-top: 0.5rem;
+
+        }
+
+
+
+
+    }
+
+
+
+.changed__elem{
+
+    margin-bottom: 0.5rem;
+
+}
+
+
+
+.update-btn , .dlt-btn{
+
+   
+
+    font-size: 12px;
+
+    width: 5rem;
+
+    height: 2rem;
+
+}
+
+.header-name{
+
+    position: relative;
+
+
+}
+.accordion-header__changedObj{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-name__changedObj{
+   
+    display: inline-block;
+    width: 100%;
+}
+
+.accordion_changedObj{
+    max-height: 30vh;
+    overflow-y: auto;
+}
+.accordion_unchangedObj{
+max-height: 20vh;
+    overflow-y: auto;
+   
+}
+.accordion_notfoundObj{
+    max-height: 20vh;
+    overflow-y: auto;
+    }
+// .p-accordion .p-accordion-header,:not(.p-disabled).p-highlight .p-accordion-header-link{
+//     border:1px solid #dee2e6
+// }
+
+.p-accordion .p-accordion-tab:not(:first-child) .p-accordion-header .p-accordion-header-link, .p-accordion .p-accordion-tab:not(:first-child) .p-accordion-header:not(.p-disabled).p-highlight:hover .p-accordion-header-link, .p-accordion .p-accordion-tab:not(:first-child) .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link{
+    border-top: 1px solid #dee2e6;
 }

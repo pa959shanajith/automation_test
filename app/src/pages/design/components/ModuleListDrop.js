@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import "../styles/ModuleListSidePanel.scss";
 import ImportMindmap from'../components/ImportMindmap.js';
-import { isEnELoad, savedList , initEnEProj,saveMindMap, selectedModule,selectedModulelist, moduleList,} from '../designSlice';
+import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -24,12 +24,12 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import SaveMapButton from "./SaveMapButton";
 import { Tooltip } from 'primereact/tooltip';
 import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
-// import { Icon } from 'primereact/icon';
 
 
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
-    const moduleLists = useSelector(state=>state.design.moduleList)
+    const toast = useRef();
+    const moduleList = useSelector(state=>state.design.moduleList)
     const proj = useSelector(state=>state.design.selectedProj)
     const initProj = useSelector(state=>state.design.selectedProj)
     const moduleSelect = useSelector(state=>state.design.selectedModule)
@@ -103,12 +103,14 @@ const ModuleListDrop = (props) =>{
         else{dispatch(savedList(true))}
         setWarning(false); 
         
-     }, [moduleLists, initProj, searchForNormal, isCreateE2E, dispatch])
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+     }, [moduleList, initProj])
      useEffect(()=> {
         return () => {
             dispatch(isEnELoad(false));
             // dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
         }
+     // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);
 
      useEffect(()=>{
@@ -127,33 +129,37 @@ const ModuleListDrop = (props) =>{
         })()
       },[projectId])
 
-    //  useEffect (()=>{
-    //     {dispatch({type:actionTypes.SAVED_LIST,payload:true});}
-    //  },[isCreateE2E])
+     useEffect (()=>{
+      dispatch(savedList(true))
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+     },[isCreateE2E])
 
-    //  useEffect(()=>{
-    //      setSearchForNormal(false);
-    //      if(!isE2EOpen){
-    //     // setIsCreateE2E(false);
-    //     }
+     useEffect(()=>{
+         setSearchForNormal(false);
+         if(!isE2EOpen){
+        // setIsCreateE2E(false);
+        }
         
-    //  },[initProj])
-    //  useEffect(() => {
-    //     setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+     },[initProj])
+     useEffect(() => {
+        setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         
-    //   },[initEnEProj]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      },[initEnEProj]);
 
-    //  useEffect(()=>{
-    //     // if(moduleSelect.type === 'endtoend') {
+     useEffect(()=>{
+        if(moduleSelect.type === 'endtoend') {
             
-    //     // }
-    //     searchModule("");
-    //     searchModule_E2E("");
-    //     setSearchInpTextEnE("");
-    //     setSearchInpText("");
-    //     setWarning(false);
-    //     setScenarioList([]);
-    //  }, [proj])
+        }
+        searchModule("");
+        searchModule_E2E("");
+        setSearchInpTextEnE("");
+        setSearchInpText("");
+        setWarning(false);
+        setScenarioList([]);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+     }, [proj])
     
      useEffect(()=>{
         var filter = [...initScList].filter((e)=>e.name.toUpperCase().indexOf(filterSc.toUpperCase())!==-1)
@@ -170,7 +176,7 @@ const ModuleListDrop = (props) =>{
       },[moduleSelectlist, moduleLists])
     const displayError = (error) =>{
         setLoading(false)
-        setMsg(error)
+        toast.current.show({severity:'error', summary:'Error', detail:error, life:2000});
     }
     const collapsed =()=> setCollapse(!collapse)
     const collapsedForModules =()=> setCollapseForModules (!collapseForModules )
@@ -209,7 +215,7 @@ const ModuleListDrop = (props) =>{
         // if(moduleSelect._id === modID){
            
         // }
-        dispatch(selectedModule({}))
+        // dispatch(selectedModule({}))
         var req={
             tab:"createTab",
             projectid:proj,
@@ -793,6 +799,7 @@ const ModuleListDrop = (props) =>{
       
     return(
         <Fragment>
+          <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
             {warning.modID?<ModalContainer
                 show = {warning.modID} 
