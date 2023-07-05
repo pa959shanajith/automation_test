@@ -112,7 +112,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)} >
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
-                    <text x="16" y="18">Export</text>
+                    <text x="20" y="17">Export</text>
                 </g>
             </svg>
         </Fragment>
@@ -337,7 +337,7 @@ const toExcel = async(projId,module,fname,displayError,setBlockui) => {
         setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
     }catch(err){
         console.error(err)
-        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
+        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP.CONTENT)
     }
 }
 
@@ -375,7 +375,7 @@ const toJSON = async(module,fname,displayError,setBlockui,setShowMessage,setMsg,
     }catch(err){
         console.error(err)
         ResetSession.end()
-        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP);
+        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP.CONTENT);
         setShowMessage(false);
         dispatchAction(ExportProjname(""))
         dispatchAction(EnableExport(false))
@@ -398,7 +398,7 @@ const exportToProj = async(module,currProjId,displayError,setBlockui) => {
     }catch(err){
         ResetSession.end()
         console.error(err)
-        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
+        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP.CONTENT)
     }
 }
 /*

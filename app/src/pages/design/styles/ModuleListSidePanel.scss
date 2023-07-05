@@ -40,7 +40,7 @@
     }
 
     .E2E_main_container {
-        height: 30%;
+        height: 34%;
         border-bottom: 1px solid rgb(91, 89, 89);
     }
 
@@ -111,7 +111,7 @@
     }
 
     .moduleLayer_plusIcon img {
-        padding-right: 0.1rem;
+        padding-right: 0.7rem;
 
     }
 
@@ -147,7 +147,7 @@
     }
 
     .NorModuleList {
-        max-height: 85%;
+        max-height: 83%;
         // border: 1px solid black;
         overflow-y: auto;
     }
@@ -207,11 +207,11 @@
 }
 
 ////////////////////E2E Work flow css
-.Project-Dialog {
-    .modalClass .p-dialog-header {
-        // background: rgba(96,91,255,.08);
-    }
-}
+// .Project-Dialog {
+//     .modalClass .p-dialog-header {
+//         // background: rgba(96,91,255,.08);
+//     }
+// }
 
 .mainCentralContainer {
     width: 100%;
@@ -252,17 +252,23 @@
                     }
 
                     .p-card-content {
-                        padding-top:0.25rem;
+                        justify-content: center;
+                        display: flex;
+                        align-items: center;
+                         padding-top:0.25rem;
                            .DrpoDown_search_Tree{
                             display: flex;
                             flex-direction: column;
-                            align-items: center;
-
+                            // align-items: center;
+                            .searchAndDropDown{
+                                align-items: center;
+                                display: flex;
+                                flex-direction: row-reverse;
                         .card {
                             .p-dropdown {
                                 height: 2.1rem;
                                 align-items: center;
-                                width: 32.67rem;
+                                width: 13rem;
                             }
                         }
 
@@ -278,10 +284,12 @@
                             }
 
                         }
+                      }
                         .overlay4ModSce{
                             font: $f6_regular;
                             align-items: center;
                             margin-top: 8rem;
+                            margin-left: 6.5rem;
                             width: 17rem;
                             height: 2rem;
                             border: 1px solid black;
@@ -292,7 +300,7 @@
                         }
                         
                         .p-tree {
-                            height: 20.9rem;
+                            height: 23.8rem;
                             overflow: auto;
                             width: 32.68rem;
                             .p-tree-container{
@@ -414,7 +422,7 @@
                             font-weight: 400;
                         }
 
-                        .ArrowImg {}
+                        // .ArrowImg {}
 
                     }
                 }
