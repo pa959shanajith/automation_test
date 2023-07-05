@@ -1,4 +1,5 @@
 import { React, useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from "react-redux"
 import { Dialog } from 'primereact/dialog';
 import { Card } from 'primereact/card';
 import '../styles/ActionPanelObjects.scss';
@@ -14,6 +15,15 @@ import RedirectPage from '../../global/components/RedirectPage';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { tagList } from './ListVariables';
 import { updateScreen_ICE } from '../api';
+import {CompareFlag} from '../designSlice';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Checkbox } from 'primereact/checkbox';
+import { leastIndex } from 'd3';
+import {CompareElementSuccessful} from '../designSlice';
+import { ScrollPanel } from 'primereact/scrollpanel';
+
+
 
 
 
@@ -28,6 +38,12 @@ const ActionPanel = (props) => {
   const [selectObjectType, setSelectObjectType] = useState(null);
   const toast = useRef();
   const history = useNavigate();
+  const dispatch = useDispatch();
+  const userInfo = useSelector((state) => state.landing.userinfo);
+  const { changedObj, notChangedObj, notFoundObj } = useSelector(state=>state.design.compareObj);
+  const compareData = useSelector(state=>state.design.compareData);
+  const compareFlag = useSelector(state=>state.design.compareFlag);
+  const[selectedNotFoundElements,setSelectedNotFoundElements]=useState(null)
 
   const customObj = { objName: "", objType: "", url: "", name: "", relXpath: "", absXpath: "", className: "", id: "", qSelect: "" };
   const [tempIdCounter, setTempIdCounter] = useState(1);
@@ -50,6 +66,9 @@ const ActionPanel = (props) => {
   const [showName, setShowName] = useState("");
   const [orderLists, setOrderLists] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const[browserName,setBrowserName]=useState(null)
+  const [checked, setChecked] = useState([]);
+
 
   const [selectCustomObj, setSelectCustomObj] = useState({
     btn1: '',
@@ -469,6 +488,12 @@ const ActionPanel = (props) => {
       <Button size="small" onClick={addElementSaveHandler}>Save</Button> {/*className='add_object_save' */}
     </div>
   )
+  const compareElementfooter = (
+    <div className=''>
+      { changedObj && changedObj.length?<Button onClick={()=>updateObjects()} label="Update" className="update-btn" size="small" style={{borderRadius:'3px'}} />:<Button label='Cancel' size="small" className="update-btn" onClick={()=>{props.OnClose();dispatch(CompareFlag(false))}}/>}
+    </div>
+  )
+  
 
   const createElementFooter = (
     <div className='save_clear'>
@@ -485,6 +510,21 @@ const ActionPanel = (props) => {
       setSelectedSpan(null);
     } else {
       setSelectedSpan(index);
+      switch (index) {
+        case 1:
+          setBrowserName("explorer")
+          break;
+        case 2:
+          setBrowserName("chrome")
+          break;
+        case 3:
+          setBrowserName("mozilla")
+          break;
+        case 4:
+          setBrowserName("chromium")
+          break;
+       
+      }
     }
   };
 
@@ -597,7 +637,7 @@ const ActionPanel = (props) => {
   const footerCompare = (
     <div className='footer_compare'>
       <button className='clear__btn__cmp'>Clear</button>
-      <button className='save__btn__cmp'>Compare</button>
+      <button className='save__btn__cmp' onClick={()=>{props.startScrape(browserName,'compare');props.OnClose()}}>Compare</button>
     </div>
   )
 
@@ -613,13 +653,103 @@ const ActionPanel = (props) => {
       </div>
     );
   };
-
-
   const onTabChanging = (e) => {
     setSelectedTag(e.originalEvent.currentTarget.innerText);
     console.log("OnTabChange", e);
     console.log("OnTabChange", e.originalEvent.currentTarget.innerText);
   }
+
+  // checked checkboxes 
+  const onCheckCheckbox = (e) => {
+    let _selectedCheckbox = [...checked];
+
+    if (e.checked)_selectedCheckbox.push({element:e.value,checked:true});
+    else
+    _selectedCheckbox = _selectedCheckbox.filter(
+        (element) => element.element.custname !== e.value.custname
+      );
+
+    setChecked(_selectedCheckbox);
+  };
+
+  // Update compared elements
+
+  const updateObjects = () => {
+    if(!checked.length){
+      toastErrorMsg('Please select element(s) to update properties.')
+      return
+    }
+		let viewString={...props.mainScrapedData}
+    let updatedObjects = [];
+    let updatedIds=[]
+    let updatedCompareData = {...compareData};
+   
+    checked.map((element,index)=>{
+ 
+  let id=viewString.view[updatedCompareData.changedobjectskeys[index]]._id
+
+  updatedObjects.push({...updatedCompareData.view[0].changedobject[index],_id:id});
+})
+
+
+let arg = {
+        'modifiedObj': updatedObjects,
+        'screenId': props.fetchingDetails["_id"],
+        'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+        'param': 'saveScrapeData',
+        'orderList': props.orderList
+    };
+    
+updateScreen_ICE(arg)
+    .then(data => {
+        if (data.toLowerCase() === "invalid session") return RedirectPage(history);
+        if (data.toLowerCase() === 'success') {
+            props.OnClose()
+            dispatch(CompareFlag(false))
+            dispatch(CompareElementSuccessful(true))
+        } else {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Error while updating elements.', life: 10000 });
+
+            dispatch(CompareFlag(false))
+        }
+    })
+    .catch(error => console.error(error) );
+}
+
+const oncheckAll=(e)=>{
+  let checked=[]
+  if (e.checked){
+    changedObj.map(element=>checked.push({element:element,checked:true}))
+    setChecked(checked)
+
+  }
+  else{
+    setChecked([])
+  }
+
+}
+
+  // Comapre element action templates
+  const accordinHedaerChangedElem =()=>{
+    return(
+      <div style={{marginLeft:'0.5rem'}} className='accordion-header__changedObj' >
+         <Checkbox onChange={oncheckAll}
+                checked={(checked.length>0 && changedObj)?(checked.every(
+                  (item) => item.checked ===true
+                ) && checked.length===changedObj.length):false}
+                 /> 
+         <span className='header-name__changedObj' style={{marginLeft:'0.5rem'}}>Changed Elements</span>
+      </div>
+    );
+  };
+  
+  const Header = () => {
+    return (
+        <div>Element Identifier Order</div>
+    );
+};
+
 
   return (
     <>
@@ -809,8 +939,7 @@ const ActionPanel = (props) => {
       <Dialog
         className='compare__object__modal'
         header="Compare Object:Sign up screen 1"
-        style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
-        position='right'
+        style={{ height: "21.06rem", width: "24.06rem" }}
         visible={props.isOpen === 'compareObject'}
         onHide={props.OnClose} footer={footerCompare}>
         <div className='compare__object'>
@@ -825,8 +954,56 @@ const ActionPanel = (props) => {
           </span>
         </div>
       </Dialog>
+{/* COMPARE ELEMENT  */}  
+  <Dialog className='create__object__modal' draggable={false} header={Header}  style={{ height: "40rem", width: "50.06rem", marginRight: "6rem" }} visible={compareFlag} onHide={() => {dispatch(CompareFlag(false))}}  position='right' footer={compareElementfooter}>
+      <Accordion multiple activeIndex={[0]}>
+      {changedObj && changedObj.length && <AccordionTab  contentClassName='' className="accordin__elem" header={accordinHedaerChangedElem()}>
+          <div className='accordion_changedObj'>
+          {changedObj.map((element, index) => (
+           
+            <div className="changed__elem" key={index} style={{display:'flex',gap:'0.5rem',marginLeft:'1.3rem'}}>
+              <Checkbox  inputId={element.custname}
+                value={element}
+                onChange={onCheckCheckbox}
+                checked={checked.some(
+                  (item) => item.element.custname === element.custname
+                )}
+                 /> 
+              <p>{element.custname}</p>
+            </div>))}
+            </div>
+            
+          
+        </AccordionTab>
+}
 
+{notFoundObj && notFoundObj.length &&<AccordionTab  contentClassName='' className="accordin__elem" >
+<div className='accordion_notfoundObj'>
+          {notFoundObj.map((element, index) => (
+           
+            <div className="changed__elem" key={index} style={{display:'flex',gap:'0.5rem',marginLeft:'1.3rem'}}> 
+              <p>{element.custname}</p>
+            </div>
+           
+          ))}
+          </div>
+        </AccordionTab>
+}
 
+{notChangedObj && notChangedObj.length &&<AccordionTab contentClassName='' className="accordin__compare"  header="Unchanged Elements">
+<div className='accordion_unchangedObj'>
+          {notChangedObj.map((element, index) => (
+            
+            <div className="changed__elem" style={{display:'flex',gap:'0.5rem',marginLeft:'1.3rem'}} key={index} >
+              <p>{element.custname}</p>
+            </div>
+            
+          ))}
+          </div>
+        </AccordionTab>
+}
+      </Accordion>
+      </Dialog>
     </>
   );
 }

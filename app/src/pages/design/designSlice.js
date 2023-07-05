@@ -28,6 +28,7 @@ const initialState = {
     compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
     objValue: { val: null },
     isFiltered: false,
+    compareSuccessful:false,
     cert: {},
     WsData: {
         endPointURL: "",
@@ -172,6 +173,20 @@ export const designSlice = createSlice({
     EnableExportMindmapButton:(state, action)=>{
       state.enableExportMindmapButton = action.payload
     },
+    CompareFlag:(state,action)=>{
+      state.compareFlag=action.payload
+    },
+    CompareObj:(state,action)=>{
+      state.compareObj=action.payload
+    },
+    CompareData:(state,action)=>{
+      state.compareData=action.payload
+    },
+    CompareElementSuccessful:(state,action)=>{
+      state.compareSuccessful=action.payload
+    }
+
+
   },
 })
 
@@ -194,6 +209,10 @@ toDeleteScenarios,
 appType,
 savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
 TestCases,
+CompareData,
+CompareFlag,
+CompareObj,
+CompareElementSuccessful,
 Modified,
 SaveEnable,objValue,EnableExport,ExportProjname,EnableExportMindmapButton} = designSlice.actions
 
