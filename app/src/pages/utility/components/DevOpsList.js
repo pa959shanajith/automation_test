@@ -99,6 +99,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [browserDetails,setBrowserDetails] = useState([]);
     const [mobileDetails,setMobileDetails] = useState([]);
     const [dropdownSelected,setDropdownSelected] = useState([]);
+    const [sauceLabUser,setSauceLabUser] = useState({});
     
 
     const [sauceLab, setSauceLab] = useState(false);
@@ -353,8 +354,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setOsNames(arrayOS);
             setBrowserDetails(data);
         }
-        else if (data && data.android && data.iphone){
-            const arrayPlatforms = Object.keys(data).map((element, index) => { 
+        else if (data && data.emulator && data.real_devices){
+            const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
                 return {
                     key: element,
                     text: element,
@@ -794,16 +795,17 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             displayBasic4={displayBasic4}
             onHide={onHide}
             handleSubmit={handleSubmit}
+            setSauceLabUser={setSauceLabUser}
         />,
-        [setLoading, displayBasic4, onHide, handleSubmit]);
+        [setLoading, displayBasic4, onHide, handleSubmit,setSauceLabUser]);
 
     const sauceLabExecute = useMemo(() => <SauceLabsExecute mobileDetails={mobileDetails} browserDetails={browserDetails}
         displayBasic5={displayBasic5} onHide={onHide} showSauceLabs={showSauceLabs}
         changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-        availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} defaultValues={defaultValues} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+        availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
     />,
         [mobileDetails, browserDetails, displayBasic5, onHide, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-            availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, defaultValues, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+            availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
     
    const handleOptionChange = (selected,type,item,index) => {
     // setDropdownSelected(selected);
