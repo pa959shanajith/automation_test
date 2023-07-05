@@ -112,22 +112,11 @@ const MindmapHome = () => {
               <img className='avoGeniusImg' src='static\imgs\AvoGenius.png' alt='Start Avo Genius' />
             </Card>
           </div>}
-        </Fragment>
-        {show && <Component />}
-
-        {/* } */}
+          </Fragment>
+          {show &&  <Component/>}
       </div>
-      {/* <div className='mp__footer'> 
-        <div className="main-footer">
-          <div className="main-footer-content">
-              <span className="right-text">
-                © {new Date().getFullYear()}  Avo Automation. All Rights Reserved
-              </span>
-            </div>
-          </div>
-       </div>*/}
-      <div><Footer /></div>
-    </div>
+        <div className='mp__footer'><Footer/></div>
+    </div> 
   );
 }
 export default MindmapHome;

@@ -34,11 +34,23 @@ const SaveMapButton = (props) => {
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
             <g id="ct-saveAction" className="ct-actionButton">
                 <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
-                <text x="23" y="18">Save</text>
+                <text x="27" y="17">Save</text>
             </g>
         </svg>
     )
 }
+
+const updateModuleList = (moduledata) => {
+    return (dispatch) => {
+      dispatch(moduleList(moduledata));
+    };
+  };
+
+  const selectModule = (moduleselected) => {
+   return (dispatch) => {
+     dispatch(selectedModule(moduleselected));
+   };
+ };
 
 //mindmap save funtion
 const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList)=>{
@@ -172,11 +184,11 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
         modName:"",
         moduleid:null
     }
+    // eslint-disable-next-line no-redeclare
     var moduledata = await getModules(req);
-    // dispatch(moduleList(moduledata))
     if(savedList){
-        dispatch(moduleList(moduledata))
-    setTimeout(() => dispatch(selectedModule(moduleselected)), 150)
+        dispatch(updateModuleList(moduledata))
+        setTimeout(() =>dispatch(selectModule(moduleselected)),150)
     }
     return;
 
