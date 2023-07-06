@@ -123,25 +123,40 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
 
     const onOsChange = async (option) => {
         setSelectedOS(option.key)
+        setSaucelabBrowsers([]);
+        setSelectedSaucelabBrowser('');
         setBrowserVersions([]);
         setSelectedVersion('');
-        if (selectedSaucelabBrowser != '') {
-            if (browserDetails && Object.keys(browserDetails).length) {
-                let findBrowserVersion = browserDetails.browser[selectedSaucelabBrowser][option.key].map((element, index) => {
-                    return (
-                        {
-                            key: element,
-                            text: element,
-                            title: element,
-                            index: index
-                        }
-                    )
-                });
-                setBrowserVersions(findBrowserVersion.sort((a, b) => {
-                    return Number(a.key) - Number(b.key);
-                }));
+          let arrayBrowser = []
+          let index = 0;
+          for (let browser in browserDetails.browser) {
+            if(option.key.split(' ')[0] == 'Windows' && browserDetails.browser[browser][option.key]?.length){
+                arrayBrowser.push({
+                    key: browser,
+                    text: browser,
+                    title: browser,
+                    index: index
+                  });
+                index++;
+            } else if(option.key.split(' ')[0] == 'Mac' && browser == 'Google Chrome') {
+                arrayBrowser.push({
+                    key: browser,
+                    text: browser,
+                    title: browser,
+                    index: index
+                  });
+                  index++;
+            }else if(option.key.split(' ')[0] == 'Linux' && browserDetails.browser[browser][option.key]?.length){
+              arrayBrowser.push({
+                    key: browser,
+                    text: browser,
+                    title: browser,
+                    index: index
+                  });
+                  index++;
             }
-        }
+          }
+          setSaucelabBrowsers(arrayBrowser);
     }
 
     const onSaucelabBrowserChange = async (option) => {
@@ -208,6 +223,11 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     const onToggle = () =>{
         // alert('hi')
         showRealdevice == 'emulator' ? setShowRealdevice('real_devices') : setShowRealdevice('emulator')
+        setSelectedPlatforms('');
+        setSelectedMobileVersion('')
+        setPlatformVersions([])
+        setSelectedEmulator('')
+        setEmulator([])
     }
 
     return (
