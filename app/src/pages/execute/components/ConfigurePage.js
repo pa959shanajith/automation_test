@@ -137,6 +137,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [activeIndex1, setActiveIndex1] = useState(0);
   const timeinfo = useRef(null);
   const scheduleinfo  = useRef(null);
+  const errorinfo  = useRef(null);
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
@@ -779,11 +780,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
-        dispatch(storeConfigureKey(executionData)).then(() => {
-          tableUpdate();
-        })
+        dispatch(storeConfigureKey(executionData))
       );
-      setVisible_setup(false);
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
       setVisible_setup(false);
@@ -791,6 +789,20 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       setSelectedNodeKeys({});
     } else setVisible_setup(false);
   };
+
+  useEffect(() => {
+    if(getConfigData?.setupExists === "success"){
+      tableUpdate();
+      setVisible_setup(false);
+    } else if(getConfigData?.setupExists?.error?.CONTENT){
+      errorinfo.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: getConfigData.setupExists.error.CONTENT,
+        life: 5000
+      });
+    };
+  }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
     return (
@@ -1199,6 +1211,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
+          <Toast ref={errorinfo} />
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}

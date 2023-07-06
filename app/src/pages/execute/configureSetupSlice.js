@@ -16,6 +16,7 @@ const initialState = {
   error: "",
   scheduledList: [],
   scheduledStatusList: [],
+  setupExists: ""
 };
 
 const getProjects = createAsyncThunk("config/fetchProjects", async () => {
@@ -247,14 +248,17 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(storeConfigureKey.pending, (state) => {
       state.loading = true;
+      state.setupExists = "";
     });
     builder.addCase(storeConfigureKey.fulfilled, (state, action) => {
+      state.setupExists = action?.payload;
       state.loading = false;
       state.error = "";
     });
     builder.addCase(storeConfigureKey.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message;
+      state.setupExists = "";
     });
     builder.addCase(testSuitesScheduler_ICE.pending, (state) => {
       state.loading = true;
