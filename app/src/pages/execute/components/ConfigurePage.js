@@ -531,6 +531,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         ),
         executionOptions: (
           <div className="Buttons_config_button">
+            <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
             <Button
               className="execute_now"
               onClick={() => {
@@ -543,10 +544,12 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 console.log(fetechConfig, configItem)
               }}
               size="small"
+              
             >
-                  <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+                  
               Execute Now
             </Button>
+            <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
             <Button
               className="schedule"
               onClick={() => {
@@ -556,10 +559,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               }}
               size="small"
             >
-              <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
               Schedule
             </Button>
-
+            <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
             <Button
               className="CICD"
               size="small"
@@ -568,8 +570,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
-            >
-               <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+            >  
               CI/CD
             </Button>
             <Button
@@ -577,7 +578,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               size="small"
 
             >
-              SouceLab
+              SauceLab
             </Button>
           </div>
         ),
@@ -592,12 +593,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               icon="pi pi-pencil"
               className=" pencil_button p-button-edit"
               onClick={() => configModal("CancelUpdate", item)}
-            ></Button>
+            >
+               <Tooltip target=".pencil_button" position="left" content="Edit the execution configuration."/>
+            </Button>
             <Button
               icon="pi pi-trash"
-              className="p-button-edit"
+              className="trash_button p-button-edit"
               onClick={(event) => confirm_delete(event, item)}
-            ></Button>
+            >
+               <Tooltip target=".trash_button" position="left" content=" Delete the Execution configuration."/>
+            </Button>
           </div>
         ),
       });
@@ -1142,7 +1147,7 @@ Learn More '/>
                   <label className=" executeRadio_label_clint ml-2">
                     Execute with Avo Assure Client
                   </label>
-                  <img className='info__btn_grid'src="static/imgs/info.png" title="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></img>
+                  <img className='info__btn_grid'src="static/imgs/info.png" ></img>
                   <Tooltip target=".info__btn_grid" position="left" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></Tooltip> 
 
                 </div>

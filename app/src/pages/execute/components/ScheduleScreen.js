@@ -124,7 +124,6 @@ const ScheduleScreen = ({
             name="everymonth"
             placeholder=" eg:5"
             title=" Enter after every how many month(s) you wish it to recur."
-            // value={scheduleOption.everymonth}
             value={scheduleOption?.everymonth}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
