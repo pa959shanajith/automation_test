@@ -17,6 +17,7 @@ import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice
 import { InputText } from 'primereact/inputtext';
 import Select from "react-select";
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import { Tooltip } from 'primereact/tooltip';
 
 
 const DesignModal = (props) => {
@@ -666,7 +667,7 @@ const DesignModal = (props) => {
     const headerTemplate = (
         <>
             <div>
-                <h5 className='dailog_header1'>Design Test Step</h5>
+                <h5 className='dailog_header1'>Design Test steps</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="screen_btn" src="static/imgs/ic-screen-icon.png" alt='screen icon' />
             </div>
@@ -762,7 +763,9 @@ const DesignModal = (props) => {
                     <i className='pi pi-plus' style={{marginTop:'0.9rem'}} title='Add Test Step' onClick={()=>addRow()} />
                     <i className='pi pi-save' style={{marginTop:'0.9rem'}} title='Save' onClick={()=>saveTestCases} />
                     <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
-                    <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' title='Debug' outlined></Button>
+                    <Button size='small' className='debug_but' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' outlined>
+                    <Tooltip target=".debug_but" position="left" content=" Click to debug and optionally add dependent test steps repository." />
+                    </Button>
                 </div>:null}
             </div>}
             </>

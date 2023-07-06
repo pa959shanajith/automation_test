@@ -11,6 +11,7 @@ import { dispatch } from 'd3';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import { Tooltip } from 'primereact/tooltip';
 /*Component ExportMapButton
   use: renders ExportMapButton and popups for selection on click 
 */
@@ -109,10 +110,12 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             <Dialog className='exportDialog' header='Export MindMap' onHide={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}  visible={exportBox} style={{ width: '50vw' }} footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>} >
                     <Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport} />
             </Dialog>
-            <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)} >
-                <g id="ct-exportAction" className="ct-actionButton">
-                    <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
-                    <text x="16" y="18">Export</text>
+            <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)}   title= "export">
+                <g id="ct-exportAction" className="ct-actionButton" title="export">
+                    <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px" ></rect>
+                    {/* <title>{enableExport || selectedModulelist.length>0?"export":" Select module(s) to export"}</title> */}
+                    <Tooltip target=".exportButton" position="left" content="export"/>
+                    <text x="16" y="18"  >Export</text>
                 </g>
             </svg>
         </Fragment>
@@ -256,6 +259,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
                                 style={{width:'20rem', marginLeft:'4rem'}}
                                 defaultValue={'def-option'}
                                 onChange={(e)=>changeExportFile(e)}
+                            
                             />
                         {/* // <select defaultValue={'def-option'} disabled={exportProject} ref={ftypeRef} onChange={changeExportFile}>
                         //     <option value={""} >Select Export Format</option>

@@ -50,6 +50,8 @@ const ScheduleScreen = ({
         <span>
           Every{" "}
           <InputText
+          placeholder="eg:5"
+          title="Enter after every how many number of day(s) you wish it to recur."
             className="every_day"
             name="everyday"
             value={scheduleOption.everyday}
@@ -70,6 +72,8 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="monthweek"
+            placeholder="eg:5"
+            title=" Enter on which day of the month you wish it to recur."
             value={scheduleOption.monthweek}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
@@ -77,6 +81,8 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="monthday"
+            placeholder="eg:5"
+            title=" Enter after every how many month(s) you wish it to recur."
             value={scheduleOption.monthday}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
@@ -103,7 +109,7 @@ const ScheduleScreen = ({
             onDropdownChange={(e) => setDropdownDay(e.value)}
             dropdownOptions={scheduleWeek}
             name="scheduleday"
-            placeholder="Select Day"
+            placeholder="Select day"
             required={false}
             customeClass="dropdown_day"
           />{" "}
@@ -111,6 +117,8 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="everymonth"
+            placeholder=" eg:5"
+            title=" Enter after every how many month(s) you wish it to recur."
             value={scheduleOption.everymonth}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
@@ -144,7 +152,7 @@ const ScheduleScreen = ({
       WY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
-            Recur every <InputText /> week(s) on:
+            Recur every <InputText placeholder="eg:5" title="Enter after every how many week(s) you wish it to recur" /> week(s) on:
           </div>
           <div className="flex flex-wrap">
             {scheduleWeeks.map((el) => (

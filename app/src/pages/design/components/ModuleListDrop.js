@@ -773,7 +773,8 @@ const ModuleListDrop = (props) =>{
                            <i className="pi pi-times"  onClick={click_X_Button}></i>
                        </div>)}
                      </div> */}
-                     <i className="pi pi-file-import mindmapImport" title='Import Module' onClick={()=>setImportPop(true)}></i>
+                     <i className="pi pi-file-import mindmapImport"  onClick={()=>setImportPop(true)}></i>
+                     <Tooltip target=".mindmapImport" position="left" content=" Edit the properties of elements." />
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
                      <Tooltip target=".custom-target-icon" content=" Create module" position="bottom" />
                      <img  className="custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  /> 

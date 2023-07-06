@@ -1076,15 +1076,11 @@ const footerContentScreen =(
                 })}
                 {Object.entries(nodes).map((node)=>
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} ref={imageRef} onMouseEnter={() => handleTooltipToggle(node[1].type)} onMouseLeave={() => handleMouseLeave1()}>
-                       <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                       <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src} title="reused"></image>
                    
-                        <text className="ct-nodeLabel" textAnchor="middle" x="20" title={
-                          <div className='card__add'>
-                            <h3> {node[1].name}</h3>
-                            <p className='text__insprint__info1'>Click here to sort projects.</p>
-                          
-                          </div>
-                        } y="50">{node[1].name}</text>
+                        <text className="ct-nodeLabel" textAnchor="middle" x="20" title= {node[1].name}
+                       
+                         y="50">{node[1].name}</text>
                         {(node[1].type!=='testcases')?
                         <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                         :null}
@@ -1105,16 +1101,63 @@ const footerContentScreen =(
             })}
             {Object.entries(nodes).map((node, nodeIdx)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle(nodeIdx)} onMouseLeave={() => handleMouseLeave1()}  ></image>
+                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle(nodeIdx)} onMouseLeave={() => handleMouseLeave1()}  title=  {node[1].name} ></image>
                     <text className="ct-nodeLabel" textAnchor="middle" x="20" 
                     
                            y="50">{node[1].name}</text>
                           
-{/* 
-<title val={node[0]} className="ct-node-title">
 
-</title> */}
-<g val={node[0]} className="ct-node-title">
+<title val={node[0]} className="ct-node-title" >
+{showTooltip !== "" && (
+      ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
+        <div className="tooltip">
+        <span className="tooltiptext">
+          <span className="tooltip-line">"module_name":{node[1].name}</span>
+          <span className="tooltip-line">Click here to add new testcase(s).</span>
+        </span>
+      </div>
+        
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
+        <div className="tooltip">
+ 
+ <span className="tooltiptext">"module_name":{node[1].name} </span>
+ <br />
+ <span  className='tooltipchild'>Click here to add new testcase(s).</span>
+</div> 
+      
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
+        <div className="tooltip">
+ 
+ <span className="tooltiptext">"screen_name":{node[1].name}</span>
+ <br />
+ <span  className='tooltipchild'>Click here to add new testcase(s).</span>
+</div> 
+       
+      )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
+        <div className="tooltip">
+ 
+ <span className="tooltiptext">"module_name":{node[1].name}</span>
+ <br />
+ <span  className='tooltipchild'>Click here to add new testcase(s).</span>
+</div> 
+       
+      ))
+  )}
+
+ {/* <div className="tooltip">
+ 
+ <span className="tooltiptext">"module_name":{node[1].name}</span>
+ <br />
+ <span  className='tooltipchild'>Click here to add new testcase(s).</span>
+</div> */}
+
+
+
+</title> 
+
+
+
+{/* <g val={node[0]} className="ct-node-title">
   {showTooltip !== "" && (
       ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
         <g>
@@ -1129,6 +1172,7 @@ const footerContentScreen =(
             stroke="#ccc"
             strokeWidth="1"
             className="tooltip-background"
+            z-index= "20"
           ></rect>
           <text
             x={verticalLayout ? 20 : cardPosition.left + 20}
@@ -1142,7 +1186,7 @@ const footerContentScreen =(
             y={verticalLayout ? cardPosition.top - 680 : -3040}
             className="tooltip-subtext"
           >
-            Click here to sort projects.
+            Click here to add new testcase(s).
           </text>
         </g>
       )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
@@ -1157,7 +1201,8 @@ const footerContentScreen =(
             fill="#495057"
             stroke="#ccc"
             strokeWidth="1"
-            className="tooltip-background"
+            className="tooltip-background_sceen"
+            z-index="20"
           ></rect>
           <text
             x={verticalLayout ? 20 : cardPosition.right + 80}
@@ -1186,17 +1231,18 @@ const footerContentScreen =(
             fill="#495057"
             stroke="#ccc"
             strokeWidth="1"
-            className="tooltip-background"
+            className="tooltip-background_sceen"
+            z-index="20"
           ></rect>
           <text
-            x={verticalLayout ? 20 : cardPosition.left + 20}
+            x={verticalLayout ? 20 : cardPosition.left + 60}
             y={verticalLayout ? cardPosition.top - 700 : -3060}
             className="tooltip-text"
           >
             {node[1].name}
           </text>
           <text
-            x={verticalLayout ? 20 : cardPosition.left + 40}
+            x={verticalLayout ? 20 : cardPosition.left + 60}
             y={verticalLayout ? cardPosition.top - 680 : -3040}
             className="tooltip-subtext"
           >
@@ -1206,7 +1252,7 @@ const footerContentScreen =(
       )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
         <g>
           <rect
-            x={verticalLayout ? -80 : cardPosition.left - 80}
+            x={verticalLayout ? -80 : cardPosition.left - 60}
             y={verticalLayout ? cardPosition.top - 720 : -3120}
             width="400"
             height="80"
@@ -1215,17 +1261,18 @@ const footerContentScreen =(
             fill="#495057"
             stroke="#ccc"
             strokeWidth="1"
-            className="tooltip-background"
+            className="tooltip-background_sceen"
+            z-indez="20"
           ></rect>
           <text
-            x={verticalLayout ? 20 : cardPosition.left + 20}
+            x={verticalLayout ? 20 : cardPosition.left + 60}
             y={verticalLayout ? cardPosition.top - 700 : -3060}
             className="tooltip-text"
           >
             {node[1].name}
           </text>
           <text
-            x={verticalLayout ? 20 : cardPosition.left + 40}
+            x={verticalLayout ? 20 : cardPosition.left + 60}
             y={verticalLayout ? cardPosition.top - 680 : -3040}
             className="tooltip-subtext"
           >
@@ -1234,7 +1281,7 @@ const footerContentScreen =(
         </g>
       ))
   )}
-</g>
+</g> */}
 
 
 
