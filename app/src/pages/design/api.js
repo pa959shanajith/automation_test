@@ -758,6 +758,34 @@ export const saveE2EDataPopup = async(HardCodedApiDataForE2E) => {
     }
 }
 
+export const getProjectsMMTS = async(data) => {
+    console.log("data",data)
+    try{
+        const res = await axios(url+'/getProjectsMMTS', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+            console.log("res.data",res.data)
+        }
+        console.error(res.data)
+        return {error:"failed"}
+    }catch(err){
+        console.error(err)
+        return {error:"failed"}
+    }
+
+    
+}
+
 
 /* Component
   api returns data in array - [{"username","id","id","userRole"},{"username","id","id","userRole"},,,]
