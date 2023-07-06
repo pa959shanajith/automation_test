@@ -405,13 +405,25 @@
     font-weight: bold;
   }
 
-  .info__btn {
+  .info__btn_insprint {
     cursor: pointer;
     height: 11%;
     width: 5%;
     left: 5%;
     position: relative;
     bottom: 21%;
+  }
+  .add_obj_insprint {
+    .p-dialog-header {
+      height: 2rem !important;
+    }
+  
+    height: 4vh;
+    width: 2vw;
+  }
+  .map_obj_insprint {
+    height: 4vh;
+    width: 2vw;
   }
 
 }
@@ -433,13 +445,25 @@
     right: 1rem;
   }
 
-  .info__btn {
+  .info__btn_upgrade {
     bottom: 21%;
     cursor: pointer;
     height: 11%;
     left: 4%;
     position: relative;
     width: 4%;
+  }
+  .add_obj_upgrade {
+    .p-dialog-header {
+      height: 2rem !important;
+    }
+  
+    height: 4vh;
+    width: 2vw;
+  }
+  .map_obj_upgrade {
+    height: 4vh;
+    width: 2vw;
   }
 }
 
@@ -487,6 +511,14 @@
     position: relative;
     right: 1rem;
   }
+  .add_obj_import{
+    position: relative;
+    right: 1rem;
+  }
+  .add_obj_export{
+    position: relative;
+    right: 1rem;
+  }
 
   .imp__text {
     position: relative;
@@ -522,7 +554,7 @@
     cursor: pointer;
   }
 
-  .info__btn {
+  .info__btn_utility {
     cursor: pointer;
     height: 11%;
     left: 23%;
@@ -564,13 +596,17 @@
     cursor: pointer;
   }
 
-  .info__btn {
+  .info__btn_create {
     bottom: 22%;
     cursor: pointer;
     height: 11%;
     left: 9%;
     position: relative;
     width: 8%;
+  }
+  .map_obj {
+    height: 4vh;
+    width: 2vw;
   }
 }
 

@@ -42,6 +42,7 @@ import ScheduleScreen from "./ScheduleScreen";
 import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
 import ExecutionCard from "./ExecutionCard";
+import { Tooltip } from 'primereact/tooltip';
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
@@ -98,8 +99,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
   const [executionTypeInRequest, setExecutionTypeInRequest] =
     useState("asynchronous");
-  const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-  const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
+  const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState(" Copy");
+  const [copyToolTip, setCopyToolTip] = useState(" Copy");
   const [logoutClicked, setLogoutClicked] = useState(false);
   const [profileTxt, setProfileTxt] = useState("");
   const [searchProfile, setSearchProfile] = useState("");
@@ -344,7 +345,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (navigator.clipboard.writeText(title)) {
       setCopyToolTip("Copied!");
       setTimeout(() => {
-        setCopyToolTip("Click to Copy");
+        setCopyToolTip(" Copy");
       }, 1500);
     }
   };
@@ -533,6 +534,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         ),
         executionOptions: (
           <div className="Buttons_config_button">
+            <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
             <Button
               className="execute_now"
               onClick={() => {
@@ -545,10 +547,12 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 console.log(fetechConfig, configItem)
               }}
               size="small"
+              
             >
-              {" "}
+                  
               Execute Now
             </Button>
+            <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
             <Button
               className="schedule"
               onClick={() => {
@@ -558,10 +562,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               }}
               size="small"
             >
-              {" "}
               Schedule
             </Button>
-
+            <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
             <Button
               className="CICD"
               size="small"
@@ -570,7 +573,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
-            >
+            >  
               CI/CD
             </Button>
             <Button
@@ -578,7 +581,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               size="small"
 
             >
-              SouceLab
+              SauceLab
             </Button>
           </div>
         ),
@@ -593,12 +596,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               icon="pi pi-pencil"
               className=" pencil_button p-button-edit"
               onClick={() => configModal("CancelUpdate", item)}
-            ></Button>
+            >
+               <Tooltip target=".pencil_button" position="left" content="Edit the execution configuration."/>
+            </Button>
             <Button
               icon="pi pi-trash"
-              className="p-button-edit"
+              className="trash_button p-button-edit"
               onClick={(event) => confirm_delete(event, item)}
-            ></Button>
+            >
+               <Tooltip target=".trash_button" position="left" content=" Delete the Execution configuration."/>
+            </Button>
           </div>
         ),
       });
@@ -821,6 +828,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               <b>Project: </b>
             </label>
             <select
+            placeholder="Search"
+            title=" Search for project"
               onChange={(e) => {
                 setConfigProjectId(e.target.value);
               }}
@@ -881,7 +890,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           toast.current.show({
             severity: "success",
             summary: "Success",
-            detail: "Execution has started",
+            detail: " Execution started.",
             life: 5000,
           });
 
@@ -1064,7 +1073,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     return (
       <>
         {/* <Checkbox classname=" checkbox_header" /> */}
-        <span className="profile_label"> Configuration Profile Name</span>
+        <span className="profile_label"> Configuration Name</span>
       </>
     );
   };
@@ -1088,7 +1097,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             <Column
               field="sno"
               style={{ width: "5%" }}
-              header={<span className="SNo-header">S No</span>}
+              header={<span className="SNo-header">S.No.</span>}
             />
             <Column
               style={{
@@ -1110,7 +1119,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               field="executionOptions"
               header={
                 <span className="executionOption-header">
-                  Execution Options
+               Execution Options
                 </span>
               }
             />
@@ -1148,6 +1157,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   <label className="executeRadio_label_grid ml-2">
                     Execute with Avo Assure Agent/ Grid
                   </label>
+                  <img className='info__btn'src="static/imgs/info.png" ></img>
+<Tooltip target=".info__btn" position="left" content=' "Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents". 
+Learn More '/>
                   <div className="radioButtonContainer1">
                     <RadioButton
                       value="Execute with Avo Assure Client"
@@ -1163,6 +1175,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   <label className=" executeRadio_label_clint ml-2">
                     Execute with Avo Assure Client
                   </label>
+                  <img className='info__btn_grid'src="static/imgs/info.png" ></img>
+                  <Tooltip target=".info__btn_grid" position="left" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></Tooltip> 
+
                 </div>
                 {showIcePopup && (
                   <div>
@@ -1205,7 +1220,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 )}
               </>
             }
-            headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
+            headerTxt={`Execute Now : ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
             modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
           />
@@ -1333,7 +1348,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 <div className="input_CICD ">
                   <div class="container_url">
                     <label for="inputField" class="devopsUrl_label">
-                      Devops Integration URL
+                    DevOps Integration URL
                     </label>
                     <pre className="grid_download_dialog__content__code cicdpre">
                       <code id="api-url" title={url}>
@@ -1347,9 +1362,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                       onClick={() => {
                         copyConfigKey(url);
                       }}
-                      title={copyToolTip}
+                      // title={copyToolTip}
                     />
-                  </div>
+                    <Tooltip target=".copy_CICD" position="left" content={copyToolTip}/>
+                   </div>
                   <div className="executiontype">
                     <div className="lable_sync">
                       <label
@@ -1358,8 +1374,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                         htmlFor="synch"
                         value="asynchronous"
                       >
-                        Asynchronous{" "}
+                        Asynchronous
                       </label>
+                      <img className='info__btn_async'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info__btn_async" position="left" content=" Execution responses are generated simultaneously during the execution."/>
                       <InputSwitch
                         className="inputSwitch_CICD"
                         label=""
@@ -1377,8 +1395,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                         htmlFor="synch"
                         value="synchronous"
                       >
-                        Synchronous{" "}
+                        Synchronous
                       </label>
+                      <img className='info__btn'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info__btn" position="left" content=" Execution responses are generated after the end of execution."/>
                     </div>
                   </div>
                   <div className="container_devopsLabel" title={str}>
@@ -1400,14 +1420,15 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                         onClick={() => {
                           copyConfigKey(str);
                         }}
-                        title={copyToolTip}
+                        // title={copyToolTip}
                       />
+                      <Tooltip target=".copy_devops" position="left" content={copyToolTip}/>
                     </div>
                   </div>
                 </div>
               </>
             }
-            headerTxt={`CICD: ${fetechConfig[configItem]?.configurename}`}
+            headerTxt={`CICD Execution : ${fetechConfig[configItem]?.configurename}`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
             onModalBtnClick={showSuccess_CICD}
           />
@@ -1437,7 +1458,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 }}
 
               >
-                Configuration Profile Name
+                Configuration Name
               </span>
               <span
                 style={{
@@ -1456,7 +1477,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   fontFamily: "open Sans",
                 }}
               >
-                Actions
+               Actions
               </span>
             </div>
           }
@@ -1468,7 +1489,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 alt="Card"
                 src="static/imgs/execution_report.png"
               />
-              <span className="text1 ">No Configuration's yet</span>
+              <span className="text1 ">No items yet.</span>
             </div>
           </div>
           <Button
@@ -1477,6 +1498,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           >
             {" "}
             configure{" "}
+            <Tooltip target=".configure_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
       );
@@ -1502,11 +1524,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   icon="pi pi-search"
                   placeholder="Search"
                   inputTxt={searchProfile}
+                  title="Search for an execution configuration."
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small">
-                  Add Configuration
+                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
+               Add Configuration
+               <Tooltip target=".addConfig_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}
