@@ -45,6 +45,7 @@ import ExecutionCard from "./ExecutionCard";
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
+  const [visible_setup, setVisible_setup] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
@@ -111,7 +112,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [selectedPattren, setSelectedPattren] = useState(null);
+  const [selectedPattren, setSelectedPattren] = useState({});
   const [selectedDaily, setSelectedDaily] = useState(null);
   const [selectedWeek, setselectedWeek] = useState([]);
   const [selectedMonthly, setSelectedMonthly] = useState(null);
@@ -136,6 +137,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [activeIndex1, setActiveIndex1] = useState(0);
   const timeinfo = useRef(null);
   const scheduleinfo  = useRef(null);
+  const errorinfo  = useRef(null);
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
@@ -351,6 +353,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // setLoading('Please Wait...');
     setTimeout(async () => {
       const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
+      setLogoutClicked(false);
       if (deletedConfig.error) {
         if (deletedConfig.error.CONTENT) {
           setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
@@ -363,33 +366,33 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           );
         }
       } else {
-        const configurationList = await fetchConfigureList({
-          projectid: selectedProject,
-        });
-        if (configurationList.error) {
-          if (configurationList.error.CONTENT) {
-            setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
-          } else {
-            setMsg(
-              MSG.CUSTOM(
-                "Error While Fetching Execute Configuration List",
-                VARIANT.ERROR
-              )
-            );
-          }
-        } else {
-          const integrationData = configurationList.map((item, idx) => {
-            setIntegration(item.executionRequest.integration);
-          });
-          setConfigList(configurationList);
-        }
-        setMsg(
-          MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
-        );
+        tableUpdate();
+        // const configurationList = await fetchConfigureList({
+        //   projectid: selectedProject,
+        // });
+        // if (configurationList.error) {
+        //   if (configurationList.error.CONTENT) {
+        //     setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
+        //   } else {
+        //     setMsg(
+        //       MSG.CUSTOM(
+        //         "Error While Fetching Execute Configuration List",
+        //         VARIANT.ERROR
+        //       )
+        //     );
+        //   }
+        // } else {
+        //   const integrationData = configurationList.map((item, idx) => {
+        //     setIntegration(item.executionRequest.integration);
+        //   });
+        //   setConfigList(configurationList);
+        // }
+        // setMsg(
+        //   MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
+        // );
       }
       // setLoading(false);
     }, 500);
-    setShowConfirmPop(false);
   };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
@@ -644,7 +647,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       setModules("normalExecution");
       setSelectedNodeKeys({});
     }
-    setVisible(true);
+    setVisible_setup(true);
     setSetupBtn(getType);
   };
 
@@ -777,18 +780,29 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
-        dispatch(storeConfigureKey(executionData)).then(() => {
-          tableUpdate();
-        })
+        dispatch(storeConfigureKey(executionData))
       );
-      setVisible(false);
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
-      setVisible(false);
+      setVisible_setup(false);
       setDotNotExe({});
       setSelectedNodeKeys({});
-    } else setVisible(false);
+    } else setVisible_setup(false);
   };
+
+  useEffect(() => {
+    if(getConfigData?.setupExists === "success"){
+      tableUpdate();
+      setVisible_setup(false);
+    } else if(getConfigData?.setupExists?.error?.CONTENT){
+      errorinfo.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: getConfigData.setupExists.error.CONTENT,
+        life: 5000
+      });
+    };
+  }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
     return (
@@ -976,17 +990,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               ...el,
               poolid: "",
               type: "normal",
-              targetUser: selectedICE,
-              iceList: [],
+              ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
               date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startDate ? startDate.getTime() : "",
+              timestamp: startTime.getTime().toString(),
               recurringValue: getPattren().recurringValue,
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
-              endAfter: startDate ? "" : endDate.toLocaleDateString('es-CL'),
-              clientTime: startDate ? "" : `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
-              clientTimeZone: startDate ? "" : `GMT+${Math.abs(new Date().getTimezoneOffset()/60)}`,
+              endAfter: startDate ? "" : endDate?.name,
+              clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
+              clientTimeZone: "+0530",
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
             })),
             scenarioFlag: false,
             type: "normal",
@@ -1007,10 +1021,24 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         setEndDate(null);
         setStartTime(null);
         setScheduleOption({});
+        setSelectedDaily(null);
+        setselectedWeek([]);
+        setSelectedMonthly(null);
+        setDropdownWeek(null);
+        setSelectedPattren({});
       });
     }
     if (btnType === "Cancel") {
       setScheduling(false);
+      setStartDate(null);
+      setEndDate(null);
+      setStartTime(null);
+      setScheduleOption({});
+      setSelectedDaily(null);
+      setselectedWeek([]);
+      setSelectedMonthly(null);
+      setDropdownWeek(null);
+      setSelectedPattren({});
     }
   };
 
@@ -1067,7 +1095,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
-                width: "50%"
+                width: "50%",
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
@@ -1179,12 +1207,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             }
             headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF", height:"85%" }}
-            
-           
+            modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
+          <Toast ref={errorinfo} />
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}
@@ -1200,13 +1227,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
-                isDisabled={!startDate && (!selectedPattren?.key || !endDate)}
+                isDisabled={
+                  !startDate &&
+                  (!selectedPattren?.key || !endDate || !startTime)
+                }
                 onSchedule={onScheduleBtnClick}
                 selectedDaily={selectedDaily}
                 selectedWeek={selectedWeek}
                 selectedMonthly={selectedMonthly}
                 dropdownWeek={dropdownWeek}
-                dropdownDay={dropdownDay} 
+                dropdownDay={dropdownDay}
                 setSelectedDaily={setSelectedDaily}
                 setSelectedMonthly={setSelectedMonthly}
                 setDropdownWeek={setDropdownWeek}
@@ -1229,40 +1259,69 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             onModalBtnClick={onScheduleBtnClickClient}
             content={
               <>
-                <div className="ice_label">Allocate Avo Assure Client</div>
-                <div className="ice_container">
-                  <div className="ice_status">
-                    <span className="available"></span>
-                    <span>Available</span>
-                    <span className="unavailable"></span>
-                    <span>Unavailable</span>
-                    <span className="dnd"></span>
-                    <span>Do Not Disturb</span>
-                  </div>
-                  <DropDownList
-                    poolType={poolType}
-                    ExeScreen={ExeScreen}
-                    inputErrorBorder={inputErrorBorder}
-                    setInputErrorBorder={setInputErrorBorder}
-                    placeholder={"Search"}
-                    data={availableICE}
-                    smartMode={ExeScreen === true ? smartMode : ""}
-                    selectedICE={selectedICE}
-                    setSelectedICE={setSelectedICE}
+                <div className="radioButtonContainer">
+                  <RadioButton
+                    value="Execute with Avo Assure Agent/ Grid"
+                    onChange={(e) => {
+                      setShowIcePopup(false);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Agent/ Grid"
+                    }
                   />
+                  <label className="executeRadio_label_grid ml-2 mr-2">
+                    Execute with Avo Assure Agent/ Grid
+                  </label>
+                  <RadioButton
+                    value="Execute with Avo Assure Client"
+                    onChange={(e) => {
+                      setShowIcePopup(true);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Client"
+                    }
+                  />
+                  <label className=" executeRadio_label_clint ml-2 mr-2">
+                    Execute with Avo Assure Client
+                  </label>
                 </div>
+                {showIcePopup && (
+                  <div className="ice_container">
+                    <div className="ice_status">
+                      <span className="available"></span>
+                      <span>Available</span>
+                      <span className="unavailable"></span>
+                      <span>Unavailable</span>
+                      <span className="dnd"></span>
+                      <span>Do Not Disturb</span>
+                    </div>
+                    <DropDownList
+                      poolType={poolType}
+                      ExeScreen={ExeScreen}
+                      inputErrorBorder={inputErrorBorder}
+                      setInputErrorBorder={setInputErrorBorder}
+                      placeholder={"Search"}
+                      data={availableICE}
+                      smartMode={ExeScreen === true ? smartMode : ""}
+                      selectedICE={selectedICE}
+                      setSelectedICE={setSelectedICE}
+                    />
+                  </div>
+                )}
               </>
             }
             headerTxt="Allocate Avo Assure Client to Schedule"
             footerType="ScheduleIce"
             modalSytle={{
-              width: "55vw",
-              height: "45vh",
+              width: "45vw",
+              height: "55vh",
               background: "#FFFFFF",
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-            isDisabled={!selectedICE}
+            // isDisabled={!selectedICE}
           />
           <AvoModal
             visible={visible_CICD}
@@ -1462,8 +1521,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           <ExecutionPage />
         )}
         <AvoModal
-          visible={visible}
-          setVisible={setVisible}
+          visible={visible_setup}
+          setVisible={setVisible_setup}
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup

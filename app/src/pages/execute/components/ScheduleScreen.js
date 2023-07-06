@@ -9,12 +9,14 @@ import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Link } from "react-router-dom";
 import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
-import { getScheduledDetails_ICE } from "../configureSetupSlice";
-import { scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
+import { getScheduledDetailsOnDate_ICE, getScheduledDetails_ICE } from "../configureSetupSlice";
+import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
+import AvoModal from "../../../globalComponents/AvoModal";
 
 const ScheduleScreen = ({
   cardData,
@@ -42,6 +44,7 @@ const ScheduleScreen = ({
   onWeekChange
 }) => {
   const [tableFilter, setTableFilter] = useState("");
+  const [exestatus, setExestatus] = useState("");
   const getScheduledList = useSelector((store) => store.configsetup);
   const dispatch = useDispatch();
 
@@ -199,6 +202,22 @@ const ScheduleScreen = ({
     );
   }, []);
 
+  const onScheduleStatus = (getStatus) => {
+    dispatch(
+      getScheduledDetailsOnDate_ICE({
+        param: "getScheduledDetails_ICE",
+        configKey: getStatus?.configurekey,
+        configName: getStatus?.configurename,
+        scheduledDate: getStatus?.scheduledon
+      })
+    );
+    setExestatus(true);
+  };
+
+  const onStatusBtnClick = () => {
+    setExestatus(false);
+  }
+
   return (
     <>
       <ExecutionCard cardData={cardData} />
@@ -258,8 +277,7 @@ const ScheduleScreen = ({
                           setStartTime(new Date());
                           setStartDate(null);
                           setSelectedPattren(e.value);
-                        }
-                        }
+                        }}
                         checked={selectedPattren?.key === el?.key}
                       />
                       <label htmlFor={el?.key} className="ml-2">
@@ -270,11 +288,14 @@ const ScheduleScreen = ({
                 </div>
                 {onRecurrenceClick()}
                 <div className="col-12">
-                  <Calendar
-                    value={endDate}
-                    placeholder="Enter End date"
-                    onChange={(e) => setEndDate(e.value)}
-                    showIcon
+                  <AvoDropdown
+                    dropdownValue={endDate}
+                    onDropdownChange={(e) => setEndDate(e.value)}
+                    dropdownOptions={endMonths}
+                    name="endmonth"
+                    placeholder="End After"
+                    required={false}
+                    customeClass="dropdown_enddate"
                   />
                 </div>
               </div>
@@ -304,18 +325,24 @@ const ScheduleScreen = ({
                   ...el,
                   scheduledon: `${new Date(
                     el.scheduledon
-                  ).toLocaleDateString()}, ${new Date(
-                    el.scheduledon
-                  ).getUTCHours()}:${new Date(el.scheduledon).getUTCMinutes()}`,
+                  ).toLocaleDateString()}, ${el.time}`,
+                  endafter: el.endafter ? el.endafter : "-",
+                  status: (
+                    <Link onClick={() => onScheduleStatus(el)}>
+                      {el.status}
+                    </Link>
+                  ),
+                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
                 }))
                 .filter((el) => el?.status !== "recurring")}
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="scheduledon" header="Date & Time"></Column>
-              <Column field="target" header="Host"></Column>
-              <Column field="recurringpattern" header="Schedule Type"></Column>
-              <Column field="status" header="Status"></Column>
+              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
+              <Column align="center" field="target" header="Envrionment"></Column>
+              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
+              <Column align="center" field="endafter" header="End After"></Column>
+              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
           <TabPanel header="Recurring Taks">
@@ -325,22 +352,51 @@ const ScheduleScreen = ({
                   ...el,
                   scheduledon: `${new Date(
                     el.scheduledon
-                  ).toLocaleDateString()}, ${new Date(
-                    el.scheduledon
-                  ).getUTCHours()}:${new Date(el.scheduledon).getUTCMinutes()}`,
+                  ).toLocaleDateString()}, ${el.time}`,
+                  endafter: el.endafter ? el.endafter : "-",
+                  status: (
+                    <Link onClick={() => onScheduleStatus(el)}>
+                      {el.status}
+                    </Link>
+                  ),
+                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
                 }))
                 .filter((el) => el?.status === "recurring")}
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="scheduledon" header="Date & Time"></Column>
-              <Column field="target" header="Host"></Column>
-              <Column field="recurringpattern" header="Schedule Type"></Column>
-              <Column field="status" header="Status"></Column>
+              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
+              <Column align="center" field="target" header="Envrionment"></Column>
+              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
+              <Column align="center" field="endafter" header="End After"></Column>
+              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
         </TabView>
       </div>
+      <AvoModal
+        visible={exestatus}
+        setVisible={setExestatus}
+        onhide={exestatus}
+        onModalBtnClick={onStatusBtnClick}
+        content={
+          <DataTable
+              value={getScheduledList?.scheduledStatusList.map((el) => ({
+                ...el,
+                scenariodetails: "Test_Scenario12",
+                testsuitenames: ""
+              }))}
+              tableStyle={{ minWidth: "50rem" }}
+              globalFilter={tableFilter}
+            >
+              <Column align="center" field="testsuitenames" header="Test Suite"></Column>
+              <Column align="center" field="scenariodetails" header="Scenario Name"></Column>
+              <Column align="center" field="status" header="Status"></Column>
+            </DataTable>
+        }
+        headerTxt="Execution Status"
+        modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
+      />
     </>
   );
 };

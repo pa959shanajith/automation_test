@@ -14,7 +14,9 @@ const initialState = {
     avogrids: [],
   },
   error: "",
-  scheduledList: []
+  scheduledList: [],
+  scheduledStatusList: [],
+  setupExists: ""
 };
 
 const getProjects = createAsyncThunk("config/fetchProjects", async () => {
@@ -136,6 +138,22 @@ const getScheduledDetails_ICE = createAsyncThunk("config/getScheduledDetails_ICE
     .catch((err) => console.log(err));
 });
 
+const getScheduledDetailsOnDate_ICE = createAsyncThunk(
+  "config/getScheduledDetailsOnDate_ICE",
+  async (args) => {
+    return await axios(`${url}/getScheduledDetailsOnDate_ICE`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      data: args,
+      credentials: "include",
+    })
+      .then((response) => response.data)
+      .catch((err) => console.log(err));
+  }
+);
+
 export {
   getProjects,
   getModules,
@@ -144,7 +162,8 @@ export {
   updateTestSuite,
   storeConfigureKey,
   testSuitesScheduler_ICE,
-  getScheduledDetails_ICE
+  getScheduledDetails_ICE,
+  getScheduledDetailsOnDate_ICE
 };
 
 const configureSetupSlice = createSlice({
@@ -229,14 +248,17 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(storeConfigureKey.pending, (state) => {
       state.loading = true;
+      state.setupExists = "";
     });
     builder.addCase(storeConfigureKey.fulfilled, (state, action) => {
+      state.setupExists = action?.payload;
       state.loading = false;
       state.error = "";
     });
     builder.addCase(storeConfigureKey.rejected, (state, action) => {
       state.loading = false;
       state.error = action.error.message;
+      state.setupExists = "";
     });
     builder.addCase(testSuitesScheduler_ICE.pending, (state) => {
       state.loading = true;
@@ -260,6 +282,19 @@ const configureSetupSlice = createSlice({
     builder.addCase(getScheduledDetails_ICE.rejected, (state, action) => {
       state.loading = false;
       state.scheduledList = [];
+      state.error = action.error.message;
+    });
+    builder.addCase(getScheduledDetailsOnDate_ICE.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getScheduledDetailsOnDate_ICE.fulfilled, (state, action) => {
+      state.loading = false;
+      state.scheduledStatusList = action.payload;
+      state.error = "";
+    });
+    builder.addCase(getScheduledDetailsOnDate_ICE.rejected, (state, action) => {
+      state.loading = false;
+      state.scheduledStatusList = [];
       state.error = action.error.message;
     });
   },
