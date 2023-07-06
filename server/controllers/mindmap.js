@@ -991,22 +991,30 @@ exports.exportToGit = async (req, res) => {
 	logger.info("Inside UI service: " + actionName);
 	try {
 		const data = req.body;
-		const gitname = data.gitconfig;
+		// const gitname = data.gitconfig;
 		const gitVersion = data.gitVersion;
-		var gitFolderPath = data.gitFolderPath;
-		const gitBranch = data.gitBranch;
+		// var gitFolderPath = data.gitFolderPath;
+		// const gitBranch = data.gitBranch;
 		const moduleId = data.mindmapId;
-		if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
-			gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
-		}
+		const exportProjAppType=data.exportProjAppType;
+		const projectId =data.projectId;
+		const gitComMsgRef = data.gitComMsgRef;
+		const projectName =data.projectName;
+		// if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
+		// 	gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
+		// }
 		const inputs = {
 			"moduleId":moduleId,
 			"userid":req.session.userid,
 			"action":actionName,
-			"gitname":gitname,
-			"gitBranch":gitBranch,
+			// "gitname":gitname,
+			// "gitBranch":gitBranch,
 			"gitVersion": gitVersion,
-			"gitFolderPath": gitFolderPath
+			// "gitFolderPath": gitFolderPath,
+			"exportProjAppType":exportProjAppType,
+			"projectId":projectId,
+			"gitComMsgRef":gitComMsgRef,
+			"projectName":projectName
 		};
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
 		return res.send(module_data);
@@ -1299,25 +1307,31 @@ exports.importGitMindmap = async (req, res) => {
 	const fnName = "importGitMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
+		const expProj = req.body.expProj;
 		const projectid = req.body.projectid;
-		const gitname = req.body.gitname;
-		const gitbranch = req.body.gitbranch;
+		// const gitname = req.body.gitname;
+		// const gitbranch = req.body.gitbranch;
 		const gitversion = req.body.gitversion;
-		var gitfolderpath = req.body.gitfolderpath;
-		if(!gitfolderpath.startsWith("avoassuretest_artifacts")){
-			gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
-		}
+		// var gitfolderpath = req.body.gitfolderpath;
+		var appType= req.body.appType;		
+		var projectName = req.body.projectName;
+		// if(!gitfolderpath.startsWith("avoassuretest_artifacts")){
+		// 	gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
+		// }
 		const inputs= {
 			"userid": req.session.userid,
 			"roleid": req.session.activeRoleId,
 			"projectid": projectid,
-			"gitname": gitname,
-			"gitbranch": gitbranch,
-			"gitversion": gitversion,
-			"gitfolderpath": gitfolderpath
+			// "gitname": gitname,
+			// "gitbranch": gitbranch,
+			 "gitversion": gitversion,
+			// "gitfolderpath": gitfolderpath,
+			"appType":appType,			
+			"projectName":projectName,
+			"expProj":expProj
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
-		res.send(result)
+		return res.send(result)
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
@@ -1591,6 +1605,25 @@ exports.singleExcelToMindmap = function (req, res) {
 		}
 		if (err) res.status(200).send('fail');
 		else res.status(200).send(qObj);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.checkExportVer = async (req, res) => {
+	const fnName = "checkExportVer";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const exportname= req.body.exportname;
+		const query = req.body.query;
+		const projectId = req.body.projectId || "default"
+		const inputs= { "exportname":exportname,"query": query,"projectId":projectId}
+		const result = await utils.fetchData(inputs, "git/checkExportVer", fnName);
+		if (result == "fail") {
+			return res.send('fail');}
+		else {
+			return res.send(result);
+		}
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");

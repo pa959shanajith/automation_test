@@ -3,7 +3,7 @@ import {ModalContainer, Messages as MSG, setMsg,ResetSession,VARIANT} from '../.
 import * as actionTypes from '../state/action';
 import {useSelector,useDispatch} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit,exportToProject,getModules,exportToMMSkel} from '../api';
+import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit,exportToProject,getModules,exportToMMSkel,checkExportVer} from '../api';
 import '../styles/ExportMapButton.scss'
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -37,6 +37,8 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const userInfo = useSelector(state=>state.login.userinfo);   
     const [showMessage, setShowMessage] = useState(false);    
     const dispatchAction=useDispatch()
+    const gitComMsgRef = useRef()
+    const [exportVer,setExportVer]=useState([])
      
     const getExportFile = async () => {        
         try {
@@ -45,15 +47,15 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             const res = await fetch("/downloadExportfile?projName="+exportprojname);            
             await res.json().then(({status})=>{
               
-                if (status === "available"){ 
-                    window.location.href = window.location.origin+"/downloadExportfile?projName="+exportprojname+"&file=getExportFile"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
-                     setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED);                     
-                     setExportBox(false);
-                     dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
-                     dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true})
-                     setExportProject(true);
-                     setExportFile(false);
-
+                if (status === "available"){
+                    setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED);                     
+                    setExportBox(false);
+                    dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:""})
+                    dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true})
+                    setExportProject(true);
+                    setExportFile(false);
+                    window.location.href = window.location.origin+"/downloadExportfile?projName="+exportprojname+"&file=getExportFile"
+                    
                 }else {setMsg("error while exporting");
                 dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:true}) 
                 setExportBox(false); 
@@ -85,22 +87,23 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     }
     const clickExport = () => {
         // if(!selectedModule._id || selectedModulelist.length==0)return;
-        var err = validate([fnameRef,ftypeRef,gitconfigRef,gitBranchRef,gitVerRef])
+        var err = validate([fnameRef,ftypeRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,gitComMsgRef])
         if(err)return
-        let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
-        setExportBox(false)
-        setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);
-        setExportFile(false)
-        
         var ftype = ftypeRef.current.value
+        if(ftype === 'git' && exportVer.includes(gitVerRef.current.value)){
+            displayError({CONTENT:"Version is already used, Please provide a unique version",VARIANT:VARIANT.ERROR});return;
+        } 
+        let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
+        setExportBox(false);
+        setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);
+        setExportFile(false)        
         var fname=projectList[selectedProj]["name"];
         var exportProjId=projectList[selectedProj]["id"];
         var exportProjAppType=projectList[selectedProj]["apptypeName"];
-        
         if(ftype === 'json') {dispatchAction({type:actionTypes.ENABLE_EXPORT,payload:false});dispatchAction({type:actionTypes.EXPORT_PROJNAME,payload:fname});setShowMessage(true);setBlockui({show:true,content:'Exporting Mindmap ...'});setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED_NOTIFY);toJSON(selectedModuleVar,fname,displayError,setBlockui,setShowMessage,setMsg,dispatchAction,exportProjId,exportProjAppType);}           
         if(ftype === 'excel') {setBlockui({show:true,content:'Exporting Mindmap ...'});toExcel(selectedProj,selectedModuleVar,fname,displayError,setBlockui)};
         if(ftype === 'custom') {setBlockui({show:true,content:'Exporting Mindmap ...'});toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fname,displayError,setBlockui)};
-        if(ftype === 'git') {setBlockui({show:true,content:'Exporting Mindmap ...'});toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule})};
+        if(ftype === 'git') {setMsg(MSG.MINDMAP.SUCC_DATA_EXPORT_NOTIFY);toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModuleVar,exportProjAppType,gitComMsgRef,fname})}
     }
     return(
         <Fragment>
@@ -109,7 +112,8 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             close={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}
             footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>}
             content={<Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} 
-            expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}/>} 
+            expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport} gitComMsgRef ={gitComMsgRef}
+            setExportVer={setExportVer}/>} 
             />:null}
             <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)} >
                 <g id="ct-exportAction" className="ct-actionButton">
@@ -136,7 +140,7 @@ const validate = (arr) =>{
 }
 
 
-const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,setExpType,setError,selectedProj,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile,getExportFile,showMessage,enableExport}) =>{
+const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,setExpType,setError,selectedProj,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile,getExportFile,showMessage,enableExport,gitComMsgRef,setExportVer}) =>{
     
     const changeExport = (e) => {
         
@@ -144,8 +148,12 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
         setCurrProjId(e.target.value);
         resetImportModule(e.target.value);
     }
-    const changeExportFile=(e) =>{
+    const changeExportFile=async(e) =>{
         setExpType(e.target.value);
+        if (e.target.value == "git"){
+            const res= await checkExportVer({"exportname":"exportname","query":"exportgit","projectId":selectedProj})
+            setExportVer(res);
+        }
     }
     const resetImportModule = async(selProj) => {
           if(selProj) {
@@ -208,7 +216,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
                     {!isEndtoEnd &&
                     <>
                     <option value={'excel'}>Structure only- Excel (.xlx,.xlsx)</option>
-                    {/* <option value={'git'}disabled={selectedModulelist.length>1}>Git (.mm)</option> */}
+                    <option value={'git'}>Git</option>
                     <option value={'json'}>Complete Module (.zip)</option>
                     </>}
                 </select>}
@@ -216,21 +224,25 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
             </div>
             {(expType === 'git')?
                 <Fragment>
-                    <div className='export-row'>
+                    {/* <div className='export-row'>
                         <label>Git Configuration: </label>
                         <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Git configuration name'} ref={gitconfigRef}/>
-                    </div>
-                    <div className='export-row'>
+                    </div> */}
+                    {/* <div className='export-row'>
                         <label>Git Branch: </label>
                         <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Branch name'} ref={gitBranchRef}/>
-                    </div>
+                    </div>*/}
                     <div className='export-row'>
-                        <label>Version: </label>
-                        <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version'} ref={gitVerRef}/>
+                        <label style={{width:'5.9rem'}}>Version: </label>
+                        <input  style={{width:'75%'}} onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version'} ref={gitVerRef}/>
                     </div>
-                    <div className='export-row'>
+                    {/*<div className='export-row'>
                         <label>Folder Path: </label>
-                        <input placeholder={'Projectname/Modulename (optional)'} ref={gitPathRef}/>
+                        <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Projectname/Modulename'} ref={gitPathRef}/>
+                    </div> */}
+                    <div className='export-row'>
+                        <label style={{width:'5.9rem'}} >Comment : </label>
+                        <textarea  style={{width:'75%'}} placeholder={'Commit message'} ref={gitComMsgRef}></textarea>
                     </div>
                 </Fragment>:null
             }
@@ -353,19 +365,25 @@ const exportToProj = async(module,currProjId,displayError,setBlockui) => {
     param :
 */
 
-const toGit = async ({projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
-    var gitpath=gitPathRef.current.value;
-	if(!gitpath){
-        gitpath = 'avoassuretest_artifacts/'+projectList[selectedProj].name+'/'+selectedModule.name;
-    }
+const toGit = async ({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModuleVar,exportProjAppType,gitComMsgRef,fname}) => {
+    // var gitpath=gitPathRef.current.value;
+	// if(!gitpath){
+    //     gitpath = 'avoassuretest_artifacts/'+projectList[selectedProj].name+'/';
+    // }
+    ResetSession.start()
     var res = await exportToGit({
-        gitconfig: gitconfigRef.current.value,
+        // gitconfig: gitconfigRef.current.value,
         gitVersion: gitVerRef.current.value,
-		gitFolderPath:gitpath,
-		gitBranch: gitBranchRef.current.value,
-		mindmapId: selectedModule
+		// gitFolderPath:gitpath,
+		// gitBranch: gitBranchRef.current.value,
+		mindmapId: Array.isArray(selectedModuleVar)?selectedModuleVar:selectedModuleVar._id,
+        "exportProjAppType":exportProjAppType,
+        "projectId":selectedProj,
+        "projectName":fname,
+        gitComMsgRef:gitComMsgRef.current.value
     })
-    if(res.error){displayError(res.error);return;}
+    if(res.error){displayError(res.error);setBlockui({show:false});ResetSession.end();return;}
+    ResetSession.end()
     setBlockui({show:false})
     setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
 }
