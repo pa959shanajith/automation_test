@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import "../styles/ModuleListSidePanel.scss";
 import ImportMindmap from'../components/ImportMindmap.js';
-import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist} from '../designSlice';
+import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist,saveMindMap,moduleList} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -29,7 +29,7 @@ import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const toast = useRef();
-    const moduleList = useSelector(state=>state.design.moduleList)
+    const moduleLists = useSelector(state=>state.design.moduleList)
     const proj = useSelector(state=>state.design.selectedProj)
     const initProj = useSelector(state=>state.design.selectedProj)
     const moduleSelect = useSelector(state=>state.design.selectedModule)
@@ -104,7 +104,7 @@ const ModuleListDrop = (props) =>{
         setWarning(false); 
         
      // eslint-disable-next-line react-hooks/exhaustive-deps
-     }, [moduleList, initProj])
+     }, [moduleLists, initProj])
      useEffect(()=> {
         return () => {
             dispatch(isEnELoad(false));
