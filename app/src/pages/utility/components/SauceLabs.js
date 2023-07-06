@@ -232,11 +232,13 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
 
     return (
         <>
-            <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onHide={() => onHide('displayBasic5')}>
+            <Dialog id='SauceLab_Integration' header='SauceLabs Intergration' visible={displayBasic5} onHide={() => onHide('displayBasic5')}>
             {showSauceLabs && <>
-                <label>Emulator </label>
-                <Toggle onClick={onToggle}/>
-                <label>Real Devices </label>
+            <div className='saucelab_toggle_button'>
+                <label className='toggle_saucelabs_emulator'>Emulator </label>
+               <div className='toggle_saucelabs'> <Toggle onClick={onToggle}/></div>
+                <label className='toggle_saucelabs_realdevice'>Real Devices </label>  
+                </div>  
             </>}
 
 
