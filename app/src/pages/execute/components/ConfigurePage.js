@@ -1000,7 +1000,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
-              scheduleThrough: showIcePopup ? "client" : "agent"
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
             })),
             scenarioFlag: false,
             type: "normal",

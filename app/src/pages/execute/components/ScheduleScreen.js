@@ -332,6 +332,7 @@ const ScheduleScreen = ({
                       {el.status}
                     </Link>
                   ),
+                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
                 }))
                 .filter((el) => el?.status !== "recurring")}
               tableStyle={{ minWidth: "50rem" }}
@@ -358,6 +359,7 @@ const ScheduleScreen = ({
                       {el.status}
                     </Link>
                   ),
+                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
                 }))
                 .filter((el) => el?.status === "recurring")}
               tableStyle={{ minWidth: "50rem" }}

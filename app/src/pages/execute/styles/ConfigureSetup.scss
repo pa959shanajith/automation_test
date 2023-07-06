@@ -153,7 +153,7 @@
             td:nth-child(4) {
               display: none;
             }
-            td:nth-child(1) {
+            td:nth-child(1) { 
               display: inline-block;
               width: 293.7%;
             }
@@ -163,7 +163,7 @@
               }
               .p-checkbox::after {
                 padding-left: 0.5rem;
-                content: url('../../../../public/static/imgs/E2EModuleSideIcon.png');
+                content: url('../../../../public/static/imgs/E2E_configsetup.png');
               }
             }
           }
