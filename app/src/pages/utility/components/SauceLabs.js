@@ -215,13 +215,11 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
             index: index
         }))
         setEmulator(findEmulator);
-        console.log(findEmulator);
     }
     const onEmulatorChange = async (option) => {
         setSelectedEmulator(option.key)
     }
     const onToggle = () =>{
-        // alert('hi')
         showRealdevice == 'emulator' ? setShowRealdevice('real_devices') : setShowRealdevice('emulator')
         setSelectedPlatforms('');
         setSelectedMobileVersion('')

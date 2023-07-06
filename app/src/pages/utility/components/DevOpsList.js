@@ -1009,8 +1009,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                           onChange={(e) => handleOptionChange(e.target.value,'mobile-web',item,index)}>
                                         <option value="">Cloud Test</option>
                                         <option value="sauceLabs">SauceLabs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}&nbsp;&nbsp;&nbsp;
                                      
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
@@ -1020,8 +1020,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                           onChange={!userInfo.isTrial?(e) => handleOptionChange(e.target.value,'web',item,index):""}>
                                         <option value="">Cloud Test</option>
                                         <option value="sauceLabs">SauceLabs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}&nbsp;&nbsp;&nbsp; 
 
                                     {showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""} src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} className="action_icons" alt="Edit Icon" title='CI/CD'/>}
@@ -1090,9 +1090,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {showSauceLabs && <select className='cloud-test-provider' value={dropdownSelected[index]}
                                           onChange={(e) => handleOptionChange(e.target.value,'mobile-web',item,index)}>
                                         <option value="">Cloud Test</option>
-                                        <option value="sauceLabs">Sauce Labs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}&nbsp;&nbsp;&nbsp;
                                      
                                      
@@ -1102,9 +1102,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     {showCICD && <select className='cloud-test-provider' value={dropdownSelected[index]}
                                           onChange={!userInfo.isTrial?(e) => handleOptionChange(e.target.value,'web',item,index):""}>
                                         <option value="">Cloud Test</option>
-                                        <option value="sauceLabs">Sauce Labs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}
 
                                     { showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""}  src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} title="CI/CD" className="action_icons" alt="Edit Icon"/>}
