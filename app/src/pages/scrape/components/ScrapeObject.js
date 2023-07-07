@@ -156,14 +156,14 @@ const openElementProperties=()=>{
         let element=props.object.xpath.split(';')
         let dataValue=[]
         let elementFinalProperties={
-            xpath:(element[0]==="null"||element[0]===""||element[0]==="undefined")?'None':element[0],
-            id:(element[1]==="null"|| element[1]===""||(element[1]==="undefined"))?'None':element[1],
-            rxpath:(element[2]==="null"||element[2]===""||(element[2]==="undefined"))?'None':element[2],
-            name:(element[3]==="null"||element[3]===""||(element[3]==="undefined"))?'None':element[3],
-            classname:(element[5]==="null"||element[5]===""||(element[5]==="undefined"))?'None':element[5],
-            cssselector:(element[12]==="null"||element[12]===""||(element[12]==="undefined"))?'None':element[12],
-            href:(element[11]==="null"||element[11]===""||(element[11]==="undefined"))?'None':element[11],
-            label:(element[10]==="null"||element[10]===""||(element[10]==="undefined"))?'None':element[10],
+            xpath:(element[0]==="null"||element[0]===""||element[0]==undefined)?'None':element[0],
+            id:(element[1]==="null"|| element[1]===""||(element[1]==undefined))?'None':element[1],
+            rxpath:(element[2]==="null"||element[2]===""||(element[2]==undefined))?'None':element[2],
+            name:(element[3]==="null"||element[3]===""||(element[3]==undefined))?'None':element[3],
+            classname:(element[5]==="null"||element[5]===""||(element[5]==undefined))?'None':element[5],
+            cssselector:(element[12]==="null"||element[12]===""||(element[12]==undefined))?'None':element[12],
+            href:(element[11]==="null"||element[11]===""||(element[11]==undefined))?'None':element[11],
+            label:(element[10]==="null"||element[10]===""||(element[10]==undefined))?'None':element[10],
         }
         Object.entries(elementFinalProperties).forEach(([key, value], index) => {
             let currindex=props.object.identifier.filter(element=>element.identifier===key)
@@ -186,7 +186,7 @@ const openElementProperties=()=>{
                         "static/imgs/ic-highlight-element-active.png" : 
                         "static/imgs/ic-highlight-element-inactive.png"} 
                 alt="eyeIcon"
-                onMouseEnter={(appType === 'Web' || appType === "MobileWeb")?(e)=>{showIdentifierCard(e);getElementCordinates(e)}:null}
+                onMouseEnter={((appType === 'Web' || appType === "MobileWeb")&& !props.comparedObject)?(e)=>{showIdentifierCard(e);getElementCordinates(e)}:null}
                 onMouseLeave={(appType === 'Web' || appType === "MobileWeb")?()=>{setMoveCardUp(false);setIsIdentifierVisible(false);}:null}
                 />
                 
@@ -214,7 +214,7 @@ const openElementProperties=()=>{
                     </div> 
                 </div>
             }
-            {((appType === 'Web' || appType === "MobileWeb") && (props.object.xpath.split(';')[0]!=="iris"))?<span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>:null}
+            {((appType === 'Web' || appType === "MobileWeb") && (props.object.xpath.split(';')[0]!=="iris") && !props.comparedObject)?<span title={"View/Edit Element Properties"} style={{cursor:'pointer'}} onClick={openElementProperties} ><i className="pi pi-info-circle" style={{marginLeft:'5px'}}></i></span>:null}
 
         </div>
         {isIdentifierVisible?(props.object.identifier!==undefined)?
