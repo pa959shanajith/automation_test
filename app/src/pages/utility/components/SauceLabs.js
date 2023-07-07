@@ -6,9 +6,10 @@ import { SearchDropdown } from '@avo/designcomponents';
 import DropDownList from '../../global/components/DropDownList';
 import {getDetails_SAUCELABS} from '../../settings/api';
 import { Messages as MSG, setMsg} from '../../global';
+import {Toggle} from '@avo/designcomponents';
 
 
-const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSubmit }) => {
+const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSubmit,setSauceLabUser }) => {
 
     const [defaultValues, setDefaultValues] = useState({});
     const [isEmpty, setIsEmpty] = useState(false);
@@ -21,6 +22,7 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
             if (data !== "empty") {
                 setIsEmpty(true);
                 setDefaultValues(data);
+                setSauceLabUser(data);
             } else {
                 setIsEmpty(false);
             }
@@ -47,21 +49,24 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
                                 name="Saucelabs-URL"
                                 placeholder="Enter Saucelabs Remote URL"
                                 onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, SaucelabsURL: event.target.value })
+                                    setDefaultValues({ ...defaultValues, SaucelabsURL: event.target.value });
+                                    setSauceLabUser({ ...defaultValues, SaucelabsURL: event.target.value });
                                 }}
                                 className="saucelabs_input" />
                         </div>
                         <div className="flex flex-row">
                             <FormInput value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"
                                 onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, SaucelabsUsername: event.target.value })
+                                    setDefaultValues({ ...defaultValues, SaucelabsUsername: event.target.value });
+                                    setSauceLabUser({ ...defaultValues, SaucelabsUsername: event.target.value });
                                 }}
                                 className="saucelabs_input_URL" />
                         </div>
                         <div className="flex flex-row">
                             <FormInput value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"
                                 onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, Saucelabskey: event.target.value })
+                                    setDefaultValues({ ...defaultValues, Saucelabskey: event.target.value });
+                                    setSauceLabUser({ ...defaultValues, Saucelabskey: event.target.value });
                                 }}
                                 className="saucelabs_input_Accesskey" />
                         </div>
@@ -80,7 +85,7 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
 
 const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBasic5, onHide, showSauceLabs,
     changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-    availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, defaultValues, browserlist, CheckStatusAndExecute, iceNameIdMap }) => {
+    availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap }) => {
     const [newOsNames, setNewOsNames] = useState([])
     const [selectedOS, setSelectedOS] = useState('');
     const [browserVersions, setBrowserVersions] = useState([]);
@@ -93,6 +98,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     const [selectedEmulator, setSelectedEmulator] = useState('');
     const [emulator, setEmulator] = useState([]);
     const [platformVersions, setPlatformVersions] = useState([]);
+    const [showRealdevice, setShowRealdevice] = useState('emulator');
 
     useEffect(() => {
         if (Object.keys(browserDetails).length) {
@@ -103,8 +109,8 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                 return { key: element, text: element, title: element, index: index };
             }));
         }
-        if (Object.keys(mobileDetails).length) {
-            setPlatforms(Object.keys(mobileDetails).map((element, index) => {
+        if (mobileDetails && Object.keys(mobileDetails).length && Object.keys(mobileDetails[showRealdevice]).length) {
+            setPlatforms(Object.keys(mobileDetails[showRealdevice]).map((element, index) => {
                 return {
                     key: element,
                     text: element,
@@ -117,25 +123,40 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
 
     const onOsChange = async (option) => {
         setSelectedOS(option.key)
+        setSaucelabBrowsers([]);
+        setSelectedSaucelabBrowser('');
         setBrowserVersions([]);
         setSelectedVersion('');
-        if (selectedSaucelabBrowser != '') {
-            if (browserDetails && Object.keys(browserDetails).length) {
-                let findBrowserVersion = browserDetails.browser[selectedSaucelabBrowser][option.key].map((element, index) => {
-                    return (
-                        {
-                            key: element,
-                            text: element,
-                            title: element,
-                            index: index
-                        }
-                    )
-                });
-                setBrowserVersions(findBrowserVersion.sort((a, b) => {
-                    return Number(a.key) - Number(b.key);
-                }));
+          let arrayBrowser = []
+          let index = 0;
+          for (let browser in browserDetails.browser) {
+            if(option.key.split(' ')[0] == 'Windows' && browserDetails.browser[browser][option.key]?.length){
+                arrayBrowser.push({
+                    key: browser,
+                    text: browser,
+                    title: browser,
+                    index: index
+                  });
+                index++;
+            } else if(option.key.split(' ')[0] == 'Mac' && browser == 'Google Chrome') {
+                arrayBrowser.push({
+                    key: browser,
+                    text: browser,
+                    title: browser,
+                    index: index
+                  });
+                  index++;
+            }else if(option.key.split(' ')[0] == 'Linux' && browserDetails.browser[browser][option.key]?.length){
+              arrayBrowser.push({
+                    key: browser,
+                    text: browser,
+                    title: browser,
+                    index: index
+                  });
+                  index++;
             }
-        }
+          }
+          setSaucelabBrowsers(arrayBrowser);
     }
 
     const onSaucelabBrowserChange = async (option) => {
@@ -167,7 +188,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
         setSelectedMobileVersion('')
         setSelectedEmulator('')
         setEmulator([])
-        let findMobileVersions = Object.keys(mobileDetails[option.key]).map((element, index) => {
+        let findMobileVersions = Object.keys(mobileDetails[showRealdevice][option.key]).map((element, index) => {
             let each_version = option.key + " " + element
             return (
                 {
@@ -187,22 +208,36 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
         setSelectedMobileVersion(option.text);
         setSelectedEmulator('')
         setEmulator([])
-        let findEmulator = mobileDetails[selectedPlatforms][option.key.split(" ")[1]].map((element, index) => ({
+        let findEmulator = mobileDetails[showRealdevice][selectedPlatforms][option.key.split(" ")[1]].map((element, index) => ({
             key: element,
             text: element,
             title: element,
             index: index
         }))
         setEmulator(findEmulator);
-        console.log(findEmulator);
     }
     const onEmulatorChange = async (option) => {
         setSelectedEmulator(option.key)
     }
+    const onToggle = () =>{
+        showRealdevice == 'emulator' ? setShowRealdevice('real_devices') : setShowRealdevice('emulator')
+        setSelectedPlatforms('');
+        setSelectedMobileVersion('')
+        setPlatformVersions([])
+        setSelectedEmulator('')
+        setEmulator([])
+    }
 
     return (
         <>
-            <Dialog id='SauceLab_Integration' header='SauceLab Intergration' visible={displayBasic5} onHide={() => onHide('displayBasic5')}>
+            <Dialog id='SauceLab_Integration' header='SauceLabs Intergration' visible={displayBasic5} onHide={() => onHide('displayBasic5')}>
+            {showSauceLabs && <>
+            <div className='saucelab_toggle_button'>
+                <label className='toggle_saucelabs_emulator'>Emulator </label>
+               <div className='toggle_saucelabs'> <Toggle onClick={onToggle}/></div>
+                <label className='toggle_saucelabs_realdevice'>Real Devices </label>  
+                </div>  
+            </>}
 
 
                 {showSauceLabs &&
@@ -275,7 +310,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                     </>}
                 {showSauceLabs &&
                     <>
-                        <div><h6>Emulator</h6></div>
+                        <div><h6>{showRealdevice == 'emulator'?"Emulator":'Real Devices'}</h6></div>
                         <SearchDropdown
                             noItemsText={[]}
                             onChange={onEmulatorChange}
@@ -328,7 +363,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                     else dataExecution.targetUser = selectedICE
 
                     dataExecution['executionEnv'] = 'saucelabs'
-                    dataExecution['saucelabDetails'] = defaultValues
+                    dataExecution['saucelabDetails'] = sauceLabUser
                     if (!showSauceLabs) {
                         dataExecution['platform'] = selectedOS;
                         dataExecution['browserVersion'] = selectedVersion;

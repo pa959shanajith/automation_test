@@ -852,3 +852,23 @@
     cursor: pointer; 
     outline: none; 
 }
+.toggle_saucelabs_emulator{
+    position: relative;
+    right: 0.2rem;
+
+}
+.toggle_saucelabs{
+    position: relative;
+
+}
+.toggle_saucelabs_realdevice{
+    position: relative;
+    left: 0.2rem;
+
+}
+.saucelab_toggle_button{
+    height: 2rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}

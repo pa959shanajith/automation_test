@@ -99,6 +99,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [browserDetails,setBrowserDetails] = useState([]);
     const [mobileDetails,setMobileDetails] = useState([]);
     const [dropdownSelected,setDropdownSelected] = useState([]);
+    const [sauceLabUser,setSauceLabUser] = useState({});
     
 
     const [sauceLab, setSauceLab] = useState(false);
@@ -353,8 +354,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setOsNames(arrayOS);
             setBrowserDetails(data);
         }
-        else if (data && data.android && data.iphone){
-            const arrayPlatforms = Object.keys(data).map((element, index) => { 
+        else if (data && data.emulator && data.real_devices){
+            const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
                 return {
                     key: element,
                     text: element,
@@ -794,16 +795,17 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             displayBasic4={displayBasic4}
             onHide={onHide}
             handleSubmit={handleSubmit}
+            setSauceLabUser={setSauceLabUser}
         />,
-        [setLoading, displayBasic4, onHide, handleSubmit]);
+        [setLoading, displayBasic4, onHide, handleSubmit,setSauceLabUser]);
 
     const sauceLabExecute = useMemo(() => <SauceLabsExecute mobileDetails={mobileDetails} browserDetails={browserDetails}
         displayBasic5={displayBasic5} onHide={onHide} showSauceLabs={showSauceLabs}
         changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-        availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} defaultValues={defaultValues} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+        availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
     />,
         [mobileDetails, browserDetails, displayBasic5, onHide, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-            availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, defaultValues, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+            availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
     
    const handleOptionChange = (selected,type,item,index) => {
     // setDropdownSelected(selected);
@@ -1006,9 +1008,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {showSauceLabs && <select className='cloud-test-provider' value={dropdownSelected[index]}
                                           onChange={(e) => handleOptionChange(e.target.value,'mobile-web',item,index)}>
                                         <option value="">Cloud Test</option>
-                                        <option value="sauceLabs">Sauce Labs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}&nbsp;&nbsp;&nbsp;
                                      
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
@@ -1017,9 +1019,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {showCICD && <select className='cloud-test-provider' value={dropdownSelected[index]}
                                           onChange={!userInfo.isTrial?(e) => handleOptionChange(e.target.value,'web',item,index):""}>
                                         <option value="">Cloud Test</option>
-                                        <option value="sauceLabs">Sauce Labs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}&nbsp;&nbsp;&nbsp; 
 
                                     {showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""} src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} className="action_icons" alt="Edit Icon" title='CI/CD'/>}
@@ -1088,9 +1090,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      {showSauceLabs && <select className='cloud-test-provider' value={dropdownSelected[index]}
                                           onChange={(e) => handleOptionChange(e.target.value,'mobile-web',item,index)}>
                                         <option value="">Cloud Test</option>
-                                        <option value="sauceLabs">Sauce Labs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}&nbsp;&nbsp;&nbsp;
                                      
                                      
@@ -1100,9 +1102,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     {showCICD && <select className='cloud-test-provider' value={dropdownSelected[index]}
                                           onChange={!userInfo.isTrial?(e) => handleOptionChange(e.target.value,'web',item,index):""}>
                                         <option value="">Cloud Test</option>
-                                        <option value="sauceLabs">Sauce Labs</option>
-                                        <option value="browserStack">Browser Stack</option>
-                                        <option value="lambdaTest">Lambda Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
                                     </select>}
 
                                     { showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""}  src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} title="CI/CD" className="action_icons" alt="Edit Icon"/>}
