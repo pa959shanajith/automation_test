@@ -157,8 +157,11 @@ exports.connectAzure_ICE = function(req, res) {
             }  
         } else if (req.body.action == 'getAzureConfigureFields') { //gets azure configure fields for given project and issue type
             var createObj = req.body.azure_input_dict;
-            var project = req.body.project;
-            project = 'AvoAssure'
+            var project = '';
+            if(req.body.projects && req.body.projects.length){
+                project = req.body.projects[0].text
+            }
+             
             var issuetype = req.body.issuetype;
             var url =req.body.url;
             var username= req.body.username;
@@ -199,6 +202,11 @@ exports.connectAzure_ICE = function(req, res) {
                                         }
                                     } else if (data1.onAction == "configure_field") {
                                         var resultData = data1.value;
+                                        if(Object.keys(resultData).length && resultData.hasOwnProperty('Error')){
+                                            logger.info('Azure: '+resultData.Error.msg);
+                                            res.status(resultData.Error.status).send(resultData.Error.msg);
+                                            return;
+                                        }
                                         if (resultData != "Fail") {
                                             logger.info('Azure: configure field fetched successfully.');
                                         } else {
