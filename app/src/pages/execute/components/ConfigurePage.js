@@ -534,7 +534,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         ),
         executionOptions: (
           <div className="Buttons_config_button">
-            <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+            {/* <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/> */}
             <Button
               className="execute_now"
               onClick={() => {
@@ -552,7 +552,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   
               Execute Now
             </Button>
-            <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
+            {/* <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/> */}
             <Button
               className="schedule"
               onClick={() => {
@@ -564,7 +564,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             >
               Schedule
             </Button>
-            <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+            {/* <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/> */}
             <Button
               className="CICD"
               size="small"
@@ -1082,6 +1082,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (!!configList.length) {
       return (
         <>
+         <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+         <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
+         <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+
           <DataTable
             showGridlines
             resizableColumns
