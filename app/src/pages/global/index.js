@@ -6,8 +6,10 @@ import {Messages, VARIANT} from './components/Messages';
 import ModalContainer from './components/ModalContainer';
 import ChangePassword from './components/ChangePassword';
 import ScrollBar from './components/ScrollBar';
+import FooterTwo from './components/FooterTwo';
 import ResetSession from './components/ResetSession';
 import Thumbnail from './components/Thumbnail';
+import Footer from './components/FooterTwo';
 
 export { 
         ProgressBar,
@@ -17,9 +19,11 @@ export {
         Messages,
         VARIANT,
         setMsg,
+        FooterTwo,
         ModalContainer,
         ChangePassword,
         ScrollBar,
         ResetSession,
         Thumbnail,
+        Footer,
     };

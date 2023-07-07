@@ -20,10 +20,10 @@ const ExecutionCard = ({ cardData }) => {
           </div>
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
-          <div>Select Browsers : {getBrowser(cardData?.executionRequest?.browserType).join(", ")}</div>
+          <div>Selected Browser  : {getBrowser(cardData?.executionRequest?.browserType).join(", ")}</div>
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
-          <div>Integration : ALM, Qtest, Zephyr</div>
+          <div>Integration(s) : ALM, Qtest, Zephyr</div>
         </div>
       </div>
     </Card>

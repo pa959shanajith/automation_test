@@ -3,7 +3,8 @@ import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import { Menubar } from 'primereact/menubar';
 import UserProfile from './UserProfile'
 import { Menu } from 'primereact/menu';
-import '../styles/Topbar.scss'
+import '../styles/Topbar.scss';
+import { Tooltip } from 'primereact/tooltip';
 
 
 const MenubarDemo = (props) => {
@@ -104,14 +105,19 @@ const MenubarDemo = (props) => {
   return (
     <div className='Topbar_Menu'>
       <Menubar className='Header_size' start={start} end={end} />
+      <div className='Need_Help_menu'>
       <div className="card needHelp flex justify-content-center bg-white shadow-2">
         <img className='needHelp_img'  ref={imageRefhelp} onMouseEnter={() => handleTooltipToggle()} onMouseLeave={() => handleMouseLeave1()} src="static/imgs/need_help.png" alt="need_Help" onClick={(event) => needHelpmenuLeft.current.toggle(event)} aria-controls="popup_menu_left" aria-haspopup />
-        {showTooltip_help && (<div className='card__insprint1' style={{ position: 'absolute',  right: `${cardPosition.right - 1500}px`, top: `${cardPosition.top- 890}px`, display: 'block' }}>
-                  <h3> Need help?</h3>
-                  <p className='text__insprint__info'>View Training videos documents.</p>
+        {/* {showTooltip_help && (<div className='card__insprint1' style={{ position: 'absolute',  right: `${cardPosition.right - 1500}px`, top: `${cardPosition.top- 775}px`, display: 'block' }}>
+        <div className='text__insprint__content'>
+      <h3 className='text__insprint__title'>Need help?</h3>
+      <p className='text__insprint__info'>View training videos and documents.</p>
+    </div>
                  
-                </div>)}
+                </div>)} */}
+                 <Tooltip target=".needHelp_img" position="left" content="View training videos and documents." />
         <Menu className='needHelp_Menu w-13rem top-50'id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft}/>
+        </div>
       </div>
     </div>
   );

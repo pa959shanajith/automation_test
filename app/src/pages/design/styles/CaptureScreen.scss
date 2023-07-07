@@ -1,3 +1,4 @@
+
 .compare__object__note {
   .p-dialog-header-icons {
     right: 2%!important;
@@ -86,6 +87,7 @@
 
 
 .datatable__col {
+  // overflow-y: scroll;
   overflow: auto;
   .p-datatable .p-datatable-thead>tr>th {
     background: rgba(96, 91, 255, 0.1) !important;
@@ -134,6 +136,8 @@
 }
 
 .card-table {
+  // overflow: auto;
+  // max-height: 24rem;
   position: relative;
   top: 1rem;
 
@@ -144,11 +148,18 @@
 
 .screen_btn {
   height: 4vh;
-  margin-right: -0.5rem;
   position: relative;
-  top: 0.3rem;
-  right: 1.5rem;
+  right: 0.5rem;
+  top: 0.4rem;
 }
+
+.btn_test_screen {
+  height: 3.2vh;
+  position: relative;
+    /* right: 0.5rem; */
+  top: 1rem;
+}
+
 .screen__name{
   white-space: nowrap;
     overflow: hidden;
@@ -255,6 +266,7 @@
 
 
 .dailog_box {
+  overflow: hidden;
   .p-dialog-content {
     padding: 0 0 !important;
     overflow: hidden;
@@ -393,13 +405,25 @@
     font-weight: bold;
   }
 
-  .info__btn {
+  .info__btn_insprint {
     cursor: pointer;
     height: 11%;
     width: 5%;
     left: 5%;
     position: relative;
     bottom: 21%;
+  }
+  .add_obj_insprint {
+    .p-dialog-header {
+      height: 2rem !important;
+    }
+  
+    height: 4vh;
+    width: 2vw;
+  }
+  .map_obj_insprint {
+    height: 4vh;
+    width: 2vw;
   }
 
 }
@@ -421,13 +445,25 @@
     right: 1rem;
   }
 
-  .info__btn {
+  .info__btn_upgrade {
     bottom: 21%;
     cursor: pointer;
     height: 11%;
     left: 4%;
     position: relative;
     width: 4%;
+  }
+  .add_obj_upgrade {
+    .p-dialog-header {
+      height: 2rem !important;
+    }
+  
+    height: 4vh;
+    width: 2vw;
+  }
+  .map_obj_upgrade {
+    height: 4vh;
+    width: 2vw;
   }
 }
 
@@ -475,6 +511,14 @@
     position: relative;
     right: 1rem;
   }
+  .add_obj_import{
+    position: relative;
+    right: 1rem;
+  }
+  .add_obj_export{
+    position: relative;
+    right: 1rem;
+  }
 
   .imp__text {
     position: relative;
@@ -510,7 +554,7 @@
     cursor: pointer;
   }
 
-  .info__btn {
+  .info__btn_utility {
     cursor: pointer;
     height: 11%;
     left: 23%;
@@ -552,13 +596,17 @@
     cursor: pointer;
   }
 
-  .info__btn {
+  .info__btn_create {
     bottom: 22%;
     cursor: pointer;
     height: 11%;
     left: 9%;
     position: relative;
     width: 8%;
+  }
+  .map_obj {
+    height: 4vh;
+    width: 2vw;
   }
 }
 
@@ -704,11 +752,13 @@
 
 //Styles related to element properties 
 .p-dialog .p-dialog-footer {
-  padding:0.5rem
+  padding:0.5rem;
+
   
   }
   .p-dialog .p-dialog-header {
   padding: 0.75rem;
+  background: #e2e2ed;
   }
   .p-dialog .p-dialog-header .p-dialog-title 
   {
@@ -717,4 +767,15 @@
   .p-datatable .p-datatable-tbody>tr>td{
     padding: 0.55rem;
   }
-  
+  .save__btn__cmp {
+    position: relative;
+    width: 24% !important;
+    height: 1.7rem;
+    background: #605BFF;
+    border: none;
+    color: white;
+    font-size: 12px;
+    font-family: 'Open Sans';
+    border-radius: 4px;
+    cursor: pointer;
+}

@@ -8,19 +8,22 @@ import { Checkbox } from "primereact/checkbox";
 import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Toast } from 'primereact/toast';
 import { TabPanel, TabView } from "primereact/tabview";
+import { Link } from "react-router-dom";
 import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
-import { getScheduledDetails_ICE } from "../configureSetupSlice";
-import { scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
+import { getScheduledDetailsOnDate_ICE, getScheduledDetails_ICE } from "../configureSetupSlice";
+import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
+import AvoModal from "../../../globalComponents/AvoModal";
 
 const ScheduleScreen = ({
   cardData,
   startDate,
   setStartDate,
+  endDate,
+  setEndDate,
   startTime,
   setStartTime,
   selectedPattren,
@@ -36,9 +39,12 @@ const ScheduleScreen = ({
   setDropdownWeek,
   setDropdownDay,
   scheduleOption,
-  onScheduleChange
+  onScheduleChange,
+  selectedWeek,
+  onWeekChange
 }) => {
   const [tableFilter, setTableFilter] = useState("");
+  const [exestatus, setExestatus] = useState("");
   const getScheduledList = useSelector((store) => store.configsetup);
   const dispatch = useDispatch();
 
@@ -50,9 +56,11 @@ const ScheduleScreen = ({
         <span>
           Every{" "}
           <InputText
+          placeholder="eg:5"
+          title="Enter after every how many number of day(s) you wish it to recur."
             className="every_day"
             name="everyday"
-            value={scheduleOption.everyday}
+            value={scheduleOption?.everyday}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           day(s).
@@ -70,14 +78,20 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="monthweek"
-            value={scheduleOption.monthweek}
+            placeholder="eg:5"
+            title=" Enter on which day of the month you wish it to recur."
+            // value={scheduleOption.monthweek}
+            value={scheduleOption?.monthweek}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           of every{" "}
           <InputText
             className="every_day"
             name="monthday"
-            value={scheduleOption.monthday}
+            placeholder="eg:5"
+            title=" Enter after every how many month(s) you wish it to recur."
+            // value={scheduleOption.monthday}
+            value={scheduleOption?.monthday}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           month(s).
@@ -103,7 +117,7 @@ const ScheduleScreen = ({
             onDropdownChange={(e) => setDropdownDay(e.value)}
             dropdownOptions={scheduleWeek}
             name="scheduleday"
-            placeholder="Select Day"
+            placeholder="Select day"
             required={false}
             customeClass="dropdown_day"
           />{" "}
@@ -111,7 +125,9 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="everymonth"
-            value={scheduleOption.everymonth}
+            placeholder=" eg:5"
+            title=" Enter after every how many month(s) you wish it to recur."
+            value={scheduleOption?.everymonth}
             onChange={(e) => onScheduleChange(e)}
           />{" "}
           month(s).
@@ -144,7 +160,7 @@ const ScheduleScreen = ({
       WY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
-            Recur every <InputText /> week(s) on:
+            Recur every <InputText placeholder="eg:5" title="Enter after every how many week(s) you wish it to recur" /> week(s) on:
           </div>
           <div className="flex flex-wrap">
             {scheduleWeeks.map((el) => (
@@ -153,8 +169,8 @@ const ScheduleScreen = ({
                   inputId={el?.key}
                   name="daily"
                   value={el}
-                  onChange={(e) => setSelectedDaily(e.value)}
-                  checked={selectedDaily?.key === el?.key}
+                  onChange={onWeekChange}
+                  checked={selectedWeek.some((item) => item.key === el.key)}
                 />
                 <label htmlFor={el?.key} className="ml-2">
                   {el?.name}
@@ -196,11 +212,27 @@ const ScheduleScreen = ({
     );
   }, []);
 
+  const onScheduleStatus = (getStatus) => {
+    dispatch(
+      getScheduledDetailsOnDate_ICE({
+        param: "getScheduledDetails_ICE",
+        configKey: getStatus?.configurekey,
+        configName: getStatus?.configurename,
+        scheduledDate: getStatus?.scheduledon
+      })
+    );
+    setExestatus(true);
+  };
+
+  const onStatusBtnClick = () => {
+    setExestatus(false);
+  }
+
   return (
     <>
       <ExecutionCard cardData={cardData} />
       <div className="schedule_container">
-        <div className="grid" style={{ marginBottom: "-2rem" }}>
+        <div className="grid schedule_options">
           <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
             <Calendar
               value={startDate}
@@ -209,6 +241,7 @@ const ScheduleScreen = ({
                 setStartDate(e.value);
                 setStartTime(new Date());
               }}
+              disabled={selectedPattren?.key}
               minDate={new Date()}
               showIcon
             />
@@ -250,7 +283,11 @@ const ScheduleScreen = ({
                         inputId={el?.key}
                         name="schedule"
                         value={el}
-                        onChange={(e) => setSelectedPattren(e.value)}
+                        onChange={(e) => {
+                          setStartTime(new Date());
+                          setStartDate(null);
+                          setSelectedPattren(e.value);
+                        }}
                         checked={selectedPattren?.key === el?.key}
                       />
                       <label htmlFor={el?.key} className="ml-2">
@@ -261,11 +298,14 @@ const ScheduleScreen = ({
                 </div>
                 {onRecurrenceClick()}
                 <div className="col-12">
-                  <Calendar
-                    value={startDate}
-                    placeholder="Enter End date"
-                    onChange={(e) => setStartDate(e.value)}
-                    showIcon
+                  <AvoDropdown
+                    dropdownValue={endDate}
+                    onDropdownChange={(e) => setEndDate(e.value)}
+                    dropdownOptions={endMonths}
+                    name="endmonth"
+                    placeholder="End After"
+                    required={false}
+                    customeClass="dropdown_enddate"
                   />
                 </div>
               </div>
@@ -295,18 +335,24 @@ const ScheduleScreen = ({
                   ...el,
                   scheduledon: `${new Date(
                     el.scheduledon
-                  ).toLocaleDateString()}, ${new Date(
-                    el.scheduledon
-                  ).getUTCHours()}:${new Date(el.scheduledon).getUTCMinutes()}`,
+                  ).toLocaleDateString()}, ${el.time}`,
+                  endafter: el.endafter ? el.endafter : "-",
+                  status: (
+                    <Link onClick={() => onScheduleStatus(el)}>
+                      {el.status}
+                    </Link>
+                  ),
+                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
                 }))
                 .filter((el) => el?.status !== "recurring")}
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="scheduledon" header="Date & Time"></Column>
-              <Column field="target" header="Host"></Column>
-              <Column field="recurringpattern" header="Schedule Type"></Column>
-              <Column field="status" header="Status"></Column>
+              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
+              <Column align="center" field="target" header="Envrionment"></Column>
+              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
+              <Column align="center" field="endafter" header="End After"></Column>
+              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
           <TabPanel header="Recurring Taks">
@@ -316,22 +362,51 @@ const ScheduleScreen = ({
                   ...el,
                   scheduledon: `${new Date(
                     el.scheduledon
-                  ).toLocaleDateString()}, ${new Date(
-                    el.scheduledon
-                  ).getUTCHours()}:${new Date(el.scheduledon).getUTCMinutes()}`,
+                  ).toLocaleDateString()}, ${el.time}`,
+                  endafter: el.endafter ? el.endafter : "-",
+                  status: (
+                    <Link onClick={() => onScheduleStatus(el)}>
+                      {el.status}
+                    </Link>
+                  ),
+                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
                 }))
                 .filter((el) => el?.status === "recurring")}
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column field="scheduledon" header="Date & Time"></Column>
-              <Column field="target" header="Host"></Column>
-              <Column field="recurringpattern" header="Schedule Type"></Column>
-              <Column field="status" header="Status"></Column>
+              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
+              <Column align="center" field="target" header="Envrionment"></Column>
+              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
+              <Column align="center" field="endafter" header="End After"></Column>
+              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
         </TabView>
       </div>
+      <AvoModal
+        visible={exestatus}
+        setVisible={setExestatus}
+        onhide={exestatus}
+        onModalBtnClick={onStatusBtnClick}
+        content={
+          <DataTable
+              value={getScheduledList?.scheduledStatusList.map((el) => ({
+                ...el,
+                scenariodetails: "Test_Scenario12",
+                testsuitenames: ""
+              }))}
+              tableStyle={{ minWidth: "50rem" }}
+              globalFilter={tableFilter}
+            >
+              <Column align="center" field="testsuitenames" header="Test Suite"></Column>
+              <Column align="center" field="scenariodetails" header="Scenario Name"></Column>
+              <Column align="center" field="status" header="Status"></Column>
+            </DataTable>
+        }
+        headerTxt="Execution Status"
+        modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
+      />
     </>
   );
 };

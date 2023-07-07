@@ -1,23 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { TabMenu } from "primereact/tabmenu";
 import { v4 as uuid } from "uuid";
-import { Card } from "primereact/card";
 import { Panel } from "primereact/panel";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Link } from "react-router-dom";
 import { RadioButton } from "primereact/radiobutton";
-import { Tree } from "primereact/tree";
-import { InputText } from "primereact/inputtext";
-import { Calendar } from "primereact/calendar";
 import { InputSwitch } from "primereact/inputswitch";
 import { Toast } from "primereact/toast";
-import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { ConfirmPopup } from "primereact/confirmpopup";
 import { useDispatch, useSelector } from "react-redux";
 import "../styles/ConfigurePage.scss";
 import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
+import {FooterTwo as Footer} from '../../global';
 import {
   fetchConfigureList,
   getPools,
@@ -46,15 +42,15 @@ import ScheduleScreen from "./ScheduleScreen";
 import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
 import ExecutionCard from "./ExecutionCard";
+import { Tooltip } from 'primereact/tooltip';
 
-const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
+const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
+  const [visible_setup, setVisible_setup] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
   const [showIcePopup, setShowIcePopup] = useState(false);
-  const [selectedNodeKey, setSelectedNodeKey] = useState(null);
-  const [counter, setCounter] = useState(0);
   const toast = useRef(null);
   const url = window.location.href.slice(0, -7) + "execAutomation";
   const [configProjectId, setConfigProjectId] = useState("");
@@ -103,8 +99,8 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
   const [executionTypeInRequest, setExecutionTypeInRequest] =
     useState("asynchronous");
-  const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-  const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
+  const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState(" Copy");
+  const [copyToolTip, setCopyToolTip] = useState(" Copy");
   const [logoutClicked, setLogoutClicked] = useState(false);
   const [profileTxt, setProfileTxt] = useState("");
   const [searchProfile, setSearchProfile] = useState("");
@@ -115,9 +111,11 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [selectedPattren, setSelectedPattren] = useState(null);
+  const [selectedPattren, setSelectedPattren] = useState({});
   const [selectedDaily, setSelectedDaily] = useState(null);
+  const [selectedWeek, setselectedWeek] = useState([]);
   const [selectedMonthly, setSelectedMonthly] = useState(null);
   const [dropdownWeek, setDropdownWeek] = useState(null);
   const [dropdownDay, setDropdownDay] = useState(null);
@@ -137,10 +135,10 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
 
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState(0);
   const [activeIndex1, setActiveIndex1] = useState(0);
   const timeinfo = useRef(null);
   const scheduleinfo  = useRef(null);
+  const errorinfo  = useRef(null);
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
@@ -237,7 +235,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
       setProjectList(data);
     })();
   }, []);
-  
+
 
 
   const showSuccess_CICD = (btnType) => {
@@ -347,7 +345,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     if (navigator.clipboard.writeText(title)) {
       setCopyToolTip("Copied!");
       setTimeout(() => {
-        setCopyToolTip("Click to Copy");
+        setCopyToolTip(" Copy");
       }, 1500);
     }
   };
@@ -356,6 +354,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     // setLoading('Please Wait...');
     setTimeout(async () => {
       const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
+      setLogoutClicked(false);
       if (deletedConfig.error) {
         if (deletedConfig.error.CONTENT) {
           setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
@@ -368,33 +367,33 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
           );
         }
       } else {
-        const configurationList = await fetchConfigureList({
-          projectid: selectedProject,
-        });
-        if (configurationList.error) {
-          if (configurationList.error.CONTENT) {
-            setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
-          } else {
-            setMsg(
-              MSG.CUSTOM(
-                "Error While Fetching Execute Configuration List",
-                VARIANT.ERROR
-              )
-            );
-          }
-        } else {
-          const integrationData = configurationList.map((item, idx) => {
-            setIntegration(item.executionRequest.integration);
-          });
-          setConfigList(configurationList);
-        }
-        setMsg(
-          MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
-        );
+        tableUpdate();
+        // const configurationList = await fetchConfigureList({
+        //   projectid: selectedProject,
+        // });
+        // if (configurationList.error) {
+        //   if (configurationList.error.CONTENT) {
+        //     setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
+        //   } else {
+        //     setMsg(
+        //       MSG.CUSTOM(
+        //         "Error While Fetching Execute Configuration List",
+        //         VARIANT.ERROR
+        //       )
+        //     );
+        //   }
+        // } else {
+        //   const integrationData = configurationList.map((item, idx) => {
+        //     setIntegration(item.executionRequest.integration);
+        //   });
+        //   setConfigList(configurationList);
+        // }
+        // setMsg(
+        //   MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
+        // );
       }
       // setLoading(false);
     }, 500);
-    setShowConfirmPop(false);
   };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
@@ -418,7 +417,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     ExecuteTestSuite(executionData);
   };
 
-  const ExecuteTestSuite = async (executionData,btnType) => {
+  const ExecuteTestSuite = async (executionData, btnType) => {
     if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(
@@ -438,8 +437,8 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     executionData["integration"] = integration;
     executionData["batchInfo"] =
       currentSelectedItem &&
-      currentSelectedItem.executionRequest &&
-      currentSelectedItem.executionRequest.batchInfo
+        currentSelectedItem.executionRequest &&
+        currentSelectedItem.executionRequest.batchInfo
         ? currentSelectedItem.executionRequest.batchInfo
         : [];
     executionData["scenarioFlag"] =
@@ -492,9 +491,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             });
           }
         }
-       
+
       }
-      
+
       setBrowserTypeExe([]);
       setModuleInfo([]);
       setExecAction("serial");
@@ -522,19 +521,20 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
       projectid: configProjectId,
     });
     setFetechConfig(configurationList);
-    configurationList.forEach((item, idx) => {   
+    configurationList.forEach((item, idx) => {
       getState.push({
         sno: idx + 1,
         // profileName: item.configurename,
         profileName: (
           <span
             title={item.configurename} // Add title attribute for tooltip with full text
-            >
+          >
             {item.configurename}
           </span>
         ),
         executionOptions: (
           <div className="Buttons_config_button">
+            <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
             <Button
               className="execute_now"
               onClick={() => {
@@ -547,10 +547,12 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                 console.log(fetechConfig, configItem)
               }}
               size="small"
+              
             >
-              {" "}
+                  
               Execute Now
             </Button>
+            <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
             <Button
               className="schedule"
               onClick={() => {
@@ -560,10 +562,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
               }}
               size="small"
             >
-              {" "}
               Schedule
             </Button>
-
+            <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
             <Button
               className="CICD"
               size="small"
@@ -572,15 +573,15 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
-            >
+            >  
               CI/CD
             </Button>
             <Button
               className="CICD"
               size="small"
-             
+
             >
-              SouceLab
+              SauceLab
             </Button>
           </div>
         ),
@@ -595,12 +596,16 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
               icon="pi pi-pencil"
               className=" pencil_button p-button-edit"
               onClick={() => configModal("CancelUpdate", item)}
-            ></Button>
+            >
+               <Tooltip target=".pencil_button" position="left" content="Edit the execution configuration."/>
+            </Button>
             <Button
               icon="pi pi-trash"
-              className="p-button-edit"
+              className="trash_button p-button-edit"
               onClick={(event) => confirm_delete(event, item)}
-            ></Button>
+            >
+               <Tooltip target=".trash_button" position="left" content=" Delete the Execution configuration."/>
+            </Button>
           </div>
         ),
       });
@@ -649,7 +654,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
       setModules("normalExecution");
       setSelectedNodeKeys({});
     }
-    setVisible(true);
+    setVisible_setup(true);
     setSetupBtn(getType);
   };
 
@@ -782,24 +787,29 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
           })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
-        dispatch(storeConfigureKey(executionData)).then(() => {
-          tableUpdate();
-        })
+        dispatch(storeConfigureKey(executionData))
       );
-      setVisible(false);
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
-      setVisible(false);
+      setVisible_setup(false);
       setDotNotExe({});
       setSelectedNodeKeys({});
-    } else setVisible(false);
+    } else setVisible_setup(false);
   };
 
-  const onNodeSelect = (e) => {
-    if (e && e.node && e.node.key) {
-      setSelectedNodeKey(e.node.key);
-    }
-  };
+  useEffect(() => {
+    if(getConfigData?.setupExists === "success"){
+      tableUpdate();
+      setVisible_setup(false);
+    } else if(getConfigData?.setupExists?.error?.CONTENT){
+      errorinfo.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: getConfigData.setupExists.error.CONTENT,
+        life: 5000
+      });
+    };
+  }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
     return (
@@ -818,6 +828,8 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
               <b>Project: </b>
             </label>
             <select
+            placeholder="Search"
+            title=" Search for project"
               onChange={(e) => {
                 setConfigProjectId(e.target.value);
               }}
@@ -845,48 +857,48 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   }, [currentSelectedItem?.executionRequest?.browserType[0]]);
 
   const onExecuteBtnClick = async (btnType) => {
-    if(btnType==="Execute"){
-    if (showIcePopup) {
-      dataExecution.type =
-        ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
-      dataExecution.poolid = "";
+    if (btnType === "Execute") {
+      if (showIcePopup) {
+        dataExecution.type =
+          ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
+        dataExecution.poolid = "";
 
-      if ((ExeScreen === true ? smartMode : "") !== "normal")
-        dataExecution.targetUser = Object.keys(selectedICE).filter(
-          (icename) => selectedICE[icename]
-        );
-      else dataExecution.targetUser = selectedICE;
-
-      CheckStatusAndExecute(dataExecution, iceNameIdMap);
-    } else {
-      const temp = await execAutomation(currentKey);
-      if (temp.status !== "pass") {
-        if (temp.error && temp.error.CONTENT) {
-          setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
-        } else {
-          setMsg(
-            MSG.CUSTOM(
-              "Error While Adding Configuration to the Queue",
-              VARIANT.ERROR
-            )
+        if ((ExeScreen === true ? smartMode : "") !== "normal")
+          dataExecution.targetUser = Object.keys(selectedICE).filter(
+            (icename) => selectedICE[icename]
           );
-        }
+        else dataExecution.targetUser = selectedICE;
+
+        CheckStatusAndExecute(dataExecution, iceNameIdMap);
       } else {
-        setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
-      }
-      if(btnType ===  "Execute"){
+        const temp = await execAutomation(currentKey);
+        if (temp.status !== "pass") {
+          if (temp.error && temp.error.CONTENT) {
+            setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
+          } else {
+            setMsg(
+              MSG.CUSTOM(
+                "Error While Adding Configuration to the Queue",
+                VARIANT.ERROR
+              )
+            );
+          }
+        } else {
+          setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+        }
+        if (btnType === "Execute") {
           toast.current.show({
             severity: "success",
             summary: "Success",
-            detail: "Execution has started",
+            detail: " Execution started.",
             life: 5000,
           });
-          
-          }
-      // onHide(name);
+
+        }
+        // onHide(name);
+      }
     }
-  }
-    if(btnType === 'Cancel'){
+    if (btnType === 'Cancel') {
       setVisible_execute(false);
     }
     // if(btnType ===  "Execute"){
@@ -896,9 +908,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     //     detail: "Execution has started",
     //     life: 5000,
     //   });
-      
+
     //   }
-    
+
   };
 
   useEffect(() => {
@@ -932,7 +944,48 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
   };
 
   const onScheduleBtnClickClient = (btnType) => {
-    if(btnType === "ScheduleIce"){
+    const getPattren = () => {
+      let getKey = selectedPattren?.key ? selectedPattren?.key : "OT";
+      let pattrenObj = {
+        OT: {
+          recurringValue: "One Time",
+          recurringString: "One Time",
+          recurringStringOnHover: "One Time",
+        },
+        DY: {
+          recurringValue: scheduleOption?.everyday
+            ? `0 0 */${scheduleOption.everyday} * *`
+            : "0 0 * * 1-5",
+          recurringString: "Every Day",
+          recurringStringOnHover: scheduleOption?.everyday
+            ? `Occurs every ${scheduleOption.everyday} days`
+            : "Occurs every weekday",
+        },
+        WY: {
+          recurringValue: `0 0 * * ${selectedWeek
+            .map((el) => el.key)
+            .toString()}`,
+          recurringString: "Every Week",
+          recurringStringOnHover: `Occurs on every  ${selectedWeek.map(
+            (el) => el.name
+          )}`,
+        },
+        MY: {
+          recurringValue:
+            selectedMonthly?.key === "daymonth"
+              ? `0 0 * * ${scheduleOption?.monthday} /${scheduleOption?.monthweek}`
+              : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
+          recurringString: "Every Month",
+          recurringStringOnHover:
+            selectedMonthly?.key === "daymonth"
+              ? `Occurs on ${scheduleOption?.monthday}th day of every ${scheduleOption?.monthweek} month`
+              : `Occurs on ${dropdownWeek?.name} ${dropdownDay?.name} of every ${scheduleOption?.everymonth} month`,
+        },
+      };
+      return pattrenObj[getKey];
+    };
+
+    if (btnType === "ScheduleIce") {
       dispatch(
         testSuitesScheduler_ICE({
           param: "testSuitesScheduler_ICE",
@@ -942,20 +995,21 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             executionEnv: "default",
             browserType: selectedSchedule?.executionRequest?.browserType,
             integration: selectedSchedule?.executionRequest?.integration,
-            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({ ...el, 
+            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
+              ...el,
               poolid: "",
               type: "normal",
-              targetUser: selectedICE,
-              iceList: [],
-              date: startDate.toLocaleDateString('es-CL'),
+              ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
+              date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startDate.getTime(),
-              recurringValue: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
-              recurringString: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
-              recurringStringOnHover: selectedSchedule?.name ? selectedSchedule?.name : "One Time",
-              endAfter: "",
-              clientTime: "",
-              clientTimeZone: ""
+              timestamp: startTime.getTime().toString(),
+              recurringValue: getPattren().recurringValue,
+              recurringString: getPattren().recurringString,
+              recurringStringOnHover: getPattren().recurringStringOnHover,
+              endAfter: startDate ? "" : endDate?.name,
+              clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
+              clientTimeZone: "+0530",
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
             })),
             scenarioFlag: false,
             type: "normal",
@@ -972,10 +1026,28 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
           })
         );
         setScheduling(false);
+        setStartDate(null);
+        setEndDate(null);
+        setStartTime(null);
+        setScheduleOption({});
+        setSelectedDaily(null);
+        setselectedWeek([]);
+        setSelectedMonthly(null);
+        setDropdownWeek(null);
+        setSelectedPattren({});
       });
     }
     if (btnType === "Cancel") {
       setScheduling(false);
+      setStartDate(null);
+      setEndDate(null);
+      setStartTime(null);
+      setScheduleOption({});
+      setSelectedDaily(null);
+      setselectedWeek([]);
+      setSelectedMonthly(null);
+      setDropdownWeek(null);
+      setSelectedPattren({});
     }
   };
 
@@ -986,11 +1058,22 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
     })
   };
 
+  const onWeekChange = (e) => {
+    let selectedWeeks = [...selectedWeek];
+
+    if (e.checked)
+      selectedWeeks.push(e.value);
+    else
+      selectedWeeks = selectedWeeks.filter(category => category.key !== e.value.key);
+
+    setselectedWeek(selectedWeeks);
+  };
+
   const checkboxHeaderTemplate = () => {
     return (
       <>
         {/* <Checkbox classname=" checkbox_header" /> */}
-        <span className="profile_label"> Configuration Profile Name</span>
+        <span className="profile_label"> Configuration Name</span>
       </>
     );
   };
@@ -1014,18 +1097,18 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             <Column
               field="sno"
               style={{ width: "5%" }}
-              header={<span className="SNo-header">S No</span> }
+              header={<span className="SNo-header">S.No.</span>}
             />
-          <Column
+            <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
-                width:"50%"
-               }}
-                 field="profileName"
-             header={checkboxHeaderTemplate}
-/>
+                width: "50%",
+              }}
+              field="profileName"
+              header={checkboxHeaderTemplate}
+            />
             <Column
               style={{
                 fontWeight: "bold",
@@ -1036,7 +1119,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
               field="executionOptions"
               header={
                 <span className="executionOption-header">
-                  Execution Options
+               Execution Options
                 </span>
               }
             />
@@ -1059,7 +1142,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             onModalBtnClick={onExecuteBtnClick}
             content={
               <>
-               {<ExecutionCard cardData={fetechConfig[configItem]} />}
+                {<ExecutionCard cardData={fetechConfig[configItem]} />}
                 <div className="radioButtonContainer">
                   <RadioButton
                     value="Execute with Avo Assure Agent/ Grid"
@@ -1074,6 +1157,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   <label className="executeRadio_label_grid ml-2">
                     Execute with Avo Assure Agent/ Grid
                   </label>
+                  <img className='info__btn'src="static/imgs/info.png" ></img>
+<Tooltip target=".info__btn" position="left" content=' "Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents". 
+Learn More '/>
                   <div className="radioButtonContainer1">
                     <RadioButton
                       value="Execute with Avo Assure Client"
@@ -1089,6 +1175,9 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   <label className=" executeRadio_label_clint ml-2">
                     Execute with Avo Assure Client
                   </label>
+                  <img className='info__btn_grid'src="static/imgs/info.png" ></img>
+                  <Tooltip target=".info__btn_grid" position="left" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></Tooltip> 
+
                 </div>
                 {showIcePopup && (
                   <div>
@@ -1096,7 +1185,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                       <div className="legend">
                         <span id="status" className="status-available"></span>
                         <span className="legend-text">Available</span>
-                  </div>
+                      </div>
                       <div className="legend">
                         <span id="status" className="status-unavailable"></span>
                         <span className="legend-text2">Unavailable</span>
@@ -1114,31 +1203,30 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                         Execute on
                       </span>
                       <div className="search_icelist ">
-                  <DropDownList
-                    poolType={poolType}
-                    ExeScreen={ExeScreen}
-                    inputErrorBorder={inputErrorBorder}
-                    setInputErrorBorder={setInputErrorBorder}
-                    placeholder={"Search"}
-                    data={availableICE}
-                    smartMode={ExeScreen === true ? smartMode : ""}
-                    selectedICE={selectedICE}
-                    setSelectedICE={setSelectedICE}
-                  />
-                  </div>
-                </div>
+                        <DropDownList
+                          poolType={poolType}
+                          ExeScreen={ExeScreen}
+                          inputErrorBorder={inputErrorBorder}
+                          setInputErrorBorder={setInputErrorBorder}
+                          placeholder={"Search"}
+                          data={availableICE}
+                          smartMode={ExeScreen === true ? smartMode : ""}
+                          selectedICE={selectedICE}
+                          setSelectedICE={setSelectedICE}
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
               </>
             }
-            headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
+            headerTxt={`Execute Now : ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF", height:"85%" }}
-            
-           
+            modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
+          <Toast ref={errorinfo} />
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}
@@ -1148,22 +1236,29 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                 cardData={fetechConfig[configItem]}
                 startDate={startDate}
                 setStartDate={setStartDate}
+                endDate={endDate}
+                setEndDate={setEndDate}
                 startTime={startTime}
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
-                isDisabled={!startDate}
+                isDisabled={
+                  !startDate &&
+                  (!selectedPattren?.key || !endDate || !startTime)
+                }
                 onSchedule={onScheduleBtnClick}
                 selectedDaily={selectedDaily}
+                selectedWeek={selectedWeek}
                 selectedMonthly={selectedMonthly}
                 dropdownWeek={dropdownWeek}
-                dropdownDay={dropdownDay} 
+                dropdownDay={dropdownDay}
                 setSelectedDaily={setSelectedDaily}
                 setSelectedMonthly={setSelectedMonthly}
                 setDropdownWeek={setDropdownWeek}
                 setDropdownDay={setDropdownDay}
                 scheduleOption={scheduleOption}
                 onScheduleChange={onScheduleChange}
+                onWeekChange={onWeekChange}
               />
             }
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}
@@ -1179,52 +1274,81 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
             onModalBtnClick={onScheduleBtnClickClient}
             content={
               <>
-                <div className="ice_label">Allocate Avo Assure Client</div>
-                <div className="ice_container">
-                  <div className="ice_status">
-                    <span className="available"></span>
-                    <span>Available</span>
-                    <span className="unavailable"></span>
-                    <span>Unavailable</span>
-                    <span className="dnd"></span>
-                    <span>Do Not Disturb</span>
-                  </div>
-                  <DropDownList
-                    poolType={poolType}
-                    ExeScreen={ExeScreen}
-                    inputErrorBorder={inputErrorBorder}
-                    setInputErrorBorder={setInputErrorBorder}
-                    placeholder={"Search"}
-                    data={availableICE}
-                    smartMode={ExeScreen === true ? smartMode : ""}
-                    selectedICE={selectedICE}
-                    setSelectedICE={setSelectedICE}
+                <div className="radioButtonContainer">
+                  <RadioButton
+                    value="Execute with Avo Assure Agent/ Grid"
+                    onChange={(e) => {
+                      setShowIcePopup(false);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Agent/ Grid"
+                    }
                   />
+                  <label className="executeRadio_label_grid ml-2 mr-2">
+                    Execute with Avo Assure Agent/ Grid
+                  </label>
+                  <RadioButton
+                    value="Execute with Avo Assure Client"
+                    onChange={(e) => {
+                      setShowIcePopup(true);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Client"
+                    }
+                  />
+                  <label className=" executeRadio_label_clint ml-2 mr-2">
+                    Execute with Avo Assure Client
+                  </label>
                 </div>
+                {showIcePopup && (
+                  <div className="ice_container">
+                    <div className="ice_status">
+                      <span className="available"></span>
+                      <span>Available</span>
+                      <span className="unavailable"></span>
+                      <span>Unavailable</span>
+                      <span className="dnd"></span>
+                      <span>Do Not Disturb</span>
+                    </div>
+                    <DropDownList
+                      poolType={poolType}
+                      ExeScreen={ExeScreen}
+                      inputErrorBorder={inputErrorBorder}
+                      setInputErrorBorder={setInputErrorBorder}
+                      placeholder={"Search"}
+                      data={availableICE}
+                      smartMode={ExeScreen === true ? smartMode : ""}
+                      selectedICE={selectedICE}
+                      setSelectedICE={setSelectedICE}
+                    />
+                  </div>
+                )}
               </>
             }
             headerTxt="Allocate Avo Assure Client to Schedule"
             footerType="ScheduleIce"
             modalSytle={{
-              width: "55vw",
-              height: "45vh",
+              width: "45vw",
+              height: "55vh",
               background: "#FFFFFF",
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-            isDisabled={!selectedICE}
+            // isDisabled={!selectedICE}
           />
           <AvoModal
             visible={visible_CICD}
             setVisible={setVisible_CICD}
             content={
               <>
-                 <ExecutionCard cardData={fetechConfig[configItem]} />
+                <ExecutionCard cardData={fetechConfig[configItem]} />
 
                 <div className="input_CICD ">
                   <div class="container_url">
                     <label for="inputField" class="devopsUrl_label">
-                      Devops Integration URL
+                    DevOps Integration URL
                     </label>
                     <pre className="grid_download_dialog__content__code cicdpre">
                       <code id="api-url" title={url}>
@@ -1238,9 +1362,10 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                       onClick={() => {
                         copyConfigKey(url);
                       }}
-                      title={copyToolTip}
+                      // title={copyToolTip}
                     />
-                  </div>
+                    <Tooltip target=".copy_CICD" position="left" content={copyToolTip}/>
+                   </div>
                   <div className="executiontype">
                     <div className="lable_sync">
                       <label
@@ -1249,8 +1374,10 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                         htmlFor="synch"
                         value="asynchronous"
                       >
-                        Asynchronous{" "}
+                        Asynchronous
                       </label>
+                      <img className='info__btn_async'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info__btn_async" position="left" content=" Execution responses are generated simultaneously during the execution."/>
                       <InputSwitch
                         className="inputSwitch_CICD"
                         label=""
@@ -1268,8 +1395,10 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                         htmlFor="synch"
                         value="synchronous"
                       >
-                        Synchronous{" "}
+                        Synchronous
                       </label>
+                      <img className='info__btn'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info__btn" position="left" content=" Execution responses are generated after the end of execution."/>
                     </div>
                   </div>
                   <div className="container_devopsLabel" title={str}>
@@ -1291,14 +1420,15 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                         onClick={() => {
                           copyConfigKey(str);
                         }}
-                        title={copyToolTip}
+                        // title={copyToolTip}
                       />
+                      <Tooltip target=".copy_devops" position="left" content={copyToolTip}/>
                     </div>
                   </div>
                 </div>
               </>
             }
-            headerTxt={`CICD: ${fetechConfig[configItem]?.configurename}`}
+            headerTxt={`CICD Execution : ${fetechConfig[configItem]?.configurename}`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
             onModalBtnClick={showSuccess_CICD}
           />
@@ -1316,7 +1446,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   fontWeight: "bold",
                   fontFamily: "open Sans",
                 }}
-              
+
               >
                 S.No.
               </span>
@@ -1326,16 +1456,16 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   fontWeight: "bold",
                   fontFamily: "open Sans",
                 }}
-                
+
               >
-                Configuration Profile Name
+                Configuration Name
               </span>
               <span
                 style={{
                   marginRight: "18rem",
                   fontWeight: "bold",
                   fontFamily: "open Sans",
-                  
+
                 }}
               >
                 Execution Options
@@ -1347,7 +1477,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   fontFamily: "open Sans",
                 }}
               >
-                Actions
+               Actions
               </span>
             </div>
           }
@@ -1359,7 +1489,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                 alt="Card"
                 src="static/imgs/execution_report.png"
               />
-              <span className="text1 ">No Configuration's yet</span>
+              <span className="text1 ">No items yet.</span>
             </div>
           </div>
           <Button
@@ -1368,6 +1498,7 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
           >
             {" "}
             configure{" "}
+            <Tooltip target=".configure_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
       );
@@ -1393,11 +1524,13 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
                   icon="pi pi-search"
                   placeholder="Search"
                   inputTxt={searchProfile}
+                  title="Search for an execution configuration."
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small">
-                  Add Configuration
+                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
+               Add Configuration
+               <Tooltip target=".addConfig_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}
@@ -1406,13 +1539,14 @@ const ConfigurePage = ({ setShowConfirmPop ,cardData}) => {
         {activeIndex1 !== 1 ? (
           <div className="ConfigurePage_container m-2" showGridlines>
             {renderTable()}{" "}
+            <div><Footer/></div>
           </div>
         ) : (
           <ExecutionPage />
         )}
         <AvoModal
-          visible={visible}
-          setVisible={setVisible}
+          visible={visible_setup}
+          setVisible={setVisible_setup}
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup

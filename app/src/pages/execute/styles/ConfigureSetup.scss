@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .config_setup {
   width: 100%;
   margin: 0;
@@ -17,8 +18,6 @@
   .config_container {
     padding: 0 1.875rem;
     .config_subcontainer {
-
-
       .table_section {
         min-width: 31.25rem;
         .p-treetable-header {
@@ -39,10 +38,8 @@
           .p-treetable-header {
             background: #ffffff;
             border-width: 1px;
-            font-family: "Open Sans";
             color: #030229;
-            font-size: 1rem;
-            font-weight: 400;
+            font: $f6_regular;
             .config_text {
               width: 50%;
               .p-input-icon-left {
@@ -86,7 +83,7 @@
           .p-treetable-thead>tr>th {
             background: #F3F2FF;
             padding: 0.8rem 0.8rem;
-            font-size: 0.875rem;
+            // font-size: 0.875rem;
             color: #030229;
             border: none;
             white-space: nowrap;
@@ -95,22 +92,23 @@
             position: sticky;
             top: 0;
             z-index: 1;
+            font: $f6_semibold !important;
           }
 
           .p-treetable-tbody>tr>td {
             padding: 0.4rem 0.4rem;
-            font-size: 1rem;
             color: #030229;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font: $f6_regular;
             .p-multiselect {
               width: 100%;
               padding: 0.3rem 0.3rem;
-              font-size: 0.875rem;  
+              font: $f6_regular;
               .p-multiselect-label {
                 padding: 0;
-                font-size: 0.875rem;       
+                font: $f6_regular;
               }
               .p-multiselect-label.p-placeholder {
                 padding: 0.3rem 0.3rem;
@@ -118,7 +116,7 @@
             }
             .p-inputtext {
               padding: 0.3rem 0.3rem;
-              font-size: 0.875rem;
+              font: $f6_regular;
             }
             .p-inputtext-sm {
               width: 100%;
@@ -128,7 +126,7 @@
             }
           }
 
-          .p-treetable-tbody>tr.customRow {
+          .p-treetable-tbody>tr.customNormalRow {
             td:nth-child(2),
             td:nth-child(3),
             td:nth-child(4) {
@@ -140,7 +138,7 @@
             }
             .column_name{
               .p-checkbox {
-                width: 42px;
+                width: 2.5rem;
               }
               .p-checkbox::after {
                 padding-left: 0.5rem;
@@ -149,10 +147,31 @@
             }
           }
 
+          .p-treetable-tbody>tr.customE2ERow {
+            td:nth-child(2),
+            td:nth-child(3),
+            td:nth-child(4) {
+              display: none;
+            }
+            td:nth-child(1) { 
+              display: inline-block;
+              width: 293.7%;
+            }
+            .column_name{
+              .p-checkbox {
+                width: 2.5rem;
+              }
+              .p-checkbox::after {
+                padding-left: 0.5rem;
+                content: url('../../../../public/static/imgs/E2E_configsetup.png');
+              }
+            }
+          }
+
           .p-treetable-tbody>tr.genaralRow {
             .column_name{
               .p-checkbox {
-                width: 46px;
+                width: 2.8rem;
               }
               .p-checkbox::after {
                 padding-left: 0.5rem;
@@ -178,13 +197,14 @@
             display: flex;
             flex-direction: column;
             justify-content: space-around;
+            font: $f7_semibold;
             .p-multiselect .p-multiselect-label.p-placeholder {
               text-align: left;
               line-height: 0.5rem;
             }
             .p-inputtext {
               padding: 0.4rem 0.4rem;
-              font-size: 0.875rem;
+              font: $f6_regular;
             }
             .p-dropdown {
               width: 100%;
@@ -198,10 +218,8 @@
                 width: 50%;
                 padding: 0.5rem 0 0.5rem 0;
                 .p-button-label {
-                  font-family: "Open Sans";
                   color: #030229;
-                  font-size: 0.875rem;
-                  font-weight: 400;
+                  font: $f7_semibold;
                 }
               }
             }

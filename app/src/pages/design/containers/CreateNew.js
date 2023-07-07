@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import {getProjectList, getModules, getScreens} from '../api';
 import {useDispatch, useSelector} from 'react-redux';
 import SaveMapButton from '../components/SaveMapButton';
@@ -14,6 +14,7 @@ import CanvasEnE from './CanvasEnE';
 import { Navigate } from 'react-router-dom';
 import { projectList, selectedProj, screenData, moduleList } from '../designSlice';
 import ModuleListDrop from '../components/ModuleListDrop';
+import { Toast } from 'primereact/toast';
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -21,7 +22,8 @@ import ModuleListDrop from '../components/ModuleListDrop';
     
 const CreateNew = ({importRedirect}) => {
    const [redirectTo, setRedirectTo] = useState("");
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const toast = useRef();
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(true)
@@ -34,10 +36,13 @@ const CreateNew = ({importRedirect}) => {
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
   const isEnELoad = useSelector(state=>state.design.isEnELoad);
-  const Proj = useSelector(state=>state.landing.defaultSelectProject);
-  
+  const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+  let Proj = reduxDefaultselectedProject;
 
- 
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+    Proj = JSON.parse(localStorageDefaultProject);
+  }
 
   // useEffect(()=>{
   //   if(selectProj && prjList[selectProj]){
@@ -90,13 +95,14 @@ const CreateNew = ({importRedirect}) => {
   const displayError = (error) =>{
     setBlockui({show:false})
     setLoading(false)
-    setMsg(error)
+    toast.current.show({severity: 'error', summary: 'Error', detail:error, life:2000})
   }
   
   return (
     <>
     {/* { redirectTo && <Navigate data-test="redirectTo" to={redirectTo} />} */}
     <Fragment>
+      <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
         {(!loading)?
@@ -104,7 +110,7 @@ const CreateNew = ({importRedirect}) => {
                 <div className='mp__toolbar__container'>
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                 </div>
-                <div style={{height:'42.4rem', display:'flex'}}>
+                <div style={{height:'38.54rem', display:'flex'}}>
                   <ModuleListDrop  setBlockui={setBlockui}/>
                 </div>
               <div id='mp__canvas' className='mp__canvas'>

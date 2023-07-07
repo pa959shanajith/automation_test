@@ -13,12 +13,11 @@ const Footer = () => {
         <div className="main-footer">
             <div className="main-footer-content">
             <span className="right-text">
-                © {new Date().getFullYear()}  Avo Automation. All Rights Reserved
+                <img src='static/imgs/Copyright.svg' className='copyImg' alt='copyright'/> Copyright {new Date().getFullYear()} Avo Automation - <span className='terms'>Terms of Use</span>
             </span>
-            {/* <span className="left-text">
-                Powered By
-                <img className="footer-logo_two" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
-            </span> */}
+            <span className="left-text">
+                Avo Assure v23.2.1
+            </span>
             </div>
         </div>
     );

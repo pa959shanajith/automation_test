@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ConfigurePage_container {
   display: flex;
   flex-direction: row;
@@ -5,8 +6,6 @@
   height: 96vh;
   padding-bottom: 10rem;
   padding-top: 0rem;
-  font-family: "OpenSans";
-  font-weight: normal;
   //width:125%;
   .m-2 {
     margin: 0.5rem !important;
@@ -31,8 +30,7 @@
                 text-overflow: ellipsis;
                 position: sticky;
                 top: 0;
-                z-index: 1;
-       
+                z-index: 1;  
    }
    
   .p-panel .p-panel-header {
@@ -184,12 +182,7 @@
   left: calc(46% - 123px);
   background: #605bff;
   border-radius: 10px;
-
-  font-family: "Open Sans";
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 19px;
+  font: $f7_semibold;
   width: 15rem;
   height: 2rem;
 
@@ -206,6 +199,7 @@
   /* white */
 
   color: #ffffff;
+  font: $f7_semibold;
 }
 .datatable-container {
   width: 100%;
@@ -215,7 +209,7 @@
   width: 9rem;
   font-Family: Open Sans;
   font-Style: normal;
-   margin-Left: 0.5rem;
+  margin-Left: 0.5rem;
   height: 2rem
 }
 .schedule{
@@ -533,23 +527,50 @@
 .schedule_date {
   gap: 2rem;
 }
+// .copy_CICD {
+//   color: #000000;
+//   background-color: transparent;
+//   border: none;
+
+//   margin-top: -3rem;
+//   left: 12.5rem;
+//   display: flex;
+//     top: -1rem;
+//     text-align: center;
+//     left: 43rem;
+//     .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
+//       background: transparent ;
+//       border-color: transparent ;
+//       color: black ;
+//   }
+// }
 .copy_CICD {
   color: #000000;
   background-color: transparent;
   border: none;
-
   margin-top: -3rem;
   left: 12.5rem;
   display: flex;
-    top: -1rem;
-    text-align: center;
-    left: 41rem;
-    .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
-      background: transparent ;
-      border-color: transparent ;
-      color: black ;
+  top: -1rem;
+  text-align: center;
+  left: 43rem;
+  .p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
+          background: transparent ;
+          border-color: transparent ;
+          color: black ;
+      }
+}
+
+
+@media (max-width: 768px) {
+  .copy_CICD {
+    position: sticky;
+    top: 1rem;
+    right: 1rem;
   }
 }
+
+
 
 .inputtext_devops {
   display: flex;
@@ -563,7 +584,7 @@
   color: #000000;
   background-color: transparent;
   border: none;
-  left: 41rem;
+  left: 43rem;
   display: flex;
   
   top: -7rem;
@@ -702,7 +723,9 @@
 .pencil_button {
   margin-left: 2rem;
 }
-
+.trash_button{
+  margin: 0;
+}
 .datatable_list {
   .p-datatable .p-datatable-thead > tr > th {
     width: 100%;
@@ -772,11 +795,9 @@
   display: flex;
 }
 .radioButtonContainer {
-  align-items: flex-end;
   align-items: center;
   display: flex;
-  margin-left: 1.4rem;
-  margin-top: 2.1rem;
+  padding: 2rem 0 2rem 0;
 }
 
 .radioButtonContainer1 {
@@ -959,7 +980,9 @@
   white-space: pre-wrap;
   background-color: #b8d8ff;
   margin-left: 44px;
-  margin-right: 8.5rem;
+  // margin-right: 11.5rem;
+  width: 78vh;
+
 }
 .executiontypenamepre {
   width: 78vh;
@@ -1174,6 +1197,9 @@
     }
     
     .ice_container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       .ice_status {
       .available {
         height: 0.75rem;
@@ -1209,3 +1235,31 @@
   }
 }
 
+.info__btn {
+  bottom: 21%;
+  cursor: pointer;
+  height: 2.3vh;
+  left: 0%;
+  position: relative;
+  width: 2.2%;
+}
+.info__btn_async{
+  bottom: 21%;
+  cursor: pointer;
+  height: 2.3vh;
+  left: -0.5%;
+  position: relative;
+  width: 2.2%;
+  bottom: 0.3vh;
+  
+
+}
+
+.info__btn_grid {
+  bottom: 21%;
+  cursor: pointer;
+  height: 2.3vh;
+  left: 0%;
+  position: relative;
+  width: 2.2%;
+}

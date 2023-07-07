@@ -1,12 +1,10 @@
-
+@import "../pages/global/styles/ColorVariables.scss";
 .modalClass {
     .p-dialog-header {
       height: 5rem;
       background: rgba(96, 91, 255, 0.08);
       .p-dialog-title {
-          font-size: 1.25rem;
-          font-weight: 600;
-          font-family: 'Open Sans';
+         font: $f5_semibold;
       }
     }
     .p-dialog-content {
@@ -26,10 +24,7 @@
       width: 7.125rem;
       height: 2.25rem;
       .p-button-label {
-        font-family: 'Open Sans';
-        font-style: normal;
-        font-weight: 600;
-        font-size: 0.875rem;
+        font: $f7_semibold;
         color: #FFFFFF;
       }
     }
@@ -38,10 +33,7 @@
       width: 7.125rem;
       height: 2.25rem;
       .p-button-label {
-        font-family: 'Open Sans';
-        font-style: normal;
-        font-weight: 600;
-        font-size: 0.875rem;
+        font: $f7_semibold;
         color: #030229;
       }
     }
@@ -50,7 +42,7 @@
 .schedule_modal {
   .p-dialog-content {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     input {
         margin: 0.5rem;

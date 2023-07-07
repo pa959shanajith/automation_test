@@ -21,7 +21,6 @@
 }
 .ct-node .ct-nodeLabel {
     display: block;
-    font-size: 12px;
     cursor: default;
     word-wrap: break-word;
     padding-top: 2px;
@@ -40,7 +39,6 @@
     width: 80px;
 }
 .ct-actionButton>text{
-    font-size: 17px;
     fill: $whiteColor;
     font: $f7_semibold;
 }
@@ -71,12 +69,9 @@
     width: 169px !important;
     height: 40px !important;
     left: 0rem;
-    top: 1rem;
+    // top: 1rem;
     background: #605BFF;
     border-radius: 4px;
-    // font-size: 14px !important;
-    // font-weight: 600 !important;
-    // font-family: 'Open Sans' !important;
     font: $f7_semibold !important;
 }
 
@@ -85,10 +80,6 @@
     .p-dialog-header {
     background: #e9ecef !important;
     padding: 1rem !important;
-    font-family: 'Open Sans' !important;
-   font-style: normal !important;
-   font-weight: 600 !important; 
-   font-size: 20px !important;
    font: $f5_semibold !important;
      }
      .p-dialog-content{
@@ -100,12 +91,9 @@
 .add_row_btn{
     width: 6rem;
     height: 2rem;
-    font-size: 14px;
-    font-family: 'Open Sans';
     background: white;
     color: #605BFF;
     border: none;
-    font-weight: 600;
     font:$f7_semibold;
 }
 .toolbar_scenario{
@@ -118,23 +106,20 @@
 }
 
 .p-contextmenu{
-    width: 17.5rem !important;
+    width: 18.5rem !important;
     font: $f6_regular;
 }
 
 .p-column-title{
-    font-size: 14px !important;
-    font-weight: 400 !important;
-    font-family: 'Open Sans' !important;
     display: flex;
     align-items: flex-start;
     font: $f6_semibold;
 }
 .scenario_inp{
     height: 2.5rem;
-    width: 15rem;
+    width: 20rem;
     position: relative;
-    right: 3rem;
+    right: 1rem;
     font: $f6_regular;
 }
 .scenario-header{
@@ -143,7 +128,7 @@
 .icons_class{
     bottom: 0rem;
     top: 1rem;
-    left: 2rem;
+    left: 8rem;
     position: relative;
 }
 .row_data{
@@ -165,4 +150,68 @@
   
   .text__insprint__info {
     padding: 1.2rem 0;
+  }
+  .tooltip-background_sceen {
+    /* Other styles */
+    fill: #495057 !important;
+    width: 45rem;
+  }
+  .tooltip-background {
+    /* Other styles */
+    fill: #495057 !important;
+    padding: 1rem 5rem 1rem 5rem;
+    background-color: navy;
+  }
+  
+  .tooltip-text {
+    /* Other styles */
+    color: white !important;
+  }
+  
+  .tooltip-subtext {
+    /* Other styles */
+    color: white !important;
+  }
+ 
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+  }
+  .ct-node-title {
+    font-size: larger;
+    background-color: #605BFF;
+    margin-left: 2rem;
+  }
+  
+  
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  .tooltipchild{
+    line-height: 1rem;
+    display: block;
+  }
+  .tooltip-line {
+    display: flex;
+    justify-content: center;
+    white-space: pre-line;
   }
