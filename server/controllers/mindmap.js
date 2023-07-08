@@ -1519,3 +1519,25 @@ exports.dropTempExpImpColl = async () => {
     if (result == "fail") logger.error( fnName + " : Error occured while deleting Temporary collections");
     else logger.info( fnName + " :Temporary collections got deleted successfully");
 }
+
+exports.updateE2E = async (req, res) => {
+	const fnName = "updateE2E";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+		const inputs={ 
+			"query": "updateE2E",
+			"scenarioID": req.body.scenarioID,
+			"projectID": req.body.projectID
+		 };
+		const result = await utils.fetchData(inputs, "mindmap/updateE2E", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};

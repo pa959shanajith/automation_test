@@ -239,6 +239,7 @@ if (cluster.isMaster) {
 		var report = require('./server/controllers/report');
     	var plugin = require('./server/controllers/plugin');
 		var devOps = require('./server/controllers/devOps');
+		var mindmap = require('./server/controllers/mindmap');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -253,6 +254,7 @@ if (cluster.isMaster) {
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
+		app.post('/updateE2E', mindmap.updateE2E);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -441,6 +443,7 @@ if (cluster.isMaster) {
 		app.post('/writeZipFileServer', auth.protect,upload.single('file'),mindmap.writeZipFileServer);
 		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
+		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);

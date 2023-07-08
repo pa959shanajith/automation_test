@@ -103,6 +103,7 @@ const DisplayProject = (props) => {
         return {
           key: index,
           projectName: element.name,
+          progressStep:element.progressStep,
           modifiedName: element.firstname,
           modifieDateProject: element.releases[0].modifiedon,
           modifiedDate: lastModified,
@@ -131,6 +132,7 @@ const DisplayProject = (props) => {
               {
                 key: index,
                 projectName: element.name,
+                progressStep:element.progressStep,
                 modifiedName: element.firstname,
                 modifiedDate: lastModified,
                 modifieDateProject: modified_Date,
