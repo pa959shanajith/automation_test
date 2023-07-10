@@ -13,7 +13,7 @@ const initialState = {
     elementPropertiesUpdated:false,
     isFiltered: false,
     cert: {},
-    sony:false,
+    impactAnalysisScreenLevel:false,
     WsData: {
         endPointURL: "",
         method: "0",
@@ -101,10 +101,10 @@ const reducer = (state=initialState, action) => {
                     ...state,
                     elementPropertiesUpdated : action.payload
             }                
-        case actionTypes.SET_SONY:
+        case actionTypes.SET_IMPACT_ANALYSIS_SCREENLEVEL:
                 return {
                     ...state,
-                    sony: action.payload
+                    impactAnalysisScreenLevel: action.payload
                 
                 }
         default:

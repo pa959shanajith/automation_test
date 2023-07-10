@@ -23,7 +23,7 @@ const CompareObjectList = (props) => {
     const [checkedList, setCheckedList] = useState([]);
     const [viewString, setViewString] = useState({});
     const [replaceVisible, setReplaceVisible] = useState(false);
-    const sony = useSelector(state => state.scrape.sony);
+    const impactAnalysisScreenLevel = useSelector(state => state.scrape.impactAnalysisScreenLevel);
 
 
     useEffect(() => {
@@ -265,7 +265,7 @@ const MapObjectModal = props => {
                                 dispatch({ type: actionTypes.SET_COMPAREOBJ, payload: newCompareObj });
                                 dispatch({ type: actionTypes.SET_COMPAREDATA, payload: newComparedData });
 
-                                dispatch({ type: actionTypes.SET_SONY, payload: true });
+                                dispatch({ type: actionTypes.SET_IMPACT_ANALYSIS_SCREENLEVEL, payload: true });
                                 props.setReplaceVisible(false);
                             }
                             else  setMsg(MSG.CUSTOM("Error while updating Not-Found Elements",VARIANT.ERROR));

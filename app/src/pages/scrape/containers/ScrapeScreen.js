@@ -59,7 +59,7 @@ const ScrapeScreen = (props)=>{
     const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]);
     const[identifierModified,setIdentifierModiefied]=useState(false)
     const[oldScrapedObjsMap,setoldScrapedObjsMap]=useState({});
-    const sony = useSelector(state => state.scrape.sony);
+    const impactAnalysisScreenLevel = useSelector(state => state.scrape.impactAnalysisScreenLevel);
 
 
     
@@ -114,11 +114,11 @@ const ScrapeScreen = (props)=>{
         }
     }, [showObjModal])
     useEffect(()=>{
-        if(sony){
+        if(impactAnalysisScreenLevel){
             dispatch({type:actionTypes.SET_COMPAREFLAG,payload:true})
-            dispatch({type:actionTypes.SET_SONY,payload:false})
+            dispatch({type:actionTypes.SET_IMPACT_ANALYSIS_SCREENLEVEL,payload:false})
         }
-    },[sony])
+    },[impactAnalysisScreenLevel])
 
     const fetchScrapeData = () => {
 		return new Promise((resolve, reject) => {
