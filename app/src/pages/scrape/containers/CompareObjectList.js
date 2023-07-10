@@ -23,8 +23,6 @@ const CompareObjectList = (props) => {
     const [checkedList, setCheckedList] = useState([]);
     const [viewString, setViewString] = useState({});
     const [replaceVisible, setReplaceVisible] = useState(false);
-    const impactAnalysisScreenLevel = useSelector(state => state.scrape.impactAnalysisScreenLevel);
-
 
     useEffect(() => {
         let newViewString = { ...viewString };
