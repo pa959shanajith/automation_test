@@ -57,7 +57,7 @@
         width: 100%;
     }
     .p-datatable-wrapper {
-        height: 44vh;
+        height: 42vh;
         .p-datatable-thead>tr>th {
             color: #030229;
             white-space: nowrap;
@@ -119,5 +119,11 @@
     }
     .checkbox_padding {
         padding: 0.7rem;
+    }
+    .dropdown_enddate {
+        width: 15rem;
+        .p-inputtext {
+            padding: 0.4rem;
+        }
     }
 }

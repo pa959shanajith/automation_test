@@ -860,14 +860,22 @@ else{
 
   const renderActionsCell = (rowData) => {
     return (
-      <div>
+      <div >
+      
+        <Tooltip target=".delete__icon" position="left" content=" Delete the element." />
         <img
+        
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px" }}
           className="delete__icon" onClick={() => handleDelete(rowData)} />
-        <img src="static/imgs/ic-edit.png" title="view/edit element properties"
+       
+         
+          <Tooltip target=".edit__icon" position="right" content=" Edit the properties of elements." />
+        <img src="static/imgs/ic-edit.png" 
+      
           style={{ height: "20px", width: "20px" }}
           className="edit__icon" onClick={() => openElementProperties(rowData)} />
+          
       </div>
     )
 
@@ -918,8 +926,10 @@ else{
         {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
           <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
-          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }}>Add More</button>
-          <button className="btn-capture" onClick={() => setShowNote(true)}>Capture Elements</button>
+          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }} >Add more</button>
+          <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
+          <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
+          <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
         </div> : <button className='btn_panel__single' onClick={togglePanel}>Action Panel</button>}
       </div>
     </>
@@ -930,7 +940,8 @@ else{
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Not Captured</p>
-        <Button className="btn-capture-single" onClick={() => handleAddMore('add more')}>Capture Elements</Button>
+        <Button className="btn-capture-single" onClick={() => handleAddMore('add more')} >Capture Elements</Button>
+        <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
   );
@@ -1343,10 +1354,10 @@ const footerSave = (
       )
 
   }
-
+  
   return (
     <>
-      {overlay && <ScreenOverlay content={overlay} />}
+     {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
@@ -1356,17 +1367,22 @@ const footerSave = (
             <div className="action_panelCard">
               <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
-                <img className='info__btn' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" title=' Automate test cases of inflight features well within the sprint before application ready'></img>
+                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj' title=" Add a placeholder element by specifying element type." src="static/imgs/ic-add-object.png"></img>
+                  <img className='add_obj_insprint' ></img>
+                  <Tooltip target=".add_obj_insprint" position="left" content=" Add a placeholder element by specifying element type." />
                   <p>Add Element</p>
                 </span>
                 <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png"></img>
+                  <img className='map_obj_insprint' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png"></img>
+                <Tooltip target=".map_obj_insprint" position="left" content=" Map placeholder elements to captured elements." />
+
                   <p>Map Element</p>
                 </span>
+                {/* <Tooltip target=".info__btn" position="left" content="View training videos and documents." /> */}
                 {/* {isInsprintHovered &&
-                 
+               
                 (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>InSprint Automation</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
@@ -1376,13 +1392,16 @@ const footerSave = (
               </div>
               <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
-                <img className='info__btn' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" title='Easily upgrade Test Automation as application changes'></img>
+                <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_upgrade" position="left" content="  Easily upgrade Test Automation as application changes" />
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
-                  <img className='add_obj' src="static/imgs/ic-compare.png" title='Analyze screen to compare existing and newly captured element properties.'></img>
+                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" title='Analyze screen to compare existing and newly captured element properties.'></img>
+                  <Tooltip target=".add_obj_upgrade" position="left" content="  Analyze screen to compare existing and newly captured element properties." />
                   <p>Compare Element</p>
                 </span>
                 <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
-                  <img className='map_obj' src="static/imgs/ic-replace.png" title=' Replace the existing elements with the newly captured elements.'></img>
+                  <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
+                  <Tooltip target=".map_obj_upgrade" position="left" content=" Replace the existing elements with the newly captured elements." />
                   <p>Replace Element</p>
                 </span>
                 {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -1393,7 +1412,8 @@ const footerSave = (
               </div>
               <div className='utility__block'>
                 <p className='insprint__text'>Capture from PDF</p>
-                <img className='info__btn' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" title='Capture the elements from a PDF.'></img>
+                <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_utility" position="left" content="  Capture the elements from a PDF." />
                 <span className='insprint_auto'>
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
                   <p>PDF Utility</p>
@@ -1406,7 +1426,8 @@ const footerSave = (
               </div>
               <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
-                <img className='info__btn' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" title=' Create element manually by specifying properties.'></img>
+                <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_create" position="left" content="  Create element manually by specifying properties." />
                 <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
@@ -1420,11 +1441,13 @@ const footerSave = (
               <div className='imp_exp__block'>
                 <span className='insprint_auto'>
                   <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                    <img className='add_obj' src="static/imgs/ic-import.png" title=' Import elements from json or excel file exported from same/other screens.' />
+                    <img className='add_obj_import' src="static/imgs/ic-import.png"  />
+                    <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
                     <p className='imp__text'>Import Screen</p>
                   </span>
                   <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
-                    <img className='add_obj' src="static/imgs/ic-export.png"  title=' Export captured elements as json or excel file to be reused across screens/projects.'/>
+                    <img className='add_obj_export' src="static/imgs/ic-export.png"  />
+                    <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
                     <p className='imp__text'>Export Screen</p>
 
                   </span>

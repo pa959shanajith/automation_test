@@ -723,7 +723,9 @@
 .pencil_button {
   margin-left: 2rem;
 }
-
+.trash_button{
+  margin: 0;
+}
 .datatable_list {
   .p-datatable .p-datatable-thead > tr > th {
     width: 100%;
@@ -793,11 +795,9 @@
   display: flex;
 }
 .radioButtonContainer {
-  align-items: flex-end;
   align-items: center;
   display: flex;
-  margin-left: 1.4rem;
-  margin-top: 2.1rem;
+  padding: 2rem 0 2rem 0;
 }
 
 .radioButtonContainer1 {
@@ -1197,6 +1197,9 @@
     }
     
     .ice_container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       .ice_status {
       .available {
         height: 0.75rem;
@@ -1232,3 +1235,31 @@
   }
 }
 
+.info__btn {
+  bottom: 21%;
+  cursor: pointer;
+  height: 2.3vh;
+  left: 0%;
+  position: relative;
+  width: 2.2%;
+}
+.info__btn_async{
+  bottom: 21%;
+  cursor: pointer;
+  height: 2.3vh;
+  left: -0.5%;
+  position: relative;
+  width: 2.2%;
+  bottom: 0.3vh;
+  
+
+}
+
+.info__btn_grid {
+  bottom: 21%;
+  cursor: pointer;
+  height: 2.3vh;
+  left: 0%;
+  position: relative;
+  width: 2.2%;
+}
