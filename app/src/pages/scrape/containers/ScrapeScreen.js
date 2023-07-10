@@ -57,7 +57,12 @@ const ScrapeScreen = (props)=>{
     const [showTeststeps , setshowTeststeps]=useState([]);
     const [displayTest , setdisplayTest]=useState({});
     const [identifierList, setIdentifierList] = useState([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]);
-   const[identifierModified,setIdentifierModiefied]=useState(false)
+    const[identifierModified,setIdentifierModiefied]=useState(false)
+    const[oldScrapedObjsMap,setoldScrapedObjsMap]=useState({});
+    const impactAnalysisScreenLevel = useSelector(state => state.scrape.impactAnalysisScreenLevel);
+
+
+    
     useEffect(() => {
         // if(Object.keys(current_task).length !== 0) {
             fetchScrapeData()
@@ -108,6 +113,12 @@ const ScrapeScreen = (props)=>{
             }
         }
     }, [showObjModal])
+    useEffect(()=>{
+        if(impactAnalysisScreenLevel){
+            dispatch({type:actionTypes.SET_COMPAREFLAG,payload:true})
+            dispatch({type:actionTypes.SET_IMPACT_ANALYSIS_SCREENLEVEL,payload:false})
+        }
+    },[impactAnalysisScreenLevel])
 
     const fetchScrapeData = () => {
 		return new Promise((resolve, reject) => {
@@ -316,8 +327,13 @@ const ScrapeScreen = (props)=>{
                 //COMPARE & UPDATE SCRAPE OPERATION
                 if (data.action === "compare") {
                     if (data.status === "SUCCESS") {
+                        let oldScrapedObjsMapLocal={}
                         let compareObj = generateCompareObject(data, scrapeItems.filter(object => object.xpath.substring(0, 4)==="iris"));
                         let [newScrapeList, newOrderList] = generateScrapeItemList(0, mainScrapedData);
+                       newScrapeList.map(object=>{
+                            oldScrapedObjsMapLocal[object['xpath']]=true;
+                        });
+                        setoldScrapedObjsMap(oldScrapedObjsMapLocal)
                         setScrapeItems(newScrapeList);
                         setOrderList(newOrderList);
                         setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
@@ -567,7 +583,7 @@ const Header = () => {
             {/* <Header/> */}
             
             <div data-test="ssMidSection" className="ss__mid_section">
-                <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
+                <ScrapeContext.Provider value={{ startScrape, oldScrapedObjsMap, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
                 <ActionBarItems appType={props.appType}  fetchingDetails={props.fetchingDetails} />
                     { props.appType === "Webservice" 
                         ? <WebserviceScrape fetchingDetails={props.fetchingDetails}/> 
@@ -679,6 +695,7 @@ function generateCompareObject(data, irisObjects){
         }
         compareObj.notFoundObj = [...localList, ...irisObjects];
     }
+    compareObj['fullScrapeData'] = data['fullScrapeData']
     return compareObj;
 } 
 
