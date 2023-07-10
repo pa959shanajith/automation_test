@@ -6,13 +6,14 @@ const initialState = {
     disableAppend: false,
     compareFlag: false,
     compareData: {},
-    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: [],fullScrapeData:[]},
     objValue: { val: null },
     enableIdentifier:false,
     listofcheckeditems:[],
     elementPropertiesUpdated:false,
     isFiltered: false,
     cert: {},
+    sony:false,
     WsData: {
         endPointURL: "",
         method: "0",
@@ -100,9 +101,12 @@ const reducer = (state=initialState, action) => {
                     ...state,
                     elementPropertiesUpdated : action.payload
             }                
+        case actionTypes.SET_SONY:
+                return {
+                    ...state,
+                    sony: action.payload
                 
-
-
+                }
         default:
             return state
     }
