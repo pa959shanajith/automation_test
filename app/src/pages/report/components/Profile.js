@@ -223,9 +223,10 @@ const Profile = () => {
 
   const statusBodyTemplate = (rowData) => {
     let statusSeverity = {
-      Scheduled: "info",
+      Queued: "info",
       Completed: "success",
       ["In Progress"]: "warning",
+      Fail: "danger"
     };
     return (
       <Badge
