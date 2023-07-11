@@ -772,11 +772,8 @@ export const getProjectsMMTS = async(data) => {
                 'Content-Type': 'application/json'
 
             },
-
             data:{"projectid":data,
-
                 "readme":"Projectid"},
-
             credentials: 'include',
 
         });
@@ -786,13 +783,9 @@ export const getProjectsMMTS = async(data) => {
             return {error:MSG.GENERIC.INVALID_SESSION};
 
         }
-
         if(res.status===200 && res.data !== "fail"){    
-
             console.log("res.data",res.data)        
-
-            return res.data;
-
+            return res.data; 
         }
 
         console.error(res.data)
@@ -1239,6 +1232,62 @@ export const userObjectElement_ICE = custObjProps => {
         })
         .catch(err => reject(err));
     });
+}
+export const singleExcelToMindmap = async(data) => {
+    try{
+        const res = await axios(url+'/singleExcelToMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        else if (res.data == 'valueError') {
+            return {error : MSG.MINDMAP.ERR_EMPTY_COL}
+        }
+        else if (res.data == 'Multiple modules') {
+            return {error : MSG.MINDMAP.ERR_MULTI_MOD}
+        }  
+        else if (res.data == "emptySheet" || res.data == 'fail') {
+            return {error : MSG.MINDMAP.ERR_EXCEL_SHEET}
+        }
+        else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
+    }
+}
+export const checkExportVer = async(data) => {
+    try{
+        const res = await axios(url+'/checkExportVer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
 }
 
 export const fetchReplacedKeywords_ICE = arg => {
