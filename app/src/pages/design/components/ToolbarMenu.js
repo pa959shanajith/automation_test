@@ -83,7 +83,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         // if(!selectedModule._id || selectedModulelist.length==0)return;
         var err = validate([fnameRef,ftypeRef,gitconfigRef,gitBranchRef,gitVerRef])
         if(err)return
-        let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
+        let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModuled;
         setExportBox(false)
         setBlockui({show:true,content:'Exporting Mindmap ...'})
         var ftype = ftypeRef.current.value
@@ -91,8 +91,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             toJSON(selectedModuleVar,fnameRef.current.value,displayError,setBlockui);
         }
         
-        if(ftype === 'excel') toExcel(selectedProj,selectedModulelisted.length>0?selectedModulelisted[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
-        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelisted.length>0?selectedModulelisted[0]:selectedModuled});
+        if(ftype === 'excel') toExcel(selectedProj,selectedModulelisted.length>0?selectedModulelisted[0]:selectedModuled,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModuled:selectedModulelisted.length>0?selectedModulelisted[0]:selectedModuled});
     }
     const validate = (arr) =>{
         var err = false;
@@ -264,23 +264,23 @@ const toExcel = async(projId,module,fname,displayError,setBlockui) => {
         displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
     }
 }
-const toGit = async ({projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
+const toGit = async ({projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModuled,selectedProj}) => {
     var gitpath=gitPathRef.current.value;
 	if(!gitpath){
-        gitpath = 'avoassuretest_artifacts/'+projectList[selectedProj].name+'/'+selectedModule.name;
+        gitpath = 'avoassuretest_artifacts/'+projectList[selectedProj].name+'/'+selectedModuled.name;
     }
     var res = await exportToGit({
         gitconfig: gitconfigRef.current.value,
         gitVersion: gitVerRef.current.value,
 		gitFolderPath:gitpath,
 		gitBranch: gitBranchRef.current.value,
-		mindmapId: selectedModule
+		mindmapId: selectedModuled
     })
     if(res.error){displayError(res.error);return;}
     setBlockui({show:false})
     setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
 }
-const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setBlockui) =>{
+const toCustom = async (selectedProj,selectedModuled,projectList,releaseRef,cycleRef,fname,displayError,setBlockui) =>{
     try{
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [""], "scenarioId": "", "scenarioName": "" };
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
@@ -296,14 +296,14 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
         const reqObject = [{
             "releaseid": moduleData.releaseId,
             "cycleid": moduleData.cycleId,
-            "testsuiteid": selectedModule._id,
-            "testsuitename": selectedModule.name,
+            "testsuiteid": selectedModuled._id,
+            "testsuitename": selectedModuled.name,
             "projectidts": moduleData.projectId
             // "versionnumber": parseFloat(version_num)
         }];
         var moduleObj = await readTestSuite_ICE(reqObject)
         if(moduleObj.error){displayError(moduleObj.error);return;}
-        moduleObj = moduleObj[selectedModule._id];
+        moduleObj = moduleObj[selectedModuled._id];
         if(moduleObj && moduleObj.testsuiteid != null) {
             moduleData.testsuiteId = moduleObj.testsuiteid;
             moduleData.testsuiteName = moduleObj.testsuitename;
