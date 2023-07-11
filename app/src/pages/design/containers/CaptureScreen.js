@@ -292,16 +292,16 @@ const CaptureModal = (props) => {
 
   const toastError = (erroMessage) => {
     if (erroMessage.CONTENT) {
-      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
   }
 
-  const toastSuccess = (erroMessage) => {
-    if (erroMessage.CONTENT) {
-      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Success', detail: erroMessage.CONTENT, life: 5000 });
+  const toastSuccess = (successMessage) => {
+    if (successMessage.CONTENT) {
+      toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'success', summary: 'Success', detail: erroMessage, life: 5000 });
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -669,11 +669,11 @@ const elementTypeProp =(elementProperty) =>{
     let screenViewObject = {};
     let blockMsg = 'Capturing in progress. Please Wait...';
     if (compareFlag) {
-      blockMsg = 'Comparing objects in progress...';
+      blockMsg = 'Comparing Element in progress...';
       handleClose()
     };
     if (replaceFlag) {
-      blockMsg = 'Capture and Replace Object in progress...';
+      blockMsg = 'Capture and Replace Element in progress...';
     };
     screenViewObject = getScrapeViewObject("web", browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
     setOverlay(blockMsg);
@@ -733,6 +733,17 @@ const elementTypeProp =(elementProperty) =>{
           }
         }
         else if (data.action === "replace") {
+          let viewString = data;
+
+                    if (viewString.view.length !== 0){
+                        let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+
+                        let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+                        setNewScrapedData(scrapeItemList);
+                        handleDialog("replaceObjectPhase2");
+                    } else {
+                        // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                    }
           
        }
 else{
@@ -797,7 +808,6 @@ else{
 
           if (viewString.view.length > 0) setSaved({ flag: false });
           setEndScrape(true)
-
         }
       }
       })
@@ -1558,11 +1568,19 @@ const footerSave = (
         toastError={toastError}
       />}
 
-      {currentDialog === 'replaceObject' && <ActionPanel
+      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
         isOpen={currentDialog}
         OnClose={handleClose}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        captureList={capturedDataToSave}
+        setShow={setCurrentDialog}
+        newScrapedData={newScrapedData}
+        startScrape={startScrape}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        setOverlay={setOverlay}
+        setShowPop={setShowPop}
       />}
 
       {currentDialog === 'createObject' && <ActionPanel
