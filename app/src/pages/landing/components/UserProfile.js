@@ -13,9 +13,11 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
+import { Button } from "primereact/button";
 
 
 const UserDemo = (props) => {
+    const menu = useRef(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showUserMenu, setShowUserMenu] = useState(false);
@@ -24,14 +26,8 @@ const UserDemo = (props) => {
     const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
     const [initials, setInitials] = useState('');
     let userInfo = useSelector((state) => state.landing.userinfo);
-
-    
     userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-    const handleUserMenu = () => {
-        setShowUserMenu(!showUserMenu);
-    };
-
+      
     useEffect(() => {
         const firstNameInitial = userInfo.firstname ? userInfo.firstname.slice(0, 1) : '';
         const lastNameInitial = userInfo.lastname ? userInfo.lastname.slice(0, 1) : '';
@@ -45,9 +41,9 @@ const UserDemo = (props) => {
                 return (
                             <div className='ProfileDisplay'>
                                 <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800"
-                                image={userInfo.userimage ? userInfo.userimage : initials} 
+                                image={userInfo?.userimage ? userInfo.userimage : initials} 
                                 label={ !userInfo.userimage ? initials :''}
-                                onClick={handleUserMenu} size="xlarge" shape="circle"/>
+                                size="xlarge" shape="circle"/>
                                 <div className="flex flex-column">
                                     <span className="font-bold user_name">{userInfo.username}</span>
                                     <span className="text-sm user_role">{userInfo.rolename}</span>
@@ -118,7 +114,7 @@ const UserDemo = (props) => {
   
     return (
         <div className="UserProfileContainer">
-            { showUserMenu && <TieredMenu className='custom-tieredmenu' model={userMenuItems} />}
+            <TieredMenu className='custom-tieredmenu' model={userMenuItems} popup ref={menu} breakpoint="767px" />
             { showEditProfileDialog && <EditProfile showDialogBox = {showEditProfileDialog} setShowDialogBox= {setShowEditProfileDialog}/>}
             { showChangePasswordDialog && < ChangePassword showDialogBox = {showChangePasswordDialog} setShowDialogBox= {setShowChangePasswordDialog}/>}
             <AvoConfirmDialog 
@@ -129,9 +125,9 @@ const UserDemo = (props) => {
                 icon="pi pi-exclamation-triangle" 
                 accept={confirmLogout} />
             <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800"
-                image={userInfo.userimage ? userInfo.userimage : initials} 
+                image={userInfo?.userimage ? userInfo.userimage : initials} 
                 label={ !userInfo.userimage ? initials :''}
-                onClick={handleUserMenu} size='small' shape="circle"/>
+                onClick={(e) => menu.current.toggle(e)} size='small' shape="circle"/>
         </div>
    );
 };

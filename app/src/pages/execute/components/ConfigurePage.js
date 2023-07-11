@@ -1158,11 +1158,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                       radioButton_grid === "Execute with Avo Assure Agent/ Grid"
                     }
                   />
-                  <label className="executeRadio_label_grid ml-2">
+                  <label className="executeRadio_label_grid ">
                     Execute with Avo Assure Agent/ Grid
                   </label>
                   <img className='info__btn'src="static/imgs/info.png" ></img>
-<Tooltip target=".info__btn" position="left" content=' "Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents". 
+<Tooltip target=".info__btn" position="left" content=' Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents. 
 Learn More '/>
                   <div className="radioButtonContainer1">
                     <RadioButton
@@ -1176,7 +1176,7 @@ Learn More '/>
                       }
                     />
                   </div>
-                  <label className=" executeRadio_label_clint ml-2">
+                  <label className=" executeRadio_label_clint ">
                     Execute with Avo Assure Client
                   </label>
                   <img className='info__btn_grid'src="static/imgs/info.png" ></img>
@@ -1368,7 +1368,7 @@ Learn More '/>
                       }}
                       // title={copyToolTip}
                     />
-                    <Tooltip target=".copy_CICD" position="left" content={copyToolTip}/>
+                    <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
                    </div>
                   <div className="executiontype">
                     <div className="lable_sync">
@@ -1401,8 +1401,8 @@ Learn More '/>
                       >
                         Synchronous
                       </label>
-                      <img className='info__btn'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info__btn" position="left" content=" Execution responses are generated after the end of execution."/>
+                      <img className='info_btn_sync'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info_btn_sync" position="left" content=" Execution responses are generated after the end of execution."/>
                     </div>
                   </div>
                   <div className="container_devopsLabel" title={str}>
@@ -1426,7 +1426,7 @@ Learn More '/>
                         }}
                         // title={copyToolTip}
                       />
-                      <Tooltip target=".copy_devops" position="left" content={copyToolTip}/>
+                      <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
                     </div>
                   </div>
                 </div>
