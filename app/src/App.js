@@ -27,6 +27,7 @@ import SideNavBar from './pages/landing/components/SideNav';
 import Overview from './pages/landing/components/ProjectCreation';
 import Analysis from './pages/landing/components/Analysis';
 import MindmapHome from './pages/design/containers/MindmapHome';
+import Profile from './pages/report/components/Profile';
 
 
 
@@ -74,6 +75,7 @@ const RouteApp = () => {
         <Route path="/landing" element={<HomePage />} />
         <Route path="/integration" element={<Integration />} />
         <Route path="/reports" element={<Report />} />
+        <Route path="/reports/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/itdm" element={<itdm />} />
         <Route path="/design" element={<MindmapHome />} />
