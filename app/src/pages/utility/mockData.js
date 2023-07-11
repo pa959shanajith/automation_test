@@ -114,3 +114,37 @@ export const endMonths = [
   { name: '6 Months', key: 6 },
   { name: '9 Months', key: 9 }
 ];
+
+export const reportsData = [
+  {
+    _id: "de666ad5-e25f-4ece-aad7-9c4df1f68c03",
+    startDate: "2023-07-10T11:48:31.000Z",
+    modSattus: ["Pass", "Pass", "Pass", "Fail", "Pass", "Fail", "Fail"],
+    scestatus: ["Pass", "Pass", "Pass", "Pass", "Fail", "Fail"],
+  },
+  {
+    _id: "58e2725c-2a53-4fab-a851-bd14fad3be3f",
+    startDate: "2023-07-10T12:01:02.000Z",
+    modSattus: ["Pass", "Fail", "Inprogress", "Inprogress", "Inprogress"],
+    scestatus: ["Pass", "Pass"],
+  },
+  {
+    _id: "3de9f0f2-036d-438a-b961-8754a4945ce7",
+    startDate: "2023-07-10T11:45:36.000Z",
+    modSattus: ["Pass", "Pass"],
+    scestatus: ["Pass", "Pass"],
+  },
+  {
+    _id: "ef4e63c8-f190-4056-a14d-62e5d36c7f30",
+    startDate: "2023-07-10T12:02:12.000Z",
+    modSattus: ["Queued", "Inprogress"],
+    scestatus: ["Pass", "Pass"],
+  },
+];
+
+export const reportsBar = {
+  Pass: "#8FBC8F",
+  Fail: "#8B0000",
+  Queued: "#808080",
+  Inprogress: "#0000FF",
+};

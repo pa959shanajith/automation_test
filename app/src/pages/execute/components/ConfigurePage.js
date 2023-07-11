@@ -1144,9 +1144,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             setVisible={setVisible_execute}
             onhide={visible_execute}
             onModalBtnClick={onExecuteBtnClick}
+            // onHide={() => setVisible_execute(false)}
             content={
               <>
                 {<ExecutionCard cardData={fetechConfig[configItem]} />}
+                <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
                     value="Execute with Avo Assure Agent/ Grid"
@@ -1158,12 +1160,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                       radioButton_grid === "Execute with Avo Assure Agent/ Grid"
                     }
                   />
-                  <label className="executeRadio_label_grid ml-2">
+                  <label className="executeRadio_label_grid ">
                     Execute with Avo Assure Agent/ Grid
                   </label>
                   <img className='info__btn'src="static/imgs/info.png" ></img>
-<Tooltip target=".info__btn" position="left" content=' "Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents". 
+<Tooltip target=".info__btn" position="left" content=' Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents. 
 Learn More '/>
+</div>
                   <div className="radioButtonContainer1">
                     <RadioButton
                       value="Execute with Avo Assure Client"
@@ -1176,7 +1179,7 @@ Learn More '/>
                       }
                     />
                   </div>
-                  <label className=" executeRadio_label_clint ml-2">
+                  <label className=" executeRadio_label_clint ">
                     Execute with Avo Assure Client
                   </label>
                   <img className='info__btn_grid'src="static/imgs/info.png" ></img>
@@ -1206,7 +1209,8 @@ Learn More '/>
                       >
                         Execute on
                       </span>
-                      <div className="search_icelist ">
+                      <div className="ice">
+                       <div className="search_icelist ">
                         <DropDownList
                           poolType={poolType}
                           ExeScreen={ExeScreen}
@@ -1218,6 +1222,7 @@ Learn More '/>
                           selectedICE={selectedICE}
                           setSelectedICE={setSelectedICE}
                         />
+                       </div>
                       </div>
                     </div>
                   </div>
@@ -1350,10 +1355,12 @@ Learn More '/>
                 <ExecutionCard cardData={fetechConfig[configItem]} />
 
                 <div className="input_CICD ">
+                 
                   <div class="container_url">
                     <label for="inputField" class="devopsUrl_label">
                     DevOps Integration URL
                     </label>
+                    <div className="url">
                     <pre className="grid_download_dialog__content__code cicdpre">
                       <code id="api-url" title={url}>
                         {url}
@@ -1368,7 +1375,8 @@ Learn More '/>
                       }}
                       // title={copyToolTip}
                     />
-                    <Tooltip target=".copy_CICD" position="left" content={copyToolTip}/>
+                    <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
+                   </div>
                    </div>
                   <div className="executiontype">
                     <div className="lable_sync">
@@ -1381,7 +1389,7 @@ Learn More '/>
                         Asynchronous
                       </label>
                       <img className='info__btn_async'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info__btn_async" position="left" content=" Execution responses are generated simultaneously during the execution."/>
+                      <Tooltip target=".info__btn_async" position="right" content=" Execution responses are generated simultaneously during the execution."/>
                       <InputSwitch
                         className="inputSwitch_CICD"
                         label=""
@@ -1401,13 +1409,14 @@ Learn More '/>
                       >
                         Synchronous
                       </label>
-                      <img className='info__btn'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info__btn" position="left" content=" Execution responses are generated after the end of execution."/>
+                      <img className='info_btn_sync'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info_btn_sync" position="right" content=" Execution responses are generated after the end of execution."/>
                     </div>
                   </div>
                   <div className="container_devopsLabel" title={str}>
                     <span className="devops_label">DevOps Request Body : </span>
                     <div>
+                      <div className="key">
                       <pre className="grid_download_dialog__content__code executiontypenamepre">
                         <code
                           className="executiontypecode"
@@ -1426,14 +1435,15 @@ Learn More '/>
                         }}
                         // title={copyToolTip}
                       />
-                      <Tooltip target=".copy_devops" position="left" content={copyToolTip}/>
+                      <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
+                      </div>
                     </div>
                   </div>
                 </div>
               </>
             }
             headerTxt={`CICD Execution : ${fetechConfig[configItem]?.configurename}`}
-            modalSytle={{ width: "50vw", background: "#FFFFFF" }}
+            modalSytle={{ width: "50vw", background: "#FFFFFF",height:"95%" }}
             onModalBtnClick={showSuccess_CICD}
           />
         </>
