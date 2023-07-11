@@ -251,31 +251,31 @@ const Profile = () => {
         {
             key: '0-0',
             label: 'Test Case 1',
-            data: 'Work Folder',
+            data: e.name,
             icon: 'pi pi-fw pi-angle-right',
         },
         {
             key: '0-1',
             label: 'Test Case 2',
-            data: 'Home Folder',
+            data: e.name,
             icon: 'pi pi-fw pi-angle-right',
         },
         {
             key: '0-2',
             label: 'Test Case 3',
-            data: 'Home Folder',
+            data: e.name,
             icon: 'pi pi-fw pi-angle-right',
         },
         {
             key: '0-3',
             label: 'Test Case 4',
-            data: 'Home Folder',
+            data: e.name,
             icon: 'pi pi-fw pi-angle-right',
         },
         {
             key: '0-4',
             label: 'Test Case 5',
-            data: 'Home Folder',
+            data: e.name,
             icon: 'pi pi-fw pi-angle-right',
         }
     ]
