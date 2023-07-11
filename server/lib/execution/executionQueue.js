@@ -626,16 +626,34 @@ module.exports.Execution_Queue = class Execution_Queue {
         let testSuiteInfo = gettingTestSuiteIds.executionData.batchInfo;
 
         let newExecutionList = []
-        for (let ids of testSuiteInfo)
-            newExecutionList.push({
-                executionListId:newExecutionListId,
-                configurename: gettingTestSuiteIds.executionData.configurename,
-                modulename:ids.testsuiteName,
-                moduleid:ids.testsuiteId,status: 'QUEUED',
-                avoagentList:gettingTestSuiteIds.executionData.avoagents,
-                startTime: new Date().toLocaleString(),
-                isExecuteNow: req.body.isExecuteNow
-            });
+        let execType = 'scenarioParallel'
+        for (let ids of testSuiteInfo){
+            if(execType == 'scenarioParallel') {
+                for (let scId of ids.suiteDetails) {
+                    newExecutionList.push({
+                        executionListId:newExecutionListId,
+                        configurename: gettingTestSuiteIds.executionData.configurename,
+                        modulename:ids.testsuiteName,
+                        moduleid:ids.testsuiteId,status: 'QUEUED',
+                        avoagentList:gettingTestSuiteIds.executionData.avoagents,
+                        startTime: new Date().toLocaleString(),
+                        isExecuteNow: req.body.isExecuteNow,
+                        scenarioIds:scId.scenarioId,
+                        execType:execType
+                    });
+                }
+            } else {
+                newExecutionList.push({
+                    executionListId:newExecutionListId,
+                    configurename: gettingTestSuiteIds.executionData.configurename,
+                    modulename:ids.testsuiteName,
+                    moduleid:ids.testsuiteId,status: 'QUEUED',
+                    avoagentList:gettingTestSuiteIds.executionData.avoagents,
+                    startTime: new Date().toLocaleString(),
+                    isExecuteNow: req.body.isExecuteNow
+                });
+            }
+        }
 
         keyQueue.push(newExecutionList);
 
@@ -781,13 +799,19 @@ module.exports.Execution_Queue = class Execution_Queue {
                 for(let entries of executionQueue) {
                     listIndex++;
                     if(entries[0]['executionListId'] == executionListId) {
-                        let moduleIndex = -1;
+                        let moduleIndex = -1,scenarioIndex = -1, currModuleId = '';
                         for(let testSuites of entries) {
+                            if (testSuites.moduleid != currModuleId) {
+                                scenarioIndex = -1;
+                                currModuleId = testSuites.moduleid
+                            }
                             moduleIndex++;
+                            scenarioIndex++;
                             if(testSuites['status'] == 'QUEUED') {
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
-
-                                executionData = await utils.fetchData({'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
+                                const inputs = {'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}
+                                if (testSuites['execType'] == 'scenarioParallel') inputs['scenarioIndex'] = scenarioIndex
+                                executionData = await utils.fetchData(inputs, "devops/getExecScenario", fnName);
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
                                     'body': executionData[0],
                                     'session':executionData[0].session,
