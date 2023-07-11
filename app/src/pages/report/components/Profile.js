@@ -18,164 +18,6 @@ const Profile = () => {
     { field: "module", header: "Test Suite(s)" },
     { field: "testCases", header: "Test Case(s)" },
   ]);
-  const [modules, setModules] = useState([
-    [{
-      key: "0",
-      label: (
-        <HSBar
-          showTextIn
-          data={[
-            { value: 90, description: "90/100 completed", color: "#3b82f6" },
-            { value: 100, description: "100/100 executed", color: "#22c55e" },
-            { value: 80, description: "80/100 passed", color: "#f59e0b" },
-          ]}
-        />
-      ),
-      data: "Documents Folder",
-      children: [
-        {
-          key: "0-0",
-          label: "Testsuite 1",
-          data: "Work Folder",
-          icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-          key: "0-1",
-          label: "Testsuite 2",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-          key: "0-2",
-          label: "Testsuite 3",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-          key: "0-3",
-          label: "Testsuite 4",
-          data: "Home Folder",
-        },
-      ],
-    }],
-    [{
-      key: "0",
-      label: (
-        <HSBar
-          showTextIn
-          data={[
-            { value: 70, description: "70/100 completed", color: "#3b82f6" },
-            { value: 100, description: "100/100 executed", color: "#22c55e" },
-            { value: 100, description: "100/100 passed", color: "#f59e0b" },
-          ]}
-        />
-      ),
-      data: "Documents Folder",
-      children: [
-        {
-          key: "0-0",
-          label: "Testsuite 1",
-          data: "Work Folder",
-          icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-          key: "0-1",
-          label: "Testsuite 2",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-          key: "0-2",
-          label: "Testsuite 3",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-          key: "0-3",
-          label: "Testsuite 4",
-          data: "Home Folder",
-        },
-      ],
-    }],
-    [{
-      key: "0",
-      label: (
-        <HSBar
-          showTextIn
-          data={[
-            { value: 100, description: "100/100 completed", color: "#3b82f6" },
-            { value: 100, description: "100/100 executed", color: "#22c55e" },
-            { value: 70, description: "70/100 passed", color: "#f59e0b" },
-          ]}
-        />
-      ),
-      data: "Documents Folder",
-      children: [
-        {
-          key: "0-0",
-          label: "Testsuite 1",
-          data: "Work Folder",
-          icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-          key: "0-1",
-          label: "Testsuite 2",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-plus',
-        },
-        {
-          key: "0-2",
-          label: "Testsuite 3",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-plus',
-        },
-        {
-          key: "0-3",
-          label: "Testsuite 4",
-          data: "Home Folder",
-        },
-      ],
-    }],
-    [{
-      key: "0",
-      label: (
-        <HSBar
-          showTextIn
-          data={[
-            { value: 50, description: "50/100 completed", color: "#3b82f6" },
-            { value: 80, description: "80/100 executed", color: "#22c55e" },
-            { value: 60, description: "60/100 passed", color: "#f59e0b" },
-          ]}
-        />
-      ),
-      data: "Documents Folder",
-      children: [
-        {
-          key: "0-0",
-          label: "Testsuite 1",
-          data: "Work Folder",
-          icon: 'pi pi-fw pi-plus',
-        },
-        {
-          key: "0-1",
-          label: "Testsuite 2",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-plus',
-        },
-        {
-          key: "0-2",
-          label: "Testsuite 3",
-          data: "Home Folder",
-          icon: 'pi pi-fw pi-plus',
-        },
-        {
-          key: "0-3",
-          label: "Testsuite 4",
-          data: "Home Folder",
-        },
-      ],
-    }]
-  ]);
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -226,7 +68,7 @@ const Profile = () => {
       Queued: "info",
       Completed: "success",
       ["In Progress"]: "warning",
-      Fail: "danger"
+      Fail: "danger",
     };
     return (
       <Badge
@@ -237,64 +79,155 @@ const Profile = () => {
   };
 
   const moduleBodyTemplate = (e) => {
-    let treeArr = [{
-      key: e.key,
-      label: (
-        <HSBar
-          showTextIn
-          data={Object.keys(e.testCases).map((item, ind) => ({
-            value: e.testCases[item], description: `${e.testCases[item]} ${item}`, color: reportsBar[item]
-          }))}
-        />
-      ),
-      data: e.name,
-      children: [
-        {
-            key: '0-0',
-            label: 'Test Case 1',
-            data: e.name,
-            icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-            key: '0-1',
-            label: 'Test Case 2',
-            data: e.name,
-            icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-            key: '0-2',
-            label: 'Test Case 3',
-            data: e.name,
-            icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-            key: '0-3',
-            label: 'Test Case 4',
-            data: e.name,
-            icon: 'pi pi-fw pi-angle-right',
-        },
-        {
-            key: '0-4',
-            label: 'Test Case 5',
-            data: e.name,
-            icon: 'pi pi-fw pi-angle-right',
-        }
-    ]
-    }];
-    return <Tree value={treeArr} onNodeClick={(e) => onTestSuiteClick(e)} className="modules_tree" />;
+    let treeArr = [
+      {
+        key: e.key,
+        label: (
+          <div className="grid">
+            <div className="col-6">
+              <div>Execution Progress</div>
+              <HSBar
+                showTextIn
+                data={[
+                  {
+                    value: Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) - Object.keys(e.testSuites).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testSuites[el]).reduce((ac, cv) => ac + cv, 0),
+                    description: `${Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) - Object.keys(e.testSuites).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testSuites[el]).reduce((ac, cv) => ac + cv, 0)} Executed`,
+                    color: "#6a5acd",
+                  },
+                  {
+                    value: Object.keys(e.testSuites).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testSuites[el]).reduce((ac, cv) => ac + cv, 0),
+                    description: `${Object.keys(e.testSuites).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testSuites[el]).reduce((ac, cv) => ac + cv, 0)} Not Executed`,
+                    color: "#808080",
+                  },
+                ]}
+              />
+            </div>
+            <div className="col-6">
+            <div>Status</div>
+              <HSBar
+                showTextIn
+                data={Object.keys(e.testSuites).map((item, ind) => ({
+                  value: e.testSuites[item],
+                  description: `${e.testSuites[item]} ${item}`,
+                  color: reportsBar[item],
+                }))}
+              />
+            </div>
+          </div>
+        ),
+        data: e.name,
+        children: [
+          {
+            key: "0-0",
+            label: "Test suite 1",
+            data: e.name
+          },
+          {
+            key: "0-1",
+            label: "Test suite 2",
+            data: e.name
+          },
+          {
+            key: "0-2",
+            label: "Test suite 3",
+            data: e.name
+          },
+          {
+            key: "0-3",
+            label: "Test suite 4",
+            data: e.name
+          },
+          {
+            key: "0-4",
+            label: "Test suite 5",
+            data: e.name
+          },
+        ],
+      },
+    ];
+    return (
+      <Tree
+        value={treeArr}
+        onNodeClick={(e) => onTestSuiteClick(e)}
+        className="modules_tree"
+      />
+    );
   };
 
   const testCaseBodyTemplate = (e) => {
-    return <div className="grid">
-      <div className="col-12">
-      <HSBar
-          showTextIn
-          data={Object.keys(e.testSuites).map((item, ind) => ({
-            value: e.testSuites[item], description: `${e.testSuites[item]} ${item}`, color: reportsBar[item]
-          }))}
-        />
-      </div>
-    </div>
+    let treeArr = [
+      {
+        key: e.key,
+        label: (
+          <div className="grid">
+            <div className="col-6">
+              <div>Execution Progress</div>
+              <HSBar
+                showTextIn
+                data={[
+                  {
+                    value: Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) - Object.keys(e.testCases).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testCases[el]).reduce((ac, cv) => ac + cv, 0),
+                    description: `${Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) - Object.keys(e.testCases).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testCases[el]).reduce((ac, cv) => ac + cv, 0)} Executed`,
+                    color: "#6a5acd",
+                  },
+                  {
+                    value: Object.keys(e.testCases).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testCases[el]).reduce((ac, cv) => ac + cv, 0),
+                    description: `${Object.keys(e.testCases).filter(item => item === "Queued" || item === "Inprogress" ).map((el) => e.testCases[el]).reduce((ac, cv) => ac + cv, 0)} Not Executed`,
+                    color: "#808080",
+                  },
+                ]}
+              />
+            </div>
+            <div className="col-6">
+            <div>Status</div>
+              <HSBar
+                showTextIn
+                data={Object.keys(e.testCases).map((item, ind) => ({
+                  value: e.testCases[item],
+                  description: `${e.testCases[item]} ${item}`,
+                  color: reportsBar[item],
+                }))}
+              />
+            </div>
+          </div>
+        ),
+        data: e.name,
+        children: [
+          {
+            key: "0-0",
+            label: "Test Case 1",
+            data: e.name
+          },
+          {
+            key: "0-1",
+            label: "Test Case 2",
+            data: e.name
+          },
+          {
+            key: "0-2",
+            label: "Test Case 3",
+            data: e.name
+          },
+          {
+            key: "0-3",
+            label: "Test Case 4",
+            data: e.name
+          },
+          {
+            key: "0-4",
+            label: "Test Case 5",
+            data: e.name
+          },
+        ],
+      },
+    ];
+    return (
+      <Tree
+        value={treeArr}
+        onNodeClick={(e) => onTestSuiteClick(e)}
+        className="modules_tree"
+      />
+    );
   };
 
   return (

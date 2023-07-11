@@ -15,9 +15,6 @@
         min-width: 20vw;
         .p-treenode-label {
             width: 100%;
-            svg {
-                border-radius: 8px;
-            }
         }
         .p-treenode-content {
             padding: 0 1rem 0 0;
@@ -27,9 +24,14 @@
         height: 75vh;
     }
     .p-datatable .p-datatable-tbody>tr>td:nth-child(4) {
-        width: 35rem;
+        width: 30rem;
+        vertical-align: top;
     }
     .p-datatable .p-datatable-tbody>tr>td:nth-child(5) {
-        width: 25rem;
+        width: 30rem;
+        vertical-align: top;
+    }
+    svg {
+        border-radius: 8px;
     }
 }

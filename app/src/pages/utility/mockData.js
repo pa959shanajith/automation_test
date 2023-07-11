@@ -146,5 +146,5 @@ export const reportsBar = {
   Pass: "#8FBC8F",
   Fail: "#8B0000",
   Queued: "#808080",
-  Inprogress: "#0000FF",
+  Inprogress: "#6366f1",
 };
