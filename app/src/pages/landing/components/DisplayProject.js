@@ -79,16 +79,16 @@ const DisplayProject = (props) => {
       output = "Created now";
     }
     else if (years == 0 && months == 0 && hours == 0 && minutes >= 1) {
-      output = "Last modified " + minutes + minute_ago +" ago";
+      output = "Edited " + minutes + minute_ago +" ago";
     }
     else if (years == 0 && months == 0 && hours >= 1) {
-      output = "Last modified " + hours + hours_ago +" ago";
+      output = "Edited " + hours + hours_ago +" ago";
     }
     else if (years == 0 && months >= 1) {
-      output = "Last modified " + inputDate.slice(5,11);
+      output = "Edited on " + inputDate.slice(5,11);
     }
     else {
-      output = "Last modified " + years + years_ago + " ago";
+      output = "Edited " + years + years_ago + " ago";
     }
 
     return output;
@@ -263,6 +263,7 @@ const DisplayProject = (props) => {
                 {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
                 {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
                 {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "5db0022cf87fdec084ae49b5" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
                 <div className="Project_name">
                 <p id="projectInside">{project.projectName}</p>
                 </div>

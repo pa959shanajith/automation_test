@@ -42,9 +42,11 @@ import ScheduleScreen from "./ScheduleScreen";
 import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
 import ExecutionCard from "./ExecutionCard";
+import { Tooltip } from 'primereact/tooltip';
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
+  const [visible_setup, setVisible_setup] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
@@ -97,8 +99,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
   const [executionTypeInRequest, setExecutionTypeInRequest] =
     useState("asynchronous");
-  const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-  const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
+  const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState(" Copy");
+  const [copyToolTip, setCopyToolTip] = useState(" Copy");
   const [logoutClicked, setLogoutClicked] = useState(false);
   const [profileTxt, setProfileTxt] = useState("");
   const [searchProfile, setSearchProfile] = useState("");
@@ -111,7 +113,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [selectedPattren, setSelectedPattren] = useState(null);
+  const [selectedPattren, setSelectedPattren] = useState({});
   const [selectedDaily, setSelectedDaily] = useState(null);
   const [selectedWeek, setselectedWeek] = useState([]);
   const [selectedMonthly, setSelectedMonthly] = useState(null);
@@ -136,6 +138,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [activeIndex1, setActiveIndex1] = useState(0);
   const timeinfo = useRef(null);
   const scheduleinfo  = useRef(null);
+  const errorinfo  = useRef(null);
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
   const handleTabChange = (e) => {
@@ -342,7 +345,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (navigator.clipboard.writeText(title)) {
       setCopyToolTip("Copied!");
       setTimeout(() => {
-        setCopyToolTip("Click to Copy");
+        setCopyToolTip(" Copy");
       }, 1500);
     }
   };
@@ -351,6 +354,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // setLoading('Please Wait...');
     setTimeout(async () => {
       const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
+      setLogoutClicked(false);
       if (deletedConfig.error) {
         if (deletedConfig.error.CONTENT) {
           setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
@@ -363,33 +367,33 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           );
         }
       } else {
-        const configurationList = await fetchConfigureList({
-          projectid: selectedProject,
-        });
-        if (configurationList.error) {
-          if (configurationList.error.CONTENT) {
-            setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
-          } else {
-            setMsg(
-              MSG.CUSTOM(
-                "Error While Fetching Execute Configuration List",
-                VARIANT.ERROR
-              )
-            );
-          }
-        } else {
-          const integrationData = configurationList.map((item, idx) => {
-            setIntegration(item.executionRequest.integration);
-          });
-          setConfigList(configurationList);
-        }
-        setMsg(
-          MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
-        );
+        tableUpdate();
+        // const configurationList = await fetchConfigureList({
+        //   projectid: selectedProject,
+        // });
+        // if (configurationList.error) {
+        //   if (configurationList.error.CONTENT) {
+        //     setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
+        //   } else {
+        //     setMsg(
+        //       MSG.CUSTOM(
+        //         "Error While Fetching Execute Configuration List",
+        //         VARIANT.ERROR
+        //       )
+        //     );
+        //   }
+        // } else {
+        //   const integrationData = configurationList.map((item, idx) => {
+        //     setIntegration(item.executionRequest.integration);
+        //   });
+        //   setConfigList(configurationList);
+        // }
+        // setMsg(
+        //   MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
+        // );
       }
       // setLoading(false);
     }, 500);
-    setShowConfirmPop(false);
   };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
@@ -530,6 +534,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         ),
         executionOptions: (
           <div className="Buttons_config_button">
+            {/* <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/> */}
             <Button
               className="execute_now"
               onClick={() => {
@@ -542,10 +547,12 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 console.log(fetechConfig, configItem)
               }}
               size="small"
+              
             >
-              {" "}
+                  
               Execute Now
             </Button>
+            {/* <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/> */}
             <Button
               className="schedule"
               onClick={() => {
@@ -555,10 +562,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               }}
               size="small"
             >
-              {" "}
               Schedule
             </Button>
-
+            {/* <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/> */}
             <Button
               className="CICD"
               size="small"
@@ -567,7 +573,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
-            >
+            >  
               CI/CD
             </Button>
             <Button
@@ -575,7 +581,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               size="small"
 
             >
-              SouceLab
+              SauceLab
             </Button>
           </div>
         ),
@@ -590,12 +596,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               icon="pi pi-pencil"
               className=" pencil_button p-button-edit"
               onClick={() => configModal("CancelUpdate", item)}
-            ></Button>
+            >
+               <Tooltip target=".pencil_button" position="left" content="Edit the execution configuration."/>
+            </Button>
             <Button
               icon="pi pi-trash"
-              className="p-button-edit"
+              className="trash_button p-button-edit"
               onClick={(event) => confirm_delete(event, item)}
-            ></Button>
+            >
+               <Tooltip target=".trash_button" position="left" content=" Delete the Execution configuration."/>
+            </Button>
           </div>
         ),
       });
@@ -644,7 +654,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       setModules("normalExecution");
       setSelectedNodeKeys({});
     }
-    setVisible(true);
+    setVisible_setup(true);
     setSetupBtn(getType);
   };
 
@@ -777,18 +787,29 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           })),
       };
       dispatch(updateTestSuite(dataObj)).then(() =>
-        dispatch(storeConfigureKey(executionData)).then(() => {
-          tableUpdate();
-        })
+        dispatch(storeConfigureKey(executionData))
       );
-      setVisible(false);
     } else if (getBtnType === "Cancel") {
       setConfigTxt("");
-      setVisible(false);
+      setVisible_setup(false);
       setDotNotExe({});
       setSelectedNodeKeys({});
-    } else setVisible(false);
+    } else setVisible_setup(false);
   };
+
+  useEffect(() => {
+    if(getConfigData?.setupExists === "success"){
+      tableUpdate();
+      setVisible_setup(false);
+    } else if(getConfigData?.setupExists?.error?.CONTENT){
+      errorinfo.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: getConfigData.setupExists.error.CONTENT,
+        life: 5000
+      });
+    };
+  }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
     return (
@@ -807,6 +828,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               <b>Project: </b>
             </label>
             <select
+            placeholder="Search"
+            title=" Search for project"
               onChange={(e) => {
                 setConfigProjectId(e.target.value);
               }}
@@ -867,7 +890,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           toast.current.show({
             severity: "success",
             summary: "Success",
-            detail: "Execution has started",
+            detail: " Execution started.",
             life: 5000,
           });
 
@@ -976,17 +999,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               ...el,
               poolid: "",
               type: "normal",
-              targetUser: selectedICE,
-              iceList: [],
+              ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
               date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startDate ? startDate.getTime() : "",
+              timestamp: startTime.getTime().toString(),
               recurringValue: getPattren().recurringValue,
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
-              endAfter: startDate ? "" : endDate.toLocaleDateString('es-CL'),
-              clientTime: startDate ? "" : `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
-              clientTimeZone: startDate ? "" : `GMT+${Math.abs(new Date().getTimezoneOffset()/60)}`,
+              endAfter: startDate ? "" : endDate?.name,
+              clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
+              clientTimeZone: "+0530",
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
             })),
             scenarioFlag: false,
             type: "normal",
@@ -1007,10 +1030,24 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         setEndDate(null);
         setStartTime(null);
         setScheduleOption({});
+        setSelectedDaily(null);
+        setselectedWeek([]);
+        setSelectedMonthly(null);
+        setDropdownWeek(null);
+        setSelectedPattren({});
       });
     }
     if (btnType === "Cancel") {
       setScheduling(false);
+      setStartDate(null);
+      setEndDate(null);
+      setStartTime(null);
+      setScheduleOption({});
+      setSelectedDaily(null);
+      setselectedWeek([]);
+      setSelectedMonthly(null);
+      setDropdownWeek(null);
+      setSelectedPattren({});
     }
   };
 
@@ -1036,7 +1073,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     return (
       <>
         {/* <Checkbox classname=" checkbox_header" /> */}
-        <span className="profile_label"> Configuration Profile Name</span>
+        <span className="profile_label"> Configuration Name</span>
       </>
     );
   };
@@ -1045,6 +1082,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (!!configList.length) {
       return (
         <>
+         <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+         <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
+         <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+
           <DataTable
             showGridlines
             resizableColumns
@@ -1060,14 +1101,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             <Column
               field="sno"
               style={{ width: "5%" }}
-              header={<span className="SNo-header">S No</span>}
+              header={<span className="SNo-header">S.No.</span>}
             />
             <Column
               style={{
                 fontWeight: "normal",
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
-                width: "50%"
+                width: "50%",
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
@@ -1082,7 +1123,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               field="executionOptions"
               header={
                 <span className="executionOption-header">
-                  Execution Options
+               Execution Options
                 </span>
               }
             />
@@ -1120,6 +1161,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   <label className="executeRadio_label_grid ml-2">
                     Execute with Avo Assure Agent/ Grid
                   </label>
+                  <img className='info__btn'src="static/imgs/info.png" ></img>
+<Tooltip target=".info__btn" position="left" content=' "Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents". 
+Learn More '/>
                   <div className="radioButtonContainer1">
                     <RadioButton
                       value="Execute with Avo Assure Client"
@@ -1135,6 +1179,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   <label className=" executeRadio_label_clint ml-2">
                     Execute with Avo Assure Client
                   </label>
+                  <img className='info__btn_grid'src="static/imgs/info.png" ></img>
+                  <Tooltip target=".info__btn_grid" position="left" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></Tooltip> 
+
                 </div>
                 {showIcePopup && (
                   <div>
@@ -1177,14 +1224,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 )}
               </>
             }
-            headerTxt={`Execute: ${fetechConfig[configItem]?.configurename}`}
+            headerTxt={`Execute Now : ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
-            modalSytle={{ width: "50vw", background: "#FFFFFF", height:"85%" }}
-            
-           
+            modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
+          <Toast ref={errorinfo} />
           <AvoModal
             visible={visible_schedule}
             setVisible={setVisible_schedule}
@@ -1200,13 +1246,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
                 setSelectedPattren={setSelectedPattren}
-                isDisabled={!startDate && (!selectedPattren?.key || !endDate)}
+                isDisabled={
+                  !startDate &&
+                  (!selectedPattren?.key || !endDate || !startTime)
+                }
                 onSchedule={onScheduleBtnClick}
                 selectedDaily={selectedDaily}
                 selectedWeek={selectedWeek}
                 selectedMonthly={selectedMonthly}
                 dropdownWeek={dropdownWeek}
-                dropdownDay={dropdownDay} 
+                dropdownDay={dropdownDay}
                 setSelectedDaily={setSelectedDaily}
                 setSelectedMonthly={setSelectedMonthly}
                 setDropdownWeek={setDropdownWeek}
@@ -1229,40 +1278,69 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             onModalBtnClick={onScheduleBtnClickClient}
             content={
               <>
-                <div className="ice_label">Allocate Avo Assure Client</div>
-                <div className="ice_container">
-                  <div className="ice_status">
-                    <span className="available"></span>
-                    <span>Available</span>
-                    <span className="unavailable"></span>
-                    <span>Unavailable</span>
-                    <span className="dnd"></span>
-                    <span>Do Not Disturb</span>
-                  </div>
-                  <DropDownList
-                    poolType={poolType}
-                    ExeScreen={ExeScreen}
-                    inputErrorBorder={inputErrorBorder}
-                    setInputErrorBorder={setInputErrorBorder}
-                    placeholder={"Search"}
-                    data={availableICE}
-                    smartMode={ExeScreen === true ? smartMode : ""}
-                    selectedICE={selectedICE}
-                    setSelectedICE={setSelectedICE}
+                <div className="radioButtonContainer">
+                  <RadioButton
+                    value="Execute with Avo Assure Agent/ Grid"
+                    onChange={(e) => {
+                      setShowIcePopup(false);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Agent/ Grid"
+                    }
                   />
+                  <label className="executeRadio_label_grid ml-2 mr-2">
+                    Execute with Avo Assure Agent/ Grid
+                  </label>
+                  <RadioButton
+                    value="Execute with Avo Assure Client"
+                    onChange={(e) => {
+                      setShowIcePopup(true);
+                      setRadioButton_grid(e.target.value);
+                    }}
+                    checked={
+                      radioButton_grid === "Execute with Avo Assure Client"
+                    }
+                  />
+                  <label className=" executeRadio_label_clint ml-2 mr-2">
+                    Execute with Avo Assure Client
+                  </label>
                 </div>
+                {showIcePopup && (
+                  <div className="ice_container">
+                    <div className="ice_status">
+                      <span className="available"></span>
+                      <span>Available</span>
+                      <span className="unavailable"></span>
+                      <span>Unavailable</span>
+                      <span className="dnd"></span>
+                      <span>Do Not Disturb</span>
+                    </div>
+                    <DropDownList
+                      poolType={poolType}
+                      ExeScreen={ExeScreen}
+                      inputErrorBorder={inputErrorBorder}
+                      setInputErrorBorder={setInputErrorBorder}
+                      placeholder={"Search"}
+                      data={availableICE}
+                      smartMode={ExeScreen === true ? smartMode : ""}
+                      selectedICE={selectedICE}
+                      setSelectedICE={setSelectedICE}
+                    />
+                  </div>
+                )}
               </>
             }
             headerTxt="Allocate Avo Assure Client to Schedule"
             footerType="ScheduleIce"
             modalSytle={{
-              width: "55vw",
-              height: "45vh",
+              width: "45vw",
+              height: "55vh",
               background: "#FFFFFF",
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-            isDisabled={!selectedICE}
+            // isDisabled={!selectedICE}
           />
           <AvoModal
             visible={visible_CICD}
@@ -1274,7 +1352,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 <div className="input_CICD ">
                   <div class="container_url">
                     <label for="inputField" class="devopsUrl_label">
-                      Devops Integration URL
+                    DevOps Integration URL
                     </label>
                     <pre className="grid_download_dialog__content__code cicdpre">
                       <code id="api-url" title={url}>
@@ -1288,9 +1366,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                       onClick={() => {
                         copyConfigKey(url);
                       }}
-                      title={copyToolTip}
+                      // title={copyToolTip}
                     />
-                  </div>
+                    <Tooltip target=".copy_CICD" position="left" content={copyToolTip}/>
+                   </div>
                   <div className="executiontype">
                     <div className="lable_sync">
                       <label
@@ -1299,8 +1378,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                         htmlFor="synch"
                         value="asynchronous"
                       >
-                        Asynchronous{" "}
+                        Asynchronous
                       </label>
+                      <img className='info__btn_async'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info__btn_async" position="left" content=" Execution responses are generated simultaneously during the execution."/>
                       <InputSwitch
                         className="inputSwitch_CICD"
                         label=""
@@ -1318,8 +1399,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                         htmlFor="synch"
                         value="synchronous"
                       >
-                        Synchronous{" "}
+                        Synchronous
                       </label>
+                      <img className='info__btn'src="static/imgs/info.png" ></img>
+                      <Tooltip target=".info__btn" position="left" content=" Execution responses are generated after the end of execution."/>
                     </div>
                   </div>
                   <div className="container_devopsLabel" title={str}>
@@ -1341,14 +1424,15 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                         onClick={() => {
                           copyConfigKey(str);
                         }}
-                        title={copyToolTip}
+                        // title={copyToolTip}
                       />
+                      <Tooltip target=".copy_devops" position="left" content={copyToolTip}/>
                     </div>
                   </div>
                 </div>
               </>
             }
-            headerTxt={`CICD: ${fetechConfig[configItem]?.configurename}`}
+            headerTxt={`CICD Execution : ${fetechConfig[configItem]?.configurename}`}
             modalSytle={{ width: "50vw", background: "#FFFFFF" }}
             onModalBtnClick={showSuccess_CICD}
           />
@@ -1378,7 +1462,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 }}
 
               >
-                Configuration Profile Name
+                Configuration Name
               </span>
               <span
                 style={{
@@ -1397,7 +1481,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   fontFamily: "open Sans",
                 }}
               >
-                Actions
+               Actions
               </span>
             </div>
           }
@@ -1409,7 +1493,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 alt="Card"
                 src="static/imgs/execution_report.png"
               />
-              <span className="text1 ">No Configuration's yet</span>
+              <span className="text1 ">No items yet.</span>
             </div>
           </div>
           <Button
@@ -1418,6 +1502,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           >
             {" "}
             configure{" "}
+            <Tooltip target=".configure_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
       );
@@ -1443,11 +1528,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                   icon="pi pi-search"
                   placeholder="Search"
                   inputTxt={searchProfile}
+                  title="Search for an execution configuration."
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small">
-                  Add Configuration
+                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
+               Add Configuration
+               <Tooltip target=".addConfig_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}
@@ -1462,8 +1549,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           <ExecutionPage />
         )}
         <AvoModal
-          visible={visible}
-          setVisible={setVisible}
+          visible={visible_setup}
+          setVisible={setVisible_setup}
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup

@@ -107,3 +107,10 @@ export const scheduleWeek = [
   { name: 'Friday', key: 5 },
   { name: 'Saturday', key: 6 }
 ];
+
+export const endMonths = [
+  { name: '1 Month', key: 1 },
+  { name: '3 Months', key: 3 },
+  { name: '6 Months', key: 6 },
+  { name: '9 Months', key: 9 }
+];

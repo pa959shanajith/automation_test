@@ -151,10 +151,16 @@
   .text__insprint__info {
     padding: 1.2rem 0;
   }
+  .tooltip-background_sceen {
+    /* Other styles */
+    fill: #495057 !important;
+    width: 45rem;
+  }
   .tooltip-background {
     /* Other styles */
     fill: #495057 !important;
-    width: 40rem;
+    padding: 1rem 5rem 1rem 5rem;
+    background-color: navy;
   }
   
   .tooltip-text {
@@ -165,4 +171,47 @@
   .tooltip-subtext {
     /* Other styles */
     color: white !important;
+  }
+ 
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+  }
+  .ct-node-title {
+    font-size: larger;
+    background-color: #605BFF;
+    margin-left: 2rem;
+  }
+  
+  
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+  .tooltipchild{
+    line-height: 1rem;
+    display: block;
+  }
+  .tooltip-line {
+    display: flex;
+    justify-content: center;
+    white-space: pre-line;
   }
