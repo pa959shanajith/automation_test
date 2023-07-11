@@ -758,33 +758,53 @@ export const saveE2EDataPopup = async(HardCodedApiDataForE2E) => {
     }
 }
 
+
 export const getProjectsMMTS = async(data) => {
-    console.log("data",data)
+
     try{
+
         const res = await axios(url+'/getProjectsMMTS', {
+
             method: 'POST',
+
             headers: {
+
                 'Content-Type': 'application/json'
+
             },
             data:{"projectid":data,
                 "readme":"Projectid"},
             credentials: 'include',
+
         });
+
         if(res.status === 401 || res.data === "Invalid Session"){
+
             return {error:MSG.GENERIC.INVALID_SESSION};
+
         }
         if(res.status===200 && res.data !== "fail"){    
             console.log("res.data",res.data)        
             return res.data; 
         }
+
         console.error(res.data)
+
         return {error:"failed"}
+
     }catch(err){
+
         console.error(err)
+
         return {error:"failed"}
+
     }
 
-    
+
+
+
+   
+
 }
 
 
@@ -1268,4 +1288,22 @@ export const checkExportVer = async(data) => {
         console.error(err)
         return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
+}
+
+export const fetchReplacedKeywords_ICE = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/fetchReplacedKeywords_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : arg,
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
 }

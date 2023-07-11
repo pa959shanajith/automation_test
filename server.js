@@ -252,6 +252,7 @@ if (cluster.isMaster) {
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -440,9 +441,6 @@ if (cluster.isMaster) {
 		app.post('/writeZipFileServer', auth.protect,upload.single('file'),mindmap.writeZipFileServer);
 		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
-		app.post('/getProjectsMMTS',auth.protect, devOps.getProjectsMMTS);
-		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
-		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
