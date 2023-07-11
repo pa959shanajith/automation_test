@@ -145,27 +145,49 @@ exports.getAllSuites_ICE = async (req, res) => {
 };
 
 exports.getProjectsMMTS = async (req, res) => {
+
     const fnName = "getProjectsMMTS";
+
     logger.info("Inside UI service: " + fnName);
+
     try {
+
         var requestedaction = req.body.readme;
-        if (requestedaction == 'projects' || requestedaction == 'reports') {
+
+        // if (requestedaction === 'Projectid' ) {
+
             const inputs = {
+
                 "query": "getProjectsMMTS",
-				"userid": req.session.userid,
-                projectid: req.body.projectid
+
+                "userid": req.session.userid,
+
+                "projectid": req.body.projectid
+
             };
+
             const result = await utils.fetchData(inputs, "/mindmap/getProjectsMMTS", fnName);
+
             if (result == "fail") return res.send("fail");
+
             res.send(result);
-        } else {
-            logger.error("Error occurred in report/"+fnName+": Invalid input fail");
-            res.send('Invalid input fail');
-        }
+
+        // } else {
+
+        //     logger.error("Error occurred in report/"+fnName+": Invalid input fail");
+
+        //     res.send('Invalid input fail');
+
+        // }
+
    } catch (exception) {
+
      logger.error("Error occurred in report/"+fnName+":", exception);
+
      res.send("fail");
+
   }
+
 };
 
 exports.getConfigureList = async (req, res) => {
