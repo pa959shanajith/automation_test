@@ -741,8 +741,6 @@ const elementTypeProp =(elementProperty) =>{
                         let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
                         setNewScrapedData(scrapeItemList);
                         handleDialog("replaceObjectPhase2");
-                        dispatch(ReplaceFlag(true));
-                        setReplaceVisible(true);
                     } else {
                         // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
                     }
@@ -1570,7 +1568,7 @@ const footerSave = (
         toastError={toastError}
       />}
 
-      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2' || replaceFlag) && <ActionPanel
+      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
         isOpen={currentDialog}
         OnClose={handleClose}
         fetchingDetails={props.fetchingDetails}
