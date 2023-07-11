@@ -115,7 +115,7 @@ const CreateNew = ({importRedirect}) => {
                 </div>
               <div id='mp__canvas' className='mp__canvas'>
                      {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?
-                     <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError}/>
+                     <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast}/>
                     :<Fragment>
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
