@@ -1079,7 +1079,7 @@ const footerContentScreen =(
             {/* <Legends/> */}
             {props.GeniusDialog?<Legends />:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
-            {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
+            {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
             {props.GeniusDialog ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
             {props.gen?<svg id="mp__canvas_svg_genius" className='mp__canvas_svg_genius' ref={CanvasRef}>
                 <g className='ct-container-genius'>
