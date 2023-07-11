@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .report_landing{
 .report{
     background: #F5F5F5;
@@ -241,14 +242,30 @@
     box-sizing: border-box;
     flex-direction: column;
     gap: 8px;
-    height: 170px;
+    height: 9rem;
     /* left: 0px; */
-    padding: 32px;
-    position: relative;
-    top: 93px;
-    width: 334.11px;
+    // padding: 32px;
+    // position: relative;
+    // top: 93px;
+    width:19rem ;
     &:hover{
         transform:scale(1.1);
+    }
+    .p-card-body {
+        padding: 0rem 1rem 1rem 1rem !important;
+    }
+}
+
+.browser__img {
+    height: 1.2rem;
+    padding: 0.1rem 0.3rem;
+    top: 2%;
+    position: relative;
+    top: 0.2rem;
+}
+.browser-avatar{
+    .p-avatar-group{
+        border: none !important;
     }
 }
 
@@ -266,15 +283,26 @@
 
 .projectDropDown{
     position: relative;
-    top: 0.4rem;
+    // top: 0.4rem;
+    .p-inputtext{
+        padding: 0.25rem !important;
+    }
+}
+.Profile_Name{
+    font: $f6_regular;
+
 }
 .sort{
     display:inline-flex;
     position: relative;
     top: 4rem; 
     color:#8E8E8E;
+    .p-inputtext{
+        padding: 0.25rem !important;
+    }
     // background: #F5F5F5 !important;
 }
+
 .Projectreport{
     display: flex;
     position: relative;
@@ -305,9 +333,16 @@
 .Report_Image{
     display: flex;
     justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+#report_icon{
+    height: 28rem;
     position: relative;
     top: 3rem;
-    height: 24rem;
+}
+.report_text{
+    top: 4rem;
 }
 .projectSelectreport{
     box-shadow: none;
@@ -317,5 +352,11 @@
     width: 10rem;
     left: 4.5rem;
     bottom: 0.4rem;
+}
+.report_Data{
+    position: relative;
+    top: 5rem;
+    max-height: 25rem;
+    overflow: auto;
 }
 }

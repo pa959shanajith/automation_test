@@ -7,12 +7,14 @@
   margin-left: 50rem;
 }
 
-.custom-tieredmenu {
+}
+
+.p-tieredmenu.custom-tieredmenu {
   background:linear-gradient(180deg,#EDECEC 15%,#fafafb 13%)!important;
   border-radius: 8px !important;
   width: 13.8rem !important;
   position: relative;
-  z-index: 1;
+  z-index: 2;
   position: absolute;
   top: 2.6rem;
   right: 0.2rem;
@@ -21,32 +23,30 @@
     background: #bec2be !important;
     font: $f6_regular !important;
   }
-  
-}
-.user_name{
-  font: $f6_semibold;
-}
-.user_role{
-  font: $f7_regular;
-}
-
-.ProfileDisplay  {
-  text-align: center;
-  margin-bottom: 0.8rem;
-  margin-right: 0.5rem;
-  margin-top: 1rem;
-}
-.tooltipEmailId{
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  left: 0.8rem;
-  position: relative;
-  cursor: pointer;
-  color: #495057;
-  font: $f7_regular;
+  .ProfileDisplay  {
+    text-align: center;
+    margin-bottom: 0.8rem;
+    margin-right: 0.5rem;
+    margin-top: 1rem;
   }
-.p-avatar.p-avatar-image{
-  border:2px solid white !important;
-}
+  .user_name{
+    font: $f6_semibold;
+  }
+  .user_role{
+    font: $f7_regular;
+  }
+  
+  .tooltipEmailId{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    left: 0.8rem;
+    position: relative;
+    cursor: pointer;
+    color: #495057;
+    font: $f7_regular;
+    }
+  .p-avatar.p-avatar-image{
+    border:2px solid white !important;
+  }
 }
