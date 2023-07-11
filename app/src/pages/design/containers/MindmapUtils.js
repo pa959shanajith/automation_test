@@ -560,7 +560,7 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
     var node = {
         id: 0,
         childIndex: 0,
-        name: name?name:'Module_0',
+        name: name?name:'TestSuite_0',
         type: types?types:'modules',
         children: [],
         parent: null,
@@ -751,7 +751,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         if (obj) {
                 tempName = obj;
         } else {
-                tempName = nNext[pt][0]+'_'+count[(nNext[pt][0]).toLowerCase() + 's'];
+                tempName = (nNext[pt][0]==='Scenario'?'TestCase':nNext[pt][0]==='Testcase'?'TestSteps':'Screen')+'_'+count[(nNext[pt][0]).toLowerCase() + 's'];
         }
         var node = {
                 id: uNix,
