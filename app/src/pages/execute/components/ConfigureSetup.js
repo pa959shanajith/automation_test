@@ -301,7 +301,7 @@ const ConfigureSetup = ({
     if (node?.key?.includes('-')) {
       return { genaralRow: true };
     } else {
-      return { customRow: true };
+      return { ...(modules === "normalExecution" ? {customNormalRow: true} : {customE2ERow: true} )};
     }
   };
 

@@ -32,6 +32,7 @@ const ProjectOverview = ({ }) => {
                 {defaultselectedProject && defaultselectedProject.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="35" width='45' />)}
                 {defaultselectedProject && defaultselectedProject.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="35" width='30' />)}
                 {defaultselectedProject && defaultselectedProject.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="35" width='30' />)}
+                {defaultselectedProject && defaultselectedProject.appType === "5db0022cf87fdec084ae49b5" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
                 <p className='DefaultProjectName'>{defaultselectedProject && defaultselectedProject.projectName}</p>
             </div>
             <TabMenu className='tab-menu' model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />

@@ -17,6 +17,7 @@ import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice
 import { InputText } from 'primereact/inputtext';
 import Select from "react-select";
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import { Tooltip } from 'primereact/tooltip';
 
 
 const DesignModal = (props) => {
@@ -671,7 +672,7 @@ const DesignModal = (props) => {
     const headerTemplate = (
         <>
             <div>
-                <h5 className='dailog_header1'>Design Test Step</h5>
+                <h5 className='dailog_header1'>Design Test steps</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="btn_test_screen" src="static/imgs/bi_code-square.svg" alt='screen icon' />
             </div>
@@ -761,13 +762,20 @@ const DesignModal = (props) => {
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
                 {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
-                    <i className='pi pi-file-import' style={{marginTop:'0.9rem'}} title='Import Test Steps' onClick={()=>importTestCase()} />
+                    <i className='pi pi-file-import' style={{marginTop:'0.9rem'}} onClick={()=>importTestCase()} />
+                    <Tooltip target=".pi-file-import" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <i className='pi pi-file-export' style={{marginTop:'0.9rem'}} title='Export Test Steps' onClick={()=>exportTestCase()} />
-                    <i className='pi pi-plus' style={{marginTop:'0.9rem'}} title='Add Test Step' onClick={()=>addRow()} />
-                    <i className='pi pi-save' style={{marginTop:'0.9rem'}} title='Save' onClick={()=>saveTestCases()} />
+                    <i className='pi pi-file-export' style={{marginTop:'0.9rem'}}  onClick={()=>exportTestCase()} />
+                <Tooltip target=".pi-file-export" position="bottom" content="Export Test Steps"/>
+                    <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
+                    <Tooltip target=".pi-plus " position="bottom" content="  Add Test Step"/>
+                    <i className='pi pi-save' style={{marginTop:'0.9rem'}} onClick={()=>saveTestCases()} />
+                    <Tooltip target=".pi-save " position="bottom" content="  save"/>
                     <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
-                    <Button size='small' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' title='Debug' outlined></Button>
+                    <Tooltip target=".pi-trash " position="bottom" content="  Delete"/>
+                    <Button size='small' className='debug_but' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' outlined>
+                    <Tooltip target=".debug_but" position="left" content=" Click to debug and optionally add dependent test steps repository." />
+                    </Button>
                 </div>:null}
             </div>}
             </>
@@ -1068,7 +1076,8 @@ const DesignModal = (props) => {
                             <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
                             <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
                             <Column field="remarks" header="Remarks" />
-                            <Column rowEditor field="action" header="Actions" bodyStyle={{ textAlign: 'center' }} ></Column>
+                            <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center' }} ></Column>
+                            <Tooltip target=".action " position="left" content="  Edit the test step."/>
                     </DataTable>
             </div>
         );

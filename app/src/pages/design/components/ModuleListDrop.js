@@ -875,24 +875,24 @@ const ModuleListDrop = (props) =>{
                            <i className="pi pi-times"  onClick={click_X_Button}></i>
                        </div>)}
                      </div> */}
-                  <i className="pi pi-file-import mindmapImport" title='Import Module' onClick={() => setImportPop(true)}></i>
-                  {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} /> : null}
-                  <Tooltip target=".custom-target-icon" content=" Create module" position="bottom" />
-                  <img className="custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules" onClick={() => { CreateNew() }} />
-
-
-                </div>
-                <div className='' style={{ display: 'flex', height: '1.6rem', marginTop: '2%', marginLeft: '3%' }}>
-                  <input style={{ width: '1rem', marginLeft: '0.57rem', marginTop: '0.28rem' }} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
-                    if (!allModSelected) {
-                      dispatch(selectedModulelist(moduleLists.filter(module => module.type === 'basic').map((modd) => modd._id)))
-                    } else {
-                      dispatch(selectedModulelist([]))
-                    }
-                    setAllModSelected(!allModSelected)
-                  }} >
-                  </input>
-                  {/* <input className='pFont' style={{width:'12rem'}}placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
+                     <i className="pi pi-file-import mindmapImport"  onClick={()=>setImportPop(true)}></i>
+                     <Tooltip target=".mindmapImport" position="left" content=" Edit the properties of elements." />
+                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
+                     <Tooltip target=".custom-target-icon" content=" Create module" position="bottom" />
+                     <img  className="custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  /> 
+                   
+                  
+             </div>
+                <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
+                      <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
+                                    if (!allModSelected) {
+                                        dispatch(selectedModulelist( moduleList.filter(module=> module.type==='basic').map((modd) => modd._id) ))
+                                    } else {
+                                        dispatch(selectedModulelist([]) )
+                                    }
+                                    setAllModSelected(!allModSelected)}} >
+                       </input>
+                       {/* <input className='pFont' style={{width:'12rem'}}placeholder="Search Modules" ref={SearchInp} onChange={(e)=>{searchModule(e.target.value)}}/>
                                         <img  style={{height:'17px',width:'17px',marginTop:'3px'}} src={"static/imgs/ic-search-icon.png"} alt={'search'}/> */}
                   <div className='inputSearchNorMod'>
                     <span className="p-input-icon-left">

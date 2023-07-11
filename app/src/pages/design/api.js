@@ -1240,3 +1240,21 @@ export const userObjectElement_ICE = custObjProps => {
         .catch(err => reject(err));
     });
 }
+
+export const fetchReplacedKeywords_ICE = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/fetchReplacedKeywords_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : arg,
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
