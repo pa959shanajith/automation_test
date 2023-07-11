@@ -207,3 +207,20 @@
     position: relative;
     padding: 0.5rem;
 }
+
+#testcaseDropdownRefID{
+    .select-option{
+        .p-dropdown-panel .p-dropdown-items .p-dropdown-item{
+            padding: 0.1rem 1rem !important;
+        }
+        .p-dropdown-panel .p-dropdown-items{
+            padding: 0 !important;
+        }
+        .p-dropdown-item{
+            padding: 0.1rem 1rem !important;
+        }
+        .p-dropdown-items-wrapper{
+            max-height: 273px !important;
+        }
+    }
+}

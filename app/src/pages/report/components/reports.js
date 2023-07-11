@@ -14,6 +14,7 @@ import { InputText } from 'primereact/inputtext';
 import { AvatarGroup } from 'primereact/avatargroup';
 import { Avatar } from 'primereact/avatar';
 import { fetchConfigureList, getProjectList } from "../api";
+import { NavLink } from 'react-router-dom';
 // import ExecutionprofileTable from './ExecutionprofileTable';
 
 
@@ -216,16 +217,16 @@ const reports = () => {
                         {filteredExecutionData.length > 0 ? (<div className='report_Data ml-4'>
                             {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
                                 {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'><Card key={index} className='testCards'>
-                                    <p onMouseDownCapture={handleData} className='Profile_Name'>{data.configurename}</p><p>{data.selectedModuleType}</p><p>Last executed through {data.configurename}</p><p>Last executed on {data.date}</p>
+                                <NavLink to="/reports/profile" activeClassName="active">{data.configurename}</NavLink><p>{data.selectedModuleType}</p><p>Last executed through {data.configurename}</p><p>Last executed on {data.date}</p>
                                 </Card></div>))}
                             </div>)}
                             {activeIndex === "Functional Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
-                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><p onMouseDownCapture={handleData}>{data.key}</p><p>{data.scenariovalue}</p>
+                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><p m={handleData}>{data.key}</p><p>{data.scenariovalue}</p>
                                     <Avatar key={data.value} className='browser-avatar' />
                                 </Card></div>)}
                             </div>)}
                             {activeIndex === "Accessibility Test" && executionButon === 'View by Execution Profile' && (<div className="grid ml-4" >
-                                {reportData.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><p onMouseDownCapture={handleData}>{data.key}</p><p>{data.Modulevalue + data.scenariovalue}</p>
+                                {reportData.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" activeClassName="active">{data.key}</NavLink><p>{data.Modulevalue + data.scenariovalue}</p>
                                     <AvatarGroup>
                                         {data.value.map((image, index) => (
                                             <Avatar key={index} image={image.props.src} className='browser-avatar' />
@@ -235,7 +236,7 @@ const reports = () => {
                                 </Card></div>)}
                             </div>)}
                             {activeIndex === "Accessibility Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
-                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><p onMouseDownCapture={handleData}>{data.key}</p><p>{data.scenariovalue}</p>
+                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" activeClassName="active">{data.key}</NavLink><p>{data.scenariovalue}</p>
                                     <Avatar key={data.value} className='browser-avatar' />
                                 </Card></div>)}
                             </div>)}
