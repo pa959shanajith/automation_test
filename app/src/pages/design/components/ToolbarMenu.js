@@ -27,8 +27,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const gitPathRef =  useRef()
     const moduleSelect = useSelector(state=>state.design.selectedModule)
     const selectBox = useSelector(state=>state.design.selectBoxState)
-    const selectNodes = useSelector(state=>state.design.selectNodes)
-    const copyNodes = useSelector(state=>state.design.copyNodes)
+    const selectNode = useSelector(state=>state.design.selectNodes)
+    const copyNode = useSelector(state=>state.design.copyNodes)
     const prjList = useSelector(state=>state.design.projectList)
     const initProj = useSelector(state=>state.design.selectedProj)
     // const setselectedProjectNameForDropdown = useSelector(state=>state.design.selectedProj)
@@ -120,10 +120,10 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             setMsg(MSG.MINDMAP.ERR_PASTEMAP_ACTIVE_COPY)
             return;
         }
-        var val = copy({...selectNodes},copyNodes)
+        var val = copy({...selectNode},copyNode)
         if(val){
             d3.select('#copyImg').classed('active-map',true)
-            dispatch(copyNodes(selectNodes))
+            dispatch(copyNodes(selectNode))
             dispatch(selectBoxState(false))
             dispatch(selectNodes({nodes:[],links:[]}))
         }
@@ -142,7 +142,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             return;
         }
         d3.select('#copyImg').classed('active-map',false)
-        paste({...copyNodes})
+        paste({...copyNode})
     }
     var projectList = Object.entries(prjList)
     return(
@@ -349,8 +349,8 @@ function jsonDownload(filename, responseData) {
 }
 
 //check for paste errors and paste action
-const paste = (copyNodes) =>{
-    var dNodes_c = copyNodes.nodes
+const paste = (copyNode) =>{
+    var dNodes_c = copyNode.nodes
     var module_check_flag = false
     if(dNodes_c.length === 0){
         setMsg(MSG.MINDMAP.ERR_NOTHING_PASTE)
@@ -369,15 +369,15 @@ const paste = (copyNodes) =>{
 }
 
 //check for dangling errors and and copy action
-const copy = (selectNodes,copyNodes) =>{
-    var dNodes_c = selectNodes.nodes
-    var dLinks_c = selectNodes.links
+const copy = (selectNode,copyNode) =>{
+    var dNodes_c = selectNode.nodes
+    var dLinks_c = selectNode.links
     var dangling_screen_check_flag = false
     var dangling_screen ;
     var dangling_screen_flag = false
     var ds_list = [];
     if(dNodes_c.length === 0){
-        if(copyNodes.nodes.length>0){
+        if(copyNode.nodes.length>0){
             setMsg(MSG.MINDMAP.WARN_CLICK_PASTEMAP)
             return false
         }

@@ -315,7 +315,7 @@ const DesignModal = (props) => {
                                                 let temp = testcase[i].keywordVal
                                                 testcase[i].keywordVal = testcase[i].keywordVal[0].toLowerCase() + testcase[i].keywordVal.slice(1,);
                                                 if(testcase[i].custname !== "OBJECT_DELETED"){
-                                                    let objType = getKeywordList(testcase[i].custname,keywordData,props.appType)
+                                                    let objType = getKeywordList(testcase[i].custname,keywordData,props.appType,scriptData.view)
                                                     testcase[i]["keywordTooltip"] = keywordData[objType.obType][temp]?.tooltip!==undefined?keywordData[objType.obType][temp].tooltip:'--';
                                                     testcase[i]["keywordDescription"] = keywordData[objType.obType][temp]?.description!==undefined?keywordData[objType.obType][temp].description:'--';
                                                 }else{
@@ -548,7 +548,21 @@ const DesignModal = (props) => {
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
     //Debug function
+    const showSuccess = (success) => {
+        toast.current.show({severity:'success', summary: 'Success', detail:success, life: 3000});
+    }
 
+    const showInfo = (Info) => {
+        toast.current.show({severity:'info', summary: 'Info', detail:Info, life: 2000});
+    }
+
+    const showWarn = (Warn) => {
+        toast.current.show({severity:'warn', summary: 'Warning', detail:Warn, life: 2000});
+    }
+
+    const showError = (Error) => {
+        toast.current.show({severity:'error', summary: 'Error', detail:Error, life: 3000});
+    }
     const debugTestCases = selectedBrowserType => {
         setVisibleDependentTestCaseDialog(false);
         let testcaseID = [];
@@ -567,13 +581,13 @@ const DesignModal = (props) => {
                 setOverlay("");
                 // ResetSession.end();
                 if (data === "Invalid Session") return ;
-                else if (data === "unavailableLocalServer")  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
-                else if (data === "success") setMsg(MSG.DESIGN.SUCC_DEBUG)
-                else if (data === "fail") setMsg(MSG.DESIGN.ERR_DEBUG)
-                else if (data === "Terminate") setMsg(MSG.DESIGN.WARN_DEBUG_TERMINATE)
-                else if (data === "browserUnavailable") setMsg(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
-                else if (data === "scheduleModeOn") setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
-                else if (data === "ExecutionOnlyAllowed") setMsg(MSG.GENERIC.WARN_EXECUTION_ONLY)
+                else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+                else if (data === "success") showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT)
+                else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+                else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+                else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+                else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+                else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
                 else if (data.status === "success"){
                     let rows={}
                     mainTestCases.forEach((testCase, index) => {
@@ -880,12 +894,14 @@ const DesignModal = (props) => {
                 let keyData = null;
                 if(testCase.testCases.length>0){
                     for(var i = 0; testCase.testCases.length>i; i++){
-                        let obj = !testCase.testCases[i].custname ? objNameList[0] : testCase.testCases[i].custname;
-                        caseData = getKeywords(obj)
-                        data=obj;
-                        let key = (!caseData.keywords.includes(testCase.testCases[i].keywordVal) || !testCase.testCases[i].custname) ? caseData.keywords[0] : testCase.testCases[i].keywordVal;
-                        placeholders = getRowPlaceholders(caseData.obType, key);
-                        keyData = key
+                        if (!testCase.testCases[i].custname || (testCase.testCases[i].custname !== "OBJECT_DELETED" && objNameList.includes(testCase.testCases[i].custname))){
+                            let obj = !testCase.testCases[i].custname ? objNameList[0] : testCase.testCases[i].custname;
+                            caseData = getKeywords(obj)
+                            data=obj;
+                            let key = (!caseData.keywords.includes(testCase.testCases[i].keywordVal) || !testCase.testCases[i].custname) ? caseData.keywords[0] : testCase.testCases[i].keywordVal;
+                            placeholders = getRowPlaceholders(caseData.obType, key);
+                            keyData = key
+                        }
                     }
                 }
                 // let obj = !testCase.custname ? objNameList : testCase.custname;
