@@ -726,6 +726,8 @@
         display: flex;
         position: relative;
         height: 80%;
+        max-height: 19rem;
+        overflow: auto;
     }
 
     .ro_listCanvas {
@@ -753,6 +755,8 @@
         height: 80%;
         display: flex;
         margin-top: 0.5rem;
+        max-height: 19rem;
+        overflow: auto;
     }
 
     .ss__ro_customInContainer {
