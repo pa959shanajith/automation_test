@@ -782,6 +782,7 @@ const ActionPanel = (props) => {
   const [CORData, setCORData] = useState({});
   const [forceRender, setForceRender] = useState(false); // only used to re-render the replace-keyword screen
   const [objectsReplaced, setObjectsReplaced] = useState(false); // used to detect whether any object was replaced or not
+  const [dataTableData, setDataTableData] = useState([]);
 
 
   useEffect(() => {
@@ -977,7 +978,21 @@ const ActionPanel = (props) => {
       });
     props.setShow(false)
   }
-
+  const handleSelectChange = (e, keyword, oldObj) => {
+    if (e.target.value) e.target.classList.remove("r-group__selectError")
+    else return
+    if (!CrossObjKeywordMap[oldObj.objId]) {
+      CrossObjKeywordMap[oldObj.objId] = {
+        "keywordMap": {
+          [keyword]: e.target.value
+        }
+      }
+    }
+    else {
+      CrossObjKeywordMap[oldObj.objId]["keywordMap"][keyword] = e.target.value;
+    }
+    setCrossObjKeywordMap(CrossObjKeywordMap);
+  }
   const handleReplaceKeywordClick = () => {
     if (!Object.keys(replace).length) {
       props.toastError("Please select atleast one object to Replace");
@@ -1036,7 +1051,47 @@ const ActionPanel = (props) => {
       fetchReplacedKeywords_ICE(arg).then((res) => {
         props.setOverlay(null)
         if (!(res === "fail")) {
-          setCORData(res)
+          setCORData(res);
+          setDataTableData(Object.keys(replace).map((val_id, idx) => {
+            let tag = "";
+            if (replace[val_id]) tag = tagListToReplace.includes(replace[val_id][1].tag) ? replace[val_id][1].tag : 'element';
+            const oldObj = replace[val_id] ? replace[val_id][0] : {};
+            const newObj = replace[val_id] ? replace[val_id][1] : {};
+            const keywords = replace[val_id] && res[replace[val_id][0].objId] ? res[replace[val_id][0].objId].keywords : [];
+            const newkeywords = (res.keywordList && res.keywordList[tag] && Object.keys(res.keywordList[tag]).length) ? Object.keys(res?.keywordList[tag]) : [];
+            const singleDataTableData = keywords.map((k_word, idx) => {
+              const similarTagNames = (tagListToReplace.includes(oldObj.tag) ? oldObj.tag : "element") === (tagListToReplace.includes(newObj.tag) ? newObj.tag : "element")
+              return (
+                {
+                  oldObj: <span title={oldObj.title}>{oldObj.title}</span>,
+                  keywords: <span title={k_word}>{k_word}</span>,
+                  newObj: <span title={newObj.title}>{newObj.title}</span>,
+                  selectKeyword: (
+                    <span style={{ width: '40%' }}>
+                      <select
+                        className="r-group__select"
+                        defaultValue={similarTagNames}
+                        onFocus={(e) => { e.target.value ? e.target.classList.remove('r-group__selectError') : e.target.classList.add('r-group__selectError') }}
+                        onChange={(e) => { handleSelectChange(e, k_word, oldObj) }}
+                        style={{ height: '2rem' }}
+                      >
+                        <option key="notSelected" value="" title="Select keyword" disabled>
+                          Select keyword
+                        </option>
+                        {newkeywords &&
+                          newkeywords.map((keyword, i) => (
+                            <option key={keyword + i} title={keyword} value={keyword}>
+                              {keyword.slice(0, 30) + (keyword.length > 30 ? '...' : '')}
+                            </option>
+                          ))}
+                      </select>
+                    </span>
+                  )
+                }
+              );
+            });
+            return singleDataTableData;
+          }).flat());
           setActiveTab("keywordsReplacement")
         }
         else {
@@ -1061,19 +1116,11 @@ const ActionPanel = (props) => {
       <Button size='small' label='Save' onClick={() => {
         Object.keys(replace).map((val_id, idx) => {
 
-          // idx={idx} key={idx + forceRender} val={val_id} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap}
-          // oldObj={replace[val_id][0]} newObj={replace[val_id][1]} keywords={replace[val_id][0].tag ? Object.keys(CORData.keywordList[replace[val_id][0].tag]) : []}
-          // newkeywords={Object.keys(CORData.keywordList[tag]).length ? Object.keys(CORData.keywordList[tag]) : []}
-
           let keywords = replace[val_id] && CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords : [];
           let oldObj = replace[val_id][0];
           let COKMap = CrossObjKeywordMap;
           let newObj = replace[val_id][1];
           let val = val_id;
-          // if (keywords.length > 0 && (!COKMap[oldObj.objId] || Object.keys(COKMap[oldObj.objId]["keywordMap"]).length !== keywords.length)) {
-          //   props.toastError({ "CONTENT": "Please replace all the keywords of object.", "VARIANT": "error" })
-          //   return
-          // }
 
           if (keywords.length > 0)
             saveGroupItem(oldObj.objId, COKMap[oldObj.objId]["keywordMap"], newObj, val)
@@ -1416,20 +1463,32 @@ const ActionPanel = (props) => {
                 <Dialog visible={activeTab === "keywordsReplacement"}
                   onHide={props.OnClose} footer={footerReplaceKeyword} header='Replace Keywords'>
                   <div className='ss__ro_lbl'>Please map the keywords of old elements with the new elements</div>
-                  {Object.keys(replace).map((val_id, idx) => {
-                    let tag = "";
-                    if (replace[val_id]) tag = tagListToReplace.includes(replace[val_id][1].tag) ? replace[val_id][1].tag : 'element';
-                    // let existingElement = replace[val_id][0].title;
-                    // let newElement = replace[val_id][1].title;
-                    // let newkeywordToReplace =  newkeywords.map((keyword, i) => <div key={keyword + i} title={keyword} value={keyword}>{keyword.slice(0, 30) + (keyword.length > 30 ? "..." : "")}</div>)
-                    return replace[val_id] ?
-                      <RenderGroupItem idx={idx} key={idx + forceRender} val={val_id} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap}
-                        oldObj={replace[val_id] ? replace[val_id][0] : {}} newObj={replace[val_id][1]} keywords={replace[val_id] && CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords : []}
-                        newkeywords={Object.keys(CORData.keywordList[tag]).length ? Object.keys(CORData?.keywordList[tag]) : []}
-                      ></RenderGroupItem>
-
-                      : null
-                  })}
+                  <DataTable value={dataTableData} showGridlines>
+                    <Column
+                      key="oldObj"
+                      field="oldObj"
+                      header="Old Elements"
+                      style={{ width: "14rem" }}
+                    />
+                    <Column
+                      key="keywords"
+                      field="keywords"
+                      header="Keyword Used"
+                      style={{ width: "14rem" }}
+                    />
+                    <Column
+                      key="newObj"
+                      field="newObj"
+                      header="New Elements"
+                      style={{ width: "14rem" }}
+                    />
+                    <Column
+                      key="selectKeyword"
+                      field="selectKeyword"
+                      header="Select Keyword"
+                      style={{ width: "14rem" }}
+                    />
+                  </DataTable>
                 </Dialog>
 
 
@@ -1443,93 +1502,3 @@ const ActionPanel = (props) => {
 }
 
 export default ActionPanel;
-
-const RenderGroupItem = (props) => {
-  const { oldObj, newObj, keywords, newkeywords, COKMap, stateUpdate, val, saveGroupItem, idx } = props;
-  const [expanded, setExpanded] = useState(false);
-  const handleSelectChange = (e, keyword) => {
-    if (e.target.value) e.target.classList.remove("r-group__selectError")
-    else return
-    if (!COKMap[oldObj.objId]) {
-      COKMap[oldObj.objId] = {
-        "keywordMap": {
-          [keyword]: e.target.value
-        }
-      }
-    }
-    else {
-      COKMap[oldObj.objId]["keywordMap"][keyword] = e.target.value;
-    }
-    stateUpdate(COKMap);
-  }
-  // const dataTableColumns = [
-  //   { field: 'oldObj', header: 'Old Elements', width: '14rem' },
-  //   { field: 'keywords', header: 'Keyword Used', width: '14rem' },
-  //   { field: 'newObj', header: 'New Elements', width: '14rem' },
-  //   { field: 'selectKeyword', header: 'Select Keyword', width: '14rem' }
-  // ];
-
-  const dataTableData = keywords.map((k_word, idx) => {
-    const similarTagNames = (tagListToReplace.includes(oldObj.tag) ? oldObj.tag : "element") === (tagListToReplace.includes(newObj.tag) ? newObj.tag : "element")
-    return (
-      {
-        oldObj: <span title={oldObj.title}>{oldObj.title}</span>,
-        keywords: <span title={k_word}>{k_word}</span>,
-        newObj: <span title={newObj.title}>{newObj.title}</span>,
-        selectKeyword: (
-          <span style={{ width: '40%' }}>
-            <select
-              className="r-group__select"
-              defaultValue={similarTagNames}
-              onFocus={(e) => { e.target.value ? e.target.classList.remove('r-group__selectError') : e.target.classList.add('r-group__selectError') }}
-              onChange={(e) => { handleSelectChange(e, k_word) }}
-              style={{ height: '2rem' }}
-            >
-              <option key="notSelected" value="" title="Select keyword" disabled>
-                Select keyword
-              </option>
-              {newkeywords &&
-                newkeywords.map((keyword, i) => (
-                  <option key={keyword + i} title={keyword} value={keyword}>
-                    {keyword.slice(0, 30) + (keyword.length > 30 ? '...' : '')}
-                  </option>
-                ))}
-            </select>
-          </span>
-        )
-      }
-    );
-  });
-  return (
-    <>
-
-      {!!dataTableData.length &&
-        <DataTable value={dataTableData} showGridlines>
-          <Column
-            key="oldObj"
-            field="oldObj"
-            header="Old Elements"
-            style={{ width: "14rem" }}
-          />
-          <Column
-            key="keywords"
-            field="keywords"
-            header="Keyword Used"
-            style={{ width: "14rem" }}
-          />
-          <Column
-            key="newObj"
-            field="newObj"
-            header="New Elements"
-            style={{ width: "14rem" }}
-          />
-          <Column
-            key="selectKeyword"
-            field="selectKeyword"
-            header="Select Keyword"
-            style={{ width: "14rem" }}
-          />
-        </DataTable>}
-    </>
-  );
-}
