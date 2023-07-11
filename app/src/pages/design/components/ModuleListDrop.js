@@ -5,7 +5,6 @@ import {ModalContainer,Messages as MSG, setMsg} from '../../global';
 import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
-import "../styles/ModuleListSidePanel.scss";
 import ImportMindmap from'../components/ImportMindmap.js';
 import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist,saveMindMap,moduleList} from '../designSlice';
 import { Tree } from 'primereact/tree';
@@ -140,7 +139,7 @@ const ModuleListDrop = (props) =>{
         //     value:Projects.projectNames
         //   }]
           setProjectList(data)
-          console.log("data",data)
+          // console.log("data",data)
           // console.log(" projects",projects)
         })()
       },[showE2EPopup])
@@ -230,8 +229,6 @@ const ModuleListDrop = (props) =>{
           }
           setNewProjectList(projectCollection);
           setSelectedProject(proj)
-          console.log("newProjeLst ",newProjectList)
-          console.log(" projectList",projectList)
         })();
       }, [showE2EPopup]);
       // data for module and scerrios in Tree structure for E2E popUp
@@ -241,13 +238,14 @@ const ModuleListDrop = (props) =>{
         const moduleScenarioData = await getProjectsMMTS(selectedProject? selectedProject:proj)
         setModSceTree(moduleScenarioData)
         if(modSceTree.length)setOverlayforModSce(false)
-        console.log("modSceTree",modSceTree)
-        console.log(moduleScenarioData[0].mindmapList.map(module=>module.scenarioList.map(sce=>sce)))
-        console.log(moduleScenarioData[0].mindmapList.map.scenarioList)
+        
+        
         const projectNameforScenario = projectList.find(item => item.id === selectedProject)
-        moduleScenarioData[0].mindmapList.map(sceLst=> sceLst.l)({
-          projectname:projectNameforScenario.name
-        })
+        setProjOfSce(projectNameforScenario.name)
+        moduleScenarioData[0].mindmapList.map(sceLst => ({
+          ...sceLst,
+          projectname: projectNameforScenario.name
+        }));        
           })();
         
 
@@ -502,7 +500,6 @@ const ModuleListDrop = (props) =>{
 
            })
            setTransferBut(editE2EData);
-           warning.modID(false)
 
       }
     // ///////////// _____ E2E popUp_____ ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -639,11 +636,11 @@ const ModuleListDrop = (props) =>{
 
         }
 
-        const handleCheckboxChange = (e, modIndx, sceIdx,  modName, sceName,moduleId,scenarioId) => {
+        const handleCheckboxChange = (e, modIndx, sceIdx,  modName, sceName,moduleId,scenarioId,projOfSce) => {
           const selectedScenario = `${modIndx}-${sceIdx}`;
           if (e.checked) {
             setSelectedKeys([...selectedKeys, {
-                 modIndx, sceIdx, modName, sceName, selectedScenario,moduleId,scenarioId
+                 modIndx, sceIdx, modName, sceName, selectedScenario,moduleId,scenarioId,projOfSce
             }]);
             // setStoredSelectedKeys([...selectedKeys, {
             //   projIdx, moduleIdx, scenarioIdx, projName, modName, sceName, selectedScenario
@@ -768,7 +765,7 @@ const ModuleListDrop = (props) =>{
                                     label: (
                                       <label style={{ alignItem: 'center', justifyContent: 'center'}}>
                                         <Checkbox
-                                          onChange={(e) => handleCheckboxChange(e, modIndx, sceIdx, module.name, scenario.name, module._id, scenario._id,)}
+                                          onChange={(e) => handleCheckboxChange(e, modIndx, sceIdx, module.name, scenario.name, module._id, scenario._id,projOfSce)}
                                           checked={selectedKeys.map((keysCombo) => keysCombo.selectedScenario).includes(`${modIndx}-${sceIdx}`)}
                                         />
                                         <>
@@ -818,7 +815,7 @@ const ModuleListDrop = (props) =>{
                               <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
                                 <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
                                   <h4>{ScenarioSelected.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{ScenarioSelected.modName})</h3></h5></div>
-                                  <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{ScenarioSelected.projectname})</h3></h5></div>
+                                  <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{ScenarioSelected.projOfSce})</h3></h5></div>
                                   </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(ScenarioSelectedIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
                               </div>
                             )
@@ -951,7 +948,7 @@ const ModuleListDrop = (props) =>{
                             <i className="pi pi-times"  onClick={click_X_ButtonE2E}></i>
                         </div>)}
                      </div > */}
-                  <img src="static/imgs/plusNew.png" onClick={() => setShowE2EPopup(true)} alt="PlusButtonOfE2E" />
+                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName(''); setTransferBut([]); setShowE2EPopup(true); }} alt="PlusButtonOfE2E" />
                   {/* {showE2EPopup && <LongContentDemo setShowE2EOpen={setShowE2EPopup}  module={moduleSelect} />} */}
                 </div>
                 {/* <div className='searchBox pxBlack'>
@@ -988,9 +985,10 @@ const ModuleListDrop = (props) =>{
                           <div style={{ textOverflow: 'ellipsis', width: '9rem', overflow: 'hidden', textAlign: 'left', height: '1.3rem', display: 'flex', alignItems: "center", width: '99%' }}>
                             <img src="static/imgs/checkBoxIcon.png" alt="AddButton" /><img src="static/imgs/E2EModuleSideIcon.png" style={{ marginLeft: '10px', width: '20px', height: '20px' }} alt="modules" />
                             <span style={{ textOverflow: 'ellipsis' }} className='modNmeE2E'>{e.name}</span>
-                            <div ><img src="static/imgs/edit-icon.png" onClick={() => { setShowE2EPopup(true); handleEditE2E() }}
+                            <img src="static/imgs/edit-icon.png" onClick={() => { setWarning(true); setShowE2EPopup(true); handleEditE2E();  }}
                               disabled={(moduleSelect._id === e._id) && moduleSelect.type !== "endtoend"}
-                              style={{ width: '20px', height: '20px' }} alt="AddButton" /> </div></div>
+                              style={{ width: '20px', height: '20px',display:moduleSelect._id !== e._id?  "none" : ''   }} alt="AddButton" />
+                            <div></div></div>
 
 
                         </div>
