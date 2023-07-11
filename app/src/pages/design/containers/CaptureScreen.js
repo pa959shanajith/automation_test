@@ -860,21 +860,22 @@ else{
 
   const renderActionsCell = (rowData) => {
     return (
-      <div>
-        <div className="tooltip_delete" >
-        <Tooltip target=".tooltip_delete" position="left" content=" Delete the element." />
+      <div >
+      
+        <Tooltip target=".delete__icon" position="left" content=" Delete the element." />
         <img
+        
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px" }}
           className="delete__icon" onClick={() => handleDelete(rowData)} />
-          </div>
-          <div className="tooltip_edit" >
-          <Tooltip target=".tooltip_edit" position="left" content=" Edit the properties of elements." />
+       
+         
+          <Tooltip target=".edit__icon" position="right" content=" Edit the properties of elements." />
         <img src="static/imgs/ic-edit.png" 
       
           style={{ height: "20px", width: "20px" }}
           className="edit__icon" onClick={() => openElementProperties(rowData)} />
-          </div>
+          
       </div>
     )
 
@@ -1369,7 +1370,7 @@ const footerSave = (
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj_insprint' title=" Add a placeholder element by specifying element type." src="static/imgs/ic-add-object.png"></img>
+                  <img className='add_obj_insprint' ></img>
                   <Tooltip target=".add_obj_insprint" position="left" content=" Add a placeholder element by specifying element type." />
                   <p>Add Element</p>
                 </span>
@@ -1391,7 +1392,7 @@ const footerSave = (
               </div>
               <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
-                <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" title='Easily upgrade Test Automation as application changes'></img>
+                <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="left" content="  Easily upgrade Test Automation as application changes" />
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" title='Analyze screen to compare existing and newly captured element properties.'></img>
