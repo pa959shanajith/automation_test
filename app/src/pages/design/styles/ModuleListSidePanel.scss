@@ -1,7 +1,7 @@
 @import "../../global/styles/ColorVariables.scss";
 .CollapseWholeCont{ 
-    max-height: 84vh;
-    min-height: 60vh;
+    max-height: 100%;
+    min-height: 60%;
     overflow-y: auto;
     display: flex;
     flex-direction: row-reverse;
@@ -14,8 +14,8 @@
 }
 
 .Whole_container {
-    max-height: 100vh;
-    min-height: 80vh;
+    max-height: 100%;
+    min-height: 80%;
     // width: 17vw;
     border-bottom: 0.5px solid #C7C7C7;
     background-color: rgb(255, 255, 255);
@@ -304,6 +304,7 @@
                             overflow: auto;
                             width: 32.68rem;
                             .p-tree-container{
+                                padding-left: 6.5%;
 
                                 .p-treenode{
 
@@ -477,7 +478,7 @@
                         padding-left: 0.8rem;
                         overflow: hidden;
                         text-overflow: ellipsis;
-                        width: 9rem;
+                        width: 14rem;
                     }
                    
                     .modIconSce {
@@ -499,7 +500,7 @@
                                 // padding-left: 0.5rem;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
-                                width: 9rem;
+                                width: 6rem;
                                 margin-top: 1px;
                             }
                         }
@@ -524,7 +525,7 @@
                                 // padding-left: 0.5rem;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
-                                width: 9rem;
+                                width: 6rem;
                                 margin-top: 1px;
                             }
                         }
