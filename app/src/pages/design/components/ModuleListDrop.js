@@ -5,7 +5,6 @@ import {ModalContainer,Messages as MSG, setMsg} from '../../global';
 import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
-import "../styles/ModuleListSidePanel.scss";
 import ImportMindmap from'../components/ImportMindmap.js';
 import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist,saveMindMap,moduleList} from '../designSlice';
 import { Tree } from 'primereact/tree';
