@@ -12,6 +12,7 @@ var options = require('../config/options');
 var path = require('path');
 const tokenAuth = require('../lib/tokenAuth')
 const constants = require('../lib/execution/executionConstants');
+const { query } = require('winston');
 
 let headers
 module.exports.setReq = async (req) =>
@@ -1186,6 +1187,30 @@ exports.fetchExecProfileStatus = async (req, res) => {
             return res.send("fail");
         }else {
                return res.send(executionData);
+            }
+        }
+        catch (exception) {
+        logger.error("Error occurred in report/"+fnName+":", exception);
+        res.send("fail");
+    }
+};
+
+exports.fetchModSceDetails = async (req, res) => {
+    const fnName = "fetchModSceDetails";
+    logger.info("Inside UI service: " + fnName);
+    try {      
+        inputs = {    
+                "query":"fetchModSceDetails",            
+                param: req.body.param,
+                executionId: req.body.executionId,
+                executionListId:req.body.executionListId          
+        }
+        
+        const ModSceDetails = await utils.fetchData(inputs, "reports/fetchModSceDetails", fnName);
+        if (ModSceDetails == "fail"){
+            return res.send("fail");
+        }else {
+               return res.send(ModSceDetails);
             }
         }
         catch (exception) {
