@@ -1125,7 +1125,7 @@ const footerContentScreen =(
         <div className="tooltip">
         <span className="tooltiptext">
           <span className="tooltip-line">"module_name":{node[1].name}</span>
-          <span className="tooltip-line">Click here to add new testcase(s).</span>
+          {/* <div className="tooltip-line">Click here to add new testcase(s).</div> */}
         </span>
       </div>
         
@@ -1134,7 +1134,7 @@ const footerContentScreen =(
  
  <span className="tooltiptext">"module_name":{node[1].name} </span>
  <br />
- <span  className='tooltipchild'>Click here to add new testcase(s).</span>
+ {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
 </div> 
       
       )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
@@ -1142,7 +1142,7 @@ const footerContentScreen =(
  
  <span className="tooltiptext">"screen_name":{node[1].name}</span>
  <br />
- <span  className='tooltipchild'>Click here to add new testcase(s).</span>
+ {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
 </div> 
        
       )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
@@ -1150,7 +1150,7 @@ const footerContentScreen =(
  
  <span className="tooltiptext">"module_name":{node[1].name}</span>
  <br />
- <span  className='tooltipchild'>Click here to add new testcase(s).</span>
+ {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
 </div> 
        
       ))
