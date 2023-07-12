@@ -1501,7 +1501,7 @@ const footerSave = (
             >
             </Column>
             <Column field="objectProperty" header="Element Type"></Column>
-            <Column field="screenshots" header="Screenshots"></Column>
+            <Column field="screenshots" header="Screenshot"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
           <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
