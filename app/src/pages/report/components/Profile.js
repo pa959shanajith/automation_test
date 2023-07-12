@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import HSBar from "react-horizontal-stacked-bar-chart";
 import { Column } from "primereact/column";
@@ -7,17 +7,14 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import "./Profile.scss";
 import { Badge } from "primereact/badge";
 import { Tree } from "primereact/tree";
-import { reportsBar, reportsData } from "../../utility/mockData";
+import { reportsBar } from "../../utility/mockData";
+import { useLocation } from "react-router-dom";
+import { getReportList, getTestSuite } from "../api";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
-  const [tableColumns, setTableColumns] = useState([
-    { field: "name", header: "Execution" },
-    { field: "status", header: "" },
-    { field: "dateTime", header: "Date and Time" },
-    { field: "module", header: "Test Suite(s)" },
-    { field: "testCases", header: "Test Case(s)" },
-  ]);
+  const [reportsTable, setReportsTable] = useState([]);
+  const location = useLocation();
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -28,19 +25,44 @@ const Profile = () => {
     return statusVal;
   };
 
-  const products = reportsData.map((el, ind) => ({
-    ...el,
-    id: el._id,
-    key: ind.toString(),
-    name: `Execution ${ind + 1}`,
-    dateTime: el.startDate,
-    status: checkStatus(el.modSattus),
-    testSuites: el.modSattus.reduce((ac, cv) => (ac[cv] = ac[cv] + 1 || 1, ac), {}),
-    testCases: el.scestatus.reduce((ac, cv) => (ac[cv] = ac[cv] + 1 || 1, ac), {}),
-  }))
+  const tableColumns = [
+    { field: "name", header: "Execution" },
+    { field: "status", header: "" },
+    { field: "dateTime", header: "Date and Time" },
+    { field: "module", header: "Test Suite(s)" },
+    { field: "testCases", header: "Test Case(s)" },
+  ];
+
+  useEffect(async () => {
+    const executionProfiles = await getReportList(
+      location?.state?.configureKey
+    )
+    
+    setReportsTable(executionProfiles.map((el, ind) => ({
+      ...el,
+      id: el._id,
+      key: ind.toString(),
+      name: `Execution ${ind + 1}`,
+      dateTime: el.startDate,
+      status: checkStatus(el.modStatus),
+      testSuites: el.modStatus.reduce(
+        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+        {}
+      ),
+      testCases: el.scestatus.reduce(
+        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+        {}
+      ),
+    })));
+  }, []);
   
-  const onTestSuiteClick = (getRow) => {
-    console.log(getRow);
+  const onTestSuiteClick = async(getRow) => {
+    const testSuiteList = await getTestSuite({
+      query: "fetchModSceDetails",
+      param: "modulestatus",
+      executionListId: getRow?.node?.data
+    })
+    console.log(testSuiteList);
   };
 
   const tableHeader = () => {
@@ -115,32 +137,32 @@ const Profile = () => {
             </div>
           </div>
         ),
-        data: e.name,
+        data: e.id,
         children: [
           {
             key: "0-0",
             label: "Test suite 1",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-1",
             label: "Test suite 2",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-2",
             label: "Test suite 3",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-3",
             label: "Test suite 4",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-4",
             label: "Test suite 5",
-            data: e.name
+            data: e.id
           },
         ],
       },
@@ -191,32 +213,32 @@ const Profile = () => {
             </div>
           </div>
         ),
-        data: e.name,
+        data: e.id,
         children: [
           {
             key: "0-0",
             label: "Test Case 1",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-1",
             label: "Test Case 2",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-2",
             label: "Test Case 3",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-3",
             label: "Test Case 4",
-            data: e.name
+            data: e.id
           },
           {
             key: "0-4",
             label: "Test Case 5",
-            data: e.name
+            data: e.id
           },
         ],
       },
@@ -238,7 +260,7 @@ const Profile = () => {
         <Link>Executions</Link>
       </Breadcrumbs>
       <DataTable
-        value={products}
+        value={reportsTable}
         tableStyle={{ minWidth: "50rem" }}
         header={tableHeader}
         globalFilter={searchScenario}
