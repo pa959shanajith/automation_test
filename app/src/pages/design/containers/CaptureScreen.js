@@ -1377,15 +1377,15 @@ const footerSave = (
             <div className="action_panelCard">
               <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
-                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" ></img>
+                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
                 <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj_insprint' ></img>
+                  <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' ></img>
                   <Tooltip target=".add_obj_insprint" position="left" content=" Add a placeholder element by specifying element type." />
                   <p>Add Element</p>
                 </span>
                 <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj_insprint' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png"></img>
+                  <img className='map_obj_insprint' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png" alt='map element'></img>
                 <Tooltip target=".map_obj_insprint" position="left" content=" Map placeholder elements to captured elements." />
 
                   <p>Map Element</p>
