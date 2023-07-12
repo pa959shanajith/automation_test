@@ -13,7 +13,8 @@ export const fetchConfigureList = async(props) => {
             },
             data: {
                 action: "configurelist",
-                'projectid': props.projectid
+                'projectid': props.projectid,
+                'param':props.param
             }
         });
         if(res.status === 401){

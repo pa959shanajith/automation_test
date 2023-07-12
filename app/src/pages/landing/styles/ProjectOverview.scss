@@ -1,11 +1,13 @@
 @import "../../global/styles/ColorVariables.scss";
+
 .OverviewSection {
   position: sticky;
   top: 2.5rem;
   width: 81.3rem;
 }
+
 .manage-btn {
-  border: none ;
+  border: none;
   background-color: transparent;
   color: #605bff;
   border-color: inherit;
@@ -14,33 +16,40 @@
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  margin-left:13rem ;
+  margin-left: 13rem;
 }
-.tab-menu{
+
+.tab-menu {
+
   // font: $f5_semibold;
-  .p-menuitem-link
-  {
-  padding: 0.9rem !important;  
-  box-shadow: none !important;
-  font-family: 'Open Sans' !important;
-  font-style: normal !important;
-  font-weight: bold !important;
-  font-size: 18px !important;
-  line-height: 21px !important;
-  color: #030229;
-  font: $f5_semibold !important;
+  .p-menuitem-link {
+    padding: 0.9rem !important;
+    box-shadow: none !important;
+    font-family: 'Open Sans' !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 18px !important;
+    line-height: 21px !important;
+    color: #030229;
+    font: $f5_semibold !important;
   }
-  .p-menuitem-text{
+
+  .p-menuitem-text {
     font: $f5_semibold !important;
   }
 }
-.DefaultProject{
+
+.DefaultProject {
   display: flex;
   font-size: 24px;
   font-weight: 500;
   color: #030229;
 }
-.DefaultProjectName{
+
+.DefaultProjectName {
   margin-left: 0.5rem;
   font: $f4_semibold;
+  max-width: 39rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

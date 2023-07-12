@@ -1193,3 +1193,27 @@ exports.fetchExecProfileStatus = async (req, res) => {
         res.send("fail");
     }
 };
+
+exports.fetchModSceDetails = async (req, res) => {
+    const fnName = "fetchModSceDetails";
+    logger.info("Inside UI service: " + fnName);
+    try {      
+        inputs = {    
+                "query":"fetchModSceDetails",            
+                param: req.body.param,
+                executionId: req.body.executionId,
+                executionListId:req.body.executionListId          
+        }
+        
+        const ModSceDetails = await utils.fetchData(inputs, "reports/fetchModSceDetails", fnName);
+        if (ModSceDetails == "fail"){
+            return res.send("fail");
+        }else {
+               return res.send(ModSceDetails);
+            }
+        }
+        catch (exception) {
+        logger.error("Error occurred in report/"+fnName+":", exception);
+        res.send("fail");
+    }
+};

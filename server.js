@@ -256,6 +256,7 @@ if (cluster.isMaster) {
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
+		app.post('/fetchModSceDetails', report.fetchModSceDetails);	
 		app.use(csrf({
 			cookie: true
 		}));
@@ -444,6 +445,8 @@ if (cluster.isMaster) {
 		app.post('/writeZipFileServer', auth.protect,upload.single('file'),mindmap.writeZipFileServer);
 		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
+		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
+		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
@@ -553,7 +556,8 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
 		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
-		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);
+		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);	
+
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);

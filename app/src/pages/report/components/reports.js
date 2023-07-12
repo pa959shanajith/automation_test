@@ -13,6 +13,8 @@ import { RadioButton } from "primereact/radiobutton";
 import { InputText } from 'primereact/inputtext';
 import { AvatarGroup } from 'primereact/avatargroup';
 import { Avatar } from 'primereact/avatar';
+import { classNames } from 'primereact/utils';
+import {FooterTwo as Footer} from '../../global';
 import { fetchConfigureList, getProjectList } from "../api";
 import { NavLink } from 'react-router-dom';
 // import ExecutionprofileTable from './ExecutionprofileTable';
@@ -31,6 +33,7 @@ const reports = () => {
     const [show, setShow] = useState(false);
     const [dropdownData, setDropdownData] = useState([]);
     const [executionButon, setExecutionButon] = useState('View by Execution Profile');
+    const customDropdownIcon = classNames('pi','pi-sort-amount-down');
 
     useEffect(() => {
         (async () => {
@@ -46,10 +49,11 @@ const reports = () => {
 
     useEffect(() => {
         configProjectId && (async () => {
-            const executionProfileName = await fetchConfigureList({ projectid: configProjectId });
+            const executionProfileName = await fetchConfigureList({ projectid: configProjectId ,"param":"reportData"});
             if (executionProfileName && executionProfileName.length > 0) {
                 const extractedExecutionProfileData = executionProfileName.map((obj) => ({
                     configurename: obj?.configurename || '',
+                    execDate: obj?.execDate || '',
                     selectedModuleType: obj?.executionRequest?.selectedModuleType || '',
                     configurekey: obj?.configurekey || '',
                 }));
@@ -89,13 +93,13 @@ const reports = () => {
             value: <img className='browser__img' src='static/imgs/edge.png' />
         }
     ])
-    const [selectedItem, setSelectedItem] = useState(null);
     const sort = [
         { name: 'Last modified', code: '0' },
         { name: 'Report Generation Date', code: '1' },
         { name: 'Alphabetical', code: '2' },
     ];
-    const defaultSort = sort[0].code;
+    const defaultSort = sort[0].name;
+    const [selectedItem, setSelectedItem] = useState(defaultSort);
 
     const filteredExecutionData = reportData.filter((data) =>
         data.configurename.toLowerCase().includes(searchReportData.toLowerCase())
@@ -162,7 +166,7 @@ const reports = () => {
             </div> */}
                 {/* <div className='Projectreport'><h2 className='projectDropDown'>Reports: </h2><Dropdown value={selectedProject} onChange={handleToggle} options={project} optionLabel="name" placeholder='Select a Project' className="w-full md:w-10rem ml-2" /> */}
                 <div>
-                    <label data-test="projectLabel" className='Projectreport'>Reports:</label>
+                    <label data-test="projectLabel" className='Projectreport'>Projects:</label>
                     <select data-test="projectSelect" className='projectSelectreport' value={configProjectId} onChange={(e) => { setConfigProjectId(e.target.value); }}>
                         {projectList.map((project, index) => (<option value={project.id} key={index}>{project.name}</option>))}
                     </select>
@@ -180,11 +184,11 @@ const reports = () => {
                                     <div className="flex flex-wrap gap-3">
                                         <div className="flex align-items-center">
                                             <RadioButton inputId="View by Execution Profile" name="View by Execution Profile" value="View by Execution Profile" onChange={(e) => setExecutionButon(e.value)} checked={executionButon === 'View by Execution Profile'} />
-                                            <label htmlFor="View by Execution Profile" className="ml-2" value="ExecutionProfile" checked={selectedOption === 'ExecutionProfile'}>View by Execution Profile</label>
+                                            <label htmlFor="View by Execution Profile" className="ml-2 Profile_Name" value="ExecutionProfile" checked={selectedOption === 'ExecutionProfile'}>View by Execution Profile</label>
                                         </div>
                                         <div className="flex align-items-center">
                                             <RadioButton inputId="View by Modules" name="View by Modules" value="View by Modules" onChange={(e) => setExecutionButon(e.value)} checked={executionButon === 'View by Modules'} />
-                                            <label htmlFor="View by Modules" className="ml-2" value="ViewByModules" checked={selectedOption === 'ViewByModules'}>View by Modules</label>
+                                            <label htmlFor="View by Modules" className="ml-2 Profile_Name" value="ViewByModules" checked={selectedOption === 'ViewByModules'}>View by Modules</label>
                                         </div>
                                     </div>
                                 </div>}
@@ -209,7 +213,7 @@ const reports = () => {
                                     <i className="pi pi-search" />
                                     <InputText className='report_search_input' placeholder="Search" value={searchReportData} onChange={(e) => setSearchReportData(e.target.value)} />
                                 </div>
-                                <div className='sort' ><h2 className='projectDropDown'>Sort: </h2><Dropdown value={selectedItem} onChange={(e)=>handleClicked(e)} options={sort} optionLabel="name" className="w-full md:w-14rem h-2rem	ml-2" placeholder='Select a Sort' /></div>
+                                <div className='sort'><h2 className='projectDropDown'></h2><Dropdown value={selectedItem} onChange={(e)=>handleClicked(e)} options={sort} optionLabel="name" dropdownIcon={customDropdownIcon} className="w-full md:w-10rem h-2.1rem ml-4" placeholder={selectedItem} /></div>
                             </div>
                         </>) : ''}
                     </>
@@ -218,7 +222,7 @@ const reports = () => {
                         {filteredExecutionData.length > 0 ? (<div className='report_Data ml-4'>
                             {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
                                 {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'><Card key={index} className='testCards'>
-                                <NavLink to="/reports/profile" state= {{configureKey: data.configurekey}} activeClassName="active">{data.configurename}</NavLink><p>{data.selectedModuleType}</p><p>Last executed through {data.configurename}</p><p>Last executed on {data.date}</p>
+                                <NavLink to="/reports/profile" state= {{configureKey: data.configurekey}} className='Profile_Name' activeClassName="active">{data.configurename}</NavLink><p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report'>Last executed through CI/CD</p><p className='Profile_Name_report'>Last executed on {data.execDate.slice(5,16)}</p>
                                 </Card></div>))}
                             </div>)}
                             {activeIndex === "Functional Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
@@ -243,11 +247,12 @@ const reports = () => {
                             </div>)}
                         </div>)
                             : (<div className='Report_Image'><img id='report_icon' src="static/imgs/Functional_report_not_found.svg" alt="Empty data" />
-                            <div>{activeIndex === "Functional Test" ? (<div className='flex flex-column align-items-center relative report_text'><span>Functional reports not found</span><span className='text-sm'>Execute one execution profile to see its reports</span></div>)
-                            :(<div className='flex flex-column align-items-center relative report_text'><span>Accessibility reports not found</span><span className='text-sm'>Execute one execution profile to see its reports</span></div>)}</div></div>)}
+                            <div className='report_text'>{activeIndex === "Functional Test" ? (<div className='flex flex-column align-items-center'><span>Functional reports not found</span><span className='text-sm'>Execute one execution profile to see its reports.</span></div>)
+                            :(<div className='flex flex-column align-items-center'><span>Accessibility reports not found</span><span className='text-sm'>Execute one execution profile to see its reports.</span></div>)}</div></div>)}
                 </div>}
                 {show && <ReportTestTable />}
             </div>
+            <div><Footer/></div>
         </div>
     )
 }

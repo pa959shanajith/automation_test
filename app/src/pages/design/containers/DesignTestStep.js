@@ -1083,7 +1083,7 @@ const DesignModal = (props) => {
     const rowExpansionTemplate = (data) => {
         return (
             <div className="p-1">
-                    <DataTable
+                    <DataTable className='datatable__col'
                         value={data.testCases.length>0?data.testCases:[]}
                         selectionMode="checkbox" selection={selectedTestCases}
                         onSelectionChange={(e) => setSelectedTestCases(e.value)}  
@@ -1092,7 +1092,7 @@ const DesignModal = (props) => {
                             <Column style={{ width: '3em' ,textAlign: 'center' }} rowReorder />
                             <Column selectionMode="multiple" style={{ width: '3em' ,textAlign: 'center' }} />
                             <Column field="custname" header="Element Name" editor={(options) => elementEditor(options)} ></Column>
-                            <Column field={focused?"keywordVal":"keywordDescription"} title="keywordTooltip" header="Keyword" editor={(options) => keywordEditor(options)}  ></Column>
+                            <Column field={focused?"keywordVal":"keywordDescription"} title="keywordTooltip" header="Operation" editor={(options) => keywordEditor(options)}  ></Column>
                             <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
                             <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
                             <Column field="remarks" header="Remarks" />
