@@ -1083,7 +1083,7 @@ const DesignModal = (props) => {
     const rowExpansionTemplate = (data) => {
         return (
             <div className="p-1">
-                    <DataTable
+                    <DataTable className='datatable__col'
                         value={data.testCases.length>0?data.testCases:[]}
                         selectionMode="checkbox" selection={selectedTestCases}
                         onSelectionChange={(e) => setSelectedTestCases(e.value)}  
