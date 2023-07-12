@@ -862,7 +862,7 @@ const ModuleListDrop = (props) =>{
               <div className="normalModule_main_container"  style={{  display: !collapseWhole ? "none" : "", overflow: !collapseWhole ? "hidden" : "" }}>
                 <div className="moduleLayer_plusIcon">
                   <div className="moduleLayer_icon">
-                    <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" /> <h3 className="normalModHeadLine">Module Layers</h3>
+                    <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" /> <h3 className="normalModHeadLine">Test Suites</h3>
                   </div>
                   {/* <div className="SearchIconForModules">
                        <span className={`pi pi-search ${showInput? 'searchIcon_adjust' :''}` } style={{fontSize:'1.1rem',cursor:'pointer'}} onClick={clickForSearch}></span>

@@ -1381,12 +1381,12 @@ const footerSave = (
                 <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
                   <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' ></img>
-                  <Tooltip target=".add_obj_insprint" position="left" content=" Add a placeholder element by specifying element type." />
+                  <Tooltip target=".add_obj_insprint" position="bottom" content=" Add a placeholder element by specifying element type." />
                   <p>Add Element</p>
                 </span>
                 <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj_insprint' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png" alt='map element'></img>
-                <Tooltip target=".map_obj_insprint" position="left" content=" Map placeholder elements to captured elements." />
+                  <img className='map_obj_insprint'  src="static/imgs/ic-map-object.png" alt='map element'></img>
+                <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />
 
                   <p>Map Element</p>
                 </span>
@@ -1405,13 +1405,13 @@ const footerSave = (
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="left" content="  Easily upgrade Test Automation as application changes" />
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
-                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" title='Analyze screen to compare existing and newly captured element properties.'></img>
-                  <Tooltip target=".add_obj_upgrade" position="left" content="  Analyze screen to compare existing and newly captured element properties." />
+                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
+                  <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />
                   <p>Compare Element</p>
                 </span>
                 <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
                   <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
-                  <Tooltip target=".map_obj_upgrade" position="left" content=" Replace the existing elements with the newly captured elements." />
+                  <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />
                   <p>Replace Element</p>
                 </span>
                 {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
