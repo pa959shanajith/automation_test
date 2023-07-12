@@ -12,7 +12,6 @@ var options = require('../config/options');
 var path = require('path');
 const tokenAuth = require('../lib/tokenAuth')
 const constants = require('../lib/execution/executionConstants');
-const { query } = require('winston');
 
 let headers
 module.exports.setReq = async (req) =>
