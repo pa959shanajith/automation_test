@@ -252,9 +252,10 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getGeniusData',plugin.getGeniusData);;
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/updateE2E', mindmap.updateE2E);
+		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -553,7 +554,6 @@ if (cluster.isMaster) {
 		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
 		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
 		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);
-		app.get('/fetchExecProfileStatus',auth.protect, report.fetchExecProfileStatus);
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
