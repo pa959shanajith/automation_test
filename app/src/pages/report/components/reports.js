@@ -55,6 +55,7 @@ const reports = () => {
                     configurename: obj?.configurename || '',
                     execDate: obj?.execDate || '',
                     selectedModuleType: obj?.executionRequest?.selectedModuleType || '',
+                    configurekey: obj?.configurekey || '',
                 }));
                 console.log(executionProfileName);
                 setReportData(extractedExecutionProfileData);
@@ -221,7 +222,7 @@ const reports = () => {
                         {filteredExecutionData.length > 0 ? (<div className='report_Data ml-4'>
                             {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
                                 {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'><Card key={index} className='testCards'>
-                                <NavLink to="/reports/profile" className='Profile_Name' activeClassName="active">{data.configurename}</NavLink><p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report'>Last executed through CI/CD</p><p className='Profile_Name_report'>Last executed on {data.execDate.slice(5,16)}</p>
+                                <NavLink to="/reports/profile" state= {{configureKey: data.configurekey}} className='Profile_Name' activeClassName="active">{data.configurename}</NavLink><p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report'>Last executed through CI/CD</p><p className='Profile_Name_report'>Last executed on {data.execDate.slice(5,16)}</p>
                                 </Card></div>))}
                             </div>)}
                             {activeIndex === "Functional Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
@@ -230,7 +231,7 @@ const reports = () => {
                                 </Card></div>)}
                             </div>)}
                             {activeIndex === "Accessibility Test" && executionButon === 'View by Execution Profile' && (<div className="grid ml-4" >
-                                {reportData.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" activeClassName="active">{data.key}</NavLink><p>{data.Modulevalue + data.scenariovalue}</p>
+                                {reportData.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" state= {{configureKey: data.configurekey}} activeClassName="active">{data.key}</NavLink><p>{data.Modulevalue + data.scenariovalue}</p>
                                     <AvatarGroup>
                                         {data.value.map((image, index) => (
                                             <Avatar key={index} image={image.props.src} className='browser-avatar' />
@@ -240,7 +241,7 @@ const reports = () => {
                                 </Card></div>)}
                             </div>)}
                             {activeIndex === "Accessibility Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
-                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" activeClassName="active">{data.key}</NavLink><p>{data.scenariovalue}</p>
+                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" state= {{configureKey: data.configurekey}} activeClassName="active">{data.key}</NavLink><p>{data.scenariovalue}</p>
                                     <Avatar key={data.value} className='browser-avatar' />
                                 </Card></div>)}
                             </div>)}
