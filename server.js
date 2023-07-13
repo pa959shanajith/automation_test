@@ -252,7 +252,7 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.post('/getGeniusData',plugin.getGeniusData);;
+		app.post('/getGeniusData',plugin.getGeniusData);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
