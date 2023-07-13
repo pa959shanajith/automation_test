@@ -14,6 +14,7 @@ import { getReportList, getTestSuite } from "../api";
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
   const [testSuite, setTestSuite] = useState({ key: "0-0" });
+  const [testCase, setTestCase] = useState([]);
   const [reportsTable, setReportsTable] = useState([]);
   const location = useLocation();
 
@@ -85,16 +86,17 @@ const Profile = () => {
         </div>
       ),
       data: testSuiteList[0]?._id,
+      icon: 'pi pi-fw pi-chevron-right'
     });
   };
 
-  const onTestSceneClick = async(getRow) => {
+  const onTestSceneClick = async() => {
     const testSuiteList = await getTestSuite({
       query: "fetchModSceDetails",
       param: "scenarioStatus",
-      executionId: "64a6837a36f7a620bf62a370"
+      executionId: testSuite?.data
     })
-    console.log(testSuiteList);
+    setTestCase(testSuiteList);
   };
 
   const tableHeader = () => {
@@ -201,6 +203,7 @@ const Profile = () => {
       <Tree
         value={[treeArr]}
         onExpand={(e) => onTestSuiteClick(e)}
+        onNodeClick={(e) => onTestSceneClick(e)}
         className="modules_tree"
       />
     );
@@ -259,6 +262,19 @@ const Profile = () => {
             }))}
           />
         </div>
+        {
+          testCase.map((el) => <>
+            <div className="col-4">
+              {el?.scenarioname}
+            </div>
+            <div className="col-4">
+              {el?.status}
+            </div>
+            <div className="col-4">
+              View
+            </div>
+          </>)
+        }
       </div>
     );
   };
