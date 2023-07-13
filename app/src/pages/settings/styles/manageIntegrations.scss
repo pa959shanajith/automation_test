@@ -1,0 +1,25 @@
+.dropdown-class{
+    margin-top: 1rem;
+}
+.dropdown-integration {
+    .p-dropdown{
+        width: 205px !important;
+        height: 36px !important;
+
+    }
+}
+.login-cls{
+    font-size: 18px;
+    font-weight: 600;
+}
+.input-cls, .passwrd-cls, .url-cls{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1rem;
+}
+.input-txt1{
+    .p-inputtext{
+width: 20rem !important;
+height: 2.5rem !important;
+    }
+}
