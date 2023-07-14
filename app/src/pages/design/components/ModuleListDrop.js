@@ -749,7 +749,7 @@ const ModuleListDrop = (props) =>{
                         htmlFor="username"
                         labelTxt="Name"
                         required={true}
-                        placeholder= {E2EName? E2EName:"Enter End to End Module Name"}   
+                        placeholder= {E2EName? E2EName:"Enter End to End Test Suite Name"}   
                         customClass="inputRow_for_E2E_popUp"
                         inputType="lablelRowReqInfo"
                         inputTxt={E2EName? E2EName:inputE2EData} 
@@ -759,14 +759,14 @@ const ModuleListDrop = (props) =>{
                   </div>
                   <div className="centralTwinBox">
                     <div className="leftBox">
-                      <Card title="Select Scenarios" className="leftCard">
+                      <Card title="Select TestCases" className="leftCard">
                      <div className="DrpoDown_search_Tree">
                           <div className='searchAndDropDown'>
                             <div className="headlineSearchInput">
                               <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
                                 <InputText type="text"
-                                  placeholder="Search Scenarios"
+                                  placeholder="Search TestCases"
                                   style={{ width: '15rem', height: '2.2rem', marginRight:'0.2rem', marginBottom: '1%' }}
                                   className="inputContainer" onChange={(e)=>handleSearchScenarioLeftBox(e.target.value)}
                                 />
@@ -789,9 +789,9 @@ const ModuleListDrop = (props) =>{
                          {/* <MemorizedCheckboxSelectionDemo/> */}
                         {/* <CheckboxSelectionDemo /> */}
                         <div>
-                          {overlayforNoModSce?<h5 className='overlay4ModSce'>There are no module and scenarios in this project ...</h5>: 
+                          {overlayforNoModSce?<h5 className='overlay4ModSce'>There are no Test Suites and TestCases in this project ...</h5>: 
                           <>
-                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading modules and Scenarios...</h5>:
+                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and TestCases...</h5>:
                             <Tree
                               value={
                                 modSceTree[0].mindmapList.map((module, modIndx) => ({
@@ -838,7 +838,7 @@ const ModuleListDrop = (props) =>{
                       </div>
                     </div>
                     <div className="rightBox">
-                      <Card title="Selected Scenarios" className="rightCard">
+                      <Card title="Selected TestCases" className="rightCard">
                         {!initialText?
                           <>
                           <div className="headlineSearchInputOfRightBox">
@@ -848,7 +848,7 @@ const ModuleListDrop = (props) =>{
                             <span className="p-input-icon-left">
                               <i className="pi pi-search" />
                               <InputText
-                                placeholder="Search Scenarios by name"
+                                placeholder="Search TestCases by name"
                                 className="inputContainer"
                               />
                             </span>
@@ -868,12 +868,12 @@ const ModuleListDrop = (props) =>{
                             :
                           <div className="initialText">
                             <div className="initial1StText">
-                              <h3 className="textClass"> No Scenarios Yet</h3>
+                              <h3 className="textClass"> No TestCases Yet</h3>
                             </div>
                             <div className="initial2NdText">
                               <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 className="textClass">Select Module</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 >Select Scenarios</h3>
+                              <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
+                              <h3 >Select TestCases</h3>
                             </div>
                           </div> 
                           }
@@ -929,7 +929,7 @@ const ModuleListDrop = (props) =>{
                        </div>)}
                      </div> */}
                      <i className="pi pi-file-import mindmapImport"  onClick={()=>setImportPop(true)}></i>
-                     <Tooltip target=".mindmapImport" position="left" content="  Click here to import a module." />
+                     <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
                      <Tooltip target=".custom-target-icon" content=" Create module" position="bottom" />
                      <img  className="custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  /> 
@@ -950,7 +950,7 @@ const ModuleListDrop = (props) =>{
                   <div className='inputSearchNorMod'>
                     <span className="p-input-icon-left">
                       <i className="pi pi-search" />
-                      <InputText placeholder="Search" ref={SearchInp} onChange={(e) => { searchModule(e.target.value) }} title=' Search for module' />
+                      <InputText placeholder="Search" ref={SearchInp} onChange={(e) => { searchModule(e.target.value) }} title=' Search for Test Suite' />
                     </span>
                   </div>
 
