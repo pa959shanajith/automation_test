@@ -29,7 +29,7 @@ exports.readTestCase_ICE = async (req, res) => {
 		var requestedtestscaseid = req.body.testcaseid;
 		var requestedversionnumber = req.body.versionnumber;
 		var screenName = req.body.screenName;
-		var userid = req.body.userInfo.user_id;
+		var userid = req.session.userid;
 		// base request elements sent in request
 		inputs = {
 			"screenid": requestedscreenid,
@@ -184,7 +184,7 @@ exports.debugTestCase_ICE = function (req, res) {
 							var inputs = {
 								"query": "testcaseids",
 								"testcaseid": requestedtestcaseids,
-								"userid": req.body.userInfo.user_id
+								"userid": req.session.userid
 							};
 							inputs.host = headers.headers.host;
 							var args = {
