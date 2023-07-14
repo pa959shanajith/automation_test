@@ -110,12 +110,12 @@ const CreateNew = ({importRedirect}) => {
                 <div className='mp__toolbar__container'>
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                 </div>
-                <div style={{height:'38.54rem', display:'flex'}}>
+                <div style={{display:'flex',height:'96%'}}>
                   <ModuleListDrop  setBlockui={setBlockui}/>
                 </div>
               <div id='mp__canvas' className='mp__canvas'>
                      {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?
-                     <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
+                     <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast}/>
                     :<Fragment>
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>

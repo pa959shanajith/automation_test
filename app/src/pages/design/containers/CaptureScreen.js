@@ -292,16 +292,16 @@ const CaptureModal = (props) => {
 
   const toastError = (erroMessage) => {
     if (erroMessage.CONTENT) {
-      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 10000 });
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
   }
 
-  const toastSuccess = (erroMessage) => {
-    if (erroMessage.CONTENT) {
-      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Success', detail: erroMessage.CONTENT, life: 5000 });
+  const toastSuccess = (successMessage) => {
+    if (successMessage.CONTENT) {
+      toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'success', summary: 'Success', detail: erroMessage, life: 5000 });
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -669,11 +669,11 @@ const elementTypeProp =(elementProperty) =>{
     let screenViewObject = {};
     let blockMsg = 'Capturing in progress. Please Wait...';
     if (compareFlag) {
-      blockMsg = 'Comparing objects in progress...';
+      blockMsg = 'Comparing Element in progress...';
       handleClose()
     };
     if (replaceFlag) {
-      blockMsg = 'Capture and Replace Object in progress...';
+      blockMsg = 'Capture and Replace Element in progress...';
     };
     screenViewObject = getScrapeViewObject("web", browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
     setOverlay(blockMsg);
@@ -727,6 +727,17 @@ const elementTypeProp =(elementProperty) =>{
           }
         }
         else if (data.action === "replace") {
+          let viewString = data;
+
+                    if (viewString.view.length !== 0){
+                        let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+
+                        let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+                        setNewScrapedData(scrapeItemList);
+                        handleDialog("replaceObjectPhase2");
+                    } else {
+                        // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                    }
           
        }
 else{
@@ -795,9 +806,6 @@ else{
 
           if (viewString.view.length > 0) setSaved({ flag: false });
           setEndScrape(true)
-
-          
-
         }
       }
       })
@@ -1371,16 +1379,16 @@ const footerSave = (
             <div className="action_panelCard">
               <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
-                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" ></img>
+                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
                 <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj'src="static/imgs/ic-add-object.png"></img>
-                  <Tooltip target=".add_obj" position="left" content=" Add a placeholder element by specifying element type." />
+                  <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' ></img>
+                  <Tooltip target=".add_obj_insprint" position="bottom" content=" Add a placeholder element by specifying element type." />
                   <p>Add Element</p>
                 </span>
                 <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png"></img>
-                <Tooltip target=".map_obj_insprint" position="left" content=" Map placeholder elements to captured elements." />
+                  <img className='map_obj_insprint'  src="static/imgs/ic-map-object.png" alt='map element'></img>
+                <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />
 
                   <p>Map Element</p>
                 </span>
@@ -1400,12 +1408,12 @@ const footerSave = (
                 <Tooltip target=".info__btn_upgrade" position="left" content="  Easily upgrade Test Automation as application changes" />
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
-                  <Tooltip target=".add_obj_upgrade" position="left" content="  Analyze screen to compare existing and newly captured element properties." />
+                  <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />
                   <p>Compare Element</p>
                 </span>
                 <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
                   <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
-                  <Tooltip target=".map_obj_upgrade" position="left" content=" Replace the existing elements with the newly captured elements." />
+                  <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />
                   <p>Replace Element</p>
                 </span>
                 {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -1495,7 +1503,7 @@ const footerSave = (
             >
             </Column>
             <Column field="objectProperty" header="Element Type"></Column>
-            <Column field="screenshots" header="Screenshots"></Column>
+            <Column field="screenshots" header="Screenshot"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
           <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false }); setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position: "right" }}>
@@ -1562,7 +1570,7 @@ const footerSave = (
         toastError={toastError}
       />}
 
-      {currentDialog === 'replaceObject' && <ActionPanel
+      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
         isOpen={currentDialog}
         OnClose={handleClose}
         fetchingDetails={props.fetchingDetails}
@@ -1570,10 +1578,11 @@ const footerSave = (
         captureList={capturedDataToSave}
         setShow={setCurrentDialog}
         newScrapedData={newScrapedData}
-        // startScrape={startScrape}
+        startScrape={startScrape}
         toastSuccess={toastSuccess}
         toastError={toastError}
-
+        setOverlay={setOverlay}
+        setShowPop={setShowPop}
       />}
 
       {currentDialog === 'createObject' && <ActionPanel

@@ -5,6 +5,7 @@ import { Card } from 'primereact/card';
 import '../styles/ActionPanelObjects.scss';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
 import { userObjectElement_ICE, fetchReplacedKeywords_ICE } from '../api';
 import { Button } from "primereact/button";
 import { useNavigate } from 'react-router-dom';
@@ -52,7 +53,6 @@ const ActionPanel = (props) => {
   const [orderLists, setOrderLists] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [browserName, setBrowserName] = useState(null)
-
   const [checked, setChecked] = useState([]);
   const [selectCustomObj, setSelectCustomObj] = useState({
     btn1: '',
@@ -125,7 +125,6 @@ const ActionPanel = (props) => {
   const handleAccordionTabChange = (index) => {
     setActiveIndex(index);
   };
-
 
 
   const newField = () => {
@@ -531,6 +530,374 @@ const ActionPanel = (props) => {
   };
 
 
+  // ===========================Replace Element ===================================
+  const [replaceVisible, setReplaceVisible] = useState(false);
+  const [replaceScrapedList, setReplaceScrapedList] = useState({});
+  const [allScraped, setAllScraped] = useState([]);
+  const [newScrapedList, setNewScrapedList] = useState({});
+  const [selectedReplaceTag, setSelectedReplaceTag] = useState("");
+  const [replace, setReplace] = useState({});
+  const [replaceShowName, setReplaceShowName] = useState("");
+  const [selectedReplaceItems, setSelectedReplaceItems] = useState([]);
+  const [replaceKeywordVisible, setReplaceKeywordVisible] = useState(false);
+  // const [errorMsg, setErrorMsg] = useState("");
+  const [custNames, setCustNames] = useState([]);
+  const [replacingCustNm, setReplacingCustNm] = useState([]);
+  const [activeTab, setActiveTab] = useState("ObjectReplacement");
+  const [firstRender, setFirstRender] = useState(true);
+  const [CrossObjKeywordMap, setCrossObjKeywordMap] = useState({});
+  const [CORData, setCORData] = useState({});
+  const [forceRender, setForceRender] = useState(false); // only used to re-render the replace-keyword screen
+  const [objectsReplaced, setObjectsReplaced] = useState(false); // used to detect whether any object was replaced or not
+  const [dataTableData, setDataTableData] = useState([]);
+
+
+  useEffect(() => {
+    setFirstRender(false);
+    let tempScrapeList = {};
+    let tempNewScrapedList = {};
+    let tempAllScraped = [];
+    let tempCustNames = [];
+    if (props.captureList && props.captureList.length) {
+      props.captureList.forEach(object => {
+        let elementType = object.tag;
+        elementType = tagListToReplace.includes(elementType) ? elementType : 'Element';
+        if (object.objId) {
+          if (!(object.xpath && object.xpath.split(";")[0] === "iris")) {
+            tempAllScraped.push(object);
+            if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
+            else tempScrapeList[elementType] = [object]
+          }
+        }
+        tempCustNames.push(object.custname);
+      });
+      setAllScraped(tempAllScraped);
+      setCustNames(tempCustNames);
+    }
+    if (props.newScrapedData && props.newScrapedData.length) {
+      for (let newTempScrapedDataItem in props.newScrapedData) {
+        let elementType = props.newScrapedData[newTempScrapedDataItem].tag;
+        elementType = tagListToReplace.includes(elementType) ? elementType : 'Element';
+        if (tempNewScrapedList[elementType]) tempNewScrapedList[elementType] = [...tempNewScrapedList[elementType], props.newScrapedData[newTempScrapedDataItem]];
+        else tempNewScrapedList[elementType] = [props.newScrapedData[newTempScrapedDataItem]];
+        if (!tempScrapeList[elementType]) tempScrapeList[elementType] = [];
+      }
+      // props.newScrapedData.forEach(newObj => {
+      //   let elementType = newObj.tag;
+      //   elementType = tagListToReplace.includes(elementType) ? elementType : 'Element';
+      //   if (tempNewScrapedList[elementType]) tempNewScrapedList[elementType] = [...tempNewScrapedList[elementType], newObj];
+      //   else tempNewScrapedList[elementType] = [newObj];
+      //   if (!tempScrapeList[elementType]) tempScrapeList[elementType] = [];
+      // });
+      setNewScrapedList(tempNewScrapedList);
+    }
+    setReplaceScrapedList(tempScrapeList);
+  }, [props.newScrapedData])
+
+  useEffect(() => {
+    // updateScrollBar();
+    if (activeTab === "keywordsReplacement" && !document.querySelector(".r-group__container")) {
+      _handleModalClose()
+    }
+  }, [replace])
+
+  useEffect(() => {
+    if (Object.keys(replace).length > 0) {
+      Object.keys(replace).forEach((val_id, idx) => {
+        if (replace[val_id] && (tagListToReplace.includes(replace[val_id][0].tag) ? replace[val_id][0].tag : "element") === (tagListToReplace.includes(replace[val_id][1].tag) ? replace[val_id][1].tag : "element")) {
+          let keywords = CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords : []
+          keywords.forEach((keyword, idx1) => {
+            if (!CrossObjKeywordMap[replace[val_id][0].objId]) {
+              CrossObjKeywordMap[replace[val_id][0].objId] = {
+                "keywordMap": {
+                  [keyword]: keyword
+                }
+              }
+            }
+            else {
+              CrossObjKeywordMap[replace[val_id][0].objId]["keywordMap"][keyword] = keyword;
+            }
+            setCrossObjKeywordMap(CrossObjKeywordMap);
+          })
+        }
+      })
+    }
+  }, [CORData])
+
+  const onReplaceDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
+
+  const onReplaceDragOver = event => event.preventDefault();
+
+  const onReplaceDrop = (event, currObject) => {
+    let replacingCusts = [...replacingCustNm];
+    if (replace[currObject.val]) setErrorMsg("Object already merged");
+    else {
+      let draggedObject = JSON.parse(event.dataTransfer.getData("object"));
+      let replacing = {
+        ...replace,
+        [currObject.val]: [draggedObject, currObject],
+        [draggedObject.val]: null
+      }
+      replacingCusts.push(draggedObject.custname);
+      setReplacingCustNm(replacingCusts);
+      setReplace(replacing);
+      setErrorMsg("");
+    }
+  }
+
+  const onReplaceUnlink = () => {
+    let replacing = { ...replace };
+    let replacingCusts = [...replacingCustNm];
+    for (let customObjVal of selectedReplaceItems) {
+      let scrapeObjVal = replacing[customObjVal][0].val;
+      let replNm = replacing[customObjVal][0].custname;
+      let indexOfItem = replacingCusts.indexOf(replNm);
+      if (indexOfItem > -1) replacingCusts.splice(indexOfItem, 1);
+      delete replacing[customObjVal];
+      delete replacing[scrapeObjVal];
+    }
+    setReplacingCustNm(replacingCusts);
+    setReplace(replacing);
+    setSelectedReplaceItems([]);
+    setReplaceShowName("");
+  }
+
+  const onReplaceShowAllObjects = () => setSelectedTag("");
+
+  const onReplaceCustomClick = (replaceShowName, id) => {
+    let updatedSelectedItems = [...selectedReplaceItems]
+    let indexOfItem = selectedReplaceItems.indexOf(id);
+
+    if (indexOfItem > -1) updatedSelectedItems.splice(indexOfItem, 1);
+    else updatedSelectedItems.push(id);
+
+    setReplaceShowName(replaceShowName);
+    setSelectedReplaceItems(updatedSelectedItems);
+  }
+
+  const saveGroupItem = (oldObjId, keywordMap, newObjData, val) => {
+    // props.setShowPop({
+    //   'type': 'modal',
+    //   'title': 'Warning !',
+    //   'content': <div className="ss__dup_labels">
+    //     Do you want to update the object and all dependent testcases ?
+    //   </div>,
+    //   'footer': <button onClick={() => {
+    // props.setShowPop("")
+    // let { screenId } = props.current_task;
+    const screenId = props.fetchingDetails["_id"];
+
+    let arg = {
+      screenId,
+      replaceObjList: {
+        oldObjId,
+        newKeywordsMap: keywordMap,
+        "newObjectData": newObjData,
+        testcaseIds: !CORData[oldObjId] ? [] : CORData[oldObjId]["testcasesids"],
+      },
+      param: "crossReplaceScrapeData"
+    }
+    updateScreen_ICE(arg)
+      .then(response => {
+        if (response === "Invalid Session") return RedirectPage(props.history);
+        if (response === "Success") {
+          let rep = { ...replace }
+          delete rep[val];
+          setReplace({ ...rep })
+          setForceRender(!forceRender)
+          props.toastSuccess(MSG.SCRAPE.SUCC_OBJ_TESTCASES_REPLACED)
+          if (!objectsReplaced)
+            setObjectsReplaced(true)
+          /** comment the line below when retaining the selected mappings, for deleting only saved object */
+          setCrossObjKeywordMap((prevData) => {
+            const newData = { ...prevData }
+            delete newData[oldObjId]
+            return newData;
+          })
+
+          /** uncomment the line below when retaining the selected mappings, currently deleting all mappings after saving */
+          // setCrossObjKeywordMap({})
+        }
+        else {
+          props.toastError(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
+        }
+      })
+      .catch(error => {
+        props.toastError(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
+        console.err(error);
+      })
+
+    // }}>OK</button>
+    // })
+  }
+
+  const _handleModalClose = () => {
+    props.fetchScrapeData()
+      .then(resp => {
+        if (resp === "success") {
+          if (objectsReplaced) // this is required inside only.
+            props.toastSuccess(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
+        }
+        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRtoastErrorPE)
+      })
+      .catch(err => {
+        props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+      });
+    props.setShow(false)
+  }
+  const handleSelectChange = (e, keyword, oldObj) => {
+    if (e.target.value) e.target.classList.remove("r-group__selectError")
+    else return
+    if (!CrossObjKeywordMap[oldObj.objId]) {
+      CrossObjKeywordMap[oldObj.objId] = {
+        "keywordMap": {
+          [keyword]: e.target.value
+        }
+      }
+    }
+    else {
+      CrossObjKeywordMap[oldObj.objId]["keywordMap"][keyword] = e.target.value;
+    }
+    setCrossObjKeywordMap(CrossObjKeywordMap);
+  }
+  const handleReplaceKeywordClick = () => {
+    if (!Object.keys(replace).length) {
+      props.toastError("Please select atleast one object to Replace");
+      return;
+    }
+    let duplicateItm = false;
+    let duplicateCusts = [];
+    let object_list = []
+    let replacing = { ...replace };
+    for (let val in replacing) {
+      if (replacing[val]) {
+        object_list.push([replacing[val][0].objId, replacing[val][1]]);
+        if (custNames.includes(replacing[val][1].custname) && !replacingCustNm.includes(replacing[val][1].custname)) {
+          duplicateItm = true;
+          duplicateCusts.push(replacing[val][1].custname);
+        }
+      }
+    }
+
+    if (duplicateItm) {
+      props.setShowPop({
+        'type': 'modal',
+        'title': 'Replace Scrape data',
+        'content': <div className="ss__dup_labels">
+          Please rename/delete duplicate scraped objects
+          <br /><br />
+          Object characterstics are same for:
+
+          <div className="ss__dup_scroll">
+            {duplicateCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+          </div>
+
+        </div>,
+        'footer': <button onClick={() => props.setShowPop("")}>OK</button>
+      })
+    } else {
+      props.setOverlay("Fetching Keywords for selected objects...")
+
+      // let { screenId,appType } = props.current_task;
+      const appType = props.appType ? props.appType : 'Web';
+      const screenId = props.fetchingDetails["_id"];
+
+      let arg = {
+        screenId,
+        appType,
+        objMap: {},
+      };
+
+      let replacing = { ...replace };
+      for (let val in replacing) {
+        if (replacing[val]) {
+          let tag = tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
+          arg.objMap[replacing[val][0].objId] = tag;
+        }
+      }
+      fetchReplacedKeywords_ICE(arg).then((res) => {
+        props.setOverlay(null)
+        if (!(res === "fail")) {
+          setCORData(res);
+          setDataTableData(Object.keys(replace).map((val_id, idx) => {
+            let tag = "";
+            if (replace[val_id]) tag = tagListToReplace.includes(replace[val_id][1].tag) ? replace[val_id][1].tag : 'element';
+            const oldObj = replace[val_id] ? replace[val_id][0] : {};
+            const newObj = replace[val_id] ? replace[val_id][1] : {};
+            const keywords = replace[val_id] && res[replace[val_id][0].objId] ? res[replace[val_id][0].objId].keywords : [];
+            const newkeywords = (res.keywordList && res.keywordList[tag] && Object.keys(res.keywordList[tag]).length) ? Object.keys(res?.keywordList[tag]) : [];
+            const singleDataTableData = keywords.map((k_word, idx) => {
+              const similarTagNames = (tagListToReplace.includes(oldObj.tag) ? oldObj.tag : "element") === (tagListToReplace.includes(newObj.tag) ? newObj.tag : "element")
+              return (
+                {
+                  oldObj: <span title={oldObj.title}>{oldObj.title}</span>,
+                  keywords: <span title={k_word}>{k_word}</span>,
+                  newObj: <span title={newObj.title}>{newObj.title}</span>,
+                  selectKeyword: (
+                    <span style={{ width: '40%' }}>
+                      <select
+                        className="r-group__select"
+                        defaultValue={similarTagNames}
+                        onFocus={(e) => { e.target.value ? e.target.classList.remove('r-group__selectError') : e.target.classList.add('r-group__selectError') }}
+                        onChange={(e) => { handleSelectChange(e, k_word, oldObj) }}
+                        style={{ height: '2rem' }}
+                      >
+                        <option key="notSelected" value="" title="Select keyword" disabled>
+                          Select keyword
+                        </option>
+                        {newkeywords &&
+                          newkeywords.map((keyword, i) => (
+                            <option key={keyword + i} title={keyword} value={keyword}>
+                              {keyword.slice(0, 30) + (keyword.length > 30 ? '...' : '')}
+                            </option>
+                          ))}
+                      </select>
+                    </span>
+                  )
+                }
+              );
+            });
+            return singleDataTableData;
+          }).flat());
+          setActiveTab("keywordsReplacement")
+        }
+        else {
+          props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+        }
+      }).catch((err) => {
+        props.setOverlay(null)
+        console.log(err)
+        // props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+      });
+    }
+  }
+
+  const footerReplace = (
+    <div className='footer_compare'>
+      <Button size='small' onClick={() => { onReplaceUnlink() }} label='Un-link'></Button>
+      <Button size='small' label='Replace Keywords' onClick={() => { handleReplaceKeywordClick(); }}></Button>
+    </div>
+  )
+  const footerReplaceKeyword = (
+    <div className='footer_compare'>
+      <Button size='small' label='Save' onClick={() => {
+        Object.keys(replace).map((val_id, idx) => {
+
+          let keywords = replace[val_id] && CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords : [];
+          let oldObj = replace[val_id][0];
+          let COKMap = CrossObjKeywordMap;
+          let newObj = replace[val_id][1];
+          let val = val_id;
+
+          if (keywords.length > 0)
+            saveGroupItem(oldObj.objId, COKMap[oldObj.objId]["keywordMap"], newObj, val)
+          else
+            saveGroupItem(oldObj.objId, [], newObj, val)
+        })
+      }}></Button>
+    </div>
+  )
+
 
   return (
     <>
@@ -541,15 +908,6 @@ const ActionPanel = (props) => {
         toastError={props.toastError}
       />
       }
-
-        {/* isOpen={currentDialog}
-        OnClose={handleClose}
-        captureList={capturedDataToSave}
-        fetchingDetails={props.fetchingDetails}
-        fetchScrapeData={fetchScrapeData}
-        setShow={setCurrentDialog}
-        toastSuccess={toastSuccess}
-        toastError={toastError} */}
 
       {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
         OnClose={props.OnClose}
@@ -642,9 +1000,8 @@ const ActionPanel = (props) => {
       <Dialog
         className='compare__object__modal'
         header="Select Browser"
-        style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
-        position='right'
-        visible={props.isOpen === 'compareObject'}
+        style={{ height: "21.06rem", width: "24.06rem",  marginRight: "15rem"  }}
+        visible={(props.isOpen === 'compareObject' || props.isOpen === 'replaceObject') && (replaceVisible === false)}
         onHide={props.OnClose} footer={footerCompare}>
         <div className='compare__object'>
           <span className='compare__btn'>
@@ -660,55 +1017,6 @@ const ActionPanel = (props) => {
       </Dialog>
 
 
-      {/* COMPARE ELEMENT  */}
-      {/* <Dialog className='create__object__modal' draggable={false} header={Header} style={{ height: "40rem", width: "50.06rem", marginRight: "6rem" }} visible={compareFlag} onHide={() => { dispatch(CompareFlag(false)) }} position='right' footer={compareElementfooter}>
-        <Accordion multiple activeIndex={[0]}>
-          {changedObj && changedObj.length && <AccordionTab contentClassName='' className="accordin__elem" header={accordinHedaerChangedElem()}>
-            <div className='accordion_changedObj'>
-              {changedObj.map((element, index) => (
-
-                <div className="changed__elem" key={index} style={{ display: 'flex', gap: '0.5rem', marginLeft: '1.3rem' }}>
-                  <Checkbox inputId={element.custname}
-                    value={element}
-                    onChange={onCheckCheckbox}
-                    checked={checked.some(
-                      (item) => item.element.custname === element.custname
-                    )}
-                  />
-                  <p>{element.custname}</p>
-                </div>))}
-            </div>
-
-
-          </AccordionTab>
-          }
-
-          {notFoundObj && notFoundObj.length && <AccordionTab contentClassName='' className="accordin__elem" >
-            <div className='accordion_notfoundObj'>
-              {notFoundObj.map((element, index) => (
-
-                <div className="changed__elem" key={index} style={{ display: 'flex', gap: '0.5rem', marginLeft: '1.3rem' }}>
-                  <p>{element.custname}</p>
-                </div>
-
-              ))}
-            </div>
-          </AccordionTab>
-          }
-          {notChangedObj && notChangedObj.length && <AccordionTab contentClassName='' className="accordin__compare" header="Unchanged Elements">
-            <div className='accordion_unchangedObj'>
-              {notChangedObj.map((element, index) => (
-
-                <div className="changed__elem" style={{ display: 'flex', gap: '0.5rem', marginLeft: '1.3rem' }} key={index} >
-                  <p>{element.custname}</p>
-                </div>
-
-              ))}
-            </div>
-          </AccordionTab>
-          }
-        </Accordion>
-      </Dialog> */}
       <CompareElement
         screenId={props.fetchingDetails["_id"]}
         mainScrapedData={props.mainScrapedData}
@@ -720,6 +1028,119 @@ const ActionPanel = (props) => {
         OnClose={props.OnClose}
         setShow={props.setShow}
       />
+
+      {/* Replace Element */}
+      <Dialog
+        className='replace__object__modal'
+        header="Replace: Sign up screen 1"
+        style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
+        position='right'
+        visible={props.isOpen === "replaceObjectPhase2"}
+        onHide={props.OnClose} footer={footerReplace}>
+        {
+          <div data-test="replaceObject" className="ss__replaceObj">
+
+            <>
+              {activeTab === "ObjectReplacement" ?
+                <>
+
+                  <div className="ss__replaceObjBody">
+                    <div data-test="replaceObjectHeading" className="ss__ro_lbl ro__headerMargin">Please select the Element type and then drag and drop the necessary elements to be replaced with the new Elements</div>
+                    <div className="ss__ro_lists">
+                      <div data-test="replaceObjectScrapeObjectList" className="ss__ro_scrapeObjectList">
+                        <div data-test="replaceObjectLabel" className="ss__ro_lbl ro__lblMargin">Captured Elements</div>
+                        <div className="ro_scrapeListContainer">
+                          <div className="ro_listCanvas">
+                            <div className="ro_listMinHeight">
+                              <div data-test="replaceObjectListContent" className="ro_listContent" id="roListId">
+
+                                <>
+                                  {allScraped.map((object, i) => {
+                                    let replaced = object.val in replace;
+                                    return (<div data-test="replaceObjectListItem" key={i} title={object.title} className={"ss__ro_listItem" + (replaced ? " ro_replaced" : "")} draggable={replaced ? "false" : "true"} onDragStart={(e) => onReplaceDragStart(e, object)}>
+                                      {object.title}
+                                    </div>)
+                                  })}
+                                </>
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div data-test="replaceObjectCustomObjectList" className="ss__ro_customObjectList">
+                        <div data-test="replaceObjectCustomHeading" className="ss__ro_lbl ro__lblMargin">New Captured Elements</div>
+                        <div className="ss__ro_customOutContainer">
+                          <div className="ro_listCanvas">
+                            <div className="ro_listMinHeight">
+                              <div className="ro_listContent" id="roListId">
+                                <div data-test="replaceObjectCustomContainer" className="ss__ro_customInContainer">
+                                  {Object.keys(newScrapedList).map((elementType, i) => (
+                                    <div key={i} className='ro_tagHeaderList'>
+                                      <div data-test="replaceObjectTagHead" className="ro_tagHead" onClick={() => setSelectedReplaceTag(elementType === selectedReplaceTag ? "" : elementType)}>{elementType}</div>
+                                      {selectedReplaceTag === elementType && <div className="ro_tagItemList">
+                                        {newScrapedList[selectedReplaceTag].map((object, j) => <div data-test="replaceObjectCustomListItem" key={j} title={object.custname} className={"ro_tagItems" + (selectedReplaceItems.includes(object.val) ? " ro_selectedTag" : "")} onDragOver={onReplaceDragOver} onDrop={(e) => onReplaceDrop(e, object)}>
+                                          {object.val in replace ?
+                                            <>
+                                              <span data-test="replaceObjectReplacedName" className="ro_replacedName" onClick={() => onReplaceCustomClick("", object.val)}>
+                                                {replaceShowName === object.val ? object.title : replace[object.val][0].title}
+                                              </span>
+                                              <span data-test="replaceObjectFlipName" className="ro_nameFlip" onClick={() => onReplaceCustomClick(object.val, object.val)}></span>
+                                            </> :
+                                            <span data-test="h3">{object.custname}</span>}
+
+                                        </div>)}
+                                      </div>}
+                                    </div>
+                                  ))}
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </> :
+                <Dialog visible={activeTab === "keywordsReplacement"}
+                  onHide={props.OnClose} footer={footerReplaceKeyword} header='Replace Keywords'>
+                  <div className='ss__ro_lbl'>Please map the keywords of old elements with the new elements</div>
+                  <DataTable value={dataTableData} showGridlines>
+                    <Column
+                      key="oldObj"
+                      field="oldObj"
+                      header="Old Elements"
+                      style={{ width: "14rem" }}
+                    />
+                    <Column
+                      key="keywords"
+                      field="keywords"
+                      header="Keyword Used"
+                      style={{ width: "14rem" }}
+                    />
+                    <Column
+                      key="newObj"
+                      field="newObj"
+                      header="New Elements"
+                      style={{ width: "14rem" }}
+                    />
+                    <Column
+                      key="selectKeyword"
+                      field="selectKeyword"
+                      header="Select Keyword"
+                      style={{ width: "14rem" }}
+                    />
+                  </DataTable>
+                </Dialog>
+
+
+              }
+            </>
+          </div>
+        }
+      </Dialog>
     </>
   );
 }

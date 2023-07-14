@@ -103,6 +103,7 @@ const DisplayProject = (props) => {
         return {
           key: index,
           projectName: element.name,
+          progressStep:element.progressStep,
           modifiedName: element.firstname,
           modifieDateProject: element.releases[0].modifiedon,
           modifiedDate: lastModified,
@@ -131,6 +132,7 @@ const DisplayProject = (props) => {
               {
                 key: index,
                 projectName: element.name,
+                progressStep:element.progressStep,
                 modifiedName: element.firstname,
                 modifiedDate: lastModified,
                 modifieDateProject: modified_Date,
@@ -263,6 +265,7 @@ const DisplayProject = (props) => {
                 {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
                 {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
                 {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "5db0022cf87fdec084ae49b5" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
                 <div className="Project_name">
                 <p id="projectInside">{project.projectName}</p>
                 </div>
