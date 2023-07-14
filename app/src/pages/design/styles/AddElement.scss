@@ -1,0 +1,91 @@
+.add__object__header {
+    .p-dialog-header-icons {
+        right: 2% !important;
+        position: absolute;
+    }
+
+    .p-dialog-header {
+        background: #E2E2ED !important;
+    }
+
+    .card__add_object {
+        display: flex;
+        flex-direction: row;
+
+        .add_object__left {
+            position: absolute;
+            height: 60%;
+            width: 46%;
+            top: 18%;
+            right: 51%;
+            border: 1px solid #C7C7C7;
+    
+            .object__dropdown {
+                left: 7%;
+            }
+
+            .p-card-title {
+                font-family: 'Open Sans';
+                font-weight: 500 !important;
+                font-size: 15px !important;
+                border-bottom: 1px solid #C7C7C7;
+                color: #030229;
+                padding: 0.7rem;
+                margin-left: 1.7%;
+            }
+    
+            .p-card-body {
+                padding: 0 !important;
+            }
+        }
+
+        .add_object__right {
+            position: absolute;
+            height: 60%;
+            width: 46%;
+            top: 18%;
+            left: 51%;
+            border: 1px solid #C7C7C7;
+    
+            .p-card-title {
+                font-family: 'Open Sans';
+                font-weight: 500 !important;
+                font-size: 15px !important;
+                color: #030229;
+                border-bottom: 1px solid #C7C7C7;
+                padding: 0.7rem;
+            }
+    
+            .p-card-body {
+                padding: 0 !important;
+    
+                .p-card-content {
+                    padding: 0rem;
+                    max-height: 13rem !important;
+                    overflow-y: auto !important;
+    
+                }
+            }
+    
+            .text__added__step {
+                background: rgba(96, 91, 255, .2);
+                border-radius: 3px;
+                color: #605bff;
+                font-family: Open Sans;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 400;
+                height: 2rem;
+                margin: 0.5rem;
+                position: relative;
+                padding: 0.5rem;
+            }
+        }
+    
+    }
+
+    
+   
+
+   
+}

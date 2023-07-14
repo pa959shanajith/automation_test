@@ -1,0 +1,136 @@
+.map__object__header {
+    .p-dialog-header {
+        background: #E2E2ED !important;
+    }
+
+    .p-dialog-content {
+        overflow-y: hidden;
+
+        .map_element_content {
+            display: flex;
+            flex-direction: row;
+
+            .custom_element,
+            .captured_elements {
+                .header {
+                    font-size: large;
+                    display: block;
+                    font-weight: 500;
+                    margin: 0.5rem;
+                    text-align: center;
+                }
+
+            }
+
+            .captured_elements {
+                width: 50%;
+                margin-right: 0.5rem;
+
+                .list {
+                    overflow-y: auto;
+                    max-height: 22rem;
+                }
+
+                .ss__mo_listItem {
+                    border: 2px solid #abc2ee;
+                    border-radius: 5px;
+                    font-size: 15px;
+                    margin: 0.4rem 4rem;
+                    overflow: hidden;
+                    padding: 0.4rem;
+                    text-overflow: ellipsis;
+                    white-space: nowrap !important;
+                    width: 65%;
+                    cursor: pointer;
+                }
+
+                .mo_mapped {
+                    background: rgb(224, 224, 224);
+                    cursor: no-drop;
+                }
+
+            }
+
+            .custom_element {
+                width: 50%;
+
+                .container {
+                    padding: 0.5rem;
+                    display: flex;
+                    flex-direction: column;
+
+                    .acoordian_container {
+                        overflow-y: auto;
+                        height: 50vh;
+                    }
+
+                    .p-accordion .p-accordion-header .p-accordion-header-link {
+                        padding: 0.7rem !important;
+                    }
+
+                    .p-accordion {
+
+                        .p-accordion-tab {
+
+                            .p-toggleable-content {
+                                .p-accordion-content {
+                                    padding: 0.7rem !important;
+
+                                    .mo_tagItemList {
+                                        width: 100%;
+                                        height: 30vh;
+                                        overflow-y: auto;
+
+                                        .mo_tagItems {
+                                            align-items: center;
+                                            background: #f0f8ff;
+                                            border: 2px solid #abc2ee;
+                                            border-radius: 5px;
+                                            height: 2rem;
+                                            margin-bottom: 8px;
+                                            text-align: left;
+                                            overflow: hidden;
+                                            /* padding-left: 0.5rem; */
+                                            position: relative;
+                                            text-overflow: ellipsis;
+                                            white-space: nowrap !important;
+                                            width: 20rem;
+                                            cursor: pointer;
+
+                                        }
+
+                                        .mo_selectedTag {
+                                            border: 1px solid rgba(73, 1, 179, 0.76) !important;
+                                            box-shadow: 2px 2px 2px rgb(124, 123, 123) !important;
+                                        }
+
+                                        .mo_mappedName {
+                                            background-color: #b4b2f1;
+                                            // flex: 0 0 100%;
+                                            height: 100%;
+                                            display: flex;
+                                            align-items: center;
+                                            padding-left: 1rem;
+                                            overflow: hidden;
+                                            text-overflow: ellipsis;
+                                            cursor: pointer;
+                                        }
+
+                                        .mo_nameFlip {
+                                            // flex: 0 0 20%;
+                                            height: 100%;
+                                        }
+
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+        }
+    }
+}

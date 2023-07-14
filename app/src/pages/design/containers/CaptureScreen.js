@@ -73,7 +73,7 @@ const CaptureModal = (props) => {
   const [editingCell, setEditingCell] = useState(null);
   const [deleted, setDeleted] = useState([]);
   const [deletedItems, setDeletedItems] = useState(false)
-  const[browserName,setBrowserName]=useState(null)
+  const [browserName, setBrowserName] = useState(null)
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -690,13 +690,7 @@ const elementTypeProp =(elementProperty) =>{
           if (scrapedItemsLength > 0) dispatch(disableAction(true));
           else dispatch(disableAction(false));
           setSaved({ flag: false });
-          err =
-
-              data === 'scheduleModeOn' ?
-                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-
-          
+          err = data === 'scheduleModeOn' ? MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT : MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
         } else if (data === "fail")
           err = MSG.SCRAPE.ERR_SCRAPE;
         else if (data === "Terminate") {
@@ -777,19 +771,23 @@ else{
           setNewScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
 
-          if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
-            setCapturedDataToSave([...scrapeItemList])
-          }
-          else {
-            if (capturedDataToSave.length > 0) { //when click on addmore
-              addMore.current = true;
-              setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+          if(visible !== 'replace') {
+            if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
+              setCapturedDataToSave([...scrapeItemList])
             }
-            else { // when captured data is empty  
-              addMore.current = false;
-              setCapturedDataToSave([...scrapeItemList]);
+            else {
+              if (capturedDataToSave.length > 0) { // when click on addmore
+                addMore.current = true;
+                setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+              }
+              else { // when captured data is empty  
+                addMore.current = false;
+                setCapturedDataToSave([...scrapeItemList]);
+              }
             }
           }
+          else handleDialog('replaceObject') // when visible === 'replace'
+          
           updateScrapeItems(scrapeItemList);
           setScrapedURL(updatedNewScrapeData.scrapedurl);
           setMirror({ scrape: viewString.mirror, compare: null });
@@ -797,6 +795,8 @@ else{
 
           if (viewString.view.length > 0) setSaved({ flag: false });
           setEndScrape(true)
+
+          
 
         }
       }
@@ -900,6 +900,10 @@ else{
   //   return null;
   // };
 
+  const captureClickHandler = () => {
+    setVisible(false); 
+    startScrape(browserName); 
+  }
 
   const footerCapture = (
     <div className='footer__capture'>
@@ -921,7 +925,7 @@ else{
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
-        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3', cursor: 'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3', cursor: 'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
         {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
@@ -1013,11 +1017,11 @@ const footerSave = (
       mirrorImg.onload = function () {
         // let aspect_ratio = mirrorImg.height / mirrorImg.width;
         let aspect_ratio = mirrorImg.height / mirrorImg.width;
-				let ds_width = 500;
-				let ds_height = ds_width * aspect_ratio;
-				let ds_ratio = 490 / mirrorImg.width;
-				if (ds_height > 300) ds_height = 300;
-				ds_height += 45; // popup header size included
+        let ds_width = 500;
+        let ds_height = ds_width * aspect_ratio;
+        let ds_ratio = 490 / mirrorImg.width;
+        if (ds_height > 300) ds_height = 300;
+        ds_height += 45; // popup header size included
         setMirrorHeight(ds_height);
         setImageHeight(mirrorImg.height)
         setDsRatio(ds_ratio);
@@ -1116,13 +1120,13 @@ const footerSave = (
 
   const headerScreenshot = (
     <>
-    <div className='header__screenshot__eye'>
-    <div>
+      <div className='header__screenshot__eye'>
+        <div>
           <img data-test="eyeIcon" className="ss_eye_icon"
             onClick={onHighlight}
-            src={activeEye ? 
-              "static/imgs/eye-active.svg" : 
-              "static/imgs/eye_disabled.svg"} 
+            src={activeEye ?
+              "static/imgs/eye-active.svg" :
+              "static/imgs/eye_disabled.svg"}
           />
         </div>
       <div className='header__popup screenshot_headerName'>
@@ -1370,12 +1374,12 @@ const footerSave = (
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj_insprint' ></img>
-                  <Tooltip target=".add_obj_insprint" position="left" content=" Add a placeholder element by specifying element type." />
+                  <img className='add_obj'src="static/imgs/ic-add-object.png"></img>
+                  <Tooltip target=".add_obj" position="left" content=" Add a placeholder element by specifying element type." />
                   <p>Add Element</p>
                 </span>
                 <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj_insprint' title=' Map placeholder elements to captured elements.' src="static/imgs/ic-map-object.png"></img>
+                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png"></img>
                 <Tooltip target=".map_obj_insprint" position="left" content=" Map placeholder elements to captured elements." />
 
                   <p>Map Element</p>
@@ -1395,7 +1399,7 @@ const footerSave = (
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="left" content="  Easily upgrade Test Automation as application changes" />
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
-                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" title='Analyze screen to compare existing and newly captured element properties.'></img>
+                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
                   <Tooltip target=".add_obj_upgrade" position="left" content="  Analyze screen to compare existing and newly captured element properties." />
                   <p>Compare Element</p>
                 </span>
@@ -1494,7 +1498,7 @@ const footerSave = (
             <Column field="screenshots" header="Screenshots"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
-          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
+          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false }); setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position: "right" }}>
             <div className="screenshot_pop__content" >
               {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
               <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
@@ -1502,7 +1506,7 @@ const footerSave = (
           </Dialog>
         </div>
       </Dialog>
-      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
+      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace'} onHide={handleBrowserClose} footer={ (visible === 'capture' || visible === 'add more' || visible === 'replace') && footerCapture}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1524,8 +1528,8 @@ const footerSave = (
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
-        
-      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
+
+      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more' || visible === 'replace'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1561,8 +1565,15 @@ const footerSave = (
       {currentDialog === 'replaceObject' && <ActionPanel
         isOpen={currentDialog}
         OnClose={handleClose}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        captureList={capturedDataToSave}
+        setShow={setCurrentDialog}
+        newScrapedData={newScrapedData}
+        // startScrape={startScrape}
         toastSuccess={toastSuccess}
         toastError={toastError}
+
       />}
 
       {currentDialog === 'createObject' && <ActionPanel
@@ -1579,15 +1590,22 @@ const footerSave = (
         setCaptureData={setCaptureData}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        fetchingDetails={props.fetchingDetails} 
+        
       />}
 
       {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
-       isOpen={currentDialog} 
-       OnClose={handleClose} 
-      startScrape={startScrape} 
-      mainScrapedData={mainScrapedData} 
-      fetchingDetails={props.fetchingDetails} 
-      orderList={orderList}/>}
+        isOpen={currentDialog} 
+        OnClose={handleClose} 
+        startScrape={startScrape} 
+        mainScrapedData={mainScrapedData} 
+        fetchingDetails={props.fetchingDetails} 
+        fetchScrapeData={fetchScrapeData}
+        orderList={orderList}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        setShow={setCurrentDialog}
+      />}
 
 
       
@@ -1832,5 +1850,6 @@ function generateCompareObject(data, irisObjects){
       }
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
+  compareObj['fullScrapeData'] = data['fullScrapeData']
   return compareObj;
 } 
