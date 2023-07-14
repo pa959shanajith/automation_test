@@ -784,6 +784,51 @@ export const getProjectsMMTS = async(data) => {
 
         }
         if(res.status===200 && res.data !== "fail"){    
+            return res.data; 
+        }
+
+        console.error(res.data)
+
+        return {error:"failed"}
+
+    }catch(err){
+
+        console.error(err)
+
+        return {error:"failed"}
+
+    }
+
+
+
+
+   
+
+}
+export const updateE2E = async(data) => {
+
+    try{
+
+        const res = await axios(url+'/updateE2E', {
+
+            method: 'POST',
+
+            headers: {
+
+                'Content-Type': 'application/json'
+
+            },
+            data:{"scenarioID":data},
+            credentials: 'include',
+
+        });
+
+        if(res.status === 401 || res.data === "Invalid Session"){
+
+            return {error:MSG.GENERIC.INVALID_SESSION};
+
+        }
+        if(res.status===200 && res.data !== "fail"){    
             console.log("res.data",res.data)        
             return res.data; 
         }

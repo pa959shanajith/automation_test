@@ -1384,7 +1384,6 @@ exports.deleteScenario = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	try{
 		const inputs = {};
-		console.log(req.body);		
 		const result = await utils.fetchData(req.body, "mindmap/deleteScenario", fnName);
 		return res.status('200').send(result);
 	}catch (exception){
@@ -1397,7 +1396,6 @@ exports.deleteScenarioETE = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	try{
 		const inputs = {};
-		console.log(req.body);		
 		const result = await utils.fetchData(req.body, "mindmap/deleteScenarioETE", fnName);
 		return res.status('200').send(result);
 	}catch (exception){
@@ -1628,7 +1626,7 @@ exports.updateE2E = async (req, res) => {
 		const inputs={ 
 			"query": "updateE2E",
 			"scenarioID": req.body.scenarioID,
-			"projectID": req.body.projectID
+			// "projectID": req.body.projectID
 		 };
 		const result = await utils.fetchData(inputs, "mindmap/updateE2E", fnName);
 		if (result == "fail") {
