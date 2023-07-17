@@ -71,7 +71,6 @@ const ModuleListDrop = (props) =>{
     const [showInput, setShowInput] = useState(false);
     // const [moduleLists, setModuleLists] = useState(null);
     const [ moduleListsForScenario,  setModuleListsForScenario] = useState(null);
-    const [showInputE2E, setShowInputE2E] = useState(false);
     const [projectList, setProjectList] = useState([]);
     const [projectId, setprojectId] = useState("");
     const [showE2EPopup, setShowE2EPopup] = useState(false);
@@ -81,6 +80,8 @@ const ModuleListDrop = (props) =>{
     const [editE2ERightBoxData,setEditE2ERightBoxData] = useState([])
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
   const [showTooltip, setShowTooltip] = useState(false);
+  const [scenarioDataOnRightBox,setScenarioDataOnRightBox]= useState([])
+  const [filterSceForRightBox,setFilterSceForRightBox]= useState([])
 
   // const [newProjectList, setNewProjectList] = useState([]);
         const[overlayforModSce,setOverlayforModSce]=useState(false)
@@ -89,9 +90,10 @@ const ModuleListDrop = (props) =>{
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [transferBut, setTransferBut] = useState( [] );
         const [inputE2EData, setInputE2EData] = useState('');
-        const [newModSceList, setNewModSceList] = useState([]);
+        const [ newModSceList, setNewModSceList] = useState([]);
         const [modSceTree, setModSceTree] = useState([]);
         const [selectedProject, setSelectedProject] = useState(proj);
+        const [preventDefaultModule, setPreventDefaultModule] = useState(false);
         const [projOfSce, setProjOfSce] = useState({
           id: "",
           name: ""
@@ -113,7 +115,7 @@ const ModuleListDrop = (props) =>{
     };
    
     useEffect(()=> {
-        if(!searchForNormal && !isCreateE2E ) {
+        if(!preventDefaultModule ) {
             if(moduleLists.length > 0) {
                 const showDefaultModuleIndex = moduleLists.findIndex((module) => module.type==='basic');
                 selectModule(moduleLists[showDefaultModuleIndex]._id, moduleLists[showDefaultModuleIndex].name, moduleLists[showDefaultModuleIndex].type, false,true); 
@@ -155,7 +157,7 @@ const ModuleListDrop = (props) =>{
      },[isCreateE2E])
 
      useEffect(()=>{
-         setSearchForNormal(false);
+         setPreventDefaultModule(false);
          if(!isE2EOpen){
         // setIsCreateE2E(false);
         }
@@ -521,23 +523,11 @@ const ModuleListDrop = (props) =>{
               projName:item.proj_name
             }
            })
+           setScenarioDataOnRightBox(e2eData)
+           setFilterSceForRightBox(e2eData)
            setTransferBut(e2eData);
 
       }
-      // const handleEditE2E=async()=>{
-      //   if(moduleSelect.type=== "endtoend"){
-      //      setE2EName(moduleSelect.name)}
-      //      const editE2EData  = moduleSelect.children.map((item)=>{
-      //       return{
-      //           scenarioID: item._id,
-      //           projectID:item.projectID
-      //         }
-      //      })
-      //      console.log("moduleSelect",moduleSelect)
-      //      console.log("editdata",editE2EData)
-      //      setTransferBut(editE2EData);
-
-      // }
     // ///////////// _____ E2E popUp_____ ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     
@@ -548,9 +538,11 @@ const ModuleListDrop = (props) =>{
           let newTrans =[...transferBut];
          let newData = newTrans.find(item=>item.sceIdx === ScenarioSelectedIndex)
           newTrans.splice(ScenarioSelectedIndex, 1);
-          
+          setScenarioDataOnRightBox(newTrans)
+          setFilterSceForRightBox(newTrans)
           setTransferBut(newTrans);
           if(newTrans.length==0){setInitialText(true)}
+          
          }
         
         const handleSearchScenarioLeftBox =(val)=>{
@@ -562,14 +554,27 @@ const ModuleListDrop = (props) =>{
           setSearchScenarioLeftBox(val);  
         }
         
+        
         const handleArrowBut =()=>{
           // let array = [...selectedKeys]
             // setTransferBut=[...transferBut,array]
             setInitialText(false)
             setTransferBut((oldTransferBut) => [...oldTransferBut, ...selectedKeys]);
-
+             setFilterSceForRightBox((oldTransferBut) => [...oldTransferBut, ...selectedKeys])
             setSelectedKeys([]);
+            setScenarioDataOnRightBox((oldTransferBut) => [...oldTransferBut, ...selectedKeys])
         }
+        const handleSearchScenarioRightBox = (val) => {
+          if (val === "") {
+            setFilterSceForRightBox(scenarioDataOnRightBox);
+          } else {
+            const filteredData = scenarioDataOnRightBox.filter(
+              (e) => e.sceName.toUpperCase().indexOf(val.toUpperCase()) !== -1
+            );
+            setFilterSceForRightBox(filteredData);
+          }
+        };
+
         // const pushingEnENmInArr ={
         //     "id": 0,
         //     "childIndex": 0,
@@ -661,18 +666,58 @@ const ModuleListDrop = (props) =>{
           }
           var moduledata = await getModules(req);
           if (moduledata.error) { displayError(moduledata.error); return }
-          dispatch(saveMindMap({screendata,moduledata,moduleselected}))
-
-
+          // dispatch(saveMindMap({screendata,moduledata,moduleselected}))
           
-          // console.log("moduledata",moduledata)
+          // dispatch(moduleList(moduledata));
+          // setTimeout(() => dispatch(selectedModule(moduleselected)), 350)
 
-          dispatch(moduleList(moduledata));
-          setTimeout(() => dispatch(selectedModule(moduleselected)), 150)
+          // Assuming you have access to the 'dispatch' function
+
+// Create a function to dispatch 'moduleList'
+const dispatchModuleList = (moduledata) => {
+  return new Promise((resolve, reject) => {
+    dispatch(moduleList(moduledata));
+    resolve();
+  });
+};
+
+// Create another function to dispatch 'selectedModule'
+const dispatchSelectedModule = (moduleselected) => {
+  return new Promise((resolve, reject) => {
+    dispatch(selectedModule(moduleselected));
+    resolve();
+  });
+};
+
+// Create a function to dispatch 'saveMindMap'
+const dispatchSaveMindMap = (screendata, moduledata, moduleselected) => {
+  return new Promise((resolve, reject) => {
+    dispatch(saveMindMap({ screendata, moduledata, moduleselected }));
+    resolve();
+  });
+};
+
+// Create an async function to execute all three dispatches in sequence
+const executeDispatches = async (screendata, moduledata, moduleselected) => {
+  try {
+    await dispatchSaveMindMap(screendata, moduledata, moduleselected);
+    await dispatchModuleList(moduledata);
+    await dispatchSelectedModule(moduleselected);
+  } catch (error) {
+    console.error('Error occurred during dispatch:', error);
+  }
+};
+setPreventDefaultModule(true);
+
+// Call the async function to execute all three dispatches
+executeDispatches(screendata, moduledata, moduleselected);
+
  
-        setE2EName('')
-        setTransferBut([])
-          // console.log("moduleselected",moduleselected)
+           setE2EName('')
+           setTransferBut([])
+           setFilterSceForRightBox([])
+           setScenarioDataOnRightBox([])
+             // console.log("moduleselected",moduleselected)
 
         }
 
@@ -708,7 +753,7 @@ const ModuleListDrop = (props) =>{
             const footerContent = (
               <div>
                   <Button label="Cancel"  onClick={() => setShowE2EPopup(false)} className="p-button-text" />
-                  <Button label="Save" disabled={(!inputE2EData.length>0) && (!transferBut.length>0) }  onClick={() => {setShowE2EPopup(false); dataOnSaveButton() }} autoFocus />
+                  <Button label="Save" disabled={(E2EName? !E2EName.length>0 : !inputE2EData.length > 0) || !transferBut.length > 0}  onClick={() => {setShowE2EPopup(false); dataOnSaveButton() }} autoFocus />
                   {/* <SaveMapButton  isEnE={true}   /> */}
               </div>
             );
@@ -850,11 +895,12 @@ const ModuleListDrop = (props) =>{
                               <InputText
                                 placeholder="Search TestCases by name"
                                 className="inputContainer"
+                                onChange={(e)=>handleSearchScenarioRightBox(e.target.value)}
                               />
                             </span>
                           </div>
                           <div className="ScenairoList">
-                            {transferBut.map((ScenarioSelected, ScenarioSelectedIndex) => {
+                            {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
                               return (
                                 <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
                                   <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
@@ -1004,7 +1050,7 @@ const ModuleListDrop = (props) =>{
                             <i className="pi pi-times"  onClick={click_X_ButtonE2E}></i>
                         </div>)}
                      </div > */}
-                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName(''); setTransferBut([]); setShowE2EPopup(true); }} alt="PlusButtonOfE2E" />
+                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true) }} alt="PlusButtonOfE2E" />
                   {/* {showE2EPopup && <LongContentDemo setShowE2EOpen={setShowE2EPopup}  module={moduleSelect} />} */}
                 </div>
                 {/* <div className='searchBox pxBlack'>
