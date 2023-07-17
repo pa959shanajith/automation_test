@@ -264,7 +264,7 @@ const Profile = () => {
   const tableHeader = () => {
     return (
       <div className="flex flex-column">
-        <div className="exeprofile_txt">Execution Profile 1</div>
+        <div className="exeprofile_txt">{location?.state?.execution}</div>
         <div className="flex justify-content-between align-items-center">
           <div>Execution List</div>
           <div className="search_container">
