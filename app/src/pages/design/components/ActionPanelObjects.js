@@ -662,7 +662,6 @@ const ActionPanel = (props) => {
     setReplaceShowName("");
   }
 
-  const onReplaceShowAllObjects = () => setSelectedTag("");
 
   const onReplaceCustomClick = (replaceShowName, id) => {
     let updatedSelectedItems = [...selectedReplaceItems]
@@ -878,6 +877,7 @@ const ActionPanel = (props) => {
       <Button size='small' label='Replace Keywords' onClick={() => { handleReplaceKeywordClick(); }}></Button>
     </div>
   )
+
   const footerReplaceKeyword = (
     <div className='footer_compare'>
       <Button size='small' label='Save' onClick={() => {

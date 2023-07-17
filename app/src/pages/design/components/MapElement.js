@@ -10,7 +10,7 @@ import { Dialog } from 'primereact/dialog';
 import { Tooltip } from 'primereact/tooltip';
 import { tagList } from './ListVariables';
 import { CompareObj, CompareData, ImpactAnalysisScreenLevel, CompareFlag } from '../designSlice';
-import '../styles/MapElement';
+import '../styles/MapElement.scss';
 
 const MapElement = (props) => {
 

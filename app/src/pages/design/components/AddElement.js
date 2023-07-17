@@ -8,7 +8,7 @@ import { Dropdown } from 'primereact/dropdown';
 
 
 
-const AddElement = () => {
+const AddElement = (props) => {
     //add Elements
     const [addElementTempIdCounter, setAddElementTempIdCounter] = useState(0);
     const [addElementObjects, setAddElementObjects] = useState([]);
