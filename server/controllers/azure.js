@@ -159,9 +159,8 @@ exports.connectAzure_ICE = function(req, res) {
             var createObj = req.body.azure_input_dict;
             var project = '';
             if(req.body.projects && req.body.projects.length){
-                project = req.body.projects[0].text
+                project = req.body.projects.filter((element) => element.key == req.body.project)[0].text
             }
-             
             var issuetype = req.body.issuetype;
             var url =req.body.url;
             var username= req.body.username;
