@@ -24,7 +24,7 @@ const DesignModal = (props) => {
     const testcaseDropdownRef = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const userInfo = useSelector((state) => state.landing.userinfo);
+    let userInfo = useSelector((state) => state.landing.userinfo);
     const copiedContent = useSelector(state => state.design.copiedTestCases);
     const modified = useSelector(state => state.design.Modified);
     const saveEnable = useSelector(state => state.design.SaveEnable);
@@ -68,7 +68,7 @@ const DesignModal = (props) => {
     const [visible, setVisible] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
-        "stepNo": '1',
+        "stepNo": 1,
         "objectName": ' ',
         "custname": '',
         "keywordVal": '',
@@ -155,7 +155,7 @@ const DesignModal = (props) => {
         setSelectedTestCase({name:props.fetchingDetails['name'], id:props.fetchingDetails['_id']})
     },[])
     useEffect(() => {
-        if (Object.keys(userInfo).length) {
+        // if (Object.keys(userInfo).length) {
             //  && Object.keys(props.current_task).length) {
             for(var i = 0 ; i<parentScreen.length; i++){
                 fetchTestCases(i)
@@ -173,7 +173,7 @@ const DesignModal = (props) => {
                 .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
             }
             setScreenLevelTastSteps(screenLevelTestCases)
-        }
+        // }
         //eslint-disable-next-line
     }, [userInfo, setScreenLevelTastSteps]);
 
@@ -311,7 +311,7 @@ const DesignModal = (props) => {
                                                         testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
                                                     }
                                                 }
-                                                testcase[i].stepNo = (i + 1).toString();
+                                                testcase[i].stepNo = (i + 1);
                                                 let temp = testcase[i].keywordVal
                                                 testcase[i].keywordVal = testcase[i].keywordVal[0].toLowerCase() + testcase[i].keywordVal.slice(1,);
                                                 if(testcase[i].custname !== "OBJECT_DELETED"){
@@ -535,7 +535,7 @@ const DesignModal = (props) => {
     const addRow = () => {
         let oldScreenLevelTestSTeps=[...screenLavelTestSteps]
         let testCaseUpdated = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
-        let emptyRowDataIndex = { ...emptyRowData, stepNo: String(testCaseUpdated.testCases.length + 1) };
+        let emptyRowDataIndex = { ...emptyRowData, stepNo: testCaseUpdated.testCases.length + 1 };
         let data = [...testCaseUpdated.testCases, emptyRowDataIndex];
         let updatedTestCase = { ...testCaseUpdated, testCases: data };
         let index=screenLavelTestSteps.findIndex(screen=>screen.name === rowExpandedName.name)
@@ -970,7 +970,7 @@ const DesignModal = (props) => {
     const keywordEditor = (options) => {
         setFocused(true);
         return (
-            <Dropdown className='select-option' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel="label" menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
+            <Dropdown className='select-option' width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel="label" menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
         )
     };
     const inputEditor = (options) => {
@@ -987,14 +987,14 @@ const DesignModal = (props) => {
         updatedTestCases[index] = newData;
 
         // Update the keywordDescription based on newData
-        // if (updatedTestCases[index].hasOwnProperty("keywordDescription")) {
-        //     updatedTestCases[index].keywordDescription = "Your updated value";
-        //   }
-        updatedTestCases[index] = {
-        ...updatedTestCases[index],
-        keywordDescription: keywordList[getKeywords(newData.custname).obType][newData.keywordVal].description
+        if (updatedTestCases[index].hasOwnProperty("keywordDescription")) {
+            updatedTestCases[index].keywordDescription = keywordList[getKeywords(newData.custname).obType][newData.keywordVal].description;
+          }else{
+            updatedTestCases[index] = {
+                ...updatedTestCases[index],
+                keywordDescription: keywordList[getKeywords(newData.custname).obType][newData.keywordVal].description        
+            }
         };
-
         let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
         if (screen.name === rowExpandedName.name) {
             return { ...screen, testCases: updatedTestCases };
@@ -1090,8 +1090,8 @@ const DesignModal = (props) => {
                         emptyMessage={newtestcase.length === 0?emptyMessage:null} onRowEditComplete={onRowEditComplete}
                         rowReorder editMode="row" reorderableRows onRowReorder={(e) => reorderTestCases(e)} resizableColumns showGridlines size='small' >
                             <Column style={{ width: '3em' ,textAlign: 'center' }} rowReorder />
-                            <Column selectionMode="multiple" style={{ width: '3em' ,textAlign: 'center' }} />
-                            <Column field="custname" header="Element Name" editor={(options) => elementEditor(options)} ></Column>
+                            <Column selectionMode="multiple" style={{ width: '3em' }} />
+                            <Column field="custname" header="Element Name" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => elementEditor(options)} ></Column>
                             <Column field={focused?"keywordVal":"keywordDescription"} title="keywordTooltip" header="Operation" editor={(options) => keywordEditor(options)}  ></Column>
                             <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
                             <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
