@@ -10,11 +10,12 @@ import { Tree } from "primereact/tree";
 import { reportsBar } from "../../utility/mockData";
 import { useLocation } from "react-router-dom";
 import { getReportList, getTestSuite } from "../api";
+import { Button } from "primereact/button";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
-  const [testSuite, setTestSuite] = useState({ key: "0-0" });
-  const [testCase, setTestCase] = useState([]);
+  const [testSuite, setTestSuite] = useState({});
+  const [testCase, setTestCase] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
   const location = useLocation();
 
@@ -64,45 +65,206 @@ const Profile = () => {
       param: "modulestatus",
       executionListId: getRow?.node?.data,
     });
-    const getScenarioStatus = testSuiteList[0]?.scenarioStatus.reduce(
-      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-      {}
-    );
+
     setTestSuite({
       ...testSuite,
-      label: (
-        <div className="flex align-items-center justify-content-between">
-          <div>{testSuiteList[0]?.modulename}</div>
-          <div>
-            <HSBar
-              showTextIn
-              data={Object.keys(getScenarioStatus).map((item, ind) => ({
-                value: getScenarioStatus[item],
-                description: `${getScenarioStatus[item]} ${item}`,
-                color: reportsBar[item],
-              }))}
-            />
+      [getRow?.node?.key]: testSuiteList.map((item, ind) => ({
+        key: `0-${ind}`,
+        label: item?.modulename,
+        data: item?._id,
+      })),
+    });
+
+    setTestCase({
+      ...testCase,
+      [getRow?.node?.key]: testSuiteList.map((el, i) => ({
+        key: i.toString(),
+        label: (
+          <div className="grid">
+            <div className="col-6">
+              <div>Execution Progress</div>
+              <HSBar
+                showTextIn
+                data={[
+                  {
+                    value:
+                      Object.values(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      ).reduce((ac, cv) => ac + cv, 0) -
+                      Object.keys(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      )
+                        .filter(
+                          (item) =>
+                            item === "Terminate" ||
+                            item === "Skipped" ||
+                            item === "Incomplete"
+                        )
+                        .map(
+                          (e) =>
+                            el.scenarioStatus.reduce(
+                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                              {}
+                            )[e]
+                        )
+                        .reduce((ac, cv) => ac + cv, 0),
+                    description: `${
+                      Object.values(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      ).reduce((ac, cv) => ac + cv, 0) -
+                      Object.keys(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      )
+                        .filter(
+                          (item) =>
+                            item === "Terminate" ||
+                            item === "Skipped" ||
+                            item === "Incomplete"
+                        )
+                        .map(
+                          (e) =>
+                            el.scenarioStatus.reduce(
+                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                              {}
+                            )[e]
+                        )
+                        .reduce((ac, cv) => ac + cv, 0)
+                    } / ${Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0)} Executed`,
+                    color: "#6a5acd",
+                  },
+                  {
+                    value: Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0),
+                    color: "#808080",
+                  },
+                ]}
+              />
+            </div>
+            <div className="col-6">
+              <div>Execution Status</div>
+              <HSBar
+                showTextIn
+                data={Object.keys(
+                  el.scenarioStatus.reduce(
+                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                    {}
+                  )
+                )
+                  .filter((el) => el === "Pass" || el === "fail")
+                  .map((item, ind) => {
+                    return {
+                      value: el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )[item],
+                      description:
+                        item === "Pass"
+                          ? `${
+                              el.scenarioStatus.reduce(
+                                (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                {}
+                              )[item]
+                            } / ${Object.values(
+                              Object.keys(
+                                el.scenarioStatus.reduce(
+                                  (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                  {}
+                                )
+                              )
+                                .filter(
+                                  (key) => key === "Pass" || key === "fail"
+                                )
+                                .reduce((obj, key) => {
+                                  return Object.assign(obj, {
+                                    [key]: el.scenarioStatus.reduce(
+                                      (ac, cv) => (
+                                        (ac[cv] = ac[cv] + 1 || 1), ac
+                                      ),
+                                      {}
+                                    )[key],
+                                  });
+                                }, {})
+                            ).reduce((ac, cv) => ac + cv, 0)} Passed`
+                          : "",
+                      color: reportsBar[item],
+                    };
+                  })}
+              />
+            </div>
           </div>
-        </div>
-      ),
-      data: testSuiteList[0]?._id,
-      icon: 'pi pi-fw pi-chevron-right'
+        ),
+        data: { id: el._id, selected: getRow?.node?.key },
+        children: [{ key: "0-0" }],
+      })),
     });
   };
 
-  const onTestSceneClick = async() => {
+  const onTestCaseClick = async (row) => {
     const testSuiteList = await getTestSuite({
       query: "fetchModSceDetails",
       param: "scenarioStatus",
-      executionId: testSuite?.data
-    })
-    setTestCase(testSuiteList);
+      executionId: row?.node?.data?.id,
+    });
+    const getState = { ...testCase };
+    getState[row?.node?.data?.selected][row?.node?.key].children = [
+      {
+        key: "0-0",
+        label: (
+          <div className="grid">
+            {testSuiteList.map((item) => (
+              <>
+                <div className="col-4 flex align-items-center">{item?.scenarioname}</div>
+                <div className="col-3 flex align-items-center">{item?.status}</div>
+                <div className="col-3 flex align-items-center"><Button label="View" severity="secondary" size="small" outlined /></div>
+                <div className="col-2 flex align-items-center"><i className="pi pi-download"></i></div>
+              </>
+            ))}
+          </div>
+        ),
+      },
+    ];
+    setTestCase(getState);
   };
 
   const tableHeader = () => {
     return (
       <div className="flex flex-column">
-        <div className="exeprofile_txt">Execution Profile 1</div>
+        <div className="exeprofile_txt">{location?.state?.execution}</div>
         <div className="flex justify-content-between align-items-center">
           <div>Execution List</div>
           <div className="search_container">
@@ -161,7 +323,10 @@ const Profile = () => {
                       )
                       .map((el) => e.testSuites[el])
                       .reduce((ac, cv) => ac + cv, 0)
-                  } Executed`,
+                  } / ${Object.values(e.testSuites).reduce(
+                    (ac, cv) => ac + cv,
+                    0
+                  )} Executed`,
                   color: "#6a5acd",
                 },
                 {
@@ -171,39 +336,44 @@ const Profile = () => {
                     )
                     .map((el) => e.testSuites[el])
                     .reduce((ac, cv) => ac + cv, 0),
-                  description: `${Object.keys(e.testSuites)
-                    .filter(
-                      (item) => item === "Queued" || item === "Inprogress"
-                    )
-                    .map((el) => e.testSuites[el])
-                    .reduce((ac, cv) => ac + cv, 0)} Not Executed`,
                   color: "#808080",
                 },
               ]}
             />
           </div>
           <div className="col-6">
-            <div>Status</div>
+            <div>Execution Status</div>
             <HSBar
               showTextIn
-              data={Object.keys(e.testSuites).map((item, ind) => ({
-                value: e.testSuites[item],
-                description: `${e.testSuites[item]} ${item}`,
-                color: reportsBar[item],
-              }))}
+              data={Object.keys(e.testSuites)
+                .filter((el) => el === "Pass" || el === "fail")
+                .map((item, ind) => ({
+                  value: e.testSuites[item],
+                  description:
+                    item === "Pass"
+                      ? `${e.testCases[item]} / ${Object.values(
+                          Object.keys(e.testCases)
+                            .filter((key) => key === "Pass" || key === "fail")
+                            .reduce((obj, key) => {
+                              return Object.assign(obj, {
+                                [key]: e.testCases[key],
+                              });
+                            }, {})
+                        ).reduce((ac, cv) => ac + cv, 0)} Passed`
+                      : "",
+                  color: reportsBar[item],
+                }))}
             />
           </div>
         </div>
       ),
       data: e.id,
-      children: [testSuite],
+      children: testSuite[e.key] ? testSuite[e.key] : [{ key: '0-0' }],
     };
-    console.log(testSuite);
     return (
       <Tree
         value={[treeArr]}
         onExpand={(e) => onTestSuiteClick(e)}
-        onNodeClick={(e) => onTestSceneClick(e)}
         className="modules_tree"
       />
     );
@@ -222,7 +392,10 @@ const Profile = () => {
                   Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
                   Object.keys(e.testCases)
                     .filter(
-                      (item) => item === "Queued" || item === "Inprogress"
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete"
                     )
                     .map((el) => e.testCases[el])
                     .reduce((ac, cv) => ac + cv, 0),
@@ -230,51 +403,65 @@ const Profile = () => {
                   Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
                   Object.keys(e.testCases)
                     .filter(
-                      (item) => item === "Queued" || item === "Inprogress"
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete"
                     )
                     .map((el) => e.testCases[el])
                     .reduce((ac, cv) => ac + cv, 0)
-                } Executed`,
+                } / ${Object.values(e.testCases).reduce(
+                  (ac, cv) => ac + cv,
+                  0
+                )} Executed`,
                 color: "#6a5acd",
               },
               {
                 value: Object.keys(e.testCases)
-                  .filter((item) => item === "Queued" || item === "Inprogress")
+                  .filter(
+                    (item) =>
+                      item === "Terminate" ||
+                      item === "Skipped" ||
+                      item === "Incomplete"
+                  )
                   .map((el) => e.testCases[el])
                   .reduce((ac, cv) => ac + cv, 0),
-                description: `${Object.keys(e.testCases)
-                  .filter((item) => item === "Queued" || item === "Inprogress")
-                  .map((el) => e.testCases[el])
-                  .reduce((ac, cv) => ac + cv, 0)} Not Executed`,
                 color: "#808080",
               },
             ]}
           />
         </div>
         <div className="col-6">
-          <div>Status</div>
+          <div>Execution Status</div>
           <HSBar
             showTextIn
-            data={Object.keys(e.testCases).map((item, ind) => ({
-              value: e.testCases[item],
-              description: `${e.testCases[item]} ${item}`,
-              color: reportsBar[item],
-            }))}
+            data={Object.keys(e.testCases)
+              .filter((el) => el === "Pass" || el === "fail")
+              .map((item, ind) => {
+                return {
+                  value: e.testCases[item],
+                  description:
+                    item === "Pass"
+                      ? `${e.testCases[item]} / ${Object.values(
+                          Object.keys(e.testCases)
+                            .filter((key) => key === "Pass" || key === "fail")
+                            .reduce((obj, key) => {
+                              return Object.assign(obj, {
+                                [key]: e.testCases[key],
+                              });
+                            }, {})
+                        ).reduce((ac, cv) => ac + cv, 0)} Passed`
+                      : "",
+                  color: reportsBar[item],
+                };
+              })}
           />
         </div>
-        {
-          testCase.map((el) => <>
-            <div className="col-4">
-              {el?.scenarioname}
-            </div>
-            <div className="col-4">
-              {el?.status}
-            </div>
-            <div className="col-4">
-              View
-            </div>
-          </>)
-        }
+        <Tree
+          value={testCase[e.key]}
+          onExpand={(e) => onTestCaseClick(e)}
+          className="modules_tree"
+        />
       </div>
     );
   };
