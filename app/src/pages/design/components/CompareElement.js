@@ -202,17 +202,15 @@ function CompareElement(props) {
         </Accordion>
       </Dialog>
       {impactAnalysisScreenLevel && <MapElement
-        // notFoundList={notFoundObj}
-        // changedObj={changedObj}
-        // notChangedObj={notChangedObj}
         isOpen={"mapObject"}
-        OnClose={props.OnClose}
+        onClose={props.onClose}
         setShow={props.setShow}
         toastSuccess={props.toastSuccess}
         toastError={props.toastError}
         orderList={props.orderList}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={props.fetchScrapeData}
+        elementTypeProp={props.elementTypeProp}
       ></MapElement>
       }
     </>

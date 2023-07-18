@@ -410,18 +410,33 @@ const ActionPanel = (props) => {
   };
 
   
-  const footerCompare = (
-    <div className='footer_compare'>
-      <button className='clear__btn__cmp'>Clear</button>
-      {props.isOpen === 'replaceObject' && <Button size="small" onClick={replaceButtonClickHandler}>Replace</Button>}
-      {props.isOpen === 'compareObject' && <button className='save__btn__cmp' onClick={() => { props.startScrape(browserName, 'compare'); props.OnClose() }}>Compare</button>}
-    </div>
-  )
+  
+  // const footerCompare = (
+  //   <div className='footer_compare'>
+  //     <button className='clear__btn__cmp'>Clear</button>
+  //     {props.isOpen === 'replaceObject' && <Button size="small" onClick={replaceButtonClickHandler}>Replace</Button>}
+  //     {props.isOpen === 'compareObject' && <button className='save__btn__cmp' onClick={() => { props.startScrape(browserName, 'compare'); props.OnClose() }}>Compare</button>}
+  //   </div>
+  // )
 
-  const replaceButtonClickHandler = () => {
-    props.startScrape();
-    // setReplaceVisible = (true);
-}
+//   const replaceButtonClickHandler = () => {
+//     props.startScrape();
+//     // setReplaceVisible = (true);
+// }
+
+
+//   const footerCompare = (
+//     <div className='footer_compare'>
+//       <button className='clear__btn__cmp'>Clear</button>
+//       {props.isOpen === 'replaceObject' && <Button size="small" onClick={replaceButtonClickHandler}>Replace</Button>}
+//       {props.isOpen === 'compareObject' && <button className='save__btn__cmp' onClick={() => { props.startScrape(browserName, 'compare'); props.OnClose() }}>Compare</button>}
+//     </div>
+//   )
+
+//   const replaceButtonClickHandler = () => {
+//     props.startScrape();
+//     // setReplaceVisible = (true);
+// }
 
   // ============================ compare element ==================================
 
@@ -910,17 +925,19 @@ const ActionPanel = (props) => {
         addCustomElement={props.addCustomElement}
         toastSuccess={props.toastSuccess}
         toastError={props.toastError}
+        elementTypeProp={props.elementTypeProp}
       />
       }
 
       {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
-        OnClose={props.OnClose}
+        onClose={props.onClose}
         captureList={props.captureList}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={props.fetchScrapeData}
         setShow={props.setShow}
         toastSuccess={props.toastSuccess}
         toastError={props.toastError}
+        elementTypeProp={props.elementTypeProp}
       />}
 
       
@@ -1000,28 +1017,9 @@ const ActionPanel = (props) => {
 
       </Dialog>
 
-      {/* Browser Slection */}
-      <Dialog
-        className='compare__object__modal'
-        header="Select Browser"
-        style={{ height: "21.06rem", width: "24.06rem",  marginRight: "15rem"  }}
-        visible={(props.isOpen === 'compareObject' || props.isOpen === 'replaceObject') && (replaceVisible === false)}
-        onHide={props.OnClose} footer={footerCompare}>
-        <div className='compare__object'>
-          <span className='compare__btn'>
-            <p className='compare__text'>List Of Browsers</p>
-          </span>
-          <span className='browser__col'>
-            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          </span>
-        </div>
-      </Dialog>
 
 
-      <CompareElement
+      {props.isOpen === 'compareObject' &&  <CompareElement
         screenId={props.fetchingDetails["_id"]}
         mainScrapedData={props.mainScrapedData}
         orderList={props.orderList}
@@ -1029,9 +1027,9 @@ const ActionPanel = (props) => {
         fetchScrapeData={props.fetchScrapeData}
         toastSuccess={props.toastSuccess}
         toastError={props.toastError}
-        OnClose={props.OnClose}
+        onClose={props.onClose}
         setShow={props.setShow}
-      />
+      />}
 
       {/* Replace Element */}
       <Dialog
@@ -1039,7 +1037,7 @@ const ActionPanel = (props) => {
         header="Replace: Sign up screen 1"
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
-        visible={props.isOpen === "replaceObjectPhase2"}
+        visible={props.isOpen === "replaceObject"}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">

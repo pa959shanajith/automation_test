@@ -71,7 +71,7 @@ const MapElement = (props) => {
             if (props.captureList && props.captureList.length) {
                 props.captureList.forEach(object => {
                     let elementType = object.tag;
-                    elementType = tagList.includes(elementType) ? elementType : 'Element';;
+                    elementType = props.elementTypeProp(elementType);
                     if (object.objId) {
                         if (object.isCustom) {
                             if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
@@ -284,8 +284,8 @@ const MapElement = (props) => {
 
     const resetHandler = () => {
         dispatch(ImpactAnalysisScreenLevel(false));
-        if (props.onClose) return props.onClose
-        else setDialogVisible(false)
+        if (props.onClose)  props.onClose();
+        else setDialogVisible(false);
     }
     return (
         <>
@@ -308,7 +308,7 @@ const MapElement = (props) => {
                                 let mapped = (impactAnalysisScreenLevel ? object.xpath : object.val) in map;
 
                                 return (<>
-                                    <Tooltip target={`.ss__mo_listItem${object.custname}`} content={object.title}></Tooltip>
+                                    {/* <Tooltip target={`custnames${i}`} content={object.title}></Tooltip> */}
                                     <div data-test="mapObjectListItem" key={i} className={"ss__mo_listItem" + (mapped ? " mo_mapped" : "")} draggable={mapped ? "false" : "true"} onDragStart={(e) => mapOnDragStart(e, object)}>
                                         {object.custname}
                                     </div>
