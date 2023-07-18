@@ -45,3 +45,5 @@ export  const ENABLE_EXPORT_BUTTON='ENABLE_EXPORT_BUTTON';
 export const EXPORT_PROJNAME='EXPORT_PROJNAME';
 
 export const ENABLE_EXPORT='ENABLE_EXPORT';
+
+export const Dont_Show_First_Module = 'Dont_Show_First_Module';
