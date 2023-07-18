@@ -593,6 +593,7 @@ export const addNode = (n) =>{
         n.display_name = n.display_name.slice(0, ch) + '...';
     }
     var img_src = 'static/imgs/node-' + n.type + '.png';
+    if (n.type === 'scenarios') img_src = 'static/imgs/node-' + n.type + '.svg';
     if (n.reuse && (n.type === 'testcases' || n.type === 'screens')) img_src = 'static/imgs/' + n.type + '-reuse.png';
     if (n.type === 'screens' && n.objLen===0) img_src = 'static/imgs/' + n.type + '-capture.png';
     if (n.type === 'screens' && n.objLen===0 && n.reuse) img_src = 'static/imgs/' + n.type + '-reusecapture.png';

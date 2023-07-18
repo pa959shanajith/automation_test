@@ -1,5 +1,5 @@
 import { React, useState, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
 import { Dialog } from 'primereact/dialog';
 import { Card } from 'primereact/card';
 import '../styles/ActionPanelObjects.scss';
@@ -757,6 +757,7 @@ const ActionPanel = (props) => {
     else {
       CrossObjKeywordMap[oldObj.objId]["keywordMap"][keyword] = e.target.value;
     }
+
     setCrossObjKeywordMap(CrossObjKeywordMap);
   }
   const handleReplaceKeywordClick = () => {
@@ -824,13 +825,14 @@ const ActionPanel = (props) => {
             const oldObj = replace[val_id] ? replace[val_id][0] : {};
             const newObj = replace[val_id] ? replace[val_id][1] : {};
             const keywords = replace[val_id] && res[replace[val_id][0].objId] ? res[replace[val_id][0].objId].keywords : [];
-            const newkeywords = (res.keywordList && res.keywordList[tag] && Object.keys(res.keywordList[tag]).length) ? Object.keys(res?.keywordList[tag]) : [];
+            const newkeywords = (res.keywordList && res.keywordList[tag] && Object.keys(res.keywordList[tag]).length) ? [res?.keywordList[tag]] : [];
             const singleDataTableData = keywords.map((k_word, idx) => {
               const similarTagNames = (tagListToReplace.includes(oldObj.tag) ? oldObj.tag : "element") === (tagListToReplace.includes(newObj.tag) ? newObj.tag : "element")
               return (
                 {
                   oldObj: <span title={oldObj.title}>{oldObj.title}</span>,
-                  keywords: <span title={k_word}>{k_word}</span>,
+                  keywords: <span title={k_word}>{
+                    res.keywordList[oldObj.tag][k_word].description ? res.keywordList[oldObj.tag][k_word].description : "--"}</span>,
                   newObj: <span title={newObj.title}>{newObj.title}</span>,
                   selectKeyword: (
                     <span style={{ width: '40%' }}>
@@ -844,10 +846,10 @@ const ActionPanel = (props) => {
                         <option key="notSelected" value="" title="Select keyword" disabled>
                           Select keyword
                         </option>
-                        {newkeywords &&
-                          newkeywords.map((keyword, i) => (
-                            <option key={keyword + i} title={keyword} value={keyword}>
-                              {keyword.slice(0, 30) + (keyword.length > 30 ? '...' : '')}
+                        {newkeywords && newkeywords[0] &&
+                          Object.keys(newkeywords[0]).map((keyword, i) => (
+                            <option key={newkeywords[0][keyword] + i} title={newkeywords[0][keyword].description ? newkeywords[0][keyword].description : "--"} value={keyword}>
+                              {newkeywords[0][keyword].description ? (newkeywords[0][keyword].description.slice(0, 30) + (newkeywords[0][keyword].description.length > 30 ? '...' : '')) : "--"}
                             </option>
                           ))}
                       </select>
@@ -884,15 +886,17 @@ const ActionPanel = (props) => {
         Object.keys(replace).map((val_id, idx) => {
 
           let keywords = replace[val_id] && CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords : [];
-          let oldObj = replace[val_id][0];
+          let oldObj = replace[val_id] ? replace[val_id][0] : {};
           let COKMap = CrossObjKeywordMap;
-          let newObj = replace[val_id][1];
+          let newObj = replace[val_id] ? replace[val_id][1] : {};
           let val = val_id;
 
-          if (keywords.length > 0)
-            saveGroupItem(oldObj.objId, COKMap[oldObj.objId]["keywordMap"], newObj, val)
-          else
-            saveGroupItem(oldObj.objId, [], newObj, val)
+          if (Object.keys(oldObj).length && COKMap && Object.keys(newObj).length && val) {
+            if (keywords.length > 0)
+              saveGroupItem(oldObj.objId, COKMap && COKMap[oldObj.objId] && COKMap[oldObj.objId]["keywordMap"] ? COKMap[oldObj.objId]["keywordMap"] : [], newObj, val)
+            else
+              saveGroupItem(oldObj.objId, [], newObj, val)
+          }
         })
       }}></Button>
     </div>
