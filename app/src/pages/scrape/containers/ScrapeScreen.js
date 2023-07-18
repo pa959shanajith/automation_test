@@ -695,7 +695,7 @@ function generateCompareObject(data, irisObjects){
         }
         compareObj.notFoundObj = [...localList, ...irisObjects];
     }
-    compareObj['fullScrapeData'] = data['fullScrapeData']
+    compareObj['fullScrapeData'] = data.view[3].newElements;
     return compareObj;
 } 
 
