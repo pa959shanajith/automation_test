@@ -629,10 +629,11 @@ exports.excelToMindmap = function (req, res){
 				if (i==4){return res.status(200).send("fail");}
 			});
 			for (let i = 0; i < cSheetRow.length; i++) {
-				row=cSheetRow[i].split(",")
-				excelrows.push(row)
-
-
+				if(cSheetRow[i] ==",,,"){
+					break
+				}
+				else{row=cSheetRow[i].split(",")
+				excelrows.push(row)}								
 			}
 			var scenarios=[]
 			var modules=[]
