@@ -20,6 +20,7 @@ const initialState = {
     toDeleteScenarios: [],
     appType:undefined,
     savedList:false,
+    dontShowFirstModule:false,
     ScrapeData : [],
     disableAction: false,
     disableAppend: false,
@@ -120,6 +121,9 @@ export const designSlice = createSlice({
     savedList:(state, action)=>{
       state.savedList = action.payload
     },
+    dontShowFirstModule:(state,action)=>{
+      state.dontShowFirstModule = action.payload
+    },
     saveMindMap: (state, action) => {
       return{
         ...state,
@@ -219,6 +223,6 @@ CompareFlag,
 CompareObj,
 CompareElementSuccessful,
 Modified,
-SaveEnable,objValue,EnableExport,ExportProjname,EnableExportMindmapButton} = designSlice.actions
+SaveEnable,objValue,EnableExport,ExportProjname,EnableExportMindmapButton,dontShowFirstModule} = designSlice.actions
 
 export default designSlice.reducer

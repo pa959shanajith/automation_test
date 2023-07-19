@@ -6,7 +6,7 @@ import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
-import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist,saveMindMap,moduleList} from '../designSlice';
+import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -32,7 +32,7 @@ const ModuleListDrop = (props) =>{
     const proj = useSelector(state=>state.design.selectedProj)
     const initProj = useSelector(state=>state.design.selectedProj)
     const moduleSelect = useSelector(state=>state.design.selectedModule)
-
+    const dontShowFirstModules = useSelector(state=>state.design.dontShowFirstModule)
     const moduleSelectlist = useSelector(state=>state.design.selectedModulelist)
     const initEnEProjt = useSelector(state=>state.design.initEnEProj)
     const [moddrop,setModdrop]=useState(true)
@@ -99,7 +99,7 @@ const ModuleListDrop = (props) =>{
           name: ""
         });
         const [searchScenarioLeftBox, setSearchScenarioLeftBox] = useState('')
-        const[filterModSceList,setFilterModSceList] =useState([])
+        const [filterModSceList,setFilterModSceList] =useState([])
         // const forCatchingCheckBoxSelDemo = useMemo(()=> CheckboxSelectionDemo())
 
     const imageRefadd = useRef(null);
@@ -115,7 +115,7 @@ const ModuleListDrop = (props) =>{
     };
    
     useEffect(()=> {
-        if(!preventDefaultModule ) {
+        if(!preventDefaultModule && !dontShowFirstModules ) {
             if(moduleLists.length > 0) {
                 const showDefaultModuleIndex = moduleLists.findIndex((module) => module.type==='basic');
                 selectModule(moduleLists[showDefaultModuleIndex]._id, moduleLists[showDefaultModuleIndex].name, moduleLists[showDefaultModuleIndex].type, false,true); 
@@ -245,18 +245,20 @@ const ModuleListDrop = (props) =>{
         setOverlayforModSce(true)
         const moduleScenarioData = await getProjectsMMTS(selectedProject? selectedProject:proj)
         setModSceTree(moduleScenarioData)
-        if(modSceTree.length)setOverlayforModSce(false)
+        if(newModSceList.length)setOverlayforModSce(false)
         if(moduleScenarioData.length){setOverlayforNoModSce(false)}
         
         // const handleEditE2EModPrjName = await updateE2E({"scenarioID": ,
         // "projectID": req.body.projectID})
         const projectNameforScenario = projectList.find(item => item.id === selectedProject)
         setProjOfSce(projectNameforScenario)
-        moduleScenarioData[0].mindmapList.map(sceLst => ({
-          ...sceLst,
-          projectname: projectNameforScenario.name
-        }));        
-          
+        // moduleScenarioData[0].mindmapList.map(sceLst => ({
+        //   ...sceLst,
+        //   projectname: projectNameforScenario.name
+        // }));        
+        setNewModSceList(moduleScenarioData)
+        setFilterModSceList(moduleScenarioData)
+          console.log("moduleScenarioData",moduleScenarioData)
       })();
         
 
@@ -549,9 +551,20 @@ const ModuleListDrop = (props) =>{
           if(val === "") {
             setFilterModSceList(newModSceList);
           } else {
-            setFilterModSceList(newModSceList.scenarioList.find((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1));
+            // console.log("newModSceList",newModSceList[0].mindmapList.map((module) =>
+            // module.scenarioList))
+            // let filtereddata=newModSceList[0].mindmapList.map((module) =>
+            // module.scenarioList.filter((sce) => {
+            //   if(sce.name.toUpperCase().includes(val.toUpperCase())) return sce ;
+            // }
+            //  ))
+            // setFilterModSceList([{mindmapList: newModSceList[0].mindmapList.map((module) =>
+            //  module.scenarioList.filter((sce) => sce.name.toUpperCase().indexOf(val.toUpperCase()) !== -1)
+            //   )}]);
+            //   console.log("filter",filterModSceList)
+            //   console.log("8",filtereddata)
           }
-          setSearchScenarioLeftBox(val);  
+          // setSearchScenarioLeftBox(val);  
         }
         
         
@@ -666,57 +679,60 @@ const ModuleListDrop = (props) =>{
           }
           var moduledata = await getModules(req);
           if (moduledata.error) { displayError(moduledata.error); return }
-          // dispatch(saveMindMap({screendata,moduledata,moduleselected}))
+          dispatch(isEnELoad(true))
+          dispatch(dontShowFirstModule(true))
+          dispatch(saveMindMap({screendata,moduledata,moduleselected}))
           
-          // dispatch(moduleList(moduledata));
-          // setTimeout(() => dispatch(selectedModule(moduleselected)), 350)
+          dispatch(moduleList(moduledata));
+          dispatch(selectedModule(moduleselected))
 
-          // Assuming you have access to the 'dispatch' function
+//           // Assuming you have access to the 'dispatch' function
+//           dispatch(dontShowFirstModule(true))
+// // Create a function to dispatch 'moduleList'
+// const dispatchModuleList = (moduledata) => {
+//   return new Promise((resolve, reject) => {
+//     dispatch(moduleList(moduledata));
+//     resolve();
+//   });
+// };
 
-// Create a function to dispatch 'moduleList'
-const dispatchModuleList = (moduledata) => {
-  return new Promise((resolve, reject) => {
-    dispatch(moduleList(moduledata));
-    resolve();
-  });
-};
+// // Create another function to dispatch 'selectedModule'
+// const dispatchSelectedModule = (moduleselected) => {
+//   return new Promise((resolve, reject) => {
+//     dispatch(selectedModule(moduleselected));
+//     resolve();
+//   });
+// };
 
-// Create another function to dispatch 'selectedModule'
-const dispatchSelectedModule = (moduleselected) => {
-  return new Promise((resolve, reject) => {
-    dispatch(selectedModule(moduleselected));
-    resolve();
-  });
-};
+// // Create a function to dispatch 'saveMindMap'
+// const dispatchSaveMindMap = (screendata, moduledata, moduleselected) => {
+//   return new Promise((resolve, reject) => {
+//     dispatch(saveMindMap({ screendata, moduledata, moduleselected }));
+//     resolve();
+//   });
+// };
 
-// Create a function to dispatch 'saveMindMap'
-const dispatchSaveMindMap = (screendata, moduledata, moduleselected) => {
-  return new Promise((resolve, reject) => {
-    dispatch(saveMindMap({ screendata, moduledata, moduleselected }));
-    resolve();
-  });
-};
-
-// Create an async function to execute all three dispatches in sequence
-const executeDispatches = async (screendata, moduledata, moduleselected) => {
-  try {
-    await dispatchSaveMindMap(screendata, moduledata, moduleselected);
-    await dispatchModuleList(moduledata);
-    await dispatchSelectedModule(moduleselected);
-  } catch (error) {
-    console.error('Error occurred during dispatch:', error);
-  }
-};
+// // Create an async function to execute all three dispatches in sequence
+// const executeDispatches = async (screendata, moduledata, moduleselected) => {
+//   try {
+//     await dispatchSaveMindMap(screendata, moduledata, moduleselected);
+//     await dispatchModuleList(moduledata);
+//     await dispatchSelectedModule(moduleselected);
+//   } catch (error) {
+//     console.error('Error occurred during dispatch:', error);
+//   }
+// };
 setPreventDefaultModule(true);
 
 // Call the async function to execute all three dispatches
-executeDispatches(screendata, moduledata, moduleselected);
+// executeDispatches(screendata, moduledata, moduleselected);
 
  
            setE2EName('')
            setTransferBut([])
            setFilterSceForRightBox([])
            setScenarioDataOnRightBox([])
+           setInputE2EData('')
              // console.log("moduleselected",moduleselected)
 
         }
@@ -839,7 +855,7 @@ executeDispatches(screendata, moduledata, moduleselected);
                           {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and TestCases...</h5>:
                             <Tree
                               value={
-                                modSceTree[0].mindmapList.map((module, modIndx) => ({
+                                filterModSceList[0].mindmapList.map((module, modIndx) => ({
                                   key: modIndx,
                                   label: (
                                     <div className="labelOfArray">
@@ -1050,7 +1066,7 @@ executeDispatches(screendata, moduledata, moduleselected);
                             <i className="pi pi-times"  onClick={click_X_ButtonE2E}></i>
                         </div>)}
                      </div > */}
-                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true) }} alt="PlusButtonOfE2E" />
+                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true);setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" />
                   {/* {showE2EPopup && <LongContentDemo setShowE2EOpen={setShowE2EPopup}  module={moduleSelect} />} */}
                 </div>
                 {/* <div className='searchBox pxBlack'>
