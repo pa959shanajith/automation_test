@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState, useRef } from "react";
 import { Dialog } from 'primereact/dialog';
 import { TabMenu } from 'primereact/tabmenu';
 import { Dropdown } from 'primereact/dropdown';
@@ -8,18 +8,90 @@ import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Card } from 'primereact/card';
+import LoginModal from "../Login/LoginModal";
+import { useDispatch, useSelector } from 'react-redux';
+import { screenType } from '../settingSlice'
+import * as api from '../api.js';
+import { RedirectPage, Messages as MSG, setMsg } from '../../global';
+import { Toast } from "primereact/toast";
+import { resetIntergrationLogin, resetScreen,selectedProject,selectedIssue } from '../settingSlice';
 
 
 
 const ManageIntegrations = ({ visible, onHide }) => {
-    const [selectedIntegrationType, setSelectedIntegrationType] = useState(null);
-    const [passeordValue, setPasswordValue] = useState('');
-    const [value, setValue] = useState('');
     const [activeIndex, setActiveIndex] = useState(0);
     const [showLoginCard, setShowLoginCard] = useState(true);
+    const selectedscreen = useSelector(state => state.setting.screenType);
+    const loginDetails = useSelector(state => state.setting.intergrationLogin);
+    const [isSpin, setIsSpin] = useState(false);
+    const [projectDetails,setProjectDetails] = useState([]);
+    const [issueTypes,setIssueTypes] = useState([]);
+    const [disableIssue,setDisableIssue] = useState(true)
+    const currentProject = useSelector(state => state.setting.selectedProject);
+    const currentIssue = useSelector(state => state.setting.selectedIssue);
+    const toast = useRef();
+
+    const dispatchAction = useDispatch();
+
+    const handleIntegration = useCallback((value) => {
+        // setSelectedIntegrationType(value);
+        dispatchAction(screenType(value));
+    }, [])
+
+    const handleSubmit = () => {
+        setIsSpin(true);
+        switch (selectedscreen.name) {
+            case 'jira':
+                callLogin_Jira();
+                break;
+            case 'Zephyr':
+                break;
+            case 'Azue DevOps':
+                break;
+            case 'ALM':
+                break;
+            case 'qTest':
+                break;
+            default:
+                break;
+        }
+    }
+    /* Jira Login handler */
+    const callLogin_Jira = async () => {
+        const jiraurl = loginDetails.url || '';
+        const jirausername = loginDetails.username || '';
+        const jirapwd = loginDetails.password || '';
+
+        const domainDetails = await api.connectJira_ICE(jiraurl, jirausername, jirapwd);
+        if (domainDetails.error) setMsg(domainDetails.error);
+        else if (domainDetails === "unavailableLocalServer") setToast("error", "Error", "ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (domainDetails === "scheduleModeOn") setToast("warn", "Warning", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session") {
+            setToast("error", "Error", "Session Expired please login again");
+            setIsSpin(false);
+            // dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            // return RedirectPage(history);
+        }
+        else if (domainDetails === "invalidcredentials") setToast("error", "Error", "Invalid Credentials");
+        else if (domainDetails === "fail") setToast("error", "Error", "Fail to Login");
+        else if (domainDetails === "notreachable") setToast("error", "Error", "Host not reachable.");
+        else if (domainDetails) {
+            if(Object.keys(domainDetails).length && domainDetails.projects){
+                setProjectDetails(domainDetails.projects.map((el) => {return {label:el.name , value:el.code, key:el.id}}))
+                setIssueTypes(domainDetails.issue_types.map((el) => {return {label:el.name , value:el.id, key:el.id}}))
+            }
+            setToast("success", "Success", `${selectedscreen.name} login successful`);
+            setShowLoginCard(false);
+        }
+        setIsSpin(false);
+    }
+
+    const setToast = (tag, summary, msg) => {
+        toast.current.show({ severity: tag, summary: summary, detail: msg, life: 10000 });
+    }
 
     const integrationItems = [
-        { label: 'ALM' },
+        { label: 'AML' },
         { label: 'Cloud Based Integration' },
     ];
 
@@ -33,6 +105,12 @@ const ManageIntegrations = ({ visible, onHide }) => {
     ];
 
     const handleCloseManageIntegrations = () => {
+        dispatchAction(resetIntergrationLogin());
+        dispatchAction(resetScreen());
+        dispatchAction(selectedProject(''));
+        dispatchAction(selectedIssue(''));
+        setShowLoginCard(true);
+        setIsSpin(false);
         onHide();
     }
 
@@ -47,12 +125,47 @@ const ManageIntegrations = ({ visible, onHide }) => {
     };
 
     const showCard2 = () => {
-        setShowLoginCard(false);
+        handleSubmit();
     };
 
     const showLogin = () => {
+        dispatchAction(resetIntergrationLogin());
+        dispatchAction(resetScreen());
         setShowLoginCard(true);
+        dispatchAction(selectedProject(''));
+        dispatchAction(selectedIssue(''));
     };
+
+    const onProjectChange = (e) => {
+        e.preventDefault();
+        dispatchAction(selectedProject(e.target.value));
+        setDisableIssue(false);
+        console.log(e.target.value, ' project e');
+    }
+
+    const onIssueChange = async (e) => {
+        e.preventDefault();
+        console.log(e.target.value, ' project f');
+        dispatchAction(selectedIssue(e.target.value));
+        let projectName = projectDetails.filter(el => el.value === currentProject)[0]['label'];
+        let issueName = issueTypes.filter(el => el.value === currentIssue)[0]['label'];
+        console.log(projectDetails,' /n',projectName);
+        let jira_info ={
+            project: projectName,
+            action:'getJiraTestcases',
+            issuetype: "",
+            itemType:issueName, 
+            url: loginDetails.url,
+            username: loginDetails.username,
+            password: loginDetails.password,
+            project_data: [],
+            key:currentProject
+        }
+        console.log(jira_info, ' jira_info ');
+        const testData = await api.getJiraTestcases_ICE(jira_info)
+        setTestCaseData(testData.testcases)
+
+    }
 
     const footerIntegrations = (
         <div className='btn-11'>
@@ -60,7 +173,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         </div>
     );
 
-
+    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2}  />, [isSpin,showCard2])
 
 
     return (
@@ -76,29 +189,29 @@ const ManageIntegrations = ({ visible, onHide }) => {
                         <>
                             <div className="login_container_integrations">
                                 <div className="side-panel">
-                                    <div className="icon-wrapper">
+                                    <div className={`icon-wrapper ${selectedscreen?.name === 'jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'jira', code: 'NY' })}>
                                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                                         <span className="text__jira">Jira</span>
                                     </div>
-                                    <div className="icon-wrapper">
+                                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Zephyr', code: 'RM' })}>
                                         <span><img src="static/imgs/azure_devops_icon.svg" className="img__azure"></img></span>
                                         <span className="text__azure">Azure DevOps</span>
                                     </div>
-                                    <div className="icon-wrapper">
+                                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Azure DevOps', code: 'LDN' })}>
                                         <span><img src="static/imgs/zephyr_icon.svg" className="img__zephyr"></img></span>
                                         <span className="text__zephyr">Zephyr</span>
                                     </div>
-                                    <div className="icon-wrapper">
+                                    <div className={`icon-wrapper ${selectedscreen?.name === 'qTest' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'qTest', code: 'LDN' })}>
                                         <span><img src="static/imgs/qTest_icon.svg" className="img__qtest"></img></span>
                                         <span className="text__qtest">qTest</span>
                                     </div>
-                                    <div className="icon-wrapper">
+                                    <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'ALM', code: 'LDN' })}>
                                         <span><img src="static/imgs/ALM_icon.svg" className="img__alm"></img></span>
                                         <span className="text__alm">ALM</span>
                                     </div>
                                 </div>
-
-                                <Card className="card__login__jira">
+                                {IntergrationLogin}
+                                {/* <Card className="card__login__jira">
                                     <div className="Login__jira">
 
                                         <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
@@ -124,7 +237,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                             <Button size="small" label="login" onClick={showCard2} className="login__btn"></Button>
                                         </div>
 
-                                    </div></Card>
+                                    </div>
+                                </Card> */}
                             </div>
                         </>
 
@@ -170,8 +284,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <span className="release_span"> Select Release<span style={{ color: 'red' }}>*</span></span>
                                                         </div>
                                                         <div className="dropdown-map">
-                                                            <Dropdown style={{ width: '11rem', height: '2.5rem' }} className="dropdown_project" options={dropdownOptions} placeholder="Select Project" />
-                                                            <Dropdown style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release" options={dropdownOptions} placeholder="Select Release" />
+                                                            <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e) } placeholder="Select Project" />
+                                                            <Dropdown disabled={disableIssue} style={{ width: '11rem', height: '2.5rem' }} value={currentIssue} className="dropdown_release" options={issueTypes} onChange={(e) => onIssueChange(e)} placeholder="Select Release" />
                                                         </div>
                                                     </div>
                                                 </Card>
@@ -207,6 +321,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     )}
 
 
+<Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
             </div>
 
@@ -214,4 +329,4 @@ const ManageIntegrations = ({ visible, onHide }) => {
     )
 }
 
-export default ManageIntegrations;
+export default React.memo(ManageIntegrations);
