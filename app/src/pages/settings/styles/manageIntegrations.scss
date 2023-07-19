@@ -1,3 +1,5 @@
+
+@import "../../global/styles/ColorVariables.scss";
 .dropdown-class{
     margin-top: 1rem;
 }
@@ -22,4 +24,229 @@
 width: 20rem !important;
 height: 2.5rem !important;
     }
+}
+.loginbtn-jira{
+    .p-button {
+        height: 2.5rem !important;
+        width: 6rem !important;
+        position: relative !important;
+        left: 14rem !important;
+    }
+}
+.logout__btn{
+    position: relative;
+    left: 52rem !important;
+    top: 0.5rem !important;
+    background:white !important;
+    color: blue !important;
+    .p-button{
+     width: 7rem !important;
+    }
+}
+.tab__cls{
+    margin-top: 0.5rem;
+}
+.integration_header{
+    font:$f6_bold !important;
+}
+.data__mapping{
+    display: flex;
+    flex-direction:row;
+    height: 20rem;
+    gap: 4rem;
+}
+.card_data1{
+    margin-left: -1rem;
+    .p-component{
+        box-shadow: none !important;
+        border: 1px solid lightgray;
+    }
+}
+.card_data2{
+    .p-component{
+        box-shadow: none !important;
+        border: 1px solid lightgray;
+    }
+}
+.mapping_data_card1, .mapping_data_card2{
+    width: 30rem;
+   
+    .p-card-body{
+        height: 23rem;
+        width: 30rem;
+       
+    }
+}
+.dropdown-map{
+    display: flex;
+    flex-direction:row;
+}
+.release_span{
+    position: relative;
+    left: 7rem;
+}
+.dropdown_release{
+    position: relative;
+    left: 2.5rem;
+}
+.dropdown_div{
+    margin-top: -1.5rem;
+}
+
+//login screen jira changes 
+
+.login__jira {
+
+    margin-left: 15rem;
+
+}
+
+
+
+
+.login__div {
+
+    .login__btn {
+
+        position: relative;
+
+        height: 2.5rem !important;
+
+        width: 6rem !important;
+
+        left: 21rem;
+
+    }
+
+}
+
+
+
+
+.card__login__jira {
+
+    margin-left: 19rem;
+
+    position: relative;
+
+    height: 20rem;
+
+    box-shadow: none;
+
+
+
+
+    .p-card-body {
+
+        width: 33rem;
+
+    }
+
+
+
+
+}
+
+
+
+
+.Manage_Integrations {
+
+    .p-dialog-content {
+
+        overflow: hidden;
+
+    }
+
+}
+
+
+
+
+.login_container_integrations {
+
+    display: flex;
+
+    flex-direction: row;
+
+    position: relative;
+
+    top: 3rem;
+
+    .p-component{
+
+        box-shadow: none !important;
+
+    }
+
+}
+
+
+
+
+.side-panel {
+
+    .icon-wrapper {
+
+        position: relative;
+
+        top: 2rem;
+
+        width: 40px
+
+    }
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    top: 1rem;
+    /* bottom: -1rem; */
+    width: 5rem;
+    gap: 2rem;
+    position: absolute;
+
+
+    .img__jira {
+
+        height: 2rem;
+
+        width: 33px;
+
+    }
+
+    .img__azure {
+
+        height: 2rem;
+
+        width: 33px;
+
+    }
+
+    .img__zephyr {
+
+        height: 2rem;
+
+        width: 33px;
+
+    }
+
+
+    .img__qtest {
+
+        height: 2rem;
+
+        width: 33px;
+
+    }
+
+    .img__alm {
+
+        height: 2rem;
+
+        width: 33px;
+
+    }
+
 }

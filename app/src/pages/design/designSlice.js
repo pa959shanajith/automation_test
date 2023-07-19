@@ -26,7 +26,8 @@ const initialState = {
     disableAppend: false,
     compareFlag: false,
     compareData: {},
-    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: [], fullScrapeData: []},
+    impactAnalysisScreenLevel: false,
     objValue: { val: null },
     isFiltered: false,
     compareSuccessful:false,
@@ -177,6 +178,9 @@ export const designSlice = createSlice({
     EnableExportMindmapButton:(state, action)=>{
       state.enableExportMindmapButton = action.payload
     },
+    ImpactAnalysisScreenLevel:(state,action)=>{
+      state.impactAnalysisScreenLevel=action.payload
+    },
     CompareFlag:(state,action)=>{
       state.compareFlag=action.payload
     },
@@ -213,6 +217,7 @@ toDeleteScenarios,
 appType,
 savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
 TestCases,
+ImpactAnalysisScreenLevel,
 CompareData,
 CompareFlag,
 CompareObj,

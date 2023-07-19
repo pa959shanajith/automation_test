@@ -3,9 +3,9 @@
 .toolbar__header{
     background-color: $borderThree;
     height: 30px;
-    padding: 0 10px;
+    // padding: 0 10px;
     font-family: $avoFont;
-    padding-top: 5px;
+    // padding-top: 5px;
 }
 .projectLabel{
     display: inline-block;
@@ -25,13 +25,33 @@
     font: $f6_regular;
 }
 .toolbar__header-menus{
-    display: inline-block;
+    display: flex;
+    height: 0vh;
     white-space: nowrap;
     padding: 4px 7px 0 7px;
+    .p-inputswitch{
+        bottom: 0.2rem;
+    }
+    .p-divider-vertical:before{
+        height: 66% !important;
+    }
 }
-.toolbar__header-menus i{
-    margin-left: 11%;
+.line{
+    height: 2rem;
+    position: relative;
+    bottom: 0.3rem;
+    margin-right: 1rem;
 }
+.am{
+    height: 4rem;
+    position: relative;
+    bottom: 1.1rem;
+}
+  
+// .toolbar__header-menus i{
+//     margin-left: 11%;
+//     margin-right: 3%;
+// }
 .toolbar__header button{
     color: $whiteColor;
     border: 0;

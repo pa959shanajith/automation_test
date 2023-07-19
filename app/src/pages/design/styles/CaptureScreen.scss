@@ -158,6 +158,7 @@
   position: relative;
     /* right: 0.5rem; */
   top: 1rem;
+  left: 3rem;
 }
 
 .screen__name{
@@ -293,7 +294,7 @@
     .p-dialog-title {
       .dailog_header1 {
         position: absolute;
-        left: 3rem !important;
+        left: 4rem !important;
         top: 0.5rem;
         font-family: 'Open Sans';
         font-weight: 500;
@@ -710,10 +711,6 @@
       position: absolute;
       left: 20rem;
     }
-}
-
-.ss__red{
-  color: red!important;
 }
 
 

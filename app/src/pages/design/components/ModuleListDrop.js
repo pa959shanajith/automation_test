@@ -64,6 +64,7 @@ const ModuleListDrop = (props) =>{
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
     const [collapseWhole, setCollapseWhole] = useState(true);
+    const [E2EName,setE2EName] = useState('')
     const [initialText, setInitialText] = useState(E2EName? false : true);
 
 
@@ -76,7 +77,6 @@ const ModuleListDrop = (props) =>{
     const [showE2EPopup, setShowE2EPopup] = useState(false);
     const [configTxt, setConfigTxt] = useState("");
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
-    const [E2EName,setE2EName] = useState('')
     const [editE2ERightBoxData,setEditE2ERightBoxData] = useState([])
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
   const [showTooltip, setShowTooltip] = useState(false);
