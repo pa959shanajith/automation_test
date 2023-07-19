@@ -459,7 +459,7 @@ exports.connectJira_ICE = function(req, res) {
                                             var soc = myserver.socketMapNotify[username];
                                             soc.emit("ICEnotAvailable");
                                         }
-                                    } else if (data.onAction == "Jira_Projects") {
+                                    } else if (data.onAction == "Jira_details") {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
@@ -521,11 +521,13 @@ exports.connectJira_ICE = function(req, res) {
                                         'key':req.body.key
                                     }
                                 };
+                                console.log(dataToIce,' its dataToIce');
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
     
                                 function jira_login_5_listener(channel, message) {
                                     var data = JSON.parse(message);
+                                    console.log(data,' its data from socket');
                                     if (icename == data.username && ["unavailableLocalServer", "Jira_testcases"].includes(data.onAction)) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_5_listener);
                                         if (data.onAction == "unavailableLocalServer") {
