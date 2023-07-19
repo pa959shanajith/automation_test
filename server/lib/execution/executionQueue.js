@@ -795,23 +795,29 @@ module.exports.Execution_Queue = class Execution_Queue {
 
                 const executionQueue = this.key_list[configKey];
                 let executionData = '';
-                let listIndex = -1;
+                let listIndex = -1,executionId = '',batchId = '';
                 for(let entries of executionQueue) {
                     listIndex++;
                     if(entries[0]['executionListId'] == executionListId) {
                         let moduleIndex = -1,scenarioIndex = -1, currModuleId = '';
                         for(let testSuites of entries) {
+                            moduleIndex++;
                             if (testSuites.moduleid != currModuleId) {
                                 scenarioIndex = -1;
-                                currModuleId = testSuites.moduleid
+                                currModuleId = testSuites.moduleid;
+                                executionId = 'executionId' in this.key_list[configKey][listIndex][moduleIndex] ? this.key_list[configKey][listIndex][moduleIndex]['executionId'] : ''
+                                batchId = 'batchId' in this.key_list[configKey][listIndex][moduleIndex] ? this.key_list[configKey][listIndex][moduleIndex]['batchId'] : ''
                             }
-                            moduleIndex++;
                             scenarioIndex++;
                             if(testSuites['status'] == 'QUEUED') {
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
                                 const inputs = {'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}
                                 if (testSuites['execType'] == 'scenarioParallel') inputs['scenarioIndex'] = scenarioIndex
                                 executionData = await utils.fetchData(inputs, "devops/getExecScenario", fnName);
+                                if(executionId != '') {
+                                    executionData[0]['executionData']['scenarioParallelExecutionId'] = executionId;
+                                    executionData[0]['executionData']['scenarioParallelBatchId'] = batchId;
+                                }
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
                                     'body': executionData[0],
                                     'session':executionData[0].session,
@@ -821,7 +827,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     return response;
                                 }
                                 executionData = [executionRequest];
+                                if (scenarioIndex == 0) {
+                                    executionId = executionRequest.executionRequest.executionIds[0];
+                                    batchId = executionRequest.executionRequest.batchId
+                                    this.key_list[configKey][listIndex][moduleIndex]['executionId'] = executionId;
+                                    this.key_list[configKey][listIndex][moduleIndex]['batchId'] = batchId;
 
+                                }
 
                                 //Updating the status to IN_Progress
                                 await cache.set("execution_list", this.key_list);
@@ -893,7 +905,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                         let moduleIndex = -1;
                         for (let testSuite of executionList){
                             moduleIndex++;
-                            if(testSuite.moduleid == resultData.testsuiteId){
+                            let checkForScenarioParallel = true
+                            if(testSuite.execType == 'scenarioParallel' && testSuite.scenarioIds != resultData.execReq.suitedetails[0].scenarioIds[0]){
+                                checkForScenarioParallel = false
+                            }
+                            if(checkForScenarioParallel && testSuite.moduleid == resultData.testsuiteId){
                                 this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED';
                                 
                                 //Adding details for synchronous report
