@@ -451,7 +451,7 @@ exports.connectJira_ICE = function(req, res) {
 
                             function jira_login_4_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Jira_Projects"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", jira_login_4_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
@@ -519,15 +519,15 @@ exports.connectJira_ICE = function(req, res) {
                                     "project_selected": {
                                         'project':req.body.project,
                                         'key':req.body.key
-                                    }
+                                    },
+                                    "itemType":req.body.itemType,
+                                    
                                 };
-                                console.log(dataToIce,' its dataToIce');
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
     
                                 function jira_login_5_listener(channel, message) {
                                     var data = JSON.parse(message);
-                                    console.log(data,' its data from socket');
                                     if (icename == data.username && ["unavailableLocalServer", "Jira_testcases"].includes(data.onAction)) {
                                         redisServer.redisSubServer.removeListener("message", jira_login_5_listener);
                                         if (data.onAction == "unavailableLocalServer") {
@@ -683,7 +683,7 @@ exports.getReport_API = async (req, res) => {
         finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo).report;
+            const report = prepareReportData(reportInfo,'removeReportItems').report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
@@ -739,8 +739,10 @@ exports.saveJiraDetails_ICE = async (req, res) => {
 				'projectid': itr.projectId,			
 				'projectName': itr.projectName,
 				'projectCode': itr.projectCode,
-				'testId': itr.testId,
-				'testCode': itr.testCode,
+				'itemId': itr.testId,
+				'itemCode': itr.testCode,
+                'itemType': itr.itemType,
+                'itemSummary':itr.itemSummary,
 				"query": "saveJiraDetails_ICE"
 			};
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
@@ -979,7 +981,7 @@ exports.getDevopsReport_API = async (req) => {
         // execResponse.tokenValidation = 'passed';
 
         const inputs = { executionId, scenarioIds, 'query': 'devopsReport' };
-        const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
+        const data = await utils.fetchData(inputs, "reports/getDevopsReport_API", fnName, true);
         let reportResult = data[0];
         let reportStatus = data[2];
         if (reportResult == "fail") {
@@ -992,7 +994,7 @@ exports.getDevopsReport_API = async (req) => {
         // finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo).report;
+            const report = prepareReportData(reportInfo,'removeReportItems').report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
