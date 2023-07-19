@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'primereact/button';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -17,11 +17,13 @@ import { classNames } from 'primereact/utils';
 import {FooterTwo as Footer} from '../../global';
 import { fetchConfigureList, getProjectList } from "../api";
 import { NavLink } from 'react-router-dom';
+import { loadUserInfoActions } from '../../landing/LandingSlice';
 // import ExecutionprofileTable from './ExecutionprofileTable';
 
 
 
 const reports = () => {
+    const dispatch = useDispatch();
     const [activeIndex, setActiveIndex] = useState("Functional Test");
     const [testSteps, setTestSteps] = useState(false);
     const [testStep, setTestStep] = useState(true);
@@ -35,21 +37,37 @@ const reports = () => {
     const [executionButon, setExecutionButon] = useState('View by Execution Profile');
     const customDropdownIcon = classNames('pi','pi-sort-amount-down');
 
+    const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+    const initProj = selectProjects.projectId;
+    const handeSelectProject=(initProj)=>{
+        dispatch(loadUserInfoActions.setDefaultProject(initProj));
+        fetchReportData(initProj);
+    };
     useEffect(() => {
-        (async () => {
-            var data = [];
-            const Projects = await getProjectList();
-            for (var i = 0; Projects.projectName.length > i; i++) {
-                data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
+            (async () => {
+                try{
+                const Projects = await getProjectList();
+                if(Projects && Projects.projectName && Projects.projectId){
+                    const data = Projects.projectName.map((name,index)=>({
+                        name,
+                        id:Projects.projectId[index]
+                    }));
+                    setProjectList(data);
+                    if(!initProj || !data.find((proj)=> proj.id === initProj)){
+                        handeSelectProject(data[0]?.id || '');
+                    }else{
+                        fetchReportData(initProj);
+                    }
+                }
+            }catch(error){
+                console.error('Error fetching project list:',error);
             }
-            setConfigProjectId(data[0] && data[0]?.id);
-            setProjectList(data);
         })();
     }, []);
 
-    useEffect(() => {
-        configProjectId && (async () => {
-            const executionProfileName = await fetchConfigureList({ projectid: configProjectId ,"param":"reportData"});
+    const fetchReportData = async (initProj) => {
+        try{
+            const executionProfileName = await fetchConfigureList({ projectid: initProj ,"param":"reportData"});
             if (executionProfileName && executionProfileName.length > 0) {
                 const extractedExecutionProfileData = executionProfileName.map((obj) => ({
                     configurename: obj?.configurename || '',
@@ -62,35 +80,37 @@ const reports = () => {
             } else {
                 setReportData([]);
             }
-        })();
-    }, [configProjectId]);
+        }catch(error){
+            console.error('Error fetching report data :',error);
+        }
+        };
 
     const [reportData, setReportData] = useState([]);
     const [reportDataModule, setReportDataModule] = useState([
         {
             key: "moduleName_1",
             scenariovalue: "4 scenarios",
-            value: <img className='browser__img' src='static/imgs/chrome.png' />
+            value: <img className='browser__img' src='static/imgs/chrome.png' alt=''/>
         }, {
             key: "moduleName_2",
             scenariovalue: "2 scenarios",
-            value: <img className='browser__img' src='static/imgs/fire-fox.png' />
+            value: <img className='browser__img' src='static/imgs/fire-fox.png' alt='' />
         }, {
             key: "moduleName_3",
             scenariovalue: "3 scenarios",
-            value: <img className='browser__img' src='static/imgs/chrome.png' />
+            value: <img className='browser__img' src='static/imgs/chrome.png' alt='' />
         }, {
             key: "moduleName_4",
             scenariovalue: "1 scenarios",
-            value: <img className='browser__img' src='static/imgs/edge.png' />
+            value: <img className='browser__img' src='static/imgs/edge.png' alt=''/>
         }, {
             key: "moduleName_5",
             scenariovalue: "4 scenarios",
-            value: <img className='browser__img' src='static/imgs/chrome.png' />
+            value: <img className='browser__img' src='static/imgs/chrome.png' alt='' />
         }, {
             key: "moduleName_6",
             scenariovalue: "5 scenarios",
-            value: <img className='browser__img' src='static/imgs/edge.png' />
+            value: <img className='browser__img' src='static/imgs/edge.png'  alt=''/>
         }
     ])
     const sort = [
@@ -167,8 +187,8 @@ const reports = () => {
                 {/* <div className='Projectreport'><h2 className='projectDropDown'>Reports: </h2><Dropdown value={selectedProject} onChange={handleToggle} options={project} optionLabel="name" placeholder='Select a Project' className="w-full md:w-10rem ml-2" /> */}
                 <div>
                     <label data-test="projectLabel" className='Projectreport'>Projects:</label>
-                    <select data-test="projectSelect" className='projectSelectreport' value={configProjectId} onChange={(e) => { setConfigProjectId(e.target.value); }}>
-                        {projectList.map((project, index) => (<option value={project.id} key={index}>{project.name}</option>))}
+                    <select data-test="projectSelect" className='projectSelectreport' value={initProj} onChange={(e)=>{handeSelectProject(e.target.value)}}>
+                        {projectList.map((project, index)=><option key={index} value={project.id} >{project.name}</option>)}
                     </select>
                 </div>
                 {!show && <div id="reports" className="cards">
@@ -220,10 +240,19 @@ const reports = () => {
 
                     
                         {filteredExecutionData.length > 0 ? (<div className='report_Data ml-4'>
-                            {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
+                            {/* {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
                                 {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'><Card key={index} className='testCards'>
                                 <NavLink to="/reports/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active">{data.configurename}</NavLink><p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report'>Last executed through CI/CD</p><p className='Profile_Name_report'>Last executed on {data.execDate.slice(5,16)}</p>
                                 </Card></div>))}
+                            </div>)} */}
+                            {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
+                            {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'> <NavLink to="/reports/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active"><Card key={index} className='testCards'>
+                                           <div><p className='reportConfigName'>{data.configurename}</p>
+                                                <p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report_sm'>Last executed through CI/CD</p><p className='Profile_Name_report_sm'>Last executed on {data.execDate.slice(5,16)}</p>
+                                           </div>
+                                        </Card>
+                                    </NavLink>
+                                </div>))}
                             </div>)}
                             {activeIndex === "Functional Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
                                 {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><p m={handleData}>{data.key}</p><p>{data.scenariovalue}</p>

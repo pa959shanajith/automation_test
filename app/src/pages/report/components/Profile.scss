@@ -4,7 +4,7 @@
         border-bottom: 1px solid #e9ecef;
     }
     .search_container {
-        padding-top: 0.5rem;
+        padding: 0.5rem;
         width: 20%;
         .p-input-icon-left {
             width: 100%;
@@ -25,14 +25,20 @@
         height: 75vh;
     }
     .p-datatable .p-datatable-tbody>tr>td:nth-child(4) {
-        width: 30rem;
+        width: 17rem;
         vertical-align: top;
     }
     .p-datatable .p-datatable-tbody>tr>td:nth-child(5) {
-        width: 30rem;
+        width: 19rem;
         vertical-align: top;
     }
     svg {
         border-radius: 8px;
+    }
+    .p-datatable .p-datatable-header {
+        padding: 0rem !important;
+    }
+    .p-datatable .p-datatable-thead>tr>th{
+        padding: 0.5rem !important;
     }
 }
