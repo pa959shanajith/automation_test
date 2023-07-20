@@ -15,13 +15,22 @@ import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
 import { resetIntergrationLogin, resetScreen,selectedProject,
-    selectedIssue,selectedTCReqDetails,selectedTestCase,syncedTestCases,mappedPair,selectedScenarioIds } from '../settingSlice';
+        selectedIssue,selectedTCReqDetails,selectedTestCase,
+        syncedTestCases,mappedPair,selectedScenarioIds,
+        selectedAvoproject } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
 
 
 const ManageIntegrations = ({ visible, onHide }) => {
+    // selectors
+    const currentProject = useSelector(state => state.setting.selectedProject);
+    const currentIssue = useSelector(state => state.setting.selectedIssue);
+    const selectedZTCDetails = useSelector(state=>state.setting.selectedZTCDetails);
+    const selectedScIds = useSelector(state=>state.setting.selectedScenarioIds);
+    const selectedAvo = useSelector(state=>state.setting.selectedAvoproject);
+    // state
     const [activeIndex, setActiveIndex] = useState(0);
     const [activeIndexViewMap, setActiveIndexViewMap] = useState(0);
     const [showLoginCard, setShowLoginCard] = useState(true);
@@ -32,10 +41,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [projectDetails,setProjectDetails] = useState([]);
     const [issueTypes,setIssueTypes] = useState([]);
     const [disableIssue,setDisableIssue] = useState(true)
-    const currentProject = useSelector(state => state.setting.selectedProject);
-    const currentIssue = useSelector(state => state.setting.selectedIssue);
-    const selectedZTCDetails = useSelector(state=>state.setting.selectedZTCDetails);
-    const selectedScIds = useSelector(state=>state.setting.selectedScenarioIds);
     const [testCaseData, setTestCaseData] = useState([]);
     const [selected,setSelected]=useState(false);
     const [selectedId, setSelectedId] = useState('');
@@ -44,6 +49,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [avoProjects , setAvoProjects]= useState([]);
     const [avoProjectsList , setAvoProjectsList]= useState(null);
     const [enableBounce , setEnableBounce]= useState(false);
+    const [listofScenarios,setListofScenarios] = useState([]);
 
 
     // const [proj, setProj] = useState('');
@@ -168,6 +174,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(syncedTestCases([]));
         dispatchAction(selectedTestCase([]));
         dispatchAction(selectedScenarioIds([]));
+        setTestCaseData([]);
+        setAvoProjectsList([]);
+        setAvoProjects([]);
+        dispatchAction(selectedAvoproject(''))
         setShowLoginCard(true);
         setIsSpin(false);
         onHide();
@@ -200,6 +210,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setTestCaseData([]);
         setAvoProjectsList([]);
         setAvoProjects([]);
+        dispatchAction(selectedAvoproject(''))
     };
 
     const onProjectChange = async (e) => {
@@ -221,7 +232,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (projectScenario && projectScenario.avoassure_projects && projectScenario.avoassure_projects.length) {
             // setProjectDetails(projectScenario.project_dets);
             setAvoProjectsList(projectScenario.avoassure_projects); 
-            setAvoProjects(projectScenario.avoassure_projects.map((el,i) => {return {label:el.project_name , value:el.project_name, key:i}}));  
+            setAvoProjects(projectScenario.avoassure_projects.map((el,i) => {return {label:el.project_name , value:el.project_id, key:i}}));  
             // setSelectedRel(releaseId);  
             // clearSelections();
         }
@@ -231,11 +242,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
         // e.preventDefault();
         setTestCaseData([]);
         setEnableBounce(true);
-        console.log(e.target.value, ' project f');
         dispatchAction(selectedIssue(e.target.value));
         let projectName = projectDetails.filter(el => el.value === currentProject)[0]['label'];
         let issueName = issueTypes.filter(el => el.value === e.target.value)[0]['label'];
-        console.log(projectDetails,' /n',projectName);
         let jira_info ={
             project: projectName,
             action:'getJiraTestcases',
@@ -247,12 +256,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
             project_data: [],
             key:currentProject
         }
-        console.log(jira_info, ' jira_info ');
         const testData = await api.getJiraTestcases_ICE(jira_info)
         if(testData){
             setTestCaseData(testData.testcases)
         }
         setEnableBounce(false);
+    }
+    const onAvoProjectChange = async (e) => {
+        dispatchAction(selectedAvoproject(e.target.value));
+        if(avoProjectsList.length){
+            setListofScenarios(avoProjectsList.filter(el => el.project_id === e.target.value)[0]['scenario_details'])
+        }
     }
     const handleClick= useCallback((value, id,summary)=>{
         let newSelectedTCDetails = { ...selectedZTCDetails };
@@ -428,9 +442,23 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                 <span>Select Project <span style={{ color: 'red' }}>*</span></span>
                                                             </div>
                                                             <div className="dropdown-map">
-                                                                <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} className="dropdown_project" placeholder="Select Project" />
+                                                                <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" />
                                                             </div>
                                                         </div>
+                                                            {
+                                                                selectedAvoproject ?
+                                                                listofScenarios.map((e,i)=> (<div
+                                                                    key={i}
+                                                                    className={"scenario__listItem"}
+                                                                    title={e.name}
+                                                                    onClick={(event) => { selectScenarioMultiple(event, e._id); }}
+                                                                >
+                                                                    {e.name}
+                                                                </div>))
+                                                                     :
+                                                                    null
+
+                                                            }
                                                     </Card>
                                                 </div>
                                             </div>

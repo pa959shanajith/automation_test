@@ -19,6 +19,7 @@ const initialState = {
     syncedTestCases: [],
     selectedScenarioIds: [],
     mappedPair: [],
+    selectedAvoproject:''
 }
 
 export const settingSlice=createSlice({
@@ -59,6 +60,9 @@ export const settingSlice=createSlice({
         mappedPair:(state,action) => {
             state.mappedPair =  action.payload
         },
+        selectedAvoproject:(state,action) => {
+            state.selectedAvoproject =  action.payload
+        }
 
     }
 })
@@ -74,7 +78,8 @@ export const {
     selectedTestCase,
     syncedTestCases,
     selectedScenarioIds,
-    mappedPair
+    mappedPair,
+    selectedAvoproject
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;
