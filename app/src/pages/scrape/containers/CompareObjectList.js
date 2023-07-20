@@ -218,7 +218,7 @@ const MapObjectModal = props => {
     const submitMap = () => {
 
         if (!Object.keys(map).length) {
-            setErrorMsg("Please select atleast one object to Map");
+            setErrorMsg("Please select atleast one object to Replace");
             return;
         }
 
@@ -331,7 +331,7 @@ const MapObjectModal = props => {
                                             <div className="mo_listContent" id="moListId">
                                                 <ScrollBar scrollId="moListId">
                                                     <div data-test="mapObjectCustomContainer" className="ss__mo_customInContainer">
-                                                        {Object.keys(FilteredList).map((elementType, i) => (
+                                                        {Object.keys(FilteredList).length > 0 ? Object.keys(FilteredList).map((elementType, i) => (
                                                             <Fragment key={i}>
                                                                 <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>{elementType}</div>
                                                                 {selectedTag === elementType && <div className="mo_tagItemList">
@@ -352,7 +352,9 @@ const MapObjectModal = props => {
                                                                         </div>)}
                                                                 </div>}
                                                             </Fragment>
-                                                        ))}
+                                                        )) : 
+                                                        <span style={{color:'red'}}>{`No elements found that can be replaced with "Not found element"`}</span>
+                                                        }
                                                     </div>
                                                 </ScrollBar>
                                             </div>

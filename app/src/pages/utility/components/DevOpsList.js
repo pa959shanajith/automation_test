@@ -356,15 +356,15 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setBrowserDetails(data);
         }
         else if (data && data.emulator && data.real_devices){
-            const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
-                return {
-                    key: element,
-                    text: element,
-                    title: element,
-                    index: index
-                }
-            })
-            setPlatforms(arrayPlatforms);
+            // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
+            //     return {
+            //         key: element,
+            //         text: element,
+            //         title: element,
+            //         index: index
+            //     }
+            // })
+            // setPlatforms(arrayPlatforms);
 
             setMobileDetails(data);
             setLoading(false);
