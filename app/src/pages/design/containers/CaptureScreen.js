@@ -1378,7 +1378,7 @@ const footerSave = (
               <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
-                <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
+                <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
                   <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' ></img>
                   <Tooltip target=".add_obj_insprint" position="bottom" content=" Add a placeholder element by specifying element type." />
@@ -1403,7 +1403,7 @@ const footerSave = (
               <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_upgrade" position="left" content="  Easily upgrade Test Automation as application changes" />
+                <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
                 <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
                   <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />
@@ -1423,7 +1423,7 @@ const footerSave = (
               <div className='utility__block'>
                 <p className='insprint__text'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_utility" position="left" content="  Capture the elements from a PDF." />
+                <Tooltip target=".info__btn_utility" position="bottom" content="  Capture the elements from a PDF." />
                 <span className='insprint_auto'>
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
                   <p>PDF Utility</p>
@@ -1437,7 +1437,7 @@ const footerSave = (
               <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_create" position="left" content="  Create element manually by specifying properties." />
+                <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
                 <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
@@ -1452,12 +1452,12 @@ const footerSave = (
                 <span className='insprint_auto'>
                   <span className='import__block' onClick={() => setShowObjModal("importModal")}>
                     <img className='add_obj_import' src="static/imgs/ic-import.png"  />
-                    <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
+                    <Tooltip target=".add_obj_import" position="bottom" content=" Import elements from json or excel file exported from same/other screens." />
                     <p className='imp__text'>Import Screen</p>
                   </span>
                   <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
                     <img className='add_obj_export' src="static/imgs/ic-export.png"  />
-                    <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
+                    <Tooltip target=".add_obj_export" position="bottom" content=" Export captured elements as json or excel file to be reused across screens/projects." />
                     <p className='imp__text'>Export Screen</p>
 
                   </span>
