@@ -178,6 +178,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setAvoProjectsList([]);
         setAvoProjects([]);
         dispatchAction(selectedAvoproject(''))
+        setListofScenarios([])
         setShowLoginCard(true);
         setIsSpin(false);
         onHide();
@@ -210,6 +211,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setTestCaseData([]);
         setAvoProjectsList([]);
         setAvoProjects([]);
+        setListofScenarios([]);
         dispatchAction(selectedAvoproject(''))
     };
 
@@ -451,7 +453,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                     key={i}
                                                                     className={"scenario__listItem"}
                                                                     title={e.name}
-                                                                    onClick={(event) => { selectScenarioMultiple(event, e._id); }}
+                                                                    // onClick={(event) => { selectScenarioMultiple(event, e._id); }}
                                                                 >
                                                                     {e.name}
                                                                 </div>))
