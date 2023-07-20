@@ -597,14 +597,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               className=" pencil_button p-button-edit"
               onClick={() => configModal("CancelUpdate", item)}
             >
-               <Tooltip target=".pencil_button" position="left" content="Edit the execution configuration."/>
+               <Tooltip target=".pencil_button" position="bottom" content="Edit the execution configuration."/>
             </Button>
             <Button
               icon="pi pi-trash"
               className="trash_button p-button-edit"
               onClick={(event) => confirm_delete(event, item)}
             >
-               <Tooltip target=".trash_button" position="left" content=" Delete the Execution configuration."/>
+               <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution configuration."  className="small-tooltip" />
             </Button>
           </div>
         ),
@@ -1082,9 +1082,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (!!configList.length) {
       return (
         <>
-         <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
-         <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
-         <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+         <Tooltip target=".execute_now " position="bottom" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+         <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
+         <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
 
           <DataTable
             showGridlines
@@ -1164,7 +1164,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                     Execute with Avo Assure Agent/ Grid
                   </label>
                   <img className='info__btn'src="static/imgs/info.png" ></img>
-<Tooltip target=".info__btn" position="left" content=' Avo Agent is a collection of Avo Assure Clients. The grid consists of several agents. 
+<Tooltip target=".info__btn" position="bottom" content=' Avo Agent is a collection of Avo Assure Clients.The grid consists of several agents. 
 Learn More '/>
 </div>
                   <div className="radioButtonContainer1">
@@ -1183,7 +1183,7 @@ Learn More '/>
                     Execute with Avo Assure Client
                   </label>
                   <img className='info__btn_grid'src="static/imgs/info.png" ></img>
-                  <Tooltip target=".info__btn_grid" position="left" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></Tooltip> 
+                  <Tooltip target=".info__btn_grid" position="bottom" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></Tooltip> 
 
                 </div>
                 {showIcePopup && (
@@ -1389,7 +1389,7 @@ Learn More '/>
                         Asynchronous
                       </label>
                       <img className='info__btn_async'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info__btn_async" position="right" content=" Execution responses are generated simultaneously during the execution."/>
+                      <Tooltip target=".info__btn_async" position="bottom" content=" Execution responses are generated simultaneously during the execution."/>
                       <InputSwitch
                         className="inputSwitch_CICD"
                         label=""
@@ -1410,7 +1410,7 @@ Learn More '/>
                         Synchronous
                       </label>
                       <img className='info_btn_sync'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info_btn_sync" position="right" content=" Execution responses are generated after the end of execution."/>
+                      <Tooltip target=".info_btn_sync" position="bottom" content=" Execution responses are generated after the end of execution."/>
                     </div>
                   </div>
                   <div className="container_devopsLabel" title={str}>
@@ -1455,41 +1455,24 @@ Learn More '/>
           header={
             <div>
               <span
-                style={{
-                  marginRight: "13rem",
-                  fontWeight: "bold",
-                  fontFamily: "open Sans",
-                }}
+               className="sno_nocontent"
 
               >
                 S.No.
               </span>
               <span
-                style={{
-                  marginRight: "13rem",
-                  fontWeight: "bold",
-                  fontFamily: "open Sans",
-                }}
+               className="profile_nocontent"
 
               >
                 Configuration Name
               </span>
               <span
-                style={{
-                  marginRight: "18rem",
-                  fontWeight: "bold",
-                  fontFamily: "open Sans",
-
-                }}
+             className="execution_nocontent"
               >
                 Execution Options
               </span>
               <span
-                style={{
-                  marginRight: "1rem",
-                  fontWeight: "bold",
-                  fontFamily: "open Sans",
-                }}
+               className="Action_nocontent"
               >
                Actions
               </span>
@@ -1512,7 +1495,7 @@ Learn More '/>
           >
             {" "}
             configure{" "}
-            <Tooltip target=".configure_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+            <Tooltip target=".configure_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
       );
@@ -1544,7 +1527,7 @@ Learn More '/>
                 />
                 <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
                Add Configuration
-               <Tooltip target=".addConfig_button" position="left" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+               <Tooltip target=".addConfig_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}
