@@ -20,6 +20,8 @@ import { resetIntergrationLogin, resetScreen,selectedProject,
         selectedAvoproject } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Tree } from 'primereact/tree';
+import { Checkbox } from 'primereact/checkbox';
 
 
 
@@ -50,6 +52,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [avoProjectsList , setAvoProjectsList]= useState(null);
     const [enableBounce , setEnableBounce]= useState(false);
     const [listofScenarios,setListofScenarios] = useState([]);
+    const [selectedNodes, setSelectedNodes] = useState([]);
+    const [treeData,setTreeData] = useState([]) 
 
 
     // const [proj, setProj] = useState('');
@@ -89,7 +93,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         const jirapwd = loginDetails.password || '';
 
         const domainDetails = await api.connectJira_ICE(jiraurl, jirausername, jirapwd);
-        if (domainDetails.error) setMsg(domainDetails.error);
+        console.log(domainDetails,' domainDetails ');
+        if (domainDetails.error) setToast("error", "Error", domainDetails.error);
         else if (domainDetails === "unavailableLocalServer") setToast("error", "Error", "ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setToast("warn", "Warning", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (domainDetails === "Invalid Session") {
@@ -98,7 +103,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             // return RedirectPage(history);
         }
         else if (domainDetails === "invalidcredentials") setToast("error", "Error", "Invalid Credentials");
-        else if (domainDetails === "fail") setToast("error", "Error", "Fail to Login");
+        else if (domainDetails === "Fail") setToast("error", "Error", "Fail to Login");
         else if (domainDetails === "notreachable") setToast("error", "Error", "Host not reachable.");
         else if (domainDetails) {
             if(Object.keys(domainDetails).length && domainDetails.projects){
@@ -165,6 +170,78 @@ const ManageIntegrations = ({ visible, onHide }) => {
         { name: 'qTest', code: 'LDN' },
     ];
 
+    //dummy data tree structure........
+    
+    
+    
+// const testData = [
+//     {
+//       label: 'Scenario 1',
+//       key: '1',
+//       data: { type: 'scenario' },
+//       children: [
+//         // {
+//         //   label: 'Testcase 1',
+//         //   key: '1-1',
+//         //   data: { type: 'testcase' },
+//         // },
+//         // {
+//         //   label: 'Testcase 2',
+//         //   key: '1-2',
+//         //   data: { type: 'testcase' },
+//         // },
+//       ],
+//     },
+//     {
+//       label: 'Scenario 2',
+//       key: '2',
+//       data: { type: 'scenario' },
+//       children: [
+//         // {
+//         //   label: 'Testcase 3',
+//         //   key: '2-1',
+//         //   data: { type: 'testcase' },
+//         // },
+//         // {
+//         //   label: 'Testcase 4',
+//         //   key: '2-2',
+//         //   data: { type: 'testcase' },
+//         // },
+//       ],
+//     },
+//   ];
+
+
+  const onCheckboxChange = (nodeKey) => {
+    const nodeIndex = selectedNodes.indexOf(nodeKey);
+    const newSelectedNodes = [...selectedNodes];
+
+    if (nodeIndex !== -1) {
+      newSelectedNodes.splice(nodeIndex, 1);
+    } else {
+      newSelectedNodes.push(nodeKey);
+    }
+
+    setSelectedNodes(newSelectedNodes);
+  };
+
+  const checkboxTemplate = (node) => {
+    return (
+        <div>
+      <Checkbox
+        checked={selectedNodes.includes(node.key)}
+        onChange={() => onCheckboxChange(node.key)}
+      />
+      <span>{node.label}</span>
+      </div>
+    );
+  };
+   
+//   const treeNodes = testData.map((node) => ({
+//     ...node,
+//     children: node.children ? node.children.map((child) => ({ ...child, children: null })) : null,
+//   }));
+
     const handleCloseManageIntegrations = () => {
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
@@ -183,12 +260,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setIsSpin(false);
         onHide();
     }
-
-    const dropdownOptions = [
-        { label: 'Option 1', value: 'option1' },
-        { label: 'Option 2', value: 'option2' },
-        { label: 'Option 3', value: 'option3' },
-    ];
 
     const handleTabChange = (index) => {
         setActiveIndex(index);
@@ -220,7 +291,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(selectedProject(e.target.value));
         setDisableIssue(false);
         console.log(e.target.value, ' project e');
-        const releaseId = event.target.value;
+        const releaseId = e.target.value;
         const projectScenario =await api.getAvoDetails("6440e7b258c24227f829f2a4");
         if (projectScenario.error)
             setToast("error", "Error", projectScenario.error);
@@ -267,9 +338,38 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const onAvoProjectChange = async (e) => {
         dispatchAction(selectedAvoproject(e.target.value));
         if(avoProjectsList.length){
-            setListofScenarios(avoProjectsList.filter(el => el.project_id === e.target.value)[0]['scenario_details'])
+            let filterScns = avoProjectsList.filter(el => el.project_id === e.target.value)[0]['scenario_details'] || [];
+            setListofScenarios(filterScns);
+
+            const dummyTestCases = [
+                {
+                  _id: 'testcase-1',
+                  name: 'Test Case 1',
+                },
+                {
+                  _id: 'testcase-2',
+                  name: 'Test Case 2',
+                },
+                // Add more dummy data as needed
+              ];
+
+            let treeData = selectedAvoproject
+                ? filterScns.map((scenario) => ({
+                    key: scenario._id,
+                    label: scenario.name,
+                    data: { type: 'scenario' },
+                    children: dummyTestCases.map((testCase) => ({
+                        key: testCase._id,
+                        label: testCase.name,
+                        data: { type: 'testCase' },
+                      })),
+                })) 
+                
+                : []
+                setTreeData(treeData);
         }
     }
+
     const handleClick= useCallback((value, id,summary)=>{
         let newSelectedTCDetails = { ...selectedZTCDetails };
         let newSelectedTC = [...value,summary];
@@ -384,6 +484,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                         <span><img src="static/imgs/ALM_icon.svg" className="img__alm"></img></span>
                                         <span className="text__alm">ALM</span>
                                     </div>
+
                                 </div>
                                 {IntergrationLogin}
                             </div>
@@ -446,8 +547,12 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <div className="dropdown-map">
                                                                 <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" />
                                                             </div>
+
+                                                           
+      <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
+   
                                                         </div>
-                                                            {
+                                                            {/* {
                                                                 selectedAvoproject ?
                                                                 listofScenarios.map((e,i)=> (<div
                                                                     key={i}
@@ -460,7 +565,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                      :
                                                                     null
 
-                                                            }
+                                                            } */}
                                                     </Card>
                                                 </div>
                                             </div>

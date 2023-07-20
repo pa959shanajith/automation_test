@@ -49,7 +49,6 @@ height: 2.5rem !important;
     .p-tabview-nav-content {
          height: 3rem !important;
     }
-
 }
 .integration_header{
     font:$f6_bold !important;
@@ -224,6 +223,7 @@ height: 2.5rem !important;
         height: 2rem;
 
         width: 33px;
+        cursor: pointer;
 
     }
 
@@ -232,6 +232,7 @@ height: 2.5rem !important;
         height: 2rem;
 
         width: 33px;
+        cursor: pointer;
 
     }
 
@@ -240,6 +241,7 @@ height: 2.5rem !important;
         height: 2rem;
 
         width: 33px;
+        cursor: pointer;
 
     }
 
@@ -249,6 +251,7 @@ height: 2.5rem !important;
         height: 2rem;
 
         width: 33px;
+        cursor: pointer;
 
     }
 
@@ -257,6 +260,7 @@ height: 2.5rem !important;
         height: 2rem;
 
         width: 33px;
+        cursor: pointer;
 
     }
 
@@ -277,9 +281,12 @@ height: 2.5rem !important;
 }
 
 .side-panel .icon-wrapper.selected {
-    border: 2px solid #6837e6;
-    border-radius: 4px; /* Customize the border radius for the square shape */
-  }
+border: 1px solid #6837e6;
+border-radius: 7px;
+padding: 1rem 4rem 2rem 2rem;
+background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+cursor: pointer;
+}
 
   .bouncing-loader {
     display: flex;
@@ -314,4 +321,9 @@ height: 2.5rem !important;
   
   .bouncing-loader > div:nth-child(3) {
     animation-delay: 0.4s;
+  }
+  .avoProject_tree{
+    .p-tree{
+    border: none !important;
+    }
   }
