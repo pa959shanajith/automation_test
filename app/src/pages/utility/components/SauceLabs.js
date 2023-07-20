@@ -101,6 +101,13 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     const [showRealdevice, setShowRealdevice] = useState('emulator');
 
     useEffect(() => {
+        setSelectedPlatforms('')
+        setSelectedMobileVersion('')
+        setSelectedEmulator('')
+        setShowRealdevice('emulator')
+        setPlatforms([])
+        setPlatformVersions([])
+        setEmulator([])
         if (Object.keys(browserDetails).length) {
             setNewOsNames(browserDetails.os_names.map((element, index) => {
                 return { key: element, text: element, title: element, index: index };
@@ -289,7 +296,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             options={platformVersions}
                             selectedKey={selectedMobileVersion}
                             width='15rem'
-                            placeholder='select android versions'
+                            placeholder={'select ' + selectedPlatforms + ' versions'}
                             calloutMaxHeight='12rem'
                         />
                     </>}
@@ -318,7 +325,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             selectedKey={selectedEmulator}
                             disabled={selectedMobileVersion == ''}
                             width='15rem'
-                            placeholder='select'
+                            placeholder={showRealdevice == 'emulator'?"Select Emulator":'Select Real Devices'}
                             calloutMaxHeight='12rem'
                         />
                     </>}
