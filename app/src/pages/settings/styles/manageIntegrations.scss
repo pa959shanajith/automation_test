@@ -35,7 +35,7 @@ height: 2.5rem !important;
 }
 .logout__btn{
     position: relative;
-    left: 38rem !important;
+    left: 37rem !important;
     top: 0.3rem !important;
     background:white !important;
     color: blue !important;
@@ -63,12 +63,16 @@ height: 2.5rem !important;
 }
 .card_data1{
     margin-left: -1rem;
+    position: relative;
+    right: 0.7rem;
     .p-component{
         box-shadow: none !important;
         border: 1px solid lightgray;
     }
 }
 .card_data2{
+    position: relative;
+    right: 6.3rem;
     .p-component{
         box-shadow: none !important;
         border: 1px solid lightgray;
@@ -220,46 +224,43 @@ height: 2.5rem !important;
 
 
     .img__jira {
-
         height: 2rem;
-
         width: 33px;
+        cursor: pointer;
 
     }
 
     .img__azure {
-
         height: 2rem;
-
         width: 33px;
-
+        cursor: pointer;
     }
 
     .img__zephyr {
-
         height: 2rem;
-
         width: 33px;
-
+        cursor: pointer;
     }
 
 
     .img__qtest {
-
         height: 2rem;
-
         width: 33px;
-
+        cursor: pointer;
     }
 
     .img__alm {
-
         height: 2rem;
-
         width: 33px;
-
+        cursor: pointer;
     }
 
+}
+
+.map__btn{
+    position: relative;
+    top: 13rem;
+    right: 3.5rem;
 }
 
 .view_map_card{
@@ -277,8 +278,36 @@ height: 2.5rem !important;
 }
 
 .side-panel .icon-wrapper.selected {
-    border: 2px solid #6837e6;
-    border-radius: 4px; /* Customize the border radius for the square shape */
+    border: 1px solid #6837e6;
+    border-radius: 7px;
+    padding: 1rem 4rem 2rem 2rem;
+    background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+
+  }
+
+  .leafId{
+    padding-left: 0.5rem;
+    color: purple;
+  }
+
+  .test__tcName{
+    padding-left: 0.5rem;
+    color: black;
+    position: relative;
+    top: 0.5rem;
+  }
+  .test_tree_leaves{
+    margin-bottom: 0.3rem;
+  }
+
+  .testcase__data{
+    padding-top: 1rem;
+    font: $f6_regular;
+    text-overflow: ellipsis;
+    overflow-y: auto;
+    max-height: 21rem;
+    max-width: 40rem;
+    overflow-x: hidden;
   }
 
   .bouncing-loader {

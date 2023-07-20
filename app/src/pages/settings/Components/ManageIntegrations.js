@@ -18,6 +18,8 @@ import { resetIntergrationLogin, resetScreen,selectedProject,
     selectedIssue,selectedTCReqDetails,selectedTestCase,syncedTestCases,mappedPair,selectedScenarioIds } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Checkbox } from 'primereact/checkbox';
+import { Tag } from 'primereact/tag';
 
 
 
@@ -44,6 +46,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [avoProjects , setAvoProjects]= useState([]);
     const [avoProjectsList , setAvoProjectsList]= useState(null);
     const [enableBounce , setEnableBounce]= useState(false);
+    const [checkedTestcase, setCheckedTestcase] = useState(false);
 
 
     // const [proj, setProj] = useState('');
@@ -60,6 +63,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const handleSubmit = () => {
         setIsSpin(true);
+        console.log(' login clicked');
         switch (selectedscreen.name) {
             case 'jira':
                 callLogin_Jira();
@@ -207,7 +211,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(selectedProject(e.target.value));
         setDisableIssue(false);
         console.log(e.target.value, ' project e');
-        const releaseId = event.target.value;
+        // const releaseId = e.target.value;
         const projectScenario =await api.getAvoDetails("6440e7b258c24227f829f2a4");
         if (projectScenario.error)
             setToast("error", "Error", projectScenario.error);
@@ -390,21 +394,16 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <Dropdown disabled={disableIssue} style={{ width: '11rem', height: '2.5rem' }} value={currentIssue} className="dropdown_release" options={issueTypes} onChange={(e) => onIssueChange(e)} placeholder="Select Release" />
                                                         </div>
                                                     </div>
-                                                    <div>
+                                                    <div className="testcase__data">
                                                             {
                                                                 testCaseData && testCaseData.length ?
                                                                     testCaseData.map((e, i) => (
                                                                         <div className={"test_tree_leaves" + (selected === e.code ? " test__selectedTC" : "")}>
                                                                             <label className="test__leaf" title={e.code} onClick={() => handleClick(e.code, e.id, e.summary)}>
-                                                                                <span className="leafId">{e.code}</span>
-                                                                                <span className="test__tcName">{e.summary} </span>
+                                                                            <Checkbox onChange={e => setCheckedTestcase(e.checkedTestcase)} checked={checkedTestcase} />
+                                                                                <span className="leafId"><Tag style={{background: 'purple', width:'6rem', height:'2rem', position:'relative', top:'0.2rem'}}>{e.code}</Tag></span>
+                                                                                <span className="test__tcName" title={e.summary}>{e.summary.trim().length>35?e.summary.substr(0,35)+"...":e.summary} </span>
                                                                             </label>
-                                                                            {selected === e.code
-                                                                                && <><div className="test__syncBtns">
-                                                                                    {selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled ? "static/imgs/ic-qcSyncronise.png" : null} />}
-                                                                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
-                                                                                </div></>
-                                                                            }
                                                                         </div>
                                                                     ))
                                                                     :
@@ -419,7 +418,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                     </div>
                                                 </Card>
                                             </div>
-
+                                             <span>
+                                                <img className="map__btn" src="static/imgs/map_button_icon.svg"/>
+                                             </span>
                                             <div>
                                                 <div className="card_data2">
                                                     <Card className="mapping_data_card2">
