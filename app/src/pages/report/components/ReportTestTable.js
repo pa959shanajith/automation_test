@@ -1,9 +1,12 @@
 import React, {useEffect, useState} from 'react'; 
 import { TabView, TabPanel } from 'primereact/tabview';
-import { Breadcrumbs, Link } from '@mui/material';
 import { Chart } from 'primereact/chart';
+import { DataTable } from 'primereact/datatable';
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export default function BasicDemo() {
+    const navigate = useNavigate()
     const [chartData, setChartData] = useState({});
     const [chartOptions, setChartOptions] = useState({});
 
@@ -38,15 +41,12 @@ export default function BasicDemo() {
         setChartData(data);
         setChartOptions(options);
     }, []);
-
+    function handdleViweReportsBack(){
+        navigate('/reports')
+    }
     return (
         <>
-        <Breadcrumbs>
-        <Link>Home</Link>
-        <Link>Reports</Link>
-        <Link>Executions</Link>
-        <Link>Test Cases</Link>
-        </Breadcrumbs>
+        <Button label="Back" onClick={()=>handdleViweReportsBack()} size="small" outlined />
         <div className="cards">
             <TabView>
                 <TabPanel header="Summary">
@@ -59,7 +59,7 @@ export default function BasicDemo() {
                         Platfrom
                     </div>
                     <div className="card flex justify-content-center">
-                        <Chart type="doughnut" data={chartData} options={chartOptions} className="w-full md:w-30rem" />
+                        <Chart type="doughnut" data={chartData} options={chartOptions} className="w-full md:w-15rem" />
                     </div>
                 </TabPanel>
                 <TabPanel header="Execution Settings">
@@ -80,6 +80,7 @@ export default function BasicDemo() {
                 </TabPanel>
             </TabView>
         </div>
+        <DataTable/>
         </>
     )
 }
