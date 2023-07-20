@@ -15,15 +15,19 @@ import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
 import { resetIntergrationLogin, resetScreen,selectedProject,selectedIssue } from '../settingSlice';
+import { InputSwitch } from "primereact/inputswitch";
+import { Accordion, AccordionTab } from 'primereact/accordion';
 
 
 
 const ManageIntegrations = ({ visible, onHide }) => {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [activeIndexViewMap, setActiveIndexViewMap] = useState(0);
     const [showLoginCard, setShowLoginCard] = useState(true);
     const selectedscreen = useSelector(state => state.setting.screenType);
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
     const [isSpin, setIsSpin] = useState(false);
+    const [checked, setChecked] = useState(false);
     const [projectDetails,setProjectDetails] = useState([]);
     const [issueTypes,setIssueTypes] = useState([]);
     const [disableIssue,setDisableIssue] = useState(true)
@@ -95,6 +99,42 @@ const ManageIntegrations = ({ visible, onHide }) => {
         { label: 'Cloud Based Integration' },
     ];
 
+    const jiraTestCase = [
+        {
+            id: 1,
+            name: 'Test Case 1',
+            avoassure: 'AvoTestCase 1',
+        },
+        {
+            id: 2,
+            name: 'Test Case 2',
+            avoassure: 'Avo TestCase 2'
+        },
+        {
+            id: 3,
+            name: 'Test Case 3',
+            avoassure: 'Avo TestCase 3'
+        },
+    ];
+
+    const avoTestCase = [
+        {
+            id: 1,
+            name: 'Test Case 1',
+            jiraCase: 'Jira TestCase 1',
+        },
+        {
+            id: 2,
+            name: 'Test Case 2',
+            jiraCase: 'Jira TestCase 2'
+        },
+        {
+            id: 3,
+            name: 'Test Case 3',
+            jiraCase: 'Jira TestCase 3'
+        },
+    ];
+
 
     const IntegrationTypes = [
         { name: 'jira', code: 'NY' },
@@ -163,9 +203,21 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
         console.log(jira_info, ' jira_info ');
         const testData = await api.getJiraTestcases_ICE(jira_info)
-        setTestCaseData(testData.testcases)
+        // setTestCaseData(testData.testcases)
 
     }
+
+    const logoutTab = {
+        label: '',
+        content: null,
+        template: (
+          <Button label={selectedscreen.name && `${selectedscreen.name} Logout`} onClick={showLogin} className="logout__btn" />
+        ),
+      };
+
+      if (!showLoginCard) {
+        integrationItems.push(logoutTab);
+      }
 
     const footerIntegrations = (
         <div className='btn-11'>
@@ -179,7 +231,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     return (
         <>
             <div className="card flex justify-content-center">
-                <Dialog header="Manage Integrations" visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations : ""}>
+                <Dialog className="manage_integrations" header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations : ""}>
                     <div className="card">
                         <TabMenu model={integrationItems} />
                     </div>
@@ -270,8 +322,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                         // </div>
                     ) : (
                         <div>
-                            <span className="integration_header">Jira Integration</span>
-                            <Button label="Logout" size="small" onClick={showLogin} className="logout__btn"></Button>
+                            {/* <span className="integration_header">Jira Integration</span> */}
                             <div className="tab__cls">
                                 <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                                     <TabPanel header="Mapping">
@@ -309,10 +360,38 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
                                     </TabPanel>
 
-                                    <TabPanel header=" View Mapping">
-                                        {/* Content for "Mapping Data" tab */}
+                                    <TabPanel header="View Mapping">
+                                        <Card className="view_map_card">
+                                            <div className="flex justify-content-flex-start toggle_btn">
+                                                <span>Jira Testcase to Avo Assure Testcase</span>
+                                                <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
+                                                <span>Avo Assure Testcase to Jira Testcase</span>
+                                            </div>
+
+                                            {checked ? (<div className="accordion_testcase">
+                                                <Accordion multiple activeIndex={0} >
+                                                    {avoTestCase.map((jiraCase) => (
+                                                        <AccordionTab header="Avo Assure Testcase">
+                                                            <span>{jiraCase.jiraCase}</span>
+                                                        </AccordionTab>))}
+                                                </Accordion>
+                                            </div>
+
+                                            ) : (
+
+                                                <div className="accordion_testcase">
+                                                    <Accordion multiple activeIndex={0}>
+                                                        {jiraTestCase.map((testCase) => (
+                                                            <AccordionTab header="Jira Testcase">
+                                                                <span>{testCase.avoassure}</span>
+                                                            </AccordionTab>))}
+                                                    </Accordion>
+                                                </div>
+                                            )}
+                                        </Card>
 
                                     </TabPanel>
+
                                 </TabView>
                             </div>
 

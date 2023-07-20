@@ -35,20 +35,26 @@ height: 2.5rem !important;
 }
 .logout__btn{
     position: relative;
-    left: 52rem !important;
-    top: 0.5rem !important;
+    left: 38rem !important;
+    top: 0.3rem !important;
     background:white !important;
     color: blue !important;
     .p-button{
      width: 7rem !important;
     }
 }
+
 .tab__cls{
     margin-top: 0.5rem;
+    .p-tabview-nav-content {
+         height: 3rem !important;
+    }
+
 }
 .integration_header{
     font:$f6_bold !important;
 }
+
 .data__mapping{
     display: flex;
     flex-direction:row;
@@ -72,7 +78,7 @@ height: 2.5rem !important;
     width: 30rem;
    
     .p-card-body{
-        height: 23rem;
+        height: 26.5rem;
         width: 30rem;
        
     }
@@ -181,7 +187,11 @@ height: 2.5rem !important;
 
 }
 
-
+.manage_integrations{
+    .p-dialog-content{
+        overflow: hidden;
+    }
+}
 
 
 .side-panel {
@@ -249,6 +259,20 @@ height: 2.5rem !important;
 
     }
 
+}
+
+.view_map_card{
+    height: 31rem;
+    max-height: 26.5rem;
+    .toggle_btn{
+        position: relative;
+        bottom: 2rem;
+        gap: 1rem;
+    }
+    .accordion_testcase{
+            max-height: 17rem !important;
+            overflow-y: auto !important;
+    }
 }
 
 .side-panel .icon-wrapper.selected {
