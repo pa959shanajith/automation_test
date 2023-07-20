@@ -97,7 +97,7 @@ default_sub.on("message", (channel, message) => {
 		break;
 
 	case "jiralogin":
-		mySocket.emit("jiralogin", data.action, data.inputs, data.project_selected);
+		mySocket.emit("jiralogin", data.action, data.inputs, data.project_selected,data.itemType);
 		break;
 
 	// case "getJiraTestcases":

@@ -8,7 +8,17 @@ const initialState = {
         url:'https://mnb.atlassian.net'
     },
     selectedProject:'',
-    selectedIssue:''
+    selectedIssue:'',
+    selectedZTCDetails: {
+        selectedTCPhaseId: [],
+        selectedTcId: [],
+        selectedTCNames: [],
+        selectedTCReqDetails:[]
+    },
+    selectedTestCase: [],
+    syncedTestCases: [],
+    selectedScenarioIds: [],
+    mappedPair: [],
 }
 
 export const settingSlice=createSlice({
@@ -33,7 +43,23 @@ export const settingSlice=createSlice({
         },
         selectedIssue:(state,action) => {
             state.selectedIssue =  action.payload
-        } 
+        },
+        selectedTCReqDetails:(state,action) => {
+            state.selectedTCReqDetails =  action.payload
+        },
+        selectedTestCase:(state,action) => {
+            state.selectedTestCase =  action.payload
+        },
+        syncedTestCases:(state,action) => {
+            state.syncedTestCases =  action.payload
+        },
+        selectedScenarioIds:(state,action) => {
+            state.syncedTestCases =  action.payload
+        },
+        mappedPair:(state,action) => {
+            state.mappedPair =  action.payload
+        },
+
     }
 })
 // export all the action creators
@@ -43,6 +69,12 @@ export const {
     resetIntergrationLogin,
     resetScreen,
     selectedProject,
-    selectedIssue } = settingSlice.actions;
+    selectedIssue,
+    selectedTCReqDetails,
+    selectedTestCase,
+    syncedTestCases,
+    selectedScenarioIds,
+    mappedPair
+     } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

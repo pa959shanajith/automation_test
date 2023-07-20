@@ -202,7 +202,8 @@ height: 2.5rem !important;
 
         top: 2rem;
 
-        width: 40px
+        width: 40px;
+        cursor: pointer;
 
     }
     align-items: center;
@@ -278,4 +279,39 @@ height: 2.5rem !important;
 .side-panel .icon-wrapper.selected {
     border: 2px solid #6837e6;
     border-radius: 4px; /* Customize the border radius for the square shape */
+  }
+
+  .bouncing-loader {
+    display: flex;
+    position: absolute;
+    top: 60%;
+    left: 19%;
+    // justify-content: center;
+    // align-items: center;
+    // height: 100%;
+  }
+  
+  .bouncing-loader > div {
+    width: 10px;
+    height: 10px;
+    margin: 3px 6px;
+    border-radius: 50%;
+    background-color: #7e4ef7;
+    opacity: 1;
+    animation: bouncing-loader 0.6s infinite alternate;
+  }
+
+  @keyframes bouncing-loader {
+    to {
+      opacity: 0.1;
+      transform: translateY(-16px);
+    }
+  }
+  
+  .bouncing-loader > div:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .bouncing-loader > div:nth-child(3) {
+    animation-delay: 0.4s;
   }

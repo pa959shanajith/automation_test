@@ -14,7 +14,8 @@ import { screenType } from '../settingSlice'
 import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
-import { resetIntergrationLogin, resetScreen,selectedProject,selectedIssue } from '../settingSlice';
+import { resetIntergrationLogin, resetScreen,selectedProject,
+    selectedIssue,selectedTCReqDetails,selectedTestCase,syncedTestCases,mappedPair,selectedScenarioIds } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
 
@@ -33,12 +34,27 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [disableIssue,setDisableIssue] = useState(true)
     const currentProject = useSelector(state => state.setting.selectedProject);
     const currentIssue = useSelector(state => state.setting.selectedIssue);
+    const selectedZTCDetails = useSelector(state=>state.setting.selectedZTCDetails);
+    const selectedScIds = useSelector(state=>state.setting.selectedScenarioIds);
+    const [testCaseData, setTestCaseData] = useState([]);
+    const [selected,setSelected]=useState(false);
+    const [selectedId, setSelectedId] = useState('');
+    const [selectedSummary, setSelectedSummary] = useState('');
+    const [disabled, setDisabled] = useState(true);
+    const [avoProjects , setAvoProjects]= useState([]);
+    const [avoProjectsList , setAvoProjectsList]= useState(null);
+    const [enableBounce , setEnableBounce]= useState(false);
+
+
+    // const [proj, setProj] = useState('');
+    // const [projCode, setProjCode] = useState('');
+    // const [projName, setProjName] = useState('');
+    // const [releaseId, setReleaseId] = useState('');
     const toast = useRef();
 
     const dispatchAction = useDispatch();
 
     const handleIntegration = useCallback((value) => {
-        // setSelectedIntegrationType(value);
         dispatchAction(screenType(value));
     }, [])
 
@@ -73,7 +89,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "Invalid Session") {
             setToast("error", "Error", "Session Expired please login again");
             setIsSpin(false);
-            // dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             // return RedirectPage(history);
         }
         else if (domainDetails === "invalidcredentials") setToast("error", "Error", "Invalid Credentials");
@@ -149,6 +164,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(resetScreen());
         dispatchAction(selectedProject(''));
         dispatchAction(selectedIssue(''));
+        dispatchAction(mappedPair([]));
+        dispatchAction(syncedTestCases([]));
+        dispatchAction(selectedTestCase([]));
+        dispatchAction(selectedScenarioIds([]));
         setShowLoginCard(true);
         setIsSpin(false);
         onHide();
@@ -174,21 +193,48 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setShowLoginCard(true);
         dispatchAction(selectedProject(''));
         dispatchAction(selectedIssue(''));
+        dispatchAction(mappedPair([]));
+        dispatchAction(syncedTestCases([]));
+        dispatchAction(selectedTestCase([]));
+        dispatchAction(selectedScenarioIds([]));
+        setTestCaseData([]);
+        setAvoProjectsList([]);
+        setAvoProjects([]);
     };
 
-    const onProjectChange = (e) => {
+    const onProjectChange = async (e) => {
         e.preventDefault();
         dispatchAction(selectedProject(e.target.value));
         setDisableIssue(false);
         console.log(e.target.value, ' project e');
+        const releaseId = event.target.value;
+        const projectScenario =await api.getAvoDetails("6440e7b258c24227f829f2a4");
+        if (projectScenario.error)
+            setToast("error", "Error", projectScenario.error);
+        else if (projectScenario === "unavailableLocalServer")
+            setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+        else if (projectScenario === "scheduleModeOn")
+            setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+        else if (projectScenario === "Invalid Session"){
+            setToast("error", "Error", 'Invalid Session');
+        }
+        else if (projectScenario && projectScenario.avoassure_projects && projectScenario.avoassure_projects.length) {
+            // setProjectDetails(projectScenario.project_dets);
+            setAvoProjectsList(projectScenario.avoassure_projects); 
+            setAvoProjects(projectScenario.avoassure_projects.map((el,i) => {return {label:el.project_name , value:el.project_name, key:i}}));  
+            // setSelectedRel(releaseId);  
+            // clearSelections();
+        }
     }
 
     const onIssueChange = async (e) => {
-        e.preventDefault();
+        // e.preventDefault();
+        setTestCaseData([]);
+        setEnableBounce(true);
         console.log(e.target.value, ' project f');
         dispatchAction(selectedIssue(e.target.value));
         let projectName = projectDetails.filter(el => el.value === currentProject)[0]['label'];
-        let issueName = issueTypes.filter(el => el.value === currentIssue)[0]['label'];
+        let issueName = issueTypes.filter(el => el.value === e.target.value)[0]['label'];
         console.log(projectDetails,' /n',projectName);
         let jira_info ={
             project: projectName,
@@ -203,9 +249,70 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
         console.log(jira_info, ' jira_info ');
         const testData = await api.getJiraTestcases_ICE(jira_info)
-        // setTestCaseData(testData.testcases)
-
+        if(testData){
+            setTestCaseData(testData.testcases)
+        }
+        setEnableBounce(false);
     }
+    const handleClick= useCallback((value, id,summary)=>{
+        let newSelectedTCDetails = { ...selectedZTCDetails };
+        let newSelectedTC = [...value,summary];
+       setSelected(value)
+       setSelectedId(id)
+       setSelectedSummary(summary)
+       setDisabled(true)
+       dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
+        dispatchAction(syncedTestCases([]));
+        dispatchAction(selectedTestCase(newSelectedTC));
+    },[])
+
+    const handleSync = useCallback(() => {
+        let popupMsg = false;
+        let currentProject = projectDetails.filter(el => el.value === currentProject)[0];
+        let releaseId = issueTypes.filter(el => el.value === currentIssue)[0]['label'];
+             if(selectedScIds.length===0){
+                 popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+             }
+             else if(selectedId===''){
+                 popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+             }
+             else if(selectedId===selectedId && selectedScIds.length>1) {
+                 popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+             }
+     
+             if (popupMsg) setMsg(popupMsg);
+             else{
+                // label:el.name , value:el.code, key:el.id
+                     const mappedPairObj=[
+                             {
+                                 projectId: currentProject.id, 
+                                 projectCode: currentProject.code,
+                                 projectName: currentProject.label,        
+                                 testId: selectedId,
+                                 testCode: selected, 
+                                 scenarioId: selectedScIds,
+                                 itemType:releaseId,
+                                 itemSummary:selectedSummary
+                                
+ 
+                             }
+                         ];
+                         dispatchAction(mappedPair(mappedPairObj));
+                         console.log(mappedPairObj);
+                         dispatchAction(syncedTestCases(selected));
+             }
+         setDisabled(false);
+     },[])
+
+     const handleUnSync = useCallback(() => {
+        dispatchAction(mappedPair([]));
+        dispatchAction(syncedTestCases([]));
+        dispatchAction(selectedTestCase([]));
+        dispatchAction(selectedScenarioIds([]));
+        // clearSelections();
+        setDisabled(true)
+        setSelected(false)
+    },[])
 
     const logoutTab = {
         label: '',
@@ -263,66 +370,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                     </div>
                                 </div>
                                 {IntergrationLogin}
-                                {/* <Card className="card__login__jira">
-                                    <div className="Login__jira">
-
-                                        <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
-                                        <div className="input-cls">
-                                            <span>Username <span style={{ color: 'red' }}>*</span></span>
-                                            <span className="p-float-label" style={{ marginLeft: '1.5rem' }}>
-                                                <InputText style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={value} onChange={(e) => setValue(e.target.value)} />
-                                                <label htmlFor="username">Username</label>
-                                            </span>
-                                        </div>
-                                        <div className="passwrd-cls">
-                                            <span>Password <span style={{ color: 'red' }}>*</span></span>
-                                            <Password style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={passeordValue} onChange={(e) => setPasswordValue(e.target.passeordValue)} toggleMask />
-                                        </div>
-                                        <div className="url-cls">
-                                            <span>URL <span style={{ color: 'red' }}>*</span></span>
-                                            <span className="p-float-label" style={{ marginLeft: '4.5rem' }}>
-                                                <InputText style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={value} onChange={(e) => setValue(e.target.value)} />
-                                                <label htmlFor="username">URL</label>
-                                            </span>
-                                        </div>
-                                        <div className="login__div">
-                                            <Button size="small" label="login" onClick={showCard2} className="login__btn"></Button>
-                                        </div>
-
-                                    </div>
-                                </Card> */}
                             </div>
                         </>
-
-
-                        // <div>
-                        //   <p style={{marginBottom:'0.5rem',marginTop:'0.5rem'}} className="login-cls">Login </p>
-                        //   <div className="input-cls">
-                        //   <span>Username <span style={{color:'red'}}>*</span></span>
-                        //     <span className="p-float-label" style={{marginLeft:'1.5rem'}}>
-                        //         <InputText style={{width:'20rem', height:'2.5rem'}} className="input-txt1" id="username" value={value} onChange={(e) => setValue(e.target.value)} />
-                        //         <label htmlFor="username">Username</label>
-                        //     </span>
-                        //     </div>
-                        //     <div className="passwrd-cls">
-                        //     <span>Password <span style={{color:'red'}}>*</span></span>
-                        //     <Password style={{width:'20rem', height:'2.5rem' , marginLeft:'2rem'}} className="input-txt1"value={passeordValue} onChange={(e) => setPasswordValue(e.target.passeordValue)} toggleMask />
-                        //     </div>
-                        //     <div className="url-cls">
-                        //     <span>URL <span style={{color:'red'}}>*</span></span>
-                        //     <span className="p-float-label" style={{marginLeft:'4.5rem'}}>
-                        //         <InputText  style={{width:'20rem', height:'2.5rem'}}className="input-txt1" id="URL" value={value} onChange={(e) => setValue(e.target.value)} />
-                        //         <label htmlFor="username">URL</label>
-                        //     </span>
-                        //     </div>
-                        //     <div>
-                        //         <Button className="loginbtn-jira"  onClick={showCard2} label="Login"></Button>
-                        //     </div>
-
-                        // </div>
                     ) : (
                         <div>
-                            {/* <span className="integration_header">Jira Integration</span> */}
                             <div className="tab__cls">
                                 <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                                     <TabPanel header="Mapping">
@@ -339,6 +390,33 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <Dropdown disabled={disableIssue} style={{ width: '11rem', height: '2.5rem' }} value={currentIssue} className="dropdown_release" options={issueTypes} onChange={(e) => onIssueChange(e)} placeholder="Select Release" />
                                                         </div>
                                                     </div>
+                                                    <div>
+                                                            {
+                                                                testCaseData && testCaseData.length ?
+                                                                    testCaseData.map((e, i) => (
+                                                                        <div className={"test_tree_leaves" + (selected === e.code ? " test__selectedTC" : "")}>
+                                                                            <label className="test__leaf" title={e.code} onClick={() => handleClick(e.code, e.id, e.summary)}>
+                                                                                <span className="leafId">{e.code}</span>
+                                                                                <span className="test__tcName">{e.summary} </span>
+                                                                            </label>
+                                                                            {selected === e.code
+                                                                                && <><div className="test__syncBtns">
+                                                                                    {selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled ? "static/imgs/ic-qcSyncronise.png" : null} />}
+                                                                                    <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                                                                                </div></>
+                                                                            }
+                                                                        </div>
+                                                                    ))
+                                                                    :
+                                                                    enableBounce && 
+                                                                    <div className="bouncing-loader">
+                                                                        <div></div>
+                                                                        <div></div>
+                                                                        <div></div>
+                                                                    </div>
+
+                                                            }
+                                                    </div>
                                                 </Card>
                                             </div>
 
@@ -350,7 +428,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                 <span>Select Project <span style={{ color: 'red' }}>*</span></span>
                                                             </div>
                                                             <div className="dropdown-map">
-                                                                <Dropdown options={dropdownOptions} style={{ width: '11rem', height: '2.5rem' }} className="dropdown_project" placeholder="Select Project" />
+                                                                <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} className="dropdown_project" placeholder="Select Project" />
                                                             </div>
                                                         </div>
                                                     </Card>

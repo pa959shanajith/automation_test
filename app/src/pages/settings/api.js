@@ -69,3 +69,30 @@ export const getJiraTestcases_ICE = async(input_payload) => {
         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }
+
+export const getAvoDetails = async(user_id) => {
+    try{
+        const res = await axios(url+'/getAvoDetails', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: 'getAvoDetails',
+                user_id : user_id
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    } catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }
+}
