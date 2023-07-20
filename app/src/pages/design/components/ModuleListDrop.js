@@ -64,7 +64,6 @@ const ModuleListDrop = (props) =>{
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
     const [collapseWhole, setCollapseWhole] = useState(true);
-    const [E2EName,setE2EName] = useState('')
     const [initialText, setInitialText] = useState(E2EName? false : true);
 
 
@@ -77,11 +76,14 @@ const ModuleListDrop = (props) =>{
     const [showE2EPopup, setShowE2EPopup] = useState(false);
     const [configTxt, setConfigTxt] = useState("");
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
+    const [E2EName,setE2EName] = useState('')
     const [editE2ERightBoxData,setEditE2ERightBoxData] = useState([])
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
   const [showTooltip, setShowTooltip] = useState(false);
   const [scenarioDataOnRightBox,setScenarioDataOnRightBox]= useState([])
   const [filterSceForRightBox,setFilterSceForRightBox]= useState([])
+  const [valueSearchLeftBox, setValueSearchLeftBox] = useState('');
+
 
   // const [newProjectList, setNewProjectList] = useState([]);
         const[overlayforModSce,setOverlayforModSce]=useState(false)
@@ -98,7 +100,7 @@ const ModuleListDrop = (props) =>{
           id: "",
           name: ""
         });
-        const [searchScenarioLeftBox, setSearchScenarioLeftBox] = useState('')
+        const [showDataOnSearchEmpty, setShowDataOnSearchEmpty] = useState(false)
         const [filterModSceList,setFilterModSceList] =useState([])
         // const forCatchingCheckBoxSelDemo = useMemo(()=> CheckboxSelectionDemo())
 
@@ -258,7 +260,7 @@ const ModuleListDrop = (props) =>{
         // }));        
         setNewModSceList(moduleScenarioData)
         setFilterModSceList(moduleScenarioData)
-          console.log("moduleScenarioData",moduleScenarioData)
+        // if(showDataOnSearchEmpty){setFilterModSceList(moduleScenarioData)}
       })();
         
 
@@ -549,20 +551,17 @@ const ModuleListDrop = (props) =>{
         
         const handleSearchScenarioLeftBox =(val)=>{
           if(val === "") {
+            // setShowDataOnSearchEmpty(true)
             setFilterModSceList(newModSceList);
           } else {
-            // console.log("newModSceList",newModSceList[0].mindmapList.map((module) =>
-            // module.scenarioList))
-            // let filtereddata=newModSceList[0].mindmapList.map((module) =>
-            // module.scenarioList.filter((sce) => {
-            //   if(sce.name.toUpperCase().includes(val.toUpperCase())) return sce ;
-            // }
-            //  ))
-            // setFilterModSceList([{mindmapList: newModSceList[0].mindmapList.map((module) =>
-            //  module.scenarioList.filter((sce) => sce.name.toUpperCase().indexOf(val.toUpperCase()) !== -1)
-            //   )}]);
-            //   console.log("filter",filterModSceList)
-            //   console.log("8",filtereddata)
+            // let listOFModule = [...newModSceList[0].mindmapList];
+            let listOFModule = JSON.parse(JSON.stringify(newModSceList[0].mindmapList));
+            let filtereddata=listOFModule.map((module) => ({
+                ...module,
+                scenarioList: module.scenarioList.filter((scenarioObj) => scenarioObj.name.toUpperCase().includes(val.toUpperCase()) )
+              }))
+              .filter((module) => module.scenarioList.length > 0);
+            setFilterModSceList([{mindmapList: filtereddata}]);
           }
           // setSearchScenarioLeftBox(val);  
         }
@@ -828,8 +827,9 @@ setPreventDefaultModule(true);
                                 <i className="pi pi-search" />
                                 <InputText type="text"
                                   placeholder="Search TestCases"
+                                  value={valueSearchLeftBox}
                                   style={{ width: '15rem', height: '2.2rem', marginRight:'0.2rem', marginBottom: '1%' }}
-                                  className="inputContainer" onChange={(e)=>handleSearchScenarioLeftBox(e.target.value)}
+                                  className="inputContainer" onChange={(e)=>{setValueSearchLeftBox(e.target.value);handleSearchScenarioLeftBox(e.target.value)}}
                                 />
                               </span>
                             </div>
@@ -838,7 +838,11 @@ setPreventDefaultModule(true);
                               <Dropdown
                                 value={selectedProject}
                                 name={projectItems}
-                                onChange={(e) => changeProject(e)}
+                                onChange={(e) => {
+                                  changeProject(e);
+                                  setValueSearchLeftBox("")
+                                }}
+                                
                                 options={projectItems}
 
                                 placeholder="Select a Project"
