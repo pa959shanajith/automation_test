@@ -110,7 +110,7 @@ const CreateNew = ({importRedirect}) => {
                 <div className='mp__toolbar__container'>
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                 </div>
-                <div style={{display:'flex',height:'96%'}}>
+                <div style={{display:'flex',height: '86vh',maxHeight: '100%'}}>
                   <ModuleListDrop  setBlockui={setBlockui}/>
                 </div>
               <div id='mp__canvas' className='mp__canvas'>

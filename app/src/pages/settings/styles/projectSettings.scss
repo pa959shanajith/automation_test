@@ -1,0 +1,80 @@
+@import "../../global/styles/ColorVariables.scss";
+.proj-card{
+ width: 58rem;
+ margin-left: 4rem;
+ box-shadow: none !important;
+ margin-bottom: 1.2rem;
+ margin-top: -0.5rem;
+ .p-card-content {
+ padding:0.2rem 0 !important;
+ }
+    .p-card-body{
+        width: 48rem;
+        height: 8rem;
+    }
+    .p-card-title {
+        font: $f4_bold !important;
+        margin-bottom: 0rem !important;
+        margin-top: -0.5rem;
+
+}
+}
+
+.manageProj_btn{
+    background:white !important;
+    color: blue !important;
+    height: 37px;
+    width:140px;
+    padding: 1rem;
+    .p-button-label{
+        font: $f7_semibold !important;
+        }
+}
+.manageProj1_btn, .manageProj2_btn, .manageProj3_btn{
+    background:white !important;
+    color: blue !important;
+    height: 37px;
+    padding: 1rem;
+    .p-button-label{
+        font: $f7_semibold !important;
+        }
+}
+.manageProj3_btn,.manageProj2_btn{
+   cursor: not-allowed !important;
+} 
+.image-settings{
+    position: absolute;
+    left: 57rem;
+    bottom: 30rem;
+    border-radius: 5rem;
+    background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+    padding: 1rem;
+}
+.image-integration{
+    position: absolute;
+    left: 57rem;
+    bottom: 21.5rem; 
+    border-radius: 5rem;
+    background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+    padding: 1rem;
+}
+.image-config{
+    position: absolute;
+    left: 57rem;
+    bottom: 12.5rem; 
+    border-radius: 5rem;
+    background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+    padding: 1rem;
+}
+.image-eamil{
+    position: absolute;
+    left: 57rem;
+    bottom: 4.2rem; 
+    border-radius: 5rem;
+    background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+    padding: 1rem;
+}
+.sentence-cls{
+    font: $f6_regular;
+}
+

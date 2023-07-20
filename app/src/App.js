@@ -28,6 +28,7 @@ import Overview from './pages/landing/components/ProjectCreation';
 import Analysis from './pages/landing/components/Analysis';
 import MindmapHome from './pages/design/containers/MindmapHome';
 import Profile from './pages/report/components/Profile';
+import ReportTestTable from './pages/report/components/ReportTestTable';
 
 
 
@@ -80,6 +81,7 @@ const RouteApp = () => {
         <Route path="/itdm" element={<itdm />} />
         <Route path="/design" element={<MindmapHome />} />
         <Route path="/execute" element={<ConfigurePage />} />
+        <Route path='/reports/viewReports' element={<ReportTestTable/>}/>
       </Routes>
     </>
   )
