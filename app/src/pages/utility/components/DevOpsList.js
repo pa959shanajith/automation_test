@@ -60,6 +60,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [cyclesList, setCyclesList] = useState('');
     const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
     const [currentKey,setCurrentKey] = useState('');
+    const [currentExecutionRequest,setCurrentExecutionRequest] = useState(null);
     const [projectName, setProjectName] = useState('');
     const [currentName, setCurrentName] = useState('');
     const current_task = useSelector(state=>state.plugin.PN);
@@ -624,7 +625,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             executionData["browserType"]=browserTypeExe;
         }
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, accessibilityParameters, '');
+        const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, accessibilityParameters, '', currentExecutionRequest);
         if(modul_Info === false) return;
         setLoading("Sending Execution Request");
         executionData["source"]="task";
@@ -964,6 +965,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <img onClick={() =>{
                                     onClick('displayBasic2');
                                     setCurrentKey(item.configurekey);
+                                    setCurrentExecutionRequest(item.executionRequest);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
@@ -1045,6 +1047,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <img onClick={() =>{
                                     onClick('displayBasic2');
                                     setCurrentKey(item.configurekey);
+                                    setCurrentExecutionRequest(item.executionRequest);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !=="Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
@@ -1238,7 +1241,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     </>);
 }
 
-const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType) => {
+const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType, currentExecutionRequest) => {
     for(var i =0 ;i<eachData.length;i++){
         var testsuiteDetails = current_task.testSuiteDetails[i];
         var suiteInfo = {};
@@ -1247,17 +1250,15 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
         var cycid = testsuiteDetails.cycleid;
         var projectid = testsuiteDetails.projectidts;
         
-        for(var j =0 ; j<eachData[i].executestatus.length; j++){
-            if(eachData[i].executestatus[j]===1){
-                selectedRowData.push({
-                    condition: eachData[i].condition[j],
-                    dataparam: [eachData[i].dataparam[j].trim()],
-                    scenarioName: eachData[i].scenarionames[j],
-                    scenarioId: eachData[i].scenarioids[j],
-                    scenariodescription: undefined,
-                    accessibilityParameters: accessibilityParameters
-                });
-            }
+        for(let j =0 ; j<currentExecutionRequest.batchInfo[i].suiteDetails.length; j++){
+            selectedRowData.push({
+                condition: currentExecutionRequest.batchInfo[i].suiteDetails[j].condition,
+                dataparam: [currentExecutionRequest.batchInfo[i].suiteDetails[j].dataparam[0].trim()],
+                scenarioName: currentExecutionRequest.batchInfo[i].suiteDetails[j].scenarioName,
+                scenarioId: currentExecutionRequest.batchInfo[i].suiteDetails[j].scenarioId,
+                scenariodescription: undefined,
+                accessibilityParameters: accessibilityParameters
+            });
         }
         suiteInfo.scenarioTaskType = scenarioTaskType;
         suiteInfo.testsuiteName = eachData[i].testsuitename;
