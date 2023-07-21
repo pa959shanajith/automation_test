@@ -204,7 +204,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end(); return;}
+                    if(res.error){displayError({CONTENT:res.error.CONTENT,VARIANT:VARIANT.ERROR});setBlockui({show:false});ResetSession.end(); return;}
                     if(res === "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
                     if(res === "dupMod"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
                     if(res === "dupSce"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
@@ -217,7 +217,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     }
                     res = await getModules(req)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end();return;}
+                    if(res.error){displayError({CONTENT:res.error,VARIANT:VARIANT.ERROR});setBlockui({show:false});ResetSession.end();return;}
                     setFiledUpload(res)
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                     setBlockui({show:false})
