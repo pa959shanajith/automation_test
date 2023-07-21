@@ -20,12 +20,14 @@ const initialState = {
     toDeleteScenarios: [],
     appType:undefined,
     savedList:false,
+    dontShowFirstModule:false,
     ScrapeData : [],
     disableAction: false,
     disableAppend: false,
     compareFlag: false,
     compareData: {},
-    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: [], fullScrapeData: []},
+    impactAnalysisScreenLevel: false,
     objValue: { val: null },
     isFiltered: false,
     compareSuccessful:false,
@@ -119,6 +121,9 @@ export const designSlice = createSlice({
     savedList:(state, action)=>{
       state.savedList = action.payload
     },
+    dontShowFirstModule:(state,action)=>{
+      state.dontShowFirstModule = action.payload
+    },
     saveMindMap: (state, action) => {
       return{
         ...state,
@@ -173,6 +178,9 @@ export const designSlice = createSlice({
     EnableExportMindmapButton:(state, action)=>{
       state.enableExportMindmapButton = action.payload
     },
+    ImpactAnalysisScreenLevel:(state,action)=>{
+      state.impactAnalysisScreenLevel=action.payload
+    },
     CompareFlag:(state,action)=>{
       state.compareFlag=action.payload
     },
@@ -209,11 +217,12 @@ toDeleteScenarios,
 appType,
 savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
 TestCases,
+ImpactAnalysisScreenLevel,
 CompareData,
 CompareFlag,
 CompareObj,
 CompareElementSuccessful,
 Modified,
-SaveEnable,objValue,EnableExport,ExportProjname,EnableExportMindmapButton} = designSlice.actions
+SaveEnable,objValue,EnableExport,ExportProjname,EnableExportMindmapButton,dontShowFirstModule} = designSlice.actions
 
 export default designSlice.reducer

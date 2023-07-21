@@ -6,8 +6,10 @@ import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
-import Legends from './Legends'
-import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes } from '../designSlice'
+import Legends from './Legends';
+import { InputSwitch } from 'primereact/inputswitch';
+import { Divider } from 'primereact/divider';
+import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
 
 
 
@@ -40,6 +42,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const initEnEProj = useSelector(state=>state.design.initEnEProj)
     const [isCreateE2E, setIsCreateE2E] = useState(false)
     const isEnELoad = useSelector(state=>state.design.isEnELoad);
+    const [checked, setChecked] = useState(false);
     useEffect(() => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         
@@ -47,6 +50,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
+        dispatch(dontShowFirstModule(false))
         dispatch(selectedProj(proj))
         // setselectedProjectNameForDropdown(proj);
         // if(!isEnELoad){
@@ -161,11 +165,24 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 </select> 
             </div>     
             <div className='toolbar__header'>    
-                <span data-test="headerMenu" className='toolbar__header-menus'>
-                    <i className={"fa fa-crop fa-lg"+' active-map'} title="Select" onClick={clickSelectBox}></i>
+                {/* <span data-test="headerMenu" className='toolbar__header-menus'>
+                    <i className={"fa fa-crop fa-lg active-map"} title="Select" onClick={clickSelectBox}></i>
                     <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                     <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
-                </span>
+                </span> */}
+                <div data-test="headerMenu" className='toolbar__header-menus'>
+                    <img className='am' src='static/imgs/minus-icon.svg' alt='minus'/>
+                    <div>40%</div>
+                    <img  className='am' src='static/imgs/add.svg' alt='add'/>
+                    <img className='line' src='static/imgs/line.svg' alt='line'/>
+                    <div className="flex justify-content-center gap-2">
+                        <label htmlFor='input-metakey'>Map View</label>
+                        <InputSwitch inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
+                        <label htmlFor="input-metakey" style={{marginRight:'0.8rem'}}>Table View</label>
+                    </div>
+                    <img className='line' src='static/imgs/line.svg' alt='line'/>
+                </div>
+                <img  className='line' src='static/imgs/line.svg' alt='line'/>
                 {!isEnELoad ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
             </div>
         </div>

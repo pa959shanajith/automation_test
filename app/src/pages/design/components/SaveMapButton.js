@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {saveMindmap,getModules,getScreens} from '../api';
 import * as d3 from 'd3';
-import { saveMindMap, toDeleteScenarios, moduleList, selectedModule } from '../designSlice';
+import { saveMindMap, toDeleteScenarios, moduleList, selectedModule,dontShowFirstModule } from '../designSlice';
 import '../styles/SaveMapButton.scss'
 import { VARIANT, Messages as MSG, setMsg } from '../../global';
 
@@ -28,32 +28,20 @@ const SaveMapButton = (props) => {
           // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNoded,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList,props.toast)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNoded,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
             <g id="ct-saveAction" className="ct-actionButton">
                 <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
-                <text x="27" y="17">Save</text>
+                <text x="23" y="18">Save</text>
             </g>
         </svg>
     )
 }
 
-const updateModuleList = (moduledata) => {
-    return (dispatch) => {
-      dispatch(moduleList(moduledata));
-    };
-  };
-
-  const selectModule = (moduleselected) => {
-   return (dispatch) => {
-     dispatch(selectedModule(moduleselected));
-   };
- };
-
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList,toast)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList)=>{
     var tab = "endToend"
     var selectedProject;
     var error = !1
@@ -61,11 +49,9 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     var flag = 10 
     var temp_data = [];
     var counter = {};
-
     var displayError = (error) => {
         setBlockui({show:false});
-        MSG.CUSTOM(((error)?( toast.current.show({severity:'error', summary: 'Error', detail:error.CONTENT, life: 2000}) || toast.current.show({severity:'error', summary: 'Error', detail:error, life: 2000}) ):toast.current.show({severity:'error', summary: 'Error', detail:MSG.MINDMAP.ERR_SAVE.CONTENT, life: 2000})));
-        // toast.current.show({sev(MSG.CUSTOM(((error)?( error.CONTENT || error ):MSG.MINDMAP.ERR_SAVE.CONTENT),error.VARIANT || VARIANT.ERROR))
+        setMsg(MSG.CUSTOM(((error)?( error.CONTENT || error ):MSG.MINDMAP.ERR_SAVE.CONTENT),error.VARIANT || VARIANT.ERROR))
         return;
     }
     d3.select('#pasteImg').classed('active-map',false)
@@ -82,8 +68,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
         } return true;
     })
     if(!duplicateNode){
-        toast.current.show({severity:'warn', summary: 'Warning', detail:MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME.CONTENT, life: 2000});
-        // setMsg()
+        setMsg(MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME)
         return;
     }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
@@ -174,7 +159,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     dispatch(saveMindMap({screendata,moduledata,moduleselected}))
     // if(!savedList){ dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})}
     setBlockui({show:false});
-    if(createnew!=='autosave') toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT, life: 3000})
+    if(createnew!=='autosave') setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
     if(result.scenarioInfo){
         dispatch(toDeleteScenarios(result.scenarioInfo))
         setDelSnrWarnPop(true);
@@ -187,11 +172,12 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
         modName:"",
         moduleid:null
     }
-    // eslint-disable-next-line no-redeclare
     var moduledata = await getModules(req);
+    // dispatch(moduleList(moduledata))
     if(savedList){
-        dispatch(updateModuleList(moduledata))
-        setTimeout(() =>dispatch(selectModule(moduleselected)),150)
+        dispatch(dontShowFirstModule(true))
+        dispatch(moduleList(moduledata))
+        dispatch(selectedModule(moduleselected))
     }
     return;
 
