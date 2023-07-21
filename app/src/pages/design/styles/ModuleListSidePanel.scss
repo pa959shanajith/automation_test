@@ -285,6 +285,19 @@
 
                         }
                       }
+                      .overlay4ModSceNoMod{
+                        font: $f6_regular;
+                        align-items: center;
+                        margin-top: 8rem;
+                        margin-left: 8.5rem;
+                        width: 14rem;
+                        height: 3rem;
+                        border: 1px solid black;
+                        display: flex;
+                        justify-content: center;
+                        border-radius: 0.5rem;
+                        background-color: #f2f2ff;
+                    }
                         .overlay4ModSce{
                             font: $f6_regular;
                             align-items: center;
