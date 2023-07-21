@@ -66,6 +66,7 @@ const ModuleListDrop = (props) =>{
         return () => {
             dispatch({type:actionTypes.IS_ENELOAD,payload:false});
             dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
+            dispatch({type:actionTypes.Dont_Show_First_Module,payload:false})
         }
      },[]);
      useEffect (()=>{
