@@ -841,6 +841,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     onClick('displayBasic4');
     onClick('showSauceLabLogin');
     setCurrentKey(item.configurekey);
+    setCurrentExecutionRequest(item.executionRequest);
     setAppType(item.executionRequest.batchInfo[0].appType);
     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
