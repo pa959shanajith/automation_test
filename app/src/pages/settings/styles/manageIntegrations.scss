@@ -322,8 +322,14 @@ cursor: pointer;
   .bouncing-loader > div:nth-child(3) {
     animation-delay: 0.4s;
   }
-  .avoProject_tree{
+  .avotest__data{
     .p-tree{
-    border: none !important;
-    }
+        border: none !important;
+        background: none !important;
+        overflow: auto;
+        height: 21.5rem;
+        padding: 0.5rem;
+        }
   }
+  
+

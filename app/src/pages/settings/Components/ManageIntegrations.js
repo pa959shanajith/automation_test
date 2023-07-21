@@ -350,7 +350,18 @@ const ManageIntegrations = ({ visible, onHide }) => {
                   _id: 'testcase-2',
                   name: 'Test Case 2',
                 },
-                // Add more dummy data as needed
+                {
+                    _id: 'testcase-2',
+                    name: 'Test Case 2',
+                  },
+                  {
+                    _id: 'testcase-2',
+                    name: 'Test Case 2',
+                  },
+                  {
+                    _id: 'testcase-2',
+                    name: 'Test Case 2',
+                  },
               ];
 
             let treeData = selectedAvoproject
@@ -548,9 +559,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                 <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" />
                                                             </div>
 
-                                                           
-      <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
-   
+                                                           <div className="avotest__data">
+                                                         <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
+                                                         </div>
                                                         </div>
                                                             {/* {
                                                                 selectedAvoproject ?
