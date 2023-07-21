@@ -93,7 +93,7 @@ const CompareObjectList = (props) => {
             compareContent={
                 <div className="ss__compareContents">
                     <div className="ss__comparebtngroup">
-                        {changedObj && changedObj.length && <button className="ss__compareAction" onClick={updateObjects}>Update</button>}
+                        {(changedObj && changedObj.length) ? <button className="ss__compareAction" onClick={updateObjects}>Update</button> : null}
                         <button className="ss__compareAction" onClick={closeCompare}>Cancel</button>
                     </div>
                     <div className="ss__compareboxes">
