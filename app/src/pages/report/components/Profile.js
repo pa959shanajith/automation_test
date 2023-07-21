@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import HSBar from "react-horizontal-stacked-bar-chart";
 import { Column } from "primereact/column";
+import { NavLink } from 'react-router-dom';
 import { Breadcrumbs, Link } from "@mui/material";
 import AvoInput from "../../../globalComponents/AvoInput";
 import "./Profile.scss";
@@ -138,7 +139,7 @@ const Profile = () => {
                         {}
                       )
                     ).reduce((ac, cv) => ac + cv, 0)} Executed`,
-                    color: "#6a5acd",
+                    color: "#605BFF",
                   },
                   {
                     value: Object.keys(
@@ -161,7 +162,7 @@ const Profile = () => {
                           )[e]
                       )
                       .reduce((ac, cv) => ac + cv, 0),
-                    color: "#808080",
+                    color: "#DEE2E6",
                   },
                 ]}
               />
@@ -342,7 +343,7 @@ const Profile = () => {
                         {}
                       )
                     ).reduce((ac, cv) => ac + cv, 0)} Executed`,
-                    color: "#6a5acd",
+                    color: "#605BFF",
                   },
                   {
                     value: Object.keys(
@@ -365,7 +366,7 @@ const Profile = () => {
                           )[e]
                       )
                       .reduce((ac, cv) => ac + cv, 0),
-                    color: "#808080",
+                    color: "#DEE2E6",
                   },
                 ]}
               />
@@ -486,9 +487,11 @@ const Profile = () => {
   const tableHeader = () => {
     return (
       <div className="flex flex-column">
-        <div className="exeprofile_txt">{location?.state?.execution}</div>
         <div className="flex justify-content-between align-items-center">
-          <div>Execution List</div>
+          <div>
+            <NavLink to="/reports" className="pi pi-angle-left"></NavLink>
+            Execution List : {location?.state?.execution}
+          </div>
           <div className="search_container">
             <AvoInput
               icon="pi pi-search"
@@ -549,7 +552,7 @@ const Profile = () => {
                     (ac, cv) => ac + cv,
                     0
                   )} Executed`,
-                  color: "#6a5acd",
+                  color: "#605BFF",
                 },
                 {
                   value: Object.keys(e.testSuites)
@@ -558,7 +561,7 @@ const Profile = () => {
                     )
                     .map((el) => e.testSuites[el])
                     .reduce((ac, cv) => ac + cv, 0),
-                  color: "#808080",
+                  color: "#DEE2E6",
                 },
               ]}
             />
@@ -619,7 +622,7 @@ const Profile = () => {
                     (ac, cv) => ac + cv,
                     0
                   )} Executed`,
-                  color: "#6a5acd",
+                  color: "#605BFF",
                 },
                 {
                   value: Object.keys(e.testCases)
@@ -631,7 +634,7 @@ const Profile = () => {
                     )
                     .map((el) => e.testCases[el])
                     .reduce((ac, cv) => ac + cv, 0),
-                  color: "#808080",
+                  color: "#DEE2E6",
                 },
               ]}
             />
