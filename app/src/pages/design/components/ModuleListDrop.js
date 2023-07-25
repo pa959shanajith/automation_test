@@ -118,7 +118,7 @@ const ModuleListDrop = (props) =>{
    
     useEffect(()=> {
         if(!preventDefaultModule && !dontShowFirstModules ) {
-            if(moduleLists.length > 0) {
+            if(moduleLists.length > 0 && moduleLists.find((module) => module.type==='basic')) {
                 const showDefaultModuleIndex = moduleLists.findIndex((module) => module.type==='basic');
                 selectModule(moduleLists[showDefaultModuleIndex]._id, moduleLists[showDefaultModuleIndex].name, moduleLists[showDefaultModuleIndex].type, false,true); 
         }}
@@ -130,7 +130,8 @@ const ModuleListDrop = (props) =>{
      useEffect(()=> {
         return () => {
             dispatch(isEnELoad(false));
-            // dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
+            // this comment is removed when auto save of mod will effect default mod
+            // dispatch(dontShowFirstModule(false))
         }
      // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);
@@ -504,7 +505,7 @@ const ModuleListDrop = (props) =>{
     }
       const handleEditE2E=async()=>{
         setInitialText(false)
-        const editDataE2E = []
+        
         if(moduleSelect.type=== "endtoend"){
            setE2EName(moduleSelect.name)}
            const editE2EData  = moduleSelect.children.map((item)=>{
@@ -514,14 +515,15 @@ const ModuleListDrop = (props) =>{
                 // projectID:item.projectID
               }
            })
-           for (let i = 0; i < editE2EData.length; i++) {
-            const { scenarioID, scenarioName } = editE2EData[i];
-            const data = await updateE2E(editE2EData[i].scenarioID);
-            const updatedData = Object.assign({}, data, { scenarioID, scenarioName });
-            editDataE2E.push(updatedData);
-          }
-           const e2eData = editDataE2E.map((item)=>{
-            return{ sceName:item.scenarioName,
+           const editDataE2E = await updateE2E(editE2EData.map((scenario) => scenario.scenarioID));
+          //  for (let i = 0; i < editE2EData.length; i++) {
+          //   const { scenarioID, scenarioName } = editE2EData[i];
+          //   const data = await updateE2E([editE2EData[i].scenarioID]);
+          //   const updatedData = Object.assign({}, data, { scenarioID, scenarioName });
+          //   editDataE2E.push(updatedData);
+          // }
+           const e2eData = editDataE2E.map((item, idx)=>{
+            return{ sceName:editE2EData[idx].scenarioName,
               scenarioId: item.scenarioID,
               modName:item.module_name,
               projName:item.proj_name
@@ -854,7 +856,7 @@ setPreventDefaultModule(true);
                          {/* <MemorizedCheckboxSelectionDemo/> */}
                         {/* <CheckboxSelectionDemo /> */}
                         <div>
-                          {overlayforNoModSce?<h5 className='overlay4ModSce'>There are no Test Suites and TestCases in this project ...</h5>: 
+                          {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and TestCases in this project ...</h5>: 
                           <>
                           {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and TestCases...</h5>:
                             <Tree

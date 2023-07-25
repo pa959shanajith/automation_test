@@ -10,6 +10,8 @@ import FooterTwo from './components/FooterTwo';
 import ResetSession from './components/ResetSession';
 import Thumbnail from './components/Thumbnail';
 import Footer from './components/FooterTwo';
+import ValidationExpression from './components/ValidationExpression';
+
 
 export { 
         ProgressBar,
@@ -26,4 +28,5 @@ export {
         ResetSession,
         Thumbnail,
         Footer,
+        ValidationExpression,
     };
