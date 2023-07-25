@@ -274,8 +274,47 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
     const onAvoProjectChange = async (e) => {
         dispatchAction(selectedAvoproject(e.target.value));
-        if (avoProjectsList.length) {
-            setListofScenarios(avoProjectsList.filter(el => el.project_id === e.target.value)[0]['scenario_details'])
+        if(avoProjectsList.length){
+            let filterScns = avoProjectsList.filter(el => el.project_id === e.target.value)[0]['scenario_details'] || [];
+            setListofScenarios(filterScns);
+
+            const dummyTestCases = [
+                {
+                  _id: 'testcase-1',
+                  name: 'Test Case 1',
+                },
+                {
+                  _id: 'testcase-2',
+                  name: 'Test Case 2',
+                },
+                {
+                    _id: 'testcase-2',
+                    name: 'Test Case 2',
+                  },
+                  {
+                    _id: 'testcase-2',
+                    name: 'Test Case 2',
+                  },
+                  {
+                    _id: 'testcase-2',
+                    name: 'Test Case 2',
+                  },
+              ];
+
+            let treeData = selectedAvoproject
+                ? filterScns.map((scenario) => ({
+                    key: scenario._id,
+                    label: scenario.name,
+                    data: { type: 'scenario' },
+                    children: dummyTestCases.map((testCase) => ({
+                        key: testCase._id,
+                        label: testCase.name,
+                        data: { type: 'testCase' },
+                      })),
+                })) 
+                
+                : []
+                setTreeData(treeData);
         }
     }
     const handleClick = useCallback((value, id, summary) => {
@@ -436,6 +475,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                 {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}
                                                                 <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
                                                             </div>
+
+                                                           <div className="avotest__data">
+                                                         <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
+                                                         </div>
                                                         </div>
                                                         {
                                                             selectedAvoproject ?
