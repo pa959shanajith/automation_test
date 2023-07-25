@@ -44,22 +44,8 @@ function CompareElement(props) {
     );
   };
 
-  console.log(changedObj)
-  console.log(notChangedObj)
-
   const replaceHandler = () => {
     dispatch(ImpactAnalysisScreenLevel(true));
-    //  <MapElement 
-    //           // notFoundList={notFoundObj}
-    //           // changedObj={changedObj}
-    //           // notChangedObj={notChangedObj}
-    //           isOpen={"mapObject"}
-    //           toastSuccess={props.toastSuccess}
-    //           toastError={props.toastError}
-    //           orderList={props.orderList}
-    //           fetchingDetails={props.fetchingDetails}
-    //           fetchScrapeData={props.fetchScrapeData}
-    //   ></MapElement>
   }
 
   const accordinHedaernotFoundElem = () => {
@@ -218,5 +204,4 @@ function CompareElement(props) {
 }
 
 export default CompareElement
-{/* COMPARE ELEMENT  */ }
 
