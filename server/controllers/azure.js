@@ -161,7 +161,6 @@ exports.connectAzure_ICE = function(req, res) {
             if(req.body.projects && req.body.projects.length){
                 project = req.body.projects.filter((el) => el.key === req.body.project)[0]['text'];
             }
-             
             var issuetype = req.body.issuetype;
             var url =req.body.url;
             var username= req.body.username;

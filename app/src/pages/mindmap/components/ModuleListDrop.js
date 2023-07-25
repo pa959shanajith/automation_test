@@ -20,6 +20,7 @@ const ModuleListDrop = (props) =>{
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
     const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
     const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
+    const dontShowFirstModule = useSelector(state=>state.mindmap.dontShowFirstModule)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
@@ -52,7 +53,7 @@ const ModuleListDrop = (props) =>{
 
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
     useEffect(()=> {
-        if(!searchForNormal && !isCreateE2E ) {
+        if(!searchForNormal && !isCreateE2E && !dontShowFirstModule ) {
             if(moduleList.length > 0) {
                 const showDefaultModuleIndex = moduleList.findIndex((module) => module.type==='basic');
                 selectModule(moduleList[showDefaultModuleIndex]._id, moduleList[showDefaultModuleIndex].name, moduleList[showDefaultModuleIndex].type, false,true); 
@@ -65,6 +66,7 @@ const ModuleListDrop = (props) =>{
         return () => {
             dispatch({type:actionTypes.IS_ENELOAD,payload:false});
             dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
+            dispatch({type:actionTypes.Dont_Show_First_Module,payload:false})
         }
      },[]);
      useEffect (()=>{
@@ -410,7 +412,7 @@ const ModuleListDrop = (props) =>{
                                 </div>
                             </div>
                         </div>
-                    </div>
+                      </div>
                     </div>
                 </div>
                 

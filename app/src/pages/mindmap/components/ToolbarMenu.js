@@ -50,6 +50,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
+        dispatch({type:actionTypes.Dont_Show_First_Module,payload:false})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         // setselectedProjectNameForDropdown(proj);
         if(!isEnELoad){

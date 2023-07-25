@@ -184,7 +184,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
                 var details = {
                     "web":{"data":{"icon":"Web"},"key":"Web","text":"Web","title":"Web","img":"web"},
-                    "webservice":{"data":{"icon":"Webservice"},"key":"Web Service","text":"WebService","title":"Web Service","img":"webservice"},
+                    "webservice":{"data":{"icon":"Webservice"},"key":"Web service","text":"Webservice","title":"Web service","img":"webservice"},
                     "desktop":{"data":{"icon":"Desktop"},"key":"Desktop Apps","text":"Desktop","title":"Desktop Apps","img":"desktop"},
                     "oebs":{"data":{"icon":"OEBS"},"key":"Oracle Apps","text":"OEBS","title":"Oracle Apps","img":"oracleApps"},
                     "mobileapp":{"data":{"icon":"MobileApp"},"key":"Mobile Apps","text":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
@@ -633,7 +633,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         </div>
                         <div>
                             <div>
-                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px",marginTop:'-0.9rem' }} 
+                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} 
                             onClick={async()=>{
                                if(createProjectCheck){
                                     try{
