@@ -14,10 +14,12 @@ import { screenType } from '../settingSlice'
 import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
-import { resetIntergrationLogin, resetScreen,selectedProject,
-        selectedIssue,selectedTCReqDetails,selectedTestCase,
-        syncedTestCases,mappedPair,selectedScenarioIds,
-        selectedAvoproject } from '../settingSlice';
+import {
+    resetIntergrationLogin, resetScreen, selectedProject,
+    selectedIssue, selectedTCReqDetails, selectedTestCase,
+    syncedTestCases, mappedPair, selectedScenarioIds,
+    selectedAvoproject
+} from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Checkbox } from 'primereact/checkbox';
@@ -29,9 +31,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
     // selectors
     const currentProject = useSelector(state => state.setting.selectedProject);
     const currentIssue = useSelector(state => state.setting.selectedIssue);
-    const selectedZTCDetails = useSelector(state=>state.setting.selectedZTCDetails);
-    const selectedScIds = useSelector(state=>state.setting.selectedScenarioIds);
-    const selectedAvo = useSelector(state=>state.setting.selectedAvoproject);
+    const selectedZTCDetails = useSelector(state => state.setting.selectedZTCDetails);
+    const selectedScIds = useSelector(state => state.setting.selectedScenarioIds);
+    const selectedAvo = useSelector(state => state.setting.selectedAvoproject);
     // state
     const [activeIndex, setActiveIndex] = useState(0);
     const [activeIndexViewMap, setActiveIndexViewMap] = useState(0);
@@ -40,19 +42,20 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
     const [isSpin, setIsSpin] = useState(false);
     const [checked, setChecked] = useState(false);
-    const [projectDetails,setProjectDetails] = useState([]);
-    const [issueTypes,setIssueTypes] = useState([]);
-    const [disableIssue,setDisableIssue] = useState(true)
+    const [projectDetails, setProjectDetails] = useState([]);
+    const [issueTypes, setIssueTypes] = useState([]);
+    const [disableIssue, setDisableIssue] = useState(true)
     const [testCaseData, setTestCaseData] = useState([]);
-    const [selected,setSelected]=useState(false);
+    const [selected, setSelected] = useState(false);
     const [selectedId, setSelectedId] = useState('');
     const [selectedSummary, setSelectedSummary] = useState('');
     const [disabled, setDisabled] = useState(true);
-    const [avoProjects , setAvoProjects]= useState([]);
-    const [avoProjectsList , setAvoProjectsList]= useState(null);
-    const [enableBounce , setEnableBounce]= useState(false);
+    const [avoProjects, setAvoProjects] = useState([]);
+    const [avoProjectsList, setAvoProjectsList] = useState(null);
+    const [enableBounce, setEnableBounce] = useState(false);
     const [checkedTestcase, setCheckedTestcase] = useState(false);
-    const [listofScenarios,setListofScenarios] = useState([]);
+    const [listofScenarios, setListofScenarios] = useState([]);
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
 
 
     // const [proj, setProj] = useState('');
@@ -69,7 +72,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const handleSubmit = () => {
         setIsSpin(true);
-        console.log(' login clicked');
+        // console.log(reduxDefaultselectedProject);
+
         switch (selectedscreen.name) {
             case 'jira':
                 callLogin_Jira();
@@ -105,9 +109,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "fail") setToast("error", "Error", "Fail to Login");
         else if (domainDetails === "notreachable") setToast("error", "Error", "Host not reachable.");
         else if (domainDetails) {
-            if(Object.keys(domainDetails).length && domainDetails.projects){
-                setProjectDetails(domainDetails.projects.map((el) => {return {label:el.name , value:el.code, key:el.id}}))
-                setIssueTypes(domainDetails.issue_types.map((el) => {return {label:el.name , value:el.id, key:el.id}}))
+            if (Object.keys(domainDetails).length && domainDetails.projects) {
+                setProjectDetails(domainDetails.projects.map((el) => { return { label: el.name, value: el.code, key: el.id } }))
+                setIssueTypes(domainDetails.issue_types.map((el) => { return { label: el.name, value: el.id, key: el.id } }))
             }
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
@@ -120,7 +124,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const integrationItems = [
-        { label: 'AML' },
+        { label: 'ALM' },
         { label: 'Cloud Based Integration' },
     ];
 
@@ -225,20 +229,20 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setDisableIssue(false);
         console.log(e.target.value, ' project e');
         // const releaseId = e.target.value;
-        const projectScenario =await api.getAvoDetails("6440e7b258c24227f829f2a4");
+        const projectScenario = await api.getAvoDetails("6440e7b258c24227f829f2a4");
         if (projectScenario.error)
             setToast("error", "Error", projectScenario.error);
         else if (projectScenario === "unavailableLocalServer")
             setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
         else if (projectScenario === "scheduleModeOn")
             setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
-        else if (projectScenario === "Invalid Session"){
+        else if (projectScenario === "Invalid Session") {
             setToast("error", "Error", 'Invalid Session');
         }
         else if (projectScenario && projectScenario.avoassure_projects && projectScenario.avoassure_projects.length) {
             // setProjectDetails(projectScenario.project_dets);
-            setAvoProjectsList(projectScenario.avoassure_projects); 
-            setAvoProjects(projectScenario.avoassure_projects.map((el,i) => {return {label:el.project_name , value:el.project_id, key:i}}));  
+            setAvoProjectsList(projectScenario.avoassure_projects);
+            setAvoProjects(projectScenario.avoassure_projects.map((el, i) => { return { label: el.project_name, value: el.project_id, key: i } }));
             // setSelectedRel(releaseId);  
             // clearSelections();
         }
@@ -251,80 +255,80 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(selectedIssue(e.target.value));
         let projectName = projectDetails.filter(el => el.value === currentProject)[0]['label'];
         let issueName = issueTypes.filter(el => el.value === e.target.value)[0]['label'];
-        let jira_info ={
+        let jira_info = {
             project: projectName,
-            action:'getJiraTestcases',
+            action: 'getJiraTestcases',
             issuetype: "",
-            itemType:issueName, 
+            itemType: issueName,
             url: loginDetails.url,
             username: loginDetails.username,
             password: loginDetails.password,
             project_data: [],
-            key:currentProject
+            key: currentProject
         }
         const testData = await api.getJiraTestcases_ICE(jira_info)
-        if(testData){
+        if (testData) {
             setTestCaseData(testData.testcases)
         }
         setEnableBounce(false);
     }
     const onAvoProjectChange = async (e) => {
         dispatchAction(selectedAvoproject(e.target.value));
-        if(avoProjectsList.length){
+        if (avoProjectsList.length) {
             setListofScenarios(avoProjectsList.filter(el => el.project_id === e.target.value)[0]['scenario_details'])
         }
     }
-    const handleClick= useCallback((value, id,summary)=>{
+    const handleClick = useCallback((value, id, summary) => {
         let newSelectedTCDetails = { ...selectedZTCDetails };
-        let newSelectedTC = [...value,summary];
-       setSelected(value)
-       setSelectedId(id)
-       setSelectedSummary(summary)
-       setDisabled(true)
-       dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
+        let newSelectedTC = [...value, summary];
+        setSelected(value)
+        setSelectedId(id)
+        setSelectedSummary(summary)
+        setDisabled(true)
+        dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
         dispatchAction(syncedTestCases([]));
         dispatchAction(selectedTestCase(newSelectedTC));
-    },[])
+    }, [])
 
     const handleSync = useCallback(() => {
         let popupMsg = false;
         let currentProject = projectDetails.filter(el => el.value === currentProject)[0];
         let releaseId = issueTypes.filter(el => el.value === currentIssue)[0]['label'];
-             if(selectedScIds.length===0){
-                 popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
-             }
-             else if(selectedId===''){
-                 popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
-             }
-             else if(selectedId===selectedId && selectedScIds.length>1) {
-                 popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
-             }
-     
-             if (popupMsg) setMsg(popupMsg);
-             else{
-                // label:el.name , value:el.code, key:el.id
-                     const mappedPairObj=[
-                             {
-                                 projectId: currentProject.id, 
-                                 projectCode: currentProject.code,
-                                 projectName: currentProject.label,        
-                                 testId: selectedId,
-                                 testCode: selected, 
-                                 scenarioId: selectedScIds,
-                                 itemType:releaseId,
-                                 itemSummary:selectedSummary
-                                
- 
-                             }
-                         ];
-                         dispatchAction(mappedPair(mappedPairObj));
-                         console.log(mappedPairObj);
-                         dispatchAction(syncedTestCases(selected));
-             }
-         setDisabled(false);
-     },[])
+        if (selectedScIds.length === 0) {
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+        }
+        else if (selectedId === '') {
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+        }
+        else if (selectedId === selectedId && selectedScIds.length > 1) {
+            popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+        }
 
-     const handleUnSync = useCallback(() => {
+        if (popupMsg) setMsg(popupMsg);
+        else {
+            // label:el.name , value:el.code, key:el.id
+            const mappedPairObj = [
+                {
+                    projectId: currentProject.id,
+                    projectCode: currentProject.code,
+                    projectName: currentProject.label,
+                    testId: selectedId,
+                    testCode: selected,
+                    scenarioId: selectedScIds,
+                    itemType: releaseId,
+                    itemSummary: selectedSummary
+
+
+                }
+            ];
+            dispatchAction(mappedPair(mappedPairObj));
+            console.log(mappedPairObj);
+            dispatchAction(syncedTestCases(selected));
+        }
+        setDisabled(false);
+    }, [])
+
+    const handleUnSync = useCallback(() => {
         dispatchAction(mappedPair([]));
         dispatchAction(syncedTestCases([]));
         dispatchAction(selectedTestCase([]));
@@ -332,27 +336,35 @@ const ManageIntegrations = ({ visible, onHide }) => {
         // clearSelections();
         setDisabled(true)
         setSelected(false)
-    },[])
+    }, [])
 
-    const logoutTab = {
-        label: '',
-        content: null,
-        template: (
-          <Button label={selectedscreen.name && `${selectedscreen.name} Logout`} onClick={showLogin} className="logout__btn" />
-        ),
-      };
+    // const logoutTab = {
+    //     label: '',
+    //     content: null,
+    //     template: (
+    //       <Button label={selectedscreen.name && `${selectedscreen.name} Logout`} onClick={showLogin} className="logout__btn" />
+    //     ),
+    //   };
 
-      if (!showLoginCard) {
-        integrationItems.push(logoutTab);
-      }
+    //   if (!showLoginCard) {
+    //     integrationItems.push(logoutTab);
+    //   }
 
     const footerIntegrations = (
         <div className='btn-11'>
-            <Button label="Save" severity="primary" className='btn1' />
+            {activeIndex === 0 &&(
+                <div className="btn__2">
+                    <Button label="Save" severity="primary" className='btn1' />
+                    <Button label="Cancel" onClick={showLogin} size="small" className="logout__btn" />
+                </div>)}
+
+                {activeIndex === 1 && (
+                <Button label="Cancel" onClick={showLogin} size="small" className="cancel__btn" />)}
+
         </div>
     );
 
-    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2}  />, [isSpin,showCard2])
+    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} selectedscreen={selectedscreen} handleIntegration={handleIntegration} />, [isSpin, showCard2, selectedscreen, handleIntegration])
 
 
     return (
@@ -360,37 +372,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
             <div className="card flex justify-content-center">
                 <Dialog className="manage_integrations" header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations : ""}>
                     <div className="card">
-                        <TabMenu model={integrationItems} />
+                        {showLoginCard ? <TabMenu model={integrationItems} /> : ""}
                     </div>
 
 
                     {showLoginCard ? (
                         <>
-                            <div className="login_container_integrations">
-                                <div className="side-panel">
-                                    <div className={`icon-wrapper ${selectedscreen?.name === 'jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'jira', code: 'NY' })}>
-                                        <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
-                                        <span className="text__jira">Jira</span>
-                                    </div>
-                                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Zephyr', code: 'RM' })}>
-                                        <span><img src="static/imgs/azure_devops_icon.svg" className="img__azure"></img></span>
-                                        <span className="text__azure">Azure DevOps</span>
-                                    </div>
-                                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Azure DevOps', code: 'LDN' })}>
-                                        <span><img src="static/imgs/zephyr_icon.svg" className="img__zephyr"></img></span>
-                                        <span className="text__zephyr">Zephyr</span>
-                                    </div>
-                                    <div className={`icon-wrapper ${selectedscreen?.name === 'qTest' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'qTest', code: 'LDN' })}>
-                                        <span><img src="static/imgs/qTest_icon.svg" className="img__qtest"></img></span>
-                                        <span className="text__qtest">qTest</span>
-                                    </div>
-                                    <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'ALM', code: 'LDN' })}>
-                                        <span><img src="static/imgs/ALM_icon.svg" className="img__alm"></img></span>
-                                        <span className="text__alm">ALM</span>
-                                    </div>
-                                </div>
-                                {IntergrationLogin}
-                            </div>
+                            {IntergrationLogin}
                         </>
                     ) : (
                         <div>
@@ -406,62 +394,63 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <span className="release_span"> Select Release<span style={{ color: 'red' }}>*</span></span>
                                                         </div>
                                                         <div className="dropdown-map">
-                                                            <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e) } placeholder="Select Project" />
+                                                            <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e)} placeholder="Select Project" />
                                                             <Dropdown disabled={disableIssue} style={{ width: '11rem', height: '2.5rem' }} value={currentIssue} className="dropdown_release" options={issueTypes} onChange={(e) => onIssueChange(e)} placeholder="Select Release" />
                                                         </div>
                                                     </div>
                                                     <div className="testcase__data">
-                                                            {
-                                                                testCaseData && testCaseData.length ?
-                                                                    testCaseData.map((e, i) => (
-                                                                        <div className={"test_tree_leaves" + (selected === e.code ? " test__selectedTC" : "")}>
-                                                                            <label className="test__leaf" title={e.code} onClick={() => handleClick(e.code, e.id, e.summary)}>
+                                                        {
+                                                            testCaseData && testCaseData.length ?
+                                                                testCaseData.map((e, i) => (
+                                                                    <div className={"test_tree_leaves" + (selected === e.code ? " test__selectedTC" : "")}>
+                                                                        <label className="test__leaf" title={e.code} onClick={() => handleClick(e.code, e.id, e.summary)}>
                                                                             <Checkbox onChange={e => setCheckedTestcase(e.checkedTestcase)} checked={checkedTestcase} />
-                                                                                <span className="leafId"><Tag style={{background: 'purple', width:'6rem', height:'2rem', position:'relative', top:'0.2rem'}}>{e.code}</Tag></span>
-                                                                                <span className="test__tcName" title={e.summary}>{e.summary.trim().length>35?e.summary.substr(0,35)+"...":e.summary} </span>
-                                                                            </label>
-                                                                        </div>
-                                                                    ))
-                                                                    :
-                                                                    enableBounce && 
-                                                                    <div className="bouncing-loader">
-                                                                        <div></div>
-                                                                        <div></div>
-                                                                        <div></div>
+                                                                            <span className="leafId">{e.code}</span>
+                                                                            <span className="test__tcName" title={e.summary}>{e.summary.trim().length > 35 ? e.summary.substr(0, 35) + "..." : e.summary} </span>
+                                                                        </label>
                                                                     </div>
+                                                                ))
+                                                                :
+                                                                enableBounce &&
+                                                                <div className="bouncing-loader">
+                                                                    <div></div>
+                                                                    <div></div>
+                                                                    <div></div>
+                                                                </div>
 
-                                                            }
+                                                        }
                                                     </div>
                                                 </Card>
                                             </div>
-                                             <span>
-                                                <img className="map__btn" src="static/imgs/map_button_icon.svg"/>
-                                             </span>
+                                            <span>
+                                                <img className="map__btn" src="static/imgs/map_button_icon.svg" />
+                                            </span>
                                             <div>
                                                 <div className="card_data2">
                                                     <Card className="mapping_data_card2">
                                                         <div className="dropdown_div">
                                                             <div className="dropdown-map">
-                                                                <span>Select Project <span style={{ color: 'red' }}>*</span></span>
+                                                                <span>Selected Project <span style={{ color: 'red' }}>*</span></span>
                                                             </div>
                                                             <div className="dropdown-map">
-                                                                <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" />
+                                                                {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}
+                                                                <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
                                                             </div>
                                                         </div>
-                                                            {
-                                                                selectedAvoproject ?
-                                                                listofScenarios.map((e,i)=> (<div
+                                                        {
+                                                            selectedAvoproject ?
+                                                                listofScenarios.map((e, i) => (<div
                                                                     key={i}
                                                                     className={"scenario__listItem"}
                                                                     title={e.name}
-                                                                    // onClick={(event) => { selectScenarioMultiple(event, e._id); }}
+                                                                // onClick={(event) => { selectScenarioMultiple(event, e._id); }}
                                                                 >
                                                                     {e.name}
                                                                 </div>))
-                                                                     :
-                                                                    null
+                                                                :
+                                                                null
 
-                                                            }
+                                                        }
                                                     </Card>
                                                 </div>
                                             </div>
@@ -502,14 +491,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                     </TabPanel>
 
                                 </TabView>
+
                             </div>
-
-
                         </div>
                     )}
 
 
-<Toast ref={toast} position="bottom-center" baseZIndex={1000} />
+                    <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
             </div>
 
