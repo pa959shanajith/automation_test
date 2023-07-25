@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useRef } from "react";
+import React, { useCallback, useMemo, useState, useRef, useEffect } from "react";
 import { Dialog } from 'primereact/dialog';
 import { TabMenu } from 'primereact/tabmenu';
 import { Dropdown } from 'primereact/dropdown';
@@ -23,8 +23,8 @@ import {
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Checkbox } from 'primereact/checkbox';
-import { Tag } from 'primereact/tag';
-
+import { Tree } from 'primereact/tree';
+// import { checkboxTemplate } from './path/to/checkboxTemplate';
 
 
 const ManageIntegrations = ({ visible, onHide }) => {
@@ -56,6 +56,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [checkedTestcase, setCheckedTestcase] = useState(false);
     const [listofScenarios, setListofScenarios] = useState([]);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    const [treeData, setTreeData] = useState([]);
+    const [selectedNodes, setSelectedNodes] =useState([]);
 
 
     // const [proj, setProj] = useState('');
@@ -192,6 +194,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         onHide();
     }
 
+    
+
     const dropdownOptions = [
         { label: 'Option 1', value: 'option1' },
         { label: 'Option 2', value: 'option2' },
@@ -205,6 +209,29 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const showCard2 = () => {
         handleSubmit();
     };
+
+    const onCheckboxChange = (nodeKey) => {
+        const nodeIndex = selectedNodes.indexOf(nodeKey);
+        const newSelectedNodes = [...selectedNodes];
+        if (nodeIndex !== -1) {
+          newSelectedNodes.splice(nodeIndex, 1);
+        } else {
+          newSelectedNodes.push(nodeKey);
+        }
+        setSelectedNodes(newSelectedNodes);
+      };
+
+    const checkboxTemplate = (node) => {
+        return (
+            <div>
+          <Checkbox
+            checked={selectedNodes.includes(node.key)}
+            onChange={() => onCheckboxChange(node.key)}
+          />
+          <span>{node.label}</span>
+          </div>
+        );
+      };
 
     const showLogin = () => {
         dispatchAction(resetIntergrationLogin());
@@ -222,6 +249,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setListofScenarios([]);
         dispatchAction(selectedAvoproject(''))
     };
+
+    useEffect(() => {
+        onAvoProjectChange(reduxDefaultselectedProject.projectId);
+      }, [showLogin]);
 
     const onProjectChange = async (e) => {
         e.preventDefault();
@@ -273,9 +304,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setEnableBounce(false);
     }
     const onAvoProjectChange = async (e) => {
-        dispatchAction(selectedAvoproject(e.target.value));
+        dispatchAction(selectedAvoproject(reduxDefaultselectedProject.projectId));
         if(avoProjectsList.length){
-            let filterScns = avoProjectsList.filter(el => el.project_id === e.target.value)[0]['scenario_details'] || [];
+            let filterScns = avoProjectsList.filter(el => el.project_id === reduxDefaultselectedProject.projectId)[0]['scenario_details'] || [];
             setListofScenarios(filterScns);
 
             const dummyTestCases = [
@@ -394,11 +425,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
             {activeIndex === 0 &&(
                 <div className="btn__2">
                     <Button label="Save" severity="primary" className='btn1' />
-                    <Button label="Cancel" onClick={showLogin} size="small" className="logout__btn" />
+                    <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
                 </div>)}
 
                 {activeIndex === 1 && (
-                <Button label="Cancel" onClick={showLogin} size="small" className="cancel__btn" />)}
+                <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
 
         </div>
     );
@@ -473,27 +504,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             </div>
                                                             <div className="dropdown-map">
                                                                 {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}
-                                                                <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
+                                                               <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
                                                             </div>
 
                                                            <div className="avotest__data">
-                                                         <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
+                                                           <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
                                                          </div>
                                                         </div>
-                                                        {
-                                                            selectedAvoproject ?
-                                                                listofScenarios.map((e, i) => (<div
-                                                                    key={i}
-                                                                    className={"scenario__listItem"}
-                                                                    title={e.name}
-                                                                // onClick={(event) => { selectScenarioMultiple(event, e._id); }}
-                                                                >
-                                                                    {e.name}
-                                                                </div>))
-                                                                :
-                                                                null
-
-                                                        }
                                                     </Card>
                                                 </div>
                                             </div>
