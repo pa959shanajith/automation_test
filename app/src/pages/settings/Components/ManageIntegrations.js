@@ -223,12 +223,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const checkboxTemplate = (node) => {
         return (
-            <div>
+            <div style={{width: '100%'}}>
           <Checkbox
             checked={selectedNodes.includes(node.key)}
             onChange={() => onCheckboxChange(node.key)}
           />
-          <span>{node.label}</span>
+          <span>{node.label} </span>
+          <i className="pi pi-times" style={{ float: 'right'}}></i>
           </div>
         );
       };
