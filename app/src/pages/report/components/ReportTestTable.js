@@ -1,12 +1,15 @@
-import React, {useEffect, useState} from 'react'; 
+import React, {useEffect, useRef, useState} from 'react'; 
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Chart } from 'primereact/chart';
-import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { TreeTable } from 'primereact/treetable';
 import { Button } from 'primereact/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { viewReport} from '../api';
+import { InputText } from 'primereact/inputtext';
+import "../styles/ReportTestTable.scss"
+import { OverlayPanel } from 'primereact/overlaypanel';
+import { Checkbox } from 'primereact/checkbox';
 
 export default function BasicDemo() {
     const navigate = useNavigate()
@@ -16,6 +19,14 @@ export default function BasicDemo() {
     const [reportData,setReportData] = useState([]);
     const [reportViewData, setReportViewData] = useState([]);
     const [expandedKeys, setExpandedKeys] = useState(null);
+    const [searchTest, setSearchTest] = useState('');
+    const filterRef = useRef(null);
+    const filterValues = [
+        { name: 'Pass', key: 'P' },
+        { name: 'Fail', key: 'F' },
+        { name: 'Terminated', key: 'T' }
+    ];
+    const [selectedFilter, setSelectedFilter] = useState([]);
 
     useEffect(() => {
         const documentStyle = getComputedStyle(document.documentElement);
@@ -63,11 +74,11 @@ export default function BasicDemo() {
         const parent = [];
         if (reportData && Array.isArray(reportData.rows)) {
             for (const obj of reportData.rows) {
-                if (obj.hasOwnProperty('Step')) {
-                    if (!parent[parent.length - 1].children) {
+                if (obj.hasOwnProperty('Step') && obj?.Step !== "Terminated") {
+                    if (!parent[parent.length - 1] && parent[parent.length - 1]?.children) {
                         parent[parent.length - 1].children = [obj];  // Push the new object into parent array
                     } else {
-                        parent[parent.length - 1].children.push(obj); // Push the object into existing children array
+                        parent[parent.length - 1] && parent[parent.length - 1]?.children.push(obj); // Push the object into existing children array
                     }
                 } else {
                     parent.push(obj); // Push the object into parent array
@@ -121,47 +132,101 @@ export default function BasicDemo() {
     //             </DataTable>
     //     );
     // };
-    const handdleExpend = (e) =>{
-        setExpandedKeys(e.value)
-    }
+    const handdleExpend = (e) => {
+      setExpandedKeys(e.value);
+    };
+
+    const onFilterChange = (e) => {
+        let _selectedFilters = [...selectedFilter];
+        
+        if (e.checked)
+        _selectedFilters.push(e.value);
+        else {
+            _selectedFilters = _selectedFilters.filter(category => category.key !== e.value.key);
+        }
+        setSelectedFilter(_selectedFilters);
+        setSearchTest(_selectedFilters[0]?.name ? _selectedFilters[0].name : "");
+    };
+
+    const getTableHeader = (
+      <div className="grid">
+        <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+            <img src="static/imgs/chrome_icon.svg" alt='chrome icon' />
+            <img src="static/imgs/edge_icon.svg" alt='edge icon' />
+            <img src="static/imgs/safari_icon.svg" alt='safari icon' />
+        </div>
+        <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex justify-content-center align-items-center">
+          <div className="p-input-icon-left">
+            <i className="pi pi-search"></i>
+            <InputText
+              type="search"
+              className='search_testCase'
+              onInput={(e) => setSearchTest(e.target.value)}
+              placeholder="Search for Test Cases"
+            />
+          </div>
+        </div>
+        <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex justify-content-end">
+            <Button type="button" icon="pi pi-filter" label="Add Filter" outlined onClick={(e) => {filterRef.current.toggle(e)}} />
+        </div>
+      </div>
+    );
 
     return (
-        <div>
-        <Button label="Back" onClick={()=>handdleViweReportsBack()} size="small" outlined />
+      <div className="reportsTable_container">
+        <Button
+          label="Back"
+          onClick={() => handdleViweReportsBack()}
+          size="small"
+          outlined
+        />
         <div className="cards">
-            <TabView>
-                <TabPanel header="Summary">
-                    <div className='flex-row flex justify-content-around'>
-                        <p className='grid flex-column'>
-                            <p>Avo Assure version</p>
-                            <p>startEnd</p>
-                            <p>Elapsed</p>
-                            <p>Total Test Cases</p>
-                            <p>Local OS</p>
-                            <p>Platfrom</p>
-                        </p>
-                        <div className="card flex justify-content-center">
-                            <Chart type="doughnut" data={chartData} options={chartOptions} className="w-full md:w-15rem" />
-                        </div>
-                    </div>
-                </TabPanel>
-                <TabPanel header="Execution Settings">
-                    <p className="m-0">
-                        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, 
-                        eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo
-                        enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui 
-                        ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-                    </p>
-                </TabPanel>
-                <TabPanel header="Execution Environment">
-                    <p className="m-0">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti 
-                        quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in
-                        culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. 
-                        Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.
-                    </p>
-                </TabPanel>
-            </TabView>
+          <TabView>
+            <TabPanel header="Summary">
+              <div className="flex-row flex justify-content-around">
+                <p className="grid flex-column">
+                  <p>Avo Assure version</p>
+                  <p>startEnd</p>
+                  <p>Elapsed</p>
+                  <p>Total Test Cases</p>
+                  <p>Local OS</p>
+                  <p>Platfrom</p>
+                </p>
+                <div className="card flex justify-content-center">
+                  <Chart
+                    type="doughnut"
+                    data={chartData}
+                    options={chartOptions}
+                    className="w-full md:w-15rem"
+                  />
+                </div>
+              </div>
+            </TabPanel>
+            <TabPanel header="Execution Settings">
+              <p className="m-0">
+                Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
+                quae ab illo inventore veritatis et quasi architecto beatae
+                vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia
+                voluptas sit aspernatur aut odit aut fugit, sed quia
+                consequuntur magni dolores eos qui ratione voluptatem sequi
+                nesciunt. Consectetur, adipisci velit, sed quia non numquam eius
+                modi.
+              </p>
+            </TabPanel>
+            <TabPanel header="Execution Environment">
+              <p className="m-0">
+                At vero eos et accusamus et iusto odio dignissimos ducimus qui
+                blanditiis praesentium voluptatum deleniti atque corrupti quos
+                dolores et quas molestias excepturi sint occaecati cupiditate
+                non provident, similique sunt in culpa qui officia deserunt
+                mollitia animi, id est laborum et dolorum fuga. Et harum quidem
+                rerum facilis est et expedita distinctio. Nam libero tempore,
+                cum soluta nobis est eligendi optio cumque nihil impedit quo
+                minus.
+              </p>
+            </TabPanel>
+          </TabView>
         </div>
         <br></br>
         {/* <DataTable value={reportViewData} expandedRows={expandedRows}  onRowToggle={(e) => setExpandedRows(e.data)}
@@ -178,17 +243,45 @@ export default function BasicDemo() {
             <Column  header="Azure Defect ID"/>
             <Column header='Action'/>
         </DataTable> */}
-        <TreeTable value={treeData} expandedKeys={expandedKeys} dataKey='id' onToggle={(e) => handdleExpend(e)} tableStyle={{ minWidth: '50rem' }} >
-            <Column field="slno" header="S No." expander/>
-            <Column field='Step' header='Steps'/>
-            <Column field='StepDescription' header="Description" />
-            <Column field="EllapsedTime" header="Time Elapsed"/>
-            <Column field="status" header="Status"/>
-            <Column field='Comments' header='Comments'/>
-            <Column  header="Jira Defect ID"/>
-            <Column  header="Azure Defect ID"/>
-            <Column header='Action'/>
+        <TreeTable
+          globalFilter={searchTest}
+          header={getTableHeader}
+          value={treeData}
+          expandedKeys={expandedKeys}
+          dataKey="id"
+          onToggle={(e) => handdleExpend(e)}
+          tableStyle={{ minWidth: "50rem" }}
+        >
+          <Column field="slno" header="S No." expander />
+          <Column field="Step" header="Steps" />
+          <Column field="StepDescription" header="Description" />
+          <Column field="EllapsedTime" header="Time Elapsed" />
+          <Column field="status" header="Status" />
+          <Column field="Comments" header="Comments" />
+          <Column header="Jira Defect ID" />
+          <Column header="Azure Defect ID" />
+          <Column header="Action" />
         </TreeTable>
-        </div>
-    )
+        <OverlayPanel ref={filterRef} className="reports_download">
+          {filterValues.map((category) => {
+            return (
+              <div key={category.key} className="flex align-items-center">
+                <Checkbox
+                  inputId={category.key}
+                  name="category"
+                  value={category}
+                  onChange={onFilterChange}
+                  checked={selectedFilter.some(
+                    (item) => item?.key === category?.key
+                  )}
+                />
+                <label htmlFor={category.key} className="ml-2">
+                  {category.name}
+                </label>
+              </div>
+            );
+          })}
+        </OverlayPanel>
+      </div>
+    );
 }
