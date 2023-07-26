@@ -13,9 +13,10 @@ import { useSelector } from 'react-redux';
 const  ProjectCreation=() =>{
     const navigate = useNavigate();
     const [visible, setVisible] = useState(false );
+    const [handleManageProject, setHandleManageProject] = useState(false)
 
     let userInfo = useSelector((state) => state.landing.userinfo);
-    userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    // userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
     const handleClick = () => {
         navigate("/admin");
@@ -23,6 +24,7 @@ const  ProjectCreation=() =>{
 
     const handleOpenDialog = () => {
         setVisible(true); 
+        setHandleManageProject(false)
       };
     
       const handleCloseDialog = () => {
@@ -40,7 +42,7 @@ const  ProjectCreation=() =>{
           {userInfo.rolename === "Test Manager" ? (
             <Card className="CreateProj-card"  id='Createproj-title' title="Do you want to create a new project?" >
               <Button className="CreateProj_btn" size="small"  onClick={handleOpenDialog} >Create Project</Button> 
-              <CreateProject visible={visible} onHide={handleCloseDialog} /> 
+              <CreateProject visible={visible} onHide={handleCloseDialog} setHandleManageProject={setHandleManageProject} handleManageProject={handleManageProject}/> 
             </Card>  ) : null}
           {/* </div> */}
 

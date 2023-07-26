@@ -8,9 +8,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from 'primereact/toast';
 import { Avatar } from 'primereact/avatar';
-import { getUserDetails, userCreateProject_ICE } from '../api';
+import { getUserDetails, userCreateProject_ICE ,getUsers_ICE , userUpdateProject_ICE} from '../api';
 import { useSelector, useDispatch } from 'react-redux';
-
 import { loadUserInfoActions } from '../LandingSlice';
 
 
@@ -18,7 +17,7 @@ import { loadUserInfoActions } from '../LandingSlice';
 
 
 
-const CreateProject = ({ visible, onHide }) => {
+const CreateProject = (props) => {
   const [value, setValue] = useState('');
   const [selectedApp, setSelectedApp] = useState(null);
   const toast = useRef(null);
@@ -37,87 +36,113 @@ const CreateProject = ({ visible, onHide }) => {
   const [refreshData, setRefreshData] = useState(false);
   let userInfo = useSelector((state) => state.landing.userinfo);
   const [isInvalidProject, setIsInvalidProject] = useState(false);
+  const [createProjectCheck,setCreateProjectCheck]=useState(true);
+  const [unassignedUsers, setUnassignedUsers] = useState([]);
+  const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
+  const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
 
-
-  // const loggedInUser = {
-  //   name: userInfo.username,
-  //   role:userInfo.rolename,
-  //   id: userInfo.user_id
-  // };
-
- 
   const userDetails = async () => {
     userInfo = JSON.parse(localStorage.getItem('userInfo'));
     try {
-      const userData = await getUserDetails("user");
-      const formattedData = userData.map((user) => {
-        const [name, id, , primaryRole, firstname, lastname, email] = user;
-        return { id, name, primaryRole, firstname, lastname, email };
-      });
-      let loggedInUser = null;
-      let newFormattedData = [];
-      for (let item of formattedData) {
-        if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
-          if(item.id ===  userInfo.user_id) {
-            loggedInUser = {
-              ...item, selectedRole: "",
+      let userData = [];
+      if(props.handleManageProject) {
+        const users_obj = await getUsers_ICE(reduxDefaultselectedProject.projectId);
+        console.log(users_obj)
+        userData = users_obj["unassignedUsers"];
+        let formattedData = [];
+        for(let user of userData) {
+          const {name, _id, defaultrole, firstname, lastname, email} = user;
+          formattedData.push({ id: _id, name, primaryRole: defaultrole.name, firstname, lastname, email });
+        }
+        // const formattedData = userData.map((user) => {
+        //   const {name, _id, defaultrole, firstname, lastname, email} = user;
+        //   return { id: _id, name, primaryRole: defaultrole, firstname, lastname, email };
+        // });
+        let newFormattedData = [];
+        for (let item of formattedData) {
+          if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
+            newFormattedData.push({
+              ...item, selectedRole: '',
               initials: getInitials(item.firstname, item.lastname)
-            };
-          } else {
-            newFormattedData.push(
-              {
-                ...item, selectedRole: '',
-                initials: getInitials(item.firstname, item.lastname)
-              }
-            )
+            });
           }
         }
+        setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
+        setDisplayUser(users_obj["assignedUsers"].map((user)=> ({
+          email: user.email,
+          firstname: user.firstname,
+          id: user._id,
+          initials: getInitials(user.firstname, user.lastname),
+          lastname: user.lastname,
+          name: user.name,
+          primaryRole: user.assignedrole.name,
+          selectedRole: user.assignedrole.name
+        })));
+        const selectedProjectAppType = appTypes.find(appTypes => appTypes.value === reduxDefaultselectedProject.appType);
+        setSelectedApp({code:selectedProjectAppType.code, image:selectedProjectAppType.image, name:selectedProjectAppType.name});
+        setValue(reduxDefaultselectedProject.projectName);
+        console.log(selectedProjectAppType.name);
+      } else {
+        userData = await getUserDetails("user");
+        const formattedData = userData.map((user) => {
+          const [name, id, , primaryRole, firstname, lastname, email] = user;
+          return { id, name, primaryRole, firstname, lastname, email };
+        });
+        let loggedInUser = null;
+        let newFormattedData = [];
+        for (let item of formattedData) {
+          if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
+            if(item.id ===  userInfo.user_id) {
+              loggedInUser = {
+                ...item, selectedRole: "",
+                initials: getInitials(item.firstname, item.lastname)
+              };
+            } else {
+              newFormattedData.push(
+                {
+                  ...item, selectedRole: '',
+                  initials: getInitials(item.firstname, item.lastname)
+                }
+              )
+            }
+          }
+        }
+        setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
+        setDisplayUser([loggedInUser]);
       }
-      setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
-      setDisplayUser([loggedInUser]);
-      // setItems(formattedData
-      //   .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-      //   .filter(item => item.primaryRole !== "Admin")
-      //   .sort((a, b) => a.name.localeCompare(b.name))
-      //   .filter((item) => {
-      //     console.log('item', item.id);
-      //     console.log('userInfo.user_id', userInfo.user_id);
-      //     console.log('item.id === userInfo.user_id', item.id === userInfo.user_id);
-      //     if(item.id === userInfo.user_id){
-      //       loggedInUser = item;
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   })
-      //   .map(item => ({
-      //     ...item, selectedRole: '',
-      //     initials: getInitials(item.firstname, item.lastname)
-      //   }))
-      // );
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    userDetails()
-  }, [])
 
   function getInitials(firstname, lastname) {
     const initials = firstname.charAt(0).toUpperCase() + lastname.charAt(0).toUpperCase();
     return initials;
   }
 
+console.log(reduxDefaultselectedProject);
   const apps = [
     { name: 'Web', code: 'Web', image: 'static/imgs/web.png' },
     { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png' },
     { name: 'Web Services', code: 'Webservice', image: 'static/imgs/webService.png' },
-    { name: 'Mainframe', code: 'Mainframe', image: '/static/imgs/mainframe.png' },
+    { name: 'Mainframe', code: 'Mainframe',image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png' },
     { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png' },
+    { name: 'System Application', code: 'SystemApp',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
+  ];
+  const appTypes = [
+    { name: 'Web', code: 'Web',value:'5db0022cf87fdec084ae49b6', image: 'static/imgs/web.png' },
+    { name: 'SAP', code: 'SAP', value:'5db0022cf87fdec084ae49b4', image: 'static/imgs/SAP.svg' },
+    { name: 'Oracle Applications', code: 'OEBS', value:'5db0022cf87fdec084ae49b3', image: 'static/imgs/OEBS.svg' },
+    { name: 'Desktop', code: 'Desktop', value:'5db0022cf87fdec084ae49af', image: 'static/imgs/desktop.png' },
+    { name: 'Web Services', code: 'Webservice',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/webService.png' },
+    { name: 'Mainframe', code: 'Mainframe', value:'5db0022cf87fdec084ae49b0',image: '/static/imgs/mainframe.png' },
+    { name: 'Mobile Web', code: 'MobileWeb',value:"5db0022cf87fdec084ae49b2", image: 'static/imgs/mobileWeb.png' },
+    { name: 'Mobile Application', code: 'MobileApp',value:'5db0022cf87fdec084ae49b1', image: '/static/imgs/mobileApps.png' },
+    { name: 'System Application', code: 'SystemApp',value:'5db0022cf87fdec084ae49b1',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
 
   const roles = [
@@ -125,7 +150,6 @@ const CreateProject = ({ visible, onHide }) => {
     { name: 'Test Lead' },
     { name: 'QA' },
   ];
-
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -165,24 +189,25 @@ const CreateProject = ({ visible, onHide }) => {
     setQueryDisplayUser(event.target.value);
   }
 
-  function getFilteredItems() {
-    return items
-      .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-      .filter(item => item.primaryRole !== "Admin")
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(item => ({ ...item, selectedRole: '' }));
-  }
+  // function getFilteredItems() {
+  //   return items
+  //     .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+  //     .filter(item => item.primaryRole !== "Admin")
+  //     .sort((a, b) => a.name.localeCompare(b.name))
+  //     .map(item => ({ ...item, selectedRole: '' }));
+  // }
 
 
-  function getFilteredDisplayUser() {
-    return displayUser
-      .filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }
+  // function getFilteredDisplayUser() {
+  //   return displayUser
+  //     .filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
+  //     .sort((a, b) => a.name.localeCompare(b.name));
+  // }
 
   const handleClose = () => {
-    onHide();
+    // props.onHide;
     setRefreshData(!refreshData);
+    props.setHandleManageProject(false);
   };
 
   const handleButtonClick = () => {
@@ -195,7 +220,7 @@ const CreateProject = ({ visible, onHide }) => {
       (item) => selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
     );
 
-
+   console.log(props.handleManageProject)
 
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
@@ -257,6 +282,13 @@ const CreateProject = ({ visible, onHide }) => {
 
   };
 
+  const handleAppTypeChange = (e)=>{
+    if (e && e.value) {
+      setSelectedApp(e.value);
+      console.log(e.value);
+    }
+  }
+
 
   const handleRoleChange = (e, id) => {
     const newItems = [...items];
@@ -279,16 +311,12 @@ const CreateProject = ({ visible, onHide }) => {
     userDetails()
   }, [refreshData])
 
-  // const toastErrorMsg = (errMsg) => {
-  //   toastError.current.show({severity: "error",summary: "Invalid Project Name", detail:"Special characters are not allowed in the project name", life: 10000,});
-  // }
-
   const handleValueChange = (event) => {
     setValue(event.target.value);
     setIsInvalidProject(event.target.value === "invalid_name_spl");
   };
 
-
+/////////////// CREATE PROJECT///////////////////////////////////////////
   const handleCreate = async () => {
     if (value !== "" && selectedApp !== "" && displayUser.length !== 0) {
       const filteredUserDetails = displayUser.map((user) => ({
@@ -320,22 +348,51 @@ const CreateProject = ({ visible, onHide }) => {
       });
   
       dispatch(loadUserInfoActions.savedNewProject(true));
-      onHide();
+      props.onHide();
       setRefreshData(!refreshData);
     }
   };
 
+  /////////////////////////////////////// MANAGE PROJECT////////////////////////////////////////////////////////////////
+ const handleUpdateProject = async () => {
 
+    const filteredUserDetails = displayUser.map((user) => ({
+      id: user.id,
+      name: user.name,
+      role: !user.selectedRole.name ? user.primaryRole : user.selectedRole.name
+    }));
 
+    var upadtedProjData = {
+      projectName: value,
+      type: selectedApp.code,
+      assignedUsers: filteredUserDetails,
+      domain: "banking",
+      project_id : reduxDefaultselectedProject.projectId,
+      releases: [{ name: "R1", cycles: [{ name: "C1" }] }],
+    };
 
-  const handleCloseToast = () => {
-    setShowToast(false);
-  };
+    const manageProject= await userUpdateProject_ICE(upadtedProjData)
+
+    toast.current.show({
+      severity: "success",
+      summary: "Project Modified Successfully",
+      detail: "Project Modified Successfully",
+      life: 5000,
+    });
+     props.onHide();
+
+  }
+
+  const dialogHeader = props.handleManageProject ? 'Manage Project' : 'Create Project';
+
+  const isDisabledProjectName = props.handleManageProject;
+  const isDisabledAppType = props.handleManageProject;
+
 
   const footerContent = (
     <div className='btn-11'>
       <Button label="Cancel" severity="secondary" text className='btn1' onClick={handleClose} />
-      <Button className="btn2" label='Create' disabled={value === "" || selectedApp === "" || displayUser.length === 0} onClick={handleCreate}></Button>
+      <Button className="btn2" label={props.handleManageProject ? 'Update': 'Create'} disabled={value === "" || selectedApp === "" || displayUser.length === 0} onClick={props.handleManageProject ? handleUpdateProject : handleCreate}></Button>
     </div>
   );
   const optionTemplate = (option) => {
@@ -351,16 +408,16 @@ const CreateProject = ({ visible, onHide }) => {
   return (
     <>
       <Toast ref={toast} position="bottom-right" baseZindex={10000}/>
-      <Dialog className='Project-Dialog' header="Create Project" visible={visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>
+      <Dialog className='Project-Dialog' header={dialogHeader} visible={props.visible} style={{ width: "74.875rem" }} onHide={props.onHide} footer={footerContent}>
         <Card className='project-name-1'>
           <div className='pro-name1'>
-            < h5 className='proj__name'> Project Name <span className="imp-cls"> * </span> </h5>
-            <InputText  className={`proj-input ${isInvalidProject ? 'p-invalid' : ''}`} value={value}  onChange={handleValueChange} placeholder="Enter Project Name" />
+            < h5 className='proj__name' disabled={isDisabledProjectName} style={{opacity:!isDisabledAppType ? 1 : 0.5, cursor:isDisabledProjectName ? 'not-allowed ' : 'pointer'}} > Project Name <span className="imp-cls"> * </span> </h5>
+            <InputText  className={`proj-input ${isInvalidProject ? 'p-invalid' : ''}`} value={value}  onChange={handleValueChange}  disabled={isDisabledProjectName} style={{opacity:!isDisabledAppType ? 1 : 0.6,background: !isDisabledAppType ? '' :'lightgray',color:'black' , cursor:isDisabledProjectName ? 'not-allowed ' : 'pointer'}} placeholder="Enter Project Name" />
             {isInvalidProject && (
           <small className="p-error error-message">Special characters are not allowed in the project name</small> )}
             <div className='dropdown-1'>
-              <h5 className='application__name'>Application Type <span className="imp-cls"> * </span></h5>
-              <Dropdown value={selectedApp} onChange={(e) => setSelectedApp(e.value)} options={apps} optionLabel="name"
+              <h5 className='application__name' disabled={isDisabledAppType}  style={{opacity:!isDisabledAppType ? 1 : 0.5,  cursor:isDisabledAppType ? 'not-allowed ' : 'pointer'}}>Application Type <span className="imp-cls"> * </span></h5>
+              <Dropdown value={selectedApp} onChange={(e) =>handleAppTypeChange(e)} options={apps} disabled={isDisabledAppType}  style={{opacity:!isDisabledAppType ? 1 : 0.6, background:!isDisabledAppType ? '' :'lightgray',color:'black' , cursor:!isDisabledAppType ?'pointer' : 'not-allowed' ,}} optionLabel="name"
                 placeholder="Select an Application Type" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " />
             </div>
           </div>
@@ -390,10 +447,10 @@ const CreateProject = ({ visible, onHide }) => {
             <div className="check2">
               {items.map(item => (
 
-                <div key={item.id} className="users-list">
+             <div key={item.id} className="users-list" title={item.email}>
                   <Checkbox className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id} checked={selectedCheckboxes.some((cb) => cb.id === item.id)} onChange={handleCheckboxChange} />
-                  <h5 htmlFor={`checkbox-${item.id}`} className="label-2 ml-2 mr-2 mt-2 mb-2" title={item.email} >
-                    <div className='user-info' >
+                  <div htmlFor={`checkbox-${item.id}`} className="label-2 ml-2 mr-2 mt-2 mb-2" >
+                    <div  className='user-info' >
                       <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '27px', height: '26px' }} >{item.initials}</Avatar></span>
                       <div className='name_And_Role'>
                         <span className='user-name'> {item.name}</span>
@@ -402,7 +459,7 @@ const CreateProject = ({ visible, onHide }) => {
                       </div>
                     </div>
 
-                  </h5>
+                  </div>
                   <div className='role__dd'>
                     <Dropdown value={(item.selectedRole) ? item.selectedRole : ''} onChange={(e) => handleRoleChange(e, item.id)} options={roles} optionLabel="name"
                       placeholder="Select a Role" className="role-dropdown" />
