@@ -22,7 +22,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
-import { ContextMenu } from 'primereact/contextMenu';
+import { ContextMenu } from 'primereact/contextmenu';
 import { deletedNodes } from '../designSlice';
 import { showGenuis } from '../../global/globalSlice';
 

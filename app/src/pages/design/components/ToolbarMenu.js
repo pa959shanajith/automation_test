@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import Legends from './Legends';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Divider } from 'primereact/divider';
-import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes } from '../designSlice'
+import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
 
 
 
@@ -50,6 +50,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
+        dispatch(dontShowFirstModule(false))
         dispatch(selectedProj(proj))
         // setselectedProjectNameForDropdown(proj);
         // if(!isEnELoad){

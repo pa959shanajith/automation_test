@@ -1,0 +1,72 @@
+@import "../../global/styles/ColorVariables.scss";
+.form-group-ldap{
+    margin-bottom:15px;
+    padding-top:0;
+    max-height:20rem ;
+    overflow-y: auto;
+}
+.adminForm-ldap {
+	padding-top: 2%;
+}
+.leftControl-ldap {
+	float: left;
+	width: 47%;
+}
+.title-ldap{
+    font-size: 18px;
+}
+.admin-ldap__secure{
+    margin-bottom:2%
+}
+.ldapCert__lable{
+    cursor:pointer;
+}
+.ldapCert__lable-false{
+    cursor:not-allowed;
+}
+.certInput-ldap{
+    margin-top:5px;
+}
+.ldapcert-span{
+    width:auto !important;
+    font-weight:normal !important;
+}
+.ldapcert-upload{
+    width:auto !important;
+    margin-right:10px;
+}
+#binddn:disabled , #bindCredentials:disabled{
+    cursor: not-allowed;
+    background-color: $whisper;
+    opacity: 1;
+}
+.certTextarea-ldap {
+    margin-top: 5px;
+    width: calc(100% - 130px);
+    height: 150px;
+    font-size: 12px;
+    resize: none;
+    float: right;
+    outline: 0;
+}
+.certTextarea-edit{
+    height:70px;
+}
+
+#ldapCertValue{
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $backgroundTwo;
+        border: 1px solid transparent;
+        border-left-color: $borderThree;
+        border-right-color: $borderThree;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px; 
+    }
+}
+.ldap-credentials{
+    padding-bottom: 30px;
+}
