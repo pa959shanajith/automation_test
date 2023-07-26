@@ -9,9 +9,10 @@ import "./Profile.scss";
 import { Badge } from "primereact/badge";
 import { Tree } from "primereact/tree";
 import { reportsBar } from "../../utility/mockData";
-import { useLocation } from "react-router-dom";
-import { getReportList, getTestSuite } from "../api";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getReportList, getTestSuite} from "../api";
 import { Button } from "primereact/button";
+import { FooterTwo } from "../../global";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
@@ -20,6 +21,9 @@ const Profile = () => {
   const [testCase, setTestCase] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [logData, setLogData] = useState({});
+  const [logPath, setLogPath] = useState({});
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -96,7 +100,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete" ||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -123,7 +128,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete" ||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -152,7 +158,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete" ||
+                          item === "Fail"
                       )
                       .map(
                         (e) =>
@@ -177,7 +184,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter((el) => el === "Pass" || el === "fail")
+                  .filter((el) => el === "Pass" || el === "Fail")
                   .map((item, ind) => {
                     return {
                       value: el.scenarioStatus.reduce(
@@ -199,7 +206,7 @@ const Profile = () => {
                                 )
                               )
                                 .filter(
-                                  (key) => key === "Pass" || key === "fail"
+                                  (key) => key === "Pass" || key === "Fail"
                                 )
                                 .reduce((obj, key) => {
                                   return Object.assign(obj, {
@@ -257,7 +264,15 @@ const Profile = () => {
       ],
     });
   };
-
+//  const handleViweReports =  async (reportid) =>{
+//     const win = window.open("/reports/viewReports", "_blank"); 
+//     win.focus();
+//     localStorage['executionReportId'] = reportid;
+//     localStorage['logData'] = JSON.stringify(logData[reportid]);
+//     localStorage['logPath'] = logPath;
+//     localStorage['reportPage'] = "landing";
+//   }
+ 
   const onTestCaseClick = async (row, parentRow) => {
 
     const testCaseList = await getTestSuite({
@@ -300,7 +315,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete" ||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -327,7 +343,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete" ||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -356,7 +373,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete" ||
+                          item === "Fail"
                       )
                       .map(
                         (e) =>
@@ -381,7 +399,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter((el) => el === "Pass" || el === "fail")
+                  .filter((el) => el === "Pass" || el === "Fail")
                   .map((item, ind) => {
                     return {
                       value: el.scenarioStatus.reduce(
@@ -403,7 +421,7 @@ const Profile = () => {
                                 )
                               )
                                 .filter(
-                                  (key) => key === "Pass" || key === "fail"
+                                  (key) => key === "Pass" || key === "Fail"
                                 )
                                 .reduce((obj, key) => {
                                   return Object.assign(obj, {
@@ -430,12 +448,14 @@ const Profile = () => {
                   ...item,
                   downLoad: <i className="pi pi-download"></i>,
                   statusView: (
-                    <Button
+                    <NavLink to='/reports/viewReports' state={{id: item._id}}>
+                      <Button
                       label="View"
                       severity="secondary"
                       size="small"
                       outlined
                     />
+                    </NavLink>
                   ),
                 }))}
               >
@@ -571,17 +591,17 @@ const Profile = () => {
             <HSBar
               showTextIn
               data={Object.keys(e.testSuites)
-                .filter((el) => el === "Pass" || el === "fail")
+                .filter((el) => el === "pass" || el === "fail")
                 .map((item, ind) => ({
                   value: e.testSuites[item],
                   description:
-                    item === "Pass"
-                      ? `${e.testCases[item]} / ${Object.values(
-                          Object.keys(e.testCases)
-                            .filter((key) => key === "Pass" || key === "fail")
+                    item === "pass"
+                      ? `${e.testSuites[item]} / ${Object.values(
+                          Object.keys(e.testSuites)
+                            .filter((key) => key === "pass" || key === "fail")
                             .reduce((obj, key) => {
                               return Object.assign(obj, {
-                                [key]: e.testCases[key],
+                                [key]: e.testSuites[key],
                               });
                             }, {})
                         ).reduce((ac, cv) => ac + cv, 0)} Passed`
@@ -603,7 +623,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete" ||
+                          item === "Fail"
                       )
                       .map((el) => e.testCases[el])
                       .reduce((ac, cv) => ac + cv, 0),
@@ -614,7 +635,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete" ||
+                          item === "Fail"
                       )
                       .map((el) => e.testCases[el])
                       .reduce((ac, cv) => ac + cv, 0)
@@ -630,7 +652,8 @@ const Profile = () => {
                       (item) =>
                         item === "Terminate" ||
                         item === "Skipped" ||
-                        item === "Incomplete"
+                        item === "Incomplete" ||
+                        item === "Fail"
                     )
                     .map((el) => e.testCases[el])
                     .reduce((ac, cv) => ac + cv, 0),
@@ -644,7 +667,7 @@ const Profile = () => {
             <HSBar
               showTextIn
               data={Object.keys(e.testCases)
-                .filter((el) => el === "Pass" || el === "fail")
+                .filter((el) => el === "Pass" || el === "Fail")
                 .map((item, ind) => {
                   return {
                     value: e.testCases[item],
@@ -652,7 +675,7 @@ const Profile = () => {
                       item === "Pass"
                         ? `${e.testCases[item]} / ${Object.values(
                             Object.keys(e.testCases)
-                              .filter((key) => key === "Pass" || key === "fail")
+                              .filter((key) => key === "Pass" || key === "Fail")
                               .reduce((obj, key) => {
                                 return Object.assign(obj, {
                                   [key]: e.testCases[key],
@@ -680,12 +703,8 @@ const Profile = () => {
   };
 
   return (
+    <>
     <div className="profile_container">
-      <Breadcrumbs>
-        <Link>Home</Link>
-        <Link>Reports</Link>
-        <Link>Executions</Link>
-      </Breadcrumbs>
       <DataTable
         value={reportsTable}
         tableStyle={{ minWidth: "50rem" }}
@@ -710,6 +729,8 @@ const Profile = () => {
         ))}
       </DataTable>
     </div>
+    <div><FooterTwo/></div>
+    </>
   );
 };
 
