@@ -43,6 +43,10 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
+import { loadUserInfoActions } from '../../landing/LandingSlice'
+
+
+
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
@@ -123,6 +127,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
+
+  const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+
+  const initProj = selectProjects.projectId;
+  console.log(selectProjects)
 
   const displayError = (error) => {
     // setLoading(false)
@@ -420,14 +429,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const ExecuteTestSuite = async (executionData, btnType) => {
     if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
-    const modul_Info = parseLogicExecute(
-      eachData,
-      currentTask,
-      appType,
-      moduleInfo,
-      accessibilityParameters,
-      ""
-    );
+    const modul_Info = parseLogicExecute(eachData,currentTask, appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
     // setLoading("Sending Execution Request");
     executionData["source"] = "task";
@@ -542,6 +544,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
+                setAppType(item.executionRequest.batchInfo[0].appType);
                 setCurrentSelectedItem(item);
                 setConfigItem(idx);
                 console.log(fetechConfig, configItem)
@@ -712,7 +715,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: "Web",
+            appType: appType,
             domainName: "Banking",
             projectName: getConfigData?.projects[0]?.name,
             projectId: configProjectId,
@@ -1151,6 +1154,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
+                  disabled={selectProjects.appType!=="5db0022cf87fdec084ae49b7"}
+                  defaultChecked={selectProjects.appType==="5db0022cf87fdec084ae49b7"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
                       setShowIcePopup(false);
