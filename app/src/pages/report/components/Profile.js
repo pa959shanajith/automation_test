@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import HSBar from "react-horizontal-stacked-bar-chart";
 import { Column } from "primereact/column";
@@ -10,16 +10,18 @@ import { Badge } from "primereact/badge";
 import { Tree } from "primereact/tree";
 import { reportsBar } from "../../utility/mockData";
 import { useLocation } from "react-router-dom";
-import { getReportList, getTestSuite } from "../api";
+import { downloadReports, getReportList, getTestSuite } from "../api";
 import { Button } from "primereact/button";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { Menu } from "primereact/menu";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
   const [testSuite, setTestSuite] = useState({});
-  const [testCaseList, setTestCaseList] = useState([]);
-  const [testCase, setTestCase] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
+  const [downloadId, setDownloadId] = useState("");
   const location = useLocation();
+  const downloadRef = useRef(null);
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -428,7 +430,10 @@ const Profile = () => {
                 className="statusTable"
                 value={testsList.map((item) => ({
                   ...item,
-                  downLoad: <i className="pi pi-download"></i>,
+                  downLoad: <i className="pi pi-download" onClick={(e) => {
+                    setDownloadId(item?._id);
+                    downloadRef.current.toggle(e)
+                  }}></i>,
                   statusView: (
                     <Button
                       label="View"
@@ -679,6 +684,28 @@ const Profile = () => {
     );
   };
 
+  const onDownload = async (getId) => {
+    let data = await downloadReports({ id: downloadId, type: getId });
+
+    if (getId === "json") data = JSON.stringify(data, undefined, 2);
+
+    let filedata = new Blob([data], {
+      type: "application/" + getId + ";charset=utf-8",
+    });
+
+    if (window.navigator.msSaveOrOpenBlob)
+      window.navigator.msSaveOrOpenBlob(filedata, downloadId);
+    else {
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(filedata);
+      a.download = downloadId;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(a.href);
+      document.body.removeChild(a);
+    }
+  };
+
   return (
     <div className="profile_container">
       <Breadcrumbs>
@@ -709,6 +736,13 @@ const Profile = () => {
           />
         ))}
       </DataTable>
+      <OverlayPanel ref={downloadRef} className="reports_download">
+      <Menu model={[
+        {label: <span onClick={() => onDownload('json')}>JSON</span>, icon: 'pi pi-fw pi-file'},
+        {label: <span onClick={() => onDownload('pdf')}>PDF</span>, icon: 'pi pi-fw pi-file'},
+        {label: <span onClick={() => onDownload('pdfwithimg')}>PDF with screenshots</span>, icon: 'pi pi-fw pi-file'}
+    ]} />
+      </OverlayPanel>
     </div>
   );
 };

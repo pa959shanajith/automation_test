@@ -1,0 +1,16 @@
+{
+    "shortid": "rkE973-5l",
+    "recipe": "phantom-pdf",
+    "engine": "handlebars",
+    "modificationDate": {
+        "$$date": 1489568311172
+    },
+    "_id": "2ikqtxTiQgHPFRZd",
+    "phantom": {
+        "fitToPage": true,
+        "customPhantomJS": true,
+        "blockJavaScript": true
+    },
+    "data": null,
+    "resources": {}
+}
