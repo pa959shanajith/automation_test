@@ -64,7 +64,6 @@ const ModuleListDrop = (props) =>{
     const [allModSelected, setAllModSelected] = useState(false);
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
     const [collapseWhole, setCollapseWhole] = useState(true);
-    const [E2EName,setE2EName] = useState('')
     const [initialText, setInitialText] = useState(E2EName? false : true);
 
 
@@ -77,11 +76,14 @@ const ModuleListDrop = (props) =>{
     const [showE2EPopup, setShowE2EPopup] = useState(false);
     const [configTxt, setConfigTxt] = useState("");
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
+    const [E2EName,setE2EName] = useState('')
     const [editE2ERightBoxData,setEditE2ERightBoxData] = useState([])
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
   const [showTooltip, setShowTooltip] = useState(false);
   const [scenarioDataOnRightBox,setScenarioDataOnRightBox]= useState([])
   const [filterSceForRightBox,setFilterSceForRightBox]= useState([])
+  const [valueSearchLeftBox, setValueSearchLeftBox] = useState('');
+
 
   // const [newProjectList, setNewProjectList] = useState([]);
         const[overlayforModSce,setOverlayforModSce]=useState(false)
@@ -98,7 +100,7 @@ const ModuleListDrop = (props) =>{
           id: "",
           name: ""
         });
-        const [searchScenarioLeftBox, setSearchScenarioLeftBox] = useState('')
+        const [showDataOnSearchEmpty, setShowDataOnSearchEmpty] = useState(false)
         const [filterModSceList,setFilterModSceList] =useState([])
         // const forCatchingCheckBoxSelDemo = useMemo(()=> CheckboxSelectionDemo())
 
@@ -116,7 +118,7 @@ const ModuleListDrop = (props) =>{
    
     useEffect(()=> {
         if(!preventDefaultModule && !dontShowFirstModules ) {
-            if(moduleLists.length > 0) {
+            if(moduleLists.length > 0 && moduleLists.find((module) => module.type==='basic')) {
                 const showDefaultModuleIndex = moduleLists.findIndex((module) => module.type==='basic');
                 selectModule(moduleLists[showDefaultModuleIndex]._id, moduleLists[showDefaultModuleIndex].name, moduleLists[showDefaultModuleIndex].type, false,true); 
         }}
@@ -128,7 +130,8 @@ const ModuleListDrop = (props) =>{
      useEffect(()=> {
         return () => {
             dispatch(isEnELoad(false));
-            // dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined});
+            // this comment is removed when auto save of mod will effect default mod
+            // dispatch(dontShowFirstModule(false))
         }
      // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);
@@ -258,7 +261,7 @@ const ModuleListDrop = (props) =>{
         // }));        
         setNewModSceList(moduleScenarioData)
         setFilterModSceList(moduleScenarioData)
-          console.log("moduleScenarioData",moduleScenarioData)
+        // if(showDataOnSearchEmpty){setFilterModSceList(moduleScenarioData)}
       })();
         
 
@@ -502,7 +505,7 @@ const ModuleListDrop = (props) =>{
     }
       const handleEditE2E=async()=>{
         setInitialText(false)
-        const editDataE2E = []
+        
         if(moduleSelect.type=== "endtoend"){
            setE2EName(moduleSelect.name)}
            const editE2EData  = moduleSelect.children.map((item)=>{
@@ -512,14 +515,15 @@ const ModuleListDrop = (props) =>{
                 // projectID:item.projectID
               }
            })
-           for (let i = 0; i < editE2EData.length; i++) {
-            const { scenarioID, scenarioName } = editE2EData[i];
-            const data = await updateE2E(editE2EData[i].scenarioID);
-            const updatedData = Object.assign({}, data, { scenarioID, scenarioName });
-            editDataE2E.push(updatedData);
-          }
-           const e2eData = editDataE2E.map((item)=>{
-            return{ sceName:item.scenarioName,
+           const editDataE2E = await updateE2E(editE2EData.map((scenario) => scenario.scenarioID));
+          //  for (let i = 0; i < editE2EData.length; i++) {
+          //   const { scenarioID, scenarioName } = editE2EData[i];
+          //   const data = await updateE2E([editE2EData[i].scenarioID]);
+          //   const updatedData = Object.assign({}, data, { scenarioID, scenarioName });
+          //   editDataE2E.push(updatedData);
+          // }
+           const e2eData = editDataE2E.map((item, idx)=>{
+            return{ sceName:editE2EData[idx].scenarioName,
               scenarioId: item.scenarioID,
               modName:item.module_name,
               projName:item.proj_name
@@ -549,20 +553,17 @@ const ModuleListDrop = (props) =>{
         
         const handleSearchScenarioLeftBox =(val)=>{
           if(val === "") {
+            // setShowDataOnSearchEmpty(true)
             setFilterModSceList(newModSceList);
           } else {
-            // console.log("newModSceList",newModSceList[0].mindmapList.map((module) =>
-            // module.scenarioList))
-            // let filtereddata=newModSceList[0].mindmapList.map((module) =>
-            // module.scenarioList.filter((sce) => {
-            //   if(sce.name.toUpperCase().includes(val.toUpperCase())) return sce ;
-            // }
-            //  ))
-            // setFilterModSceList([{mindmapList: newModSceList[0].mindmapList.map((module) =>
-            //  module.scenarioList.filter((sce) => sce.name.toUpperCase().indexOf(val.toUpperCase()) !== -1)
-            //   )}]);
-            //   console.log("filter",filterModSceList)
-            //   console.log("8",filtereddata)
+            // let listOFModule = [...newModSceList[0].mindmapList];
+            let listOFModule = JSON.parse(JSON.stringify(newModSceList[0].mindmapList));
+            let filtereddata=listOFModule.map((module) => ({
+                ...module,
+                scenarioList: module.scenarioList.filter((scenarioObj) => scenarioObj.name.toUpperCase().includes(val.toUpperCase()) )
+              }))
+              .filter((module) => module.scenarioList.length > 0);
+            setFilterModSceList([{mindmapList: filtereddata}]);
           }
           // setSearchScenarioLeftBox(val);  
         }
@@ -828,8 +829,9 @@ setPreventDefaultModule(true);
                                 <i className="pi pi-search" />
                                 <InputText type="text"
                                   placeholder="Search TestCases"
+                                  value={valueSearchLeftBox}
                                   style={{ width: '15rem', height: '2.2rem', marginRight:'0.2rem', marginBottom: '1%' }}
-                                  className="inputContainer" onChange={(e)=>handleSearchScenarioLeftBox(e.target.value)}
+                                  className="inputContainer" onChange={(e)=>{setValueSearchLeftBox(e.target.value);handleSearchScenarioLeftBox(e.target.value)}}
                                 />
                               </span>
                             </div>
@@ -838,7 +840,11 @@ setPreventDefaultModule(true);
                               <Dropdown
                                 value={selectedProject}
                                 name={projectItems}
-                                onChange={(e) => changeProject(e)}
+                                onChange={(e) => {
+                                  changeProject(e);
+                                  setValueSearchLeftBox("")
+                                }}
+                                
                                 options={projectItems}
 
                                 placeholder="Select a Project"
@@ -850,7 +856,7 @@ setPreventDefaultModule(true);
                          {/* <MemorizedCheckboxSelectionDemo/> */}
                         {/* <CheckboxSelectionDemo /> */}
                         <div>
-                          {overlayforNoModSce?<h5 className='overlay4ModSce'>There are no Test Suites and TestCases in this project ...</h5>: 
+                          {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and TestCases in this project ...</h5>: 
                           <>
                           {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and TestCases...</h5>:
                             <Tree
