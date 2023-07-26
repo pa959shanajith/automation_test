@@ -14,6 +14,7 @@ import { downloadReports, getReportList, getTestSuite } from "../api";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
+import { FooterTwo } from "../../global";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
@@ -98,7 +99,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete"||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -125,7 +127,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete"||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -154,7 +157,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete"||
+                          item === "Fail"
                       )
                       .map(
                         (e) =>
@@ -179,7 +183,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter((el) => el === "Pass" || el === "fail")
+                  .filter((el) => el === "Pass" || el === "Fail")
                   .map((item, ind) => {
                     return {
                       value: el.scenarioStatus.reduce(
@@ -201,7 +205,7 @@ const Profile = () => {
                                 )
                               )
                                 .filter(
-                                  (key) => key === "Pass" || key === "fail"
+                                  (key) => key === "Pass" || key === "Fail"
                                 )
                                 .reduce((obj, key) => {
                                   return Object.assign(obj, {
@@ -302,7 +306,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete"||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -329,7 +334,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete"||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -358,7 +364,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete"||
+                          item === "Fail"
                       )
                       .map(
                         (e) =>
@@ -383,7 +390,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter((el) => el === "Pass" || el === "fail")
+                  .filter((el) => el === "Pass" || el === "Fail")
                   .map((item, ind) => {
                     return {
                       value: el.scenarioStatus.reduce(
@@ -405,7 +412,7 @@ const Profile = () => {
                                 )
                               )
                                 .filter(
-                                  (key) => key === "Pass" || key === "fail"
+                                  (key) => key === "Pass" || key === "Fail"
                                 )
                                 .reduce((obj, key) => {
                                   return Object.assign(obj, {
@@ -435,12 +442,12 @@ const Profile = () => {
                     downloadRef.current.toggle(e)
                   }}></i>,
                   statusView: (
-                    <Button
+                    <NavLink to='/reports/viewReports' state={{id: item._id}} ><Button
                       label="View"
                       severity="secondary"
                       size="small"
                       outlined
-                    />
+                    /></NavLink>
                   ),
                 }))}
               >
@@ -576,17 +583,17 @@ const Profile = () => {
             <HSBar
               showTextIn
               data={Object.keys(e.testSuites)
-                .filter((el) => el === "Pass" || el === "fail")
+                .filter((el) => el === "pass" || el === "fail")
                 .map((item, ind) => ({
                   value: e.testSuites[item],
                   description:
-                    item === "Pass"
-                      ? `${e.testCases[item]} / ${Object.values(
-                          Object.keys(e.testCases)
+                    item === "pass"
+                      ? `${e.testSuites[item]} / ${Object.values(
+                          Object.keys(e.testSuites)
                             .filter((key) => key === "Pass" || key === "fail")
                             .reduce((obj, key) => {
                               return Object.assign(obj, {
-                                [key]: e.testCases[key],
+                                [key]: e.testSuites[key],
                               });
                             }, {})
                         ).reduce((ac, cv) => ac + cv, 0)} Passed`
@@ -608,7 +615,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete"||
+                          item === "Fail"
                       )
                       .map((el) => e.testCases[el])
                       .reduce((ac, cv) => ac + cv, 0),
@@ -619,7 +627,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete"||
+                          item === "Fail"
                       )
                       .map((el) => e.testCases[el])
                       .reduce((ac, cv) => ac + cv, 0)
@@ -635,7 +644,8 @@ const Profile = () => {
                       (item) =>
                         item === "Terminate" ||
                         item === "Skipped" ||
-                        item === "Incomplete"
+                        item === "Incomplete"||
+                        item === "Fail"
                     )
                     .map((el) => e.testCases[el])
                     .reduce((ac, cv) => ac + cv, 0),
@@ -649,7 +659,7 @@ const Profile = () => {
             <HSBar
               showTextIn
               data={Object.keys(e.testCases)
-                .filter((el) => el === "Pass" || el === "fail")
+                .filter((el) => el === "Pass" || el === "Fail")
                 .map((item, ind) => {
                   return {
                     value: e.testCases[item],
@@ -657,7 +667,7 @@ const Profile = () => {
                       item === "Pass"
                         ? `${e.testCases[item]} / ${Object.values(
                             Object.keys(e.testCases)
-                              .filter((key) => key === "Pass" || key === "fail")
+                              .filter((key) => key === "Pass" || key === "Fail")
                               .reduce((obj, key) => {
                                 return Object.assign(obj, {
                                   [key]: e.testCases[key],
@@ -707,12 +717,8 @@ const Profile = () => {
   };
 
   return (
+    <>
     <div className="profile_container">
-      <Breadcrumbs>
-        <Link>Home</Link>
-        <Link>Reports</Link>
-        <Link>Executions</Link>
-      </Breadcrumbs>
       <DataTable
         value={reportsTable}
         tableStyle={{ minWidth: "50rem" }}
@@ -744,6 +750,8 @@ const Profile = () => {
     ]} />
       </OverlayPanel>
     </div>
+    <div><FooterTwo/></div>
+    </>
   );
 };
 
