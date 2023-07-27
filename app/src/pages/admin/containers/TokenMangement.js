@@ -15,7 +15,7 @@ import { Button } from 'primereact/button';
 
 const TokenManagement = (props) => {
 
-	const userInfo = useSelector(state => state.login.userinfo);
+	const userInfo = useSelector(state => state.landing.userinfo);
 
 	const [loading, setLoading] = useState(false)
 	const [op, setOp] = useState("normal")
@@ -63,7 +63,7 @@ const TokenManagement = (props) => {
 			setNameErrBorder(true);
 			return false;
 		}
-		let tokendetails;
+		let tokendetails ="720";
 		if (Object.keys(userInfo).length !== 0) {
 			tokendetails = userInfo.token;
 		}
@@ -71,6 +71,7 @@ const TokenManagement = (props) => {
 		var exptime = timeVal;
 		var today = new Date();
 		var td = new Date();
+
 		if (expdate === "") {
 			td.setHours(today.getHours() + parseInt(tokendetails));
 			var dt = td.getDate();
@@ -137,7 +138,7 @@ const TokenManagement = (props) => {
 			{loading ? <ScreenOverlay content={loading} /> : null}
 			<div className="tkn-mgmt_container">
 				<div className="content_wrapper-tkn-mgmt">
-					<TokenMgmtForm username={props.username} setUserId={setUserId} generateCIusertokens={generateCIusertokens} userConfig={userConfig} userInfo={props.userInfo} setShowList={setShowList}
+					<TokenMgmtForm username={props.username} setUserId={setUserId} generateCIusertokens={generateCIusertokens} userConfig={userConfig} userInfo={userInfo} setShowList={setShowList}
 						showList={showList} runLoadData={runLoadData} op={op} setOp={setOp}
 						dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder}
 						nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder}
