@@ -590,7 +590,7 @@ const Profile = () => {
                     item === "pass"
                       ? `${e.testSuites[item]} / ${Object.values(
                           Object.keys(e.testSuites)
-                            .filter((key) => key === "Pass" || key === "fail")
+                            .filter((key) => key === "pass" || key === "fail")
                             .reduce((obj, key) => {
                               return Object.assign(obj, {
                                 [key]: e.testSuites[key],
