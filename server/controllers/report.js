@@ -17,12 +17,12 @@ const constants = require('../lib/execution/executionConstants');
 const Handlebars = require('../lib/handlebar.js');
 
 // PDF EXPORT
-wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
-var templatepdf = '';
+// wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
+// var templatepdf = '';
 
-fs.readFile('D:\\projects\\Avo_assureDB_setup\\Webserver_Backup\\WebServer\\templates\\pdfReport\\content.handlebars', 'utf8', function(err, data) {
-    templatepdf = Handlebars.compile(data);
-});
+// fs.readFile('D:\\projects\\Avo_assureDB_setup\\Webserver_Backup\\WebServer\\templates\\pdfReport\\content.handlebars', 'utf8', function(err, data) {
+//     templatepdf = Handlebars.compile(data);
+// });
 
 let headers
 module.exports.setReq = async (req) =>
