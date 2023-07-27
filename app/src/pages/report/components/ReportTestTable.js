@@ -137,7 +137,10 @@ export default function BasicDemo() {
         </div>
       </div>
     );
-
+    const defectIDForJiraAndAzure = (rowData) => {
+        const hasChildren = rowData?.children && rowData?.children?.length > 0;
+        return hasChildren ? null :  <img src='static/imgs/bug.svg' alt='bug defect'/>;
+    }
     return (
         <div className="reportsTable_container">
             <div className="reportSummary">
@@ -169,7 +172,7 @@ export default function BasicDemo() {
                 <Column field="EllapsedTime" header="Time Elapsed"/>
                 <Column field="status" header="Status"/>
                 <Column field='Comments' header='Comments'/>
-                <Column header="No. Defect ID"/>
+                <Column header="No. Defect ID" body={defectIDForJiraAndAzure}/>
                 <Column header='Action'/>
             </TreeTable>
             <OverlayPanel ref={filterRef} className="reports_download">
