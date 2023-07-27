@@ -57,7 +57,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [listofScenarios, setListofScenarios] = useState([]);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const [treeData, setTreeData] = useState([]);
-    const [selectedNodes, setSelectedNodes] =useState([]);
+    const [selectedNodes, setSelectedNodes] = useState([]);
 
 
     // const [proj, setProj] = useState('');
@@ -194,7 +194,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         onHide();
     }
 
-    
+
 
     const dropdownOptions = [
         { label: 'Option 1', value: 'option1' },
@@ -214,25 +214,38 @@ const ManageIntegrations = ({ visible, onHide }) => {
         const nodeIndex = selectedNodes.indexOf(nodeKey);
         const newSelectedNodes = [...selectedNodes];
         if (nodeIndex !== -1) {
-          newSelectedNodes.splice(nodeIndex, 1);
+            newSelectedNodes.splice(nodeIndex, 1);
         } else {
-          newSelectedNodes.push(nodeKey);
+            newSelectedNodes.push(nodeKey);
         }
         setSelectedNodes(newSelectedNodes);
-      };
+    };
 
     const checkboxTemplate = (node) => {
-        return (
-            <div style={{width: '100%'}}>
-          <Checkbox
-            checked={selectedNodes.includes(node.key)}
-            onChange={() => onCheckboxChange(node.key)}
-          />
-          <span>{node.label} </span>
-          <i className="pi pi-times" style={{ float: 'right'}}></i>
-          </div>
-        );
-      };
+            return (
+                <div style={{width: '100%'}}>
+                    <Checkbox
+                        checked={selectedNodes.includes(node.key)}
+                        onChange={() => onCheckboxChange(node.key)}
+                    />
+          <span className="scenario_label">{node.label} </span>
+          <i className="pi pi-times unmap_icon" style={{ float: 'right'}}></i>
+                </div>
+            );
+    };
+
+    // const checkboxTemplate = (node) => {
+    //     return (
+    //         <div style={{width: '100%'}}>
+    //       <Checkbox
+    //         checked={selectedNodes.includes(node.key)}
+    //         onChange={() => onCheckboxChange(node.key)}
+    //       />
+    //       <span>{node.label} </span>
+    //       <i className="pi pi-times" style={{ float: 'right'}}></i>
+    //       </div>
+    //     );
+    //   };
 
     const showLogin = () => {
         dispatchAction(resetIntergrationLogin());
@@ -253,7 +266,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     useEffect(() => {
         onAvoProjectChange(reduxDefaultselectedProject.projectId);
-      }, [showLogin]);
+    }, [showLogin]);
 
     const onProjectChange = async (e) => {
         e.preventDefault();
@@ -306,32 +319,32 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
     const onAvoProjectChange = async (e) => {
         dispatchAction(selectedAvoproject(reduxDefaultselectedProject.projectId));
-        if(avoProjectsList.length){
+        if (avoProjectsList.length) {
             let filterScns = avoProjectsList.filter(el => el.project_id === reduxDefaultselectedProject.projectId)[0]['scenario_details'] || [];
             setListofScenarios(filterScns);
 
             const dummyTestCases = [
                 {
-                  _id: 'testcase-1',
-                  name: 'Test Case 1',
-                },
-                {
-                  _id: 'testcase-2',
-                  name: 'Test Case 2',
+                    _id: 'testcase-1',
+                    name: 'Test Case 1',
                 },
                 {
                     _id: 'testcase-2',
                     name: 'Test Case 2',
-                  },
-                  {
+                },
+                {
                     _id: 'testcase-2',
                     name: 'Test Case 2',
-                  },
-                  {
+                },
+                {
                     _id: 'testcase-2',
                     name: 'Test Case 2',
-                  },
-              ];
+                },
+                {
+                    _id: 'testcase-2',
+                    name: 'Test Case 2',
+                },
+            ];
 
             let treeData = selectedAvoproject
                 ? filterScns.map((scenario) => ({
@@ -342,11 +355,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
                         key: testCase._id,
                         label: testCase.name,
                         data: { type: 'testCase' },
-                      })),
-                })) 
-                
+                    })),
+                }))
+
                 : []
-                setTreeData(treeData);
+            setTreeData(treeData);
         }
     }
     const handleClick = useCallback((value, id, summary) => {
@@ -423,13 +436,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const footerIntegrations = (
         <div className='btn-11'>
-            {activeIndex === 0 &&(
+            {activeIndex === 0 && (
                 <div className="btn__2">
                     <Button label="Save" severity="primary" className='btn1' />
                     <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
                 </div>)}
 
-                {activeIndex === 1 && (
+            {activeIndex === 1 && (
                 <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
 
         </div>
@@ -460,11 +473,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                             <div className="card_data1">
                                                 <Card className="mapping_data_card1">
                                                     <div className="dropdown_div">
-                                                        <div className="dropdown-map">
-                                                            <span>Select Project <span style={{ color: 'red' }}>*</span></span>
-                                                            <span className="release_span"> Select Release<span style={{ color: 'red' }}>*</span></span>
+                                                        <div className="dropdown-map1">
+                                                            <span>Select Jira Project <span style={{ color: 'red' }}>*</span></span>
+                                                            <span className="release_span"> Select Jira workItems<span style={{ color: 'red' }}>*</span></span>
                                                         </div>
-                                                        <div className="dropdown-map">
+                                                        <div className="dropdown-map2">
                                                             <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e)} placeholder="Select Project" />
                                                             <Dropdown disabled={disableIssue} style={{ width: '11rem', height: '2.5rem' }} value={currentIssue} className="dropdown_release" options={issueTypes} onChange={(e) => onIssueChange(e)} placeholder="Select Release" />
                                                         </div>
@@ -493,28 +506,28 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                     </div>
                                                 </Card>
                                             </div>
-                                            <span>
-                                                <img className="map__btn" src="static/imgs/map_button_icon.svg" />
-                                            </span>
                                             <div>
                                                 <div className="card_data2">
                                                     <Card className="mapping_data_card2">
                                                         <div className="dropdown_div">
                                                             <div className="dropdown-map">
-                                                                <span>Selected Project <span style={{ color: 'red' }}>*</span></span>
+                                                                <span>Selected Avo Assure Project <span style={{ color: 'red' }}>*</span></span>
                                                             </div>
                                                             <div className="dropdown-map">
                                                                 {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}
-                                                               <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
+                                                                <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
                                                             </div>
 
-                                                           <div className="avotest__data">
-                                                           <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
-                                                         </div>
+                                                            <div className="avotest__data">
+                                                                <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
+                                                            </div>
                                                         </div>
                                                     </Card>
                                                 </div>
                                             </div>
+                                            <span>
+                                                <img className="map__btn" src="static/imgs/map_button_icon.svg" />
+                                            </span>
                                         </div>
 
                                     </TabPanel>
