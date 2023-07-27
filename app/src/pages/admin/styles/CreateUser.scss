@@ -1,0 +1,326 @@
+@import "../../global/styles/ColorVariables.scss";
+
+#page-taskName,[id^=page-taskName] {
+    float: left;
+    width: 100%;
+	margin-bottom: 10px;
+}
+#page-taskName span,[id^=page-taskName] span {
+    display: inline-block;
+    background: $primaryColorDarkest;
+    font-size: 18px;
+    color: white;
+    font: $f6_regular;
+    padding: 2px 14px 1px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+#additionalRole_options {
+    position: relative;
+    left: 10px;
+    top: 2px;
+}
+.userLDAPFetch label{
+	margin-right: 50px;
+}
+.edit-user-dropdown{
+    width: 85%;
+    background: none;
+    height: 30px;
+    
+    display: inline-block;
+    font-weight: 400;
+    color: $darkestGray;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid;
+    padding: .375rem .75rem;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  
+}
+
+.dropdown-menu-users{
+    max-height:165px;
+    overflow-y:scroll;
+    width: 85%;
+    padding: 6px;
+}
+.dropdown-menu-users>li{
+    padding: 3px 12px;
+}
+.dropdown-menu-users>li:hover{
+    background:$primaryColor;
+    border-radius: 3px;
+    color:$whiteColor;
+    cursor: pointer;
+}
+.adminActionBtn {
+	// float: right;
+	width: auto;
+    padding-right: 4rem;
+}
+.btn-disabled:disabled {
+	opacity: 0.5;
+}
+.Create-User__btn_edit:disabled {
+	opacity: 0.5;
+}
+
+
+
+
+
+
+.adminControl {
+	margin-bottom: 3%;
+    padding: 0px 0px;
+    position: relative;
+    float: left;
+    width: 100%;
+}
+
+.adminControl div span {
+    display: inline-block;
+    font-size: small;
+    width: 130px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+.adminControl div input, .adminControl div select {
+    width: calc(100% - 130px);
+}
+.userForm {
+	float: left;
+	width: 100%;
+}
+.selectRole {
+	margin-top: 2%;
+    float: left;
+    width: 50%;
+}
+.leftControl {
+	float: left;
+	width: 47%;
+}
+.primaryRole {
+	width: auto;
+	vertical-align: middle;
+	font-weight: 600;
+    line-height: 2;
+    font-size: 14px;
+}
+.selectControl {
+	position: relative;
+	left: -90px;
+}
+
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {
+    float: left;
+}
+.col-xs-9 {
+    width: 75%;
+}
+.rightControl {
+	float: right;
+	width: 50%;
+}
+.create-user__input{
+    padding-right:175px;
+}
+#userName, #icename
+{
+    text-transform: lowercase;
+}
+
+.form-control-custom{
+	border: 1px solid $borderOne !important;
+	border-left:0 !important;
+	border-right:0 !important;
+	border-top:0 !important;
+	border-radius:0;
+	box-shadow: none;
+	color:$darkGray;
+}
+
+.form-control-custom:focus {
+    box-shadow: none !important;
+}
+
+.form-control-custom-prop{
+	border: 1px solid $borderOne !important;
+	border-left:0 !important;
+	border-right:0 !important;
+	border-top:0 !important;
+	border-radius:0;
+	box-shadow: none;
+	color:$darkGray;
+}
+
+.form-control-custom-prop:focus {
+    box-shadow: none !important;
+}
+.form-control-custom.inputErrorBorderBottom{
+    border: 2px solid $redError !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0  ;
+    box-shadow: none;
+    color: $darkGray;
+}
+
+.form-control-custom-prop.inputErrorBorderBottom
+{
+    border: 2px solid $redError !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0 ;
+    box-shadow: none;
+    color: $darkGray;
+}
+
+
+.form-control__conv {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: $primaryText;
+    background-color: $whiteColor;
+    background-image: none;
+    outline: none;
+    border: 1px solid $borderTwo;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: 0;
+}
+.middle__input__border{
+    border-radius: 0;
+}
+.adminSelect {
+	padding: 0px;
+	height: 25px;
+	margin-bottom: 0;
+	width: 50%;
+	margin-left: 4%;
+	margin-top: 1%;
+	line-height: 2;
+    border: 1px solid $borderOne !important;
+    -webkit-text-stroke: thin;
+}
+.adminSelect:focus {
+	box-shadow: none !important;
+}
+.dropdown, .dropup {
+    position: relative;
+}
+
+.dropdown-menu-multiselect>li>input {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: $darkGray;
+    white-space: nowrap;
+}
+
+.dropdown-menu-multiselect>li> :hover{
+    background:$primaryColor;
+    color: $whiteColor;
+}
+
+.dropdown-menu-multiselect{
+    position: relative;
+    left: 10px;
+    margin-top: -6px;
+    z-index: 1000;
+    float: left;
+    min-width: 187px;
+    padding: 5px 0;
+    font-size: 14px;
+    text-align: left;
+    list-style: none;
+    background-color: $whiteColor;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid $medLightGray;
+    border-radius: 1px;
+
+}
+.dropdown-menu-multiselect>li{
+    border-bottom: 1px solid $borderThree;
+    margin-top: 3px;
+  }
+  
+  .dropdown-menu-multiselect>li:last-child { border-bottom: none; }
+  
+  .dropdown-menu-multiselect>li:first-child { margin-top: none; }
+
+.secondaryRole{
+	width: auto;
+	vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+}
+.chooseRole{
+    /*cursor: pointer;*/
+    float: left;
+    width: 47%;
+    vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 0px;
+    border-radius: 4px;
+    height: 25px;
+    width: 155px;
+    line-height: 1.7;
+    border: 1px solid $borderOne !important;
+    overflow: hidden;
+    line-height: 1.42857143;
+    color: $primaryText;
+    font-size: 14px;
+}
+.rolesSpan>label{
+    font-weight: normal;
+    padding-left: 7px;
+    width: calc(100% - 26px);
+  }
+  
+  .rolesSpan>input{
+    margin-top: 3px;
+    margin-left: 12px;
+  }
+  
+  .rolesSpan{
+      padding-top: 6px;
+      padding-bottom: 6px;
+  }
+.rolesChecklabel{
+    margin-bottom: 5px;
+}
+
+.role-padding{
+    padding-left: 0 ;
+}
+.createUser-container{
+    padding-top: 1rem;
+}
