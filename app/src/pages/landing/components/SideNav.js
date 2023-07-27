@@ -52,6 +52,12 @@ const SideNav = () =>{
             icon: <img src= {tabSelected==="/itdm" ? "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Avo’s intelligent Test Data Management (iTDM) solution offers production-like, relevant, and compliant data with a few clicks. It streamlines the entire test data management process making testing cost-effective and faster."  data-pr-position="right" height="25px"/>,
             disabled: true
         },
+        {
+            path: "/admin",
+            name: "Admin",
+            icon: <img src= {tabSelected==="/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="" data-pr-tooltip="Avo’s intelligent Test Data Management (iTDM) solution offers production-like, relevant, and compliant data with a few clicks. It streamlines the entire test data management process making testing cost-effective and faster."  data-pr-position="right" height="25px"/>,
+            disabled: false
+        }
     ]
     const onTabClickHandler = (event, route, disabled)=>{
         if(!disabled) setTabSelected(route);
@@ -69,19 +75,22 @@ const SideNav = () =>{
                 <div>
                     <h4 className="mb-1">Description about ITDM</h4>
                     <div className="mt-5 flex flex-wrap gap-2 justify-content-center">
-                        <Button  className="" >Buy Add-ON</Button>
+                        <Button  className="" onClick={()=> setDisableIconDialogVisible(false)}>Buy Add-ON</Button>
                     </div>
                 </div>
             </div>
         );
     };
 
+    const itdmDialogHide = () => {
+        setDisableIconDialogVisible(false)
+    }
 
     return ( 
         <>
             <div className="sidebar_container">
             <Tooltip target=".icon" mouseTrack mouseTrackLeft={20}/>
-            <Dialog visible={disableIconDialogVisible} onHide={()=> setDisableIconDialogVisible(false)} style={{ width: '30vw' }} >
+            <Dialog visible={disableIconDialogVisible} onHide={() => itdmDialogHide} style={{ width: '30vw' }} >
                 <Carousel value={ITDM_images} numVisible={1} numScroll={1} itemTemplate={ITDM_Template} />
             </Dialog>
                 <div className="sidebar">
