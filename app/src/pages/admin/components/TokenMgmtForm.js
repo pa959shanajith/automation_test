@@ -254,6 +254,8 @@ const TokenMgmtForm = (props) => {
 							className='w-full md:w-20rem pr-4'
 							onChange={(e) => setDate(e.value)}
 							showIcon
+							dateFormat="dd/mm/yy"
+							minDate={new Date()}
 							placeholder="Select Date"
 						/>
 						<Calendar id="calendar-timeonly"
