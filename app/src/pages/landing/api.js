@@ -196,4 +196,24 @@ export const getProjectsMMTS = async(data) => {
     }
 }
 
+export const getAgent = async () => {
+    try {
+        // const res = await fetch("/downloadAgent");
+        // const {status} = await res.json();
+        // if (status === "available") window.location.href = "https://localhost:8443/downloadAgent"+queryICE+"&file=getICE"
+        // if (status === "available"){
+        const link = document.createElement('a');
+        link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+        link.setAttribute('download', "avoURL.txt");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.location.href = window.location.origin+"/downloadAgent";
+        // }
+        // else setMsg(MSG.GLOBAL.ERR_PACKAGE);
+    } catch (ex) {
+        console.error("Error while downloading Agent. Error:", ex);
+    }
+}
+
 
