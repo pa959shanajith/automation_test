@@ -39,8 +39,7 @@ const MindmapHome = () => {
   const [showCard, setShowCard] = useState(true);
   const [show, setShow] = useState(false);
   const [initBlockUi, setInitBlockUi] = useState(false)
-  console.log("showCard", showCard)
-  console.log("show", show)
+
   var Component = createType["newmindmap"];
   const handleModule = () => {
     setShowCard(false);

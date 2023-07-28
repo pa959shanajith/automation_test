@@ -1,0 +1,122 @@
+@import "../../global/styles/ColorVariables.scss";
+.form-group-tkn-mgmt{
+    margin-bottom:15px
+}
+.adminForm-tkn-mgmt {
+	padding-top: 5%;
+}
+.sessionHeading-tkn-mgmt{
+	padding-left: 5px;
+	display: flex;
+	background: $whisper;
+	cursor: pointer;
+	width: 100%;
+	margin-bottom: 3px;
+}
+
+.sessionHeading-tkn-mgmt:hover {
+	background: $backgroundOne;
+}
+
+.sessionHeading-tkn-mgmt h4{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    flex-grow: 1;
+	display: inline-block;
+	padding-right: 5px;
+    user-select: none;
+    font-size: 18px;
+}
+.searchIcon{
+	cursor: pointer;
+	background: $whiteColor;
+    padding: 4px;
+    border-radius: 7px 7px 7px 7px;
+    position: relative;
+    left: 61px;
+    font-size: 14px;
+}
+.searchInput{
+	border-radius: 7px 0px 0px 7px;
+    border: none;
+    position: relative;
+    left: 60px;
+    height: 28px;
+    outline: none;
+    color: black;
+    padding-left: 5px;
+    -webkit-transition: width 0.3s;
+    transition: width 0.3s;
+}
+#activeUsersToken{
+    // overflow-y: auto;
+    height: calc(100% - 40px);
+}
+.search-tkn-mgmt{
+    background-color: $whiteColor;
+    float: right;
+    margin-right: 30px;
+    height: 30px;
+    float: right;
+    margin-right: 30px;
+    margin-top: 6px;
+    border-radius: 10px;
+}
+.tkn-mgmt-Wrap{
+    float : left;
+    width: 100%;
+    height:fit-content;
+}
+.active-users-token{
+    max-height :450px;
+}
+.search-list-tkn-mgmt{
+    float:right;
+    margin-right:30px;
+    height: 30px;
+}
+.searchIcon-list{
+    border-radius: 0px 7px 7px 0px;
+    left:0;
+    float:right;
+}
+.search-img-list{
+    margin-top: -1px;
+    margin-left: 1px;
+}
+.searchInput-list-tkn-mgmt{
+    left:0;
+    float:right;
+    position:relative;
+    margin-left:0;
+}
+.btn-list-tkn-mgmt{
+    margin-left:-3% !important;
+}
+.tkn-table__row{
+    display: flex;
+    margin-right: 2px;
+}
+.tkn-table__name{
+    width: 30%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__status{
+    width: 15%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__exp{
+    width: 25%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__action{
+    width: 30%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__button{
+    margin-left: 0%
+}

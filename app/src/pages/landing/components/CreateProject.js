@@ -43,6 +43,7 @@ const CreateProject = (props) => {
 
   const userDetails = async () => {
     userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  if(userInfo){
     try {
       let userData = [];
       if(props.handleManageProject) {
@@ -113,6 +114,7 @@ const CreateProject = (props) => {
     } catch (error) {
       console.error(error);
     }
+  }
   };
 
 
@@ -497,7 +499,7 @@ console.log(reduxDefaultselectedProject);
           </div>
           <div className='check-bx3'>
             <ul>
-              {displayUser.map((checkboxId) => (
+              {displayUser.length && displayUser.map((checkboxId) => (
                 <div className="selected_users__list">
                   <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id} value={checkboxId.id} checked={selectedAssignedCheckboxes.some((ab) => ab.id === checkboxId.id)}
                     onChange={handleAssignedCheckboxChange}

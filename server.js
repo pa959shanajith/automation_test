@@ -256,7 +256,8 @@ if (cluster.isMaster) {
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
-		app.post('/fetchModSceDetails', report.fetchModSceDetails);	
+		app.post('/fetchModSceDetails', report.fetchModSceDetails);
+		app.get('/viewReport', report.viewReport);	
 		app.use(csrf({
 			cookie: true
 		}));
