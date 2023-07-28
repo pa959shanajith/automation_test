@@ -50,6 +50,7 @@ import { loadUserInfoActions } from '../../landing/LandingSlice'
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
+  // const proj = useSelector((state)=>state.design.selectedProj)
   const [visible_setup, setVisible_setup] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
@@ -127,11 +128,18 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
+  // const [selectedAPP,setSelectedApp]=useState()
+  // const typeOfAppType = useSelector((state) => state.landing.defaultSelectProject);
+  // const nameOfAppType = typeOfAppType.apptype
+  // console.log(state.landing.defaultSelectProject)
+  // console.log(typeOfAppType)
 
-  const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+  // const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
 
-  const initProj = selectProjects.projectId;
-  console.log(selectProjects)
+  // const initProj = selectProjects.projectId;
+  // console.log(selectProjects)
+
+
 
   const displayError = (error) => {
     // setLoading(false)
@@ -1154,8 +1162,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
-                  disabled={selectProjects.appType!=="5db0022cf87fdec084ae49b7"}
-                  defaultChecked={selectProjects.appType==="5db0022cf87fdec084ae49b7"}
+                  // disabled={selectProjects.appType!=="5db0022cf87fdec084ae49b7"}
+                  // defaultChecked={selectProjects.appType==="5db0022cf87fdec084ae49b7"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
                       setShowIcePopup(false);
@@ -1179,6 +1187,8 @@ Learn More '/>
                         setShowIcePopup(true);
                         setRadioButton_grid(e.target.value);
                       }}
+                      // checked={nameOfAppType !== '5db0022cf87fdec084ae49b7'&&radioButton_grid === "Execute with Avo Assure Client"}
+                      // checked={nameOfAppType}
                       checked={
                         radioButton_grid === "Execute with Avo Assure Client"
                       }
@@ -1498,8 +1508,7 @@ Learn More '/>
             className="configure_button"
             onClick={() => configModal("CancelSave")}
           >
-            {" "}
-            configure{" "}
+            configure
             <Tooltip target=".configure_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
