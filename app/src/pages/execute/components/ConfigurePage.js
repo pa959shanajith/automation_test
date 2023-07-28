@@ -354,7 +354,12 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setDeleteItem(item);
     event.preventDefault(); // Prevent the default behavior of the button click
     setLogoutClicked(true);
-    let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
+    // let text = `Are you sure you want to delete' ${item.configurename}' execution profile?`;
+    let text = (
+      <p>
+        Are you sure you want to delete <strong>{item.configurename}</strong> execution profile?
+      </p>
+    );
     setProfileTxt(text);
   };
 
@@ -1509,7 +1514,7 @@ Learn More '/>
             onClick={() => configModal("CancelSave")}
           >
             configure
-            <Tooltip target=".configure_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+            <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
       );
@@ -1541,7 +1546,7 @@ Learn More '/>
                 />
                 <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
                Add Configuration
-               <Tooltip target=".addConfig_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+               <Tooltip target=".addConfig_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}

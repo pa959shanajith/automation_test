@@ -209,7 +209,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
         { name: 'Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'excel',disabled:!isEndtoEnd?false:true},
         { name: 'Structure only - Json (.json)', code: 'LDN', value:'custom', disabled:isAssign?false:true },
         { name: 'Git', code:'GT', value:'git',disabled:!isEndtoEnd?false:true},
-        { name: 'Complete Module(S) (.zip)', code: 'IST', value:'json' , disabled:!isEndtoEnd?false:true}
+        { name: 'Complete Test Suite(S) (.zip)', code: 'IST', value:'json' , disabled:!isEndtoEnd?false:true}
     ]
     const exportProjectItem = Object.entries(projectList).map((e)=>{
                     let appTypeName = ''

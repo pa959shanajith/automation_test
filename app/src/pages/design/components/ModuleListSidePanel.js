@@ -616,7 +616,7 @@ const LongContentDemo = () => {
                   htmlFor="username"
                   labelTxt="Name"
                   required={true}
-                  placeholder="Enter End to End Module Name"
+                  placeholder="Enter End to End Flow Name"
                   customClass="inputRow_for_E2E_popUp"
                   inputType="lablelRowReqInfo"
                   inputTxt={inputE2EData}
