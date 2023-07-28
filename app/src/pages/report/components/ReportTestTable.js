@@ -57,47 +57,6 @@ export default function BasicDemo() {
         setReportViewData(parent);
     },[reportData])
 
-    const convertDataToTree = (data) => {
-        const treeDataArray = [];
-        for (let i = 0; i < data.length; i++) {
-          const rootNode = {
-            key:data[i].id,
-            data: { StepDescription: data[i].StepDescription, slno: data[i].slno, key:data[i].id },
-            children: [],
-          };
-          data[i].children?.forEach((child) => {
-            rootNode.children.push({
-              data: child,
-            });
-          });
-          treeDataArray.push(rootNode); // Add the rootNode to the array
-        }
-        return treeDataArray; // Return the array of treeData
-      };
-      
-    const treeData = convertDataToTree(reportViewData)
-    
-    // const [expandedRows, setExpandedRows] = useState([]);
-
-    // const allowExpansion = (rowData) => {
-    //     return rowData.children.length > 0;
-    // };
-    // const rowExpansionTemplate = (data) => {
-    //     return (
-    //             <DataTable value={data.children}>
-    //                 <Column style={{width:'2rem'}}/>
-    //                 <Column field="slno" header='S No.'></Column>
-    //                 <Column field="Step" header='Steps' ></Column>
-    //                 <Column field='Keyword'  header='Description'/>
-    //                 <Column field="EllapsedTime"  header='Time Elapsed' ></Column>
-    //                 <Column field="status"  header='Status' ></Column>
-    //                 <Column field='comments'  header='Comments' />
-    //                 <Column field='jira_defect_id'  header='Jira' />
-    //                 <Column field='azure_defect_id' header='Azure'  />
-    //                 <Column field='action'  header='Action' />
-    //             </DataTable>
-    //     );
-    // };
     const handdleExpend = (e) => {
       setExpandedKeys(e.value);
     };
@@ -141,6 +100,77 @@ export default function BasicDemo() {
         const hasChildren = rowData?.children && rowData?.children?.length > 0;
         return hasChildren ? null :  <img src='static/imgs/bug.svg' alt='bug defect'/>;
     }
+    
+    useEffect(()=>{
+        (async()=>{
+            const view = await viewReport(location?.state?.id);
+            setReportData(JSON.parse(view))
+        })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[location])
+    useEffect(() => {
+        const parent = [];
+        if (reportData && Array.isArray(reportData.rows)) {
+            for (const obj of reportData.rows) {
+                if (obj.hasOwnProperty('Step')) {
+                    if (!parent[parent.length - 1].children) {
+                        parent[parent.length - 1].children = [obj];  // Push the new object into parent array
+                    } else {
+                        parent[parent.length - 1].children.push(obj); // Push the object into existing children array
+                    }
+                } else {
+                    parent.push(obj); // Push the object into parent array
+                }
+            }
+        } else {
+            // Handle the case when reportData or reportData.rows is not as expected.
+            console.error('reportData.rows is not defined or not an array.');
+        }
+        setReportViewData(parent);
+    },[reportData])
+
+    const convertDataToTree = (data) => {
+        const treeDataArray = [];
+        for (let i = 0; i < data.length; i++) {
+          const rootNode = {
+            key:data[i].id,
+            data: { StepDescription: data[i].StepDescription, slno: data[i].slno, key:data[i].id },
+            children: [],
+          };
+          data[i].children?.forEach((child) => {
+            rootNode.children.push({
+              data: child,
+            });
+          });
+          treeDataArray.push(rootNode); // Add the rootNode to the array
+        }
+        return treeDataArray; // Return the array of treeData
+      };
+      
+    const treeData = convertDataToTree(reportViewData)
+    
+    // const [expandedRows, setExpandedRows] = useState([]);
+
+    // const allowExpansion = (rowData) => {
+    //     return rowData.children.length > 0;
+    // };
+    // const rowExpansionTemplate = (data) => {
+    //     return (
+    //             <DataTable value={data.children}>
+    //                 <Column style={{width:'2rem'}}/>
+    //                 <Column field="slno" header='S No.'></Column>
+    //                 <Column field="Step" header='Steps' ></Column>
+    //                 <Column field='Keyword'  header='Description'/>
+    //                 <Column field="EllapsedTime"  header='Time Elapsed' ></Column>
+    //                 <Column field="status"  header='Status' ></Column>
+    //                 <Column field='comments'  header='Comments' />
+    //                 <Column field='jira_defect_id'  header='Jira' />
+    //                 <Column field='azure_defect_id' header='Azure'  />
+    //                 <Column field='action'  header='Action' />
+    //             </DataTable>
+    //     );
+    // };
+
     return (
         <div className="reportsTable_container">
             <div className="reportSummary">
