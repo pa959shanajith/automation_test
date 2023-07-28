@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import HSBar from "react-horizontal-stacked-bar-chart";
 import { Column } from "primereact/column";
+import { NavLink } from 'react-router-dom';
 import { Breadcrumbs, Link } from "@mui/material";
 import AvoInput from "../../../globalComponents/AvoInput";
 import "./Profile.scss";
@@ -9,15 +10,19 @@ import { Badge } from "primereact/badge";
 import { Tree } from "primereact/tree";
 import { reportsBar } from "../../utility/mockData";
 import { useLocation } from "react-router-dom";
-import { getReportList, getTestSuite } from "../api";
+import { downloadReports, getReportList, getTestSuite } from "../api";
 import { Button } from "primereact/button";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { Menu } from "primereact/menu";
+import { FooterTwo } from "../../global";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
   const [testSuite, setTestSuite] = useState({});
-  const [testCase, setTestCase] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
+  const [downloadId, setDownloadId] = useState("");
   const location = useLocation();
+  const downloadRef = useRef(null);
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -32,31 +37,31 @@ const Profile = () => {
     { field: "name", header: "Execution" },
     { field: "status", header: "" },
     { field: "dateTime", header: "Date and Time" },
-    { field: "module", header: "Test Suite(s)" },
-    { field: "testCases", header: "Test Case(s)" },
+    { field: "module", header: <div><span className="suite_text">Test Suite(s)</span><span className="case_text">Test Case(s)</span></div> }
   ];
 
-  useEffect(async () => {
-    const executionProfiles = await getReportList(
-      location?.state?.configureKey
-    )
-    
-    setReportsTable(executionProfiles.map((el, ind) => ({
-      ...el,
-      id: el._id,
-      key: ind.toString(),
-      name: `Execution ${ind + 1}`,
-      dateTime: el.startDate,
-      status: checkStatus(el.modStatus),
-      testSuites: el.modStatus.reduce(
-        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-        {}
-      ),
-      testCases: el.scestatus.reduce(
-        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-        {}
-      ),
-    })));
+  useEffect(() => {
+    (async() => {
+      const executionProfiles = await getReportList(
+        location?.state?.configureKey
+        )
+        setReportsTable(executionProfiles.map((el, ind) => ({
+          ...el,
+          id: el._id,
+          key: ind.toString(),
+          name: `Execution ${ind + 1}`,
+          dateTime: el.startDate,
+          status: checkStatus(el.modStatus),
+          testSuites: el.modStatus.reduce(
+            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+            {}
+            ),
+            testCases: el.scestatus.reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
+              ),
+            })));
+          })()
   }, []);
   
   const onTestSuiteClick = async (getRow) => {
@@ -66,18 +71,8 @@ const Profile = () => {
       executionListId: getRow?.node?.data,
     });
 
-    setTestSuite({
-      ...testSuite,
-      [getRow?.node?.key]: testSuiteList.map((item, ind) => ({
-        key: `0-${ind}`,
-        label: item?.modulename,
-        data: item?._id,
-      })),
-    });
-
-    setTestCase({
-      ...testCase,
-      [getRow?.node?.key]: testSuiteList.map((el, i) => ({
+    const nestedTable = testSuiteList.map((el, i) => {
+      let nestedtreeArr = {
         key: i.toString(),
         label: (
           <div className="grid">
@@ -104,7 +99,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete"||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -131,7 +127,8 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"
+                            item === "Incomplete"||
+                            item === "Fail"
                         )
                         .map(
                           (e) =>
@@ -147,7 +144,7 @@ const Profile = () => {
                         {}
                       )
                     ).reduce((ac, cv) => ac + cv, 0)} Executed`,
-                    color: "#6a5acd",
+                    color: "#605BFF",
                   },
                   {
                     value: Object.keys(
@@ -160,7 +157,8 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Incomplete"||
+                          item === "Fail"
                       )
                       .map(
                         (e) =>
@@ -170,7 +168,7 @@ const Profile = () => {
                           )[e]
                       )
                       .reduce((ac, cv) => ac + cv, 0),
-                    color: "#808080",
+                    color: "#DEE2E6",
                   },
                 ]}
               />
@@ -185,7 +183,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter((el) => el === "Pass" || el === "fail")
+                  .filter((el) => el === "Pass" || el === "Fail")
                   .map((item, ind) => {
                     return {
                       value: el.scenarioStatus.reduce(
@@ -207,7 +205,7 @@ const Profile = () => {
                                 )
                               )
                                 .filter(
-                                  (key) => key === "Pass" || key === "fail"
+                                  (key) => key === "Pass" || key === "Fail"
                                 )
                                 .reduce((obj, key) => {
                                   return Object.assign(obj, {
@@ -228,45 +226,292 @@ const Profile = () => {
             </div>
           </div>
         ),
-        data: { id: el._id, selected: getRow?.node?.key },
-        children: [{ key: "0-0" }],
-      })),
+        data: el.id,
+        icon: 'pi pi-fw pi-chevron-right',
+      };
+      return {
+        key: i,
+        testSuite: el?.modulename,
+        testSuiteBar: (
+          <Tree
+            value={[nestedtreeArr]}
+            // onExpand={(e) => onTestSuiteClick(e)}
+            className="modules_tree"
+          />
+        ),
+        id: el?._id,
+      };
+    });
+
+    setTestSuite({
+      ...testSuite,
+      [getRow?.node?.key]: [
+        {
+          key: "0-0",
+          label: (
+            <DataTable
+              showHeaders={false}
+              value={nestedTable}
+              onRowClick={(e) => onTestCaseClick(e, getRow)}
+              className="module_table"
+            >
+              <Column field="testSuite"></Column>
+              <Column field="testSuiteBar"></Column>
+            </DataTable>
+          ),
+        },
+      ],
     });
   };
+//  const handleViweReports =  async (reportid) =>{
+//     const win = window.open("/reports/viewReports", "_blank"); 
+//     win.focus();
+//     localStorage['executionReportId'] = reportid;
+//     localStorage['logData'] = JSON.stringify(logData[reportid]);
+//     localStorage['logPath'] = logPath;
+//     localStorage['reportPage'] = "landing";
+//   }
+ 
+  const onTestCaseClick = async (row, parentRow) => {
 
-  const onTestCaseClick = async (row) => {
-    const testSuiteList = await getTestSuite({
+    const testCaseList = await getTestSuite({
+      query: "fetchModSceDetails",
+      param: "modulestatus",
+      executionListId: parentRow?.node?.data,
+    });
+
+    const testsList = await getTestSuite({
       query: "fetchModSceDetails",
       param: "scenarioStatus",
-      executionId: row?.node?.data?.id,
+      executionId: row?.data?.id,
     });
-    const getState = { ...testCase };
-    getState[row?.node?.data?.selected][row?.node?.key].children = [
-      {
-        key: "0-0",
+
+    const nestedTable = testCaseList.map((el, i) => {
+      let nestedtreeArr = {
+        key: i.toString(),
         label: (
           <div className="grid">
-            {testSuiteList.map((item) => (
-              <>
-                <div className="col-4 flex align-items-center">{item?.scenarioname}</div>
-                <div className="col-3 flex align-items-center">{item?.status}</div>
-                <div className="col-3 flex align-items-center"><Button label="View" severity="secondary" size="small" outlined /></div>
-                <div className="col-2 flex align-items-center"><i className="pi pi-download"></i></div>
-              </>
-            ))}
+            <div className="col-6">
+              <div>Execution Progress</div>
+              <HSBar
+                showTextIn
+                data={[
+                  {
+                    value:
+                      Object.values(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      ).reduce((ac, cv) => ac + cv, 0) -
+                      Object.keys(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      )
+                        .filter(
+                          (item) =>
+                            item === "Terminate" ||
+                            item === "Skipped" ||
+                            item === "Incomplete"||
+                            item === "Fail"
+                        )
+                        .map(
+                          (e) =>
+                            el.scenarioStatus.reduce(
+                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                              {}
+                            )[e]
+                        )
+                        .reduce((ac, cv) => ac + cv, 0),
+                    description: `${
+                      Object.values(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      ).reduce((ac, cv) => ac + cv, 0) -
+                      Object.keys(
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )
+                      )
+                        .filter(
+                          (item) =>
+                            item === "Terminate" ||
+                            item === "Skipped" ||
+                            item === "Incomplete"||
+                            item === "Fail"
+                        )
+                        .map(
+                          (e) =>
+                            el.scenarioStatus.reduce(
+                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                              {}
+                            )[e]
+                        )
+                        .reduce((ac, cv) => ac + cv, 0)
+                    } / ${Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0)} Executed`,
+                    color: "#605BFF",
+                  },
+                  {
+                    value: Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "Fail"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0),
+                    color: "#DEE2E6",
+                  },
+                ]}
+              />
+            </div>
+            <div className="col-6">
+              <div>Execution Status</div>
+              <HSBar
+                showTextIn
+                data={Object.keys(
+                  el.scenarioStatus.reduce(
+                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                    {}
+                  )
+                )
+                  .filter((el) => el === "Pass" || el === "Fail")
+                  .map((item, ind) => {
+                    return {
+                      value: el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )[item],
+                      description:
+                        item === "Pass"
+                          ? `${
+                              el.scenarioStatus.reduce(
+                                (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                {}
+                              )[item]
+                            } / ${Object.values(
+                              Object.keys(
+                                el.scenarioStatus.reduce(
+                                  (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                  {}
+                                )
+                              )
+                                .filter(
+                                  (key) => key === "Pass" || key === "Fail"
+                                )
+                                .reduce((obj, key) => {
+                                  return Object.assign(obj, {
+                                    [key]: el.scenarioStatus.reduce(
+                                      (ac, cv) => (
+                                        (ac[cv] = ac[cv] + 1 || 1), ac
+                                      ),
+                                      {}
+                                    )[key],
+                                  });
+                                }, {})
+                            ).reduce((ac, cv) => ac + cv, 0)} Passed`
+                          : "",
+                      color: reportsBar[item],
+                    };
+                  })}
+              />
+            </div>
+            {row?.index === i ? (
+              <DataTable
+                showHeaders={false}
+                className="statusTable"
+                value={testsList.map((item) => ({
+                  ...item,
+                  downLoad: <i className="pi pi-download" onClick={(e) => {
+                    setDownloadId(item?._id);
+                    downloadRef.current.toggle(e)
+                  }}></i>,
+                  statusView: (
+                    <NavLink to='/reports/viewReports' state={{id: item._id}} ><Button
+                      label="View"
+                      severity="secondary"
+                      size="small"
+                      outlined
+                    /></NavLink>
+                  ),
+                }))}
+              >
+                <Column field="scenarioname"></Column>
+                <Column field="status"></Column>
+                <Column field="statusView"></Column>
+                <Column field="downLoad"></Column>
+              </DataTable>
+            ) : null}
           </div>
         ),
-      },
-    ];
-    setTestCase(getState);
+        data: el.id,
+        icon: row?.index === i ? "pi pi-fw pi-chevron-down" : "pi pi-fw pi-chevron-right",
+      };
+      return {
+        key: i,
+        testSuite: el?.modulename,
+        testSuiteBar: (
+          <Tree
+            value={[nestedtreeArr]}
+            className="modules_tree"
+          />
+        ),
+        id: el?._id,
+      };
+    });
+
+    setTestSuite({
+      ...testSuite,
+      [parentRow?.node?.key]: [
+        {
+          key: "0-0",
+          label: (
+            <DataTable
+              showHeaders={false}
+              value={nestedTable}
+              onRowClick={(e) => onTestCaseClick(e, parentRow)}
+              className="nested_table"
+            >
+              <Column field="testSuite"></Column>
+              <Column field="testSuiteBar"></Column>
+            </DataTable>
+          ),
+        },
+      ],
+    });
   };
 
   const tableHeader = () => {
     return (
       <div className="flex flex-column">
-        <div className="exeprofile_txt">{location?.state?.execution}</div>
         <div className="flex justify-content-between align-items-center">
-          <div>Execution List</div>
+          <div>
+            <NavLink to="/reports" className="pi pi-angle-left"></NavLink>
+            Execution List : {location?.state?.execution}
+          </div>
           <div className="search_container">
             <AvoInput
               icon="pi pi-search"
@@ -301,7 +546,7 @@ const Profile = () => {
       key: e.key,
       label: (
         <div className="grid">
-          <div className="col-6">
+          <div className="col-3">
             <div>Execution Progress</div>
             <HSBar
               showTextIn
@@ -327,7 +572,7 @@ const Profile = () => {
                     (ac, cv) => ac + cv,
                     0
                   )} Executed`,
-                  color: "#6a5acd",
+                  color: "#605BFF",
                 },
                 {
                   value: Object.keys(e.testSuites)
@@ -336,27 +581,27 @@ const Profile = () => {
                     )
                     .map((el) => e.testSuites[el])
                     .reduce((ac, cv) => ac + cv, 0),
-                  color: "#808080",
+                  color: "#DEE2E6",
                 },
               ]}
             />
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <div>Execution Status</div>
             <HSBar
               showTextIn
               data={Object.keys(e.testSuites)
-                .filter((el) => el === "Pass" || el === "fail")
+                .filter((el) => el === "pass" || el === "fail")
                 .map((item, ind) => ({
                   value: e.testSuites[item],
                   description:
-                    item === "Pass"
-                      ? `${e.testCases[item]} / ${Object.values(
-                          Object.keys(e.testCases)
-                            .filter((key) => key === "Pass" || key === "fail")
+                    item === "pass"
+                      ? `${e.testSuites[item]} / ${Object.values(
+                          Object.keys(e.testSuites)
+                            .filter((key) => key === "pass" || key === "fail")
                             .reduce((obj, key) => {
                               return Object.assign(obj, {
-                                [key]: e.testCases[key],
+                                [key]: e.testSuites[key],
                               });
                             }, {})
                         ).reduce((ac, cv) => ac + cv, 0)} Passed`
@@ -365,10 +610,88 @@ const Profile = () => {
                 }))}
             />
           </div>
+          <div className="col-3">
+            <div>Execution Progress</div>
+            <HSBar
+              showTextIn
+              data={[
+                {
+                  value:
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "Fail"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0),
+                  description: `${
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "Fail"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${Object.values(e.testCases).reduce(
+                    (ac, cv) => ac + cv,
+                    0
+                  )} Executed`,
+                  color: "#605BFF",
+                },
+                {
+                  value: Object.keys(e.testCases)
+                    .filter(
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete"||
+                        item === "Fail"
+                    )
+                    .map((el) => e.testCases[el])
+                    .reduce((ac, cv) => ac + cv, 0),
+                  color: "#DEE2E6",
+                },
+              ]}
+            />
+          </div>
+          <div className="col-3">
+            <div>Execution Status</div>
+            <HSBar
+              showTextIn
+              data={Object.keys(e.testCases)
+                .filter((el) => el === "Pass" || el === "Fail")
+                .map((item, ind) => {
+                  return {
+                    value: e.testCases[item],
+                    description:
+                      item === "Pass"
+                        ? `${e.testCases[item]} / ${Object.values(
+                            Object.keys(e.testCases)
+                              .filter((key) => key === "Pass" || key === "Fail")
+                              .reduce((obj, key) => {
+                                return Object.assign(obj, {
+                                  [key]: e.testCases[key],
+                                });
+                              }, {})
+                          ).reduce((ac, cv) => ac + cv, 0)} Passed`
+                        : "",
+                    color: reportsBar[item],
+                  };
+                })}
+            />
+          </div>
         </div>
       ),
       data: e.id,
-      children: testSuite[e.key] ? testSuite[e.key] : [{ key: '0-0' }],
+      children: testSuite[e.key] ? testSuite[e.key] : [{ key: "0-0" }],
     };
     return (
       <Tree
@@ -379,105 +702,37 @@ const Profile = () => {
     );
   };
 
-  const testCaseBodyTemplate = (e) => {
-    return (
-      <div className="grid">
-        <div className="col-6">
-          <div>Execution Progress</div>
-          <HSBar
-            showTextIn
-            data={[
-              {
-                value:
-                  Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
-                  Object.keys(e.testCases)
-                    .filter(
-                      (item) =>
-                        item === "Terminate" ||
-                        item === "Skipped" ||
-                        item === "Incomplete"
-                    )
-                    .map((el) => e.testCases[el])
-                    .reduce((ac, cv) => ac + cv, 0),
-                description: `${
-                  Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
-                  Object.keys(e.testCases)
-                    .filter(
-                      (item) =>
-                        item === "Terminate" ||
-                        item === "Skipped" ||
-                        item === "Incomplete"
-                    )
-                    .map((el) => e.testCases[el])
-                    .reduce((ac, cv) => ac + cv, 0)
-                } / ${Object.values(e.testCases).reduce(
-                  (ac, cv) => ac + cv,
-                  0
-                )} Executed`,
-                color: "#6a5acd",
-              },
-              {
-                value: Object.keys(e.testCases)
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete"
-                  )
-                  .map((el) => e.testCases[el])
-                  .reduce((ac, cv) => ac + cv, 0),
-                color: "#808080",
-              },
-            ]}
-          />
-        </div>
-        <div className="col-6">
-          <div>Execution Status</div>
-          <HSBar
-            showTextIn
-            data={Object.keys(e.testCases)
-              .filter((el) => el === "Pass" || el === "fail")
-              .map((item, ind) => {
-                return {
-                  value: e.testCases[item],
-                  description:
-                    item === "Pass"
-                      ? `${e.testCases[item]} / ${Object.values(
-                          Object.keys(e.testCases)
-                            .filter((key) => key === "Pass" || key === "fail")
-                            .reduce((obj, key) => {
-                              return Object.assign(obj, {
-                                [key]: e.testCases[key],
-                              });
-                            }, {})
-                        ).reduce((ac, cv) => ac + cv, 0)} Passed`
-                      : "",
-                  color: reportsBar[item],
-                };
-              })}
-          />
-        </div>
-        <Tree
-          value={testCase[e.key]}
-          onExpand={(e) => onTestCaseClick(e)}
-          className="modules_tree"
-        />
-      </div>
-    );
+  const onDownload = async (getId) => {
+    let data = await downloadReports({ id: downloadId, type: getId });
+
+    if (getId === "json") data = JSON.stringify(data, undefined, 2);
+
+    let filedata = new Blob([data], {
+      type: "application/" + getId + ";charset=utf-8",
+    });
+
+    if (window.navigator.msSaveOrOpenBlob)
+      window.navigator.msSaveOrOpenBlob(filedata, downloadId);
+    else {
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(filedata);
+      a.download = downloadId;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(a.href);
+      document.body.removeChild(a);
+    }
   };
 
   return (
+    <>
     <div className="profile_container">
-      <Breadcrumbs>
-        <Link>Home</Link>
-        <Link>Reports</Link>
-        <Link>Executions</Link>
-      </Breadcrumbs>
       <DataTable
         value={reportsTable}
         tableStyle={{ minWidth: "50rem" }}
         header={tableHeader}
         globalFilter={searchScenario}
+        className="reports_table"
       >
         {tableColumns.map((col) => (
           <Column
@@ -492,11 +747,19 @@ const Profile = () => {
               : {})}
             {...(col.field === "status" ? { body: statusBodyTemplate } : {})}
             {...(col.field === "module" ? { body: moduleBodyTemplate } : {})}
-            {...(col.field === "testCases" ? { body: testCaseBodyTemplate } : {})}
           />
         ))}
       </DataTable>
+      <OverlayPanel ref={downloadRef} className="reports_download">
+      <Menu model={[
+        {label: <span onClick={() => onDownload('json')}>JSON</span>, icon: 'pi pi-fw pi-file'},
+        {label: <span onClick={() => onDownload('pdf')}>PDF</span>, icon: 'pi pi-fw pi-file'},
+        {label: <span onClick={() => onDownload('pdfwithimg')}>PDF with screenshots</span>, icon: 'pi pi-fw pi-file'}
+    ]} />
+      </OverlayPanel>
     </div>
+    <div><FooterTwo/></div>
+    </>
   );
 };
 

@@ -21,22 +21,15 @@ import { Column } from 'primereact/column';
 import { Checkbox } from 'primereact/checkbox';
 import { leastIndex } from 'd3';
 import { CompareElementSuccessful } from '../designSlice';
-// import { ScrollPanel } from 'primereact/scrollpanel';
-
-
-
-
-
-
-
-
-
+import { ScrollPanel } from 'primereact/scrollpanel';
+import CompareElement from './CompareElement';
+import AddElement from './AddElement';
+import MapElement from './MapElement';
 
 
 
 const ActionPanel = (props) => {
   const [selectObjectType, setSelectObjectType] = useState(null);
-  const toast = useRef();
   const history = useNavigate();
   const dispatch = useDispatch();
   const userInfo = useSelector((state) => state.landing.userinfo);
@@ -51,25 +44,16 @@ const ActionPanel = (props) => {
   const [customObjList, setCustomObjList] = useState({});
   const [error, setError] = useState({ type: '', tempId: '' });
   const [showFields, setShowFields] = useState([tempIdCounter]);
-
-  const [addElementTempIdCounter, setAddElementTempIdCounter] = useState(0);
-  const [addElementObjects, setAddElementObjects] = useState([]);
-  const [addElementSelectObjectType, setAddElementSelectObjectType] = useState(null);
-  const [addElementInputValue, setAddElementInputValue] = useState('');
   const [activeIndex, setActiveIndex] = useState("");
-  const [scrapedList, setScrapedList] = useState({});
-  const [customList, setCustomList] = useState({});
-  const [nonCustomList, setNonCustomList] = useState([]);
-  const [selectedTag, setSelectedTag] = useState("");
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [map, setMap] = useState({});
+
+
+
+
   const [showName, setShowName] = useState("");
   const [orderLists, setOrderLists] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [browserName, setBrowserName] = useState(null)
   const [checked, setChecked] = useState([]);
-
-
   const [selectCustomObj, setSelectCustomObj] = useState({
     btn1: '',
     btn2: '',
@@ -106,13 +90,15 @@ const ActionPanel = (props) => {
 
       userObjectElement_ICE(customFields)
         .then(data => {
-          if (data === "unavailableLocalServer")
-            // setMsg(MSG.SCRAPE.ERR_CREATE_OBJ);
+          if (data === "unavailableLocalServer") {
+            props.toastError(MSG.SCRAPE.ERR_CREATE_OBJ);
             return null;
+          }
           else if (data === "invalid session") return RedirectPage(history);
-          else if (data === "fail")
-            // setMsg(MSG.SCRAPE.ERR_CREATE_OBJ);
+          else if (data === "fail") {
+            props.toastError(MSG.SCRAPE.ERR_CREATE_OBJ);
             return null;
+          }
           else {
             let custname = props.utils.object.title;
             let newObj = {
@@ -140,43 +126,6 @@ const ActionPanel = (props) => {
     setActiveIndex(index);
   };
 
-  useEffect(() => {
-    let tempScrapeList = {};
-    let tempCustomList = {};
-    let tempNonCustom = [];
-    let tempOrderList = [];
-    if (props.captureList && props.captureList.length) {
-      props.captureList.forEach(object => {
-        let elementType = object.tag;
-        elementType = tagList.includes(elementType) ? elementType : 'Element';;
-        if (object.objId) {
-          if (object.isCustom) {
-            if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
-            else tempCustomList[elementType] = [object]
-            if (!tempScrapeList[elementType]) tempScrapeList[elementType] = []
-          }
-          else {
-            tempNonCustom.push(object);
-            if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
-            else tempScrapeList[elementType] = [object]
-          }
-          tempOrderList.push(object.objId);
-        }
-      });
-      setScrapedList(tempScrapeList);
-      setCustomList(tempCustomList);
-      setNonCustomList(tempNonCustom);
-      setOrderLists(tempOrderList);
-    }
-  }, []);
-
-  // useEffect(() => {
-
-  const toastErrorMsg = (errorMsg) => {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
-  }
-
-  // }, [errorMsg])
 
   const newField = () => {
     let updatedObjects = [...objects];
@@ -226,7 +175,6 @@ const ActionPanel = (props) => {
     }
   }
 
-
   const onSave = index => {
     let object = objects[index];
     let [tag, elementType] = object.objType.code.split('-');
@@ -237,26 +185,23 @@ const ActionPanel = (props) => {
       errorObj = { [object.tempId]: !object.objName ? "objName" : !object.objType.code ? "objType" : "url" };
     } else if (object.name === "" && object.relXpath === "" && object.absXpath === "" && object.className === "" && object.id === "" && object.qSelect === "") {
       errorObj = { missingField: true }
+      props.toastError(MSG.SCRAPE.WARN_ADD_PROPERTY);
       return null
-      // setMsg(MSG.SCRAPE.WARN_ADD_PROPERTY);
     }
 
     if (!Object.keys(errorObj).length) {
       customFields.push(...[object.url, object.name, object.relXpath, object.absXpath, object.className, object.id, object.qSelect, elementType]);
       userObjectElement_ICE(customFields)
         .then(data => {
-          if (data === "unavailableLocalServer")
-            // return null;
-            toastErrorMsg(" Failed to create element - ICE not available")
-
-          // setMsg(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`,VARIANT.ERROR));
-
+          if (data === "unavailableLocalServer") {
+            props.toastError(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`, VARIANT.ERROR));
+            return null;
+          }
           else if (data === "Invalid Session")
             return RedirectPage(history);
           else if (data === "fail") {
-            // return null;
-            // setMsg({VARIANT:VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object`});
-            toastErrorMsg(" Failed to create element - ICE not available")
+            props.toastError({ VARIANT: VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object` });
+            return null;
           }
           else {
             let customObject = {
@@ -278,7 +223,7 @@ const ActionPanel = (props) => {
         })
         .catch(error => console.error(error));
     }
-    setError(errorObj)
+    props.toastError(errorObj)
   }
 
 
@@ -296,8 +241,8 @@ const ActionPanel = (props) => {
       }
       if (errorFlag) {
         setError(errorObj);
-        // setMsg(MSG.CUSTOM(`Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`,VARIANT.ERROR));
-        toastErrorMsg("Object Characteristics are same ")
+        props.toastError(MSG.CUSTOM(`Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`, VARIANT.ERROR));
+        // props.toastError("Object Characteristics are same ")
       }
       else {
         props.utils.modifyScrapeItem(props.utils.object.val, {
@@ -368,12 +313,12 @@ const ActionPanel = (props) => {
 
       if (errorFlag) {
         setError(errorObj);
-        // setMsg(MSG.CUSTOM( `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`,VARIANT.ERROR));
+        props.toastError(MSG.CUSTOM(`Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`, VARIANT.ERROR));
       }
       else if (duplicateFlag) {
         tempIdArr.forEach(tempId => errorObj[tempId] = "objName");
         setError(errorObj);
-        // setMsg(MSG.SCRAPE.ERR_DUPLICATE_OBJ);
+        props.toastError(MSG.SCRAPE.ERR_DUPLICATE_OBJ);
       } else {
         let updatedNewScrapeData = { ...props.capturedDataToSave };
         if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
@@ -398,7 +343,7 @@ const ActionPanel = (props) => {
         ]);
         props.setSaved({ flag: false });
         props.setShow(false);
-        // setMsg(MSG.SCRAPE.SUCC_OBJ_CREATE);
+        props.toastError(MSG.SCRAPE.SUCC_OBJ_CREATE);
 
       }
     }
@@ -423,72 +368,7 @@ const ActionPanel = (props) => {
     setError({ type: '', tempId: '' });
   }
 
-  const addElementSaveHandler = () => {
-    let newObjects = [];
-    let newOrderList = [];
 
-    for (let i = 0; i < addElementObjects.length; i++) {
-      let name = addElementObjects[i].objName;
-      let type = addElementObjects[i].objType;
-      let tempId = addElementObjects[i].tempId;
-      let [tag, value] = type.split("-");
-      let custname = `${name.trim()}_${value}`;
-      let newUUID = uuid();
-      newObjects.push({
-        custname: name,
-        objIdx: i,
-        title: name,
-        tag: tag,
-        xpath: "",
-        val: newUUID,
-        isCustom: true,
-        tempOrderId: newUUID,
-      });
-      newOrderList.push(newUUID);
-    }
-    if (newObjects.length > 0) {
-      props.addCustomElement(newObjects, newOrderList);
-    }
-    props.OnClose();
-  }
-
-
-  const handleAddElementInputChange = (e) => {
-    setAddElementInputValue(e.target.value);
-  };
-
-  const handleAddElementDropdownChange = (e) => {
-    setAddElementSelectObjectType(e.value);
-  };
-
-  const handleAddElementAdd = () => {
-    let updatedObjects = {};
-    objectTypes.map(object_type => {
-      if (object_type.value === addElementSelectObjectType) {
-        updatedObjects["objName"] = addElementInputValue;
-        updatedObjects["objType"] = object_type.value + '-' + object_type.typeOfElement;
-        updatedObjects["tempId"] = addElementTempIdCounter + 1;
-
-      }
-    });
-    setAddElementObjects([...addElementObjects, updatedObjects]);
-    setAddElementInputValue('');
-    setAddElementSelectObjectType('');
-    setAddElementTempIdCounter(addElementTempIdCounter + 1);
-  };
-
-  const handleAddElementClear = () => {
-    setAddElementInputValue('');
-    setAddElementSelectObjectType('');
-    setAddElementObjects([]);
-  }
-
-  const addElementfooter = (
-    <div className=''>
-      <Button size="small" onClick={handleAddElementClear} text >Clear</Button> {/*className='add_object_clear'*/}
-      <Button size="small" onClick={addElementSaveHandler}>Save</Button> {/*className='add_object_save' */}
-    </div>
-  )
   const compareElementfooter = (
     <div className=''>
       {changedObj && changedObj.length ? <Button onClick={() => updateObjects()} label="Update" className="update-btn" size="small" style={{ borderRadius: '3px' }} /> : <Button label='Cancel' size="small" className="update-btn" onClick={() => { props.OnClose(); dispatch(CompareFlag(false)) }} />}
@@ -529,129 +409,36 @@ const ActionPanel = (props) => {
     }
   };
 
-  // ----------------------map Element ---------------
+  
+  
+  // const footerCompare = (
+  //   <div className='footer_compare'>
+  //     <button className='clear__btn__cmp'>Clear</button>
+  //     {props.isOpen === 'replaceObject' && <Button size="small" onClick={replaceButtonClickHandler}>Replace</Button>}
+  //     {props.isOpen === 'compareObject' && <button className='save__btn__cmp' onClick={() => { props.startScrape(browserName, 'compare'); props.OnClose() }}>Compare</button>}
+  //   </div>
+  // )
 
-  const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
-
-  const onDragOver = event => event.preventDefault();
-
-  const onDrop = (event, currObject) => {
-    if (map[currObject.val]) props.toastError("Object already merged");
-    else {
-      let draggedObject = JSON.parse(event.dataTransfer.getData("object"));
-      let mapping = {
-        ...map,
-        [currObject.val]: [draggedObject, currObject],
-        [draggedObject.val]: null
-      }
-      setMap(mapping);
-    }
-  }
-
-  const onUnlink = () => {
-    let mapping = { ...map };
-    for (let customObjVal of selectedItems) {
-      let scrapeObjVal = mapping[customObjVal][0].val
-      delete mapping[customObjVal];
-      delete mapping[scrapeObjVal];
-    }
-    setMap(mapping);
-    setSelectedItems([]);
-    setShowName("");
-  }
-
-  const onShowAllObjects = () => setSelectedTag("");
-
-  const submitMap = () => {
-
-    if (!Object.keys(map).length) {
-      props.toastError("Please select atleast one object to Map");
-      return;
-    }
-
-    // let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
-    let appType = props.appType ? props.appType : "web"; //props.appType;
-    const screenId = props.fetchingDetails["_id"];
-    const projectId = props.fetchingDetails.projectID;
-    const screenName = props.fetchingDetails["name"];
-    const versionNumber = 0;
-
-    let arg = {
-      projectId: projectId,
-      screenId: screenId,
-      screenName: screenName,
-      param: "mapScrapeData",
-      appType: appType,
-      objList: [],
-      orderList: orderLists,
-      versionnumber: 0,
-    };
-
-    let mapping = { ...map };
-    for (let val in mapping) {
-      if (mapping[val]) {
-        arg.objList.push([mapping[val][0].objId, mapping[val][1].objId, mapping[val][1].custname]);
-        arg.orderList.splice(arg.orderList.indexOf(mapping[val][0].objId), 1)
-      }
-    }
-
-    updateScreen_ICE(arg)
-      .then(response => {
-        if (response === "Invalid Session") return RedirectPage(props.history);
-        else props.fetchScrapeData()
-          .then(resp => {
-            if (resp === "success") {
-              props.toastSuccess(MSG.SCRAPE.SUCC_MAPPED_SCRAPED);
-              props.setShow(false);
-            }
-            else props.toastError(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
-          })
-          .catch(err => {
-            props.toastError(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
-            // console.error(err);
-          });
-      })
-      .catch(error => {
-        props.toastError(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
-        props.toastError(error);
-      })
-  }
-
-  const onCustomClick = (showName, id) => {
-    let updatedSelectedItems = [...selectedItems]
-    let indexOfItem = selectedItems.indexOf(id);
-
-    if (indexOfItem > -1) updatedSelectedItems.splice(indexOfItem, 1);
-    else updatedSelectedItems.push(id);
-
-    setShowName(showName);
-    setSelectedItems(updatedSelectedItems);
-  }
+//   const replaceButtonClickHandler = () => {
+//     props.startScrape();
+//     // setReplaceVisible = (true);
+// }
 
 
-  const mapElementFooter = () => (<>
-    <Button data-test="showAll" size="small" onClick={onShowAllObjects}>Show All Elements</Button>
-    <Button data-test="unLink" size="small" onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</Button>
-    <Button data-test="submit" size="small" onClick={submitMap}>Submit</Button>
-  </>
-  )
+//   const footerCompare = (
+//     <div className='footer_compare'>
+//       <button className='clear__btn__cmp'>Clear</button>
+//       {props.isOpen === 'replaceObject' && <Button size="small" onClick={replaceButtonClickHandler}>Replace</Button>}
+//       {props.isOpen === 'compareObject' && <button className='save__btn__cmp' onClick={() => { props.startScrape(browserName, 'compare'); props.OnClose() }}>Compare</button>}
+//     </div>
+//   )
 
-  // const replaceButtonClickHandler = ()=>{
-  //   props.startScrape();
-  //   setReplaceVisible(true);
-  // }
+//   const replaceButtonClickHandler = () => {
+//     props.startScrape();
+//     // setReplaceVisible = (true);
+// }
 
-  const footerCompare = (
-    <div className='footer_compare'>
-      {props.isOpen === 'compareObject' ? <>
-        <button className='clear__btn__cmp'>Clear</button>
-        <button className='save__btn__cmp' onClick={() => { props.OnClose(); props.startScrape(browserName, 'compare'); }}>Compare</button>
-      </> :
-        <Button onClick={() => { props.startScrape(browserName, '', 'replace'); setReplaceVisible(true); }} label="Replace"></Button>}
-    </div>
-  )
-
-
+  // ============================ compare element ==================================
 
   const renderAccordionHeader = (objName, index, objects) => {
     return (
@@ -665,11 +452,6 @@ const ActionPanel = (props) => {
       </div>
     );
   };
-  const onTabChanging = (e) => {
-    setSelectedTag(e.originalEvent.currentTarget.innerText);
-    console.log("OnTabChange", e);
-    console.log("OnTabChange", e.originalEvent.currentTarget.innerText);
-  }
 
   // checked checkboxes 
   const onCheckCheckbox = (e) => {
@@ -688,7 +470,7 @@ const ActionPanel = (props) => {
 
   const updateObjects = () => {
     if (!checked.length) {
-      toastErrorMsg('Please select element(s) to update properties.')
+      props.toastError('Please select element(s) to update properties.')
       return
     }
     let viewString = { ...props.mainScrapedData }
@@ -721,7 +503,7 @@ const ActionPanel = (props) => {
           dispatch(CompareFlag(false))
           dispatch(CompareElementSuccessful(true))
         } else {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Error while updating elements.', life: 10000 });
+          props.toastError('Error while updating elements');
 
           dispatch(CompareFlag(false))
         }
@@ -895,7 +677,6 @@ const ActionPanel = (props) => {
     setReplaceShowName("");
   }
 
-  const onReplaceShowAllObjects = () => setSelectedTag("");
 
   const onReplaceCustomClick = (replaceShowName, id) => {
     let updatedSelectedItems = [...selectedReplaceItems]
@@ -1113,6 +894,7 @@ const ActionPanel = (props) => {
       <Button size='small' label='Replace Keywords' onClick={() => { handleReplaceKeywordClick(); }}></Button>
     </div>
   )
+
   const footerReplaceKeyword = (
     <div className='footer_compare'>
       <Button size='small' label='Save' onClick={() => {
@@ -1138,115 +920,29 @@ const ActionPanel = (props) => {
 
   return (
     <>
-      <Toast ref={toast} position="bottom-center" baseZIndex={1200}></Toast>
-      <Dialog
-        className='add__object__header'
-        header='Add Element'
-        visible={props.isOpen === 'addObject'}
-        onHide={props.OnClose}
-        style={{ height: "28.06rem", width: "38.06rem", marginRight: "15rem" }}
-        position='right'
-        footer={addElementfooter}>
-        <div className='card__add_object'>
-          <Card className='add_object__left'>
-            <div className='flex flex-column'>
-              <div className="pb-3">
-                <label className='text-left pl-4' htmlFor="object__dropdown">Select Element Type</label>
-                <Dropdown value={addElementSelectObjectType} onChange={handleAddElementDropdownChange} options={objectTypes} optionLabel="name"
-                  placeholder="Search" className="w-full mt-1 md:w-15rem object__dropdown" />
-              </div>
-              <div className="pb-5">
-                <label className='text-left pl-4' htmlFor="Element_name">Enter Element Name</label>
-                <InputText
-                  type="text"
-                  className='Element_name p-inputtext-sm mt-1'
-                  value={addElementInputValue}
-                  onChange={handleAddElementInputChange}
-                  placeholder='Text Input'
-                  style={{ width: "15rem", marginLeft: "1.25rem" }} />
-              </div>
-              <div style={{ marginLeft: "13.5rem" }}>
-                <Button icon="pi pi-plus" size="small" onClick={handleAddElementAdd} ></Button>
-              </div>
-            </div>
-          </Card>
-          <Card className='add_object__right' title="Added Elements">
-            {addElementObjects.map((value, index) => (
-              <div key={index} className='' >
-                <p className="text__added__step">{value.objName}</p>
-              </div>
-            ))}
-          </Card>
-        </div >
-      </Dialog >
+      {props.isOpen === 'addObject' && <AddElement isOpen={props.isOpen}
+        OnClose={props.OnClose}
+        addCustomElement={props.addCustomElement}
+        toastSuccess={props.toastSuccess}
+        toastError={props.toastError}
+        elementTypeProp={props.elementTypeProp}
+      />
+      }
 
+      {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
+        onClose={props.onClose}
+        captureList={props.captureList}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={props.fetchScrapeData}
+        setShow={props.setShow}
+        toastSuccess={props.toastSuccess}
+        toastError={props.toastError}
+        elementTypeProp={props.elementTypeProp}
+      />}
 
-      {<Dialog
-        className='map__object__header'
-        header={"Map Element"}
-        style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
-        position='right'
-        visible={props.isOpen === 'mapObject'}
-        onHide={props.OnClose}
-        footer={mapElementFooter}
-      >
+      
 
-        <p> Please select the Element type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>
-        <div className="map_element_content ">
-          <div className="captured_elements">
-            <span className="header">Captured Elements</span>
-            <div className="list">
-              {(selectedTag ? scrapedList[selectedTag] : nonCustomList).map((object, i) => {
-                let mapped = object.val in map;
-
-                return (<div data-test="mapObjectListItem" key={i} title={object.title} className={"ss__mo_listItem" + (mapped ? " mo_mapped" : "")} draggable={mapped ? "false" : "true"} onDragStart={(e) => onDragStart(e, object)}>
-                  {object.custname}
-                </div>)
-              })
-              }
-            </div>
-          </div>
-
-          <div className="custom_element">
-            <span className="header">Custom Elements</span>
-            <div className="container">
-              {Object.keys(customList).map((elementType, i) => (
-                <>
-                  <Accordion activeIndex={activeIndex} onTabOpen={(e) => { setActiveIndex(e.index); onTabChanging(e) }} onTabClose={() => { setActiveIndex(""); setSelectedTag("") }}>
-                    <AccordionTab header={elementType} >
-                      {<div className="mo_tagItemList">
-
-                        {customList[elementType].map((object, j) => (
-
-                          <div data-test="mapObjectCustomListItem"
-                            key={j} title={object.title}
-                            className={"mo_tagItems" + (selectedItems.includes(object.val) ? " mo_selectedTag" : "")}
-                            onDragOver={onDragOver}
-                            onDrop={(e) => onDrop(e, object)}>
-
-                            {object.val in map ?
-                              <>
-                                <span data-test="mapObjectMappedName" className="mo_mappedName" onClick={() => onCustomClick("", object.val)}>
-                                  {showName === object.val ? object.title : map[object.val][0].title}
-                                </span>
-                                <span data-test="mapObjectFlipName" className="mo_nameFlip" onClick={() => onCustomClick(object.val, object.val)}></span>
-                              </> :
-                              <span data-test="h3" className='pl-1'>{object.title}</span>}
-
-                          </div>))}
-                      </div>
-                      }
-                    </AccordionTab>
-                  </Accordion>
-
-                  {/* <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>{elementType}</div> */}
-
-                </>))}
-            </div>
-          </div>
-        </div>
-      </Dialog >}
-
+      {/* Create Element */}
       <Dialog
         className='create__object__modal' header='Create Element'
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
@@ -1321,81 +1017,27 @@ const ActionPanel = (props) => {
 
       </Dialog>
 
-      <Dialog
-        className='compare__object__modal'
-        header="Compare Object:Sign up screen 1"
-        style={{ height: "21.06rem", width: "24.06rem" }}
-        visible={(props.isOpen === 'compareObject' || props.isOpen === 'replaceObject') && (replaceVisible === false)}
-        onHide={props.OnClose} footer={footerCompare}>
-        <div className='compare__object'>
-          <span className='compare__btn'>
-            <p className='compare__text'>List Of Browsers</p>
-          </span>
-          <span className='browser__col'>
-            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          </span>
-        </div>
-      </Dialog>
-      {/* COMPARE ELEMENT  */}
-      <Dialog className='create__object__modal' draggable={false} header={Header} style={{ height: "40rem", width: "50.06rem", marginRight: "6rem" }} visible={compareFlag} onHide={() => { dispatch(CompareFlag(false)) }} position='right' footer={compareElementfooter}>
-        <Accordion multiple activeIndex={[0]}>
-          {changedObj && changedObj.length && <AccordionTab contentClassName='' className="accordin__elem" header={accordinHedaerChangedElem()}>
-            <div className='accordion_changedObj'>
-              {changedObj.map((element, index) => (
-
-                <div className="changed__elem" key={index} style={{ display: 'flex', gap: '0.5rem', marginLeft: '1.3rem' }}>
-                  <Checkbox inputId={element.custname}
-                    value={element}
-                    onChange={onCheckCheckbox}
-                    checked={checked.some(
-                      (item) => item.element.custname === element.custname
-                    )}
-                  />
-                  <p>{element.custname}</p>
-                </div>))}
-            </div>
 
 
-          </AccordionTab>
-          }
+      {props.isOpen === 'compareObject' &&  <CompareElement
+        screenId={props.fetchingDetails["_id"]}
+        mainScrapedData={props.mainScrapedData}
+        orderList={props.orderList}
+        fetchingDetails={props.fetchingDetails} 
+        fetchScrapeData={props.fetchScrapeData}
+        toastSuccess={props.toastSuccess}
+        toastError={props.toastError}
+        onClose={props.onClose}
+        setShow={props.setShow}
+      />}
 
-          {notFoundObj && notFoundObj.length && <AccordionTab contentClassName='' className="accordin__elem" >
-            <div className='accordion_notfoundObj'>
-              {notFoundObj.map((element, index) => (
-
-                <div className="changed__elem" key={index} style={{ display: 'flex', gap: '0.5rem', marginLeft: '1.3rem' }}>
-                  <p>{element.custname}</p>
-                </div>
-
-              ))}
-            </div>
-          </AccordionTab>
-          }
-
-          {notChangedObj && notChangedObj.length && <AccordionTab contentClassName='' className="accordin__compare" header="Unchanged Elements">
-            <div className='accordion_unchangedObj'>
-              {notChangedObj.map((element, index) => (
-
-                <div className="changed__elem" style={{ display: 'flex', gap: '0.5rem', marginLeft: '1.3rem' }} key={index} >
-                  <p>{element.custname}</p>
-                </div>
-
-              ))}
-            </div>
-          </AccordionTab>
-          }
-        </Accordion>
-      </Dialog>
-
+      {/* Replace Element */}
       <Dialog
         className='replace__object__modal'
         header="Replace: Sign up screen 1"
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
-        visible={props.isOpen === "replaceObjectPhase2"}
+        visible={props.isOpen === "replaceObject"}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">
@@ -1506,3 +1148,4 @@ const ActionPanel = (props) => {
 }
 
 export default ActionPanel;
+

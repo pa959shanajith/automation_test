@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import Legends from './Legends';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Divider } from 'primereact/divider';
-import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes } from '../designSlice'
+import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
 
 
 
@@ -50,6 +50,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
+        dispatch(dontShowFirstModule(false))
         dispatch(selectedProj(proj))
         // setselectedProjectNameForDropdown(proj);
         // if(!isEnELoad){
@@ -171,13 +172,13 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 </span> */}
                 <div data-test="headerMenu" className='toolbar__header-menus'>
                     <img className='am' src='static/imgs/minus-icon.svg' alt='minus'/>
-                    <div>40%</div>
+                    <div  style={{position:'relative', top:'0.4rem',fontSize:'12px'}} >40%</div>
                     <img  className='am' src='static/imgs/add.svg' alt='add'/>
                     <img className='line' src='static/imgs/line.svg' alt='line'/>
                     <div className="flex justify-content-center gap-2">
-                        <label htmlFor='input-metakey'>Map View</label>
+                        <label style={{position:'relative', top:'0.3rem',fontSize:'12px'}} htmlFor='input-metakey'>Map View</label>
                         <InputSwitch inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
-                        <label htmlFor="input-metakey" style={{marginRight:'0.8rem'}}>Table View</label>
+                        <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem'}}>Table View</label>
                     </div>
                     <img className='line' src='static/imgs/line.svg' alt='line'/>
                 </div>

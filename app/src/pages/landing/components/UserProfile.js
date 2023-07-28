@@ -5,15 +5,17 @@ import { Tooltip } from "primereact/tooltip";
 import { ConfirmDialog} from 'primereact/confirmdialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,Link} from "react-router-dom";
 import RedirectPage from '../../global/components/RedirectPage';
 import ChangePassword from '../../global/components/ChangePassword';
 import EditProfile from '../components/EditProfile'
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
+import Agent from '../components/Agent';
+// import 'primereact/resources/themes/saga-blue/theme.css';
+// import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { Button } from "primereact/button";
+import { setMsg , Messages as MSG, } from "../../global";
 
 
 const UserDemo = (props) => {
@@ -24,7 +26,11 @@ const UserDemo = (props) => {
     const [logoutClicked, setLogoutClicked] = useState(false);
     const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
     const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+    const [showAgentDialog, setShowAgentDialog] = useState(false);
     const [initials, setInitials] = useState('');
+    const [config, setConfig] = useState({});
+    const [showUD, setShowUD] = useState(false);
+    const [showOverlay, setShowOverlay] = useState("");
     let userInfo = useSelector((state) => state.landing.userinfo);
     userInfo = JSON.parse(localStorage.getItem('userInfo'));
       
@@ -34,6 +40,36 @@ const UserDemo = (props) => {
         const initials = (firstNameInitial+ lastNameInitial).toUpperCase();
         setInitials(initials);
     }, [userInfo])
+
+    useEffect(() => {
+        (async()=>{
+            const response = await fetch("/getClientConfig")
+            let {avoClientConfig} = await response.json();
+            setConfig(avoClientConfig);
+           
+        })();
+      }, []);
+
+      const getIce = async (clientVer) => {
+        try {
+      setShowUD(false);
+    //   setShowOverlay(`Loading...`);
+            const res = await fetch("/downloadICE?ver="+clientVer);
+        const {status} = await res.json();
+        if (status === "available"){
+        window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+"&fileName="+((userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
+      } 
+            else 
+            setMsg(MSG.GLOBAL.ERR_PACKAGE);
+    //   setShowOverlay(false)
+        } catch (ex) {
+            console.error("Error while downloading ICE package. Error:", ex);
+            setMsg(MSG.GLOBAL.ERR_PACKAGE);
+        }
+    }
+    const handleDownloadClick = () => {
+        getIce("avoclientpath_Windows");
+      };
 
     const userMenuItems =[
         {
@@ -80,8 +116,18 @@ const UserDemo = (props) => {
                 {
                     label: 'Download Client',
                     icon: 'pi pi-fw pi-download',
+                    command: () => {
+                        handleDownloadClick();
+                    }
+                },
+                {
+                    label: 'Download Agent',
+                    icon: 'pi pi-fw pi-download',
+                    command: () => {
+                        agentDialog();
+                    }
                 }
-            ]
+            ]  
         },
         {
             label: 'Notification Settings',
@@ -108,6 +154,11 @@ const UserDemo = (props) => {
     const EditProfileDialog = () => {
         setShowEditProfileDialog(true);
     }
+
+    const agentDialog = () => {
+        setShowAgentDialog(true);
+    }
+
     const confirmLogout = () => {
         RedirectPage(navigate, { reason: "logout" });
     };
@@ -116,7 +167,8 @@ const UserDemo = (props) => {
         <div className="UserProfileContainer">
             <TieredMenu className='custom-tieredmenu' model={userMenuItems} popup ref={menu} breakpoint="767px" />
             { showEditProfileDialog && <EditProfile showDialogBox = {showEditProfileDialog} setShowDialogBox= {setShowEditProfileDialog}/>}
-            { showChangePasswordDialog && < ChangePassword showDialogBox = {showChangePasswordDialog} setShowDialogBox= {setShowChangePasswordDialog}/>}
+            { showChangePasswordDialog && < ChangePassword showDialogBox = {showChangePasswordDialog} setShowDialogBox= {setShowChangePasswordDialog}/>}  
+            { showAgentDialog && < Agent showDialogBox = {showAgentDialog} setShowDialogBox= {setShowAgentDialog}/>}
             <AvoConfirmDialog 
                 visible={logoutClicked}
                 onHide={setLogoutClicked} 
@@ -128,7 +180,7 @@ const UserDemo = (props) => {
                 image={userInfo?.userimage ? userInfo.userimage : initials} 
                 label={ !userInfo.userimage ? initials :''}
                 onClick={(e) => menu.current.toggle(e)} size='small' shape="circle"/>
-        </div>
+        </div>      
    );
 };
 
