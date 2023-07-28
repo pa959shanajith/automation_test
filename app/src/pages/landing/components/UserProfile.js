@@ -10,8 +10,8 @@ import RedirectPage from '../../global/components/RedirectPage';
 import ChangePassword from '../../global/components/ChangePassword';
 import EditProfile from '../components/EditProfile'
 import Agent from '../components/Agent';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
+// import 'primereact/resources/themes/saga-blue/theme.css';
+// import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { Button } from "primereact/button";
