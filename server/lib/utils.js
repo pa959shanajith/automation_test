@@ -81,11 +81,11 @@ module.exports.delSession = async (data) => {
 	}
 };
 
-module.exports.findSessID = async (username) => {
+module.exports.findSessID = async (username,clientName) => {
 	let sid = "";
 	const sessList = await this.allSess();
 	for (let ki of sessList) {
-		if (username == ki.username) {
+		if (username == ki.username && clientName == ki.client) {
 			sid = ki.uniqueId;
 			break;
 		}
@@ -100,7 +100,7 @@ module.exports.cloneSession = async (req) => {
 		sessClient.ttl(sessid, (err, ttl) => {
 			if (err) return rsv(err);
 			var args = [sessid,JSON.stringify(req.session),'EX',ttl];
-			req.clearSession();
+			// req.clearSession();
 			sessClient.set(args, err => rsv(err));
 		});
 	}));
