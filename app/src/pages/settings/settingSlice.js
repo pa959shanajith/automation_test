@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
-    screenType: '',
+    screenType: { name: 'Jira', code: 'NY' },
     intergrationLogin:{
         username:'priyanka.r@slkgroup.com',
         password:'B8RUqqKt8B28MSz9zq1Q14AD',
@@ -19,7 +19,8 @@ const initialState = {
     syncedTestCases: [],
     selectedScenarioIds: [],
     mappedPair: [],
-    selectedAvoproject:''
+    selectedAvoproject:'',
+    mappedTree:[]
 }
 
 export const settingSlice=createSlice({
@@ -55,13 +56,16 @@ export const settingSlice=createSlice({
             state.syncedTestCases =  action.payload
         },
         selectedScenarioIds:(state,action) => {
-            state.syncedTestCases =  action.payload
+            state.selectedScenarioIds =  action.payload
         },
         mappedPair:(state,action) => {
             state.mappedPair =  action.payload
         },
         selectedAvoproject:(state,action) => {
             state.selectedAvoproject =  action.payload
+        },
+        mappedTree:(state,action) => {
+            state.mappedTree =  action.payload
         }
 
     }
@@ -79,7 +83,8 @@ export const {
     syncedTestCases,
     selectedScenarioIds,
     mappedPair,
-    selectedAvoproject
+    selectedAvoproject,
+    mappedTree
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;
