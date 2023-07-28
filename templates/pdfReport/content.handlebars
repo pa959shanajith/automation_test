@@ -1,0 +1,485 @@
+<style>
+   body {
+      font-family: 'LatoWeb', sans-serif;
+      height: 98%;
+      margin: 0;
+   }
+
+   .mainContainer {
+      float: left;
+      padding: 5px;
+      width: calc(100% - 12px);
+   }
+
+   .h2Header {
+      font-size: 12px;
+      width: 100%;
+      float: left;
+      border: 1px solid #cfcfcf;
+      background-color: #dfd0fa;
+   }
+
+   .h2Header h3 {
+      position: relative;
+      text-align: center;
+      left: -110px;
+   }
+
+   .leftSummary {
+      width: 50%;
+      float: left;
+      padding: 25px 0 25px 25px;
+      font-size: 14px;
+   }
+
+   .leftSummary label {
+      text-align: left;
+      float: left;
+      width: 29%;
+      padding-right: 5px;
+      padding-bottom: 5px;
+   }
+
+   .leftSummary span {
+      float: left;
+      width: 64%;
+      padding-bottom: 5px;
+      font-weight: bold;
+      word-break: break-all;
+   }
+
+   .progress {
+      overflow: hidden;
+      margin-bottom: 5px;
+      margin-left: 2px;
+   }
+
+   .progress-bar {
+      float: left;
+      height: 100%;
+      font-size: 12px;
+      line-height: 20px;
+      color: #fff;
+      text-align: center;
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+      transition: width .6s ease;
+   }
+
+   .reportStatusBlk {
+      float: left;
+      width: 100%;
+   }
+
+   .progresslabel {
+      float: left;
+      display: inline-block;
+      width: 20%;
+      padding-left: 14px;
+      padding-bottom: 5px;
+   }
+
+   .customprogress {
+      float: left;
+      height: 8px !important;
+      border-radius: 10px;
+      margin-top: 3px;
+      background-color: #e0e0e0;
+      position: relative;
+      left: 15px !important;
+   }
+
+   .progress-bar-success {
+      background-color: #39b54a;
+   }
+
+   .progress-bar-danger {
+      background-color: #d41e2d;
+   }
+
+   .progresspercentage {
+      margin-left: 20px;
+   }
+
+   .rightSummaryFunc {
+      width: 46%;
+      float: left;
+      margin-top: 80px;
+      font-size: 14px;
+   }
+
+   .progress-bar-warning {
+      background-color: #f7b91e;
+   }
+
+   .midContainer {
+      border-collapse: collapse;
+      border: 1px solid #cfcfcf;
+      width: 100%;
+      float: left;
+      margin: 1% 0;
+      font-size: 14px;
+   }
+
+   .midContainer td {
+      padding-top: 5px;
+      border: 1px solid #cfcfcf;
+      float: left;
+   }
+
+   .midContainer td label {
+      text-align: right;
+      float: left;
+      width: 35%;
+      font-family: 'LatoWeb', sans-serif;
+      padding-right: 5px;
+      padding-bottom: 5px;
+   }
+
+   .reportsDetails {
+      border: 1px solid #cfcfcf;
+      background-color: #dfd0fa;
+      font-size: 15px;
+   }
+
+   .reportsDetails th:nth-child(1),
+   .rDid {
+      width: 4%;
+      word-break: break-word;
+   }
+
+   .reportsDetails th:nth-child(2),
+   .rDstep {
+      width: 4%;
+      word-break: break-word;
+   }
+
+   .reportsDetails th:nth-child(3),
+   .rDstepDes {
+      width: 10%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .reportsDetails th:nth-child(4),
+   .rDellaps {
+      width: 7%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .reportsDetails th:nth-child(5),
+   .rDcomments {
+      width: 8%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .reportsDetails th:nth-child(6),
+   .rDremarks {
+      width: 9%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .reportsDetails th:nth-child(7),
+   .rDExpectedRes {
+      width: 9%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .reportsDetails th:nth-child(8),
+   .rDActualRes {
+      width: 9%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .reportsDetails th:nth-child(9),
+   .rjira {
+      width: 9%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .reportsDetails th:nth-child(10),
+   .rDstatus {
+      width: 5%;
+      word-break: break-word;
+      text-align: left
+   }
+
+   .maintabCont {
+      float: left;
+      width: 100%;
+      border: 1px solid #dcdcdc;
+      height: 49%;
+   }
+
+   .tabCont {
+      display: table-cell;
+      border-bottom: 1px solid #ececec;
+      border-right: 1px solid #ececec;
+      word-wrap: break-word
+   }
+
+   .reportsDetail {
+      line-height: 2;
+      text-align: center;
+      height: calc(100% - 35px);
+      overflow: auto;
+      font-size: 14px;
+   }
+
+   .reportsDetail tr {
+      page-break-inside: avoid;
+   }
+
+   .rDstepDes {
+      text-align: left;
+      word-break: break-word;
+   }
+
+   .reportsDetail tr.reportdetailsrow:nth-child(even) {
+      background: #f9f9f9;
+   }
+
+   .reportdetailsrow td {
+      padding-top: 9px;
+   }
+
+   @media screen and (max-height: 675px) {
+      .reportsDetail {
+         height: 174px;
+      }
+   }
+
+   .headerRepDetails {
+      left: 10px;
+      float: left;
+      display: block;
+      position: relative;
+      top: 7px;
+   }
+
+   .screenshot-container {
+      text-align: center;
+      padding: 20px
+   }
+
+   .screenshot-container img {
+      border: 1px solid #ccc;
+      min-height: 100px
+   }
+
+   .screenshot-container a {
+      font-size: 20px;
+      color: inherit;
+      text-decoration: none
+   }
+
+   .reportsDetails th,
+   td {
+      text-align: left !important;
+      padding: 2px;
+      width: 10%;
+   }
+
+   .pdfReport {
+      float: left;
+      width: 100%;
+      table-layout: table;
+   }
+
+   .latobold {
+      font-weight: bold;
+   }
+
+   .hide {
+      display: none;
+   }
+
+   .progressLabelVal {
+      font-weight: bold !important;
+   }
+   .progressBox{
+      width:315px !important;
+      float:right !important;
+      position:relative !important;
+      left:33px !important;
+      top:-15px !important;
+      font-size:12px !important;
+      margin-left:22px !important;
+      text-align:center !important;
+   }
+   .capitalize{
+      text-transform: capitalize;
+   }
+</style>
+<div class="mainContainer">
+   {{#each overallstatus}}
+   <div class="h2Header">
+      <div class="headerRepDetails">
+         <label>Report Generated Date : </label><span class='latobold'>{{date}}</span>
+         <br>
+         <label>Report Generated Time : </label><span class='latobold'>{{time}}</span>
+      </div>
+      <h3>Avo Assure Execution Report</h3>
+   </div>
+   <div class="leftSummary">
+      <h3>Result Summary</h3>
+      <label>Scenario</label><span>: {{scenarioName}}</span><br />
+      <label>Cycle</label><span>: {{cycleName}}</span><br />
+      <label>Release</label><span>: {{releaseName}}</span><br />
+      <label>Project</label><span>: {{projectName}}</span><br />
+      <label>Domain</label><span>: {{domainName}}</span><br />
+      <label>Browser Type</label><span class="capitalize">: {{browserType}}</span><br />
+      <label>Browser Version</label><span>: {{browserVersion}}</span>
+      {{#ifnotEquals version undefined}}
+        {{#ifnotEquals version '-'}}
+			<label>Version</label><span>: {{version}}</span>
+		{{/ifnotEquals}}
+      {{/ifnotEquals}}
+   </div>
+   <div id="rightSummaryFunc" class="rightSummaryFunc">
+      <div class="reportStatus">
+         <span class="progresslabel" style='width:35%'>Overall Status</span>
+         <span class="progresslabel progressLabelVal"
+            style="width:35%; color:{{getColor overallstatus}}"><text style='color:#000; !important'>:</text> {{overallstatus}}</span>
+        {{#ifnotEquals overAllStatus "Incomplete"}}
+         <span class="progresslabel" style='width:35%'>Tescase Status</span>
+         <span class="progress customprogress  progressLabelVal" style='width:53%'>
+            <span class="progress-bar" role="progressbar" style="background-color:#28a745;width:{{pass}}%">
+            </span>
+            <span class="progress-bar" role="progressbar" style="background-color:#dc3545;width: {{fail}}%">
+            </span>
+            <span class="progress-bar" role="progressbar" style="background-color:#ffc107;width: {{terminate}}%">
+            </span>
+         </span>
+         <span class="progresslabel" style='width:120px;visibility:hidden;margin-left:20px;'>Progress</span>
+         <span class="progresslabel  progressLabelVal progressBox"><span
+               style="color:#28a745;" class='progVal'>Pass: {{pass}}%</span>&nbsp;&nbsp;<span style="color:#dc3545;"
+               class='progVal'>Fail: {{fail}}%</span>&nbsp;&nbsp;<span style="color:#ffc107;"
+               class='progVal'>Terminated: {{terminate}}%</span></span>
+         <span class="progresslabel" style='width:35%'>Start Date and Time</span>
+         <span class="progresslabel  progressLabelVal" style="width:35%;">: {{StartTime}}</span>
+         <span class="progresslabel" style='width:35%'>End Date and Time</span>
+         <span class="progresslabel  progressLabelVal" style="width:35%;">: {{EndTime}}</span>
+         <span class="progresslabel" style='width:35%'>Elapsed Time</span>
+         <span class="progresslabel  progressLabelVal" style="width:35%;">: {{EllapsedTime}}</span>
+         {{/ifnotEquals}}
+      </div>
+   </div>
+   {{/each}}
+   <div class="maintabCont">
+      <span class='hide'>{{remarksLength}}</span>
+      <span class='hide'>{{commentsLength}}</span>
+      <table class='pdfReport' style="width: 100%;">
+         <thead class="reportsDetails">
+            <tr>
+               <th>Sl No.</th>
+               <th>Test Step No.</th>
+               <th style="display:none">Test Step Description</th>
+               {{#ifnotEquals remarksLength 0}}
+               {{!-- <th>Remarks</th> --}}
+               {{/ifnotEquals}}
+               <th>Expected Result</th>
+               <th>Actual Result</th>
+               <th>Status</th>
+               <th>Elapsed Time</th>
+               {{#ifnotEquals commentsLength 0}}
+               <th>Comments</th>
+               {{/ifnotEquals}}
+               <th>Jira Defect ID</th>
+            </tr>
+         </thead>
+         <tbody class="reportsDetail">
+            {{#each rows}}
+            {{#ifnotEquals hidestep "true"}}
+            <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
+               <td class="rDid tabCont">{{slno}}</td>
+               {{#ifnotEquals Step undefined}}
+               <td class="rDstep tabCont">{{Step}}</td>
+               {{/ifnotEquals}}
+               {{#ifEquals Step undefined}}
+               <td class="rDstep tabCont">{{StepDescription}}</td>
+               {{/ifEquals}}
+               <td style="display:none" class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+               {{!-- {{#ifnotEquals  ../remarksLength 0}}
+               <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
+               {{/ifnotEquals}} --}}
+               <!-- If Hide Test Details is False -->
+               {{#ifnotEquals hidestep "true"}}
+               {{#ifEquals testcase_details.testcaseDetails undefined}}
+               {{#ifnotEquals Keyword "TestCase Name"}}
+               <td class="rDExpectedRes tabCont {{getClass StepDescription}}"></td>
+               {{/ifnotEquals}}
+               {{#ifEquals Keyword "TestCase Name"}}
+               <td class="rDExpectedRes tabCont"></td>
+               {{/ifEquals}}
+               {{/ifEquals}}
+               {{#ifEquals testcase_details.testcaseDetails ""}}
+               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+               {{/ifEquals}}
+               {{#ifnotEquals testcase_details.testcaseDetails ""}}
+               {{#ifnotEquals testcase_details undefined}}
+               <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
+               {{/ifnotEquals}}
+               {{/ifnotEquals}}
+               {{#ifEquals status undefined}}
+               <td class="rDActualRes tabCont"></td>
+               {{/ifEquals}}
+               {{#ifEquals status ""}}
+               <td class="rDActualRes tabCont"></td>
+               {{/ifEquals}}
+               {{#ifEquals status "Pass"}}
+               {{#ifEquals testcase_details.actualResult_pass ""}}
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">As Expected</td>
+               {{/ifEquals}}
+               {{#ifnotEquals testcase_details.actualResult_pass ""}}
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
+               {{/ifnotEquals}}
+               {{/ifEquals}}
+               {{#ifEquals status "Fail"}}
+               {{#ifEquals testcase_details.actualResult_fail ""}}
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">
+                  <a style="color: {{getColor status}};text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a>
+               </td>
+               {{/ifEquals}}
+               {{#ifnotEquals testcase_details.actualResult_fail ""}}
+               <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
+               {{/ifnotEquals}}
+               {{/ifEquals}}
+               {{#ifEquals status "Terminate"}}
+               <td class="rDActualRes tabCont {{getClass StepDescription}}">{{StepDescription}}</td>
+               {{/ifEquals}}
+               {{/ifnotEquals}}
+               <!-- If Hide Test Details is False -->
+               <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}">
+                  <a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a>
+               </td>
+               <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+               {{#ifnotEquals ../commentsLength 0}}
+               <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+               {{/ifnotEquals}}
+               <td class="rjira tabCont" style="padding-left: 10px;">{{jira_defect_id}}</td>
+            </tr>
+            {{/ifnotEquals}}
+            {{/each}}
+         </tbody>
+      </table>
+      {{#each rows}}
+      <div class="screenshot-container" style="display:{{validateImagePath screenshot_dataURI}}">
+         {{#ifEquals ../overallstatus.0.browserType "MobileApp"}}
+         <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:70%;display:block;"
+            alt="Image for Sl No. {{slno}}">
+         {{/ifEquals}}
+         {{#ifnotEquals ../overallstatus.0.browserType "MobileApp"}}
+         <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:100%;display:block;"
+            alt="Image for Sl No. {{slno}}">
+         {{/ifnotEquals}}
+         <a href="#report-slno{{slno}}">Above image belongs to Sl No. {{slno}}</a>
+      </div>
+      {{/each}}
+   </div>
+</div>
