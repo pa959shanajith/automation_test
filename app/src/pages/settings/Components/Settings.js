@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import "../styles/projectSettings.scss";
@@ -24,6 +24,8 @@ const Settings =() =>{
         setHandleManageProject(!handleManageProject);
       }
       console.log(handleManageProject)
+      const Integrations = useMemo(() => <ManageIntegrations visible={manageIntegrationsvisible} onHide={handleCloseDialog} />,[manageIntegrationsvisible,handleCloseDialog])
+
     return(
         <>
          <div className='p-4 surface-100 flex flex-column'>
@@ -49,7 +51,7 @@ const Settings =() =>{
             <img src="static/imgs/manage_integration_icon.svg" alt="integration"  style={{ width: '50px', height: '50px' }} />
             </div>
              <Button className="manageProj1_btn" size="small" label='Manage Integrations' onClick={handleOpenDialog} ></Button> 
-             <ManageIntegrations visible={manageIntegrationsvisible} onHide={handleCloseDialog} /> 
+              {Integrations}
             
            </Card>
         </div>

@@ -57,47 +57,6 @@ export default function BasicDemo() {
         setReportViewData(parent);
     },[reportData])
 
-    const convertDataToTree = (data) => {
-        const treeDataArray = [];
-        for (let i = 0; i < data.length; i++) {
-          const rootNode = {
-            key:data[i].id,
-            data: { StepDescription: data[i].StepDescription, slno: data[i].slno, key:data[i].id },
-            children: [],
-          };
-          data[i].children?.forEach((child) => {
-            rootNode.children.push({
-              data: child,
-            });
-          });
-          treeDataArray.push(rootNode); // Add the rootNode to the array
-        }
-        return treeDataArray; // Return the array of treeData
-      };
-      
-    const treeData = convertDataToTree(reportViewData)
-    
-    // const [expandedRows, setExpandedRows] = useState([]);
-
-    // const allowExpansion = (rowData) => {
-    //     return rowData.children.length > 0;
-    // };
-    // const rowExpansionTemplate = (data) => {
-    //     return (
-    //             <DataTable value={data.children}>
-    //                 <Column style={{width:'2rem'}}/>
-    //                 <Column field="slno" header='S No.'></Column>
-    //                 <Column field="Step" header='Steps' ></Column>
-    //                 <Column field='Keyword'  header='Description'/>
-    //                 <Column field="EllapsedTime"  header='Time Elapsed' ></Column>
-    //                 <Column field="status"  header='Status' ></Column>
-    //                 <Column field='comments'  header='Comments' />
-    //                 <Column field='jira_defect_id'  header='Jira' />
-    //                 <Column field='azure_defect_id' header='Azure'  />
-    //                 <Column field='action'  header='Action' />
-    //             </DataTable>
-    //     );
-    // };
     const handdleExpend = (e) => {
       setExpandedKeys(e.value);
     };
@@ -141,6 +100,48 @@ export default function BasicDemo() {
         const hasChildren = rowData?.children && rowData?.children?.length > 0;
         return hasChildren ? null :  <img src='static/imgs/bug.svg' alt='bug defect'/>;
     }
+    const convertDataToTree = (data) => {
+        const treeDataArray = [];
+        for (let i = 0; i < data.length; i++) {
+          const rootNode = {
+            key:data[i].id,
+            data: { StepDescription: data[i].StepDescription, slno: data[i].slno, key:data[i].id },
+            children: [],
+          };
+          data[i].children?.forEach((child) => {
+            rootNode.children.push({
+              data: child,
+            });
+          });
+          treeDataArray.push(rootNode); // Add the rootNode to the array
+        }
+        return treeDataArray; // Return the array of treeData
+      };
+      
+    const treeData = convertDataToTree(reportViewData)
+    
+    // const [expandedRows, setExpandedRows] = useState([]);
+
+    // const allowExpansion = (rowData) => {
+    //     return rowData.children.length > 0;
+    // };
+    // const rowExpansionTemplate = (data) => {
+    //     return (
+    //             <DataTable value={data.children}>
+    //                 <Column style={{width:'2rem'}}/>
+    //                 <Column field="slno" header='S No.'></Column>
+    //                 <Column field="Step" header='Steps' ></Column>
+    //                 <Column field='Keyword'  header='Description'/>
+    //                 <Column field="EllapsedTime"  header='Time Elapsed' ></Column>
+    //                 <Column field="status"  header='Status' ></Column>
+    //                 <Column field='comments'  header='Comments' />
+    //                 <Column field='jira_defect_id'  header='Jira' />
+    //                 <Column field='azure_defect_id' header='Azure'  />
+    //                 <Column field='action'  header='Action' />
+    //             </DataTable>
+    //     );
+    // };
+
     return (
         <div className="reportsTable_container">
             <div className="reportSummary">

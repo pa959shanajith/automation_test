@@ -263,7 +263,15 @@ const Profile = () => {
       ],
     });
   };
-
+//  const handleViweReports =  async (reportid) =>{
+//     const win = window.open("/reports/viewReports", "_blank"); 
+//     win.focus();
+//     localStorage['executionReportId'] = reportid;
+//     localStorage['logData'] = JSON.stringify(logData[reportid]);
+//     localStorage['logPath'] = logPath;
+//     localStorage['reportPage'] = "landing";
+//   }
+ 
   const onTestCaseClick = async (row, parentRow) => {
 
     const testCaseList = await getTestSuite({

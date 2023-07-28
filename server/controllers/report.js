@@ -462,7 +462,7 @@ exports.connectJira_ICE = function(req, res) {
 
                             function jira_login_4_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Jira_Projects"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "Jira_details"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", jira_login_4_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
@@ -470,7 +470,7 @@ exports.connectJira_ICE = function(req, res) {
                                             var soc = myserver.socketMapNotify[username];
                                             soc.emit("ICEnotAvailable");
                                         }
-                                    } else if (data.onAction == "Jira_Projects") {
+                                    } else if (data.onAction == "Jira_details") {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
@@ -530,7 +530,9 @@ exports.connectJira_ICE = function(req, res) {
                                     "project_selected": {
                                         'project':req.body.project,
                                         'key':req.body.key
-                                    }
+                                    },
+                                    "itemType":req.body.itemType,
+                                    
                                 };
                                 redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
                                 var count = 0;
@@ -692,7 +694,7 @@ exports.getReport_API = async (req, res) => {
         finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo).report;
+            const report = prepareReportData(reportInfo,'removeReportItems').report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
@@ -748,8 +750,10 @@ exports.saveJiraDetails_ICE = async (req, res) => {
 				'projectid': itr.projectId,			
 				'projectName': itr.projectName,
 				'projectCode': itr.projectCode,
-				'testId': itr.testId,
-				'testCode': itr.testCode,
+				'itemId': itr.testId,
+				'itemCode': itr.testCode,
+                'itemType': itr.itemType,
+                'itemSummary':itr.itemSummary,
 				"query": "saveJiraDetails_ICE"
 			};
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
@@ -988,7 +992,7 @@ exports.getDevopsReport_API = async (req) => {
         // execResponse.tokenValidation = 'passed';
 
         const inputs = { executionId, scenarioIds, 'query': 'devopsReport' };
-        const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
+        const data = await utils.fetchData(inputs, "reports/getDevopsReport_API", fnName, true);
         let reportResult = data[0];
         let reportStatus = data[2];
         if (reportResult == "fail") {
@@ -1001,7 +1005,7 @@ exports.getDevopsReport_API = async (req) => {
         // finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
-            const report = prepareReportData(reportInfo).report;
+            const report = prepareReportData(reportInfo,'removeReportItems').report;
             report.overallstatus.reportId = reportInfo.reportid;
             delete report.overallstatus.scenarioName;
             delete report.overallstatus.executionId;
@@ -1229,6 +1233,147 @@ exports.fetchModSceDetails = async (req, res) => {
     }
 };
 
+
+exports.viewReport = async (req, res, next) => {
+    const fnName = "viewReport";
+    logger.info("Inside UI function: " + fnName);
+    // const url = req.url.split('/');
+    // let reportName = url[1] || "";
+    // if (reportName.split('.').length == 1) reportName += ".html";
+    // const reportId =  reportName.split('.')[0];
+    // const typeWithQuery = (reportName.split('.')[1] || 'html').toLowerCase().split('?')
+    // const type = typeWithQuery[0];
+    // const embedImages = typeWithQuery[1] == 'images=true';
+    const embedImages = req.query.images === 'true';
+    const reportId = req.query.reportID;
+    const type = req.query.type;
+    // const nfs = new reportNFS();
+    let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
+    logger.info("Requesting report type - " + type);
+    // if (url.length > 2) {
+    //     return res.redirect('/404');
+    // } 
+    // else if (!req._passport.instance.verifySession(req) && type == 'html') {
+    //     report.error = {
+    //         ecode: "INVALID_SESSION",
+    //         emsg: "Authentication Failed! No Active Sessions found. Please login and try again.",
+    //         status: 401
+    //     }
+    // } else
+    var statusCode = 400;
+    if (!['pdf', 'json'].includes(type)) {
+        report.error = {
+            ecode: "BAD_REQUEST",
+            emsg: "Requested Report Type is not Available",
+            status: 400
+        }
+        return res.status(statusCode).send(report.error);
+    } 
+    else {
+        const inputs = { reportid: reportId };
+        const reportData = await utils.fetchData(inputs, "reports/getReport", fnName);
+        if (reportData == "fail") {
+            report.error = {
+                ecode: "SERVER_ERROR",
+                emsg: "Error while loading Report due to an internal error. Try again later!",
+                status: 500
+            }
+            return res.status(statusCode).send(report.error);
+        } else if (reportData.length == 0) {
+            report.error = {
+                ecode: "NOT_FOUND",
+                emsg: "Requested Report is not Available!",
+                status: 404
+            }
+            return res.status(statusCode).send(report.error);
+        } else {
+            reportData.reportId = reportId;
+            const newData = prepareReportData(reportData, embedImages);
+            var scrShots = newData.scrShots;
+            report = newData.report;
+        }
+    }
+    if (type == "json") {
+        statusCode = report.error && report.error.status || 200;
+        res.setHeader("Content-Type", "application/json");
+        return res.status(statusCode).send(JSON.stringify(report, null, 2));
+    } else if (type == "pdf") {
+        if (report.error) {
+            res.setHeader("X-Render-Error", report.error.emsg);
+            return res.status(report.error.status || 200).send(report.error);
+        }
+        res.setHeader("Content-Type", "application/pdf");
+        report.overallstatus = [report.overallstatus]
+        report.remarksLength = report.remarksLength.length;
+        report.commentsLength = report.commentsLength.length;
+
+        if (scrShots && scrShots.paths.length > 0) {
+            // for (let i=0; i < scrShots.idx.length; i++) {
+            //     let image = 'fail';
+            //     let scrIndex = scrShots.idx[i];
+            //     if (nfs && scrShots.paths[i]!=="9cc33d6fe25973868b30f4439f09901a") {
+            //         try{
+            //             let respData = await nfs.getSSObject('screenshots', `${scrShots.paths[i]}`);
+            //             if (!respData.error) image=respData;
+            //         }
+            //         catch(e){
+            //             console.error("Failed to Fetch Image!")
+            //         }
+            //     }
+            // }
+            // report.rows[scrIndex].screenshot_dataURI = image;
+            let webserverURL = "https://"+(process.env.NGINX_URL || "127.0.0.1")+":"+(process.env.NGINX_PORT || "8443")
+            try{
+                const instance = axios.create({
+                    httpsAgent: new https.Agent({  
+                        rejectUnauthorized: false,
+                        requestCert: true,
+                    })
+                });
+                let dataURIs = await instance(webserverURL+'/openScreenShot_API', {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json',
+                    },
+                    data: {
+                        "absPath": scrShots.paths,
+                        "username": req.session.username
+                    },
+                    credentials: 'include',
+                })
+                if (["fail", "unavailableLocalServer", "scheduleModeOn"].includes(dataURIs.data)) {
+                    scrShots.paths.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = '');
+                } else {
+                    dataURIs.data.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = d);
+                }
+            }
+            catch(err){
+                console.log("ERROR:", err)
+                logger.error("Exception occurred in " + fnName + " when trying to access screenshots: %s", err);
+            }
+        }
+        try {
+            const pdf = new Readable({read: ()=>{}});
+            pdf.push(templatepdf(report));
+            pdf.push(null);
+            wkhtmltopdf(pdf).pipe(res);
+        } catch (exception) {
+            report.error = {
+                ecode: "SERVER_ERROR",
+                emsg: "Error while generating report due to an internal error. Try again later!",
+                status: 500
+            };
+            const emsg = exception.message;
+            if ((exception instanceof RangeError) && emsg === "Invalid string length") {
+                report.error.emsg = emsg = "Error while generating report. Report size too large";
+                report.error.ecode = "LIMIT_EXCEEDED";
+            }
+            logger.error("Exception occurred in " + fnName + " when trying to render report: %s", emsg);
+            statusCode = report.error && report.error.status || 200;
+            return res.status(statusCode).send(report.error);
+        }
+    }
+};
 
 exports.viewReport = async (req, res, next) => {
     const fnName = "viewReport";
