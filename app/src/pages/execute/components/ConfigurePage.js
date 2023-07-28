@@ -1514,7 +1514,7 @@ Learn More '/>
             onClick={() => configModal("CancelSave")}
           >
             configure
-            <Tooltip target=".configure_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+            <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
       );
