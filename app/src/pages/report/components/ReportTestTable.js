@@ -100,35 +100,6 @@ export default function BasicDemo() {
         const hasChildren = rowData?.children && rowData?.children?.length > 0;
         return hasChildren ? null :  <img src='static/imgs/bug.svg' alt='bug defect'/>;
     }
-    
-    useEffect(()=>{
-        (async()=>{
-            const view = await viewReport(location?.state?.id);
-            setReportData(JSON.parse(view))
-        })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[location])
-    useEffect(() => {
-        const parent = [];
-        if (reportData && Array.isArray(reportData.rows)) {
-            for (const obj of reportData.rows) {
-                if (obj.hasOwnProperty('Step')) {
-                    if (!parent[parent.length - 1].children) {
-                        parent[parent.length - 1].children = [obj];  // Push the new object into parent array
-                    } else {
-                        parent[parent.length - 1].children.push(obj); // Push the object into existing children array
-                    }
-                } else {
-                    parent.push(obj); // Push the object into parent array
-                }
-            }
-        } else {
-            // Handle the case when reportData or reportData.rows is not as expected.
-            console.error('reportData.rows is not defined or not an array.');
-        }
-        setReportViewData(parent);
-    },[reportData])
-
     const convertDataToTree = (data) => {
         const treeDataArray = [];
         for (let i = 0; i < data.length; i++) {
