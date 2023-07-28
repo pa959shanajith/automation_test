@@ -582,6 +582,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         var fnName = 'execAutomation';
         let response = {};
         let synchronousFlag = false;
+        let execType = 'moduleParallel'
         response['status'] = "fail";
         response["message"] = "N/A";
         response['error'] = "None";
@@ -597,6 +598,10 @@ module.exports.Execution_Queue = class Execution_Queue {
         //Checking for "executiontype" in the request
         if("executionType" in req.body) {
             executionData.executionData.executiontype = req.body.executionType;
+        }
+        // Checking for executionLevel 
+        if(executionData.executionData.execType) {
+            execType = 'scenarioParallel'
         }
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
@@ -626,7 +631,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         let testSuiteInfo = gettingTestSuiteIds.executionData.batchInfo;
 
         let newExecutionList = []
-        let execType = 'scenarioParallel'
         for (let ids of testSuiteInfo){
             if(execType == 'scenarioParallel') {
                 for (let scId of ids.suiteDetails) {
@@ -639,6 +643,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                         startTime: new Date().toLocaleString(),
                         isExecuteNow: req.body.isExecuteNow,
                         scenarioIds:scId.scenarioId,
+                        scenarioName:scId.scenarioName,
                         execType:execType
                     });
                 }
@@ -802,7 +807,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                         let moduleIndex = -1,scenarioIndex = -1, currModuleId = '';
                         for(let testSuites of entries) {
                             moduleIndex++;
-                            if (testSuites.moduleid != currModuleId) {
+                            if (testSuites['execType'] == 'scenarioParallel' && testSuites.moduleid != currModuleId) {
                                 scenarioIndex = -1;
                                 currModuleId = testSuites.moduleid;
                                 executionId = 'executionId' in this.key_list[configKey][listIndex][moduleIndex] ? this.key_list[configKey][listIndex][moduleIndex]['executionId'] : ''
@@ -812,11 +817,18 @@ module.exports.Execution_Queue = class Execution_Queue {
                             if(testSuites['status'] == 'QUEUED') {
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
                                 const inputs = {'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}
-                                if (testSuites['execType'] == 'scenarioParallel') inputs['scenarioIndex'] = scenarioIndex
+                                // changes to support scenarioParallel to include scenarioindex in input
+                                if (testSuites['execType'] == 'scenarioParallel'){
+                                    inputs['scenarioIndex'] = scenarioIndex;
+                                }
                                 executionData = await utils.fetchData(inputs, "devops/getExecScenario", fnName);
-                                if(executionId != '') {
-                                    executionData[0]['executionData']['scenarioParallelExecutionId'] = executionId;
-                                    executionData[0]['executionData']['scenarioParallelBatchId'] = batchId;
+                                // changes to support scenarioParallel
+                                if (testSuites['execType'] == 'scenarioParallel'){
+                                    executionData[0]['executionData']['scenarioParallelExec'] = true;
+                                    if(executionId != '') {
+                                        executionData[0]['executionData']['scenarioParallelExecutionId'] = executionId;
+                                        executionData[0]['executionData']['scenarioParallelBatchId'] = batchId;
+                                    }
                                 }
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
                                     'body': executionData[0],
@@ -827,12 +839,15 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     return response;
                                 }
                                 executionData = [executionRequest];
-                                if (scenarioIndex == 0) {
-                                    executionId = executionRequest.executionRequest.executionIds[0];
-                                    batchId = executionRequest.executionRequest.batchId
-                                    this.key_list[configKey][listIndex][moduleIndex]['executionId'] = executionId;
-                                    this.key_list[configKey][listIndex][moduleIndex]['batchId'] = batchId;
-
+                                // to support scenaratioParallel execution
+                                if (testSuites['execType'] == 'scenarioParallel'){
+                                    executionData[0]['executionRequest']['scenarioParallelExec'] = true;
+                                    if (scenarioIndex == 0) {
+                                        executionId = executionRequest.executionRequest.executionIds[0];
+                                        batchId = executionRequest.executionRequest.batchId
+                                        this.key_list[configKey][listIndex][moduleIndex]['executionId'] = executionId;
+                                        this.key_list[configKey][listIndex][moduleIndex]['batchId'] = batchId;
+                                    }
                                 }
 
                                 //Updating the status to IN_Progress
