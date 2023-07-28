@@ -19,7 +19,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [showLoginCard, setShowLoginCard] = useState(true);
 
     const integrationItems = [
-        { label: 'ALM' },
+        { label: 'Tool Based Integration' },
         { label: 'Cloud Based Integration' },
     ];
 

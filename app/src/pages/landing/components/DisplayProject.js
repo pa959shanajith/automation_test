@@ -84,16 +84,16 @@ const DisplayProject = (props) => {
       output = "Created now";
     }
     else if (years == 0 && months == 0 && hours == 0 && minutes >= 1) {
-      output = "Edited " + minutes + minute_ago + " ago";
+      output = "Last Edited " + minutes + minute_ago + " ago";
     }
     else if (years == 0 && months == 0 && hours >= 1) {
-      output = "Edited " + hours + hours_ago + " ago";
+      output = "Last Edited " + hours + hours_ago + " ago";
     }
     else if (years == 0 && months >= 1) {
-      output = "Edited on " + inputDate.slice(5, 11);
+      output = "Last Edited on " + inputDate.slice(5, 11);
     }
     else {
-      output = "Edited " + years + years_ago + " ago";
+      output = "Last Edited " + years + years_ago + " ago";
     }
 
     return output;

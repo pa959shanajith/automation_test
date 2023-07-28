@@ -37,7 +37,7 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
     if(!Object.keys(projList).length >0) return null
     return(
     <>
-        <Dialog className='ImportDialog' header='Import Modules' onHide={()=>setImportPop(false)} visible={importPop} style={{ width: '50vw' }} footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}>
+        <Dialog className='ImportDialog' header='Import Test Suite' onHide={()=>setImportPop(false)} visible={importPop} style={{ width: '50vw' }} footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}>
             <Container submit={submit} setMindmapData={setMindmapData}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}
              setGitExportDetails={setGitExportDetails} gitExportDetails={gitExportDetails}/>
         </Dialog>
@@ -268,11 +268,11 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
 
     const items = [
         { name: 'Select Import Format', code: 'NY', value:'def-val', disabled:true },
-        { name: 'Multi module Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'excel'},
-        { name: 'Single module Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'xls'},
+        { name: 'Multi Test Suite Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'excel'},
+        { name: 'Single test Suite Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'xls'},
         { name:'Git',code:'GT',value:'git'},
         { name: 'Structure only - Json (.json)', code: 'LDN', value:'json' },
-        { name: 'Complete Module(S) (.zip)', code: 'IST', value:'zip' }
+        { name: 'Complete Test Suite(S) (.zip)', code: 'IST', value:'zip' }
     ]
     const projectItem  = Object.entries(projList).map((e)=>{
            return { value:e[1].name,
