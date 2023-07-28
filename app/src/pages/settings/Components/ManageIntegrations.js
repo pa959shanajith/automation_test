@@ -330,21 +330,26 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    const callSaveButton =async()=>{ 
-        const response = await api.saveJiraDetails_ICE(mappedData);
-        if (response.error){
-            setToast("error", "Error", response.error);
-        } 
-        else if(response === "unavailableLocalServer")
-            setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
-        else if(response === "scheduleModeOn")
-            setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-        else if ( response === "success"){
-            callViewMappedFiles('')
-            setToast("success", "Success", 'Synced details saved successfully');
+    const callSaveButton = async () => {
+        if (mappedData && mappedData.length) {
+            const response = await api.saveJiraDetails_ICE(mappedData);
+            if (response.error) {
+                setToast("error", "Error", response.error);
+            }
+            else if (response === "unavailableLocalServer")
+                setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+            else if (response === "scheduleModeOn")
+                setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+            else if (response === "success") {
+                callViewMappedFiles('')
+                setToast("success", "Success", 'Synced details saved successfully');
+            }
         }
-    }
+        else{
+            setToast("info", "Info", 'Please sync atleast one map');
+        }
 
+    }
 
     const callViewMappedFiles=async(saveFlag)=>{
         try{
@@ -401,6 +406,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 });
                 setRows(tempRow);
                 
+            }
+            else if(response !== 'fail'){
+                setRows([]);
+                setCounts({
+                    totalCounts: 0,
+                    mappedScenarios: 0,
+                    mappedTests: 0
+                });
             }
         }
         catch(err) {
