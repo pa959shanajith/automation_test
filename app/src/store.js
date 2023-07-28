@@ -24,7 +24,7 @@ export default configureStore({
         configpage: configurePageSlice,
         progressbar: globalSlice,
         setting: settingSlice,
-        admin: adminSlice,
+        admin: adminSlice
 
     }
 })
