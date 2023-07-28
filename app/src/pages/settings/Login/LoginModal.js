@@ -24,7 +24,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration }) => {
         <>
             <div className="login_container_integrations">
                 <div className="side-panel">
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'jira', code: 'NY' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'jira', code: 'NY' })}>
                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                         <span className="text__jira">Jira</span>
                     </div>
@@ -83,9 +83,9 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration }) => {
                     <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
                     <div className="input-cls">
                         <span>Username <span style={{ color: 'red' }}>*</span></span>
-                        <span className="p-float-label" style={{ marginLeft: '1.5rem' }}>
+                        <span style={{ marginLeft: '1.5rem' }}>
                             <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={loginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
-                            <label htmlFor="username">Username</label>
+                            {/* <label htmlFor="username">Username</label> */}
                         </span>
                     </div>
                     <div className="passwrd-cls">
@@ -94,9 +94,9 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration }) => {
                     </div>
                     <div className="url-cls">
                         <span>URL <span style={{ color: 'red' }}>*</span></span>
-                        <span className="p-float-label" style={{ marginLeft: '4.5rem' }}>
+                        <span style={{ marginLeft: '4.5rem' }}>
                             <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={loginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
-                            <label htmlFor="username">URL</label>
+                            {/* <label htmlFor="username">URL</label> */}
                         </span>
                     </div>
                     <div className="login__div">

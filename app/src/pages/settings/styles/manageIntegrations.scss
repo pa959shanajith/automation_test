@@ -338,7 +338,7 @@ height: 2.5rem !important;
     border-radius: 7px;
     padding: 1rem 4rem 2rem 2rem;
     background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
-
+    cursor: pointer;
   }
 
   .leafId{
@@ -421,5 +421,10 @@ height: 2.5rem !important;
     gap: 2rem;
     margin-bottom: 3rem;
   }
-  
+  .unmap_icon{
+    &:hover{
+        opacity: 0.5;
+      }
+}
+
 
