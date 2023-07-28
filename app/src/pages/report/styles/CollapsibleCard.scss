@@ -1,0 +1,338 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.collapsible-card{
+    display: flex;
+    flex-flow: column nowrap;
+    background: $whiteColor;
+    border-radius: 5px;
+    box-shadow:  0px 0.8px 5.4px 0px rgba(0, 0, 0, 0.13), 7px 10.6px 14px rgba(75, 75, 75, 0.15);
+    cursor: default;
+    min-width: 212px;
+    padding: 5px 20px;
+    outline: none;
+    transition: box-shadow 0.5s ease 0s;
+    .collapsible-card-header{
+        display: flex;
+        .collapsible-card-heading{
+            font-family: $fontName;
+            font-style: normal;
+            font-weight: 600;
+            font-size: $avoFontLarge;
+            line-height: 24px;
+            color: $greyishText;
+        }
+        .collapsible-card-subheading{
+            font-size: $avoFontLarge;
+        }
+        button{
+            margin-left:auto;
+            color:$primaryText !important;
+            background-color: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            padding:0px;
+            .fa{
+                color:$primaryText !important;
+            }
+            .chevron{
+                transition: 0.3s transform ease-in-out;
+            }
+            .chevron-up{
+                transform: rotate(180deg);
+            }
+            &:focus{
+                color:$primaryText !important;
+                background-color: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            &:hover{
+                color:$primaryText !important;
+                background-color: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            &:active{
+                color:$primaryText !important;
+                background-color: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+            }
+            &:enabled{
+                color:$primaryText !important;
+                background-color: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                
+            }
+        }
+    }
+}
+
+.report__collapse-div{
+    display: flex;
+}
+
+.report-chart-bar {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    .chart-bar__inner {
+      height: 100%;
+      width: 80%;
+      font-size: $avoFontNormal;
+      border-radius: 9px;
+      display: flex;
+      justify-content: flex-end;
+      text-align: center;
+      & > div:first-child{
+				border-top-left-radius: 10px;
+				border-bottom-left-radius: 10px;
+    	}
+			& > div:last-child{
+				border-top-right-radius: 10px;
+				border-bottom-right-radius: 10px;
+			}
+      .chart-bar__fill{
+        width: 100%;
+        height: 30px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        
+        transition: all 0.3s ease-out;
+        font-family: $fontName;
+        font-style: normal;
+        color: $whiteColor;
+      }
+    }
+  }
+
+  .chart-bar_tooltip{
+    background: $whiteColor;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    color: $black;
+    position: absolute;
+    top: 120%;
+    font-size: $avoFontSmaller;
+    z-index: 4;
+    display: flex;
+    padding: 4px;
+    flex-direction: column;
+    text-transform: capitalize;
+    border-radius: 3px;
+  }
+  
+  .summary-bar-container{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    min-width: 280px;
+    max-width: 800px;
+    width: 35%;
+    height: 100%;
+    .data-bar{
+        margin-top: 10px;
+        margin-bottom:3px;
+        .color-schema{
+            display: flex;
+            justify-content: flex-start;
+            align-content: center;
+            .red-dot{
+                align-self: center;
+                height: 8px;
+                width: 8px;
+                border-radius: 50%;
+                background-color: $moderateFail;
+                margin-right: 10px;
+            }
+            .terminate-dot{
+                align-self: center;
+                height: 8px;
+                width: 8px;
+                border-radius: 50%;
+                background-color: $redError;
+                margin-right: 10px;
+            }
+            .color-type-text{
+                text-align: center;
+                margin-right: 20px;
+                font-family: $fontName;
+                font-style: normal;
+                font-weight: 400;
+                font-size: $avoFontSmaller;
+                line-height: 12px;
+                color: $primaryText;
+            }
+            .green-dot{
+                align-self: center;
+                height: 8px;
+                width: 8px;
+                border-radius: 50%;
+                background-color: $pistachio;
+                margin-right: 10px;
+            }
+        }
+        .chart-bar{
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+    }
+}
+
+// Radius
+
+.chart-bar-pass-bar {
+    div{
+        &:first-child{
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+    }
+}
+
+.chart-bar-fail-bar{
+    div{
+        &:last-child{
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+    }
+}
+
+.chart-bar-pass-bar:only-child, .chart-bar-fail-bar:only-child{
+    &:first-child{
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+    &:last-child{
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+    div{
+        &:first-child{
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+        &:last-child{
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+    }
+}
+
+
+  
+.report_progress_passFill {
+    background-color: $pistachio!important;
+    // border-radius: 9px 0 0 9px;
+}
+
+.report_progress_failFill {
+    background-color: $moderateFail!important;
+    // border-radius: 0 9px 9px 0;
+}
+
+.report_progress_terminateFill {
+    background-color: $redError!important;
+    // border-radius: 0 9px 9px 0;
+}
+
+.report_progress_pass_nullFill{
+    background: $nullPass;
+}
+.report_progress_pass_minorFill{
+    background: $minorPass;
+}
+.report_progress_pass_moderateFill{
+    background: $moderatePass;
+}
+.report_progress_pass_seriousFill{
+    background: $seriousPass;
+}
+.report_progress_pass_criticalFill{
+    background: $criticalPass;
+}
+
+.report_progress_fail_nullFill{
+    background: $nullFail;
+}
+.report_progress_fail_minorFill{
+    background: $minorFail;
+}
+.report_progress_fail_moderateFill{
+    background: $moderateFail;
+}
+.report_progress_fail_seriousFill{
+    background: $seriousFail;
+}
+.report_progress_fail_criticalFill{
+    background: $criticalFail;
+}
+
+@media screen and (max-width: 992px)
+{
+    .summary-bar-container{
+        justify-content: center;
+        width: 100% !important;
+    }
+}
+
+.data-value{
+    font-family: $fontName;
+    font-style: normal;
+    font-weight: 600;
+    font-size: $avoFontMedium;
+    line-height: 18px;
+    max-width: 410px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-height: 20px;
+    color: $greyishText;
+    grid-area: mainContent;
+}
+
+.data-heading-nolimit, .data-value-nolimit{
+    max-width: none;
+    text-transform: capitalize;
+}
+
+.acc_rep_standard-value {
+    background: $hovorIcon;
+    border-radius: 5px;
+    padding: 4px;
+    color: $whiteColor;
+    background: $hovorIcon;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.data-heading{
+    font-family: $fontName;
+    font-style: normal;
+    font-weight: 600;
+    font-size: $avoFontMedium;
+    color: $hovorIcon;
+    grid-area: title;
+}
+
+.rp__card_item{
+    display: grid;
+    grid-template-areas:
+        "title subContent"
+        "mainContent subContent";
+    grid-column-gap: 40px;
+    grid-template-columns: auto 1fr;
+
+    .r__jira_login-container {
+        grid-area: subContent;
+    }
+}

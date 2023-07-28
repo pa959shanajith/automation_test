@@ -48,56 +48,58 @@ const CreateProject = ({ visible, onHide }) => {
  
   const userDetails = async () => {
     userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    try {
-      const userData = await getUserDetails("user");
-      const formattedData = userData.map((user) => {
-        const [name, id, , primaryRole, firstname, lastname, email] = user;
-        return { id, name, primaryRole, firstname, lastname, email };
-      });
-      let loggedInUser = null;
-      let newFormattedData = [];
-      for (let item of formattedData) {
-        if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
-          if(item.id ===  userInfo.user_id) {
-            loggedInUser = {
-              ...item, selectedRole: "",
-              initials: getInitials(item.firstname, item.lastname)
-            };
-          } else {
-            newFormattedData.push(
-              {
-                ...item, selectedRole: '',
+    if(userInfo){
+      try {
+        const userData = await getUserDetails("user");
+        const formattedData = userData.map((user) => {
+          const [name, id, , primaryRole, firstname, lastname, email] = user;
+          return { id, name, primaryRole, firstname, lastname, email };
+        });
+        let loggedInUser = null;
+        let newFormattedData = [];
+        for (let item of formattedData) {
+          if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
+            if(item.id ===  userInfo?.user_id) {
+              loggedInUser = {
+                ...item, selectedRole: "",
                 initials: getInitials(item.firstname, item.lastname)
-              }
-            )
+              };
+            } else {
+              newFormattedData.push(
+                {
+                  ...item, selectedRole: '',
+                  initials: getInitials(item.firstname, item.lastname)
+                }
+              )
+            }
           }
         }
+        setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
+        setDisplayUser([loggedInUser]);
+        // setItems(formattedData
+        //   .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+        //   .filter(item => item.primaryRole !== "Admin")
+        //   .sort((a, b) => a.name.localeCompare(b.name))
+        //   .filter((item) => {
+        //     console.log('item', item.id);
+        //     console.log('userInfo.user_id', userInfo.user_id);
+        //     console.log('item.id === userInfo.user_id', item.id === userInfo.user_id);
+        //     if(item.id === userInfo.user_id){
+        //       loggedInUser = item;
+        //       return false;
+        //     } else {
+        //       return true;
+        //     }
+        //   })
+        //   .map(item => ({
+        //     ...item, selectedRole: '',
+        //     initials: getInitials(item.firstname, item.lastname)
+        //   }))
+        // );
+      } catch (error) {
+        console.error(error);
       }
-      setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
-      setDisplayUser([loggedInUser]);
-      // setItems(formattedData
-      //   .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-      //   .filter(item => item.primaryRole !== "Admin")
-      //   .sort((a, b) => a.name.localeCompare(b.name))
-      //   .filter((item) => {
-      //     console.log('item', item.id);
-      //     console.log('userInfo.user_id', userInfo.user_id);
-      //     console.log('item.id === userInfo.user_id', item.id === userInfo.user_id);
-      //     if(item.id === userInfo.user_id){
-      //       loggedInUser = item;
-      //       return false;
-      //     } else {
-      //       return true;
-      //     }
-      //   })
-      //   .map(item => ({
-      //     ...item, selectedRole: '',
-      //     initials: getInitials(item.firstname, item.lastname)
-      //   }))
-      // );
-    } catch (error) {
-      console.error(error);
-    }
+  }
   };
 
   useEffect(() => {
@@ -440,7 +442,7 @@ const CreateProject = ({ visible, onHide }) => {
           </div>
           <div className='check-bx3'>
             <ul>
-              {displayUser.map((checkboxId) => (
+              {displayUser.length && displayUser.map((checkboxId) => (
                 <div className="selected_users__list">
                   <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id} value={checkboxId.id} checked={selectedAssignedCheckboxes.some((ab) => ab.id === checkboxId.id)}
                     onChange={handleAssignedCheckboxChange}

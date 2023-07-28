@@ -144,8 +144,9 @@ export const reportsData = [
 
 export const reportsBar = {
   Pass: "#1DA750",
-  Fail: "#8B0000",
+  pass:"#1DA750",
+  Fail: "#D9342B",
   Queued: "#808080",
   Inprogress: "#DEE2E6",
-  fail: "#8B0000",
+  fail: "#D9342B",
 };
