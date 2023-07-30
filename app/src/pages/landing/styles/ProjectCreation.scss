@@ -14,7 +14,8 @@
     .CreateProj-card{
         margin-bottom: 1rem;
         height: 7rem;
-        width: 70%;
+        width: 82%;
+        margin-left: 0.9rem;
         top: 1rem;
         display: flex;
         justify-content: center;
@@ -42,7 +43,8 @@
     .gotoadmin-card{
         margin-bottom: 1rem;
         height: 8rem;
-        width: 83%;
+        width: 82%;
+        margin-left: 0.9rem;
         top: 2rem;
         display: flex;
         justify-content: center;
@@ -61,6 +63,8 @@
                 .admin-btn{
                     margin: -0.5rem 15rem 0rem;
                     font:$f7_semibold;
+                    margin-left: 13.3rem;
+                    width: 18.3%;
                 }
             }
             

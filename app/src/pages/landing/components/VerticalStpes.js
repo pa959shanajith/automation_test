@@ -38,11 +38,11 @@ const VerticalSteps = (props) => {
       background: (Button!="Execute"&& activeStep <1)? '#a0c8ff' : '#605bff',
       color: 'white',
       padding: '0.3rem 0.7rem',
-      marginRight: '13rem',
+      marginRight: '13.4rem',
     };
     const buttonStyle_report = {
       background:(Button!="Report"&& activeStep <2)? '#a0c8ff' : '#605bff',
-      color:"white" ,padding:"0.3rem 0.8rem",marginRight: "13.3rem"
+      color:"white" ,padding:"0.3rem 0.8rem",marginRight: "13.7rem"
     };
     
     const navigate = useNavigate();
@@ -50,7 +50,7 @@ const VerticalSteps = (props) => {
     {
         label: activeStep  > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows',
         description: ` Visualize testcases through mindmaps, capture elements and design test steps. `,
-        title:<div><Button  type = "AVOgenius" size="small" style={buttonStyle_genius} ><img style={{color:"white", fill:"white",marginRight:"10px"}} src="static/imgs/avo_genius_18x18_icon.svg"   />  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold",fontFamily: "Open Sans" }}> OR </span><Button type = "designStudio" size="small" style={buttonStyle_design} onClick={(e)=>handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg"  style={{ marginRight: '10px' }} />Design Studio</Button> </div>
+        title:<div><Button  type = "AVOgenius" size="small" style={buttonStyle_genius} ><img style={{color:"white", fill:"white",marginRight:"10px"}} src="static/imgs/avo_genius_18x18_icon.svg"   />  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold",fontFamily: "Open Sans" ,padding: "0.1rem 0.2rem"}}> OR </span><Button type = "designStudio" size="small" style={buttonStyle_design} onClick={(e)=>handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg"  style={{ marginRight: '10px' }} />Design Studio</Button> </div>
        
     },
     {
