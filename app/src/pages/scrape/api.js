@@ -351,3 +351,20 @@ export const getDeviceSerialNumber_ICE = () =>	{
         .catch(error=>reject(error))
     })
 }
+
+export const checkingMobileClient_ICE = () =>	{
+    return new Promise((resolve, reject)=>{
+        const res = axios(url+"/checkingMobileClient_ICE", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error))
+    })
+}
