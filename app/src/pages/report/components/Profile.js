@@ -45,6 +45,7 @@ const Profile = () => {
       const executionProfiles = await getReportList(
         location?.state?.configureKey
         )
+
         setReportsTable(executionProfiles.map((el, ind) => ({
           ...el,
           id: el._id,
@@ -70,7 +71,7 @@ const Profile = () => {
       param: "modulestatus",
       executionListId: getRow?.node?.data,
     });
-
+        
     const nestedTable = testSuiteList.map((el, i) => {
       let nestedtreeArr = {
         key: i.toString(),
@@ -99,8 +100,7 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"||
-                            item === "Fail"
+                            item === "Incomplete"
                         )
                         .map(
                           (e) =>
@@ -127,8 +127,7 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"||
-                            item === "Fail"
+                            item === "Incomplete"
                         )
                         .map(
                           (e) =>
@@ -157,8 +156,7 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"||
-                          item === "Fail"
+                          item === "Incomplete"
                       )
                       .map(
                         (e) =>
@@ -314,8 +312,7 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"||
-                            item === "Fail"
+                            item === "Incomplete"
                         )
                         .map(
                           (e) =>
@@ -342,8 +339,7 @@ const Profile = () => {
                           (item) =>
                             item === "Terminate" ||
                             item === "Skipped" ||
-                            item === "Incomplete"||
-                            item === "Fail"
+                            item === "Incomplete"
                         )
                         .map(
                           (e) =>
@@ -372,8 +368,7 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"||
-                          item === "Fail"
+                          item === "Incomplete"
                       )
                       .map(
                         (e) =>
@@ -623,8 +618,7 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"||
-                          item === "Fail"
+                          item === "Incomplete"
                       )
                       .map((el) => e.testCases[el])
                       .reduce((ac, cv) => ac + cv, 0),
@@ -635,8 +629,7 @@ const Profile = () => {
                         (item) =>
                           item === "Terminate" ||
                           item === "Skipped" ||
-                          item === "Incomplete"||
-                          item === "Fail"
+                          item === "Incomplete"
                       )
                       .map((el) => e.testCases[el])
                       .reduce((ac, cv) => ac + cv, 0)
@@ -652,8 +645,7 @@ const Profile = () => {
                       (item) =>
                         item === "Terminate" ||
                         item === "Skipped" ||
-                        item === "Incomplete"||
-                        item === "Fail"
+                        item === "Incomplete"
                     )
                     .map((el) => e.testCases[el])
                     .reduce((ac, cv) => ac + cv, 0),
