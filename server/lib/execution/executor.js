@@ -572,7 +572,7 @@ class TestSuiteExecutor {
                     // rsv(execStatus);
                 }
             } else if (status === "started") {
-                await _this.updateExecutionStatus([executionid], { starttime: data.startTime });
+                await _this.updateExecutionStatus([executionid], { starttime: data.startTime,scenarioParallelExec: resultData.execReq.scenarioParallelExec });
             } else if (status === "finished") {
                 const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);
                 const testsuite = execReq.suitedetails[testsuiteIndex];

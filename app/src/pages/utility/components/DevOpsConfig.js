@@ -472,6 +472,7 @@ const DevOpsConfig = props => {
             selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
             isHeadless: integrationConfig.isHeadless,
+            execType:integrationConfig.execType,
             avogridId: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'g_') ? integrationConfig.avoAgentGrid.slice(2) : '',
             avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'a_') ? [integrationConfig.avoAgentGrid.slice(2)] : [],
             integration: integration,
@@ -643,6 +644,14 @@ const DevOpsConfig = props => {
                             <label>Headless </label>
                         </div>
                     </div>:null}
+                    <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Level : </label>
+                        <div className="devOps_dropdown_label_sync">
+                            <label>Test Suite </label>
+                            <Toggle checked={integrationConfig.execType} onChange={() => setIntegrationConfig({...integrationConfig, execType: !integrationConfig.execType })} label="" inlineLabel={true} />
+                            <label>Test Case</label>
+                        </div>
+                    </div>
                     {/* <div className='devOps_seperation'>
                     </div> */}
                     {/* <div>

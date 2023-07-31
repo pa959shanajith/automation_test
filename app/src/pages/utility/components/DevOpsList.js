@@ -458,8 +458,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             showCheckbox: false,
                             // className: 'devOps_terminate_style',
                             children: executionNode.map((executionRequest) => ({
-                                label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
-                                value: executionRequest.executionListId+executionRequest.moduleid,
+                                label: executionRequest.execType != 'scenarioParallel' ? 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status : 'Scenario : '+executionRequest.scenarioName+',   Status: '+executionRequest.status ,
+                                value: executionRequest.execType != 'scenarioParallel' ? executionRequest.executionListId+executionRequest.moduleid : executionRequest.executionListId+executionRequest.scenarioIds,
                                 showCheckbox: false
                             }))
                         };
@@ -513,6 +513,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             integration: getIntegrationSelected(item.executionRequest.integration),
             executionType: item.executionRequest.executiontype,
             isHeadless: item.executionRequest.isHeadless,
+            execType: item.executionRequest.execType ? item.executionRequest.execType : false,
             executionRequest: item.executionRequest,
             disable: true,
             selectedBrowserType: showCICD
@@ -907,6 +908,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false,
+                    execType: false,
                     isLicenseTrial: (getplugins_list.LicenseTypes === "Trial")?true:false
                 })} >Create Profile</button>:null}
             { configList.length > 0 && <>
