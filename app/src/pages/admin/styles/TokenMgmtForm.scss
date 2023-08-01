@@ -1,0 +1,261 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.adminControl-tkn-mgmt {
+	margin-bottom: 2%;
+    padding: 0px 0px;
+    position: relative;
+    float: left;
+    width: 100%;
+}
+
+.adminControl-tkn-mgmt div span {
+    display: inline-block;
+    font-size: small;
+    width: 130px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+.adminControl-tkn-mgmt div input, .adminControl-tkn-mgmt div select {
+    width: calc(100% - 130px);
+    font-size: 14px;
+}
+
+.adminControl-tkn-mgmt1 {
+	margin-bottom: 2%;
+    padding: 0px 0px;
+    position: relative;
+    float: left;
+    width: 100%;
+}
+.leftControl-tkn-mgmt {
+	float: left;
+	width: 47%;
+}
+.form-control-custom-tkn-mgmt{
+	border: 1px solid $borderOne !important;
+	border-left:0 !important;
+	border-right:0 !important;
+	border-top:0 !important;
+	border-radius:0;
+	box-shadow: none;
+	color:$darkGray;
+}
+
+.form-control-custom-tkn-mgmt:focus {
+    box-shadow: none !important;
+}
+
+.form-control-custom-tkn-mgmt.inputErrorBorderBottom{
+    border: 2px solid $redError !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0  ;
+    box-shadow: none;
+    color: $darkGray;
+}
+.userForm-tkn-mgmt {
+	float: left;
+	width: 100%;
+}
+.form-control-tkn-mgmt {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: $primaryText;
+    background-color: $whiteColor;
+    background-image: none;
+    outline: none;
+    border: 1px solid $borderTwo;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: 0;
+}
+.border_input-tkn-mgmt{
+    border-radius: 0;
+}
+.adminSelect-tkn-mgmt {
+	padding: 0px;
+	height: 25px;
+	margin-bottom: 0;
+	width: 50%;
+	margin-left: 4%;
+	margin-top: 1%;
+	line-height: 2;
+    border: 1px solid $borderOne !important;
+    -webkit-text-stroke: thin;
+}
+.adminSelect-tkn-mgmt:focus {
+	box-shadow: none !important;
+}
+#tokenarea textarea {
+    margin-top: 5px;
+    width: calc(100% - 180px);
+    height: 70px;
+    resize: none;
+    font-size: 14px;
+}
+
+#tokenarea span.fa {
+    font-size: 22px;
+    padding: 5px;
+    width: auto;
+    display: block;
+}
+
+#tokenarea span.fa:hover {
+    background: $borderFour;
+    border-radius: 7px;
+    cursor: pointer;
+}
+.tokenSuite .datePicContainer, .tokenSuite .timePicContainer{
+	position: relative;
+    float: left;
+    width: calc(50% - 70px);
+    font-weight: normal;
+}
+
+.tokenSuite .datePicContainer input, .tokenSuite .timePicContainer input{
+    margin-top: -2px;
+    height: 26px;
+    width: 100%;
+    outline: none;
+}
+.datePicContainer input, .timePicContainer input{margin-top: 2px; height: 27px;}
+
+.datepickerIconToken{
+	top: -1px;
+    position: absolute;
+    right: 1px;
+    background: $primaryColor;
+    padding: 3px 5px;
+    border-radius: 0px 4px 4px 0px;
+    -moz-border-radius: 0px 4px 4px 0px;
+    -webkit-border-radius: 0px 4px 4px 0px;
+    cursor: pointer;
+}
+
+.timepickerIconToken{
+	top: -1px;
+    position: absolute;
+    right: 1px;
+    background: $primaryColor;
+    padding: 4px 5px;
+    border-radius: 0px 4px 2px 0px;
+    -moz-border-radius: 0px 4px 2px 0px;
+    -webkit-border-radius: 0px 4px 2px 0px;
+    cursor: pointer;
+}
+.adminControl-tkn-mgmt1__title {
+    display: inline-block;
+    font-size: small;
+    width: 130px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+.token-tkn-mgmt{
+    margin-top: 5px;
+    height: 70px;
+    resize: none;
+}
+.fc-datePicker{
+    background-color: $whiteColor;
+    border-width: 1px;
+    font-size: 14px;
+    border-color: $lightGray;
+    border-radius: 4px;
+    padding-top: 4px;
+    padding-left: 7px;
+}
+.fc-timePicker{
+    border-width: 1px;
+    font-size: 14px;
+    border-color: $lightGray;
+    border-radius: 4px;
+    padding-top: 4px;
+    padding-left: 7px;
+}
+.fc-timePicker:disabled{
+    background-color: rgb(238, 238, 238);
+    cursor: not-allowed;
+}
+.rdtPicker td, .rdtPicker th {
+    font-size: 14px !important;
+    text-align: center;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: none;
+}
+.rdtPicker {
+    box-shadow: 0 6px 12px rgba(0,0,0,.175) !important;
+    min-width: 200px !important;
+}
+.ice-type-tkn-mgmt{
+    margin-bottom:2%;
+    margin-top: 2%;
+}
+.datePic-cust{
+    margin-right:10px;
+}
+.token-tkn-mgmt-cust{
+    width: calc(100% - 180px);
+}
+.tip-tkn-mgmt{
+    float: right;
+}
+.action-form-mgmt{
+    width:auto;
+    margin-right:10px;
+}
+.rdtPicker td.rdtActive, .rdtPicker td.rdtActive:hover {
+    background-color: #04c !important;
+}
+.rdtPicker td.rdtDisabled, .rdtPicker td.rdtDisabled:hover {
+    background: none;
+    color: $borderFive;
+    cursor: pointer !important;
+}
+ .rdtPicker td.rdtToday :hover {
+    color: $black;
+}
+ .rdtPicker td.rdtToday .active,  .rdtPicker td.rdtToday .disabled,  .rdtPicker td.rdtToday .disabled.active,  .rdtPicker td.rdtToday .disabled.disabled,  .rdtPicker td.rdtToday .disabled:active,  .rdtPicker td.rdtToday .disabled:hover,  .rdtPicker td.rdtToday .disabled:hover.active,  .rdtPicker td.rdtToday .disabled:hover.disabled,  .rdtPicker td.rdtToday .disabled:hover:active,  .rdtPicker td.rdtToday .disabled:hover:hover,  .rdtPicker td.rdtToday .disabled:hover[disabled],  .rdtPicker td.rdtToday .disabled[disabled],  .rdtPicker td.rdtToday :active,  .rdtPicker td.rdtToday :hover,  .rdtPicker td.rdtToday :hover.active,  .rdtPicker td.rdtToday :hover.disabled,  .rdtPicker td.rdtToday :hover:active,  .rdtPicker td.rdtToday :hover:hover,  .rdtPicker td.rdtToday :hover[disabled],  .rdtPicker td.rdtToday [disabled] {
+    background-color: $backgroundYellowOne;
+}
+ .rdtPicker td.rdtToday ,  .rdtPicker td.rdtToday .disabled,  .rdtPicker td.rdtToday:hover,  .rdtPicker td.rdtToday .disabled:hover,  .rdtPicker td.rdtToday :hover {
+    background-color: $backgroundYellowThree;
+    background-image: -moz-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: -ms-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from($backgroundYellowTwo),to($backgroundYellowOne));
+    background-image: -webkit-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: -o-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$backgroundYellowTwo', endColorstr='$backgroundYellowOne', GradientType=0);
+    border-color: $backgroundYellowOne $backgroundYellowOne $backgroundYellowFour;
+    border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.25);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    color: $black;
+}
+
+
+
+// Token scrollbar css
+
+#ciToken{
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $backgroundTwo;
+        border: 1px solid transparent;
+        border-left-color: $borderThree;
+        border-right-color: $borderThree;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px; 
+    }
+}

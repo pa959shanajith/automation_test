@@ -911,7 +911,6 @@ const DesignModal = (props) => {
                 setKeywordListTable(caseData.keywords)
                 setOutputPlaceholder(placeholders.outputval);
                 setInputPlaceholder(placeholders.inputval);
-                setSelectedOptions(keyData);
             }
         }
     },[getKeywords, getRowPlaceholders, objNameList, rowExpandedName, screenLavelTestSteps])
@@ -974,27 +973,34 @@ const DesignModal = (props) => {
         )
     };
     const inputEditor = (options) => {
-        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => {options.editorCallback(e.target.value);setInput(e.target.value)}} placeholder={inputPlaceholder} />;
+        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} placeholder={inputPlaceholder} />;
     };
     const outputEditor = (options) => {
-        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => {options.editorCallback(e.target.value);setOutput(e.target.value)}} placeholder={outputPlaceholder} />;
+        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} placeholder={outputPlaceholder} />;
     };
 
     const onRowEditComplete = (e) => {
         let { newData, index } = e;
+        let updateNewData = { ...newData, 
+            keywordDescription:"",
+            keywordVal: newData.keywordDescription?newData.keywordDescription:""
+        }
         let testCaseUpdate = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
         let updatedTestCases = [...testCaseUpdate.testCases];
-        updatedTestCases[index] = newData;
+        updatedTestCases[index] = updateNewData;
 
         // Update the keywordDescription based on newData
-        if (updatedTestCases[index].hasOwnProperty("keywordDescription")) {
-            updatedTestCases[index].keywordDescription = keywordList[getKeywords(newData.custname).obType][newData.keywordVal].description;
-          }else{
-            updatedTestCases[index] = {
-                ...updatedTestCases[index],
-                keywordDescription: keywordList[getKeywords(newData.custname).obType][newData.keywordVal].description        
-            }
-        };
+        if(updatedTestCases[index].keywordVal !== ""){
+            if (updatedTestCases[index].hasOwnProperty("keywordDescription")) {
+                updatedTestCases[index].keywordDescription = keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].description;
+            }else{
+                updatedTestCases[index] = {
+                    ...updatedTestCases[index],
+                    keywordDescription: keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].description,
+                    keywordTooltip:  keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].tooltip       
+                }
+            };
+        }
         let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
         if (screen.name === rowExpandedName.name) {
             return { ...screen, testCases: updatedTestCases };
@@ -1092,7 +1098,7 @@ const DesignModal = (props) => {
                             <Column style={{ width: '3em' ,textAlign: 'center' }} rowReorder />
                             <Column selectionMode="multiple" style={{ width: '3em' }} />
                             <Column field="custname" header="Element Name" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => elementEditor(options)} ></Column>
-                            <Column field={focused?"keywordVal":"keywordDescription"} title="keywordTooltip" header="Operation" editor={(options) => keywordEditor(options)}  ></Column>
+                            <Column field="keywordDescription" title="keywordTooltip" header="Operation" editor={(options) => keywordEditor(options)}  ></Column>
                             <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
                             <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
                             <Column field="remarks" header="Remarks" />

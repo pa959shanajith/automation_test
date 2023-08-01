@@ -3,9 +3,9 @@ import {createSlice} from '@reduxjs/toolkit'
 const initialState = {
     screenType: { name: 'Jira', code: 'NY' },
     intergrationLogin:{
-        username:'priyanka.r@slkgroup.com',
-        password:'B8RUqqKt8B28MSz9zq1Q14AD',
-        url:'https://mnb.atlassian.net'
+        username:'',
+        password:'',
+        url:''
     },
     selectedProject:'',
     selectedIssue:'',

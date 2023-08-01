@@ -1,0 +1,65 @@
+.admin_nav {
+    // .p-panelmenu {
+    //     @media screen and (min-width: 768px) {
+    //         width: 23rem !important;
+    //     }
+
+    //     .p-panelmenu-panel {
+    //         .p-panelmenu-header {
+    //             .p-panelmenu-header-link {
+    //                 border: none !important;
+    //                 background: none !important;
+    //             }
+    //         }
+
+    //         .p-toggleable-content {
+    //             .p-panelmenu-content {
+    //                 border-right: solid 2px rgba(223, 220, 220, 0.925) !important;
+    //                 border-bottom: none !important;
+    //                 border-left: none !important;
+    //             }
+    //         }
+    //     }
+    // }
+    .p-accordion-tab {
+        .p-accordion-header {
+            .p-accordion-header-link {
+                border: none !important;
+                background: none !important;
+                &:focus{
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+            }
+        }
+
+        .p-toggleable-content {
+            .p-accordion-content {
+                border: none !important;
+                padding: 0.5rem !important;
+
+                .p-button {
+                    color: black !important;
+                    margin: 0.2rem 0.2rem !important;
+                    padding: 0.2rem 0.5rem !important;
+                    background: white !important;
+                    border: none !important;
+                    align-items: start !important;
+                    text-align: left !important;
+                    border-radius: 5px;
+
+                    .p-button-label {
+                        font-weight: 400;
+                    }
+
+                    &:focus {
+                        background: #e3cff0 !important;
+                        box-shadow: none !important;
+                    }
+
+                }
+            }
+        }
+    }
+
+}

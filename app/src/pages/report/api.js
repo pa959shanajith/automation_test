@@ -106,3 +106,52 @@ export const getTestSuite = async(getSuiteKey) => {
         return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
     }
 }
+
+export const downloadReports = async(getDownload) => {
+    try{
+        const res = await axios(`/viewReport?reportID=${getDownload?.id}&type=${ getDownload?.type === 'json' ? 'json' : 'pdf' }&images=${ getDownload?.type === 'pdfwithimg' ? true : false }`, {
+            method: 'GET',
+            headers: {
+            'Content-type': 'application/json',
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+
+export const viewReport = async (reportid, reportType="json", screenshotFlag) => { 
+    try{
+        const res = await axios(url+'/viewReport', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
+            params: { reportID: reportid, type: reportType, images: screenshotFlag  },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error: MSG.REPORT.ERR_FETCH_REPORT }
+    }
+    catch(err){
+        console.error(err)
+        return { error: MSG.REPORT.ERR_FETCH_REPORT }
+    }
+}

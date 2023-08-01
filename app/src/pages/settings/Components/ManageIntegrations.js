@@ -14,6 +14,7 @@ import { screenType } from '../settingSlice'
 import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import {
     resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
@@ -71,6 +72,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         mappedScenarios: 0,
         mappedTests: 0
     })
+    const [isShowConfirm,setIsShowConfirm] = useState(false);
 
 
     // const [proj, setProj] = useState('');
@@ -305,18 +307,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 args['screenType'] = selectedscreen.name;
                 const saveUnsync = await api.saveUnsyncDetails(args);
                 if (saveUnsync.error)
-                    setToast("error", "Error", 'Failed to Unsync');
-                // setMsg(saveUnsync.error);
-                else if (saveUnsync === "unavailableLocalServer")
+                    setToast("error", "Error", 'Failed to Unsync'); 
+				else if(saveUnsync === "unavailableLocalServer")
                     setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
-                // setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-                else if (saveUnsync === "scheduleModeOn")
+				else if(saveUnsync === "scheduleModeOn")
                     setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-                // setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
-                else if (saveUnsync === "fail")
+				else if(saveUnsync === "fail")
                     setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
-                // setMsg(MSG.INTEGRATION.ERR_SAVE);
-                else if (saveUnsync == "success") {
+				else if(saveUnsync == "success"){
                     callViewMappedFiles()
                     setToast("success", "Success", 'Unsynced');
                 }
@@ -332,20 +330,25 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const callSaveButton = async () => {
-        const response = await api.saveJiraDetails_ICE(mappedData);
-        if (response.error) {
-            setToast("error", "Error", response.error);
+        if (mappedData && mappedData.length) {
+            const response = await api.saveJiraDetails_ICE(mappedData);
+            if (response.error) {
+                setToast("error", "Error", response.error);
+            }
+            else if (response === "unavailableLocalServer")
+                setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+            else if (response === "scheduleModeOn")
+                setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+            else if (response === "success") {
+                callViewMappedFiles('')
+                setToast("success", "Success", 'Synced details saved successfully');
+            }
         }
-        else if (response === "unavailableLocalServer")
-            setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
-        else if (response === "scheduleModeOn")
-            setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-        else if (response === "success") {
-            callViewMappedFiles('')
-            setToast("success", "Success", 'Synced details saved successfully');
+        else{
+            setToast("info", "Info", 'Please sync atleast one map');
         }
-    }
 
+    }
 
     const callViewMappedFiles = async (saveFlag) => {
         try {
@@ -403,6 +406,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 setRows(tempRow);
 
             }
+            else if(response !== 'fail'){
+                setRows([]);
+                setCounts({
+                    totalCounts: 0,
+                    mappedScenarios: 0,
+                    mappedTests: 0
+                });
+            }
         }
         catch (err) {
             setToast("error", "Error", MSG.INTEGRATION.ERR_FETCH_DATA.CONTENT);
@@ -410,6 +421,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const showLogin = () => {
+        setIsShowConfirm(true);
+    };
+
+    const acceptFunc = () => {
+        setIsShowConfirm(false);
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
         setShowLoginCard(true);
@@ -428,6 +444,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setTreeData([]);
         setSelectedNodes([]);
     };
+
+    const rejectFunc = () => {
+        console.log('its rejected');
+    }
 
     const onProjectChange = async (e) => {
         e.preventDefault();
@@ -648,7 +668,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     <div className="card">
                         {showLoginCard ? <TabMenu model={integrationItems} /> : ""}
                     </div>
-
+                    <ConfirmDialog visible={isShowConfirm} onHide={() => setIsShowConfirm(false)} message="Synced data will be lost, Are you sure you want to go Back ?"
+                            header="Confirmation" icon="pi pi-exclamation-triangle" accept={acceptFunc} reject={rejectFunc} />
 
                     {showLoginCard ? (
                         <>

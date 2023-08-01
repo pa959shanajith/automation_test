@@ -106,6 +106,7 @@
   background: rgba(96, 91, 255, 0.08);
   box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
   height: 10vh;
+  display: table;
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
@@ -795,12 +796,6 @@
 }
 
 .executeRadio_label_grid {
-  // font-family: Open Sans;
-  // left: 3rem;
-  // margin-top: 0rem;
-  // margin-left: -1.5rem;
-  // /* position: absolute; */
-  // display: flex;
   display: flex;
     font-family: Open Sans;
     left: 17rem;
@@ -825,14 +820,6 @@
 }
 
 .executeRadio_label_clint {
-  // font-family: Open Sans;
-  // left: 24.3rem;
-  // // margin-top: 0.5rem;
-  // /* position: absolute; */
-  // display: flex;
-  // top: 24.4rem;
-  // margin-left: -1.6rem;
-  // margin-top: 0.1rem;
   display: flex;
     font-family: Open Sans;
     left: 24.3rem;
@@ -872,26 +859,8 @@
 .confirm_button {
   font-family: "Open Sans";
 }
-.Daily_lable {
-  // position: absolute;
-  top: 24rem;
-  left: 9rem;
-}
-.Weekly_lable {
-  // position: absolute;
-  top: 26rem;
-  left: 9rem;
-}
-.Monthly_lable {
-  // position: absolute;
-  top: 27.8rem;
-  left: 9rem;
-}
-.yearly_lable {
-  // position: absolute;
-  top: 29.8rem;
-  left: 9rem;
-}
+
+
 .recurrence-content {
   border-left: 1px solid;
   padding-left: 20px;
@@ -899,19 +868,7 @@
   justify-content: center;
   align-items: center;
 }
-.weeks {
-  display: flex;
-  flex-wrap: wrap;
-  width: 448px;
-  gap: 0rem;
-  margin-top: 2rem;
-}
 
-.weeks-child {
-  flex: 0 0 25%;
-  margin: 5px 0 5px 0;
-}
-/* styles.css */
 
 .recurrence-container {
   display: flex;
@@ -1027,10 +984,6 @@
 }
 
 .tabmenu_confige {
-  // .p-tabmenu-nav .p-menuitem-text {
-  //   line-height: 1;
-  //   margin-top: 2rem;
-  // }
   .p-tabmenu-nav .p-menuitem-text {
     line-height: 1;
     margin-top: 2rem;
@@ -1264,16 +1217,7 @@
 }
 
 .info__btn {
-  // bottom: 21%;
-  // cursor: pointer;
-  // height: 2.3vh;
-  // left: -31px;
-  // position: relative;
-  // width: 2.2%;
-  
-  // left: -27px;
-
-  bottom: 21%;
+bottom: 21%;
   cursor: pointer;
   height: 2.3vh;
   position: relative;
@@ -1341,3 +1285,27 @@
 .radio_grid{
   display: flex;
 }
+.sno_nocontent{
+  margin-right: 13rem;
+  font-weight: bold;
+  font-family: open Sans;
+}
+.profile_nocontent{
+  margin-right: 13rem;
+  font-weight: bold;
+  font-family: open Sans;
+}
+.execution_nocontent{
+  margin-right: 18rem;
+  font-weight: bold;
+  font-family: open Sans;
+}
+.Action_nocontent{
+  margin-right: 1rem;
+  font-weight: bold;
+  font-family: open Sans;
+}
+
+
+
+

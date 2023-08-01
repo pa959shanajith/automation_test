@@ -28,6 +28,8 @@ import Overview from './pages/landing/components/ProjectCreation';
 import Analysis from './pages/landing/components/Analysis';
 import MindmapHome from './pages/design/containers/MindmapHome';
 import Profile from './pages/report/components/Profile';
+import ReportTestTable from './pages/report/components/ReportTestTable';
+import AdminContainer from './pages/admin/containers/AdminContainer';
 
 
 
@@ -58,7 +60,7 @@ const App = () => {
     {/* <ProgressBar /> */}
     {/* <ErrorBoundary> */}
     <div className="main_content">
-      {!['/login', '/'].includes(location.pathname) && <Topbar />}
+      {!['/login', '/',"/undefined"].includes(location.pathname) && <Topbar />}
       <RouteApp/>
     </div>
     {/* </ErrorBoundary> */}
@@ -80,6 +82,9 @@ const RouteApp = () => {
         <Route path="/itdm" element={<itdm />} />
         <Route path="/design" element={<MindmapHome />} />
         <Route path="/execute" element={<ConfigurePage />} />
+        <Route path='/reports/viewReports' element={<ReportTestTable/>}/>
+        <Route path="/admin" element={<AdminContainer />} />
+        
       </Routes>
     </>
   )

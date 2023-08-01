@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {saveMindmap,getModules,getScreens} from '../api';
 import * as d3 from 'd3';
-import { saveMindMap, toDeleteScenarios, moduleList, selectedModule } from '../designSlice';
+import { saveMindMap, toDeleteScenarios, moduleList, selectedModule,dontShowFirstModule } from '../designSlice';
 import '../styles/SaveMapButton.scss'
 import { VARIANT, Messages as MSG, setMsg } from '../../global';
 
@@ -175,8 +175,9 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     var moduledata = await getModules(req);
     // dispatch(moduleList(moduledata))
     if(savedList){
+        dispatch(dontShowFirstModule(true))
         dispatch(moduleList(moduledata))
-    setTimeout(() => dispatch(selectedModule(moduleselected)), 150)
+        dispatch(selectedModule(moduleselected))
     }
     return;
 

@@ -1,0 +1,9 @@
+import AdminHeader from "../components/AdminHeader"
+import OriginContainer from "./OriginContainer"
+
+const SamlConf = () => {
+    return (<></>
+    )
+}
+
+export default SamlConf;
