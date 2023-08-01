@@ -4,23 +4,41 @@
     margin: 0.5vh;
 }
 
-.viewTable{
-    bottom: 1.5rem;
-    max-height: 81vh;
-    overflow-y: auto;
-}
-
-.ViewTable{
-    bottom: 1.5rem;
-    max-height: 46vh;
-    overflow-y: auto;
-}
 .reportsTable_container {
     .p-input-icon-left {
         width: 100%;
     }
     .search_testCase {
         width: 100%;
+    }
+    .viewTable{
+        bottom: 1.5rem;
+        max-height: 81vh;
+        overflow-y: auto;
+        height: 80vh;
+        .p-treetable-thead>tr>th {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
+    }
+    
+    .ViewTableOnClose{
+        bottom: 1.5rem;
+        max-height: 46vh;
+        overflow-y: auto;
+        height: 46vh;
+        .p-treetable-thead>tr>th {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
     }
 }
 
