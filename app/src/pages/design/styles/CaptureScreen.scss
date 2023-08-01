@@ -239,6 +239,7 @@
   width: 2vw;
 }
 
+
 .insprint_auto {
   float: left;
   padding-right: 2rem;
@@ -251,19 +252,33 @@
   top: 1rem;
   cursor: pointer;
 }
-
-.upgrade_auto {
+.disabled {
   float: left;
   padding-right: 2rem;
+  pointer-events: none;
+  cursor: not-allowed;
+  display: inline-block;
+  opacity: 0.4;
   position: relative;
   text-align: center;
   font-family: 'Open Sans';
-  font-weight: 500;
   font-size: 14px;
   padding: 0 0.8rem;
   top: 1rem;
-  cursor: pointer;
 }
+
+// .upgrade_auto {
+//   float: left;
+//   padding-right: 2rem;
+//   position: relative;
+//   text-align: center;
+//   font-family: 'Open Sans';
+//   font-weight: 500;
+//   font-size: 14px;
+//   padding: 0 0.8rem;
+//   top: 1rem;
+//   cursor: pointer;
+// }
 
 
 .dailog_box {
@@ -271,6 +286,145 @@
   .p-dialog-content {
     padding: 0 0 !important;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .WebServiceApptypeContent{
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      .inputCard{
+        margin-top: 0.04%;
+      .p-component{
+        height: 4rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        .p-card-body{
+          align-items: center;
+          .p-card-content{
+            padding: 0;
+          }
+        }
+        .mainContentCard{
+          display: flex;
+          align-items: center;
+          .firstRow{
+            display: flex;
+            align-items: center;
+            .p-component{
+              height: 2.3rem;
+              width: 15rem;
+            }
+            .p-button-sm{
+              width: 3.4rem;
+              height: 2rem;
+              justify-content: center;
+              margin-left: 4px;
+
+            }
+            .dropdown{
+              margin-left: 1.2rem;
+            .card {
+              width: 17rem;
+              // margin-left: 1rem;
+              align-items: center;
+
+              .p-treeselect{
+                width: 11rem;
+
+              }
+              .p-button-sm{
+                width:4rem;
+                height: 2rem;
+                justify-content: center;
+                margin-left: 4px;
+
+              }
+            }
+          }
+          .input2{
+            margin-left: 1.2rem;
+            .p-component{
+              width: 13rem;
+
+            }
+          }
+          .input3{
+            margin-left: 1.1rem;
+            .p-inputtext{
+              width:13rem ;
+              
+            }
+          }
+            
+    
+          }
+          // .secondRow{
+            
+          // }
+        }
+      }
+    }
+    .tabMenuCard{
+      margin-top: 0.26%;
+      .p-card{
+        display: flex;
+        height: 3.3rem;
+        align-items: center;
+      .card{
+        display: flex;
+        width: 100%;
+        .tabMenu{
+          // margin-right: 24.8rem;
+          .p-component{
+            .p-reset{
+              padding-left: 24.8rem;
+              height: 3.3rem;
+
+            }
+
+          }
+
+        }
+       .buttons {
+         display: flex;
+         align-items: center;
+         width: 24.5rem;
+                
+         .saveBut {
+           display: flex;
+           align-items: center;
+           padding-left: 5rem;
+                
+           img {
+             width: 2rem;
+             height: 2rem;
+             margin-right: 1rem;
+           }
+                
+           .p-button {
+             width: 5.6rem;
+             height: 2.8rem;
+             justify-content: center;
+           }
+         }
+                
+         .cancelBut {
+           padding-left: 2rem;
+                
+           .p-button {
+             width: 5.6rem;
+             height: 2.8rem;
+           }
+                
+         }
+       }
+      }
+    }
+  }
+      
+    }
   }
 
   .p-dialog-header {
@@ -375,6 +529,7 @@
     }
 
   }
+  
 
 }
 
@@ -444,8 +599,23 @@
 
   .upgrade_auto {
     right: 1rem;
+    float: left;
+    padding-right: 2rem;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+    cursor: pointer;
   }
-
+  .disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    display: inline-block;
+    opacity: 0.4;
+  }
   .info__btn_upgrade {
     bottom: 21%;
     cursor: pointer;
@@ -554,6 +724,20 @@
     right: 0.65rem;
     cursor: pointer;
   }
+  .disabled {
+    // float: left;
+    padding-right: 2rem;
+    pointer-events: none;
+    cursor: not-allowed;
+    display: inline-block;
+    opacity: 0.4;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+  }
 
   .info__btn_utility {
     cursor: pointer;
@@ -595,6 +779,20 @@
     top: 1rem;
     right: 0.65rem;
     cursor: pointer;
+  }
+  .disabled {
+    float: left;
+    padding-right: 2rem;
+    pointer-events: none;
+    cursor: not-allowed;
+    display: inline-block;
+    opacity: 0.4;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
   }
 
   .info__btn_create {

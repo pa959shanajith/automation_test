@@ -108,7 +108,7 @@ const DisplayProject = (props) => {
           modifieDateProject: element.releases[0].modifiedon,
           modifiedDate: lastModified,
           createdDate: element.releases[0].createdon,
-          appType: element.type,
+          appType: convertIdIntoNameOfAppType(element.type),
           projectId: element._id,
         }
       });
@@ -137,7 +137,7 @@ const DisplayProject = (props) => {
                 modifiedDate: lastModified,
                 modifieDateProject: modified_Date,
                 createdDate: element.releases[0].createdon,
-                appType: element.type,
+                appType: convertIdIntoNameOfAppType(element.type),
                 projectId: element._id,
               }
             )
@@ -237,7 +237,38 @@ const DisplayProject = (props) => {
   useEffect(() => {
     dispatch(getStep(defaultProjectId));
   }, [defaultProjectId])
+  
+  // const apptypeID =()=>{
+  //     getProjectLists.map((apptype)=> apptype.appType)
+  // };
 
+  const convertIdIntoNameOfAppType = (apptypeID) => {
+    switch (apptypeID) {
+      case "5db0022cf87fdec084ae49b6":
+        return "Web";
+      case "5db0022cf87fdec084ae49b2":
+        return "MobileWeb";
+      case "5db0022cf87fdec084ae49af":
+        return "Desktop";
+      case "5db0022cf87fdec084ae49b7":
+        return "WebService";
+      case "5db0022cf87fdec084ae49b4":
+        return "SAP";
+      case "5db0022cf87fdec084ae49b3":
+        return "OEBS";
+      case "5db0022cf87fdec084ae49b0":
+        return "Mainframes";
+      case "5db0022cf87fdec084ae49b1":
+        return "MobileApps";
+      case "5db0022cf87fdec084ae49b5":
+        return "System_application";
+      default:
+        return "";
+    }
+}
+  //  const appName = convertIdIntoNameOfAppType();
+  //  console.log(appName);
+  //  console.log(convertIdIntoNameOfAppType);
   return (
     <>
       <Panel className="Project_Display" headerTemplate={allProjectTemplate} >
@@ -257,15 +288,15 @@ const DisplayProject = (props) => {
                 }}>
                 <div className="Project_Display_Nav">
                 <div className="ProjectApp_Name">
-                {project.appType === "5db0022cf87fdec084ae49b6" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
-                {project.appType === "5db0022cf87fdec084ae49b2" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "5db0022cf87fdec084ae49af" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "5db0022cf87fdec084ae49b7" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "5db0022cf87fdec084ae49b4" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
-                {project.appType === "5db0022cf87fdec084ae49b3" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "5db0022cf87fdec084ae49b0" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "5db0022cf87fdec084ae49b1" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "5db0022cf87fdec084ae49b5" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
+                {project.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
+                {project.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "WebService" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
+                {project.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                {project.appType === "Mainframes" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                {project.appType === "MobileApps" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "System_application" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
                 <div className="Project_name">
                 <p id="projectInside">{project.projectName}</p>
                 </div>
