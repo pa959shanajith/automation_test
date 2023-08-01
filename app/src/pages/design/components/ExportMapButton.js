@@ -128,7 +128,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
             <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)}   title= "export">
                 <g id="ct-exportAction" className="ct-actionButton" title="export">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px" ></rect>
-                    <title>{enableExport || selectedModulelist.length>0?"export":" Select module(s) to export"}</title>
+                    <title>{enableExport || selectedModulelist.length>0?"export":" Select test Suite(s) to export"}</title>
                     {/* <Tooltip target=".exportButton" position="left" content="export"/> */}
                     <text x="16" y="18"  >Export</text>
                 </g>
@@ -209,7 +209,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
         { name: 'Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'excel',disabled:!isEndtoEnd?false:true},
         { name: 'Structure only - Json (.json)', code: 'LDN', value:'custom', disabled:isAssign?false:true },
         { name: 'Git', code:'GT', value:'git',disabled:!isEndtoEnd?false:true},
-        { name: 'Complete Module(S) (.zip)', code: 'IST', value:'json' , disabled:!isEndtoEnd?false:true}
+        { name: 'Complete Test Suite(S) (.zip)', code: 'IST', value:'json' , disabled:!isEndtoEnd?false:true}
     ]
     const exportProjectItem = Object.entries(projectList).map((e)=>{
                     let appTypeName = ''

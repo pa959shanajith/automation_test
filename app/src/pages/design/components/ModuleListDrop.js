@@ -27,7 +27,8 @@ import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
 
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
-    const toast = useRef();
+    const toast = useRef()
+    const [E2EName,setE2EName] = useState('')
     const moduleLists = useSelector(state=>state.design.moduleList)
     const proj = useSelector(state=>state.design.selectedProj)
     const initProj = useSelector(state=>state.design.selectedProj)
@@ -76,7 +77,6 @@ const ModuleListDrop = (props) =>{
     const [showE2EPopup, setShowE2EPopup] = useState(false);
     const [configTxt, setConfigTxt] = useState("");
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProjt && initEnEProjt.isE2ECreate?true:false)
-    const [E2EName,setE2EName] = useState('')
     const [editE2ERightBoxData,setEditE2ERightBoxData] = useState([])
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
   const [showTooltip, setShowTooltip] = useState(false);
@@ -811,7 +811,7 @@ setPreventDefaultModule(true);
                         htmlFor="username"
                         labelTxt="Name"
                         required={true}
-                        placeholder= {E2EName? E2EName:"Enter End to End Test Suite Name"}   
+                        placeholder= {E2EName? E2EName:"Enter End to End Flow Name"}   
                         customClass="inputRow_for_E2E_popUp"
                         inputType="lablelRowReqInfo"
                         inputTxt={E2EName? E2EName:inputE2EData} 
@@ -821,14 +821,14 @@ setPreventDefaultModule(true);
                   </div>
                   <div className="centralTwinBox">
                     <div className="leftBox">
-                      <Card title="Select TestCases" className="leftCard">
+                      <Card title="Select Testcases" className="leftCard">
                      <div className="DrpoDown_search_Tree">
                           <div className='searchAndDropDown'>
                             <div className="headlineSearchInput">
                               <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
                                 <InputText type="text"
-                                  placeholder="Search TestCases"
+                                  placeholder="Search Testcases"
                                   value={valueSearchLeftBox}
                                   style={{ width: '15rem', height: '2.2rem', marginRight:'0.2rem', marginBottom: '1%' }}
                                   className="inputContainer" onChange={(e)=>{setValueSearchLeftBox(e.target.value);handleSearchScenarioLeftBox(e.target.value)}}
@@ -856,9 +856,9 @@ setPreventDefaultModule(true);
                          {/* <MemorizedCheckboxSelectionDemo/> */}
                         {/* <CheckboxSelectionDemo /> */}
                         <div>
-                          {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and TestCases in this project ...</h5>: 
+                          {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and Testcases in this project ...</h5>: 
                           <>
-                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and TestCases...</h5>:
+                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and Testcases...</h5>:
                             <Tree
                               value={
                                 filterModSceList[0].mindmapList.map((module, modIndx) => ({
@@ -905,7 +905,7 @@ setPreventDefaultModule(true);
                       </div>
                     </div>
                     <div className="rightBox">
-                      <Card title="Selected TestCases" className="rightCard">
+                      <Card title="Selected Testcases" className="rightCard">
                         {!initialText?
                           <>
                           <div className="headlineSearchInputOfRightBox">
@@ -915,7 +915,7 @@ setPreventDefaultModule(true);
                             <span className="p-input-icon-left">
                               <i className="pi pi-search" />
                               <InputText
-                                placeholder="Search TestCases by name"
+                                placeholder="Search Testcases by name"
                                 className="inputContainer"
                                 onChange={(e)=>handleSearchScenarioRightBox(e.target.value)}
                               />
@@ -936,12 +936,12 @@ setPreventDefaultModule(true);
                             :
                           <div className="initialText">
                             <div className="initial1StText">
-                              <h3 className="textClass"> No TestCases Yet</h3>
+                              <h3 className="textClass"> No Testcases Yet</h3>
                             </div>
                             <div className="initial2NdText">
                               <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
                               <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 >Select TestCases</h3>
+                              <h3 >Select Testcases</h3>
                             </div>
                           </div> 
                           }
@@ -1085,7 +1085,7 @@ setPreventDefaultModule(true);
                   <div className='inputSearchNorMod'>
                     <span className="p-input-icon-left">
                       <i className="pi pi-search" />
-                      <InputText placeholder="Search " ref={SearchInpEnE} onChange={(e) => searchModule_E2E(e.target.value)} title=' Search for  E2E module' />
+                      <InputText placeholder="Search " ref={SearchInpEnE} onChange={(e) => searchModule_E2E(e.target.value)} title=' Search for  E2E Flow' />
                     </span>
                   </div>
                 </div>

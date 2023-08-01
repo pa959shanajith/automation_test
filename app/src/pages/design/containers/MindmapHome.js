@@ -39,8 +39,7 @@ const MindmapHome = () => {
   const [showCard, setShowCard] = useState(true);
   const [show, setShow] = useState(false);
   const [initBlockUi, setInitBlockUi] = useState(false)
-  console.log("showCard", showCard)
-  console.log("show", show)
+
   var Component = createType["newmindmap"];
   const handleModule = () => {
     setShowCard(false);
@@ -97,7 +96,7 @@ const MindmapHome = () => {
             <Card id='p_card' className='Module'>
               <span className='cardText'>
                 <h3 id='module'>Start by creating a Mindmap</h3>
-                <p id='module_normal'>Normal and E2E Modules</p>
+                <p id='module_normal'>Test Suite and E2E Flow</p>
               </span>
               <Button className='createBatton' title='Create Mindmap' onClick={handleModule} label='Create Mindmap' />
               <img className='createBattonImg' src='static\imgs\Normal_Module.png' alt='Create Mindmap' />

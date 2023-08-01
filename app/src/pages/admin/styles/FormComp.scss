@@ -1,0 +1,59 @@
+@import "../../global/styles/ColorVariables.scss";
+.input-label{
+    width: 75%;
+    font-size: small;
+    font-weight: 700;
+    margin-top: 25px;
+    .left-opt{
+        display: inline-block;
+        width: 75%;
+        margin-left: 10px;
+    }
+    input:read-only ,input:disabled{
+        background-color: $whisper;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+    
+    label{
+        width: 120px;
+    }
+    option:disabled{
+        background-color: $whisper;
+    }
+    .conf-radio{
+        display: inline-block;
+        width: 75%;
+        margin-left: 10px;
+        input{
+            display: inline-block;
+            width: auto;
+            margin-right: 10px;
+        }
+    }
+}
+.form-inp-dropdown{
+    font-size: 14px;
+    box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+    display: block;
+    max-height: 100px;
+    background: $whiteColor;
+    margin-top: 2px;
+    option{
+        padding-left: 2px;
+        margin: 4px;
+        width: calc(100% - 14px);
+    }
+    option:hover{
+        background: $primaryColor;
+        border-radius: 3px;
+        color: $whiteColor;
+        cursor: pointer;
+    }
+}
+.form-inp-dropdown-ldap{
+    width: calc(100% - 130px);
+    position: absolute;
+    left: 130px;
+    z-index: 1000;
+}

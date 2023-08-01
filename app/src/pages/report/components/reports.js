@@ -208,7 +208,7 @@ const reports = () => {
                                         </div>
                                         <div className="flex align-items-center">
                                             <RadioButton inputId="View by Modules" name="View by Modules" value="View by Modules" onChange={(e) => setExecutionButon(e.value)} checked={executionButon === 'View by Modules'} />
-                                            <label htmlFor="View by Modules" className="ml-2 Profile_Name" value="ViewByModules" checked={selectedOption === 'ViewByModules'}>View by Modules</label>
+                                            <label htmlFor="View by Modules" className="ml-2 Profile_Name" value="ViewByModules" checked={selectedOption === 'ViewByModules'}>View by Test Suite</label>
                                         </div>
                                     </div>
                                 </div>}

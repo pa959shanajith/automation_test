@@ -196,4 +196,118 @@ export const getProjectsMMTS = async(data) => {
     }
 }
 
+export const getAgent = async () => {
+    try {
+        // const res = await fetch("/downloadAgent");
+        // const {status} = await res.json();
+        // if (status === "available") window.location.href = "https://localhost:8443/downloadAgent"+queryICE+"&file=getICE"
+        // if (status === "available"){
+        const link = document.createElement('a');
+        link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+        link.setAttribute('download', "avoURL.txt");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.location.href = window.location.origin+"/downloadAgent";
+        // }
+        // else setMsg(MSG.GLOBAL.ERR_PACKAGE);
+    } catch (ex) {
+        console.error("Error while downloading Agent. Error:", ex);
+    }
+}
+
+
+export const getUsers_ICE = (project_id) => {
+
+    return new Promise((resolve, reject)=> {
+
+        axios(url+"/getUsers_ICE", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {'action': 'getUsers_ICE', 'allflag': true,project_id},
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200){
+
+                resolve(res.data);
+
+            }
+
+            else{
+
+                reject(res.status)
+
+            }
+
+        })
+
+        .catch(err => {
+
+            reject(err);
+
+        })
+
+    })
+
+}
+
+
+export const userUpdateProject_ICE = (data) => {
+
+    return new Promise((resolve, reject)=> {
+
+        axios(url+"/userUpdateProject_ICE", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {'action': 'userUpdateProject_ICE', 'allflag': true, ...data},
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200){
+
+                resolve(res.data);
+
+            }
+
+            else{
+
+                reject(res.status)
+
+            }
+
+        })
+
+        .catch(err => {
+
+            reject(err);
+
+        })
+
+    })
+
+}
+
 

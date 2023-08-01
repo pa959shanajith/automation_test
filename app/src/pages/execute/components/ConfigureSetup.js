@@ -270,7 +270,7 @@ const ConfigureSetup = ({
           checked={modules === "e2eExecution"}
         />
         <label htmlFor="module1" className="ml-2">
-          End to End Modules
+          End to End Flow
         </label>
       </div>
       <div className="flex align-items-center">
@@ -282,7 +282,7 @@ const ConfigureSetup = ({
           checked={modules === "normalExecution"}
         />
         <label htmlFor="module2" className="ml-2">
-          Normal Modules
+          Test Suites
         </label>
       </div>
       <div className="flex align-items-center config_text">

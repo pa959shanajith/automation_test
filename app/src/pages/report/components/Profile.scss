@@ -44,7 +44,7 @@
             text-align: center;
         }
         .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 32rem;
+            width: 30rem;
         }
     }
     .module_table {
@@ -55,7 +55,7 @@
             text-align: center;
         }
         .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 32rem;
+            width: 30rem;
         }
     }
     .statusTable {
@@ -82,5 +82,11 @@
     .case_text {
         display: inline-block;
         width: 28rem;
+    }
+}
+
+.p-overlaypanel.reports_download {
+    .p-overlaypanel-content {
+        padding: 0;
     }
 }

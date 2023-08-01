@@ -9,8 +9,9 @@ import { useNavigate ,Link} from "react-router-dom";
 import RedirectPage from '../../global/components/RedirectPage';
 import ChangePassword from '../../global/components/ChangePassword';
 import EditProfile from '../components/EditProfile'
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
+import Agent from '../components/Agent';
+// import 'primereact/resources/themes/saga-blue/theme.css';
+// import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { Button } from "primereact/button";
@@ -25,6 +26,7 @@ const UserDemo = (props) => {
     const [logoutClicked, setLogoutClicked] = useState(false);
     const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
     const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+    const [showAgentDialog, setShowAgentDialog] = useState(false);
     const [initials, setInitials] = useState('');
     const [config, setConfig] = useState({});
     const [showUD, setShowUD] = useState(false);
@@ -117,6 +119,13 @@ const UserDemo = (props) => {
                     command: () => {
                         handleDownloadClick();
                     }
+                },
+                {
+                    label: 'Download Agent',
+                    icon: 'pi pi-fw pi-download',
+                    command: () => {
+                        agentDialog();
+                    }
                 }
             ]  
         },
@@ -145,6 +154,11 @@ const UserDemo = (props) => {
     const EditProfileDialog = () => {
         setShowEditProfileDialog(true);
     }
+
+    const agentDialog = () => {
+        setShowAgentDialog(true);
+    }
+
     const confirmLogout = () => {
         RedirectPage(navigate, { reason: "logout" });
     };
@@ -153,7 +167,8 @@ const UserDemo = (props) => {
         <div className="UserProfileContainer">
             <TieredMenu className='custom-tieredmenu' model={userMenuItems} popup ref={menu} breakpoint="767px" />
             { showEditProfileDialog && <EditProfile showDialogBox = {showEditProfileDialog} setShowDialogBox= {setShowEditProfileDialog}/>}
-            { showChangePasswordDialog && < ChangePassword showDialogBox = {showChangePasswordDialog} setShowDialogBox= {setShowChangePasswordDialog}/>}
+            { showChangePasswordDialog && < ChangePassword showDialogBox = {showChangePasswordDialog} setShowDialogBox= {setShowChangePasswordDialog}/>}  
+            { showAgentDialog && < Agent showDialogBox = {showAgentDialog} setShowDialogBox= {setShowAgentDialog}/>}
             <AvoConfirmDialog 
                 visible={logoutClicked}
                 onHide={setLogoutClicked} 
