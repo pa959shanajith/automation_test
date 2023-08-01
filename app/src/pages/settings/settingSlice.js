@@ -20,7 +20,8 @@ const initialState = {
     selectedScenarioIds: [],
     mappedPair: [],
     selectedAvoproject:'',
-    mappedTree:[]
+    mappedTree:[],
+    showOverlay:""
 }
 
 export const settingSlice=createSlice({
@@ -66,6 +67,9 @@ export const settingSlice=createSlice({
         },
         mappedTree:(state,action) => {
             state.mappedTree =  action.payload
+        },
+        showOverlay:(state,action) =>{
+            state.showOverlay =  action.payload
         }
 
     }
@@ -84,7 +88,8 @@ export const {
     selectedScenarioIds,
     mappedPair,
     selectedAvoproject,
-    mappedTree
+    mappedTree,
+    showOverlay
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

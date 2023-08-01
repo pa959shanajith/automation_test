@@ -1,44 +1,65 @@
-
 @import "../../global/styles/ColorVariables.scss";
-.dropdown-class{
+
+.dropdown-class {
     margin-top: 1rem;
 }
+
 .dropdown-integration {
-    .p-dropdown{
+    .p-dropdown {
         width: 205px !important;
         height: 36px !important;
 
     }
 }
 
-.basic_login{
-    position: relative;
-    left: 0.5rem;
+.project_dropdown {
+    width: 12rem;
+    position: absolute;
 }
 
-.token_login{
-    position: relative;
-    left: 0.5rem;
+.release_dropdown {
+    position: relative !important;
+    left: 1.5rem !important;
+    width: 12rem;
 }
 
-.login-cls{
+.zephyrDialog {
+    .p-dialog-content {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+}
+
+.import_img {
+    position: relative;
+    top: 1.3rem;
+    z-index: 9999;
+    float: right;
+}
+
+.login-cls {
     font-size: 23px;
     font-weight: 600;
     position: absolute;
     bottom: 20rem;
 }
-.input-cls, .passwrd-cls, .url-cls{
+
+.input-cls,
+.passwrd-cls,
+.url-cls {
     display: flex;
     flex-direction: row;
     margin-bottom: 1.5rem;
 }
-.input-txt1{
-    .p-inputtext{
-width: 20rem !important;
-height: 2.5rem !important;
+
+.input-txt1 {
+    .p-inputtext {
+        width: 20rem !important;
+        height: 2.5rem !important;
     }
 }
-.loginbtn-jira{
+
+.loginbtn-jira {
     .p-button {
         height: 2.5rem !important;
         width: 6rem !important;
@@ -46,36 +67,29 @@ height: 2.5rem !important;
         left: 14rem !important;
     }
 }
-.logout__btn{
+
+.logout__btn {
     position: absolute !important;
     left: 55rem !important;
     background: white !important;
     color: blue !important;
-    .p-button{
-     width: 7rem !important;
+
+    .p-button {
+        width: 7rem !important;
     }
 }
 
-.selected_projName{
+.selected_projName {
     padding: 0.5rem;
     border: 1px solid lightgray;
     border-radius: 4px;
-    // width: 16rem;
+    width: 10rem;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 13rem;
-    margin-top: 0.5rem;
-    width: 28rem;
-    display: flex;
-    height: 2.7rem;
-
+    max-width: 10rem;
 }
 
-.scenario_label{
-    font: $f6_regular !important;
-}
-
-.cancel__btn{
+.cancel__btn {
     position: absolute !important;
     left: 59.1rem !important;
     background: white !important;
@@ -83,97 +97,91 @@ height: 2.5rem !important;
     bottom: 0rem;
 }
 
-.btn-11{
+.btn-11 {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.tab__cls{
+.tab__cls1 {
     margin-top: 0.5rem;
+
     .p-tabview-nav-content {
-         height: 3rem !important;
+        height: 3rem !important;
     }
 }
-.integration_header{
-    font:$f6_bold !important;
+
+.integration_header {
+    font: $f6_bold !important;
 }
 
-.data__mapping{
+.zephyr__mapping {
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
     height: 20rem;
-    gap: 7rem;
+    gap: 4rem;
 }
-.card_data1{
+
+.card_zephyr1 {
     margin-left: -1rem;
     position: relative;
     right: 0.7rem;
-    .p-component{
+
+    .p-component {
         box-shadow: none !important;
         border: 1px solid lightgray;
     }
 }
-.card_data2{
+
+.card_zephyr2 {
     position: relative;
-    right: 6.3rem;
-    .p-component{
+    right: 3.3rem;
+
+    .p-component {
         box-shadow: none !important;
         border: 1px solid lightgray;
     }
 }
-.mapping_data_card1, .mapping_data_card2{
+
+.mapping_zephyr_card1,
+.mapping_zephyr_card2 {
     width: 30rem;
-   
-    .p-card-body{
+
+    .p-card-body {
         height: 30.5rem;
         width: 30rem;
-       
+
     }
 }
-.dropdown-map1{
+
+.dropdown-zephyr {
     display: flex;
-    flex-direction:row;
+    flex-direction: row;
 }
-.dropdown-map2{
-    display: flex;
-    flex-direction:row;
-    margin-top: 0.5rem;
-}
-.release_span{
+
+.release_span {
     position: relative;
     left: 7rem;
 }
 
-.dropdown_project{
-    width: 12rem !important;
-    height: 2.7rem !important;
-}
-
-.dropdown_release{
-    width: 12rem !important;
-    height: 2.7rem !important;
-    position: relative;
-    left: 3rem;
-}
-.dropdown_div{
+// .dropdown_release{
+//     position: relative;
+//     left: 2.5rem;
+// }
+.dropdown_div1 {
     margin-top: -1.5rem;
 }
 
 //login screen jira changes 
 
 .login__jira {
-  
+
     margin-left: 15rem;
 
 
 }
 
-.unmap_icon{
-    &:hover{
-        opacity: 0.5;
-      }
-}
+
 
 
 .login__div {
@@ -243,7 +251,7 @@ height: 2.5rem !important;
 
     top: 3rem;
 
-    .p-component{
+    .p-component {
 
         box-shadow: none !important;
 
@@ -251,8 +259,8 @@ height: 2.5rem !important;
 
 }
 
-.manage_integrations{
-    .p-dialog-content{
+.manage_integrations {
+    .p-dialog-content {
         overflow: hidden;
     }
 }
@@ -270,6 +278,7 @@ height: 2.5rem !important;
         cursor: pointer;
 
     }
+
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -317,30 +326,32 @@ height: 2.5rem !important;
 
 }
 
-.map__btn{
+.map__btn__zephyr {
     position: relative;
     top: 13rem;
-    right: 12.5rem !important;
+    right: 7rem;
     cursor: pointer;
-    cursor: pointer;
-     &:hover{
-       opacity: 0.5;
-     }
+
+    &:hover {
+        opacity: 0.5;
+    }
 }
 
-.view_map_card{
+.view_map_zephyr {
     height: 30rem;
     max-height: 32.5rem;
     box-shadow: none !important;
     border: 1px solid lightgray !important;
-    .toggle_btn{
+
+    .toggle_btn {
         position: relative;
         bottom: 2rem;
         gap: 1rem;
     }
-    .accordion_testcase{
-            max-height: 30rem !important;
-            overflow-y: auto !important;
+
+    .accordion_testcase {
+        max-height: 30rem !important;
+        overflow-y: auto !important;
     }
 }
 
@@ -348,27 +359,27 @@ height: 2.5rem !important;
     border: 1px solid #6837e6;
     border-radius: 7px;
     padding: 1rem 4rem 2rem 2rem;
-    background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
-    cursor: pointer;
-  }
+    background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
 
-  .leafId{
+}
+
+.leafId {
     padding-left: 0.5rem;
     color: #0052CC;
     font: $f6_semibold !important;
-  }
+}
 
-  .test__tcName{
+.test__tcName {
     padding-left: 0.5rem;
     color: black;
     position: relative;
-    font: $f6_regular !important;
-  }
-  .test_tree_leaves{
-    margin-bottom: 0.3rem;
-  }
+}
 
-  .testcase__data{
+.test_tree_leaves {
+    margin-bottom: 0.3rem;
+}
+
+.testcase__data {
     padding-top: 1rem;
     font: $f6_regular;
     text-overflow: ellipsis;
@@ -376,9 +387,9 @@ height: 2.5rem !important;
     max-height: 25rem;
     max-width: 40rem;
     overflow-x: hidden;
-  }
+}
 
-  .bouncing-loader {
+.bouncing-loader {
     display: flex;
     position: absolute;
     top: 70%;
@@ -386,9 +397,9 @@ height: 2.5rem !important;
     // justify-content: center;
     // align-items: center;
     // height: 100%;
-  }
-  
-  .bouncing-loader > div {
+}
+
+.bouncing-loader>div {
     width: 10px;
     height: 10px;
     margin: 3px 6px;
@@ -396,46 +407,104 @@ height: 2.5rem !important;
     background-color: #7e4ef7;
     opacity: 1;
     animation: bouncing-loader 0.6s infinite alternate;
-  }
+}
 
-  @keyframes bouncing-loader {
+@keyframes bouncing-loader {
     to {
-      opacity: 0.1;
-      transform: translateY(-16px);
+        opacity: 0.1;
+        transform: translateY(-16px);
     }
-  }
-  
-  .bouncing-loader > div:nth-child(2) {
+}
+
+.bouncing-loader>div:nth-child(2) {
     animation-delay: 0.2s;
-  }
-  
-  .bouncing-loader > div:nth-child(3) {
+}
+
+.bouncing-loader>div:nth-child(3) {
     animation-delay: 0.4s;
-  }
-  .avotest__data{
-    margin-left: -1.5rem;
-    .p-tree{
+}
+
+.avotest__zephyr {
+    .p-tree {
         border: none !important;
         background: none !important;
         overflow: auto;
         height: 24.5rem;
-        }
-        .avoProject_tree{
-            .p-treenode-content{
-                padding: 0 !important;
-            }
-        }
-  }
+        padding: 0;
+        // float: left;
+    }
+    .p-treenode-content{
+        padding: 0 !important;
+    }
+    .p-tree-container{
+        margin-top: 1rem !important;
+    }
+}
 
-  .apptype__token{
+.apptype__token {
     display: flex;
     gap: 2rem;
     margin-bottom: 3rem;
-  }
-  .unmap_icon{
+}
+
+.zephyrdata-card1 {
+    .p-tree {
+        border: none !important;
+        background: none !important;
+        overflow: auto;
+        height: 25rem;
+        max-height: 50rem;
+        padding: 0;
+        // float: left;
+    }
+    .p-treenode-content{
+        padding: 0 !important;
+        margin-top: 1rem;
+    }
+}
+
+.dropdown_lists {
+    margin-top: 0.7rem;
+}
+
+.selectPhase {
+    text-align: center;
+    border: 1px solid lightgray;
+    // border: none !important;
+
+    .p-tree {
+        background: none !important;
+        overflow: auto;
+        height: 16.5rem;
+        padding: 0;
+    }
+}
+
+.testcase_data_2{
+    margin-top: 1rem;
+    left: 1rem;
+}
+
+.excelSheet_dropdown {
+    left: 2rem;
+    width: 14rem;
+    margin-bottom: 1rem;
+}
+
+.selectProject_dropdown {
+    left: 1.3rem;
+    width: 14rem;
+    margin-bottom: 1rem;
+}
+
+.selectRelease_dropdown {
+    left: 1rem;
+    width: 14rem;
+    margin-bottom: 1rem;
+}
+
+.unmap_icon{
     &:hover{
         opacity: 0.5;
       }
 }
-
-
