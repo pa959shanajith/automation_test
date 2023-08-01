@@ -51,7 +51,8 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
             case 'Zephyr':
                 setShowLoginCard(false);
                 break;
-            case 'Azue DevOps':
+            case 'Azure DevOps':
+                setShowLoginCard(false);
                 break;
             case 'ALM':
                 break;

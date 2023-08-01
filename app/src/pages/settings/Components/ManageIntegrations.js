@@ -29,6 +29,7 @@ import { Tree } from 'primereact/tree';
 import { Tag } from 'primereact/tag';
 import { index } from "d3";
 import ZephyrContent from "./ZephyrContent";
+import AzureContent from "./AzureContent";
 
 
 
@@ -739,7 +740,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                         </div>
                                                     </div>
                                                     <span>
-                                                        <img className="map__btn" src="static/imgs/map_button_icon.svg" onClick={handleSync} />
+                                                        <Button className="map__btn" label="Map" size="small" onClick={handleSync}/>
                                                     </span>
                                                 </div>
 
@@ -783,7 +784,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : selectedscreen.name === "Azure DevOps" ? <AzureContent/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

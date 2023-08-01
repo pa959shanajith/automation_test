@@ -1,0 +1,135 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.mapping_data_card_azure,
+.mapping_data_card_azure {
+    width: 30rem;
+
+    .p-card-body {
+        height: 30.5rem;
+        width: 28rem;
+
+    }
+}
+
+.mapping_data_card_azure {
+    margin-left: -1rem;
+}
+
+.data__mapping {
+    display: flex;
+    flex-direction: row;
+    height: 20rem;
+    gap: 1.5rem;
+}
+
+.dropdown-map_azure {
+    display: flex;
+    flex-direction: row;
+}
+
+.release_span1 {
+    position: relative;
+    left: 3rem;
+}
+
+.dropdown_release1 {
+    position: relative;
+    left: 0.7rem;
+}
+
+.dropdown_release2 {
+    position: relative;
+    left: 1.5rem;
+}
+
+.release_span2 {
+    position: relative;
+    left: 4.3rem;
+}
+
+.map_icon_cls {
+    position: relative;
+    top: 12rem;
+    right: 1.1rem;
+}
+
+.card_Azure1 {
+    position: relative;
+    right: 0.5rem;
+}
+
+.card_Azure1,
+.card_Azure2,
+.card2_viewmap {
+    .p-component {
+        box-shadow: none !important;
+        border: 1px solid lightgray;
+    }
+}
+
+.tree_data_card1 {
+    margin-top: 1rem;
+    .azure__data__div{
+        padding-bottom: 0.3rem;
+    }
+    .p-tree {
+        border: none !important;
+        background: none !important;
+        overflow: auto;
+        height: 28rem;
+    }
+    .p-treenode-content{
+        padding: 0 !important;
+    }
+    .p-tree-container{
+        margin-top: 1rem;
+    }
+    .azure__name{
+        margin-left: 0.5rem;
+        font: $f6_regular !important;
+    }
+}
+
+.view_map_card {
+    margin-top: -0.5rem;
+    height: 33rem;
+    max-height: 31rem;
+}
+
+.view_map_card .toggle_btn {
+    position: relative;
+    bottom: 1rem;
+    gap: 1rem;
+}
+
+// .tab__cls {
+//     .p-tabview-panels {
+//         padding: 1.25rem 0 !important;
+//     }
+// }
+
+
+.view_map_card {
+    .accordion_testcase {
+        max-height: 23rem !important;
+        overflow-y: auto !important;
+    }
+}
+
+.selected_projName {
+
+    padding: 0.5rem;
+
+    border: 1px solid lightgray;
+
+    border-radius: 4px;
+
+    width: 10rem;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    max-width: 10rem;
+
+}
