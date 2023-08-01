@@ -68,23 +68,23 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
         <>
             <div className="login_container_integrations">
                 <div className="side-panel">
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Jira', code: 'NY' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Jira', code: 'JA' })}>
                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                         <span className="text__jira">Jira</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Zephyr', code: 'RM' })}>
-                        <span><img src="static/imgs/zephyr_icon.svg" className="img__zephyr"></img></span>
-                        <span className="text__azure">Zephyr</span>
-                    </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Azure DevOps', code: 'LDN' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Zephyr', code: 'ZR' })}>
                         <span><img src="static/imgs/azure_devops_icon.svg" className="img__azure"></img></span>
-                        <span className="text__zephyr">Azure DevOps</span>
+                        <span className="text__azure">Azure DevOps</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'qTest' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'qTest', code: 'LDN' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Azure DevOps', code: 'ADO' })}>
+                        <span><img src="static/imgs/zephyr_icon.svg" className="img__zephyr"></img></span>
+                        <span className="text__zephyr">Zephyr</span>
+                    </div>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'qTest' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'qTest', code: 'QT' })}>
                         <span><img src="static/imgs/qTest_icon.svg" className="img__qtest"></img></span>
                         <span className="text__qtest">qTest</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'ALM', code: 'LDN' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'ALM', code: 'ALM' })}>
                         <span><img src="static/imgs/ALM_icon.svg" className="img__alm"></img></span>
                         <span className="text__alm">ALM</span>
                     </div>
