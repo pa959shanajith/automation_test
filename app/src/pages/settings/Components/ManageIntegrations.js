@@ -19,7 +19,7 @@ import {
     resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject,mappedTree
+    selectedAvoproject, mappedTree
 } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -28,6 +28,7 @@ import { Tree } from 'primereact/tree';
 // import { checkboxTemplate } from './path/to/checkboxTemplate';
 import { Tag } from 'primereact/tag';
 import { index } from "d3";
+import ZephyrContent from "./ZephyrContent";
 
 
 
@@ -63,9 +64,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [listofScenarios, setListofScenarios] = useState([]);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const [treeData, setTreeData] = useState([]);
-    const [selectedNodes, setSelectedNodes] =useState([]);
-    const [viewMappedFiles,setViewMappedFiles] = useState([]);
-    const [rows,setRows] = useState([]);
+    const [selectedNodes, setSelectedNodes] = useState([]);
+    const [viewMappedFiles, setViewMappedFiles] = useState([]);
+    const [rows, setRows] = useState([]);
     const [counts, setCounts] = useState({
         totalCounts: 0,
         mappedScenarios: 0,
@@ -113,7 +114,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         const jirapwd = loginDetails.password || '';
 
         const domainDetails = await api.connectJira_ICE(jiraurl, jirausername, jirapwd);
-        if (domainDetails.error) setToast("error", "Error",domainDetails.error);
+        if (domainDetails.error) setToast("error", "Error", domainDetails.error);
         else if (domainDetails === "unavailableLocalServer") setToast("error", "Error", "ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setToast("warn", "Warning", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (domainDetails === "Invalid Session") {
@@ -255,7 +256,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const onCheckboxChange = (nodeKey) => {
         const nodeIndex = selectedNodes.indexOf(nodeKey);
-        const newSelectedNodes =  [];
+        const newSelectedNodes = [];
         if (nodeIndex !== -1) {
             newSelectedNodes.splice(nodeIndex, 1);
         } else {
@@ -263,44 +264,44 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
         setSelectedNodes(newSelectedNodes);
         dispatchAction(selectedScenarioIds(newSelectedNodes));
-      }
+    }
 
     const checkboxTemplate = (node) => {
-        if(node.data.type === 'scenario'){
+        if (node.data.type === 'scenario') {
             return (
-            <div style={{width: '100%'}}>
-            <Checkbox
-              checked={selectedNodes.includes(node.key)}
-              onChange={() => onCheckboxChange(node.key)}
-            />
-            <span className="scenario_label">{node.label} </span>
-            {
-                node.checked && <i className="pi pi-times unmap_icon" style={{ float: 'right'}} onClick={() => handleUnSync(node)}></i>
-            }
-             
-            </div>)
+                <div style={{ width: '100%' }}>
+                    <Checkbox
+                        checked={selectedNodes.includes(node.key)}
+                        onChange={() => onCheckboxChange(node.key)}
+                    />
+                    <span className="scenario_label">{node.label} </span>
+                    {
+                        node.checked && <i className="pi pi-times unmap_icon" style={{ float: 'right' }} onClick={() => handleUnSync(node)}></i>
+                    }
+
+                </div>)
         }
-        else if(node.data.type === 'testcase'){
+        else if (node.data.type === 'testcase') {
             return (
-            <div style={{width: '100%'}}>
-                <span>{node.label} </span>
-                {/* <i className="pi pi-times" style={{ float: 'right'}} ></i> */}
-          </div>
+                <div style={{ width: '100%' }}>
+                    <span>{node.label} </span>
+                    {/* <i className="pi pi-times" style={{ float: 'right'}} ></i> */}
+                </div>
             )
         }
-      };
+    };
 
-      const handleUnSync = async (node) => {
+    const handleUnSync = async (node) => {
         let unSyncObj = [];
-        if(Object.keys(node).length){
+        if (Object.keys(node).length) {
             // let findUnsyncedObj = mappedData.filter((item) =>  item.scenarioId[0] === node.key);
             let findMappedId = viewMappedFiles.filter((item) => item.testscenarioid === node.key);
-            if(findMappedId && findMappedId.length){
+            if (findMappedId && findMappedId.length) {
                 unSyncObj.push({
-                    'mapid':findMappedId[0]._id,
-                    'testCaseNames':[].concat(findMappedId[0].itemCode),
-                    'testid':[].concat(findMappedId[0].itemId),
-                    'testSummary':[].concat(null)
+                    'mapid': findMappedId[0]._id,
+                    'testCaseNames': [].concat(findMappedId[0].itemCode),
+                    'testid': [].concat(findMappedId[0].itemId),
+                    'testSummary': [].concat(null)
                 })
                 let args = Object.values(unSyncObj);
                 args['screenType'] = selectedscreen.name;
@@ -317,11 +318,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     callViewMappedFiles()
                     setToast("success", "Success", 'Unsynced');
                 }
-                    
+
             }
-            
-            let unsyncMap = treeData.map((item) => item.key == node.key ? {...item,checked:false,children:[]}:item);
-            let unsyncMappedData = mappedData.filter((item) =>  item.scenarioId[0] !== node.key);
+
+            let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
+            let unsyncMappedData = mappedData.filter((item) => item.scenarioId[0] !== node.key);
             setTreeData(unsyncMap);
             dispatchAction(mappedTree(unsyncMap));
             dispatchAction(mappedPair(unsyncMappedData));
@@ -349,14 +350,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     }
 
-    const callViewMappedFiles=async(saveFlag)=>{
-        try{
+    const callViewMappedFiles = async (saveFlag) => {
+        try {
             const response = await api.viewJiraMappedList_ICE("6440e7b258c24227f829f2a4");
-            
-            if (response.error){
+
+            if (response.error) {
                 setToast("error", "Error", response.error);
-            } 
-            if(response && response.length){
+            }
+            if (response && response.length) {
                 setViewMappedFiles(response);
                 let totalCounts = 0;
                 let mappedScenarios = 0;
@@ -389,12 +390,12 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     mappedScenarios = mappedScenarios + object.testscenarioname.length;
                     mappedTests = mappedTests + 1;
                     tempRow.push({
-                        'testCaseNames': object.itemCode, 
+                        'testCaseNames': object.itemCode,
                         'scenarioNames': object.testscenarioname,
                         'mapId': object._id,
                         'scenarioId': object.testscenarioid,
-                        'testid':object.itemId,
-                        'itemSummary':object.itemSummary
+                        'testid': object.itemId,
+                        'itemSummary': object.itemSummary
                     });
                 });
                 setCounts({
@@ -403,7 +404,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     mappedTests: mappedTests
                 });
                 setRows(tempRow);
-                
+
             }
             else if(response !== 'fail'){
                 setRows([]);
@@ -414,7 +415,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 });
             }
         }
-        catch(err) {
+        catch (err) {
             setToast("error", "Error", MSG.INTEGRATION.ERR_FETCH_DATA.CONTENT);
         }
     }
@@ -492,14 +493,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
         const testData = await api.getJiraTestcases_ICE(jira_info)
         if (testData) {
-            const updateCheckbox = testData.testcases.map((item) => ({...item,checked:false}));
+            const updateCheckbox = testData.testcases.map((item) => ({ ...item, checked: false }));
             setTestCaseData(updateCheckbox)
         }
         setEnableBounce(false);
     }
     const onAvoProjectChange = async (scnData) => {
         dispatchAction(selectedAvoproject(reduxDefaultselectedProject.projectId));
-        if(scnData.length){
+        if (scnData.length) {
             let filterScns = scnData.filter(el => el.project_id === reduxDefaultselectedProject.projectId)[0]['scenario_details'] || [];
             setListofScenarios(filterScns);
 
@@ -531,36 +532,36 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     key: scenario._id,
                     label: scenario.name,
                     data: { type: 'scenario' },
-                    checked:false,
+                    checked: false,
                     children: mappedTreeList
-                })) 
-                
+                }))
+
                 : []
             setTreeData(treeData);
         }
     }
-    const handleClick = (isChecked,value, id, summary) => {
-        if(isChecked){
-        let newSelectedTCDetails = { ...selectedZTCDetails };
-        let newSelectedTC = isChecked ? [...value, summary]:[];
-        console.log(newSelectedTC);
-        setSelected(value)
-        setSelectedId(id)
-        setSelectedSummary(summary)
-        setDisabled(true)
-        dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
-        dispatchAction(syncedTestCases([]));
-        dispatchAction(selectedTestCase(newSelectedTC));
+    const handleClick = (isChecked, value, id, summary) => {
+        if (isChecked) {
+            let newSelectedTCDetails = { ...selectedZTCDetails };
+            let newSelectedTC = isChecked ? [...value, summary] : [];
+            console.log(newSelectedTC);
+            setSelected(value)
+            setSelectedId(id)
+            setSelectedSummary(summary)
+            setDisabled(true)
+            dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
+            dispatchAction(syncedTestCases([]));
+            dispatchAction(selectedTestCase(newSelectedTC));
         }
-        else{
-        let newSelectedTCDetails = { ...selectedZTCDetails };
-        setSelected('')
-        setSelectedId('')
-        setSelectedSummary('')
-        setDisabled(true)
-        dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
-        dispatchAction(syncedTestCases([]));
-        dispatchAction(selectedTestCase([]));
+        else {
+            let newSelectedTCDetails = { ...selectedZTCDetails };
+            setSelected('')
+            setSelectedId('')
+            setSelectedSummary('')
+            setDisabled(true)
+            dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
+            dispatchAction(syncedTestCases([]));
+            dispatchAction(selectedTestCase([]));
         }
     }
 
@@ -581,36 +582,36 @@ const ManageIntegrations = ({ visible, onHide }) => {
         if (popupMsg) setMsg(popupMsg);
         else {
             const mappedPairObj = [...mappedData,
-                {
-                    projectId: filterProject.key,
-                    projectCode: filterProject.value,
-                    projectName: filterProject.label,
-                    testId: selectedId,
-                    testCode: selected,
-                    scenarioId: selectedScIds,
-                    itemType: releaseId,
-                    itemSummary: selectedSummary
-                }
+            {
+                projectId: filterProject.key,
+                projectCode: filterProject.value,
+                projectName: filterProject.label,
+                testId: selectedId,
+                testCode: selected,
+                scenarioId: selectedScIds,
+                itemType: releaseId,
+                itemSummary: selectedSummary
+            }
             ];
             dispatchAction(mappedPair(mappedPairObj));
-            const filterTestCase = testCaseData.filter((testCase) => testCase.id == selectedId).map(el => ({key:el.id,label:el.summary,data:{type:'testcase'}}))
+            const filterTestCase = testCaseData.filter((testCase) => testCase.id == selectedId).map(el => ({ key: el.id, label: el.summary, data: { type: 'testcase' } }))
             // checking the current map obj is already present with any other scenario
-            const findDuplicate =  treeData.map((parent,index) => {
+            const findDuplicate = treeData.map((parent, index) => {
                 const duplicateChildIndex = parent.children.findIndex(
                     (child) => child.key === selectedId
-                  );
-                  if (duplicateChildIndex !== -1) {
+                );
+                if (duplicateChildIndex !== -1) {
                     // Remove the duplicate child from the parent's children array
-                   return {...parent,checked:false, children: [] };
-                  }
-                  else {
+                    return { ...parent, checked: false, children: [] };
+                }
+                else {
                     return parent;
-                  }
+                }
             });
-            let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? {...scenario,checked:true,children:filterTestCase} :scenario)
+            let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? { ...scenario, checked: true, children: filterTestCase } : scenario)
             setTreeData(updatedTreeData);
             dispatchAction(mappedTree(updatedTreeData));
-            const updateCheckbox = testCaseData.map((item) => ({...item,checked:false}));
+            const updateCheckbox = testCaseData.map((item) => ({ ...item, checked: false }));
             setTestCaseData(updateCheckbox);
             dispatchAction(syncedTestCases(selected));
             setSelectedNodes([]);
@@ -620,12 +621,12 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setDisabled(false);
     }
 
-    
 
-    const testcaseCheck = (e,checkboxIndex) => { 
-        if(checkboxIndex >= 0 && checkboxIndex < testCaseData.length){
-            const setObjValue = testCaseData.map((item) => ({...item,checked:false}));
-            const updatedData = setObjValue.map((item,idx) => idx === checkboxIndex ? {...item,checked:e.checked} : item )
+
+    const testcaseCheck = (e, checkboxIndex) => {
+        if (checkboxIndex >= 0 && checkboxIndex < testCaseData.length) {
+            const setObjValue = testCaseData.map((item) => ({ ...item, checked: false }));
+            const updatedData = setObjValue.map((item, idx) => idx === checkboxIndex ? { ...item, checked: e.checked } : item)
             setTestCaseData(updatedData);
         }
     }
@@ -656,7 +657,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         </div>
     );
 
-    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} selectedscreen={selectedscreen} handleIntegration={handleIntegration} />, [isSpin, showCard2, selectedscreen, handleIntegration])
+    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} selectedscreen={selectedscreen} handleIntegration={handleIntegration} setShowLoginCard={setShowLoginCard} />, [isSpin, showCard2, selectedscreen, handleIntegration,setShowLoginCard])
+   console.log(showLoginCard);
 
 
     return (
@@ -673,113 +675,116 @@ const ManageIntegrations = ({ visible, onHide }) => {
                         <>
                             {IntergrationLogin}
                         </>
-                    ) : (
-                        <div>
-                            <div className="tab__cls">
-                                <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
-                                    <TabPanel header="Mapping">
-                                        <div className="data__mapping">
-                                            <div className="card_data1">
-                                                <Card className="mapping_data_card1">
-                                                    <div className="dropdown_div">
-                                                        <div className="dropdown-map1">
-                                                            <span>Select Jira Project <span style={{ color: 'red' }}>*</span></span>
-                                                            <span className="release_span"> Select Jira workItems<span style={{ color: 'red' }}>*</span></span>
-                                                        </div>
-                                                        <div className="dropdown-map2">
-                                                            <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e)} placeholder="Select Project" />
-                                                            <Dropdown disabled={disableIssue} style={{ width: '11rem', height: '2.5rem' }} value={currentIssue} className="dropdown_release" options={issueTypes} onChange={(e) => onIssueChange(e)} placeholder="Select Release" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="testcase__data">
-                                                        {
-                                                            testCaseData && testCaseData.length ?
-                                                                testCaseData.map((data, i) => (
-                                                                    <div className={"test_tree_leaves" + (selected === data.code ? " test__selectedTC" : "")}>
-                                                                        {/* onClick={() => handleClick(data.code, data.id, data.summary)} */}
-                                                                        <label className="test__leaf" title={data.code} >
-                                                                            <Checkbox onChange={e =>{ testcaseCheck(e,i);handleClick(e.checked, data.code, data.id, data.summary)}} checked={data.checked} />
-                                                                            <span className="leafId">{data.code}</span>
-                                                                            <span className="test__tcName" title={data.summary}>{data.summary.trim().length > 35 ? data.summary.substr(0, 35) + "..." : data.summary} </span>
-                                                                        </label>
-                                                                    </div>
-                                                                ))
-                                                                :
-                                                                enableBounce &&
-                                                                <div className="bouncing-loader">
-                                                                    <div></div>
-                                                                    <div></div>
-                                                                    <div></div>
+                    ) : selectedscreen.name === "Jira" ?
+                            (
+                                <div>
+                                    <div className="tab__cls">
+                                        <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
+                                            <TabPanel header="Mapping">
+                                                <div className="data__mapping">
+                                                    <div className="card_data1">
+                                                        <Card className="mapping_data_card1">
+                                                            <div className="dropdown_div">
+                                                                <div className="dropdown-map1">
+                                                                    <span>Select Jira Project <span style={{ color: 'red' }}>*</span></span>
+                                                                    <span className="release_span"> Select Jira workItems<span style={{ color: 'red' }}>*</span></span>
                                                                 </div>
+                                                                <div className="dropdown-map2">
+                                                                    <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e)} placeholder="Select Project" />
+                                                                    <Dropdown disabled={disableIssue} style={{ width: '11rem', height: '2.5rem' }} value={currentIssue} className="dropdown_release" options={issueTypes} onChange={(e) => onIssueChange(e)} placeholder="Select Release" />
+                                                                </div>
+                                                            </div>
+                                                            <div className="testcase__data">
+                                                                {
+                                                                    testCaseData && testCaseData.length ?
+                                                                        testCaseData.map((data, i) => (
+                                                                            <div className={"test_tree_leaves" + (selected === data.code ? " test__selectedTC" : "")}>
+                                                                                {/* onClick={() => handleClick(data.code, data.id, data.summary)} */}
+                                                                                <label className="test__leaf" title={data.code} >
+                                                                                    <Checkbox onChange={e => { testcaseCheck(e, i); handleClick(e.checked, data.code, data.id, data.summary) }} checked={data.checked} />
+                                                                                    <span className="leafId">{data.code}</span>
+                                                                                    <span className="test__tcName" title={data.summary}>{data.summary.trim().length > 35 ? data.summary.substr(0, 35) + "..." : data.summary} </span>
+                                                                                </label>
+                                                                            </div>
+                                                                        ))
+                                                                        :
+                                                                        enableBounce &&
+                                                                        <div className="bouncing-loader">
+                                                                            <div></div>
+                                                                            <div></div>
+                                                                            <div></div>
+                                                                        </div>
 
-                                                        }
+                                                                }
+                                                            </div>
+                                                        </Card>
                                                     </div>
-                                                </Card>
-                                            </div>
-                                            <div>
-                                                <div className="card_data2">
-                                                    <Card className="mapping_data_card2">
-                                                        <div className="dropdown_div">
-                                                            <div className="dropdown-map">
-                                                                <span>Selected Avo Assure Project <span style={{ color: 'red' }}>*</span></span>
-                                                            </div>
-                                                            <div className="dropdown-map">
-                                                                {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}
-                                                                <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
-                                                            </div>
+                                                    <div>
+                                                        <div className="card_data2">
+                                                            <Card className="mapping_data_card2">
+                                                                <div className="dropdown_div">
+                                                                    <div className="dropdown-map">
+                                                                        <span>Selected Avo Assure Project <span style={{ color: 'red' }}>*</span></span>
+                                                                    </div>
+                                                                    <div className="dropdown-map">
+                                                                        {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}
+                                                                        <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
+                                                                    </div>
 
-                                                            <div className="avotest__data">
-                                                                <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
-                                                            </div>
+                                                                    <div className="avotest__data">
+                                                                        <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
+                                                                    </div>
+                                                                </div>
+                                                            </Card>
                                                         </div>
-                                                    </Card>
+                                                    </div>
+                                                    <span>
+                                                        <img className="map__btn" src="static/imgs/map_button_icon.svg" onClick={handleSync} />
+                                                    </span>
                                                 </div>
-                                            </div>
-                                            <span>
-                                                <img className="map__btn" src="static/imgs/map_button_icon.svg" onClick={handleSync} />
-                                            </span>
-                                        </div>
 
-                                    </TabPanel>
+                                            </TabPanel>
 
-                                    <TabPanel header="View Mapping">
-                                        <Card className="view_map_card">
-                                            <div className="flex justify-content-flex-start toggle_btn">
-                                                <span>Jira Testcase to Avo Assure Testcase</span>
-                                                <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-                                                <span>Avo Assure Testcase to Jira Testcase</span>
-                                            </div>
+                                            <TabPanel header="View Mapping">
+                                                <Card className="view_map_card">
+                                                    <div className="flex justify-content-flex-start toggle_btn">
+                                                        <span>Jira Testcase to Avo Assure Testcase</span>
+                                                        <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
+                                                        <span>Avo Assure Testcase to Jira Testcase</span>
+                                                    </div>
 
-                                            {checked ? (<div className="accordion_testcase">
-                                                <Accordion multiple activeIndex={0} >
-                                                    {rows.map((item) => (
-                                                        <AccordionTab header={item.scenarioNames[0]}>
-                                                            <span>{item.itemSummary}</span>
-                                                        </AccordionTab>))}
-                                                </Accordion>
-                                            </div>
+                                                    {checked ? (<div className="accordion_testcase">
+                                                        <Accordion multiple activeIndex={0} >
+                                                            {rows.map((item) => (
+                                                                <AccordionTab header={item.scenarioNames[0]}>
+                                                                    <span>{item.itemSummary}</span>
+                                                                </AccordionTab>))}
+                                                        </Accordion>
+                                                    </div>
 
-                                            ) : (
+                                                    ) : (
 
-                                                <div className="accordion_testcase">
-                                                    <Accordion multiple activeIndex={0}>
-                                                        {rows.map((item) => (
-                                                            <AccordionTab header={item.itemSummary}>
-                                                                <span>{item.scenarioNames[0]}</span>
-                                                            </AccordionTab>))}
-                                                    </Accordion>
-                                                </div>
-                                            )}
-                                        </Card>
+                                                        <div className="accordion_testcase">
+                                                            <Accordion multiple activeIndex={0}>
+                                                                {rows.map((item) => (
+                                                                    <AccordionTab header={item.itemSummary}>
+                                                                        <span>{item.scenarioNames[0]}</span>
+                                                                    </AccordionTab>))}
+                                                            </Accordion>
+                                                        </div>
+                                                    )}
+                                                </Card>
 
-                                    </TabPanel>
+                                            </TabPanel>
 
-                                </TabView>
+                                        </TabView>
 
-                            </div>
-                        </div>
-                    )}
+                                    </div>
+                                </div>
+                            )
 
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : null
+                }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
