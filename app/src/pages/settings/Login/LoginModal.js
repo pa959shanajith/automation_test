@@ -24,7 +24,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration }) => {
         <>
             <div className="login_container_integrations">
                 <div className="side-panel">
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'jira', code: 'NY' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Jira', code: 'NY' })}>
                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                         <span className="text__jira">Jira</span>
                     </div>

@@ -14,6 +14,7 @@ import { screenType } from '../settingSlice'
 import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import {
     resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
@@ -70,6 +71,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         mappedScenarios: 0,
         mappedTests: 0
     })
+    const [isShowConfirm,setIsShowConfirm] = useState(false);
 
 
     // const [proj, setProj] = useState('');
@@ -305,16 +307,12 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 const saveUnsync = await api.saveUnsyncDetails(args);
                 if (saveUnsync.error)
                     setToast("error", "Error", 'Failed to Unsync'); 
-                    // setMsg(saveUnsync.error);
 				else if(saveUnsync === "unavailableLocalServer")
                     setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
-                    // setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
 				else if(saveUnsync === "scheduleModeOn")
                     setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-                    // setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
 				else if(saveUnsync === "fail")
                     setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
-                    // setMsg(MSG.INTEGRATION.ERR_SAVE);
 				else if(saveUnsync == "success"){
                     callViewMappedFiles()
                     setToast("success", "Success", 'Unsynced');
@@ -422,6 +420,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const showLogin = () => {
+        setIsShowConfirm(true);
+    };
+
+    const acceptFunc = () => {
+        setIsShowConfirm(false);
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
         setShowLoginCard(true);
@@ -440,6 +443,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setTreeData([]);
         setSelectedNodes([]);
     };
+
+    const rejectFunc = () => {
+        console.log('its rejected');
+    }
 
     const onProjectChange = async (e) => {
         e.preventDefault();
@@ -659,7 +666,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     <div className="card">
                         {showLoginCard ? <TabMenu model={integrationItems} /> : ""}
                     </div>
-
+                    <ConfirmDialog visible={isShowConfirm} onHide={() => setIsShowConfirm(false)} message="Synced data will be lost, Are you sure you want to go Back ?"
+                            header="Confirmation" icon="pi pi-exclamation-triangle" accept={acceptFunc} reject={rejectFunc} />
 
                     {showLoginCard ? (
                         <>
