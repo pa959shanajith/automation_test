@@ -128,6 +128,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
+  const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+  useEffect(() => {
+    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
+  }, [selectProjects]);
   // const [selectedAPP,setSelectedApp]=useState()
   // const typeOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   // const nameOfAppType = typeOfAppType.apptype
@@ -248,7 +252,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       //     key: Projects.projectId,
       //     value:Projects.projectNames
       //   }]
-      setConfigProjectId(data[0] && data[0]?.id);
+      // setConfigProjectId(data[0] && data[0]?.id);
       setProjectList(data);
     })();
   }, []);
@@ -847,7 +851,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             placeholder="Search"
             title=" Search for project"
               onChange={(e) => {
-                setConfigProjectId(e.target.value);
+                dispatch(loadUserInfoActions.setDefaultProject(e.target.value));
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
