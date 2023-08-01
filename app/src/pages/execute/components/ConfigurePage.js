@@ -69,7 +69,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [allocateICE, setAllocateICE] = useState(false);
   const [eachData, setEachData] = useState([]);
   const [currentTask, setCurrentTask] = useState({});
-  const [appType, setAppType] = useState("");
   const [moduleInfo, setModuleInfo] = useState([]);
   const [execAction, setExecAction] = useState("serial");
   const [execEnv, setExecEnv] = useState("default");
@@ -124,6 +123,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [selectedMonthly, setSelectedMonthly] = useState(null);
   const [dropdownWeek, setDropdownWeek] = useState(null);
   const [dropdownDay, setDropdownDay] = useState(null);
+  const [project, setProject] = useState({});
   const [scheduleOption, setScheduleOption] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
@@ -244,6 +244,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
+      setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
       }
@@ -446,7 +447,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const ExecuteTestSuite = async (executionData, btnType) => {
     if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
-    const modul_Info = parseLogicExecute(eachData,currentTask, appType, moduleInfo, accessibilityParameters, "");
+    const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
     // setLoading("Sending Execution Request");
     executionData["source"] = "task";
@@ -561,7 +562,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
-                setAppType(item.executionRequest.batchInfo[0].appType);
                 setCurrentSelectedItem(item);
                 setConfigItem(idx);
                 console.log(fetechConfig, configItem)
@@ -732,7 +732,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: appType,
+            appType: selectProjects.appType,
             domainName: "Banking",
             projectName: getConfigData?.projects[0]?.name,
             projectId: configProjectId,
@@ -851,7 +851,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             placeholder="Search"
             title=" Search for project"
               onChange={(e) => {
-                dispatch(loadUserInfoActions.setDefaultProject(e.target.value));
+                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appType[project?.projectId.indexOf(e.target.value)] }));
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
