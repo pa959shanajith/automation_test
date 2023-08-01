@@ -34,6 +34,9 @@ const AvoModal = ({
     ScheduleIce: [
       { btnTxt: "Schedule", autoFocus: false, btnType: null, key: "ScheduleIce", disabled: isDisabled },
     ],
+    Launch: [
+      { btnTxt: "Launch", autoFocus: false, btnType: null, key: "Launch", disabled: isDisabled },
+    ]
   };
   const footerContent = footerValues[footerType]?.map((el) => (
     <div>

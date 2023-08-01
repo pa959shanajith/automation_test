@@ -72,7 +72,6 @@ const CanvasNew = (props) => {
     const [reuseDelContent,setReuseDelContent] = useState()
     const [endToEndDelConfirm,setEndToEndDelConfirm] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true);
-    const appType = "Web"
     const proj = useSelector(state=>state.design.selectedProj)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
@@ -108,8 +107,10 @@ const CanvasNew = (props) => {
     const [visibleDesignStep, setVisibleDesignStep] = useState(false);
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
     const [showTooltip, setShowTooltip] = useState("");
-
+    const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
+    const typesOfAppType = NameOfAppType.appType;
     const imageRef = useRef(null);
+    const appType = typesOfAppType
 
     const handleTooltipToggle = (nodeType) => {
       const rect = imageRef.current.getBoundingClientRect();
@@ -1016,7 +1017,7 @@ const footerContentScreen =(
 
     return (
         <Fragment>
-                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} />}
+                    {visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement}  setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} />}
         {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetails} appType={appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
