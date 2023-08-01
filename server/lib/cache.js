@@ -72,8 +72,14 @@ class Cache {
 
 	async sethmap(key, data, ttl) {
 		let clientName="avoassure";
-		if(!(data.host.includes("localhost") || data.host.includes("127.0.0.1"))){
-			clientName=data.host.split('.')[0]
+		if(ttl){
+			if(!(ttl.includes("localhost") || ttl.includes("127.0.0.1"))){
+				clientName=ttl.split('.')[0]
+			}
+		}else {
+			if(!(data.host.includes("localhost") || data.host.includes("127.0.0.1"))){
+				clientName=data.host.split('.')[0]
+			}
 		}
 		data = JSON.stringify(data);
 		const args = (ttl)? [key, data, 'EX', ttl] : [key, data];
