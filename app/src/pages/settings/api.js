@@ -215,3 +215,114 @@ export const excelToZephyrMappings = async(data) => {
         return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
     }
 }
+
+export const loginToZephyr_ICE = async(zephyrPayload) => {
+    try{
+        const res = await axios(url+'/loginToZephyr_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: "loginToZephyr_ICE",
+                zephyrPayload: zephyrPayload,
+				zephyraction: "login"
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }
+}
+
+export const connectAzure_ICE = async(dataObj) => {
+    try{
+
+        const res = await axios(url+'/connectAzure_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data:dataObj
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status === 429 || res.data === "Max retries exceeded"){
+            return {error:MSG.GENERIC.MAX_RETRIES_EXCEEDED};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+export const saveAzureDetails_ICE = async(mappedDetails) => {
+    try{
+        const res = await axios(url+'/saveAzureDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            mappedDetails : mappedDetails,
+            action : 'saveAzureDetails_ICE'
+            
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
+    }
+}
+
+export const viewAzureMappedList_ICE = async(userID) => {
+    try{
+        const res = await axios(url+'/viewAzureMappedList_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                user_id : userID,
+                action : 'viewAzureMappedList_ICE'
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
+    }
+}
