@@ -34,23 +34,26 @@ const reports = () => {
     const [projectList, setProjectList] = useState([]);
     const [show, setShow] = useState(false);
     const [dropdownData, setDropdownData] = useState([]);
+    const [project, setProject] = useState({});
     const [executionButon, setExecutionButon] = useState('View by Execution Profile');
     const customDropdownIcon = classNames('pi','pi-sort-amount-down');
 
     const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
     const initProj = selectProjects.projectId;
     const handeSelectProject=(initProj)=>{
-        dispatch(loadUserInfoActions.setDefaultProject(initProj));
+        dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: initProj, appType: project?.appType[project?.projectId.indexOf(initProj)] }));
         fetchReportData(initProj);
     };
     useEffect(() => {
             (async () => {
                 try{
                 const Projects = await getProjectList();
+                setProject(Projects);
                 if(Projects && Projects.projectName && Projects.projectId){
                     const data = Projects.projectName.map((name,index)=>({
                         name,
                         id:Projects.projectId[index]
+
                     }));
                     setProjectList(data);
                     if(!initProj || !data.find((proj)=> proj.id === initProj)){
