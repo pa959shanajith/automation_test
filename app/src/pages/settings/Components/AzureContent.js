@@ -9,6 +9,7 @@ import "../styles/AzureContent.scss";
 import { Tree } from 'primereact/tree';
 import { Checkbox } from 'primereact/checkbox';
 import { useSelector } from 'react-redux';
+// import { Paginator } from 'primereact/paginator';
 
 
 const AzureContent = () => {
@@ -22,6 +23,54 @@ const AzureContent = () => {
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [selectedAvoKeys, setSelectedAvoKeys] = useState([]);
     const [checkedItems, setCheckedItems] = useState({});
+
+   
+    const data = [
+        { id: 1, label: 'Item 1' },
+        { id: 2, label: 'Item 2' },
+        { id: 3, label: 'Item 3' },
+        { id: 4, label: 'Item 4' },
+        { id: 5, label: 'Item 5' },
+        { id: 6, label: 'Item 1' },
+        { id: 7, label: 'Item 2' },
+        { id: 8, label: 'Item 3' },
+        { id: 9, label: 'Item 4' },
+        { id: 10, label: 'Item dqwefd' },
+        { id: 11, label: 'Item vberj,kgv' },
+        { id: 12, label: 'Item wfr' },
+        { id: 13, label: 'Item jvbkerjv' },
+        // { id: 14, label: 'Item v erm,jnv' },
+        // { id: 15, label: 'Item vklmner.lvk' },
+        // { id: 16, label: 'Item gvnrekjg' },
+        // { id: 17, label: 'Item mvlrke' },
+        // { id: 18, label: 'Item jrhbgv' },
+        // { id: 19, label: 'Item 4jnrkg' },
+        // { id: 20, label: 'Item 5rmngfgre' },
+        // { id: 21, label: 'Item vberj,kgv' },
+        // { id: 22, label: 'Item wfr' },
+        // { id: 23, label: 'Item jvbkerjv' },
+        // { id: 24, label: 'Item v erm,jnv' },
+        // { id: 25, label: 'Item vklmner.lvk' },
+        // { id: 26, label: 'Item gvnrekjg' },
+        // { id: 27, label: 'Item mvlrke' },
+        // { id: 28, label: 'Item jrhbgv' },
+        // { id: 29, label: 'Item 4jnrkg' },
+        // { id: 30, label: 'Item 5rmngfgre' },
+    ];
+
+    // const itemsPerPage = 10;
+    // const [first, setFirst] = useState(0);
+    // const [totalRecords, setTotalRecords] = useState(data.length);
+    // const [paginatedData, setPaginatedData] = useState(
+    //   data.slice(first, first + itemsPerPage)
+    // );
+  
+    // const onPageChange = (event) => {
+    //     setFirst(event.first);
+    //     setPaginatedData(data.slice(event.first, event.first + itemsPerPage));
+    //   }
+
+    // const totalRecords = treeData.length;
     const jiraTestCase = [
         {
             id: 1,
@@ -72,15 +121,6 @@ const AzureContent = () => {
     ];
 
     //tree data///////////////////
-
-    const data = [
-        { id: 1, label: 'Item 1' },
-        { id: 2, label: 'Item 2' },
-        { id: 3, label: 'Item 3' },
-        { id: 4, label: 'Item 4' },
-        { id: 5, label: 'Item 5' },
-    ];
-
     // const [data, setData] = useState([
 
     //     {
@@ -301,7 +341,7 @@ const AzureContent = () => {
                                         <div className="dropdown_div">
                                             <div className="dropdown-map_azure">
                                                 <span>Select Project <span style={{ color: 'red' }}>*</span></span>
-                                                <span className="release_span1"> Select Workitems<span style={{ color: 'red', left: '3rem' }}>*</span></span>
+                                                <span className={ selectedWorkItem && selectedWorkItem.name === 'Testplans' ? "release_span1" : "release_span21"}> Select Workitems<span style={{ color: 'red', left: '3rem' }}>*</span></span>
                                                 {selectedWorkItem && selectedWorkItem.name === 'Testplans' && (
                                                     <span className="release_span2"> Select Testplans<span style={{ color: 'red' }}>*</span></span>)}
 
@@ -317,6 +357,7 @@ const AzureContent = () => {
                                             </div>
                                         </div>
                                         {selectedWorkItem && selectedProject && (
+                                            <div>
 
                                             <div className="tree_data_card1">
                                                 {data.map(item => (
@@ -330,6 +371,16 @@ const AzureContent = () => {
                                                     </div>
                                                 ))}
                                             </div>
+                                            {/* <div className="azure_paginator">
+                                            <Paginator
+                                            first={first}
+                                            rows={itemsPerPage}
+                                            totalRecords={totalRecords}
+                                            onPageChange={onPageChange}
+                                            rowsPerPageOptions={[5, 10, 20]} // Customize the rows per page options as needed
+                                          /> */}
+                                          </div>
+                                        
                                         )}
                                     </Card>
                                 </div>

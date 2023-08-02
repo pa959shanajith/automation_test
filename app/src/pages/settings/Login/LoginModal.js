@@ -72,11 +72,11 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                         <span className="text__jira">Jira</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Zephyr', code: 'ZR' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Azure DevOps', code: 'ADO' })}>
                         <span><img src="static/imgs/azure_devops_icon.svg" className="img__azure"></img></span>
                         <span className="text__azure">Azure DevOps</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Azure DevOps', code: 'ADO' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Zephyr', code: 'ZR' })}>
                         <span><img src="static/imgs/zephyr_icon.svg" className="img__zephyr"></img></span>
                         <span className="text__zephyr">Zephyr</span>
                     </div>

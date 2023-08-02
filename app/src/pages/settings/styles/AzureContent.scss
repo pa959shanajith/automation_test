@@ -2,11 +2,11 @@
 
 .mapping_data_card_azure,
 .mapping_data_card_azure {
-    width: 30rem;
+    width: 26rem;
 
     .p-card-body {
         height: 30.5rem;
-        width: 28rem;
+        width: 26rem;
 
     }
 }
@@ -29,8 +29,10 @@
 
 .release_span1 {
     position: relative;
-    left: 3rem;
+    left: 5.2rem;
+    margin-bottom: 0.3rem;
 }
+
 
 .dropdown_release1 {
     position: relative;
@@ -44,8 +46,15 @@
 
 .release_span2 {
     position: relative;
-    left: 4.3rem;
+    left: 6.5rem;
+    margin-bottom: 0.3rem;
 }
+.release_span21{
+    position: relative;
+    left: 5.2rem;
+    margin-bottom: 0.3rem;
+}
+
 
 .map_icon_cls {
     position: relative;
@@ -56,6 +65,9 @@
 .card_Azure1 {
     position: relative;
     right: 0.5rem;
+    .mapping_data_card_azure{
+        width: 34rem !important;
+    }
 }
 
 .card_Azure1,
