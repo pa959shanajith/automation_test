@@ -18,7 +18,7 @@ const EditProfile = (props) => {
     const { showDialogBox, setShowDialogBox } = props;
     const [showDialog, setShowDialog] = useState(showDialogBox);
     const toastWrapperRef = useRef(null);
-    let userInfo = useSelector((state) => state.landing.userinfo);
+
     const dispatch = useDispatch();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -31,6 +31,22 @@ const EditProfile = (props) => {
     const [errorMsg, setErrorMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
     const [base64String, setBase64String] = useState('');
+    let userInfo = props.userInfo;
+    // if (userInfo) return;
+    // else userInfo = props.userInfo;
+
+    useEffect(() => {
+        click();
+    }, [userInfo])
+
+    useEffect(() => {
+        if (userInfo) {
+            const firstNameInitial = userInfo.firstname ? userInfo.firstname.slice(0, 1) : '';
+            const lastNameInitial = userInfo.lastname ? userInfo.lastname.slice(0, 1) : '';
+            const initials = (firstNameInitial + lastNameInitial).toUpperCase();
+            setInitials(initials);
+        }
+    }, [userInfo])
 
 
     const chooseOptions = { icon: 'pi pi-camera', label: ' ' };
@@ -47,26 +63,17 @@ const EditProfile = (props) => {
         }
     };
 
-    useEffect(() => {
-        if (errorMsg) {
-            toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
-        }
-    }, [errorMsg]);
+    // useEffect(() => {
+    //     if (errorMsg) {
+    //         toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
+    //     }
+    // }, [errorMsg]);
 
-    useEffect(() => {
-        if (successMsg) {
-            toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 5000 });
-        }
-    }, [successMsg]);
-
-
-    useEffect(() => {
-        const firstNameInitial = userInfo.firstname ? userInfo.firstname.slice(0, 1) : '';
-        const lastNameInitial = userInfo.lastname ? userInfo.lastname.slice(0, 1) : '';
-        const initials = (firstNameInitial + lastNameInitial).toUpperCase();
-        setInitials(initials);
-    }, [userInfo])
-
+    // useEffect(() => {
+    //     if (successMsg) {
+    //         toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 5000 });
+    //     }
+    // }, [successMsg]);
 
 
     const click = () => {
@@ -79,9 +86,7 @@ const EditProfile = (props) => {
         setBase64String(userInfo.userimage);
     }
 
-    useEffect(() => {
-        click();
-    }, [userInfo])
+
     const updateSubmitHandler = (event) => {
         event.preventDefault();
         var check = true;
@@ -119,7 +124,7 @@ const EditProfile = (props) => {
             email: email,
             userimage: base64String,
             role: userInfo.role,
-            createdon:userInfo.createdon,
+            createdon: userInfo.createdon,
             userConfig: true,//hardcoded only for inhouse
             type: 'inhouse' //hardcoded only for inhouse
         };
@@ -157,7 +162,7 @@ const EditProfile = (props) => {
                     if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
                     if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
                     // setMsg(MSG.CUSTOM("Following values are invalid: "+errfields.join(", ")+" "+hints,VARIANT.WARNING));
-                    errorMsg = 'Following values are invalid: "+errfields.join(", ")+" "+hints'; 
+                    errorMsg = 'Following values are invalid: "+errfields.join(", ")+" "+hints';
                 } else {
                     errorMsg = 'Something went wrong!';
                     // setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
@@ -205,8 +210,9 @@ const EditProfile = (props) => {
                 <Dialog header="Profile Information" className="editProfile_dialog" visible={showDialog} style={{ width: '33vw' }} onHide={resetFields} footer={editProfileFooter}>
                     <div className='pt-3'>
                         <div className='profileImage'>
-                            <Avatar image={base64String}
-                                label={!userInfo.userimage ? initials : base64String}
+                            <Avatar 
+                                image={base64String}
+                                label={(userInfo?.userimage === "default") ? initials : base64String}
                                 size='xlarge' title="User Profile" shape='circle'
                             />
                             <FileUpload className="userImage"
@@ -226,7 +232,7 @@ const EditProfile = (props) => {
                             <div className='pt-2'>
                                 <label htmlFor="name">First Name</label>
                                 <InputText
-                                    style={{ width: '30vw',height:'5vh' }}
+                                    style={{ width: '30vw', height: '5vh' }}
                                     id="edit_input"
                                     value={firstName}
                                     type="text"
@@ -236,7 +242,7 @@ const EditProfile = (props) => {
                             <div className='pt-2'>
                                 <label htmlFor="name">Last Name</label>
                                 <InputText
-                                    style={{ width: '30vw',height:'5vh' }}
+                                    style={{ width: '30vw', height: '5vh' }}
                                     id="edit_input"
                                     value={lastName}
                                     type="text"
@@ -248,7 +254,7 @@ const EditProfile = (props) => {
                             <div className='pt-2'>
                                 <label htmlFor="Email">Email </label>
                                 <InputText
-                                    style={{ width: '30vw',height:'5vh' }}
+                                    style={{ width: '30vw', height: '5vh' }}
                                     id="edit_input"
                                     value={email}
                                     type="email"
@@ -259,7 +265,7 @@ const EditProfile = (props) => {
                             <div className='pt-2'>
                                 <label htmlFor="Primary Role">Primary Role </label>
                                 <InputText
-                                    style={{ width: '30vw',height:'5vh' }}
+                                    style={{ width: '30vw', height: '5vh' }}
                                     id="edit_input"
                                     value={userInfo.rolename}
                                     type="text"
@@ -271,9 +277,9 @@ const EditProfile = (props) => {
                             <div className='pt-2'>
                                 <label htmlFor="Registered Date">Registered Date </label>
                                 <InputText
-                                    style={{ width: '30vw',height:'5vh' }}
+                                    style={{ width: '30vw', height: '5vh' }}
                                     id="edit_input"
-                                    value={userInfo.createdon.slice(5,16)}
+                                    value={userInfo.createdon}
                                     type="text"
                                     disabled={true}
                                 />
