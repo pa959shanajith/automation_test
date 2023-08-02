@@ -180,3 +180,38 @@ export const viewJiraMappedList_ICE = async(userID) => {
         return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }
 }
+
+
+export const excelToZephyrMappings = async(data) => {
+    try{
+        const res = await axios(url+'/excelToZephyrMappings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        else if (res.data == 'valueError') {
+            return {error : MSG.MINDMAP.ERR_EMPTY_COL}          //using the errors that are defined under Mindmap, as they have the required error content
+        }
+        else if(res.data == 'invalidformat'){
+            return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
+        }
+        else if (res.data == "emptySheet" || res.data == 'fail') {
+            return {error : MSG.MINDMAP.ERR_EXCEL_SHEET}
+        }
+        else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
+    }
+}
