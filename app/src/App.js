@@ -60,7 +60,7 @@ const App = () => {
     {/* <ProgressBar /> */}
     {/* <ErrorBoundary> */}
     <div className="main_content">
-      {!['/login', '/',"/undefined"].includes(location.pathname) && <Topbar />}
+      {!['/login', '/','/undefined','/viewReports'].includes(location.pathname) && <Topbar />}
       <RouteApp/>
     </div>
     {/* </ErrorBoundary> */}
@@ -77,12 +77,12 @@ const RouteApp = () => {
         <Route path="/landing" element={<HomePage />} />
         <Route path="/integration" element={<Integration />} />
         <Route path="/reports" element={<Report />} />
-        <Route path="/reports/profile" element={<Profile />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/itdm" element={<itdm />} />
         <Route path="/design" element={<MindmapHome />} />
         <Route path="/execute" element={<ConfigurePage />} />
-        <Route path='/reports/viewReports' element={<ReportTestTable/>}/>
+        <Route path='/viewReports' element={<ReportTestTable/>}/>
         <Route path="/admin" element={<AdminContainer />} />
         
       </Routes>
@@ -94,7 +94,7 @@ const RouteApp = () => {
 //disable duplicate tabs
 const TabCheck = (setBlockui) => {
   const storage_Handler = (e) => {
-    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport')) return false;
+    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport') || window.location.pathname.includes('/viewReports') || window.location.pathname.includes('/profile')) return false;
     // if tabGUID does not match then more than one tab and GUID
     if (e.key === 'tabUUID' && e.oldValue !== '') {
       if (e.oldValue !== e.newValue) {

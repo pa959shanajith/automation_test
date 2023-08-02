@@ -2,9 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'primereact/button';
-import Typography from '@mui/material/Typography';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
 import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
 import '../styles/reports.scss';
@@ -18,7 +15,6 @@ import {FooterTwo as Footer} from '../../global';
 import { fetchConfigureList, getProjectList } from "../api";
 import { NavLink } from 'react-router-dom';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
-// import ExecutionprofileTable from './ExecutionprofileTable';
 
 
 
@@ -176,18 +172,6 @@ const reports = () => {
     return (
         <div className='report_landing'>
             <div className='report'>
-                {/* <div role="presentation" onClick={handleClick}>
-                <Breadcrumbs aria-label="breadcrumb">
-                    <Link underline="hover" color="inherit" href="/landing">
-                        Home
-                    </Link>
-                    <Link underline="hover" color="inherit" href="/reports">
-                        Reports
-                    </Link>
-                    <Typography color="text.primary">Functional Test</Typography>
-                </Breadcrumbs>
-            </div> */}
-                {/* <div className='Projectreport'><h2 className='projectDropDown'>Reports: </h2><Dropdown value={selectedProject} onChange={handleToggle} options={project} optionLabel="name" placeholder='Select a Project' className="w-full md:w-10rem ml-2" /> */}
                 <div>
                     <label data-test="projectLabel" className='Projectreport'>Project:</label>
                     <select data-test="projectSelect" className='projectSelectreport' value={initProj} onChange={(e)=>{handeSelectProject(e.target.value)}}>
@@ -249,7 +233,7 @@ const reports = () => {
                                 </Card></div>))}
                             </div>)} */}
                             {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
-                            {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'> <NavLink to="/reports/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active"><Card key={index} className='testCards'>
+                            {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'> <NavLink to="/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active"><Card key={index} className='testCards'>
                                            <div><p className='reportConfigName'>{data.configurename}</p>
                                                 <p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report_sm'>Last executed through CI/CD</p><p className='Profile_Name_report_sm'>Last executed on {data.execDate.slice(5,16)}</p>
                                            </div>
