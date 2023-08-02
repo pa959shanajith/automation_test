@@ -1,18 +1,24 @@
-import { useSelector } from 'react-redux';
+import { useSelector} from 'react-redux';
+import React,{useState} from 'react';
 import Header from '../components/AdminHeader';
 import '../styles/OriginContainer.scss'
 import LdapConfig from './LdapConfig';
 import CreateUser from '../components/CreateUser';
+import UserCreation from './UserCreation';
+import { validateUserState } from '../../login/api';
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
+    const [createUserDialog, setCreateUserDialog] = useState(false)
     return (<>
         <div>
             <div className="admin_origin_header">
-                <Header/>
+                <Header setCreateUserDialog={setCreateUserDialog}   />
             </div>
             {currentTab === "ldapConf" && <LdapConfig/>}
-            {currentTab === "users" && <CreateUser/>}
+            {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
+            {currentTab === "users" && <UserCreation createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog} />}
+
         </div>
     </>)
 }

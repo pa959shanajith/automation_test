@@ -1,0 +1,11 @@
+.UserList{
+    .p-datatable .p-datatable-thead>tr>th{
+        padding: 0.5rem !important;
+    }
+
+    .ellipsis-table .p-datatable-tbody td{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
