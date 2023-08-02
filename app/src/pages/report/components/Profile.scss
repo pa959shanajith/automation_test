@@ -30,6 +30,14 @@
             }
         }
     }
+    .p-datatable-thead>tr>th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
     .p-datatable.statusTable {
             .p-datatable-tbody>tr>td:nth-child(4) {
                 width: 5rem;

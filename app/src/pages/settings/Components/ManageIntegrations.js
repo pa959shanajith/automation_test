@@ -168,7 +168,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const integrationItems = [
-        { label: 'ALM' },
+        { label: 'Tool Based Integration' },
         { label: 'Cloud Based Integration' },
     ];
 

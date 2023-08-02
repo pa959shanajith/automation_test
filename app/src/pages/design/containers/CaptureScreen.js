@@ -21,8 +21,19 @@ import ModalContainer from '../../global/components/ModalContainer';
 import { Toast } from 'primereact/toast';
 import { InputText } from "primereact/inputtext";
 import { Tooltip } from 'primereact/tooltip';
+import AvoModal from "../../../globalComponents/AvoModal";
+import { InputSwitch } from "primereact/inputswitch";
+import { RadioButton } from 'primereact/radiobutton';
+// import LaunchApplication from '../components/LaunchApplication';
+import "../styles/LaunchApplication.scss";
+import {getDeviceSerialNumber_ICE} from "../api";
+import { treemapSquarify } from 'd3';
 
+import { TabMenu } from 'primereact/tabmenu';
+        
 
+import { TreeSelect } from 'primereact/treeselect';
+        
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -32,6 +43,7 @@ const CaptureModal = (props) => {
   const compareSuccessful = useSelector(state => state.design.compareSuccessful);
   const compareFlag = useSelector(state=>state.design.compareFlag);
   const [visible, setVisible] = useState(false);
+  const [visibleOtherApp, setVisibleOtherApp] = useState(false);
   const [showCaptureData, setShowCaptureData] = useState([]);
   const [showPanel, setShowPanel] = useState(true);
   const [overlay, setOverlay] = useState(null);
@@ -89,8 +101,8 @@ const CaptureModal = (props) => {
   const [identifierModified, setIdentifierModiefied] = useState(false);
   const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] });
   const [idx, setIdx] = useState(0);
-
-
+  const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
+  let NameOfAppType = projectAppType
   const imageRef1 = useRef(null);
   const imageRef2 = useRef(null);
   const imageRef3 = useRef(null);
@@ -675,7 +687,7 @@ const elementTypeProp =(elementProperty) =>{
     if (replaceFlag) {
       blockMsg = 'Capture and Replace Element in progress...';
     };
-    screenViewObject = getScrapeViewObject("web", browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
+    screenViewObject = getScrapeViewObject(typesOfAppType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
     setOverlay(blockMsg);
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
@@ -950,7 +962,7 @@ else{
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Not Captured</p>
-        <Button className="btn-capture-single" onClick={() => handleAddMore('add more')} >Capture Elements</Button>
+        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true);}} >Capture Elements</Button>
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1364,29 +1376,47 @@ const footerSave = (
       )
 
   }
-  
+     const isWebApp = NameOfAppType.appType === "Web";
+     const typesOfAppType = NameOfAppType.appType;
+     console.log("typesOfAppType",typesOfAppType)
+     const onLaunchBtn =()=>{
+      setVisibleOtherApp(false)
+      console.log("NameOfAppType",NameOfAppType)
+     }
+     const items = [
+      {label: 'Requests'},
+      {label: 'Params'},
+      {label: 'Response'},
+  ];
+
+     // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
+     
+     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+     if (localStorageDefaultProject) {
+         NameOfAppType = JSON.parse(localStorageDefaultProject);
+     }
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={footerSave}>
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "WebService" ? null : footerSave}>
         {showPanel && (<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
-              <div className='insprint__block'>
+              <div   className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
-                <Tooltip target=".info__btn_insprint" position="left" content="Automate test cases of inflight features well within the sprint before application ready" />
-                <span className='insprint_auto' onClick={() => handleDialog('addObject')}>
-                  <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' ></img>
-                  <Tooltip target=".add_obj_insprint" position="bottom" content=" Add a placeholder element by specifying element type." />
+                <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
+                  <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' />
+                  {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className='insprint_auto' onClick={() => handleDialog('mapObject')}>
-                  <img className='map_obj_insprint'  src="static/imgs/ic-map-object.png" alt='map element'></img>
-                <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
+                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element'></img>
+                  {isWebApp &&<Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
                   <p>Map Element</p>
                 </span>
@@ -1403,15 +1433,15 @@ const footerSave = (
               <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_upgrade" position="left" content="  Easily upgrade Test Automation as application changes" />
-                <span className='upgrade_auto' onClick={() => handleDialog('compareObject')}>
+                <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={() =>isWebApp && setVisible("compare")}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
-                  <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />
+                  {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
-                <span className='upgrade_auto' onClick={() => handleDialog('replaceObject')}>
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && setVisible('replace')}>
                   <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
-                  <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />
+                  {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
                 </span>
                 {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -1423,8 +1453,8 @@ const footerSave = (
               <div className='utility__block'>
                 <p className='insprint__text'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_utility" position="left" content="  Capture the elements from a PDF." />
-                <span className='insprint_auto'>
+                <Tooltip target=".info__btn_utility" position="bottom" content="  Capture the elements from a PDF." />
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} >
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
                   <p>PDF Utility</p>
                 </span>
@@ -1437,8 +1467,8 @@ const footerSave = (
               <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_create" position="left" content="  Create element manually by specifying properties." />
-                <span className='insprint_auto create__block' onClick={() => handleDialog('createObject')}>
+                <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
+                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={() => isWebApp &&  handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
@@ -1467,7 +1497,54 @@ const footerSave = (
           </Card>
         </div>)}
 
-        <div className="card-table">
+        <div style={{display:typesOfAppType === "WebService"? "": "none"}} className='WebServiceApptypeContent'>
+          <div className='inputCard'>
+          <Card>
+            <div className='mainContentCard'>
+              <div className='firstRow' >
+                {/* <h4>WSDL :</h4> */}
+                <InputText placeholder='Enter WSDL URL' /><Button size="small" >Go</Button>
+                <div className='dropdown'>
+                  <div className="card flex justify-content-center">
+                    <TreeSelect
+                      // value={selectedNodeKey} onChange={(e) => setSelectedNodeKey(e.value)} options={nodes}
+                      className="md:w-20rem w-full" placeholder="Select Operation">
+                    </TreeSelect>
+                    <Button size="small" >Add</Button>
+                  </div>
+                </div>
+                <div className='input2' ><InputText placeholder='Enter URL or paste text' /></div>
+                <div className='input3' ><InputText placeholder='Operation' /></div>
+                <img className='' src='static/imgs/certificateOfWebServiceApptype.svg' />
+              </div>
+              {/* <div className='secondRow'>
+                
+              </div> */}
+            </div>
+          </Card>
+          </div>
+          <div className='tabMenuCard'>
+          <Card>
+            <div className="card">
+              <div className='tabMenu'>
+                <TabMenu model={items} />
+              </div>
+              <div className='buttons'>
+              <div className='saveBut'>
+                <img src="static/imgs/edit-icon.png" />
+                <Button>Save</Button>
+              </div>
+              <div className='cancelBut'>
+                <Button label="Cancel" outlined />
+              </div>
+              </div>
+
+            </div>
+          </Card>
+          </div>
+        </div>
+
+        <div style={{display: typesOfAppType === "WebService"? "none" :""}}  className="card-table">
 
           <DataTable
             size="small"
@@ -1512,7 +1589,153 @@ const footerSave = (
           </Dialog>
         </div>
       </Dialog>
-      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture'} onHide={handleBrowserClose} footer={visible === 'capture' ? footerCapture : footerAddMore}>
+      {/* {typesOfAppType === "MobileWeb"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="Mobile Web"
+          footerType="Launch"
+          modalSytle={{ width: "36vw", height: "34vh", background: "#FFFFFF" }}
+        content={<div className='inputContent'><span className="p-input">
+          <InputText placeholder="Android Device Serial Number / iOS Device Name" />
+         </span>
+         <span className="p-input">
+            <InputText placeholder="Android / iOS Version; UUID(for iOS device only)" />
+          </span></div>}
+         customClass="MobileWeb"
+        />: null} */}
+
+         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        
+
+        {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {/* {typesOfAppType === "Desktop"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="Desktop"
+          footerType="Launch"
+          modalSytle={{ width: "32vw", height: "40vh", background: "#FFFFFF" }}
+          content={
+               <div className='allContent'>
+                 <div className="flex flex-wrap gap-3">
+                   <h4>Object Identification :</h4>
+                   <div className="flex align-items-center">
+                     <RadioButton inputId="ingredient1" name="pizza" value="Cheese"   />
+                     <label htmlFor="ingredient1" className="ml-2">Cheese</label>
+                   </div>
+                   <div className="flex align-items-center">
+                     <RadioButton inputId="ingredient2" name="pizza" value="Mushroom"   />
+                     <label htmlFor="ingredient2" className="ml-2">Mushroom</label>
+                   </div>
+                 </div>
+                 <div className='inputContent'>
+                   <span className="p-input">
+                     <InputText placeholder="Enter Window Name" />
+                   </span>
+                   <span className="p-input">
+                     <InputText placeholder="Enter Process ID" />
+                   </span>
+                 </div>
+               </div>}
+         customClass="Desktop"
+        />: null} */}
+        {typesOfAppType === "WebService"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="WebService"
+          footerType="Launch"
+          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
+         content = {"hello"}
+         customClass="WebService"
+        />: null}
+        {/* {typesOfAppType === "SAP"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="SAP"
+          footerType="Launch"
+          modalSytle={{ width: "35vw", height: "29vh", background: "#FFFFFF" }}
+          content={<span className="p-input">
+                 <InputText placeholder="Enter the .exe path; App Name" />
+                   </span>}
+         customClass="SAP"
+        />: null} */}
+        {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {/* {typesOfAppType === "OEBS"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="OEBS"
+          footerType="Launch"
+          modalSytle={{ width: "35vw", height: "29vh", background: "#FFFFFF" }}
+         content = {<span className="p-input">
+            <InputText placeholder="Enter Window Name" />
+           </span>}
+         customClass="OEBS"
+        />: null} */}
+        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "Mainframes"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="MainFrames"
+          footerType="Launch"
+          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
+         content = {"hello"}
+         customClass="Mainframes"
+        />: null}
+        {/* {typesOfAppType === "MobileApps"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="MobileApps"
+          footerType="Launch"
+          modalSytle={{  width:"33vw", height:checked? "43vh": "51vh", background: "#FFFFFF" }}
+        content={<div className='inputContent'>
+          <div className="card flex justify-content-center gap-3">
+            <h4>iOS</h4>
+            <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
+            <h4>Android</h4>
+          </div>
+          {checked?
+          <div className='AndroidContent'>
+            <span className="p-input">
+              <InputText placeholder="Enter Application Path" />
+            </span>
+            <span className="p-input">
+              <InputText placeholder="Enter Mobile Serial Number" />
+            </span></div>
+            :
+          <div className='iOSContent'>
+            <span className="p-input">
+              <InputText placeholder="Enter Application Path" />
+            </span>
+            <span className="p-input">
+              <InputText placeholder="Enter Version Number" />
+            </span>
+            <span className="p-input">
+              <InputText placeholder="Enter Device Name" />
+            </span>
+            <span className="p-input">
+              <InputText placeholder="Enter UUID" />
+            </span></div>}
+        </div>}
+         customClass="MobileWeb"
+        />: null} */}
+        {typesOfAppType === "MobileApps"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "System_application"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="System_application"
+          footerType="Launch"
+          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
+         content = {"hello"}
+         customClass="MobileWeb"
+        />: null}
+      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={footerCapture}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1525,7 +1748,7 @@ const footerSave = (
           </span>
         </div>
         {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
-      </Dialog>
+      </Dialog> : null}
       {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
       <AvoConfirmDialog
         visible={showNote}
@@ -1670,7 +1893,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, replaceFlag, mai
     screenViewObject.applicationPath = browserType.appName;
   }
   //For Mobility
-  else if (appType === "MobileApp") {
+  else if (appType === "MobileApps") {
     if (browserType.appPath.toLowerCase().indexOf(".apk") >= 0) {
       screenViewObject.appType = appType;
       screenViewObject.apkPath = browserType.appPath;
@@ -1851,4 +2074,377 @@ function generateCompareObject(data, irisObjects){
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
   return compareObj;
-} 
+}
+
+const LaunchApplication = props => {
+
+    const [error, setError] = useState({});
+    const [serialNumbers, setSerialNumber] = useState([]);
+    const [checked, setChecked] = useState(true);
+   
+
+    // DESKTOP
+
+    const [windowName, setWindowName] = useState("");
+    const windowNameHandler = event => setWindowName(event.target.value);
+
+    const [processID, setProcessID] = useState("");
+    const processIDHandler = event => {
+        let value = event.target.value;
+        value = value.replace(/[^0-9]/, "");
+        setProcessID(value);
+    }
+
+    const [selectedMethod, setSelectedMethod] = useState("A")
+    const onMethodSelect = event => {
+        setSelectedMethod(event.target.value);
+    }
+
+    const onDesktopLaunch = () => {
+        let scrapeObject = {
+            appPath: windowName,
+            processID: processID,
+            method: selectedMethod
+        }
+        if (!windowName && !processID) setError({windowName: !windowName, processID: !processID})
+        else {
+            setError(false);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+        }
+    }
+
+    const desktopApp = {
+      // content={
+      //   <div className='allContent'>
+      //     <div className="flex flex-wrap gap-3">
+      //       <h4>Object Identification :</h4>
+      //       <div className="flex align-items-center">
+      //         <RadioButton inputId="ingredient1" name="pizza" value="Cheese"   />
+      //         <label htmlFor="ingredient1" className="ml-2">Cheese</label>
+      //       </div>
+      //       <div className="flex align-items-center">
+      //         <RadioButton inputId="ingredient2" name="pizza" value="Mushroom"   />
+      //         <label htmlFor="ingredient2" className="ml-2">Mushroom</label>
+      //       </div>
+      //     </div>
+      //     <div className='inputContent'>
+      //       <span className="p-input">
+      //         <InputText placeholder="Enter Window Name" />
+      //       </span>
+      //       <span className="p-input">
+      //         <InputText placeholder="Enter Process ID" />
+      //       </span>
+      //     </div>
+      //   </div>}
+        // 'content': <div className="ss__desktop_dlg">
+        //   <span className="ss__dskp_footer_span">
+        //         Object Identification: 
+        //         <label className="ss__dsktp_method">
+        //             <input data-test="methodA" className="ss__dsktp_method_rad" type="radio" name="method" value="A" checked={selectedMethod === "A"} onChange={onMethodSelect}/>Method A
+        //         </label>
+        //         <label className="ss__dsktp_method">
+        //             <input data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
+        //         </label>
+        //     </span>
+        //   <span className="p-input">
+        //        <InputText data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder="Enter Window Name" value={windowName} onChange={windowNameHandler} name="desktopWindowName" />
+        //      </span>
+        //      <span className="p-input">
+        //        <InputText data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} value={processID} onChange={processIDHandler} name="desktopProcessId"  placeholder="Enter Process ID" />
+        //      </span>
+        //     {/* <input data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder='Enter window name' value={windowName} onChange={windowNameHandler} name="desktopWindowName" />
+        //     <input data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} placeholder='Enter process ID' value={processID} onChange={processIDHandler} name="desktopProcessId" /> */}
+        // </div>,
+        'content':<div className='allContent'>
+          <div className="flex flex-wrap gap-3">
+            <h4>Object Identification :</h4>
+            <div className="flex align-items-center">
+              <RadioButton data-test="methodA" className="ss__dsktp_method_rad" type="radio" name="method" value="A" checked={selectedMethod === "A"} onChange={onMethodSelect}   />
+              <label htmlFor="ingredient1" className="ml-2">Method A</label>
+            </div>
+            <div className="flex align-items-center">
+              <RadioButton data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}  />
+              <label htmlFor="ingredient2" className="ml-2">Method B</label>
+            </div>
+          </div>
+          <span className="p-input">
+                <InputText data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder="Enter Window Name" value={windowName} onChange={windowNameHandler} name="desktopWindowName" />
+              </span>
+              <span className="p-input">
+                <InputText data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} value={processID} onChange={processIDHandler} name="desktopProcessId"  placeholder="Enter Process ID" />
+              </span>
+        </div>,
+        'footer': <div className="ss__sdkpt_footer">
+            {/* <span className="ss__dskp_footer_span">
+                Object Identification: 
+                <label className="ss__dsktp_method">
+                    <input data-test="methodA" className="ss__dsktp_method_rad" type="radio" name="method" value="A" checked={selectedMethod === "A"} onChange={onMethodSelect}/>Method A
+                </label>
+                <label className="ss__dsktp_method">
+                    <input data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
+                </label>
+            </span> */}
+            <input type="submit" data-test="desktopLaunch" onClick={onDesktopLaunch} style={{width: "100px"}} value="Launch" />
+        </div>,
+        'footerAction': onDesktopLaunch
+    }
+
+
+    // SAP
+
+    const [appName, setAppName] = useState("");
+    const appNameHandler = event => setAppName(event.target.value);
+
+    const onSapLaunch = () => {
+        let scrapeObject = {
+            'appName' : appName
+        }
+        if (!appName) setError({appName: !appName})
+        else {
+            setError(false);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+        }
+    }
+
+    const sapApp = {
+        'content': <input data-test="exePath" className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} name="sapWindowName" placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
+        'footer': <input type="submit" data-test="sapLaunch" onClick={onSapLaunch} style={{width: "100px"}} value="Launch" />,
+        'footerAction': onSapLaunch
+    }
+
+    // Mobile App
+
+    const [os, setOS] = useState(null);
+    const [checkedForMobApp,setCheckedForMobApp]=useState(false)
+
+    const [appPath, setAppPath] = useState("");
+    const appPathHandler = event => {
+        let value = event.target.value.trim();
+        const appPath = value.toString().replaceAll('"', "");
+        setAppPath(appPath);
+        }
+
+    const [sNum, setSNum] = useState("");
+    const sNumHandler = event => setSNum(event.target.value);
+
+    const [appPath2, setAppPath2] = useState("");
+    const appPath2Handler = event => setAppPath2(event.target.value);
+
+    const [verNum, setVerNum] = useState("");
+    const verNumHandler = event => setVerNum(event.target.value);
+
+    const [deviceName, setDeviceName] = useState("");
+    const deviceNameHandler = event => setDeviceName(event.target.value);
+
+    const [uuid, setUUID] = useState("");
+    const uuidHandler = event => setUUID(event.target.value);
+
+    const onMobileAppLaunch = () => {
+        let scrapeObject = {
+            'appPath': appPath,
+            'sNum': sNum,
+            'appPath2': appPath2,
+            'verNum': verNum,
+            'deviceName': deviceName,
+            'uuid': uuid
+        }
+        if ( os === "ios" && (!appPath2 || !verNum | !deviceName || !uuid))
+            setError({appPath2: !appPath2, verNum: !verNum, deviceName: !deviceName, uuid: !uuid})
+        else if (os === "android" && (!appPath || !sNum))
+            setError({appPath: !appPath, sNum: !sNum})
+        else {
+            setError(false);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+        }
+    }
+
+    const handleSerialNumber = () => {
+      setOS("android")
+        setError(false);
+        getDeviceSerialNumber_ICE().then(data => {
+            if(data) {}
+            setSerialNumber(data);
+            console.log(data);
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
+    const MobileApps = {
+        // 'content': <div className="ss__mblapp_inputs">
+        //         { !os && <div className="ss__mblapp_os_op">Choose OS</div>}
+        //         <div className="ss__mblapp_chooseApp">
+        //         <button data-test="chooseAndriod" className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={handleSerialNumber}>Android</button>
+        //             <button data-test="chooseIOS"className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
+        //         </div>
+        //         { os === "ios" && <>
+        //             <input data-test="iosApppath" className={"ss__mblapp_input"+(error.appPath2 ? " la_invalid": "")} placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler} name="appPath2_i" />
+        //             <input data-test="iosVersionNumber" className={"ss__mblapp_input"+(error.verNum ? " la_invalid": "")} placeholder='Enter Version Number' value={verNum} onChange={verNumHandler} name="verNum_i" />
+        //             <input data-test="iosDeviceName" className={"ss__mblapp_input"+(error.deviceName ? " la_invalid": "")} placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler} name="deviceName_i" />
+        //             <input data-test="iosUDID" className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UUID' value={uuid} onChange={uuidHandler} name="uuidNum_i" />
+        //         </> }
+        //         { os === "android" && <>
+        //             <input data-test="andriodAppPath" className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler} name="appPath_a" />
+        //             <select data-test="andriodSerialNumber" className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
+        //                 <option value="" disabled>Select Mobile Serial Number</option>
+        //                 {serialNumbers.map((serialNumber) => ( 
+        //                     <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
+        //                 ))}
+        //             </select>
+        //         </> }
+        // </div>,
+        'content':<div className='inputContent'>
+            <div className="flex flex-wrap gap-3" >
+            <div className="flex align-items-center">
+              <RadioButton className="ss__dsktp_method_rad" data-test="chooseAndriod" type="radio" name="method" value="A" onChange={(e)=>{handleSerialNumber();} } />
+              <label htmlFor="ingredient1" className="ml-2">Android</label>
+            </div>
+            <div className="flex align-items-center">
+              <RadioButton data-test="chooseAndriod" className="ss__dsktp_method_rad" type="radio" name="method" value="B" onChange={()=>{setOS("ios"); setError(false);setCheckedForMobApp(true)}}   />
+              <label htmlFor="ingredient2" className="ml-2">iOS</label>
+            </div>
+          </div>
+          {os === "android" &&
+            <div className='AndroidContent'>
+              <span className="p-input">
+                <InputText data-test="andriodAppPath" placeholder="Enter Application Path" value={appPath} onChange={appPathHandler} name="appPath_a" />
+              </span>
+              <select data-test="andriodSerialNumber"  placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
+                <option value="" disabled>Select Mobile Serial Number</option>
+                {serialNumbers.map((serialNumber) => (
+                  <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
+                ))}
+              </select></div>}
+            {os === "ios" &&
+          <div className='iOSContent'>
+            <span className="p-input">
+              <InputText data-test="iosApppath"  placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler} name="appPath2_i"  />
+            </span>
+            <span className="p-input">
+              <InputText data-test="iosVersionNumber"  placeholder='Enter Version Number' value={verNum} onChange={verNumHandler} name="verNum_i" />
+            </span>
+            <span className="p-input">
+              <InputText Textdata-test="iosDeviceName"  placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler} name="deviceName_i"  />
+            </span>
+            <span className="p-input">
+              <InputText data-test="iosUDID"  placeholder='Enter UUID' value={uuid} onChange={uuidHandler} name="uuidNum_i" />
+            </span></div>}
+        </div>,
+      //   'content': <div className='inputContent'>
+      //   <div className="card flex justify-content-center gap-3">
+      //     <h4>iOS</h4>
+      //     <InputSwitch checked={checkedForMobApp} onChange={(e) => setCheckedForMobApp(e.value)} />
+      //     <h4>Android</h4>
+      //   </div>
+      //   {checkedForMobApp?
+      //   <div className='AndroidContent'>
+      //     <span className="p-input">
+      //       <InputText placeholder="Enter Application Path" />
+      //     </span>
+      //     <span className="p-input">
+      //       <InputText placeholder="Enter Mobile Serial Number" />
+      //     </span></div>
+      //     :
+      //   <div className='iOSContent'>
+      //     <span className="p-input">
+      //       <InputText placeholder="Enter Application Path" />
+      //     </span>
+      //     <span className="p-input">
+      //       <InputText placeholder="Enter Version Number" />
+      //     </span>
+      //     <span className="p-input">
+      //       <InputText placeholder="Enter Device Name" />
+      //     </span>
+      //     <span className="p-input">
+      //       <InputText placeholder="Enter UUID" />
+      //     </span></div>}
+      // </div>,
+
+        'footer': <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" />,
+        'footerAction': onMobileAppLaunch
+    }
+
+    // OEBS
+
+    const [winName, setWinName] = useState("");
+    const winNameHandler = event => setWinName(event.target.value);
+
+    const onWinLaunch = () => {
+        let scrapeObject = {
+            'winName' : winName
+        }
+        if (!winName) setError({winName: !winName})
+        else {
+            setError(false);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+        }
+    }
+
+    const oebsApp = {
+        'content': <input data-test="oebsWinName" className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler} name="oebsWindowName" />,
+        'footer': <input type="submit" data-test="oebsLaunch" onClick={onWinLaunch} style={{width: "100px"}} value="Launch" />,
+        'footerAction': onWinLaunch
+    }
+    
+    
+    // Mobile Web
+
+    const [slNum, setSlNum] = useState("");
+    const slNumHandler = event => setSlNum(event.target.value);
+
+    const [vernNum, setVernNum] = useState("");
+    const vernNumHandler = event => setVernNum(event.target.value);
+
+    const onMobileWebLaunch = () => {
+        let scrapeObject = {
+            'slNum': slNum,
+            'vernNum': vernNum
+        }
+        if (!slNum || !vernNum) setError({slNum: !slNum, vernNum: !vernNum});
+        else {
+            setError(false);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+        }
+    }
+
+    const mobileWeb = {
+        'content': <div className="ss__mblweb_inputs">    
+            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler} name="mobWebInput1" /> 
+            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" />
+        </div>,
+
+        'footer': <input type="submit" data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}} value="Launch" />,
+        'footerAction': onMobileWebLaunch
+    }
+
+    const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApps': MobileApps, 'OEBS': oebsApp, 'MobileWeb': mobileWeb}
+
+    // return (
+    //     <div className="ss__launch_app_dialog">
+    //         <ModalContainer
+    //             title="Launch Application"
+    //             content={appDict[props.appPop.appType].content}
+    //             footer={appDict[props.appPop.appType].footer}
+    //             close={()=>{
+    //                 props.setShow(false);
+    //                 setError(false);
+    //             }}
+    //         />
+    //     </div> 
+    // );
+    return (
+      <div className="ss__launch_app_dialog">
+          <AvoModal
+            visible={props.visible}
+            setVisible={()=>{}}
+            onModalBtnClick={(input)=> input ==="Cancel" ? props.setVisible(false) : appDict[props.appPop.appType].footerAction() }
+            // footer = {appDict[props.appPop.appType].footer}
+            headerTxt={props.typesOfAppType}
+            footerType="Launch"
+            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "45vh" : "33vh", background: "#FFFFFF" }}
+            content={appDict[props.appPop.appType].content}
+          customClass={props.typesOfAppType}
+          />
+      </div> 
+  );
+}

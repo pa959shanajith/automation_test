@@ -43,9 +43,14 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./executionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
+import { loadUserInfoActions } from '../../landing/LandingSlice'
+
+
+
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible, setVisible] = useState(false);
+  // const proj = useSelector((state)=>state.design.selectedProj)
   const [visible_setup, setVisible_setup] = useState(false);
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
@@ -64,7 +69,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [allocateICE, setAllocateICE] = useState(false);
   const [eachData, setEachData] = useState([]);
   const [currentTask, setCurrentTask] = useState({});
-  const [appType, setAppType] = useState("");
   const [moduleInfo, setModuleInfo] = useState([]);
   const [execAction, setExecAction] = useState("serial");
   const [execEnv, setExecEnv] = useState("default");
@@ -119,10 +123,27 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [selectedMonthly, setSelectedMonthly] = useState(null);
   const [dropdownWeek, setDropdownWeek] = useState(null);
   const [dropdownDay, setDropdownDay] = useState(null);
+  const [project, setProject] = useState({});
   const [scheduleOption, setScheduleOption] = useState({});
   const [radioButton_grid, setRadioButton_grid] = useState(
     "Execute with Avo Assure Agent/ Grid"
   );
+  const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+  useEffect(() => {
+    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
+  }, [selectProjects]);
+  // const [selectedAPP,setSelectedApp]=useState()
+  // const typeOfAppType = useSelector((state) => state.landing.defaultSelectProject);
+  // const nameOfAppType = typeOfAppType.apptype
+  // console.log(state.landing.defaultSelectProject)
+  // console.log(typeOfAppType)
+
+  // const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+
+  // const initProj = selectProjects.projectId;
+  // console.log(selectProjects)
+
+
 
   const displayError = (error) => {
     // setLoading(false)
@@ -223,6 +244,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
+      setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
       }
@@ -231,7 +253,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       //     key: Projects.projectId,
       //     value:Projects.projectNames
       //   }]
-      setConfigProjectId(data[0] && data[0]?.id);
+      // setConfigProjectId(data[0] && data[0]?.id);
       setProjectList(data);
     })();
   }, []);
@@ -337,7 +359,12 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setDeleteItem(item);
     event.preventDefault(); // Prevent the default behavior of the button click
     setLogoutClicked(true);
-    let text = `Are you sure you want to delete' ${item.configurename}' Execution Profile?`;
+    // let text = `Are you sure you want to delete' ${item.configurename}' execution profile?`;
+    let text = (
+      <p>
+        Are you sure you want to delete <strong>{item.configurename}</strong> execution profile?
+      </p>
+    );
     setProfileTxt(text);
   };
 
@@ -420,14 +447,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const ExecuteTestSuite = async (executionData, btnType) => {
     if (executionData === undefined) executionData = dataExecution;
     setAllocateICE(false);
-    const modul_Info = parseLogicExecute(
-      eachData,
-      currentTask,
-      appType,
-      moduleInfo,
-      accessibilityParameters,
-      ""
-    );
+    const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
     // setLoading("Sending Execution Request");
     executionData["source"] = "task";
@@ -712,7 +732,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: "Web",
+            appType: selectProjects.appType,
             domainName: "Banking",
             projectName: getConfigData?.projects[0]?.name,
             projectId: configProjectId,
@@ -831,7 +851,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             placeholder="Search"
             title=" Search for project"
               onChange={(e) => {
-                setConfigProjectId(e.target.value);
+                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
@@ -1059,7 +1079,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const onWeekChange = (e) => {
-    let selectedWeeks = [...selectedWeek];
+    let selectedWeeks = e?.value?.name === "All" ? [] : [...selectedWeek];
 
     if (e.checked)
       selectedWeeks.push(e.value);
@@ -1151,6 +1171,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
+                  // disabled={selectProjects.appType!=="5db0022cf87fdec084ae49b7"}
+                  // defaultChecked={selectProjects.appType==="5db0022cf87fdec084ae49b7"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
                       setShowIcePopup(false);
@@ -1174,6 +1196,8 @@ Learn More '/>
                         setShowIcePopup(true);
                         setRadioButton_grid(e.target.value);
                       }}
+                      // checked={nameOfAppType !== '5db0022cf87fdec084ae49b7'&&radioButton_grid === "Execute with Avo Assure Client"}
+                      // checked={nameOfAppType}
                       checked={
                         radioButton_grid === "Execute with Avo Assure Client"
                       }
@@ -1493,9 +1517,8 @@ Learn More '/>
             className="configure_button"
             onClick={() => configModal("CancelSave")}
           >
-            {" "}
-            configure{" "}
-            <Tooltip target=".configure_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+            configure
+            <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
           </Button>
         </Panel>
       );
@@ -1527,7 +1550,7 @@ Learn More '/>
                 />
                 <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
                Add Configuration
-               <Tooltip target=".addConfig_button" position="bottom" content="Select test cases, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+               <Tooltip target=".addConfig_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}
