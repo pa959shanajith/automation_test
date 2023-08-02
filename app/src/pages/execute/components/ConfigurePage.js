@@ -851,7 +851,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             placeholder="Search"
             title=" Search for project"
               onChange={(e) => {
-                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appType[project?.projectId.indexOf(e.target.value)] }));
+                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
@@ -1079,7 +1079,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const onWeekChange = (e) => {
-    let selectedWeeks = [...selectedWeek];
+    let selectedWeeks = e?.value?.name === "All" ? [] : [...selectedWeek];
 
     if (e.checked)
       selectedWeeks.push(e.value);

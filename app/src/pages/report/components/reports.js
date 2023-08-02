@@ -173,7 +173,7 @@ const reports = () => {
         <div className='report_landing'>
             <div className='report'>
                 <div>
-                    <label data-test="projectLabel" className='Projectreport'>Projects:</label>
+                    <label data-test="projectLabel" className='Projectreport'>Project:</label>
                     <select data-test="projectSelect" className='projectSelectreport' value={initProj} onChange={(e)=>{handeSelectProject(e.target.value)}}>
                         {projectList.map((project, index)=><option key={index} value={project.id} >{project.name}</option>)}
                     </select>
