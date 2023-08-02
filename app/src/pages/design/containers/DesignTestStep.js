@@ -573,7 +573,7 @@ const DesignModal = (props) => {
         // globalSelectedBrowserType = selectedBrowserType;5
         let findTestCaseId = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
         if (dependencyTestCaseFlag) testcaseID = testCaseIDsList;
-        else testcaseID.push(findTestCaseId);
+        else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
         // ResetSession.start();
         DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
@@ -846,11 +846,12 @@ const DesignModal = (props) => {
                     setInputPlaceholder(placeholders.inputval);}}
                 placeholder="Select a element"
                 style={{maxWidth:'10rem'}}
+                className='select-option'
             />
         );
     };
     const [startIndex, setStartIndex] = useState(0);
-    const [endIndex, setEndIndex] = useState(10);
+    const [endIndex, setEndIndex] = useState(7);
     const [inputPlaceholder, setInputPlaceholder] = useState('');
     const [outputPlaceholder, setOutputPlaceholder] = useState('');
     const [input, setInput] = useState('');
@@ -934,7 +935,7 @@ const DesignModal = (props) => {
         const getOptionLabel = (option) => {
             return (
               <div title={option.tooltip}>
-                {option.label}
+                {option.label === "Show All"? <div style={{color:'blue'}}>{option.label}</div>: <div>{option.label}</div>}
               </div>
             );
           };
@@ -971,7 +972,7 @@ const DesignModal = (props) => {
     const keywordEditor = (options) => {
         setFocused(true);
         return (
-            <Dropdown className='select-option' width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel="label" menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
+            <Dropdown className='select-option'  width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel={getOptionLabel} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
         )
     };
     const inputEditor = (options) => {
@@ -985,7 +986,8 @@ const DesignModal = (props) => {
         let { newData, index } = e;
         let updateNewData = { ...newData, 
             keywordDescription:"",
-            keywordVal: newData.keywordVal !== ""?newData.keywordVal:newData.keywordDescription?newData.keywordDescription:""
+            keywordVal: newData.keywordVal !== ""?newData.keywordVal:newData.keywordDescription?newData.keywordDescription:"",
+            inputVal:Array.isArray(newData.inputVal)?newData.inputVal:[newData.inputVal]
         }
         let testCaseUpdate = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
         let updatedTestCases = [...testCaseUpdate.testCases];
@@ -1097,14 +1099,14 @@ const DesignModal = (props) => {
                         onSelectionChange={(e) => setSelectedTestCases(e.value)}  
                         emptyMessage={newtestcase.length === 0?emptyMessage:null} onRowEditComplete={onRowEditComplete}
                         rowReorder editMode="row" reorderableRows onRowReorder={(e) => reorderTestCases(e)} resizableColumns showGridlines size='small' >
-                            <Column style={{ width: '3em' ,textAlign: 'center' }} rowReorder />
-                            <Column selectionMode="multiple" style={{ width: '3em' }} />
+                            <Column style={{ width: '3em' ,textAlign: 'center', paddingLeft:'0.5rem' }} rowReorder />
+                            <Column selectionMode="multiple" style={{ width: '3em', paddingLeft:'0.5rem' }} />
                             <Column field="custname" header="Element Name" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => elementEditor(options)} ></Column>
-                            <Column field="keywordDescription" tooltip="keywordTooltip" header="Operation" editor={(options) => keywordEditor(options)}  ></Column>
+                            <Column field="keywordDescription" tooltip="keywordTooltip" header="Operation" style={{paddingLeft:'0.5rem'}} editor={(options) => keywordEditor(options)}  ></Column>
                             <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
                             <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
-                            <Column field="remarks" header="Remarks" />
-                            <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center' }} ></Column>
+                            <Column field="remarks" header="Remarks" style={{paddingLeft:'0.5rem'}}/>
+                            <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center',paddingLeft:'0.5rem' }} ></Column>
                             {/* <Tooltip target=".action " position="left" content="  Edit the test step."/> */}
                     </DataTable>
             </div>
@@ -1131,9 +1133,9 @@ const DesignModal = (props) => {
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>
-                        <Column expander={allowExpansion} style={{ width: '5rem',background: 'white' }} />
-                        <Column field="name" style={{background: 'white' }}/>
-                        <Column body={bodyHeader} style={{ background: 'white' }}/>
+                        <Column expander={allowExpansion} style={{ width: '5rem',background: 'white',paddingLeft:'0.5rem' }} />
+                        <Column field="name" style={{background: 'white',paddingLeft:'0.5rem' }}/>
+                        <Column body={bodyHeader} style={{ background: 'white',paddingLeft:'0.5rem' }}/>
                     </DataTable>
                 </div>
             </Dialog>
@@ -1146,9 +1148,9 @@ const DesignModal = (props) => {
                         </span>
                         <span className='browser__col'>
                             {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' alt='explorer'/>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span> */}
-                            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' alt='chrome' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
-                            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' alt='firefox' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
-                            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' alt='edge' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
+                            <span onClick={() => handleSpanClick("1")} className={selectedSpan === "1" ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' alt='chrome' />Google Chrome {selectedSpan === "1" && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
+                            <span onClick={() => handleSpanClick("2")} className={selectedSpan === "2" ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' alt='firefox' />Mozilla Firefox {selectedSpan === "2" && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
+                            <span onClick={() => handleSpanClick("8")} className={selectedSpan === "8" ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' alt='edge' />Microsoft Edge {selectedSpan === "8" && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
                         </span>
                     </div>
                     <div>

@@ -24,7 +24,7 @@ const SideNav = () =>{
     const menuItem = [
         {
             path: "/landing",
-            name: "My Project(s)",
+            name: "Projects",
             icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="Create/View all your projects."  data-pr-position="right" height="25px" />,
             disabled: false
         },
