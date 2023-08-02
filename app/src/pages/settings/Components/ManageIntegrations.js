@@ -42,6 +42,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const mappedData = useSelector(state => state.setting.mappedPair);
     const mappedTreeList = useSelector(state => state.setting.mappedTree);
     const selectedAvo = useSelector(state => state.setting.selectedAvoproject);
+    const AzureLoginDetails = useSelector(state => state.setting.AzureLogin);
+    const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
     // state
     const [activeIndex, setActiveIndex] = useState(0);
     const [activeIndexViewMap, setActiveIndexViewMap] = useState(0);
@@ -74,6 +76,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
         mappedTests: 0
     })
     const [isShowConfirm,setIsShowConfirm] = useState(false);
+    const [authType,setAuthType] = useState("basic");
+    const [user, setUser] = useState([]);
+    const azureRef = useRef(null);
 
 
     // const [proj, setProj] = useState('');
@@ -86,6 +91,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const handleIntegration = useCallback((value) => {
         dispatchAction(screenType(value));
+        setAuthType('basic');
     }, [])
 
     const handleSubmit = () => {
@@ -97,8 +103,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 callLogin_Jira();
                 break;
             case 'Zephyr':
+                callLogin_zephyr();
                 break;
-            case 'Azue DevOps':
+            case 'Azure DevOps':
+                callLogin_Azure()
                 break;
             case 'ALM':
                 break;
@@ -136,6 +144,88 @@ const ManageIntegrations = ({ visible, onHide }) => {
             getProjectScenarios();
             callViewMappedFiles();
         }
+        setIsSpin(false);
+    }
+
+
+    const callLogin_zephyr = async()=>{
+        var zephyrPayload = {};
+        zephyrPayload.authtype = authType;
+        zephyrPayload.zephyrURL = zephyrLoginDetails.url;
+        if(authType==="basic") {
+             zephyrPayload.zephyrUserName = zephyrLoginDetails.username;
+             zephyrPayload.zephyrPassword = zephyrLoginDetails.password;
+        } else {
+             zephyrPayload.zephyrApiToken = zephyrLoginDetails.token;
+        }
+
+        const domainDetails = await api.loginToZephyr_ICE(zephyrPayload);
+        console.log(domainDetails,' its domainDetails');
+        if (domainDetails.error) setToast('error','Error', domainDetails.error.CONTENT);
+        else if (domainDetails === "unavailableLocalServer") setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (domainDetails === "scheduleModeOn") setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session"){
+            setToast('error','Error','Invalid session')
+        }
+        else if (domainDetails === "invalidcredentials") setToast('error','Error',"Invalid Credentials");
+        // else if (domainDetails === "noprojectfound") setLoginError("Invalid credentials or no project found");
+        // else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
+        else if (domainDetails === "fail") setToast('error','Error',"Fail to Login");
+        else if (domainDetails === "notreachable") setToast('error','Error',"Host not reachable.");
+        //else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Host not reachable");
+        // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
+        else if (domainDetails) {
+            console.log(domainDetails);
+            setToast("success", "Success", `${selectedscreen.name} login successful`);
+            setShowLoginCard(false);
+            // setDomainDetails(domainDetails);
+            // setLoginSuccess(true);
+        }
+        setIsSpin(false);
+    }
+
+
+    const callLogin_Azure = async()=>{
+        console.log(' callLogin_Azure called');
+        const azureurl = AzureLoginDetails.url || '';
+        const azureusername = AzureLoginDetails.username || '';
+        const azurepwd = AzureLoginDetails.password || '';
+        setUser({url: azureurl,
+        username: azureusername,
+        password: azurepwd})
+        var apiObj = {   
+            "action" : 'azureLogin',
+             "url": azureurl,
+             "username": azureusername,
+             "pat": azurepwd,
+ 
+             }    
+       const domainDetails = await api.connectAzure_ICE(apiObj);
+
+        if (domainDetails.error) setToast('error','Error', domainDetails.error.CONTENT);
+        else if (domainDetails === "unavailableLocalServer") setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (domainDetails === "scheduleModeOn") setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session"){
+            setToast('error','Error',"Invalid Session");
+        }
+        else if (domainDetails === "invalidcredentials") setToast('error','Error',"Invalid Credentials");
+        else if (domainDetails === "fail") setToast('error','Error',"Fail to Login");
+        else if (domainDetails === "notreachable") setToast('error','Error',"Host not reachable.");
+        else if (domainDetails) {
+            if (Object.keys(domainDetails).length && domainDetails.projects) {
+                // {id:1,name:'Story'},{id:2,name:'TestPlans'}
+                let issueTypes = [
+                    {name: 'Story', code: 'Story'},
+                    {name: 'TestPlans', code: 'TestPlans'},
+                ]
+                setProjectDetails(domainDetails.projects.map((el) => { return { name: el.name, id: el.id } }))
+                setIssueTypes(issueTypes)
+            }
+            setToast("success", "Success", `${selectedscreen.name} login successful`);
+            setShowLoginCard(false);
+            getProjectScenarios();
+            azureRef.current.callViewMappedFiles();
+        } 
         setIsSpin(false);
     }
 
@@ -644,11 +734,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
     //     integrationItems.push(logoutTab);
     //   }
 
+    const callAzureSaveButton = () => {
+        if(azureRef.current){
+            azureRef.current.callSaveButton();
+        }
+    }
+
     const footerIntegrations = (
         <div className='btn-11'>
             {activeIndex === 0 && (
                 <div className="btn__2">
-                    <Button label="Save" severity="primary" className='btn1' onClick={callSaveButton} />
+                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
                     <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
                 </div>)}
 
@@ -658,8 +754,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
         </div>
     );
 
-    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} selectedscreen={selectedscreen} handleIntegration={handleIntegration} setShowLoginCard={setShowLoginCard} />, [isSpin, showCard2, selectedscreen, handleIntegration,setShowLoginCard])
-   console.log(showLoginCard);
+    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} selectedscreen={selectedscreen} handleIntegration={handleIntegration}
+     setShowLoginCard={setShowLoginCard} setAuthType={setAuthType} authType={authType} />, [isSpin, showCard2, selectedscreen,
+         handleIntegration,setShowLoginCard,setAuthType,authType])
+   
 
 
     return (
@@ -784,7 +882,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : selectedscreen.name === "Azure DevOps" ? <AzureContent/> :null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : selectedscreen.name === "Azure DevOps" ? <AzureContent ref={azureRef} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

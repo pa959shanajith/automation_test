@@ -238,6 +238,7 @@ if (cluster.isMaster) {
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
     	var plugin = require('./server/controllers/plugin');
+		var azure = require('./server/controllers/azure');
 		var devOps = require('./server/controllers/devOps');
 		var mindmap = require('./server/controllers/mindmap');
 		var admin = require('./server/controllers/admin');
@@ -640,7 +641,10 @@ if (cluster.isMaster) {
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
 
-
+		// Azure integeration API's
+		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
+		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
+		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

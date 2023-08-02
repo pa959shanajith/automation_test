@@ -3,7 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useDispatch, useSelector } from 'react-redux';
-import { IntergrationLogin } from '../settingSlice';
+import { IntergrationLogin,zephyrLogin,AzureLogin } from '../settingSlice';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
@@ -12,9 +12,13 @@ import "../styles/manageIntegrations.scss";
 import ZephyrContent from "../Components/ZephyrContent";
 
 
-const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) => {
+const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,setAuthType,authType}) => {
+    // list of selectors
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
     const selectedscreen = useSelector(state => state.setting.screenType);
+    const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
+    const AzureLoginDetails = useSelector(state => state.setting.AzureLogin);
+    // list of states
     const [disableFields, setDisableFields] = useState(false)
     const dispatchAction = useDispatch();
     const [loginType, setLoginType] = useState('basic');
@@ -25,11 +29,28 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
 
 
     const handleLogin = useCallback((name, value) => {
-        dispatchAction(IntergrationLogin({ fieldName: name, value }));
+        switch (selectedscreen.name) {
+            case 'Jira':
+                dispatchAction(IntergrationLogin({ fieldName: name, value }));
+                break;
+            case 'Zephyr':
+                dispatchAction(zephyrLogin({ fieldName: name, value }));
+                break;
+            case 'Azure DevOps':
+                dispatchAction(AzureLogin({ fieldName: name, value }));
+                break;
+            case 'ALM':
+                break;
+            case 'qTest':
+                break;
+            default:
+                break;
+        }
+        
     }, [])
 
     const handleRadioChange = (e) => {
-        setLoginType(e.value);
+        setAuthType(e.value);
     };
 
     const zephyrDialog = () => {
@@ -44,25 +65,9 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
     };
 
     const loginHandler = () =>{
-        switch (selectedscreen.name) {
-            case 'Jira':
-                showCard2(); setDisableFields(true);
-                break;
-            case 'Zephyr':
-                setShowLoginCard(false);
-                break;
-            case 'Azure DevOps':
-                setShowLoginCard(false);
-                break;
-            case 'ALM':
-                break;
-            case 'qTest':
-                break;
-            default:
-                break;
-        }
+        showCard2(); setDisableFields(true);
     }
-
+    
 
     return (
         <>
@@ -123,34 +128,34 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
                     <div className="modal-overlay">
                     <ProgressSpinner className="modal-spinner" style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                 </div>
-                }  */}{selectedscreen && loginType === "basic"}
+                }  */}{selectedscreen && authType === "basic"}
                     <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
                     {selectedscreen?.name === 'Zephyr' && (
                         <div className="apptype__token">
                             <span>Application Type:</span>
                             <div className="p-field-radiobutton">
-                                <RadioButton inputId="basic" name="loginType" value="basic" onChange={handleRadioChange} checked={loginType === 'basic'} />
+                                <RadioButton inputId="basic" name="loginType" value="basic" onChange={handleRadioChange} checked={authType === 'basic'} />
                                 <label htmlFor="basic" className="basic_login">Basic</label>
                             </div>
                             <div className="p-field-radiobutton">
-                                <RadioButton inputId="token" name="loginType" value="token" onChange={handleRadioChange} checked={loginType === 'token'} />
+                                <RadioButton inputId="token" name="loginType" value="token" onChange={handleRadioChange} checked={authType === 'token'} />
                                 <label htmlFor="token" className="token_login">Token</label>
                             </div>
                         </div>)}
-                    {loginType === "basic" && selectedscreen && (
+                    {authType === "basic" && selectedscreen && (
                         <>
                             <div className="input-cls">
                                 <span>Username <span style={{ color: 'red' }}>*</span></span>
                                 <span style={{ marginLeft: '1.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={loginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
+                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={selectedscreen.name === 'Jira' ? loginDetails.username : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.username : zephyrLoginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
                                     {/* <label htmlFor="username">Username</label> */}
                                 </span>
                             </div>
                             <div className="passwrd-cls">
                                 <span>Password <span style={{ color: 'red' }}>*</span></span>
                                 <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
-                                <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={loginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} />
-                                {loginDetails.password && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={togglePasswordVisibility}>
+                                <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} />
+                                {(loginDetails.password || zephyrLoginDetails.password) && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={togglePasswordVisibility}>
                                     <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
 
                                 </div>}
@@ -159,7 +164,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
                             <div className="url-cls">
                                 <span>URL <span style={{ color: 'red' }}>*</span></span>
                                 <span style={{ marginLeft: '4.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={loginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
+                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
                                     {/* <label htmlFor="username">URL</label> */}
                                 </span>
                             </div>
@@ -169,19 +174,19 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard}) =
                                 </Button>
                             </div>
                         </>)}
-                    {loginType === "token" && (
+                    {authType === "token" && (
                         <>
                             <div className="url-cls">
                                 <span>URL <span style={{ color: 'red' }}>*</span></span>
                                 <span style={{ marginLeft: '4.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={loginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
+                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url:zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
                                     {/* <label htmlFor="username">URL</label> */}
                                 </span>
                             </div>
                             <div className="url-cls">
                                 <span>Token <span style={{ color: 'red' }}>*</span></span>
                                 <span style={{ marginLeft: '4.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={loginDetails.token} onChange={(e) => handleLogin('token', e.target.value)} />
+                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.token:zephyrLoginDetails.token} onChange={(e) => handleLogin('token', e.target.value)} />
                                     {/* <label htmlFor="username">Token</label> */}
                                 </span>
                             </div>

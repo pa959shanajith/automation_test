@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef, useEffect,forwardRef,useImperativeHandle  } from "react";
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { TabView, TabPanel } from 'primereact/tabview';
@@ -8,14 +8,36 @@ import { InputSwitch } from "primereact/inputswitch";
 import "../styles/AzureContent.scss";
 import { Tree } from 'primereact/tree';
 import { Checkbox } from 'primereact/checkbox';
-import { useSelector } from 'react-redux';
-// import { Paginator } from 'primereact/paginator';
+import { useDispatch, useSelector } from 'react-redux';
+import * as api from '../api.js';
+import { RedirectPage, Messages as MSG, setMsg } from '../../global';
+import {resetIntergrationLogin, resetScreen, selectedProject,
+    selectedIssue, selectedTCReqDetails, selectedTestCase,
+    syncedTestCases, mappedPair, selectedScenarioIds,
+    selectedAvoproject, mappedTree} from '../settingSlice';
+    import { Toast } from "primereact/toast";    
 
 
-const AzureContent = () => {
+const AzureContent = ({setToast,issueTypes,projectDetails,selectedNodes,setSelectedNodes},ref) => {
+    // selectors
+     // selectors
+     const currentProject = useSelector(state => state.setting.selectedProject);
+     const currentIssue = useSelector(state => state.setting.selectedIssue);
+     const selectedZTCDetails = useSelector(state => state.setting.selectedZTCDetails);
+     const selectedScIds = useSelector(state => state.setting.selectedScenarioIds);
+     const mappedData = useSelector(state => state.setting.mappedPair);
+     const mappedTreeList = useSelector(state => state.setting.mappedTree);
+     const selectedAvo = useSelector(state => state.setting.selectedAvoproject);
+     const AzureLoginDetails = useSelector(state => state.setting.AzureLogin);
+     const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
+     const selectedTC = useSelector(state => state.setting.selectedTestCase);
+     const selectedscreen = useSelector(state => state.setting.screenType);
+
+    // const toast = useRef(null);
+    const dispatchAction = useDispatch();
     const [selectedProject, setSelectedProject] = useState(null);
     const [selectedWorkItem, setSelectedWorkItem] = useState(null);
-    const [selectedtestplan, setSelectedtestplan] = useState(null);
+    // const [selectedtestplan, setSelectedtestplan] = useState(null);
     const [activeIndex, setActiveIndex] = useState(0);
     const [checked, setChecked] = useState(false);
     const [checkedAvo, setCheckedAvo] = useState(false);
@@ -23,54 +45,35 @@ const AzureContent = () => {
     const [selectedKeys, setSelectedKeys] = useState([]);
     const [selectedAvoKeys, setSelectedAvoKeys] = useState([]);
     const [checkedItems, setCheckedItems] = useState({});
+    const [secondOption, setSecondOption] = useState('');
+    const [testSuites,setTestSuites] = useState([]);
+    const [storiesToDisplay,setStoriesToDisplay] = useState([])
+    const [testsToDisplay,setTestsToDisplay] = useState([])
+    const [currentPage, setCurrentPage] = useState(0);
+    const [recordsPerPage,setRecordsPerPage] = useState(10);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [userStories,setUserStories] = useState([]);
+    const [testPlansDropdown ,setTestPlansDropdown] = useState([]);
+    const [isShowTestplan,setIsShowTestplan] = useState(false);
+    const [showCustmBtn,setShowCustmBtn] = useState(true);
+    const [selectedTestplan,setSelectedTestplan] = useState('');
+    const [disableIssue, setDisableIssue] = useState(true);
+    const [avoProjectsList, setAvoProjectsList] = useState(null);
+    const [avoProjects, setAvoProjects] = useState([]);
+    const [treeData, setTreeData] = useState([]);
+    const [listofScenarios, setListofScenarios] = useState([]);
+    const [selected, setSelected] = useState(false);
+    const [selectedId, setSelectedId] = useState('');
+    const [selectedSummary, setSelectedSummary] = useState('');
+    const [disabled, setDisabled] = useState(true);
+    const [rows, setRows] = useState([]);
+    const [counts, setCounts] = useState({
+        totalCounts: 0,
+        mappedScenarios: 0,
+        mappedTests: 0
+    });
+    const [viewMappedFiles, setViewMappedFiles] = useState([]);
 
-   
-    const data = [
-        { id: 1, label: 'Item 1' },
-        { id: 2, label: 'Item 2' },
-        { id: 3, label: 'Item 3' },
-        { id: 4, label: 'Item 4' },
-        { id: 5, label: 'Item 5' },
-        { id: 6, label: 'Item 1' },
-        { id: 7, label: 'Item 2' },
-        { id: 8, label: 'Item 3' },
-        { id: 9, label: 'Item 4' },
-        { id: 10, label: 'Item dqwefd' },
-        { id: 11, label: 'Item vberj,kgv' },
-        { id: 12, label: 'Item wfr' },
-        { id: 13, label: 'Item jvbkerjv' },
-        // { id: 14, label: 'Item v erm,jnv' },
-        // { id: 15, label: 'Item vklmner.lvk' },
-        // { id: 16, label: 'Item gvnrekjg' },
-        // { id: 17, label: 'Item mvlrke' },
-        // { id: 18, label: 'Item jrhbgv' },
-        // { id: 19, label: 'Item 4jnrkg' },
-        // { id: 20, label: 'Item 5rmngfgre' },
-        // { id: 21, label: 'Item vberj,kgv' },
-        // { id: 22, label: 'Item wfr' },
-        // { id: 23, label: 'Item jvbkerjv' },
-        // { id: 24, label: 'Item v erm,jnv' },
-        // { id: 25, label: 'Item vklmner.lvk' },
-        // { id: 26, label: 'Item gvnrekjg' },
-        // { id: 27, label: 'Item mvlrke' },
-        // { id: 28, label: 'Item jrhbgv' },
-        // { id: 29, label: 'Item 4jnrkg' },
-        // { id: 30, label: 'Item 5rmngfgre' },
-    ];
-
-    // const itemsPerPage = 10;
-    // const [first, setFirst] = useState(0);
-    // const [totalRecords, setTotalRecords] = useState(data.length);
-    // const [paginatedData, setPaginatedData] = useState(
-    //   data.slice(first, first + itemsPerPage)
-    // );
-  
-    // const onPageChange = (event) => {
-    //     setFirst(event.first);
-    //     setPaginatedData(data.slice(event.first, event.first + itemsPerPage));
-    //   }
-
-    // const totalRecords = treeData.length;
     const jiraTestCase = [
         {
             id: 1,
@@ -121,6 +124,20 @@ const AzureContent = () => {
     ];
 
     //tree data///////////////////
+
+    const data = [
+        { id: 1, label: 'Item 1' },
+        { id: 2, label: 'Item 2' },
+        { id: 3, label: 'Item 3' },
+        { id: 4, label: 'Item 4' },
+        { id: 5, label: 'Item 5' },
+    ];
+
+    useImperativeHandle(ref, () => ({
+        callSaveButton,
+        callViewMappedFiles
+      })); 
+
     // const [data, setData] = useState([
 
     //     {
@@ -242,84 +259,125 @@ const AzureContent = () => {
     const handleTabChange = (index) => {
         setActiveIndex(index);
     };
-    const handleWorkItemChange = (e) => {
-        setSelectedWorkItem(e.value);
+    // const handleWorkItemChange = (e) => {
+    //     setSelectedWorkItem(e.value);
 
-        // If "testplans" is selected, reset the selectedTestPlan state to null
-        if (e.value.name === 'Testplans') {
-            setSelectedtestplan(null);
-        }
-    };
+    //     // If "testplans" is selected, reset the selectedTestPlan state to null
+    //     if (e.value.name === 'Testplans') {
+    //         setSelectedtestplan(null);
+    //     }
+    // };
 
     //////////////////////////////////////// left side tree/////////////////////////////////////
 
-    const TreeNodeCheckbox = (node) => {
-
-
-
-        const onCheckboxChange = (e) => {
-
-            setCheckedAvo((prevCheckedNodes) => {
-
-                const updatedCheckedNodes = { ...prevCheckedNodes, [node.key]: e.checked };
-
-                return updatedCheckedNodes;
-
-            });
-
-        };
-
-        // Check if the node has children
-
-        const hasChildren = node.children && node.children.length > 0;
-
-
-
-        // Render checkboxes only for parent nodes
-
-        if (hasChildren) {
-
-            return (
-
-                <>
-
-                    {/* <input type="checkbox" /> */}
-
-                    <div style={{ width: '100%' }}>
-
-                        <Checkbox onChange={onCheckboxChange} checked={checkedAvo[node.key]} />
-
-                        <span>{node.label}</span>
-
-                        <i className="pi pi-times" style={{ float: 'right' }}></i>
-
-                    </div>
-
-                </>
-
-            );
-
+    const onCheckboxChange = (nodeKey) => {
+        const nodeIndex = selectedNodes.indexOf(nodeKey);
+        const newSelectedNodes = [];
+        if (nodeIndex !== -1) {
+            newSelectedNodes.splice(nodeIndex, 1);
+        } else {
+            newSelectedNodes.push(nodeKey);
         }
+        setSelectedNodes(newSelectedNodes);
+        dispatchAction(selectedScenarioIds(newSelectedNodes));
+    }
 
-
-
-        return (
-
-            <>
-
+    const TreeNodeCheckbox = (node) => {
+        if (node.data.type === 'scenario') {
+            return (
                 <div style={{ width: '100%' }}>
+                    <Checkbox
+                        checked={selectedNodes.includes(node.key)}
+                        onChange={() => onCheckboxChange(node.key)}
+                    />
+                    <span className="scenario_label">{node.label} </span>
+                    {
+                        node.checked && <i className="pi pi-times unmap_icon" style={{ float: 'right' }} onClick={() => handleUnSync(node)}></i>
+                    }
 
-                    <span>{node.label}</span>
-
-                    <i className="pi pi-times" style={{ float: 'right' }}></i>
-
+                </div>)
+        }
+        else if (node.data.type === 'testcase') {
+            return (
+                <div style={{ width: '100%' }}>
+                    <span>{node.label} </span>
+                    {/* <i className="pi pi-times" style={{ float: 'right'}} ></i> */}
                 </div>
-
-            </>
-
-        );
-
+            )
+        }
     };
+
+
+    const handleClick = (isChecked, value, summary) => {
+        if (isChecked) {
+            let newSelectedTCDetails = { ...selectedZTCDetails };
+            let newSelectedTC = isChecked ? [value, summary] : [];
+            console.log(newSelectedTC);
+            setSelected(value)
+            setSelectedId(value)
+            setSelectedSummary(summary)
+            setDisabled(true)
+            dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
+            dispatchAction(syncedTestCases([]));
+            dispatchAction(selectedTestCase(newSelectedTC));
+        }
+        else {
+            let newSelectedTCDetails = { ...selectedZTCDetails };
+            setSelected('')
+            setSelectedId('')
+            setSelectedSummary('')
+            setDisabled(true)
+            dispatchAction(selectedTCReqDetails(newSelectedTCDetails));
+            dispatchAction(syncedTestCases([]));
+            dispatchAction(selectedTestCase([]));
+        }
+    }
+
+
+    const handleUnSync = async (node) => {
+        let unSyncObj = [];
+        if (Object.keys(node).length) {
+            // let findUnsyncedObj = mappedData.filter((item) =>  item.scenarioId[0] === node.key);
+            let findMappedId = viewMappedFiles.filter((item) => item.testscenarioid === node.key);
+            if (findMappedId && findMappedId.length) {
+                unSyncObj.push({
+                    'mapid': findMappedId[0]._id,
+                    'testCaseNames': [].concat(secondOption && secondOption.name === 'Story' ? findMappedId[0].userStoryId : findMappedId[0].TestSuiteId ),
+                    'testid': [].concat(null),
+                    'testSummary': [].concat(null)
+                })
+                let args = Object.values(unSyncObj);
+                args['screenType'] = selectedscreen.name === 'Azure DevOps' ? 'Azure': selectedscreen.name ;
+                const saveUnsync = await api.saveUnsyncDetails(args);
+                if (saveUnsync.error){  
+                    setToast("error", "Error", 'Failed to Unsync'); 
+                }
+				else if(saveUnsync === "unavailableLocalServer"){
+                        setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+                        return
+                    }
+				else if(saveUnsync === "scheduleModeOn"){
+                    setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+                    return
+                }
+				else if(saveUnsync === "fail"){
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
+                    return
+                }
+				else if(saveUnsync == "success"){
+                    callViewMappedFiles()
+                    setToast("success", "Success", 'Unsynced');
+                }
+
+            }
+
+            let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
+            let unsyncMappedData = mappedData.filter((item) => item.scenarioId[0] !== node.key);
+            setTreeData(unsyncMap);
+            dispatchAction(mappedTree(unsyncMap));
+            dispatchAction(mappedPair(unsyncMappedData));
+        }
+    }
 
     const handleCheckboxChange = (e, id) => {
         setCheckedItems(prevState => ({
@@ -327,6 +385,331 @@ const AzureContent = () => {
             [id]: e.checked
         }));
     };
+
+    const onProjectChange = async (e) => {
+        e.preventDefault();
+        // dispatchAction(selectedProject(e.value));
+        getProjectScenarios();
+        setDisableIssue(false);
+        console.log(e.target.value, ' project e');
+        setSelectedProject(e.value);
+        // const releaseId = e.target.value;
+        // const projectScenario = await api.getAvoDetails("6440e7b258c24227f829f2a4");
+        // if (projectScenario.error)
+        //     setToast("error", "Error", projectScenario.error);
+        // else if (projectScenario === "unavailableLocalServer")
+        //     setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+        // else if (projectScenario === "scheduleModeOn")
+        //     setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+        // else if (projectScenario === "Invalid Session") {
+        //     setToast("error", "Error", 'Invalid Session');
+        // }
+        // else if (projectScenario && projectScenario.avoassure_projects && projectScenario.avoassure_projects.length) {
+        //     // setProjectDetails(projectScenario.project_dets);
+        //     setAvoProjectsList(projectScenario.avoassure_projects);
+        //     setAvoProjects(projectScenario.avoassure_projects.map((el, i) => { return { label: el.project_name, value: el.project_id, key: i } }));
+        //     // onAvoProjectChange(reduxDefaultselectedProject.projectId);
+        // }
+    }
+
+    // useEffect(() =>{getProjectScenarios()},[])
+
+    const getProjectScenarios = async () => {
+        // It needs to be change
+        const projectScenario = await api.getAvoDetails("6440e7b258c24227f829f2a4");
+        if (projectScenario.error)
+            setToast("error", "Error", projectScenario.error);
+        else if (projectScenario === "unavailableLocalServer")
+            setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+        else if (projectScenario === "scheduleModeOn")
+            setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+        else if (projectScenario === "Invalid Session") {
+            setToast("error", "Error", 'Invalid Session');
+        }
+        else if (projectScenario && projectScenario.avoassure_projects && projectScenario.avoassure_projects.length) {
+            // setProjectDetails(projectScenario.project_dets);
+            setAvoProjectsList(projectScenario.avoassure_projects);
+            setAvoProjects(projectScenario.avoassure_projects.map((el, i) => { return { label: el.project_name, value: el.project_id, key: i } }));
+            onAvoProjectChange(projectScenario.avoassure_projects);
+            // setSelectedRel(releaseId);  
+            // clearSelections();
+        }
+    }
+
+    const onAvoProjectChange = async (scnData) => {
+        dispatchAction(selectedAvoproject(reduxDefaultselectedProject.projectId));
+        if (scnData.length) {
+            let filterScns = scnData.filter(el => el.project_id === reduxDefaultselectedProject.projectId)[0]['scenario_details'] || [];
+            setListofScenarios(filterScns);
+
+            let treeData = selectedAvoproject
+                ? filterScns.map((scenario) => ({
+                    key: scenario._id,
+                    label: scenario.name,
+                    data: { type: 'scenario' },
+                    checked: false,
+                    children: mappedTreeList
+                }))
+
+                : []
+            setTreeData(treeData);
+        }
+    }
+
+    const handleSecondOptionChange = async (event) => {
+        setSecondOption(event.value);
+        setTestSuites([]);
+        setStoriesToDisplay([]);
+        setTestsToDisplay([]);
+        setCurrentPage(0);
+        setTotalRecords(0)
+      if (event.value.name === 'TestPlans') {  
+          setUserStories([]);
+          let azureLogin = {
+            "baseurl": AzureLoginDetails.url,"username": AzureLoginDetails.username,"pat": AzureLoginDetails.password
+        }
+        let projectData = {
+            'projectdetails':selectedProject
+        }
+          let apiObj = Object.assign({"action": 'azureTestPlans'},azureLogin,projectData);
+          const getTestplans = await api.connectAzure_ICE(apiObj);
+          if(getTestplans && getTestplans.testplans && getTestplans.testplans.length){
+            setTestPlansDropdown(getTestplans.testplans);
+          }
+          setIsShowTestplan(true);
+          setShowCustmBtn(false);
+      }
+      else if (event.value.name === 'Story') {
+          setTestPlansDropdown([]);
+          setSelectedTestplan('');
+          setIsShowTestplan(false);
+          getWorkItems(event.value.name);
+      }
+  };
+
+
+  const getWorkItems = async (e) => {
+    setShowCustmBtn(true);
+    let azureLogin = {
+        "baseurl": AzureLoginDetails.url,"username": AzureLoginDetails.username,"pat": AzureLoginDetails.password
+    }
+    let projectData = {
+        'projectdetails':selectedProject
+    }
+    let apiObj = Object.assign({"action":"azureUserStories" },azureLogin,projectData,{'skip':e.skip || 0});
+    const workItemsDetails = await api.connectAzure_ICE(apiObj);
+    if(workItemsDetails && workItemsDetails.userStories){
+        const updateUserStory = workItemsDetails.userStories.map((item) => ({ ...item, checked: false }));
+        const newArray = userStories.concat(updateUserStory)
+        setUserStories(newArray);
+        setStoriesToDisplay(workItemsDetails.userStories.slice(0,9));
+        if(e && e.currPage){
+            const startIndex = e.currPage * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            setStoriesToDisplay(newArray.slice(startIndex,endIndex));
+        }
+        setTotalRecords(workItemsDetails.total_count)
+        // setIsShowPagination(true);
+        // setTotalStoriesCount(workItemsDetails.total_count)
+    }
+}
+
+const testcaseCheck = (e, checkboxIndex) => {
+    if (checkboxIndex >= 0) {
+        if(secondOption && secondOption.name  === 'TestPlans' && testsToDisplay.length){
+            const setObjValue = testsToDisplay.map((item) => ({ ...item, checked: false }));
+            const updatedData = setObjValue.map((item, idx) => idx === checkboxIndex ? { ...item, checked: e.checked } : item)
+            setTestsToDisplay(updatedData);
+        }
+        if(secondOption && secondOption.name === 'Story' && userStories.length){
+            const setObjValue = userStories.map((item) => ({ ...item, checked: false }));
+            const updatedData = setObjValue.map((item, idx) => idx === checkboxIndex ? { ...item, checked: e.checked } : item)
+            setUserStories(updatedData);
+        }
+        
+    }
+}
+
+const handleSync = () => {
+    let popupMsg = false;
+    let filterProject = projectDetails.filter(el => el.id === selectedProject.id)[0];
+    console.log(selectedProject,' its selectedProject');
+    // let releaseId = issueTypes.filter(el => el.value === currentIssue)[0]['label'];
+    if (selectedScIds.length === 0) {
+        popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+    }
+    else if (selectedId === '') {
+        popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+    }
+    else if (selectedId === selectedId && selectedScIds.length > 1) {
+        popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+    }
+
+    if (popupMsg) setMsg(popupMsg);
+    else {
+        const mappedPairObj = [...mappedData,
+        {
+                scenarioId: selectedScIds,
+                projectId: filterProject.id, 
+                projectName: filterProject.name,        
+                // testId: selectedId,
+                // testCode: selected,
+                [secondOption.name  === 'Story' ?'userStoryId':'TestSuiteId']:selectedTC[0] || '', 
+                itemType:secondOption.name  === 'Story' ? 'UserStory' : 'TestSuite' ,
+                [secondOption.name  === 'Story' ?'userStorySummary':'testSuiteSummary']:selectedTC[1] || ''
+        }
+        ];
+        dispatchAction(mappedPair(mappedPairObj));
+        if(secondOption && secondOption.name  === 'TestPlans'){
+            const filterTestCase = testsToDisplay.filter((testCase) => testCase.id == selectedId).map(el => ({ key: el.id, label: el.name, data: { type: 'testcase' } }))
+        // checking the current map obj is already present with any other scenario
+        const findDuplicate = treeData.map((parent, index) => {
+            const duplicateChildIndex = parent.children.findIndex(
+                (child) => child.key === selectedTC[0]
+            );
+            if (duplicateChildIndex !== -1) {
+                // Remove the duplicate child from the parent's children array
+                return { ...parent, checked: false, children: [] };
+            }
+            else {
+                return parent;
+            }
+        });
+        let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? { ...scenario, checked: true, children: filterTestCase } : scenario)
+        setTreeData(updatedTreeData);
+        dispatchAction(mappedTree(updatedTreeData));
+        const updateCheckbox = testsToDisplay.map((item) => ({ ...item, checked: false }));
+        setTestsToDisplay(updateCheckbox);
+        dispatchAction(syncedTestCases(selected));
+        setSelectedNodes([]);
+        dispatchAction(selectedScenarioIds([]));
+        }
+        if(secondOption && secondOption.name  === 'Story'){
+            const filterTestCase = userStories.filter((testCase) => testCase.id == selectedId).map(el => ({ key: el.id, label: el.id +' '+ el.fields['System.Title'], data: { type: 'testcase' } }))
+        // checking the current map obj is already present with any other scenario
+        const findDuplicate = treeData.map((parent, index) => {
+            const duplicateChildIndex = parent.children.findIndex(
+                (child) => child.key === selectedTC[0]
+            );
+            if (duplicateChildIndex !== -1) {
+                // Remove the duplicate child from the parent's children array
+                return { ...parent, checked: false, children: [] };
+            }
+            else {
+                return parent;
+            }
+        });
+        let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? { ...scenario, checked: true, children: filterTestCase } : scenario)
+        setTreeData(updatedTreeData);
+        dispatchAction(mappedTree(updatedTreeData));
+        const updateCheckbox = userStories.map((item) => ({ ...item, checked: false }));
+        setUserStories(updateCheckbox);
+        dispatchAction(syncedTestCases(selected));
+        setSelectedNodes([]);
+        dispatchAction(selectedScenarioIds([]));
+        }
+    }
+    setDisabled(false);
+}
+
+const callViewMappedFiles=async(saveFlag)=>{
+    try{
+        const response = await api.viewAzureMappedList_ICE('6440e7b258c24227f829f2a4');
+        if (response.error){
+            setToast('error','Error',response.error);
+        }
+        else if(response === 'fail'){
+            setToast('error','Error','failed to fetch mapped details');
+        }
+        
+        else if (response.length){
+            setViewMappedFiles(response);
+            let totalCounts = 0;
+            let mappedScenarios = 0;
+            let mappedTests = 0;
+            let tempRow = [];
+            let viewMappedData = response;
+
+            viewMappedData.forEach(object => {
+                totalCounts = totalCounts + 1;
+                mappedScenarios = mappedScenarios + object.testscenarioname.length;
+                mappedTests = mappedTests + 1;
+                tempRow.push({
+                    'testCaseNames': object.itemType === "UserStory" ? object.userStoryId : object.TestSuiteId, 
+                    'scenarioNames': object.testscenarioname,
+                    'mapId': object._id,
+                    'scenarioId': object.testscenarioid,
+                    'testid':object.itemId,
+                    'itemSummary': object.itemType === "UserStory" ? object.userStorySummary : object.testSuiteSummary
+                });
+            });
+            setCounts({
+                totalCounts: totalCounts,
+                mappedScenarios: mappedScenarios,
+                mappedTests: mappedTests
+            });
+            setRows(tempRow);
+        }
+        else if(response !== 'fail'){
+            setRows([]);
+            setCounts({
+                totalCounts: 0,
+                mappedScenarios: 0,
+                mappedTests: 0
+            });
+        } 
+    }
+    catch(err) {
+        setToast('error','Error',MSG.INTEGRATION.ERR_FETCH_DATA.CONTENT);
+    }
+}
+
+const callSaveButton =async()=>{
+    console.log(' mappedData ',mappedData); 
+    const response = await api.saveAzureDetails_ICE(mappedData);
+    console.log(response,' its response');
+    if (response.error){
+        setToast('error','Error',response.error);
+    }
+    else if (response == 'fail'){
+        setToast('error','Error','failed to save');
+    }
+    else if(response === "unavailableLocalServer")
+        setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+    else if(response === "scheduleModeOn")
+        setToast('error','Error',MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+    else if ( response === "success"){
+        console.log('inside suc');
+        setToast('success','Success',MSG.INTEGRATION.SUCC_SAVE.CONTENT);
+        callViewMappedFiles()
+    }
+    setDisabled(true)
+    setSelected(false)
+    }
+
+    const handleTestSuite = async (event) => {
+        if(event.target.value){
+            setSelectedTestplan(event.target.value);
+            setTestsToDisplay([]);
+            setTestSuites([]);
+            let azureLogin = {
+                "baseurl": AzureLoginDetails.url,"username": AzureLoginDetails.username,"pat": AzureLoginDetails.password
+            }
+            let projectData = {
+                'projectdetails':selectedProject
+            }
+            let apiObj = Object.assign({"action": 'azureTestSuites'},azureLogin,{"testplandetails":{"id":parseInt(event.target.value.id) || ''}},projectData);
+            const getTestSuites = await api.connectAzure_ICE(apiObj);
+            if(getTestSuites && getTestSuites.testsuites && getTestSuites.testsuites.length){
+                const updateCheckbox = getTestSuites.testsuites.map((item) => ({ ...item, checked: false }));
+                setTestSuites(updateCheckbox);
+                setTestsToDisplay(updateCheckbox);
+                setTotalRecords(getTestSuites.testsuites.length);
+                // setIsShowPagination(true);
+            }
+        }
+  }
+    
 
 
     return (
@@ -342,32 +725,44 @@ const AzureContent = () => {
                                             <div className="dropdown-map_azure">
                                                 <span>Select Project <span style={{ color: 'red' }}>*</span></span>
                                                 <span className={ selectedWorkItem && selectedWorkItem.name === 'Testplans' ? "release_span1" : "release_span21"}> Select Workitems<span style={{ color: 'red', left: '3rem' }}>*</span></span>
-                                                {selectedWorkItem && selectedWorkItem.name === 'Testplans' && (
+                                                {secondOption && secondOption.name === 'TestPlans' && (
                                                     <span className="release_span2"> Select Testplans<span style={{ color: 'red' }}>*</span></span>)}
 
                                             </div>
                                             <div className="dropdown-map_azure">
-                                                <Dropdown value={selectedProject} onChange={(e) => setSelectedProject(e.value)} options={projects} optionLabel="name"
+                                                <Dropdown value={selectedProject} onChange={(e) => onProjectChange(e)} options={projectDetails} optionLabel="name"
                                                     placeholder="Select Project" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_project1" />
-                                                <Dropdown value={selectedWorkItem} onChange={handleWorkItemChange} options={workItems} optionLabel="name"
+                                                <Dropdown value={secondOption} onChange={(e) => handleSecondOptionChange(e)} options={issueTypes} optionLabel="name"
                                                     placeholder="Select Project" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release1" />
-                                                {selectedWorkItem && selectedWorkItem.name === 'Testplans' && (
-                                                    <Dropdown value={selectedtestplan} onChange={(e) => setSelectedtestplan(e.value)} options={testplans} optionLabel="name"
+                                                {secondOption && secondOption.name === 'TestPlans' && (
+                                                    <Dropdown value={selectedTestplan} onChange={(e) => handleTestSuite(e)} options={testPlansDropdown} optionLabel="name"
                                                         placeholder="Select Project" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release2" />)}
                                             </div>
                                         </div>
-                                        {selectedWorkItem && selectedProject && (
+                                        {secondOption && selectedProject && (
                                             <div>
 
                                             <div className="tree_data_card1">
-                                                {data.map(item => (
+                                                {userStories && userStories.length && userStories.map((item,i) => (
                                                     <div key={item.id} className="azure__data__div">
                                                         <Checkbox
                                                             inputId={`${item.id}`}
-                                                            checked={checkedItems[item.id] || false}
-                                                            onChange={(e) => handleCheckboxChange(e, item.id)}
+                                                            checked={item.checked}
+                                                            // onChange={(e) => handleCheckboxChange(e, item.id)}
+                                                            onChange={(e) =>{testcaseCheck(e, i); handleClick(e.checked, item.id,item.fields['System.Title'])}}
                                                         />
-                                                        <label className="azure__name">{item.label}</label>
+                                                        <label className="azure__name">{item.id} {item.fields['System.Title']}</label>
+                                                    </div>
+                                                ))}
+                                                {testsToDisplay && testsToDisplay.length && testsToDisplay.map((item,i) => (
+                                                    <div key={item.id} className="azure__data__div">
+                                                        <Checkbox
+                                                            inputId={`${item.id}`}
+                                                            checked={item.checked}
+                                                            // onChange={(e) => handleCheckboxChange(e, item.id)}
+                                                            onChange={(e) => {testcaseCheck(e, i);handleClick(e.checked, item.id, item.name);}}
+                                                        />
+                                                        <label className="azure__name">{item.name}</label>
                                                     </div>
                                                 ))}
                                             </div>
@@ -402,7 +797,7 @@ const AzureContent = () => {
 
                                                 <div className="avotest__data">
 
-                                                    <Tree value={avotestcases} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
+                                                    <Tree value={treeData} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
                                                 </div>
                                             </div>
                                             {/* {
@@ -422,7 +817,7 @@ const AzureContent = () => {
                                         </Card>
                                     </div>
                                 </div>
-                                <span> <Button label="Map" size="small" className="map_icon_cls"></Button></span>
+                                <span> <Button label="Map" size="small" className="map_icon_cls" onClick={handleSync}></Button></span>
                             </div>
 
                         </TabPanel>
@@ -438,9 +833,9 @@ const AzureContent = () => {
 
                                     {checked ? (<div className="accordion_testcase">
                                         <Accordion multiple activeIndex={0} >
-                                            {avoTestCase.map((jiraCase) => (
-                                                <AccordionTab header="Avo Assure Testcase">
-                                                    <span>{jiraCase.jiraCase}</span>
+                                            {rows.map((item) => (
+                                                <AccordionTab header={item.scenarioNames[0]}>
+                                                    <span>{item.itemSummary}</span>
                                                 </AccordionTab>))}
                                         </Accordion>
                                     </div>
@@ -449,9 +844,9 @@ const AzureContent = () => {
 
                                         <div className="accordion_testcase">
                                             <Accordion multiple activeIndex={0}>
-                                                {jiraTestCase.map((testCase) => (
-                                                    <AccordionTab header="Azure DevOps Testcase">
-                                                        <span>{testCase.avoassure}</span>
+                                                {rows.map((item) => (
+                                                    <AccordionTab header={item.itemSummary}>
+                                                        <span>{item.scenarioNames[0]}</span>
                                                     </AccordionTab>))}
                                             </Accordion>
                                         </div>
@@ -459,8 +854,7 @@ const AzureContent = () => {
                                 </Card>
                             </div>
 
-                        </TabPanel>
-
+                        </TabPanel>                          
                     </TabView>
                 </div>
 
@@ -472,4 +866,4 @@ const AzureContent = () => {
     )
 }
 
-export default AzureContent;
+export default forwardRef(AzureContent);
