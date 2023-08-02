@@ -189,7 +189,7 @@ const reports = () => {
             </div> */}
                 {/* <div className='Projectreport'><h2 className='projectDropDown'>Reports: </h2><Dropdown value={selectedProject} onChange={handleToggle} options={project} optionLabel="name" placeholder='Select a Project' className="w-full md:w-10rem ml-2" /> */}
                 <div>
-                    <label data-test="projectLabel" className='Projectreport'>Projects:</label>
+                    <label data-test="projectLabel" className='Projectreport'>Project:</label>
                     <select data-test="projectSelect" className='projectSelectreport' value={initProj} onChange={(e)=>{handeSelectProject(e.target.value)}}>
                         {projectList.map((project, index)=><option key={index} value={project.id} >{project.name}</option>)}
                     </select>
