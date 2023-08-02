@@ -249,7 +249,7 @@ const reports = () => {
                                 </Card></div>))}
                             </div>)} */}
                             {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
-                            {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'> <NavLink to="/reports/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active"><Card key={index} className='testCards'>
+                            {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'> <NavLink to="/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active"><Card key={index} className='testCards'>
                                            <div><p className='reportConfigName'>{data.configurename}</p>
                                                 <p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report_sm'>Last executed through CI/CD</p><p className='Profile_Name_report_sm'>Last executed on {data.execDate.slice(5,16)}</p>
                                            </div>

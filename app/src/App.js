@@ -77,12 +77,12 @@ const RouteApp = () => {
         <Route path="/landing" element={<HomePage />} />
         <Route path="/integration" element={<Integration />} />
         <Route path="/reports" element={<Report />} />
-        <Route path="/reports/profile" element={<Profile />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/itdm" element={<itdm />} />
         <Route path="/design" element={<MindmapHome />} />
         <Route path="/execute" element={<ConfigurePage />} />
-        <Route path='/reports/viewReports' element={<ReportTestTable/>}/>
+        <Route path='/viewReports' element={<ReportTestTable/>}/>
         <Route path="/admin" element={<AdminContainer />} />
         
       </Routes>

@@ -1,10 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react'; 
-import { TabView, TabPanel } from 'primereact/tabview';
-import { Chart } from 'primereact/chart';
 import { Column } from 'primereact/column';
 import { TreeTable } from 'primereact/treetable';
 import { Button } from 'primereact/button';
-import { useLocation } from 'react-router-dom';
+import { useLocation} from 'react-router-dom';
 import { viewReport} from '../api';
 import { InputText } from 'primereact/inputtext';
 import "../styles/ReportTestTable.scss"
@@ -13,6 +11,7 @@ import { Checkbox } from 'primereact/checkbox';
 import CollapsibleCard from './CollapsibleCard';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { FooterTwo } from '../../global';
+import { getStepIcon } from "../containers/ReportUtils";
 
 export default function BasicDemo() {
     const location = useLocation();
@@ -76,9 +75,9 @@ export default function BasicDemo() {
     const getTableHeader = (
       <div className="grid">
         <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
-            <img src="static/imgs/chrome_icon.svg" alt='chrome icon' />
-            <img src="static/imgs/edge_icon.svg" alt='edge icon' />
-            <img src="static/imgs/safari_icon.svg" alt='safari icon' />
+            <img src="static/imgs/chrome_icon.svg" alt='chrome icon' style={{width:'25px',height:'25px'}} />
+            <img src="static/imgs/edge_icon.svg" alt='edge icon' style={{width:'25px',height:'25px'}}/>
+            <img src="static/imgs/safari_icon.svg" alt='safari icon' style={{width:'25px',height:'25px'}}/>
         </div>
         <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex justify-content-center align-items-center">
           <div className="p-input-icon-left">
@@ -101,46 +100,48 @@ export default function BasicDemo() {
         return hasChildren ? null :  <img src='static/imgs/bug.svg' alt='bug defect'/>;
     }
     const convertDataToTree = (data) => {
-        const treeDataArray = [];
-        for (let i = 0; i < data.length; i++) {
-          const rootNode = {
-            key:data[i].id,
-            data: { StepDescription: data[i].StepDescription, slno: data[i].slno, key:data[i].id },
-            children: [],
-          };
-          data[i].children?.forEach((child) => {
-            rootNode.children.push({
-              data: child,
-            });
+      const treeDataArray = [];
+      for (let i = 0; i < data.length; i++) {
+        const rootNode = {
+          key: data[i].id,
+          data: { StepDescription: data[i].StepDescription, slno: data[i].slno, key: data[i].id },
+          children: [],
+        };
+        data[i].children?.forEach((child) => {
+          const modifiedChild = { ...child }; // Create a new object with the same properties as child
+          if (modifiedChild?.EllapsedTime) {
+            modifiedChild.EllapsedTime = modifiedChild.EllapsedTime.split(":").slice(0, 3).join(":");
+          }
+          if(modifiedChild?.Keyword){
+            const stepIcon = getStepIcon(modifiedChild.Keyword);
+            const stepDesc = modifiedChild.StepDescription;
+            if (stepDesc) {
+              modifiedChild.StepDescription = (
+                <div key={modifiedChild.key} style={{ display: 'flex' }}>
+                  <img src={stepIcon} alt='' style={{ width: '25px',position: 'sticky',height: '25px',top: '0rem'}} />
+                  <p>{stepDesc}</p>
+                </div>
+              );
+            }
+          }
+          const statusIcon = modifiedChild.status === 'Pass' ?'static/imgs/pass.png':modifiedChild.status === 'Fail'?'static/imgs/fail.png':'static/imgs/treminated.png';
+          const statusDesc = modifiedChild.status;
+          modifiedChild.status = (
+            <div key={modifiedChild.key} style={{ display: 'flex' }}>
+                  <img src={statusIcon} alt='' style={{width: '12px',height: '12px',position: 'relative',top: '0.3rem'}} />
+                  <p>{statusDesc}</p>
+                </div>
+          );
+          rootNode.children.push({
+            data: modifiedChild, // Push the new object with modified properties
           });
-          treeDataArray.push(rootNode); // Add the rootNode to the array
-        }
-        return treeDataArray; // Return the array of treeData
-      };
+        });
+        treeDataArray.push(rootNode); // Add the rootNode to the array
+      }
+      return treeDataArray; // Return the array of treeData
+    };    
       
     const treeData = convertDataToTree(reportViewData)
-    
-    // const [expandedRows, setExpandedRows] = useState([]);
-
-    // const allowExpansion = (rowData) => {
-    //     return rowData.children.length > 0;
-    // };
-    // const rowExpansionTemplate = (data) => {
-    //     return (
-    //             <DataTable value={data.children}>
-    //                 <Column style={{width:'2rem'}}/>
-    //                 <Column field="slno" header='S No.'></Column>
-    //                 <Column field="Step" header='Steps' ></Column>
-    //                 <Column field='Keyword'  header='Description'/>
-    //                 <Column field="EllapsedTime"  header='Time Elapsed' ></Column>
-    //                 <Column field="status"  header='Status' ></Column>
-    //                 <Column field='comments'  header='Comments' />
-    //                 <Column field='jira_defect_id'  header='Jira' />
-    //                 <Column field='azure_defect_id' header='Azure'  />
-    //                 <Column field='action'  header='Action' />
-    //             </DataTable>
-    //     );
-    // };
 
     return (
         <div className="reportsTable_container">
@@ -152,29 +153,15 @@ export default function BasicDemo() {
                 </Accordion>
             </div>
             <br></br>
-            {/* <DataTable value={reportViewData} expandedRows={expandedRows}  onRowToggle={(e) => setExpandedRows(e.data)}
-                rowExpansionTemplate={rowExpansionTemplate}
-                dataKey="id" tableStyle={{ minWidth: '60rem' }}>
-                <Column expander={allowExpansion} style={{ width: '2rem' }} />
-                <Column field="slno" header="S No."/>
-                <Column field='Step' header='Steps'/>
-                <Column field='StepDescription' header="Description" />
-                <Column field="EllapsedTime" header="Time Elapsed"/>
-                <Column field="Status" header="Status"/>
-                <Column field='comments' header='Comments'/>
-                <Column  header="Jira Defect ID"/>
-                <Column  header="Azure Defect ID"/>
-                <Column header='Action'/>
-            </DataTable> */}
             <TreeTable globalFilter={searchTest} header={getTableHeader} value={treeData} className={reportSummaryCollaps?'viewTable':'ViewTable'} expandedKeys={expandedKeys} dataKey='id' onToggle={(e) => handdleExpend(e)} tableStyle={{ minWidth: '50rem' }} >
-                <Column field="slno" header="S No." style={{width:'8rem'}} expander/>
-                <Column field='Step' header='Steps' style={{width:'10rem'}}/>
-                <Column field='StepDescription' header="Description" style={{width:'15rem'}} />
-                <Column field="EllapsedTime" header="Time Elapsed"/>
-                <Column field="status" header="Status"/>
-                <Column field='Comments' header='Comments'/>
-                <Column header="No. Defect ID" body={defectIDForJiraAndAzure}/>
-                <Column header='Action'/>
+                <Column field="slno" header="S No." style={{width:'8rem',padding:'0rem'}} expander/>
+                <Column field='Step' header='Steps' style={{width:'8rem',padding:'0rem'}}/>
+                <Column field='StepDescription' header="Description" style={{width:'18rem',padding:'0rem'}}/>
+                <Column field="EllapsedTime" header="Time Elapsed" style={{width:'10rem',padding:'0rem'}}/>
+                <Column field="status" header="Status" style={{width:'8rem',padding:'0rem'}}/>
+                <Column field='Comments' header='Comments'style={{width:'18rem',padding:'0rem'}}/>
+                <Column header="No. Defect ID" body={defectIDForJiraAndAzure} style={{padding:'0rem'}}/>
+                <Column header='Action' style={{padding:'0rem'}}/>
             </TreeTable>
             <OverlayPanel ref={filterRef} className="reports_download">
           {filterValues.map((category) => {
