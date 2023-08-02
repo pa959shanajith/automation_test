@@ -60,7 +60,7 @@ exports.manageUserDetails = async (req, res) => {
 				action,
 				user:reqData,
 				name:reqData.username,
-				userimage:reqData.userimage || 'default'
+				userimage:reqData.userimage || ''
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -70,7 +70,7 @@ exports.manageUserDetails = async (req, res) => {
 			action: action,
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
-			userimage: reqData.userimage || 'default',
+			userimage: reqData.userimage || '',
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,

@@ -83,8 +83,8 @@ const UserDemo = (props) => {
                     
                     userInfo && <div className='ProfileDisplay'>
                         <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800"
-                            image={userInfo?.userimage !=="default" ? userInfo.userimage : ''}
-                            label={(userInfo?.userimage === "default") ? initials : ''}
+                            image={userInfo?.userimage !=="" ? userInfo.userimage : ''}
+                            label={(userInfo?.userimage === "") ? initials : ''}
                             size="xlarge" shape="circle" />
                         <div className="flex flex-column">
                             <span className="font-bold user_name">{userInfo.username}</span>
@@ -183,8 +183,8 @@ const UserDemo = (props) => {
                 icon="pi pi-exclamation-triangle"
                 accept={confirmLogout} />
             <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800"
-                image={userInfo?.userimage !=="default" ? userInfo.userimage : initials}
-                label={(userInfo?.userimage === "default") ? initials : ''}
+                image={userInfo?.userimage !=="" ? userInfo.userimage : initials}
+                label={(userInfo?.userimage === "") ? initials : ''}
                 onClick={(e) => menu.current.toggle(e)} size='small' shape="circle" />
         </div>
     );

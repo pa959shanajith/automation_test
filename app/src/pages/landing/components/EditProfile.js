@@ -212,7 +212,7 @@ const EditProfile = (props) => {
                         <div className='profileImage'>
                             <Avatar 
                                 image={base64String}
-                                label={(userInfo?.userimage === "default") ? initials : base64String}
+                                label={(userInfo?.userimage === "") ? initials : base64String}
                                 size='xlarge' title="User Profile" shape='circle'
                             />
                             <FileUpload className="userImage"
