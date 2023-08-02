@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import { Column } from 'primereact/column';
 import { TreeTable } from 'primereact/treetable';
 import { Button } from 'primereact/button';
-import { useLocation} from 'react-router-dom';
 import { viewReport} from '../api';
 import { InputText } from 'primereact/inputtext';
 import "../styles/ReportTestTable.scss"
@@ -14,27 +13,36 @@ import { FooterTwo } from '../../global';
 import { getStepIcon } from "../containers/ReportUtils";
 
 export default function BasicDemo() {
-    const location = useLocation();
     const [reportData,setReportData] = useState([]);
     const [reportViewData, setReportViewData] = useState([]);
     const [expandedKeys, setExpandedKeys] = useState(null);
     const [searchTest, setSearchTest] = useState('');
     const [reportSummaryCollaps, setReportSummaryCollaps] = useState(true);
     const filterRef = useRef(null);
+    const [reportid, setReportId] = useState(null)
     const filterValues = [
         { name: 'Pass', key: 'P' },
         { name: 'Fail', key: 'F' },
         { name: 'Terminated', key: 'T' }
     ];
     const [selectedFilter, setSelectedFilter] = useState([]);
-    
+    useEffect(() => {
+      const getQueryParam = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("reportID");
+        return id;
+      };
+      const id = getQueryParam();
+      setReportId(id);
+    }, []);
+
     useEffect(()=>{
         (async()=>{
-            const view = await viewReport(location?.state?.id);
+            const view = await viewReport(reportid);
             setReportData(JSON.parse(view))
         })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[location])
+    },[reportid])
     useEffect(() => {
         const parent = [];
         if (reportData && Array.isArray(reportData.rows)) {

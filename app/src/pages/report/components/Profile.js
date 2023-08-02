@@ -3,7 +3,6 @@ import { DataTable } from "primereact/datatable";
 import HSBar from "react-horizontal-stacked-bar-chart";
 import { Column } from "primereact/column";
 import { NavLink } from 'react-router-dom';
-// import { Breadcrumbs, Link } from "@mui/material";
 import AvoInput from "../../../globalComponents/AvoInput";
 import "./Profile.scss";
 import { Badge } from "primereact/badge";
@@ -261,12 +260,10 @@ const Profile = () => {
       ],
     });
   };
-//  const handleViweReports = (reportid) =>{
-  
-//     const win = window.open(`/viewReports?reportID=${reportid}`, "_blank"); 
-//     win.focus();
-//     localStorage.setItem("userInfo", JSON.stringify(userInfo))
-//   }
+ const handleViweReports = async (reportid) =>{
+    const win = window.open(`/viewReports?reportID=${reportid}`, "_blank"); 
+    win.focus();
+  }
  
   const onTestCaseClick = async (row, parentRow) => {
 
@@ -443,12 +440,13 @@ const Profile = () => {
                     downloadRef.current.toggle(e)
                   }}></i>,
                   statusView: (
-                    <NavLink to='/viewReports' state={{id: item._id}} ><Button
+                      <Button
                       label="View"
                       severity="secondary"
                       size="small"
                       outlined
-                    /></NavLink>
+                      onClick={()=>handleViweReports(item._id)}
+                    />
                   ),
                 }))}
               >
