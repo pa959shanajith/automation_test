@@ -148,8 +148,8 @@ console.log(reduxDefaultselectedProject);
   ];
 
   const roles = [
-    { name: 'Test Manager' },
-    { name: 'Test Lead' },
+    { name: 'Quality Manager' },
+    { name: 'Quality Lead' },
     { name: 'QA' },
   ];
 

@@ -440,7 +440,7 @@ const CaptureModal = (props) => {
         return "Forms";
 
       case "input" || "textarea":
-        return "Textbox/Textarea";
+        return "Textbox";
 
       case "table" || "tbody" || "tfoot" || "thead" || "tr":
         return "Table";
@@ -879,7 +879,11 @@ const CaptureModal = (props) => {
   const renderActionsCell = (rowData) => {
     return (
       <div >
+        <Tooltip target=".edit__icon" position="right" content=" Edit the properties of elements." />
+        <img src="static/imgs/ic-edit.png"
 
+          style={{ height: "20px", width: "20px" ,marginLeft:"0.5rem"}}
+          className="edit__icon" onClick={() => openElementProperties(rowData)} />
         <Tooltip target=".delete__icon" position="left" content=" Delete the element." />
         <img
 
@@ -888,11 +892,7 @@ const CaptureModal = (props) => {
           className="delete__icon" onClick={() => handleDelete(rowData)} />
 
 
-        <Tooltip target=".edit__icon" position="right" content=" Edit the properties of elements." />
-        <img src="static/imgs/ic-edit.png"
-
-          style={{ height: "20px", width: "20px" }}
-          className="edit__icon" onClick={() => openElementProperties(rowData)} />
+        
 
       </div>
     )
@@ -1567,7 +1567,7 @@ const CaptureModal = (props) => {
               bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
             >
             </Column>
-            <Column field="objectProperty" header="Element Type"></Column>
+            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshot"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>

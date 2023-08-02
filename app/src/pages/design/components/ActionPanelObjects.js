@@ -1120,7 +1120,7 @@ const ActionPanel = (props) => {
                       key="keywords"
                       field="keywords"
                       header="Keyword Used"
-                      style={{ width: "14rem" }}
+                      style={{ width: "14rem"}}
                     />
                     <Column
                       key="newObj"

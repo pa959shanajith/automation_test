@@ -39,7 +39,7 @@ const  ProjectCreation=() =>{
           <VerticalSteps/>
           </div>
           {/* <div className=" CreateProj-card"> */}
-          {userInfo.rolename === "Test Manager" ? (
+          {userInfo.rolename === "Quality Manager" ? (
             <Card className="CreateProj-card"  id='Createproj-title' title="Do you want to create a new project?" >
               <Button className="CreateProj_btn" size="small"  onClick={handleOpenDialog} >Create Project</Button> 
               <CreateProject visible={visible} onHide={handleCloseDialog} setHandleManageProject={setHandleManageProject} handleManageProject={handleManageProject}/> 
