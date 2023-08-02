@@ -60,7 +60,7 @@ const App = () => {
     {/* <ProgressBar /> */}
     {/* <ErrorBoundary> */}
     <div className="main_content">
-      {!['/login', '/',"/undefined"].includes(location.pathname) && <Topbar />}
+      {!['/login', '/','/undefined','/viewReports'].includes(location.pathname) && <Topbar />}
       <RouteApp/>
     </div>
     {/* </ErrorBoundary> */}
@@ -94,7 +94,7 @@ const RouteApp = () => {
 //disable duplicate tabs
 const TabCheck = (setBlockui) => {
   const storage_Handler = (e) => {
-    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport')) return false;
+    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport') || window.location.pathname.includes('/viewReports') || window.location.pathname.includes('/profile')) return false;
     // if tabGUID does not match then more than one tab and GUID
     if (e.key === 'tabUUID' && e.oldValue !== '') {
       if (e.oldValue !== e.newValue) {
