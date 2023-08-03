@@ -1,0 +1,65 @@
+@import '../../global/styles/ColorVariables.scss';
+
+.reportSummary{
+    margin: 0.5vh;
+}
+
+.reportsTable_container {
+    .p-input-icon-left {
+        width: 100%;
+    }
+    .search_testCase {
+        width: 100%;
+    }
+    .viewTable{
+        bottom: 1.5rem;
+        max-height: 81vh;
+        overflow-y: auto;
+        height: 80vh;
+        .p-treetable-thead>tr>th {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
+    }
+    
+    .ViewTableOnClose{
+        bottom: 1.5rem;
+        max-height: 46vh;
+        overflow-y: auto;
+        height: 46vh;
+        .p-treetable-thead>tr>th {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
+    }
+}
+
+.reports_download {
+    width: 10%;
+    .p-overlaypanel-content {
+        height: 8rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        .p-checkbox {
+            margin-left: 0.5rem;
+        }
+    }
+}
+
+.content{
+    .p-accordion-content{
+        padding: 0 !important;
+    }
+}
+.p-treetable .p-treetable-header{
+    padding: 0.5rem !important;
+}

@@ -1,0 +1,35 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.ct-actionBox{
+    height: 25px;
+    position: absolute;
+    right: 6px;
+    top: calc(100% - 610px);
+    width: 180px;
+}
+.disableButton {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.black_bullets{
+    background-color: $black;
+}
+
+.scenario_parent_list{
+    overflow: hidden;
+    white-space:intial !important;
+    text-overflow:clip;
+    overflow-wrap: break-word;
+    width: 95%;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+// .error_listItem{
+//     display: flex;
+//     padding: 0 10px;
+//     height:120px;
+//     min-height: 120px;
+//     margin-bottom: 10px;
+//     margin-top: 5px;
+// }

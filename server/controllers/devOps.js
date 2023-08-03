@@ -144,6 +144,52 @@ exports.getAllSuites_ICE = async (req, res) => {
   }
 };
 
+exports.getProjectsMMTS = async (req, res) => {
+
+    const fnName = "getProjectsMMTS";
+
+    logger.info("Inside UI service: " + fnName);
+
+    try {
+
+        var requestedaction = req.body.readme;
+
+        // if (requestedaction === 'Projectid' ) {
+
+            const inputs = {
+
+                "query": "getProjectsMMTS",
+
+                "userid": req.session.userid,
+
+                "projectid": req.body.projectid
+
+            };
+
+            const result = await utils.fetchData(inputs, "/mindmap/getProjectsMMTS", fnName);
+
+            if (result == "fail") return res.send("fail");
+
+            res.send(result);
+
+        // } else {
+
+        //     logger.error("Error occurred in report/"+fnName+": Invalid input fail");
+
+        //     res.send('Invalid input fail');
+
+        // }
+
+   } catch (exception) {
+
+     logger.error("Error occurred in report/"+fnName+":", exception);
+
+     res.send("fail");
+
+  }
+
+};
+
 exports.getConfigureList = async (req, res) => {
 	const fnName = "getConfigureList";
 	logger.info("Inside UI service: " + fnName);
@@ -151,7 +197,8 @@ exports.getConfigureList = async (req, res) => {
 		// const reqData = req.session.userid;
 		const input = {
 			userid: req.session.userid,
-			projectid: req.body.projectid
+			projectid: req.body.projectid,
+			param:req.body.param
 		}
 		const list = await utils.fetchData(input, "devops/getConfigureList", "getConfigureList");
 		res.send(list);

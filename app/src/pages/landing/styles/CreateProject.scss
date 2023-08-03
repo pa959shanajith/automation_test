@@ -1,0 +1,465 @@
+@import "../../global/styles/ColorVariables.scss";
+    .list1{
+        margin: 1em 1em 1em 1em;
+        font: $f6_regular;
+    }
+    .project-name-1{
+        .p-card-body{
+    // background: white;
+    margin: 0rem;
+    height: 6.5rem;
+        }
+    }
+    .project-name-1 , .card11 , .card22{
+        border:0.5px solid #ced4da;
+        margin-top: 0.7rem;
+        box-shadow: none !important;
+    }
+    .pro-name1{
+        position: relative;
+        bottom: 1.7rem;
+    }
+    
+
+    .proj__name , .application__name{
+        font-family: 'Open Sans' !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+    }
+    .dropdown-1{
+        float: right;
+        position: relative;
+        top: -1rem;
+        right: 1rem;
+    }
+
+    .proj-input{
+        position: relative;
+        top: 0.5rem;
+        height: 2.25rem;
+        width: 51% !important;
+       min-width: 30% !important;
+       
+    }
+
+    .app-dropdown{
+        position: relative;
+        top: 0.5rem;
+        height: 2.25rem;
+        .p-dropdown-label{
+         display: flex;
+         align-items: center;
+        }
+    }
+    
+    .proj-input::placeholder{
+        color: #C7C7C7;
+        font-size: 14px;
+    }
+    .usersearch::placeholder{
+        color: #C7C7C7;
+        font-size: 14px;
+    }
+    .selecteduser::placeholder{
+        color: #C7C7C7;
+        font-size: 14px;  
+    }
+    .p-placeholder{
+        color: #C7C7C7 !important;
+        font-size: 14px !important;  
+    }
+    
+    .card11{
+        .p-card-body{
+            margin: 0rem;
+            // overflow-y: auto;
+            // height: auto;
+            // min-height: 25rem;
+            // overflow-x: hidden;
+        }
+    }  
+    .card11{
+        position: relative;
+       top:0.5rem;
+       width: 51%;
+       min-width: 27%;
+    }
+    .card22{
+    position: relative;
+    bottom: 25.4rem;
+    float: right;
+    width: 43%;
+    min-width: 43%;
+    height: 25rem;
+    }
+    .card22{
+        .p-card-body{
+            margin: 0rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+            // height: auto;
+            // min-height: 25rem;
+        }
+    
+    }
+    .card-input1{
+        position: relative;
+        bottom: 1rem;
+    }
+    
+    .card-input2{
+        position: relative;
+        bottom: 1rem;
+    }
+     .p.button{
+        margin: 2px !important;
+     }
+     .btn-11{
+        position: relative;
+        top: 0rem;
+     }
+    
+     .btn1{
+        margin-right: 1rem !important;
+        height: 2.5rem;
+        font-family: 'Open Sans'!important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+
+     }
+     .btn2{
+        height: 2.5rem;
+        font-family:'Open sans' !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+     }
+    
+     .label1{
+        margin: -1.3rem 6rem 3rem 2rem;
+        color: #9E9E9E;
+        font-size: 12px;
+        font-family: 'Open sans' !important;
+     }
+     .check1{
+        position: relative;
+        background: white;
+        bottom: 1rem;
+     }
+     .check2{
+         position: relative;
+         bottom:4.5rem;
+         height: 18rem;
+         overflow: auto;
+     }
+     
+    .card{
+        background: none !important;
+    }
+    //  .projbtn{
+    //     position: relative;
+    //     left:28rem;
+    //  }
+    .select-users{
+        bottom: 1rem;
+        position: relative;
+        font-size: 14px;
+        font-family: 'Open Sans';
+        font-weight: 400;
+    }
+
+    .selected-users{
+        font-size: 14px;
+        font-family: 'Open Sans';
+        font-weight: 400;
+        position: relative;
+        bottom: 1rem;
+    }
+     .gtbtn {
+        color: blue !important;
+        left: 37.6rem !important;
+        bottom: 15rem !important;
+        height: 2rem !important;
+        width: 0rem !important;
+        align-items: center !important;
+        background: white !important;
+     }
+     .ltbtn{
+        bottom: 11.5rem !important;
+        left: 35rem !important;
+        color: blue !important;
+        height: 2rem !important;
+        width: 0rem !important;
+        align-items: center !important;
+        background: white !important;
+    
+     }
+    .role-dropdown{
+        float: right;
+        width: 13rem;
+        height: 2em;
+        position: relative;
+        left: 1rem;
+        bottom: 7rem;
+        margin-bottom: 0.5rem;
+    }
+    .role-dropdown{
+        .p-dropdown-label{
+            display: flex !important;
+            align-items: center !important;
+  
+      }
+    }
+    .checkbox1{
+        .label1{
+            margin-left: 1rem !important;
+        }
+    }
+    
+    .label-2{
+        display: flex;
+        flex-direction: column;
+        width: 5rem;
+        bottom: 3rem;
+        left: 1rem;
+        position: relative;
+    }
+    .selectallbtn{
+        position: relative;
+        bottom: 0.5rem;
+        height: 2.25rem;
+    }
+    .usersearch{
+        width: 31rem;
+        height: 2.25rem;
+    
+    }
+    .user-select-checkbox {
+        position: relative;
+        top: 0.5rem;
+        width: 35rem;
+    }
+    .selecteduser{
+        width: 28rem;
+        height: 2.25rem;
+    }
+    .Project-Dialog{
+        background: white;
+        .p-dialog-header {
+     background: rgba(96, 91, 255, 0.08) !important;
+     padding: 1rem !important;
+     font-family: 'Open Sans' !important;
+     font-style: normal !important;
+     font-weight: 600 !important; 
+     font-size: 20px !important;
+        }
+        .p-dialog-content{
+            overflow: hidden;
+        }
+    }
+    
+    .p-dialog { 
+        max-height: 94% !important;
+    }
+    .p-dialog-footer{
+        background:#f8f9fa !important;
+    }
+    .checkbox-2{
+        position: relative;
+        // bottom: 0.5rem;
+    }
+    .dropdown_role{
+        position: relative;
+        bottom: 5.2rem;
+        left: 21.5rem;
+        color: #9E9E9E;
+        font-size: 14px;
+        font-family: 'Open sans' !important;
+        // z-index: 9;
+    }
+    .check-bx3{
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        position: relative;
+        // bottom: 0.5rem;
+
+    }
+    .user-role{
+        color: darkgrey;
+        font-size: 12px;
+        position: relative;
+        left: 2.2rem;
+        bottom: 1rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        left: 0.2rem;
+        width: 7rem;
+
+   
+    }
+    
+    .assigned-checkbox{
+        position: relative;
+        bottom: 2rem;
+    }
+    .asgnd-name{
+        width: 15rem;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+        margin-left: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .asgnd-role{
+    color: darkgrey;
+    font-size: 12px;
+    font-family: 'Open Sans';
+   font-style: normal;
+   font-weight: 400;
+    width: 17rem;
+    }
+    .label-3{
+        display: flex;
+        flex-direction: column;
+        width: 5rem;
+        margin-bottom: -3rem;
+    }
+    // .tooltip {
+    //     position: relative;
+    //     display: inline-block;
+    //   }
+      
+    //   .tooltip::before,
+    //   .tooltip::after {
+    //     position: absolute;
+    //     visibility: hidden;
+    //     opacity: 0;
+    //     transition: opacity 0.3s ease-in-out;
+    //   }
+      
+    //   .tooltip::before {
+    //     content: attr(title);
+    //     background-color: #333;
+    //     color: #fff;
+    //     padding: 5px;
+    //     font-size: 14px;
+    //     border-radius: 5px;
+    //     // z-index: 1;
+    //   }
+      
+    //   .tooltip::after {
+    //     content: "";
+    //     border: 5px solid transparent;
+    //     border-top-color: #333;
+    //     // z-index: 2;
+    //   }
+      
+    //   .tooltip:hover::before,
+    //   .tooltip:hover::after {
+    //     visibility: visible;
+    //     opacity: 1;
+    //   }
+
+      .user-name{
+        bottom: 1rem;
+        font-family: "Open Sans";
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        left: 2.2rem;
+        position: relative;
+        width: 9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .user-av{
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        font-size: 0.85rem !important;
+        position: relative !important;
+        left: 0.3rem !important;
+      }
+      .user-avatar{
+        position: relative;
+        top: 1rem;
+        left: 0rem;
+      }
+
+      .asgnd-avatar{
+        right: 0rem !important;
+        font-size: 0.85rem !important;
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+      }
+      .users-list{
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .p-multiselect .p-multiselect-label.p-placeholder{
+      text-align: center;
+      line-height: 0.5rem;
+      }
+   
+    .gtbtn , .ltbtn{
+        .p-button-label{
+            position: relative;
+            right: 0.3rem;
+        }
+    }
+   .imp-cls{
+    color: red;
+   }
+   .user-info {
+    align-items: center;
+    /* align-items: center; */
+    display: flex;
+    flex-direction: center;
+    position: relative;
+    right: 1rem;
+    top: 2rem;
+  }
+  .name_And_Role{
+    display: flex;
+    flex-direction: row;
+    /* bottom: 3rem; */
+    position: relative;
+    border: -2rem;
+    bottom: -2rem;
+    top: 2rem;
+    right: 1.5rem;
+  }
+  .role__dd{
+    flex-shrink: 0;
+    position: relative;
+    left: 13rem;
+    top: 7rem;
+}
+.nameRole_user{
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    width: 15rem;
+    bottom: 3.8rem;
+}
+.selected_users__list{
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font:$f1_regular;
+}
+.error-message{
+    position: absolute;
+    right: 49rem!important;
+    top: 4rem!important
+}
+  
+    
+    

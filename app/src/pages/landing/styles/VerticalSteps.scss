@@ -1,0 +1,92 @@
+@import "../../global/styles/ColorVariables.scss";
+.verticalcard{
+    width: 70%;
+    height: 50% ;
+}
+.stepLabel{
+    height:2.3rem;
+}
+
+.GetStd{
+    font-size: 1.4rem;
+    margin-left: 3%;
+    padding-top: 1rem;
+    padding-bottom: 2%;
+    font: $f4_bold;
+}
+.verticalicon{
+    position: relative;
+    top: 0.35em;
+    right: 0.5em;
+}
+.label{
+    font-size: 0.97rem;
+    font-weight: 600;
+    font: $f6_semibold;
+}
+.titleDescBut{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 2%;
+    padding-right: 3%;
+
+}
+.labelDescription{
+    height: 100%;
+}
+.description{
+    font-size: 13px !important;
+    font: $f7_regular !important;
+    // padding: 0.1rem 0;
+    
+}
+.Stepper{
+    padding-left: 3.5%;
+    padding-bottom: 2%;
+}
+.buttonNav{
+    align-items: center;
+    font: $f7_semibold;
+}
+.HeaderName{
+    margin-bottom: 0em !important;
+}
+.MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiStepIcon-root Mui-active css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root{
+    margin-left: 0%;
+}
+.genius_button{
+    width: 9rem;
+    font-Family: Open Sans;
+    font-Style: normal;
+    margin-Left: 0.5rem;
+    height: 2rem;
+    color: #605bff;
+    background-color: #605bff;
+  }
+  .design_button{
+    background: #605bff;
+    color:white;
+    padding:"0.3rem 0.8rem"
+  }
+// .MuiStepLabel-root .MuiStepLabel-vertical .css-14sza3e-MuiStepLabel-root{
+//     margin-left: 1%;
+//     height: 30%;
+// }
+// .css-8t49rw-MuiStepConnector-line {
+// height: 0px !important;
+
+// }
+// .css-ahj2mt-MuiTypography-root{
+//     line-height: 0px !important;
+//     letter-spacing:0px !important;
+// }
+// .MuiBox-root .css-1bxarir{
+//     margin-bottom: 10% !important;
+//     height: 1% !important;
+   
+// }
+
+// .MuiStepper-root .MuiStepper-vertical  .css-9tmuzo-MuiStepper-root{
+//     border-width: 1px solid black;
+// }

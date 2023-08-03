@@ -1,0 +1,224 @@
+.design_dialog_box {
+    .p-dialog-header {
+        background: #E2E2ED !important;
+        border-top-right-radius: 4px;
+        padding: 0.3rem 0 !important;
+        height: 5rem !important;
+
+        .p-dialog-header-icons {
+            position: relative;
+            right: 96%;
+        }
+
+        .p-dialog-title {
+            .dailog_header1 {
+                color: rgba(3, 2, 41, .6);
+                font-family: Open Sans;
+                font-weight: 500;
+                left: 4rem !important;
+                position: absolute;
+                top: 0.5rem;
+            }
+
+            .dailog_header2 {
+                color: #030229;
+                font-family: Open Sans;
+                font-size: 20px;
+                font-weight: 500;
+                left: 5.5rem !important;
+                position: absolute;
+                top: 2.5rem;
+            }
+        }
+    }
+}
+
+.debug__object__modal {
+    .p-dialog-header {
+        background: #E2E2ED !important;
+    }
+}
+
+.toggle__tab {
+    margin-top: -1rem !important;
+
+    .p-accordion-header-link {
+        padding: 0.7rem !important;
+    }
+
+    .p-accordion .p-accordion-content {
+        padding: 0rem !important;
+    }
+
+}
+
+.btn__grp {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.add__step__btn {
+    color: white;
+    background: #605BFF;
+    border: none;
+    width: 7rem;
+    height: 2rem;
+    border-radius: 4px;
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.not_captured_ele {
+    height: 25vh;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 16vw;
+}
+
+.not_captured_message {
+    bottom: 1rem;
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    right: 1rem;
+}
+
+.btn-design-single {
+    background: #605BFF;
+    border-radius: 10px;
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 19px;
+    color: #FFFFFF;
+    position: relative;
+    border: none;
+    left: 9rem;
+    padding: 0.5rem 0.5rem;
+}
+
+.debug__opt {
+    padding: 0 1.2rem;
+    position: relative;
+    top: 3%;
+    border-bottom: 1px solid lightgray;
+    width: 100%;
+    display: flex;
+
+    .debug__opt__text {
+        margin-bottom: 0.6rem;
+        color: #030229;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 14px;
+    }
+}
+
+.empty__msg {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.empty__msg1 {
+    width: 39%;
+    margin-left: 16rem;
+}
+
+.debug__object {
+    position: relative;
+    top: 10%;
+    border: 1px solid lightgray;
+    height: 21rem;
+    border-radius: 3px;
+    width: 50%;
+}
+
+.design__fst__card {
+    border: 1px solid lightgray;
+    height: 7rem;
+    border-radius: 3px;
+    width: 100%;
+    padding: 0.2rem;
+
+}
+
+.design__snd__card {
+    border: 1px solid lightgray;
+    height: 13.5rem;
+    border-radius: 3px;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.add__depend__test {
+    margin-left: 0.5rem;
+    width: 15rem;
+    margin-top: 1rem;
+}
+
+.add__test__case {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.debug__btn {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.add__btn {
+    width: 6rem;
+    height: 2.5rem;
+    margin-top: 1rem;
+}
+
+.design__thr__card {
+    display: flex;
+    flex-direction: row;
+    gap: 7rem;
+    border-bottom: 1px solid lightgray;
+    height: 2rem;
+}
+
+.text__added__step {
+    background: rgba(96, 91, 255, .2);
+    border-radius: 3px;
+    color: #605bff;
+    font-family: Open Sans;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    height: 2rem;
+    margin: 0.5rem;
+    position: relative;
+    padding: 0.5rem;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item{
+    padding: 0.1rem 0.5rem !important;
+}
+.p-dropdown-panel .p-dropdown-items{
+    padding: 0 !important;
+}
+.p-datatable .p-datatable-thead>tr>th{
+    padding: 0.5rem;
+}
+.p-datatable .p-datatable-tbody>tr>td{
+    padding-top: 0px !important;
+    padding-right: 0px !important;
+    padding-bottom: 0px !important;
+}

@@ -1,0 +1,73 @@
+@import "../../global/styles/ColorVariables.scss";
+.list_btns{
+    display: flex;
+    justify-content: center;
+    font-size: small;
+    }
+    .VerticalStepBox{
+        // margin-top: 1%;
+        // margin-left: 1%;
+        padding: 1%;
+        width: 119%;
+    }
+    
+    .CreateProj-card{
+        margin-bottom: 1rem;
+        height: 7rem;
+        width: 82%;
+        margin-left: 0.9rem;
+        top: 1rem;
+        display: flex;
+        justify-content: center;
+        .p-card-body{
+            .p-card-title{
+                font-size: 1.2rem !important;
+                position: relative !important;
+                margin-bottom: 0rem !important;
+                text-align: center !important;
+                font: $f4_bold !important;
+             }
+            .p-card-content {
+                padding: 0.5rem 0rem 1.25rem 6rem !important;
+                .CreateProj_btn{
+                    font:$f7_semibold;
+                }
+            }
+        }
+        
+    }  
+    .main-card{
+        width: 47rem;
+    }
+
+    .gotoadmin-card{
+        margin-bottom: 1rem;
+        height: 8rem;
+        width: 82%;
+        margin-left: 0.9rem;
+        top: 2rem;
+        display: flex;
+        justify-content: center;
+        .p-card-body{
+            padding: 0.25rem !important;
+            .p-card-title{
+                font-size: 1.2rem !important;
+                position: relative !important;
+                margin-bottom: 0rem !important;
+                text-align: center !important;
+                font: $f4_bold !important;
+             }
+            .p-card-content {
+                padding: 0rem !important;
+                font: $f6_regular !important;
+                .admin-btn{
+                    margin: -0.5rem 15rem 0rem;
+                    font:$f7_semibold;
+                    margin-left: 13.3rem;
+                    width: 18.3%;
+                }
+            }
+            
+        }
+    }
+    

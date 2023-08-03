@@ -1,0 +1,73 @@
+@import "../../global/styles/ColorVariables.scss";
+.mp__canvas{
+    position: absolute;
+    top: 31px;
+    height: calc(100% - 30px);
+    overflow: hidden;
+    border: 1px solid transparent;
+    width: 100%;
+}
+@media screen and (max-width:890px){
+    .mp__canvas{
+        top: 75px;
+        height: calc(100% - 75px);
+    }
+}
+.note{
+    
+    font-size: 12px;
+    font-weight: 400;
+    font-family: 'LatoWeb';
+    width: 57rem;
+    // height: px;
+    // margin-left: 80vw;
+    // top: 2rem;
+    position: fixed;
+    // display: flex;
+    // z-index: 1;
+     left: 63rem;
+    top: 6.7rem;
+    right: 3rem;
+}
+.mp__canvas_container{
+    background: #F5F5F5;
+    flex: 0 1 100%;
+    float: left;
+    margin: 2px;
+    min-width: 0;
+    position: relative;
+    width: 81rem;
+}
+.mp__toolbar__container{
+    background-color: $borderThree;
+    position: relative;
+}
+.loading-bar{
+    position:absolute!important;
+}
+.ms-Dialog-title {
+
+    font-size: 16px;
+
+    font-family: 'LatoWebLight';
+
+    display: inline-block;
+
+    background: #331d4c;
+
+    color: #ffffff;
+
+    margin: 4px 8px 28px 3px;
+
+    padding: 8px 8px 7px 6px;
+
+    border-radius: -5px;
+
+    -moz-border-radius: 5px;
+
+    -webkit-border-radius: -49px;
+
+}
+.p-button-rounded {
+    border-radius: 2rem !important;
+}

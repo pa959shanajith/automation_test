@@ -1,0 +1,99 @@
+@import "../../global/styles/ColorVariables.scss";
+.Topbar_Menu{
+    .Header_size {
+    position: relative;
+    height: 2.6rem;
+    background: #ffffff !important;
+}
+
+.Headers {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: center;
+}
+
+.Tab_Menu_Header {
+    color: #030229;
+    display: flex;
+    font-family: Open Sans;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    gap: 46px;
+    line-height: 2.4rem;
+    position: relative;
+    right: 35rem;
+    top: 0.5rem;
+    font: $f6_regular;
+}
+
+.active {
+    color: #605BFF;
+    border-bottom: 2px solid #605BFF;
+    font: $f6_semibold;
+}
+.activeLanding{
+    color: transparent;
+    border-bottom: transparent;
+}
+.needHelp
+{
+    position: absolute;
+    z-index: 4;
+    bottom: 4rem;
+    right: 2rem;
+    border-radius: 3rem;
+    padding: 1rem;
+    .p-menu {
+        width: 13.5rem !important;
+    }
+}
+.needHelp_Menu{
+    position: absolute;
+    right: 1.5rem;
+    bottom: 2.2rem;
+}
+.needHelp_img{
+    height:1rem;
+    width: 1.2rem;
+    cursor: pointer;
+}
+.Need_Help_menu{
+    .p-menu .p-submenu-header{
+        font: $f6_semibold !important;
+    }
+    .p-menuitem-tex.p-menu .p-menuitem-link .p-menuitem-text {
+        font: $f6_regular !important;  
+    }
+
+}
+}
+.card__insprint1 {
+    height: 4rem;
+    width: 80%;
+    position: absolute;
+    z-index: 1;
+    background-color: #495057;
+    border-radius: 2px;
+    padding: 1rem 16rem 5rem 1rem;
+    color: white;
+    font-family: 'Open Sans';
+    font-size: 14px;
+  }
+  
+  .text__insprint__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .text__insprint__title,
+  .text__insprint__info {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+
+  

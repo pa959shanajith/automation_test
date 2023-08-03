@@ -1,0 +1,100 @@
+.profile_container {
+    .exeprofile_txt {
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .search_container {
+        padding-top: 0.5rem;
+        width: 20%;
+        .p-input-icon-left {
+            width: 100%;
+        }
+    }
+    .p-tree.modules_tree {
+        padding: 0;
+        border: none;
+        min-width: 20vw;
+        .p-treenode-label {
+            width: 100%;
+        }
+        .p-treenode-content {
+            padding: 0 1rem 0 0;
+        }
+    }
+    .reports_table {
+        .p-datatable-wrapper {
+            height: 75vh;
+            .p-datatable-tbody>tr>td:nth-child(4) {
+                width: 60rem;
+                vertical-align: top;
+            }
+        }
+    }
+    .p-datatable-thead>tr>th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+    .p-datatable.statusTable {
+            .p-datatable-tbody>tr>td:nth-child(4) {
+                width: 5rem;
+                vertical-align: middle;
+        }
+    }
+    .nested_table{
+        .p-datatable-wrapper {
+            height: auto;
+        }
+        .p-datatable-tbody>tr>td:nth-child(1) {
+            text-align: center;
+        }
+        .p-datatable-tbody>tr>td:nth-child(2) {
+            width: 30rem;
+        }
+    }
+    .module_table {
+        .p-datatable-wrapper {
+            height: auto;
+        }
+        .p-datatable-tbody>tr>td:nth-child(1) {
+            text-align: center;
+        }
+        .p-datatable-tbody>tr>td:nth-child(2) {
+            width: 30rem;
+        }
+    }
+    .statusTable {
+        width: 100%;
+        .p-datatable-wrapper {
+            height: auto;
+        }
+    }
+    svg {
+        border-radius: 8px;
+    }
+    .textSuite {
+        display: inline-block;
+        width: 30rem;
+    }
+    .textCase {
+        display: inline-block;
+        width: 30rem;
+    }
+    .suite_text {
+        display: inline-block;
+        width: 30rem;
+    }
+    .case_text {
+        display: inline-block;
+        width: 28rem;
+    }
+}
+
+.p-overlaypanel.reports_download {
+    .p-overlaypanel-content {
+        padding: 0;
+    }
+}

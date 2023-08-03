@@ -1,0 +1,980 @@
+
+.compare__object__note {
+  .p-dialog-header-icons {
+    right: 2%!important;
+    position: relative;
+    top: 16%;
+  }
+
+  .p-dialog-header {
+    height: 3rem !important;
+    background: #E2E2ED !important;
+    border-top-right-radius: 4px;
+    padding: 0.6rem 0!important;
+
+  }
+
+  .p-dialog-title {
+    margin-left: 1.7% !important;
+  }
+
+  height: 28.06rem !important;
+  width: 24.06rem !important;
+}
+
+.footer__capture {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn_clr {
+  position: relative;
+  top: 0.7rem;
+  width: 24% !important;
+  height: 1.7rem;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-family: 'Open Sans';
+
+}
+
+.btn_capture {
+  position: relative;
+  top: 0.7rem;
+  width: 24% !important;
+  height: 1.7rem;
+  background: #605BFF;
+  border: none;
+  color: white;
+  font-size: 12px;
+  font-family: 'Open Sans';
+  border-radius: 2px;
+}
+
+.footer__addmore {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.compare__content__adj {
+  height: 59%;
+  position: relative;
+  top: 10%;
+  border: 1px solid lightgray;
+  // height: 77%;
+  border-radius: 3px;
+}
+
+.recapture__note {
+  border: 1px solid #c7c7c7;
+  border-radius: 4px;
+  font-family: Open Sans;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 3.1rem;
+  height: 20%;
+  padding: 0.5rem;
+  display: flex;
+}
+
+.not__captured {
+  height: 1rem;
+  width: 1rem;
+}
+
+
+.datatable__col {
+  // overflow-y: scroll;
+  overflow: auto;
+  .p-datatable .p-datatable-thead>tr>th {
+    background: rgba(96, 91, 255, 0.1) !important;
+    box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem !important;
+  }
+  .p-column-title{
+    font-weight: bold !important;
+  }
+
+  .p-datatable .p-datatable-tbody>tr>td {
+    padding:0.5rem !important;
+  }
+  .ellipsis-column{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 5rem;
+  }
+}
+
+.card_modal {
+  margin: 0 !important;
+
+}
+
+
+
+.btn-capture-single {
+  background: #605BFF;
+  border-radius: 6px;
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 19px;
+  color: #FFFFFF;
+  position: relative;
+  border: none;
+  left: 22.2rem;
+  padding: 0.5rem 0.5rem;
+}
+
+.header_btn {
+  float: right;
+}
+
+.card-table {
+  // overflow: auto;
+  // max-height: 24rem;
+  position: relative;
+  top: 1rem;
+
+  .p-datatable-table {
+    padding: 0 1.5rem !important;
+  }
+}
+
+.screen_btn {
+  height: 4vh;
+  position: relative;
+  right: 0.5rem;
+  top: 0.4rem;
+}
+
+.btn_test_screen {
+  height: 3.2vh;
+  position: relative;
+    /* right: 0.5rem; */
+  top: 1rem;
+  left: 3rem;
+}
+
+.screen__name{
+  white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 4rem;
+    position: relative;
+    bottom: 0.2rem;
+    font-family: 'Open Sans';
+}
+
+.onHoverLeftIcon{
+  position:relative;
+  right:16%;
+  font-size: 1.5rem;
+  cursor: pointer !important;
+     &:hover{
+      background: #e9ecef;
+      border-color: transparent;
+      color: #343a40;
+     }
+}
+
+.onHoverRightIcon{
+  position: relative;
+  left: 3%;
+  font-size: 1.5rem;
+  cursor: pointer !important;
+    &:hover{
+      background: #e9ecef;
+      border-color: transparent;
+      color: #343a40;
+    }
+}
+
+.not_captured_ele {
+  height: 25vh;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 16vw;
+}
+
+.not_captured_message {
+  bottom: 1rem;
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  right: 1rem;
+}
+
+.action_panelCard {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.card_modal {
+  .p-card .p-card-body .panel_card {
+    width: 100%;
+  }
+}
+
+.add_obj {
+  .p-dialog-header {
+    height: 2rem !important;
+  }
+
+  height: 4vh;
+  width: 2vw;
+}
+
+.map_obj {
+  height: 4vh;
+  width: 2vw;
+}
+
+
+.insprint_auto {
+  float: left;
+  padding-right: 2rem;
+  position: relative;
+  text-align: center;
+  font-family: 'Open Sans';
+  font-weight: 500;
+  font-size: 14px;
+  padding: 0 0.8rem;
+  top: 1rem;
+  cursor: pointer;
+}
+.disabled {
+  float: left;
+  padding-right: 2rem;
+  pointer-events: none;
+  cursor: not-allowed;
+  display: inline-block;
+  opacity: 0.4;
+  position: relative;
+  text-align: center;
+  font-family: 'Open Sans';
+  font-size: 14px;
+  padding: 0 0.8rem;
+  top: 1rem;
+}
+
+// .upgrade_auto {
+//   float: left;
+//   padding-right: 2rem;
+//   position: relative;
+//   text-align: center;
+//   font-family: 'Open Sans';
+//   font-weight: 500;
+//   font-size: 14px;
+//   padding: 0 0.8rem;
+//   top: 1rem;
+//   cursor: pointer;
+// }
+
+
+.dailog_box {
+  overflow: hidden;
+  .p-dialog-content {
+    padding: 0 0 !important;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .WebServiceApptypeContent{
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      .inputCard{
+        margin-top: 0.04%;
+      .p-component{
+        height: 4rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        .p-card-body{
+          align-items: center;
+          .p-card-content{
+            padding: 0;
+          }
+        }
+        .mainContentCard{
+          display: flex;
+          align-items: center;
+          .firstRow{
+            display: flex;
+            align-items: center;
+            .p-component{
+              height: 2.3rem;
+              width: 15rem;
+            }
+            .p-button-sm{
+              width: 3.4rem;
+              height: 2rem;
+              justify-content: center;
+              margin-left: 4px;
+
+            }
+            .dropdown{
+              margin-left: 1.2rem;
+            .card {
+              width: 17rem;
+              // margin-left: 1rem;
+              align-items: center;
+
+              .p-treeselect{
+                width: 11rem;
+
+              }
+              .p-button-sm{
+                width:4rem;
+                height: 2rem;
+                justify-content: center;
+                margin-left: 4px;
+
+              }
+            }
+          }
+          .input2{
+            margin-left: 1.2rem;
+            .p-component{
+              width: 13rem;
+
+            }
+          }
+          .input3{
+            margin-left: 1.1rem;
+            .p-inputtext{
+              width:13rem ;
+              
+            }
+          }
+            
+    
+          }
+          // .secondRow{
+            
+          // }
+        }
+      }
+    }
+    .tabMenuCard{
+      margin-top: 0.26%;
+      .p-card{
+        display: flex;
+        height: 3.3rem;
+        align-items: center;
+      .card{
+        display: flex;
+        width: 100%;
+        .tabMenu{
+          // margin-right: 24.8rem;
+          .p-component{
+            .p-reset{
+              padding-left: 24.8rem;
+              height: 3.3rem;
+
+            }
+
+          }
+
+        }
+       .buttons {
+         display: flex;
+         align-items: center;
+         width: 24.5rem;
+                
+         .saveBut {
+           display: flex;
+           align-items: center;
+           padding-left: 5rem;
+                
+           img {
+             width: 2rem;
+             height: 2rem;
+             margin-right: 1rem;
+           }
+                
+           .p-button {
+             width: 5.6rem;
+             height: 2.8rem;
+             justify-content: center;
+           }
+         }
+                
+         .cancelBut {
+           padding-left: 2rem;
+                
+           .p-button {
+             width: 5.6rem;
+             height: 2.8rem;
+           }
+                
+         }
+       }
+      }
+    }
+  }
+      
+    }
+  }
+
+  .p-dialog-header {
+    background: #E2E2ED !important;
+    border-top-right-radius: 4px;
+    padding: 0.3rem 0 !important;
+    height: 5rem !important;
+
+    .p-dialog-header-icons {
+      position: relative;
+      right: 96%;
+    }
+    .p-datatable .p-datatable-tbody>tr>td {
+      padding: 0.5rem;
+    }
+
+    .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
+       padding: 0.5rem;
+    }
+
+    .p-dialog-title {
+      .dailog_header1 {
+        position: absolute;
+        left: 4rem !important;
+        top: 0.5rem;
+        font-family: 'Open Sans';
+        font-weight: 500;
+        color: rgba(3, 2, 41, 0.6);
+      }
+
+      .Header__btn {
+        display: flex;
+        justify-content: end;
+        gap: 1rem;
+
+        .add__more__btn {
+          left: 59%;
+          top: 4%;
+          width: 6.2rem;
+          border: 1px solid #ACA9FF;
+          height: 2.2rem;
+          border-radius: 7px;
+          background: white;
+          font-family: 'Open Sans';
+          font-style: normal;
+          font-weight: 400;
+          font-size: 14px;
+          color: #605BFF;
+        }
+
+          .btn_panel{
+          border-radius: 0.5rem;
+          padding: 0.5rem 1.5rem;
+          border: 1px solid #aca9ff;
+          border-radius: 7px;
+          color: #605bff;
+          background: #FFFFFF;
+          font-family: "Open Sans";
+          font-weight: 500;
+          font-size: 14px;
+          cursor: pointer;
+        }
+
+        .btn-capture {
+          background: #605BFF;
+          border-radius: 6px;
+          font-family: 'Open Sans';
+          font-style: normal;
+          font-weight: 600;
+          font-size: 14px;
+          line-height: 19px;
+          color: #FFFFFF;
+          border: none;
+          left: 24.2rem;
+          padding: 0.5rem 0.5rem;
+        }
+
+      }
+
+      .dailog_header2 {
+        position: absolute;
+        left: 3rem !important;
+        top: 2.5rem;
+        font-family: 'Open Sans';
+        font-weight: 500;
+        font-size: 20px;
+        color: #030229;
+
+      }
+    }
+    .btn_panel__single {
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid #C7C7C7;
+      background: #FFFFFF;
+      font-family: "Open Sans";
+      font-weight: 500;
+      font-size: 14px;
+      position: absolute;
+      right: 2rem;
+      top: 1.5rem;
+    }
+
+  }
+  
+
+}
+
+.panel_card {
+
+  .p-card-body,
+  .p-card-content {
+    padding: 0 0 !important;
+  }
+
+}
+
+.card-table {
+  .p-datatable-table {
+    padding: 0 1.5rem;
+  }
+}
+
+.insprint__block {
+  border-right: 1px solid #E2E2ED;
+  cursor: pointer;
+
+  .insprint__text {
+    position: relative;
+    top: 0rem;
+    left: 2rem;
+    font-size: 16px;
+    font-family: 'Open sans';
+    font-weight: bold;
+  }
+
+  .info__btn_insprint {
+    cursor: pointer;
+    height: 11%;
+    width: 5%;
+    left: 5%;
+    position: relative;
+    bottom: 21%;
+  }
+  .add_obj_insprint {
+    .p-dialog-header {
+      height: 2rem !important;
+    }
+  
+    height: 4vh;
+    width: 2vw;
+  }
+  .map_obj_insprint {
+    height: 4vh;
+    width: 2vw;
+  }
+
+}
+
+.upgrade__block {
+  border-right: 1px solid #E2E2ED;
+  cursor: pointer;
+
+  .insprint__text {
+    position: relative;
+    top: 0rem;
+    left: 4rem;
+    font-size: 16px;
+    font-family: "Open sans";
+    font-weight: bold;
+  }
+
+  .upgrade_auto {
+    right: 1rem;
+    float: left;
+    padding-right: 2rem;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+    cursor: pointer;
+  }
+  .disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    display: inline-block;
+    opacity: 0.4;
+  }
+  .info__btn_upgrade {
+    bottom: 21%;
+    cursor: pointer;
+    height: 11%;
+    left: 4%;
+    position: relative;
+    width: 4%;
+  }
+  .add_obj_upgrade {
+    .p-dialog-header {
+      height: 2rem !important;
+    }
+  
+    height: 4vh;
+    width: 2vw;
+  }
+  .map_obj_upgrade {
+    height: 4vh;
+    width: 2vw;
+  }
+}
+
+.imp_exp__block {
+  cursor: pointer;
+  .insprint__text {
+    position: relative;
+    top: 2rem;
+    right: 1rem;
+    font-size: 14px;
+    font-family: "Open sans";
+    cursor: pointer;
+  }
+
+  .insprint_auto {
+    float: left;
+    padding-right: 2rem;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+    right: 0.65rem;
+    cursor: pointer;
+  }
+
+  .import__block {
+    display: flex;
+    padding: 1.5rem 0rem;
+    position: relative;
+    bottom: 2rem;
+    cursor: pointer;
+  }
+
+  .export__block {
+    display: flex;
+    position: relative;
+    bottom: 2rem;
+    cursor: pointer;
+  }
+
+  .add_obj {
+    position: relative;
+    right: 1rem;
+  }
+  .add_obj_import{
+    position: relative;
+    right: 1rem;
+  }
+  .add_obj_export{
+    position: relative;
+    right: 1rem;
+  }
+
+  .imp__text {
+    position: relative;
+    top: 0.5rem;
+  }
+}
+
+.utility__block {
+  border-right: 1px solid #E2E2ED;
+  cursor: pointer;
+
+  .insprint__text {
+    position: relative;
+    top: 0rem;
+    right: 1rem;
+    font-size: 16px;
+    font-family: "Open sans";
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .insprint_auto {
+    float: left;
+    padding-right: 2rem;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+    right: 0.65rem;
+    cursor: pointer;
+  }
+  .disabled {
+    // float: left;
+    padding-right: 2rem;
+    pointer-events: none;
+    cursor: not-allowed;
+    display: inline-block;
+    opacity: 0.4;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+  }
+
+  .info__btn_utility {
+    cursor: pointer;
+    height: 11%;
+    left: 23%;
+    position: relative;
+    bottom: 22%;
+    width: 9%;
+  }
+}
+
+.createManual__block{
+  .create__block {
+    right: 1.45rem;
+  }
+
+  border-right: 1px solid #E2E2ED;
+  cursor: pointer;
+
+  .insprint__text {
+    position: relative;
+    top: 0rem;
+    right: 1rem;
+    font-size: 16px;
+    font-family: "Open sans";
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .insprint_auto {
+    float: left;
+    padding-right: 2rem;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-weight: 500;
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+    right: 0.65rem;
+    cursor: pointer;
+  }
+  .disabled {
+    float: left;
+    padding-right: 2rem;
+    pointer-events: none;
+    cursor: not-allowed;
+    display: inline-block;
+    opacity: 0.4;
+    position: relative;
+    text-align: center;
+    font-family: 'Open Sans';
+    font-size: 14px;
+    padding: 0 0.8rem;
+    top: 1rem;
+  }
+
+  .info__btn_create {
+    bottom: 22%;
+    cursor: pointer;
+    height: 11%;
+    left: 9%;
+    position: relative;
+    width: 8%;
+  }
+  .map_obj {
+    height: 4vh;
+    width: 2vw;
+  }
+}
+
+.card__insprint {
+  height: 23%;
+  width: 32%;
+  position: absolute;
+  z-index: 1;
+  background-color: #495057;
+  border-radius: 8px;
+  padding: 0.8rem 0.8rem;
+  color: white;
+  font-family: 'Open Sans';
+  font-size: 14px;
+}
+
+.text__insprint__info {
+  padding: 1.2rem 0;
+}
+
+
+.footer__btn{
+  display: flex;
+
+}
+
+.screenshot_pop{
+  width: 39rem!important;
+  height: 25rem!important;
+  .p-dialog-header {
+    background: #E2E2ED !important;
+    height: 4rem !important;
+  }
+  .p-dialog-header-icons{
+  position: relative;
+  // bottom: 1rem;
+  }
+  .p-dialog-content{
+    padding: 0.6rem;
+  }
+}
+.screenshot_pop__content{
+  overflow: auto;
+}
+.screenshot_img{
+  width: 100%;
+}
+
+.btn__screenshot{
+  background: none;
+    color: black;
+    padding: 0;
+    border: none;
+    font-family: "Open Sans";
+    &:hover{
+      font-family: "Open Sans";
+      border-bottom: 2px solid #605BFF;
+      font-weight: 600;
+      color: #605BFF;
+    }
+}
+
+
+.empty__msg {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.empty__msg1 {
+  width: 39%;
+  margin-left: 16rem;
+}
+
+.ss__dup_labels{
+  display: flex;
+  flex-direction: column;
+  font-family: "Open Sans" ;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+  max-height: 250px;
+}
+
+.ss__dup_scroll{
+  display: flex;
+  flex-direction: column;
+}
+
+.ss__dup_li{
+  font-weight: normal;
+}
+
+.confirm__popup{
+  .p-dialog-header {
+       background: #E2E2ED !important;
+       height: 3rem !important;
+    }
+    .p-dialog-header-icons{
+      position: absolute;
+      left: 20rem;
+    }
+}
+
+.ss__red{
+  color: red!important;
+}
+
+
+.angle-left{
+  background: none;
+    border: none;
+    color: black;
+    padding: 0.8rem;
+}
+.angle-right{
+  background: none;
+    border: none;
+    color: black;
+    padding: 0.8rem;
+}
+.header__popup{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 25rem;
+}
+
+.header__screenshot__eye{
+  display: inline-flex;
+}
+
+.ss_eye_icon{
+  cursor: pointer;
+  height: 2rem;
+  width: 1.5rem;
+  /* left: 2rem; */
+  right: 0.5rem;
+  position: relative;
+}
+
+
+//Styles related to element properties 
+.p-dialog .p-dialog-footer {
+  padding:0.5rem;
+
+  
+  }
+  .p-dialog .p-dialog-header {
+  padding: 0.75rem;
+  background: #e2e2ed;
+  }
+  .p-dialog .p-dialog-header .p-dialog-title 
+  {
+    margin-left: 0.79rem;
+  }
+  .p-datatable .p-datatable-tbody>tr>td{
+    padding: 0.55rem;
+  }
+  .save__btn__cmp {
+    position: relative;
+    width: 24% !important;
+    height: 1.7rem;
+    background: #605BFF;
+    border: none;
+    color: white;
+    font-size: 12px;
+    font-family: 'Open Sans';
+    border-radius: 4px;
+    cursor: pointer;
+}

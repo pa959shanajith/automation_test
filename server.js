@@ -1,6 +1,9 @@
 //load environment variables
 var env = require('node-env-file');
 var fs = require('fs');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 var envFilePath = __dirname + '/.env';
 try {
 	if (fs.existsSync(envFilePath)) {
@@ -234,7 +237,11 @@ if (cluster.isMaster) {
 
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
-    var plugin = require('./server/controllers/plugin');
+    	var plugin = require('./server/controllers/plugin');
+		var azure = require('./server/controllers/azure');
+		var devOps = require('./server/controllers/devOps');
+		var mindmap = require('./server/controllers/mindmap');
+		var admin = require('./server/controllers/admin');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -248,6 +255,12 @@ if (cluster.isMaster) {
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
+		app.post('/updateE2E', mindmap.updateE2E);
+		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
+		app.post('/fetchModSceDetails', report.fetchModSceDetails);
+		app.get('/viewReport', report.viewReport);	
+		app.post('/getUserRoles', admin.getUserRoles);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -295,7 +308,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings|genius)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -397,7 +410,7 @@ if (cluster.isMaster) {
 		var mindmap = require('./server/controllers/mindmap');
 		var pdintegration = require('./server/controllers/pdintegration');
 		var login = require('./server/controllers/login');
-		var admin = require('./server/controllers/admin');
+		// var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
 		var designscreen = require('./server/controllers/designscreen');
 		var utility = require('./server/controllers/utility');
@@ -409,16 +422,14 @@ if (cluster.isMaster) {
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
-		var devOps = require('./server/controllers/devOps');
-
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
 		app.post('/getProjectsNeo', (req, res) => (res.send("false")));
-		app.post('/populateProjects', auth.protect, mindmap.populateProjects);
+		app.post('/populateProjects',auth.protect, mindmap.populateProjects);
 		app.post('/populateUsers', auth.protect, mindmap.populateUsers);
 		app.post('/getProjectTypeMM', auth.protect, mindmap.getProjectTypeMM);
 		app.post('/populateScenarios', auth.protect, mindmap.populateScenarios);
-		app.post('/getModules', auth.protect, mindmap.getModules);
+		app.post('/getModules',auth.protect, mindmap.getModules);
 		app.post('/reviewTask', auth.protect, mindmap.reviewTask);
 		app.post('/saveData', auth.protect, mindmap.saveData);
 		app.post('/saveEndtoEndData', auth.protect, mindmap.saveEndtoEndData);
@@ -434,6 +445,13 @@ if (cluster.isMaster) {
 		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		app.post('/deleteScenarioETE', auth.protect, mindmap.deleteScenarioETE);
 		app.post('/exportToProject', auth.protect, mindmap.exportToProject);
+		app.post('/writeFileServer', auth.protect, mindmap.writeFileServer);
+		app.post('/writeZipFileServer', auth.protect,upload.single('file'),mindmap.writeZipFileServer);
+		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
+		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
+		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
+		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
+		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -449,7 +467,7 @@ if (cluster.isMaster) {
 		app.post('/updatePassword', login.updatePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		//Admin Routes
-		app.post('/getUserRoles', auth.protect, admin.getUserRoles);
+		// app.post('/getUserRoles', auth.protect, admin.getUserRoles);
 		app.post('/getDomains_ICE', auth.protect, admin.getDomains_ICE);
 		app.post('/createProject_ICE', auth.protect, admin.createProject_ICE);
 		app.post('/updateProject_ICE', auth.protect, admin.updateProject_ICE);
@@ -460,7 +478,7 @@ if (cluster.isMaster) {
 		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
 		app.post('/manageSessionData', auth.protect, admin.adminPrivilegeCheck, admin.manageSessionData);
 		app.post('/unlockUser', auth.protect, admin.unlockUser);
-		app.post('/manageUserDetails', auth.protect, admin.adminPrivilegeCheck, admin.manageUserDetails);
+		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
 		app.post('/fetchLockedUsers', auth.protect, admin.fetchLockedUsers);
 		app.post('/testLDAPConnection', auth.protect, admin.testLDAPConnection);
@@ -542,7 +560,8 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
 		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
-		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);
+		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);	
+
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
@@ -622,7 +641,10 @@ if (cluster.isMaster) {
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
 
-
+		// Azure integeration API's
+		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
+		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
+		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

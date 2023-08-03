@@ -23,7 +23,9 @@ exports.loadUserInfo = async (req, res) => {
 			additionalrole: userData.addroles,
 			firstname: userData.firstname,
 			lastname: userData.lastname,
+			createdon: userData.createdon,
 			role: userData.defaultrole,
+			userimage: userData.profileimage || 'default',
 			taskwflow: configpath.strictTaskWorkflow,
 			token: configpath.defaultTokenExpiry,
 			dateformat: configpath.dateFormat,
@@ -42,7 +44,7 @@ exports.loadUserInfo = async (req, res) => {
 		req.session.additionalroles = userData.addroles,
 		req.session.firstname = userData.firstname,
 		req.session.lastname = userData.lastname,
-
+              		
 		inputs = {
 			"roleid": selectedRole,
 			"query": "permissionInfoByRoleID"
@@ -62,7 +64,7 @@ exports.loadUserInfo = async (req, res) => {
 		req.session.activeRole = rolename;
 		userProfile.rolename = req.session.defaultRole;
 		userProfile.pluginsInfo = permData.pluginresult;
-		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
+		userProfile.page = (userProfile.rolename == "Admin")? "admin":"landing";
 		userProfile.tandc = false;
 		userProfile.isTrial = permData.isTrial;
 		if (userProfile.rolename != "Admin" && configpath.showEULA) {

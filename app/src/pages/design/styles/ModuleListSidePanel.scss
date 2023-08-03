@@ -1,0 +1,568 @@
+@import "../../global/styles/ColorVariables.scss";
+.CollapseWholeCont{ 
+    max-height: 100%;
+    min-height: 60%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: row-reverse;
+
+    .collapseBut img {
+        width: 25px;
+        height: 25px;
+        float: right;
+    }
+}
+
+.Whole_container {
+    // max-height: 99.7%;
+    // min-height: 80%;
+    // width: 17vw;
+    border-bottom: 0.5px solid #C7C7C7;
+    background-color: rgb(255, 255, 255);
+    z-index: 1;
+    overflow: auto;
+
+    .project_name_section {
+        max-height: 7%;
+        min-height: 5%;
+        border-bottom: 0.5px solid #575353;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        border: 1px solid blue($color: #d41717)
+    }
+
+    .normalModule_main_container {
+        height: 70%;
+        border-top: 0.5px solid #c7c7c7;
+        border-bottom: 0.5px solid #C7C7C7;
+
+    }
+
+    .E2E_main_container {
+        height: 30%;
+        border-bottom: 1px solid rgb(91, 89, 89);
+    }
+
+    .moduleLayer_icon {
+        display: flex;
+        padding-left: 0.5rem;
+        align-items: center;
+
+    }
+
+    .normalModHeadLine {
+        font-size: 16px;
+        font: $f6_bold;
+        // margin-left: 11px;
+    }
+
+    .moduleLayer_icon_SearchOn {
+        display: none;
+    }
+
+    .E2EHeadLine {
+        font-size: 16px;
+        font: $f6_bold;
+        // margin-left: 11px;
+    }
+
+    .PlusButE2E {
+        display: none;
+        cursor: pointer;
+    }
+
+    .searchIcon_adjust {
+        margin-left: 1rem;
+        cursor: none;
+    }
+
+    .moduleLayer_icon img {
+        // border: 1px solid black;
+        height: 27px;
+        width: 27px;
+    }
+
+    .moduleLayer_plusIcon {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.5rem;
+        cursor: pointer;
+
+    }
+    .inputSearchNorMod{
+        width:14rem;
+        font: $f6_regular;
+        .p-input-icon-left{
+            justify-content: center !important;
+            display: flex !important;
+        }
+
+        .p-inputtext {
+            width: 13rem !important;
+            height: 1.65rem !important;
+        }
+    }
+
+    .searchAndCheckImg {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .moduleLayer_plusIcon img {
+        padding-right: 0.1rem;
+
+    }
+
+    .BasicDemo_primeReactTree {
+        justify-content: center;
+        align-items: center;
+        margin-right: 10rem;
+
+    }
+
+    .SearchIconForModules {
+        display: flex;
+        padding-top: 0.1rem;
+        align-items: center;
+        // padding-left: 1.8rem;
+    }
+
+    .SearchIconForModulesE2E {
+        display: flex;
+        padding-top: 0.1rem;
+        align-items: center;
+        // padding-left: 1rem;
+    }
+
+    .inputOfSearch {
+        width: 10rem;
+        height: 1.6875rem;
+        // margin-left: 26px;
+    }
+
+    .hidingPlusButE2E {
+        display: none;
+    }
+
+    .NorModuleList {
+        max-height: 85%;
+        // border: 1px solid black;
+        overflow-y: auto;
+    }
+
+    .NorModuleListE2E {
+        max-height: 65%;
+        // border: 1px solid black;
+        overflow-y: auto;
+    }
+
+    .EachModNameBox {
+        // border: 1px solid rgb(213, 30, 30);
+        max-width: 100%;
+        max-height: 10%;
+        // justify-content: center;
+        // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 6px;
+        cursor: pointer;
+        display: flex;
+        padding-left: 7%;
+        align-items: center;
+
+    }
+
+    .EachModNameBox:hover {
+        background-color: rgba($color: #E9ECEF, $alpha: 0.2);
+    }
+
+    .moduleName {
+        // display: flex;
+        overflow: hidden;
+        // text-overflow: ellipsis;
+        max-width: 13rem;
+        max-height: 100%;
+        // border: 1px solid rgb(19, 225, 126);
+        padding-left: 0.5rem;
+        // font-size: 14px;
+        font: $f6_semibold;
+    }
+
+    .moduleName img {
+        height: 20px;
+        width: 20px;
+    }
+    .moduleName h4{
+        //   font-size: 13px;
+        //   font-family: "open sans";
+        //   font-weight: 400;
+        color: rgb(8, 8, 8, 1);
+        padding-left: 0.8rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font:$f6_regular;
+    }
+}
+
+////////////////////E2E Work flow css
+.Project-Dialog {
+    .modalClass .p-dialog-header {
+        // background: rgba(96,91,255,.08);
+    }
+}
+
+.mainCentralContainer {
+    width: 100%;
+    height: 100%;
+
+    .nameTopSection {
+        width: 100%;
+        height: 16%;
+        // border: 1px solid yellow;
+
+    }
+
+    .centralTwinBox {
+        width: 100%;
+        height: 86%;
+        // border: 1px solid red;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .leftBox {
+            // border: 1px solid blue;
+            width: 45.5%;
+            height: 100%;
+
+            .leftCard {
+                width: 100%;
+                height: 100%;
+
+                .p-card-body {
+                    padding: 0.25rem;
+
+                    .p-card-title {
+                        font-size: 15px;
+                        font-weight: 600;
+                        margin-bottom: 0rem;
+                    }
+
+                    .p-card-content {
+                        justify-content: center;
+                        display: flex;
+                        align-items: center;
+                         padding-top:0.25rem;
+                           .DrpoDown_search_Tree{
+                            display: flex;
+                            flex-direction: column;
+                            // align-items: center;
+                            .searchAndDropDown{
+                                align-items: center;
+                                display: flex;
+                                flex-direction: row-reverse;
+                        .card {
+                            .p-dropdown {
+                                height: 2.1rem;
+                                align-items: center;
+                                width: 13rem;
+                            }
+                        }
+
+                        .headlineSearchInput {
+                            .headlineRequired {
+                                display: flex;
+                                flex-direction: row;
+                                margin-top: 0.5rem;
+
+                                .required_icon {
+                                    padding-left: 4px;
+                                }
+                            }
+
+                        }
+                      }
+                      .overlay4ModSceNoMod{
+                        font: $f6_regular;
+                        align-items: center;
+                        margin-top: 8rem;
+                        margin-left: 8.5rem;
+                        width: 14rem;
+                        height: 3rem;
+                        border: 1px solid black;
+                        display: flex;
+                        justify-content: center;
+                        border-radius: 0.5rem;
+                        background-color: #f2f2ff;
+                    }
+                        .overlay4ModSce{
+                            font: $f6_regular;
+                            align-items: center;
+                            margin-top: 8rem;
+                            margin-left: 6.5rem;
+                            width: 17rem;
+                            height: 2rem;
+                            border: 1px solid black;
+                            display: flex;
+                            justify-content: center;
+                            border-radius: 0.5rem;
+                            background-color: #f2f2ff;
+                        }
+                        
+                        .p-tree {
+                            height: 23.8rem;
+                            overflow: auto;
+                            width: 32.68rem;
+                            .p-tree-container{
+
+                                .p-treenode{
+
+                                    .p-treenode-content{
+                                        height: 1.7rem;
+                                        .p-treenode-label{
+                                            .labelOfArray {
+                                                display: flex;
+                                                align-items: center;
+                                                  width: 10rem;
+                                                img {
+                                                    width: 20px;
+                                                    height: 20px;
+                                                }
+                                                .labelOfArrayText{
+                                                    padding-left: 0.5rem;
+                                                }
+                                            }
+                                        }
+                                        .p-tree-toggler{
+                                            height: 1rem;
+                                            width: 1rem;
+                                            .pi{
+                                                font-size: 0.8rem;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                  }
+
+                }
+
+
+
+                
+            }
+
+        }
+
+        .centerButtons {
+            height: 100%;
+            width: 9%;
+            // border: 1px solid red;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .centerButtonsIndiVisual {
+                // border: 1px solid rgb(10, 228, 108);
+                display: flex;
+                flex-direction: column;
+                height: 7rem;
+                justify-content: space-between;
+            }
+        }
+
+        .rightBox {
+            // border: 1px solid rgb(31, 7, 245);
+            width: 45.5%;
+            height: 100%;
+
+            .rightCard {
+                width: 100%;
+                height: 100%;
+                .p-card-body{
+                    padding: 0.25rem;
+                    .p-card-title {
+                        font-size: 15px;
+                        font-weight: 600;
+                        margin-bottom: 0rem;
+                    }
+                   .p-card-content {
+                       padding: 0.25rem 0;
+                       .headlineSearchInputOfRightBox {
+                            .inputContainer{
+                                width: 32.3rem;
+                               height: 2.2rem;
+                            //    margin-top: 0.5%;
+                            //    margin-right: 1rem;
+                            }
+                       }
+                    
+                   }
+                }
+                //  margin-left: 2.8rem;
+                
+
+                .p-card .p-card-content {
+                    padding: 0rem;
+                }
+
+                .initialText {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    margin-top: 29%;
+
+                    .initial1StText {
+                        .textClass {
+                            font-weight: 400;
+                        }
+                    }
+
+                    .initial2NdText {
+                        display: flex;
+                        align-items: center;
+
+                        .textClass {
+                            font-weight: 400;
+                        }
+
+                        .ArrowImg {}
+
+                    }
+                }
+
+                .ScenairoList {
+                    max-height: 85%;
+                    // border: 1px solid black;
+                    overflow-y: auto;
+
+                    .EachScenarioNameBox {
+                        // border: 1px solid rgb(213, 30, 30);
+                        max-width: 100%;
+                        max-height: 10%;
+                        justify-content: center;
+                        // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        margin-top: 6px;
+                        cursor: pointer;
+
+                    }
+
+                    .EachScenarioNameBox:hover {
+                        background-color: rgba($color: #E9ECEF, $alpha: 0.2);
+                    }
+
+                    .ScenarioName {
+                        display: flex;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 97%;
+                        max-height: 100%;
+                        // border: 1px solid rgb(19, 225, 126);
+                        padding-left: 1rem;
+                        align-items: center;
+                        justify-content: space-between;
+                    
+                    .sceNme_Icon{
+                        display: flex;
+                        align-items: center;
+                        width: 29rem;
+                    img{
+                        height: 25px;
+                        width: 25px;
+                        margin-top: 2px;
+                    }
+                    h4{
+                        font-size: 15.5px;
+                        font-family: "open sans";
+                        font-weight: 400;
+                        color: rgb(8, 8, 8, 1);
+                        padding-left: 0.8rem;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        width: 9rem;
+                    }
+                   
+                    .modIconSce {
+                        display: flex;
+                        width: 30%;
+                        h5{display: flex;
+                          font-size: 11px;
+                        img{
+                      
+                            height: 15px;
+                            width: 15px;
+                            // margin-top: 3px;
+                            }
+                        h3{
+                                font-size: 11px;
+                                font-family: "open sans";
+                                font-weight: 200;
+                                color: rgb(8, 8, 8, 1);
+                                // padding-left: 0.5rem;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                width: 9rem;
+                                margin-top: 1px;
+                            }
+                        }
+
+                    }
+                    .projIconSce{
+                        display: flex;
+                        width: 30%;
+                        h5{display: flex;
+                          font-size: 11px;
+                        img{
+                      
+                            height: 15px;
+                            width: 15px;
+                            // margin-top: 3px;
+                            }
+                        h3{
+                                font-size: 11px;
+                                font-family: "open sans";
+                                font-weight: 200;
+                                color: rgb(8, 8, 8, 1);
+                                // padding-left: 0.5rem;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                width: 9rem;
+                                margin-top: 1px;
+                            }
+                        }
+
+                    }
+                   }
+                   .p-button.p-button-icon-only.p-button-rounded{
+                    height:0.1rem;
+                    width: 1.6rem;
+                    margin-right: 0.5rem;
+                   }
+                   }
+
+                    .ScenarioName i {
+                        padding-left: 71%;
+                    }
+                }
+
+            }
+
+
+        }
+    }
+
+
+
+
+}

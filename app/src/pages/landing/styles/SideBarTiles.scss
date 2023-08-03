@@ -1,0 +1,30 @@
+@import "../../global/styles/ColorVariables.scss";
+.container_tiles{
+    position: relative;
+    text-align: center;
+    color: white;
+  .top-left {
+    position: absolute;
+    top: 0rem;
+    left: 16px;
+    width: 15rem;    
+  }
+  .tile_header{
+    position: absolute;
+    top: 0.3rem;
+  }
+  .tile_footer{
+    position: absolute;
+    top:5rem;
+  }
+ .tile_text{
+    font-size: 0.8rem;
+    text-align: left;
+    margin-left: 0.3rem;
+    font-weight: 400;
+    top:2.5rem;
+    position: absolute;
+ }
+}
+
+  

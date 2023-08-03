@@ -1,0 +1,107 @@
+@import "../../global/styles/ColorVariables.scss";
+.modal__container{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: block;
+    background-color: rgba(0, 0, 0, 0.85);
+    -moz-background-color: rgba(0, 0, 0, 0.85);
+    -webkit-background-color: rgba(0, 0, 0, 0.85);
+}
+.modal__container .modal-dialog{
+    height: 100%;
+    margin: auto;
+}
+.modal__content{
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    background: $whiteColor;
+    padding: 10px 20px;
+    cursor: auto;
+    color: $darkGray;
+    font-family: $avoFont;
+    padding: 8px;
+    outline: 0;
+    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid $borderFive;
+    border-radius: 6px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+.modal__header{
+    padding:0px!important;
+}
+.modal__header h4{
+    width: 100%;
+}
+.modal__header button{
+    float: right;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    right: 15px;
+    position: absolute;
+    color: $whiteColor;
+    opacity: 1;
+    text-shadow: none;
+    font-family: $avoThinFont;
+    font-size: 35px;
+    border: none;
+    background: transparent;
+}
+.modal__body{
+    font-size: 14px;
+    white-space: pre-line;
+}
+.modal__footer{
+    padding: 9px!important;
+    padding-bottom: 0px!important;
+    background-color: white;
+}
+.modal__footer button, .modal__footer input[type="submit"]{
+    background: $primaryColor;
+    color: $whiteColor;
+    border: 0;
+    border-radius: 20px;
+    padding: 5px 20px;
+    font-size: 16px;
+    &:disabled{
+        opacity: .65;
+    }
+}
+button:focus, input[type="submit"]:focus{
+    outline: none!important;
+}
+.modal-title {
+    margin: 0;
+    line-height: 1.42857143;
+    background: $primaryColorDark;
+    color: $whiteColor;
+    border-radius: 6px;
+    padding: 5px 40px;
+    text-align: center;
+    word-break: break-all;
+    font-size: 17px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+}
+.modal-mmd{
+    min-width: 450px;
+}
+
+.modalcontainer__header{
+    .p-dialog-header{
+        background: #E2E2ED !important;
+    }
+}
