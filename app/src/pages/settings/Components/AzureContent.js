@@ -337,7 +337,6 @@ const AzureContent = ({setToast,issueTypes,projectDetails,selectedNodes,setSelec
     const handleUnSync = async (node) => {
         let unSyncObj = [];
         if (Object.keys(node).length) {
-            // let findUnsyncedObj = mappedData.filter((item) =>  item.scenarioId[0] === node.key);
             let findMappedId = viewMappedFiles.filter((item) => item.testscenarioid === node.key);
             if (findMappedId && findMappedId.length) {
                 unSyncObj.push({
