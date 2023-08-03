@@ -94,7 +94,7 @@ io.on('connection', async socket => {
 							clientName=host.split('.')[0]
 						}
 					}
-					if(cloudsocketMap[clientName] == undefined) cloudsocketMap[clientName] = {};
+					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
 					if(!userICEMap[result.username]) userICEMap[result.username] = []
 					iceUserMap[icename] = result.username;
