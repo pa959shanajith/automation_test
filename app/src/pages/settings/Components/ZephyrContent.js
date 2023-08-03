@@ -1,7 +1,7 @@
 import { React, useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dialog } from 'primereact/dialog';
-import { excelToZephyrMappings, zephyrTestcaseDetails_ICE } from '../api';
+import * as api from '../api';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Checkbox } from 'primereact/checkbox';
 import { Tree } from 'primereact/tree';
@@ -12,6 +12,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Card } from 'primereact/card';
 import { InputSwitch } from "primereact/inputswitch";
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
+import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import {
     resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
@@ -21,9 +22,11 @@ import {
 import "../styles/ZephyrContent.scss";
 
 
-const ZephyrContent = ({ visible, onHide, selectedscreen }) => {
+const ZephyrContent = ({ domainDetails , setToast }) => {
     const uploadFileRef = useRef();
     const dispatch = useDispatch();
+    const mappedData = useSelector(state => state.setting.mappedPair);
+    const mappedTreeList = useSelector(state => state.setting.mappedTree);
     const [activeIndex, setActiveIndex] = useState(0);
     const [checked, setChecked] = useState(false);
     const [checkedAvo, setCheckedAvo] = useState(false);
@@ -47,6 +50,12 @@ const ZephyrContent = ({ visible, onHide, selectedscreen }) => {
     const [fileUpload, setFiledUpload] = useState(undefined);
     const [sheetList, setSheetList] = useState([]);
     const dropdownRef = useRef();
+    const [projectDetails , setProjectDetails]=useState([]);
+    const [releaseArr, setReleaseArr] = useState([]);
+    const [avoProjects , setAvoProjects]= useState(null);
+    const [selectedRel, setSelectedRel] = useState("Select Release");
+    const [testCases, setTestCases] = useState([]);
+    const [modules, setModules] = useState([]);
     const [data, setData] = useState([
         {
             key: "grandparent1",
@@ -188,36 +197,86 @@ const ZephyrContent = ({ visible, onHide, selectedscreen }) => {
         dispatchAction(selectedAvoproject(''))
     };
 
-    const TreeNodeCheckbox = (node) => {
-
-        const onCheckboxChange = (e) => {
-            setCheckedAvo((prevCheckedNodes) => {
-                const updatedCheckedNodes = { ...prevCheckedNodes, [node.key]: e.checked };
-                return updatedCheckedNodes;
-            });
-        };
-        const hasChildren = node.children && node.children.length > 0;
-        if (hasChildren) {
-            return (
-                <>
-                    <div style={{ width: '100%' }}>
-                        <Checkbox onChange={onCheckboxChange} checked={checkedAvo[node.key]} />
-                        <span>{node.label}</span>
-                        <i className="pi pi-times unmap__icon" style={{ float: 'right' }}></i>
-                    </div>
-                </>
-            );
+    const onCheckboxChange = (nodeKey) => {
+        const nodeIndex = selectedNodes.indexOf(nodeKey);
+        const newSelectedNodes = [];
+        if (nodeIndex !== -1) {
+            newSelectedNodes.splice(nodeIndex, 1);
+        } else {
+            newSelectedNodes.push(nodeKey);
         }
+        setSelectedNodes(newSelectedNodes);
+        dispatchAction(selectedScenarioIds(newSelectedNodes));
+    }
 
-        return (
-            <>
+    const TreeNodeCheckbox = (node) => {
+        if (node.data.type === 'scenario') {
+            return (
                 <div style={{ width: '100%' }}>
-                    <span>{node.label}</span>
-                    <i className="pi pi-times unmap__icon" style={{ float: 'right' }}></i>
+                    <Checkbox
+                        checked={selectedNodes.includes(node.key)}
+                        onChange={() => onCheckboxChange(node.key)}
+                    />
+                    <span className="scenario_label">{node.label} </span>
+                    {
+                        node.checked && <i className="pi pi-times unmap_icon" style={{ float: 'right' }} onClick={() => handleUnSync(node)}></i>
+                    }
+
+                </div>)
+        }
+        else if (node.data.type === 'testcase') {
+            return (
+                <div style={{ width: '100%' }}>
+                    <span>{node.label} </span>
+                    {/* <i className="pi pi-times" style={{ float: 'right'}} ></i> */}
                 </div>
-            </>
-        );
+            )
+        }
     };
+
+    const handleUnSync = async (node) => {
+        // let unSyncObj = [];
+        // if (Object.keys(node).length) {
+        //     let findMappedId = viewMappedFiles.filter((item) => item.testscenarioid === node.key);
+        //     if (findMappedId && findMappedId.length) {
+        //         unSyncObj.push({
+        //             'mapid': findMappedId[0]._id,
+        //             'testCaseNames': [].concat(secondOption && secondOption.name === 'Story' ? findMappedId[0].userStoryId : findMappedId[0].TestSuiteId ),
+        //             'testid': [].concat(null),
+        //             'testSummary': [].concat(null)
+        //         })
+        //         let args = Object.values(unSyncObj);
+        //         args['screenType'] = selectedscreen.name === 'Azure DevOps' ? 'Azure': selectedscreen.name ;
+        //         const saveUnsync = await api.saveUnsyncDetails(args);
+        //         if (saveUnsync.error){  
+        //             setToast("error", "Error", 'Failed to Unsync'); 
+        //         }
+		// 		else if(saveUnsync === "unavailableLocalServer"){
+        //                 setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        //                 return
+        //             }
+		// 		else if(saveUnsync === "scheduleModeOn"){
+        //             setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        //             return
+        //         }
+		// 		else if(saveUnsync === "fail"){
+        //             setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
+        //             return
+        //         }
+		// 		else if(saveUnsync == "success"){
+        //             callViewMappedFiles()
+        //             setToast("success", "Success", 'Unsynced');
+        //         }
+
+        //     }
+
+        //     let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
+        //     let unsyncMappedData = mappedData.filter((item) => item.scenarioId[0] !== node.key);
+        //     setTreeData(unsyncMap);
+        //     dispatchAction(mappedTree(unsyncMap));
+        //     dispatchAction(mappedPair(unsyncMappedData));
+        // }
+    }
 
 
     const footerIntegrations = (
@@ -244,7 +303,7 @@ const ZephyrContent = ({ visible, onHide, selectedscreen }) => {
         try {
             const result = await read(file)
             if (extension === 'xls' || extension === 'xlsx') {
-                var res = await excelToZephyrMappings({ 'content': result, 'flag': "sheetname" })
+                var res = await api.excelToZephyrMappings({ 'content': result, 'flag': "sheetname" })
                 dispatch(showOverlay(''));
                 if (res.error) { setError(res.error); return; }
                 if (res.length > 0) {
@@ -313,7 +372,200 @@ const ZephyrContent = ({ visible, onHide, selectedscreen }) => {
     //     }
     //     setSelectedNodes(newSelectedNodes);
     // };
+    const handleProject= async(e)=>{
+        const projectId = e.target.value;
+        const releaseData = await api.zephyrProjectDetails_ICE(projectId.id, '6440e7b258c24227f829f2a4');
+        if (releaseData.error)
+            setToast('error','Error',releaseData.error);
+        else if (releaseData === "unavailableLocalServer")
+            setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        else if (releaseData === "scheduleModeOn")
+            setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        else if (releaseData === "Invalid Session"){
+            setToast('error','Error','Invalid Session');
+        }
+        else if (releaseData === "invalidcredentials")
+            setToast('error','Error',MSG.INTEGRATION.ERR_INVALID_CRED.CONTENT);
+        else if (releaseData) {
+            setProjectDetails([]);
+            setReleaseArr(releaseData);
+            setSelectZephyrProject(projectId);
+            getProjectScenarios();
+            // setSelectedRel("Select Release");
+            // clearSelections();
+        }
+    }
 
+    const onReleaseSelect = async(event) => {
+        const releaseId = event.target.value;
+        const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId.id, '6440e7b258c24227f829f2a4');
+        if (testAndScenarioData.error)
+             setToast('error','Error',testAndScenarioData.error);
+        else if (testAndScenarioData === "unavailableLocalServer")
+             setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        else if (testAndScenarioData === "scheduleModeOn")
+             setToast('error','Error',MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        else if (testAndScenarioData === "Invalid Session"){
+            setToast('error','Error','Invalid Session');
+        }
+        else if (testAndScenarioData) {
+            const convertToTree = convertDataStructure(testAndScenarioData.project_dets);
+            console.log(convertToTree,' its convertToTree');
+            setProjectDetails(convertToTree);
+            // setAvoProjects(testAndScenarioData.avoassure_projects);  
+            setSelectedRel(releaseId);
+        }
+    }
+
+    function convertDataStructure(input) {
+        let output = [];
+      
+        Object.entries(input).forEach(([cycleName, items]) => {
+          let cycle = {
+            key: cycleName,
+            label: cycleName,
+            children: []
+          };
+      
+          items.forEach((item) => {
+            let [key, label] = Object.entries(item)[0];
+            cycle.children.push({
+              key,
+              label,
+              children: [{}]
+            });
+          });
+      
+          output.push(cycle);
+        });
+      
+        return output;
+      }
+
+    const getProjectScenarios = async () => {
+        // It needs to be change
+        const projectScenario = await api.getAvoDetails("6440e7b258c24227f829f2a4");
+        if (projectScenario.error)
+            setToast("error", "Error", projectScenario.error);
+        else if (projectScenario === "unavailableLocalServer")
+            setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+        else if (projectScenario === "scheduleModeOn")
+            setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+        else if (projectScenario === "Invalid Session") {
+            setToast("error", "Error", 'Invalid Session');
+        }
+        else if (projectScenario && projectScenario.avoassure_projects && projectScenario.avoassure_projects.length) {
+            // setProjectDetails(projectScenario.project_dets);
+            setAvoProjectsList(projectScenario.avoassure_projects);
+            setAvoProjects(projectScenario.avoassure_projects.map((el, i) => { return { label: el.project_name, value: el.project_id, key: i } }));
+            onAvoProjectChange(projectScenario.avoassure_projects);
+            // setSelectedRel(releaseId);  
+            // clearSelections();
+        }
+    }
+
+    const onAvoProjectChange = async (scnData) => {
+        dispatchAction(selectedAvoproject(reduxDefaultselectedProject.projectId));
+        if (scnData.length) {
+            let filterScns = scnData.filter(el => el.project_id === reduxDefaultselectedProject.projectId)[0]['scenario_details'] || [];
+            setListofScenarios(filterScns);
+
+            let treeData = selectedAvoproject
+                ? filterScns.map((scenario) => ({
+                    key: scenario._id,
+                    label: scenario.name,
+                    data: { type: 'scenario' },
+                    checked: false,
+                    children: mappedTreeList
+                }))
+
+                : []
+            setTreeData(treeData);
+        }
+    }
+
+    const TreeNodeProjectCheckbox = (node) => {
+        if (node.children) {
+            return (
+                <div>
+                    <span>{node.label}</span>
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <Checkbox
+                        // checked={selectedKeys.includes(node.key)}
+                        // onChange={(e) => {
+                        //     if (e.checked) {
+                        //         setSelectedKeys([...selectedKeys, node.key]);
+                        //     } else {
+                        //         setSelectedKeys(selectedKeys.filter((key) => key !== node.key));
+                        //     }
+                        // }}
+                    />
+                    <span>{node.label}</span>
+                </div>
+            );
+        }
+    };
+
+    const handleNodeToggle = async (nodeobj) => {
+        
+        if(Object.keys(nodeobj).length && nodeobj.node && typeof parseInt(nodeobj.node.key) === 'number'){
+            console.log(nodeobj,' its nodeobj of toggle');
+            const data = await api.zephyrTestcaseDetails_ICE("testcase", nodeobj.node.key);
+        if (data.error)
+                setToast('error','Error',data.error);
+            else if (data === "unavailableLocalServer")
+                setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+            else if (data === "scheduleModeOn")
+                setToast('error','Error',MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+            else if (data === "Invalid Session"){
+                setToast('error','Error','Invalid Session');
+            }
+            else {
+                // const updateTOTree = 
+                console.log(updateChildrenData(projectDetails,data.testcases),' its output');
+                console.log(projectDetails,' its updated details');
+                setTestCases(data.testcases);
+                setModules(data.modules);
+                // setCollapse(false);
+            }
+        }
+       
+    }
+
+    const updateChildrenData = (firstArray, secondArray) => {
+        secondArray.forEach((item) => {
+          const { parentId } = item;
+          const findParent = (nodes) => {
+            for (let i = 0; i < nodes.length; i++) {
+              const node = nodes[i];
+              if (node.key === parentId) {
+                if (!node.children) {
+                  node.children = [];
+                } else {
+                  // Remove empty object from children if exists
+                  node.children = node.children.filter((child) => Object.keys(child).length > 0);
+                }
+                node.children.push({
+                  key: String(item.id),
+                  label: item.name,
+                  children: [],
+                });
+                return true;
+              } else if (node.children) {
+                const foundInChild = findParent(node.children);
+                if (foundInChild) return true;
+              }
+            }
+            return false;
+          };
+      
+          findParent(firstArray);
+        });
+      }
 
 
     return (
@@ -335,21 +587,22 @@ const ZephyrContent = ({ visible, onHide, selectedscreen }) => {
                                                     </div>
                                                     <div className="dropdown-zephyr2">
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrProject} className="dropdown_project" options={zephyrProj} onChange={(e) => setSelectZephyrProject(e)} placeholder="Select Project" /> */}
-                                                        <Dropdown value={selectZephyrProject} onChange={(e) => setSelectZephyrProject(e.value)} options={zephyrProj} optionLabel="name"
+                                                        <Dropdown value={selectZephyrProject} onChange={(e) => handleProject(e)} options={domainDetails} optionLabel="name"
                                                             placeholder="Select a City" className="project_dropdown" />
-                                                        <Dropdown value={selectZephyrRelease} onChange={(e) => setSelectZephyrRelease(e.value)} options={zephyrRelease} optionLabel="name"
+                                                        <Dropdown value={selectedRel} onChange={(e) => onReleaseSelect(e)} options={releaseArr} optionLabel="name"
                                                             placeholder="Select a City" className="release_dropdown" />
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrRelease} className="dropdown_release" options={zephyrRelease} onChange={(e) => setSelectZephyrRelease(e)} placeholder="Select Release" /> */}
                                                     </div>
 
                                                 </div>
-                                                {selectZephyrProject && selectZephyrRelease && (<div className='zephyrdata-card1'>
+                                                {selectZephyrProject && selectedRel && (<div className='zephyrdata-card1'>
                                                     <Tree
-                                                        value={data}
-                                                        selectionMode="checkbox"
+                                                        value={projectDetails}
+                                                        selectionMode="single"
                                                         selectionKeys={selectedKeys}
                                                         onSelectionChange={(e) => setSelectedKeys(e.value)}
-                                                    // nodeTemplate={nodeTemplate}
+                                                        nodeTemplate={TreeNodeProjectCheckbox}
+                                                        onExpand={handleNodeToggle}
 
                                                     />
                                                 </div>)}
@@ -370,7 +623,7 @@ const ZephyrContent = ({ visible, onHide, selectedscreen }) => {
                                                         </div>
 
                                                         <div className="avotest__zephyr">
-                                                            <Tree value={avotestcases} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
+                                                            <Tree value={treeData} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
                                                         </div>
                                                     </div>
                                                 </Card>

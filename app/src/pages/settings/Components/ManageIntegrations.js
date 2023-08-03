@@ -78,6 +78,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [authType,setAuthType] = useState("basic");
     const [user, setUser] = useState([]);
     const azureRef = useRef(null);
+    const [domainDetails , setDomainDetails] = useState(null);
+
 
 
     // const [proj, setProj] = useState('');
@@ -177,7 +179,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             console.log(domainDetails);
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
-            // setDomainDetails(domainDetails);
+            setDomainDetails(domainDetails);
             // setLoginSuccess(true);
         }
         setIsSpin(false);
@@ -881,7 +883,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : selectedscreen.name === "Azure DevOps" ? <AzureContent ref={azureRef} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes}/> :null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent ref={azureRef} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
