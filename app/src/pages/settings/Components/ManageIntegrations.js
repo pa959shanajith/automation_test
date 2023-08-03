@@ -10,13 +10,12 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Card } from 'primereact/card';
 import LoginModal from "../Login/LoginModal";
 import { useDispatch, useSelector } from 'react-redux';
-import { screenType } from '../settingSlice'
 import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import {
-    resetIntergrationLogin, resetScreen, selectedProject,
+    screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
     selectedAvoproject, mappedTree
@@ -89,10 +88,10 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const dispatchAction = useDispatch();
 
-    const handleIntegration = useCallback((value) => {
+    const handleIntegration = (value) => {
         dispatchAction(screenType(value));
         setAuthType('basic');
-    }, [])
+    }
 
     const handleSubmit = () => {
         setIsSpin(true);
@@ -754,8 +753,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         </div>
     );
 
-    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} selectedscreen={selectedscreen} handleIntegration={handleIntegration}
-     setShowLoginCard={setShowLoginCard} setAuthType={setAuthType} authType={authType} />, [isSpin, showCard2, selectedscreen,
+    const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} handleIntegration={handleIntegration}
+     setShowLoginCard={setShowLoginCard} setAuthType={setAuthType} authType={authType} />, [isSpin, showCard2,
          handleIntegration,setShowLoginCard,setAuthType,authType])
    
 
