@@ -43,6 +43,13 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const [isCreateE2E, setIsCreateE2E] = useState(false)
     const isEnELoad = useSelector(state=>state.design.isEnELoad);
     const [checked, setChecked] = useState(false);
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    // let selectProject = reduxDefaultselectedProject;
+  
+    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+    // if (localStorageDefaultProject) {
+    //   selectProject = JSON.parse(localStorageDefaultProject);
+    // }
     useEffect(() => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         
@@ -57,6 +64,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         //     // dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         //     // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         // }
+        const defaultProjectData = {...localStorageDefaultProject, projectId:proj,projectName:prjList[proj]?.name, appType:prjList[proj]?.apptypeName}
+        localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData))
         dispatch(moduleList([]))
         dispatch(selectedModule({}))
         var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
