@@ -238,6 +238,7 @@ if (cluster.isMaster) {
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
     	var plugin = require('./server/controllers/plugin');
+		var azure = require('./server/controllers/azure');
 		var devOps = require('./server/controllers/devOps');
 		var mindmap = require('./server/controllers/mindmap');
 		var admin = require('./server/controllers/admin');
@@ -302,19 +303,19 @@ if (cluster.isMaster) {
 
 		//Only Test Engineer and Test Lead have access
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
-			var roles = ["Test Lead", "Test Engineer", "Test Manager"]; //Allowed roles
+			var roles = ["Quality Lead", "Quality Engineer", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
 		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
+			var roles = ["Quality Manager", "Quality Lead", "Quality Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
 		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
+			var roles = ["Quality Manager", "Quality Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
@@ -640,7 +641,10 @@ if (cluster.isMaster) {
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
 
-
+		// Azure integeration API's
+		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
+		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
+		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

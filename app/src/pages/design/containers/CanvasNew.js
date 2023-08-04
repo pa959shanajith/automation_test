@@ -22,7 +22,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
-import { ContextMenu } from 'primereact/contextmenu';
+import { ContextMenu } from 'primereact/contextMenu';
 import { deletedNodes } from '../designSlice';
 import { showGenuis } from '../../global/globalSlice';
 
@@ -1125,7 +1125,7 @@ const footerContentScreen =(
       ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
         <div className="tooltip">
         <span className="tooltiptext">
-          <span className="tooltip-line">testsuite_name:{node[1].name}</span>
+          <span className="tooltip-line">{node[1].name}</span>
           {/* <div className="tooltip-line1">Click here to add new testcase(s).</div> */}
         </span>
       </div>
@@ -1133,7 +1133,7 @@ const footerContentScreen =(
       )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
         <div className="tooltip">
  
- <span className="tooltiptext">testcase_name:{node[1].name} </span>
+ <span className="tooltiptext">{node[1].name} </span>
  <br />
  {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
 </div> 
@@ -1141,7 +1141,7 @@ const footerContentScreen =(
       )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
         <div className="tooltip">
  
- <span className="tooltiptext">screen_name:{node[1].name}</span>
+ <span className="tooltiptext">{node[1].name}</span>
  <br />
  {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
 </div> 
@@ -1149,7 +1149,7 @@ const footerContentScreen =(
       )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
         <div className="tooltip">
  
- <span className="tooltiptext">teststep_name:{node[1].name}</span>
+ <span className="tooltiptext">{node[1].name}</span>
  <br />
  {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
 </div> 
