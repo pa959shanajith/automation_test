@@ -879,16 +879,16 @@ const CaptureModal = (props) => {
   const renderActionsCell = (rowData) => {
     return (
       <div >
-        <Tooltip target=".edit__icon" position="right" content=" Edit the properties of elements." />
+        <Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />
         <img src="static/imgs/ic-edit.png"
 
-          style={{ height: "20px", width: "20px" ,marginLeft:"0.5rem"}}
+          style={{ height: "20px", width: "20px" }}
           className="edit__icon" onClick={() => openElementProperties(rowData)} />
-        <Tooltip target=".delete__icon" position="left" content=" Delete the element." />
+        <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
         <img
 
           src="static/imgs/ic-delete-bin.png"
-          style={{ height: "20px", width: "20px" }}
+          style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
           className="delete__icon" onClick={() => handleDelete(rowData)} />
 
 
