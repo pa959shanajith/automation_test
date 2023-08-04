@@ -6,6 +6,7 @@ import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { Tooltip } from 'primereact/tooltip';
 
 
 
@@ -154,7 +155,7 @@ const TokenMgmtForm = (props) => {
 		const x = document.getElementById('ciToken');
 		x.select();
 		document.execCommand('copy');
-		setCopyToolTip("Copied!");
+		setCopyToolTip("Copied");
 		setTimeout(() => {
 			setCopyToolTip("Click to Copy");
 		}, 1500);
@@ -288,10 +289,12 @@ const TokenMgmtForm = (props) => {
 					</div>
 				</div> */}
 				<div className='flex flex-row'>
-					<InputTextarea value={props.token} rows={3} cols={50} placeholder="Click on Generate to get the Token" readOnly />
+					<InputTextarea id="ciToken" name="ciToken" value={props.token} rows={3} cols={50} placeholder="Click on Generate to get the Token" readOnly />
 					<label className='pl-3 flex flex-column justify-content-between '>
-						<span className="pi pi-copy" style={{ fontSize: '1.5rem', cursor: 'pointer' }} data-for="copy" data-tip={copyToolTip} onClick={() => { copyTokenFunc() }} ></span>
-						<span className="pi pi-download" style={{ fontSize: '1.5rem', cursor: 'pointer' }} data-for="download" data-tip={downloadToolTip} onClick={() => { downloadToken() }}></span>
+						<span className="pi pi-copy token_copy" style={{ fontSize: '1.5rem', cursor: 'pointer' }} data-for="copy" data-tip={copyToolTip} onClick={() => { copyTokenFunc() }} ></span>
+						<Tooltip target=".token_copy" content={copyToolTip} position="right"/>
+						<span className="pi pi-download downlod_token" style={{ fontSize: '1.5rem', cursor: 'pointer' }} data-for="download" data-tip={downloadToolTip} onClick={() => { downloadToken() }}></span>
+						<Tooltip target=".downlod_token" content={downloadToolTip} position="right"/>
 					</label>
 				</div>
 			</div>
