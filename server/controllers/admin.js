@@ -60,7 +60,8 @@ exports.manageUserDetails = async (req, res) => {
 				action,
 				user:reqData,
 				name:reqData.username,
-				userimage:reqData.userimage || ''
+				userimage:reqData.userimage || '',
+				isAdminUser : reqData.isAdminUser
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -71,6 +72,7 @@ exports.manageUserDetails = async (req, res) => {
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
 			userimage: reqData.userimage || '',
+			isAdminUser : reqData.isAdminUser,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -209,7 +211,7 @@ exports.getUserDetails = async (req, res) => {
 			let data = [];
 			if (action == "user") {
 				for (let row of result) {
-					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email]);
+					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email,row.profileimage]);
 				}
 			} else {
 				data = {
@@ -220,6 +222,7 @@ exports.getUserDetails = async (req, res) => {
 					lastname: result.lastname,
 					email: result.email,
 					role: result.defaultrole,
+					profileimage: result.profileimage,
 					rolename: result.rolename,
 					addrole: result.addroles,
 					type: result.auth.type,

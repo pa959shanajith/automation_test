@@ -224,7 +224,7 @@ const DisplayProject = (props) => {
         <Tooltip target=".add_btn" position="bottom" content="Create Project" />
         <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
 
-        <CreateProject visible={visible} onHide={handleCloseDialog} />
+        <CreateProject visible={visible} onHide={handleCloseDialog} userInfo={userInfo}/>
         {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color" />}
         <div className="flex flex-row All_Project">
           <div className="All_Project_font" >ALL PROJECTS</div>
