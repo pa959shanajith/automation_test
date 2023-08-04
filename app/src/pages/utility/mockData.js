@@ -109,10 +109,12 @@ export const scheduleWeek = [
 ];
 
 export const endMonths = [
-  { name: '1 Month', key: 1 },
-  { name: '3 Months', key: 3 },
-  { name: '6 Months', key: 6 },
-  { name: '9 Months', key: 9 }
+  { name: '1 Week', key: '1M' },
+  { name: '2 Weeks', key: '1M' },
+  { name: '1 Month', key: '1M' },
+  { name: '3 Months', key: '3M' },
+  { name: '6 Months', key: '6M' },
+  { name: '9 Months', key: '9M' }
 ];
 
 export const reportsData = [
@@ -143,10 +145,10 @@ export const reportsData = [
 ];
 
 export const reportsBar = {
-  Pass: "#1DA750",
-  pass:"#1DA750",
-  Fail: "#D9342B",
+  Pass: "rgb(118, 219, 155)",
+  pass:"rgb(118, 219, 155)",
+  Fail: "rgba(254, 80, 70, 1)",
   Queued: "#808080",
   Inprogress: "#DEE2E6",
-  fail: "#D9342B",
+  fail: "rgba(254, 80, 70, 1)",
 };

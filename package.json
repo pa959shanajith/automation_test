@@ -56,7 +56,8 @@
     "winston-daily-rotate-file": "^1.7.2",
     "xlsx": "^0.12.6",
     "xml-parser": "^1.2.1",
-    "xmldom": "^0.1.27"
+    "xmldom": "^0.1.27",
+    "wkhtmltopdf": "0.4.0"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.14"

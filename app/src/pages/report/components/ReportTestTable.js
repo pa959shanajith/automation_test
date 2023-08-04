@@ -82,10 +82,10 @@ export default function BasicDemo() {
 
     const getTableHeader = (
       <div className="grid">
-        <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
-            <img src="static/imgs/chrome_icon.svg" alt='chrome icon' style={{width:'25px',height:'25px'}} />
-            <img src="static/imgs/edge_icon.svg" alt='edge icon' style={{width:'25px',height:'25px'}}/>
-            <img src="static/imgs/safari_icon.svg" alt='safari icon' style={{width:'25px',height:'25px'}}/>
+        <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
+            <img src="static/imgs/chrome_icon.svg" alt='chrome icon' style={{width:'25px',height:'25px', margin: '0.5rem'}} />
+            <img src="static/imgs/edge_icon.svg" alt='edge icon' style={{width:'25px',height:'25px', margin: '0.5rem'}}/>
+            <img src="static/imgs/safari_icon.svg" alt='safari icon' style={{width:'25px',height:'25px', margin: '0.5rem'}}/>
         </div>
         <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex justify-content-center align-items-center">
           <div className="p-input-icon-left">
@@ -154,7 +154,7 @@ export default function BasicDemo() {
     return (
         <div className="reportsTable_container">
             <div className="reportSummary">
-                <Accordion tabIndex={0} onTabOpen={()=>setReportSummaryCollaps(false)} onTabClose={()=>setReportSummaryCollaps(true)}>
+                <Accordion activeIndex={0} tabIndex={0} onTabOpen={()=>setReportSummaryCollaps(false)} onTabClose={()=>setReportSummaryCollaps(true)}>
                     <AccordionTab className='content' header="Result Summary">
                         <CollapsibleCard collapsible={false} width="100%" className={"card"}  type ="Execution" summaryValues={reportData?.overallstatus}/> 
                     </AccordionTab>
@@ -162,7 +162,7 @@ export default function BasicDemo() {
             </div>
             <br></br>
             <TreeTable globalFilter={searchTest} header={getTableHeader} value={treeData} className={reportSummaryCollaps?'viewTable':'ViewTable'} expandedKeys={expandedKeys} dataKey='id' onToggle={(e) => handdleExpend(e)} tableStyle={{ minWidth: '50rem' }} >
-                <Column field="slno" header="S No." style={{width:'8rem',padding:'0rem'}} expander/>
+                <Column field="slno" header="S No." style={{width:'8rem',padding:'0rem'}} align="center" expander/>
                 <Column field='Step' header='Steps' style={{width:'8rem',padding:'0rem'}}/>
                 <Column field='StepDescription' header="Description" style={{width:'18rem',padding:'0rem'}}/>
                 <Column field="EllapsedTime" header="Time Elapsed" style={{width:'10rem',padding:'0rem'}}/>
