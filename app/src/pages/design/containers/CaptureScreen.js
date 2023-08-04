@@ -111,6 +111,7 @@ const CaptureModal = (props) => {
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   let addMore = useRef(false);
 
   useEffect(() => {
@@ -1524,7 +1525,73 @@ const footerSave = (
                 </div>
                 <div className='input2' ><InputText placeholder='Enter URL or paste text' /></div>
                 <div className='input3' ><InputText placeholder='Operation' /></div>
-                <img className='' src='static/imgs/certificateOfWebServiceApptype.svg' />
+                {/* <img className='' src='static/imgs/certificateOfWebServiceApptype.svg' onClick={handleApptypeDialogOpen} />
+                 */}
+             <Button lable="click"  onClick={() => setIsDialogOpen(true)} />
+<Dialog header="Add Certificate" visible={isDialogOpen} style={{ width: '50vw' }} onHide={() => setIsDialogOpen(false)}>
+  <>
+  <div>
+<input
+            type="text"
+            style={{
+              borderBottom: '1px solid black',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              width: '50%',
+              padding: '0.9rem 0rem 1rem 0rem',
+            }}
+            placeholder="Enter certificate path; Enter Certificate Key(optional)"
+          />
+          </div>
+          <div>
+          <input
+            type="text"
+            style={{
+              borderBottom: '1px solid black',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              width: '50%',
+              padding: '0.9rem 0rem 1rem 0rem',
+              lineHeight:'1rem'
+            }}
+            placeholder="Enter Certificate Password(AES Encrypted); EnterServer Certificate Path "
+          />
+          </div>
+          <div>
+          <input
+            type="text"
+            style={{
+              borderBottom: '1px solid black',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              width: '50%',
+              padding: '0.9rem 0rem 1rem 0rem',
+              outline: 'none !important',
+            }}
+            placeholder="Enter AuthUserName"
+          />
+          </div>
+          <div>
+           <InputText
+            type="text"
+            style={{
+              borderBottom: '1px solid black',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              width: '100%',
+              padding: '0.9rem 0rem 1rem 0rem',
+              outline: 'none !important', // Remove the border on focus
+            }}
+            placeholder="Enter AuthUserPassword"
+          />
+          </div>
+          </>
+
+</Dialog>
               </div>
               {/* <div className='secondRow'>
                 
