@@ -238,8 +238,10 @@ if (cluster.isMaster) {
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
     	var plugin = require('./server/controllers/plugin');
+		var azure = require('./server/controllers/azure');
 		var devOps = require('./server/controllers/devOps');
 		var mindmap = require('./server/controllers/mindmap');
+		var admin = require('./server/controllers/admin');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -258,6 +260,7 @@ if (cluster.isMaster) {
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
 		app.get('/viewReport', report.viewReport);	
+		app.post('/getUserRoles', admin.getUserRoles);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -407,7 +410,7 @@ if (cluster.isMaster) {
 		var mindmap = require('./server/controllers/mindmap');
 		var pdintegration = require('./server/controllers/pdintegration');
 		var login = require('./server/controllers/login');
-		var admin = require('./server/controllers/admin');
+		// var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
 		var designscreen = require('./server/controllers/designscreen');
 		var utility = require('./server/controllers/utility');
@@ -464,7 +467,7 @@ if (cluster.isMaster) {
 		app.post('/updatePassword', login.updatePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		//Admin Routes
-		app.post('/getUserRoles', auth.protect, admin.getUserRoles);
+		// app.post('/getUserRoles', auth.protect, admin.getUserRoles);
 		app.post('/getDomains_ICE', auth.protect, admin.getDomains_ICE);
 		app.post('/createProject_ICE', auth.protect, admin.createProject_ICE);
 		app.post('/updateProject_ICE', auth.protect, admin.updateProject_ICE);
@@ -638,7 +641,10 @@ if (cluster.isMaster) {
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
 
-
+		// Azure integeration API's
+		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
+		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
+		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

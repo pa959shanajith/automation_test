@@ -7,6 +7,17 @@ const initialState = {
         password:'',
         url:''
     },
+    zephyrLogin:{
+        url:'',
+        username:'',
+        password:'',
+        token:''
+    },
+    AzureLogin:{
+        username:'',
+        password:'',
+        url:''
+    },
     selectedProject:'',
     selectedIssue:'',
     selectedZTCDetails: {
@@ -20,7 +31,8 @@ const initialState = {
     selectedScenarioIds: [],
     mappedPair: [],
     selectedAvoproject:'',
-    mappedTree:[]
+    mappedTree:[],
+    showOverlay:""
 }
 
 export const settingSlice=createSlice({
@@ -66,8 +78,21 @@ export const settingSlice=createSlice({
         },
         mappedTree:(state,action) => {
             state.mappedTree =  action.payload
-        }
-
+        },
+        showOverlay:(state,action) =>{
+            state.showOverlay =  action.payload
+        },
+        zephyrLogin:(state,action) => {
+            const { fieldName, value } = action.payload;
+            state.zephyrLogin[fieldName] = value;
+        },
+        resetZephyrLogin: (state) => {
+            state.zephyrLogin = initialState.zephyrLogin;
+          },
+        AzureLogin:(state,action) => {
+            const { fieldName, value } = action.payload;
+            state.AzureLogin[fieldName] = value;
+        }, 
     }
 })
 // export all the action creators
@@ -84,7 +109,11 @@ export const {
     selectedScenarioIds,
     mappedPair,
     selectedAvoproject,
-    mappedTree
+    mappedTree,
+    showOverlay,
+    zephyrLogin,
+    resetZephyrLogin,
+    AzureLogin
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

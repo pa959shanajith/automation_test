@@ -21,8 +21,12 @@ const DisplayProject = (props) => {
   const [projectsDetails, setProjectsDetails] = useState([]);
   const [getProjectLists, setProjectList] = useState([]);
   const [selectedsortItems, setSelectedsortItems] = useState(null)
-  let userInfo = useSelector((state) => state.landing.userinfo);
-  userInfo = JSON.parse(localStorage.getItem('userInfo'));
+ 
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if(!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo ;
+  
   const createdProject = useSelector((state) => state.landing.savedNewProject);
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [showTooltip, setShowTooltip] = useState(false);
@@ -226,7 +230,7 @@ const DisplayProject = (props) => {
           <div className="All_Project_font" >ALL PROJECTS</div>
           <div className="add_sort_btn">
             <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
-            {userInfo.rolename === "Quality Manager" ? (
+            {userInfo && userInfo.rolename === "Quality Manager" ? (
               <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
             ) : null}
 

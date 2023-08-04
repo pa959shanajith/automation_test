@@ -65,7 +65,7 @@ const CreateUser = (props) => {
     const [showEditUser, setShowEditUser] = useState(false);
     const [allRolesUpdate, setAllRolesUpdate] = useState([]);
     const [roleDropdownValue, setRoleDropdownValue] = useState("");
-    const [createUserDialog, setCreateUserDialog] = useState(currentTab === "users" ? true : false);
+    const [userCreateDialog , setUserCreateDialog] = useState(props.userCreateDialog);
     const [selectedTab, setSelectedTab] = useState('userDetails');
     const [forTokenMngmtUserName, setForTokenMngmtUserName] = useState('');
 
@@ -176,7 +176,7 @@ const CreateUser = (props) => {
                 if (data === "success") {
                     if (action === "create") { click(); setSelectedTab("tokenAuthorization") }
                     else edit();
-                    toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
+                    // toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "delete") {
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
                         if (data0.error) { displayError(data0.error); return; }
@@ -601,21 +601,20 @@ const CreateUser = (props) => {
             label="Cancel"
             disabled={selectedTab === "tokenAuthorization"}
             text
-            onClick={() => setCreateUserDialog(false)}
+            onClick={() => props.setUserCreateDialog(false)}
         >
         </Button>
-        {/* <Button data-test="createButton" className=" a__btn pull-right Create-User__btn btn-create-cust" onClick={() => { props.manage({ action: "create" }) }} disabled={nocreate} title="Create User" >Create</Button> */}
         <Button
             data-test="createButton"
             label={selectedTab === "tokenAuthorization" ? "Create" : "Next"}
-            // onClick={(e) => { manage({ action: "create" }); }} //setSelectedTab(tabHeader[e.index].key);
-            onClick={() => manage({ action: "create" })} //setSelectedTab("tokenAuthorization")
+            onClick={() => {manage({ action: "create" }); if(selectedTab === "tokenAuthorization") toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS)); }} 
             disabled={nocreate}>
         </Button>
     </>
 
     const createUserDialogHide = () => {
-        setCreateUserDialog(false)
+        // setUserCreateDialog(false);
+        props.setCreateUserDialog(false);
     }
 
     return (
@@ -624,7 +623,7 @@ const CreateUser = (props) => {
             {loading ? <ScreenOverlay content={loading} /> : null}
 
             <Dialog
-                visible={createUserDialog}
+                visible={props.createUserDialog}
                 onHide={createUserDialogHide}
                 footer={createUserFooter}
                 header={"Create User"}

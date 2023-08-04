@@ -60,7 +60,7 @@ exports.manageUserDetails = async (req, res) => {
 				action,
 				user:reqData,
 				name:reqData.username,
-				userimage:reqData.userimage
+				userimage:reqData.userimage || ''
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -70,7 +70,7 @@ exports.manageUserDetails = async (req, res) => {
 			action: action,
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
-			userimage: reqData.userimage,
+			userimage: reqData.userimage || '',
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -2540,7 +2540,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 				if (req.body.user.userid == userid && req.body.action == 'update') return next();
 				break;
 			case "/manageCIUsers":
-				if (req.body.CIUser.userId == userid) return next();
+				if (req.body.CIUser.userId) return next();
 				break;
 			case "/provisionIce":
 				if (req.body.tokeninfo.userid == userid) return next();
