@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
-    screenType: { name: 'Jira', code: 'NY' },
+    screenType: { name: 'Jira', code: 'JA' },
     intergrationLogin:{
         username:'',
         password:'',
