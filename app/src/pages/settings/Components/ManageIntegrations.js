@@ -339,6 +339,28 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const handleTabChange = (index) => {
         setActiveIndex(index);
+        // <div className='btn-11'>
+        //         {activeIndex === 0 &&(
+        //             <div className="btn__2">
+        //                 <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
+        //                 <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
+        //             </div>)}
+    
+        //         {activeIndex === 1 &&(
+        //             <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
+    
+        //     </div>
+        setFooterIntegrations(
+            <div className='btn-11'>
+                {index === 0 &&(
+                    <div className="btn__2">
+                        <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
+                        <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
+                    </div>)}
+    
+                {index === 1 &&(
+                    <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
+            </div>);
     };
 
     const showCard2 = () => {
@@ -740,19 +762,26 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    const footerIntegrations = (
+    // const footerIntegrations = ()=>{
+    //     <div className='btn-11'>
+    //         {activeIndex === 0 &&(
+    //             <div className="btn__2">
+    //                 <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
+    //                 <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
+    //             </div>)}
+
+    //         {activeIndex === 1 &&(
+    //             <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
+
+    //     </div>
+    // }
+    const [footerIntegrations, setFooterIntegrations] = useState(
         <div className='btn-11'>
-            {activeIndex === 0 && (
                 <div className="btn__2">
                     <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
                     <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-                </div>)}
-
-            {activeIndex === 1 && (
-                <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-
-        </div>
-    );
+                </div>
+        </div>);
 
     const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} selectedscreen={selectedscreen} handleIntegration={handleIntegration}
      setShowLoginCard={setShowLoginCard} setAuthType={setAuthType} authType={authType} />, [isSpin, showCard2, selectedscreen,
@@ -882,7 +911,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : selectedscreen.name === "Azure DevOps" ? <AzureContent ref={azureRef} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes}/> :null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={setFooterIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} showLogin={showLogin}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
