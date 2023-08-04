@@ -1158,20 +1158,20 @@ const footerContentScreen =(
                       ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
                         <div className="tooltip">
                           <span className="tooltiptext">
-                            <span className="tooltip-line">testsuite_name:{node[1].title}</span>
+                            <span className="tooltip-line">{node[1].title}</span>
                           </span>
                         </div>
                       )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
                         <div className="tooltip">
-                          <span className="tooltiptext">testcase_name:{node[1].title} </span>
+                          <span className="tooltiptext">{node[1].title} </span>
                         </div> 
                      )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
                       <div className="tooltip">
-                        <span className="tooltiptext">screen_name:{node[1].title}</span>
+                        <span className="tooltiptext">{node[1].title}</span>
                       </div> 
                      )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
                       <div className="tooltip">
-                        <span className="tooltiptext">teststep_name:{node[1].title}</span>
+                        <span className="tooltiptext">{node[1].title}</span>
                       </div> 
                      ))
                     )}</title>         
