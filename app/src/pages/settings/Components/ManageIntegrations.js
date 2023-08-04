@@ -912,7 +912,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={setFooterIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes}/> :null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={setFooterIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
