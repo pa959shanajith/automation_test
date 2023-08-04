@@ -1233,6 +1233,51 @@ exports.fetchModSceDetails = async (req, res) => {
     }
 };
 
+Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('ifnotEquals', function(arg1, arg2, options) {
+    return (arg1 != arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('getStyle', function(StepDescription) {
+    if (StepDescription && (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1)) return "bold";
+    else return;
+});
+
+Handlebars.registerHelper('getClass', function(StepDescription) {
+    if (StepDescription && (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1)) return "collapsible-tc demo1 txtStepDescription";
+    else return "rDstepDes tabCont";
+});
+
+Handlebars.registerHelper('getColor', function(overAllStatus) {
+    if (overAllStatus == "Pass") return "green";
+    else if (overAllStatus == "Fail") return "red";
+    else if (overAllStatus == "Terminate") return "#faa536";
+});
+
+Handlebars.registerHelper('validateImageID', function(path, slno) {
+    return path? ("#img-" + slno) : '';
+});
+
+Handlebars.registerHelper('validateImagePath', function(path) {
+    return path? 'block' : 'none';
+});
+
+Handlebars.registerHelper('getDataURI', function(uri) {
+    var f = "data:image/PNG;base64,";
+    if (!uri || uri == "fail" || uri == "unavailableLocalServer") return f;
+    else return f + uri;
+});
+
+fs.readFile('./templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
+    templatepdf = Handlebars.compile(data);
+});
+
+fs.readFile('./templates/specificReport/content.handlebars', 'utf8', function(err, data) {
+    templateweb = Handlebars.compile(data);
+});
 
 exports.viewReport = async (req, res, next) => {
     const fnName = "viewReport";
