@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useDispatch, useSelector } from 'react-redux';
-import { IntergrationLogin,zephyrLogin,AzureLogin } from '../settingSlice';
+import { IntergrationLogin,zephyrLogin,AzureLogin,screenType } from '../settingSlice';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
@@ -27,8 +27,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
 
 
 
-
-    const handleLogin = useCallback((name, value) => {
+    const handleLogin = (name, value) => {
         switch (selectedscreen.name) {
             case 'Jira':
                 dispatchAction(IntergrationLogin({ fieldName: name, value }));
@@ -47,7 +46,11 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
                 break;
         }
         
-    }, [])
+    }
+
+    const handleScreenType = (value) => {
+        dispatchAction(screenType(value))
+    }
 
     const handleRadioChange = (e) => {
         setAuthType(e.value);
@@ -73,23 +76,23 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
         <>
             <div className="login_container_integrations">
                 <div className="side-panel">
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Jira', code: 'JA' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Jira', code: 'JA' })}>
                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                         <span className="text__jira">Jira</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Azure DevOps', code: 'ADO' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Azure DevOps' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Azure DevOps', code: 'ADO' })}>
                         <span><img src="static/imgs/azure_devops_icon.svg" className="img__azure"></img></span>
                         <span className="text__azure">Azure DevOps</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'Zephyr', code: 'ZR' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'Zephyr' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Zephyr', code: 'ZR' })}>
                         <span><img src="static/imgs/zephyr_icon.svg" className="img__zephyr"></img></span>
                         <span className="text__zephyr">Zephyr</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'qTest' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'qTest', code: 'QT' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'qTest' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'qTest', code: 'QT' })}>
                         <span><img src="static/imgs/qTest_icon.svg" className="img__qtest"></img></span>
                         <span className="text__qtest">qTest</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleIntegration({ name: 'ALM', code: 'ALM' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'ALM', code: 'ALM' })}>
                         <span><img src="static/imgs/ALM_icon.svg" className="img__alm"></img></span>
                         <span className="text__alm">ALM</span>
                     </div>
