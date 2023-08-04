@@ -445,10 +445,19 @@ const elementTypeProp =(elementProperty) =>{
     case "table" || "tbody" || "tfoot" || "thead" || "tr":
       return "Table";
 
-    default:
-      return "Element";
-   }
-}
+      case "form" || "fieldset":
+        return "Forms";
+
+      case "input" || "textarea":
+        return "Textbox";
+
+      case "table" || "tbody" || "tfoot" || "thead" || "tr":
+        return "Table";
+
+      default:
+        return "Element";
+    }
+  }
 
   const fetchScrapeData = () => {
     return new Promise((resolve, reject) => {
@@ -883,21 +892,21 @@ else{
   const renderActionsCell = (rowData) => {
     return (
       <div >
-      
-        <Tooltip target=".delete__icon" position="left" content=" Delete the element." />
-        <img
-        
-          src="static/imgs/ic-delete-bin.png"
-          style={{ height: "20px", width: "20px" }}
-          className="delete__icon" onClick={() => handleDelete(rowData)} />
-       
-         
-          <Tooltip target=".edit__icon" position="right" content=" Edit the properties of elements." />
-        <img src="static/imgs/ic-edit.png" 
-      
+        <Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />
+        <img src="static/imgs/ic-edit.png"
+
           style={{ height: "20px", width: "20px" }}
           className="edit__icon" onClick={() => openElementProperties(rowData)} />
-          
+        <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
+        <img
+
+          src="static/imgs/ic-delete-bin.png"
+          style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+          className="delete__icon" onClick={() => handleDelete(rowData)} />
+
+
+        
+
       </div>
     )
 
@@ -1577,7 +1586,7 @@ const footerSave = (
               bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
             >
             </Column>
-            <Column field="objectProperty" header="Element Type"></Column>
+            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshot"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>

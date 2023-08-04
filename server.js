@@ -303,19 +303,19 @@ if (cluster.isMaster) {
 
 		//Only Test Engineer and Test Lead have access
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
-			var roles = ["Test Lead", "Test Engineer", "Test Manager"]; //Allowed roles
+			var roles = ["Quality Lead", "Quality Engineer", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
 		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
+			var roles = ["Quality Manager", "Quality Lead", "Quality Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
 		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
+			var roles = ["Quality Manager", "Quality Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
