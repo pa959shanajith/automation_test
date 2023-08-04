@@ -19,7 +19,6 @@ import {
 } from '../settingSlice';
 import { Toast } from "primereact/toast";
 import { Paginator } from 'primereact/paginator';
-import { image } from "d3";
 
 
 const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, setSelectedNodes,activeIndex, setActiveIndex, setFooterIntegrations, callAzureSaveButton,showLogin }, ref) => {
@@ -696,9 +695,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
     }
 
     const callSaveButton = async () => {
-        console.log(' mappedData ', mappedData);
         const response = await api.saveAzureDetails_ICE(mappedData);
-        console.log(response, ' its response');
         if (response.error) {
             setToast('error', 'Error', response.error);
         }
