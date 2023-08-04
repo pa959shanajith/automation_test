@@ -55,10 +55,27 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
     if (dNodes[pi].children.length > 0) { // new node has siblings
         index = dNodes[pi].children.length - 1;
         if (layout_vertical){
-            new_one = {
-                x: parseInt(dNodes[pi].children[index].x) + 100,
-                y: sections[node.type]
-            }; // Go beside last sibling node
+            if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type] - 100
+                };// Go beside last sibling node
+            }else if ((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?.parent?._id !== null)){
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type] - 90
+                };// Go beside last sibling node
+            }else if ((dNodes[pi].type === "modules") && (dNodes[pi]?._id !== null)){
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type] - 120
+                };// Go beside last sibling node
+            }else{
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type]
+                }; // Go beside last sibling node
+            } 
         }
         else{
             new_one = {
@@ -560,7 +577,7 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
     var node = {
         id: 0,
         childIndex: 0,
-        name: name?name:'TestSuite_0',
+        name: name?name:'TestSuite0',
         type: types?types:'modules',
         children: [],
         parent: null,
@@ -588,8 +605,8 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
 
 export const addNode = (n) =>{
     n.display_name = n.name;
-    var ch = 15;
-    if (n.display_name.length > 15) {
+    var ch = 10;
+    if (n.display_name.length > 10) {
         n.display_name = n.display_name.slice(0, ch) + '...';
     }
     var img_src = 'static/imgs/node-' + n.type + '.png';
@@ -752,7 +769,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         if (obj) {
                 tempName = obj;
         } else {
-                tempName = (nNext[pt][0]==='Scenario'?'TestCase':nNext[pt][0]==='Testcase'?'TestSteps':'Screen')+'_'+count[(nNext[pt][0]).toLowerCase() + 's'];
+                tempName = (nNext[pt][0]==='Scenario'?'TestCase':nNext[pt][0]==='Testcase'?'TestSteps':'Screen')+count[(nNext[pt][0]).toLowerCase() + 's'];
         }
         var node = {
                 id: uNix,
