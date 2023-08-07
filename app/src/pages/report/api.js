@@ -113,7 +113,9 @@ export const downloadReports = async(getDownload) => {
             method: 'GET',
             headers: {
             'Content-type': 'application/json',
-            }
+            },
+            responseType:(getDownload?.type === 'json')? 'application/json' : 'arraybuffer',
+            credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             return {error:MSG.GENERIC.INVALID_SESSION};

@@ -142,7 +142,7 @@ const Profile = () => {
                         {}
                       )
                     ).reduce((ac, cv) => ac + cv, 0)} Executed`,
-                    color: "#605BFF",
+                    color: "rgba(96, 154, 248, 1)",
                   },
                   {
                     value: Object.keys(
@@ -350,7 +350,7 @@ const Profile = () => {
                         {}
                       )
                     ).reduce((ac, cv) => ac + cv, 0)} Executed`,
-                    color: "#605BFF",
+                    color: "rgba(96, 154, 248, 1)",
                   },
                   {
                     value: Object.keys(
@@ -563,7 +563,7 @@ const Profile = () => {
                     (ac, cv) => ac + cv,
                     0
                   )} Executed`,
-                  color: "#605BFF",
+                  color: "rgba(96, 154, 248, 1)",
                 },
                 {
                   value: Object.keys(e.testSuites)
@@ -633,7 +633,7 @@ const Profile = () => {
                     (ac, cv) => ac + cv,
                     0
                   )} Executed`,
-                  color: "#605BFF",
+                  color: "rgba(96, 154, 248, 1)",
                 },
                 {
                   value: Object.keys(e.testCases)
@@ -692,7 +692,7 @@ const Profile = () => {
 
   const onDownload = async (getId) => {
     let data = await downloadReports({ id: downloadId, type: getId });
-
+    
     if (getId === "json") data = JSON.stringify(data, undefined, 2);
 
     let filedata = new Blob([data], {
