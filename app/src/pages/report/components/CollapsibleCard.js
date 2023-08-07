@@ -11,13 +11,13 @@ import { Chart } from 'primereact/chart';
 */
 
 const ExecutionSummaryLabels = {
-    scenarioName: "Test Case : ",
+    testCase: "Test Case : ",
     StartTime: "StartDate Time : ",
     projectName: "Project : ",
     EndTime: "EndDate Time : ",
     overallstatus: "Overall Status : ",
     EllapsedTime: "TimeElapsed : ",
-    _order_: ['scenarioName', 'StartTime', 'projectName', 'EndTime', 'overallstatus', 'EllapsedTime'],
+    _order_: ['testCase', 'StartTime', 'projectName', 'EndTime', 'overallstatus', 'EllapsedTime'],
 };
 
 const TestCaseSummaryLabels = {
