@@ -83,7 +83,7 @@ height: 2.5rem !important;
     bottom: 0rem;
 }
 
-.btn-11{
+.btn-footer-jira{
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -326,6 +326,7 @@ height: 2.5rem !important;
      &:hover{
        opacity: 0.5;
      }
+     font: $f6_regular !important;
 }
 
 .view_map_card{
