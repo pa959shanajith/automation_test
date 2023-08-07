@@ -3,6 +3,9 @@ const TokenGenerator = require('uuid-token-generator')
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const generator = require('../notifications/generator');
+const email = require('../notifications/email');
+
 const archiver = require('archiver');
 const activeDirectory = require('activedirectory');
 const Client = require("node-rest-client").Client;
@@ -60,7 +63,8 @@ exports.manageUserDetails = async (req, res) => {
 				action,
 				user:reqData,
 				name:reqData.username,
-				userimage:reqData.userimage || ''
+				userimage:reqData.userimage || '',
+				isadminuser : reqData.isAdminUser
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -71,6 +75,7 @@ exports.manageUserDetails = async (req, res) => {
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
 			userimage: reqData.userimage || '',
+			isadminuser : reqData.isAdminUser,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -209,7 +214,7 @@ exports.getUserDetails = async (req, res) => {
 			let data = [];
 			if (action == "user") {
 				for (let row of result) {
-					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email]);
+					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email, row.profileimage]);
 				}
 			} else {
 				data = {
@@ -220,6 +225,7 @@ exports.getUserDetails = async (req, res) => {
 					lastname: result.lastname,
 					email: result.email,
 					role: result.defaultrole,
+					profileimage:result.profileimage,
 					rolename: result.rolename,
 					addrole: result.addroles,
 					type: result.auth.type,
@@ -2543,7 +2549,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 				if (req.body.CIUser.userId) return next();
 				break;
 			case "/provisionIce":
-				if (req.body.tokeninfo.userid == userid) return next();
+				if (req.body.tokeninfo.userid) return next();
 				break;
 			case "/gitSaveConfig":
 				if (req.body.userId == userid) return next();
