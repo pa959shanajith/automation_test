@@ -1,11 +1,26 @@
-.UserList{
-    .p-datatable .p-datatable-thead>tr>th{
+.UserList {
+    .p-datatable .p-datatable-thead>tr>th {
         padding: 0.5rem !important;
     }
 
-    .ellipsis-table .p-datatable-tbody td{
+    .ellipsis-table .p-datatable-tbody td {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
+    .User_header {
+        height: 2rem;
+    }
+
+    .User_Inp {
+        bottom: 1.8rem;
+    left: 39.5rem;
+    position: relative;
+    }
+
+     .p-inputtext {
+        width: 40%;
+    }
+
 }

@@ -64,7 +64,7 @@ exports.manageUserDetails = async (req, res) => {
 				user:reqData,
 				name:reqData.username,
 				userimage:reqData.userimage || '',
-				isadminuser : reqData.isAdminUser
+				isAdminUser : reqData.isAdminUser
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -75,7 +75,7 @@ exports.manageUserDetails = async (req, res) => {
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
 			userimage: reqData.userimage || '',
-			isadminuser : reqData.isAdminUser,
+			isAdminUser : reqData.isAdminUser,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -225,7 +225,7 @@ exports.getUserDetails = async (req, res) => {
 					lastname: result.lastname,
 					email: result.email,
 					role: result.defaultrole,
-					profileimage:result.profileimage,
+					profileimage: result.profileimage,
 					rolename: result.rolename,
 					addrole: result.addroles,
 					type: result.auth.type,
@@ -2540,7 +2540,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		const userid = req.session.userid;
 		const activeRole = req.session.activeRole;
 		const roleId = req.session.activeRoleId;
-		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin") return next();
+		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin" && isAdminUser === true) return next();
 		switch (req.path) {
 			case "/manageUserDetails":
 				if (req.body.user.userid == userid && req.body.action == 'update') return next();

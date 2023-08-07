@@ -99,7 +99,7 @@ const CreateUser = (props) => {
 
     const tabHeader = [
         { label: 'User Details', key: 'userDetails', text: 'User Details' },
-        { label: 'Avo Azzure Client Provision', key: 'avoAzzureClient', text: 'Avo Azzure Client Provision' },
+        { label: 'Avo Assure Client Provision', key: 'avoAzzureClient', text: 'Avo Assure Client Provision' },
     ];
 
     useOnClickOutside(node, () => setToggleAddRoles(false));
