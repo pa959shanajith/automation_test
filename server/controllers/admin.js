@@ -3,6 +3,9 @@ const TokenGenerator = require('uuid-token-generator')
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const generator = require('../notifications/generator');
+const email = require('../notifications/email');
+
 const archiver = require('archiver');
 const activeDirectory = require('activedirectory');
 const Client = require("node-rest-client").Client;
@@ -211,7 +214,7 @@ exports.getUserDetails = async (req, res) => {
 			let data = [];
 			if (action == "user") {
 				for (let row of result) {
-					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email,row.profileimage]);
+					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email, row.profileimage]);
 				}
 			} else {
 				data = {
@@ -2546,7 +2549,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 				if (req.body.CIUser.userId) return next();
 				break;
 			case "/provisionIce":
-				if (req.body.tokeninfo.userid == userid) return next();
+				if (req.body.tokeninfo.userid) return next();
 				break;
 			case "/gitSaveConfig":
 				if (req.body.userId == userid) return next();
