@@ -11,7 +11,7 @@ import { Chart } from 'primereact/chart';
 */
 
 const ExecutionSummaryLabels = {
-    scenarioName: "Scenario Name : ",
+    scenarioName: "Test Case : ",
     StartTime: "StartDate Time : ",
     projectName: "Project : ",
     EndTime: "EndDate Time : ",

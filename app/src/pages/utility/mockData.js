@@ -109,8 +109,8 @@ export const scheduleWeek = [
 ];
 
 export const endMonths = [
-  { name: '1 Week', key: '1M' },
-  { name: '2 Weeks', key: '1M' },
+  { name: '1 Week', key: '1W' },
+  { name: '2 Weeks', key: '2W' },
   { name: '1 Month', key: '1M' },
   { name: '3 Months', key: '3M' },
   { name: '6 Months', key: '6M' },

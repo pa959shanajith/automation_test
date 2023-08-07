@@ -400,7 +400,7 @@ const ScheduleScreen = ({
               globalFilter={tableFilter}
             >
               <Column align="center" field="testsuitenames" header="Test Suite"></Column>
-              <Column align="center" field="scenariodetails" header="Scenario Name"></Column>
+              <Column align="center" field="scenariodetails" header="Test Case"></Column>
               <Column align="center" field="status" header="Status"></Column>
             </DataTable>
         }
