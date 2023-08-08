@@ -49,16 +49,21 @@ const IceProvisionForm = (props) => {
 			setIcenameErrBorder(true);
 			return false;
 		}
-		if (icetype === "normal" && (!props.userid || props.userid.trim() === "")) {
+		if (icetype === "normal" && (!props.userid[1] || props.userid[1].trim() === "")) {
 			setSelAssignUser2ErrBorder(true);
 			return false;
 		}
 
 		var tokeninfo = {
-			userid: props.userid,
+			userid: props.userid[1],
 			icename: props.icename.trim(),
 			icetype: icetype,
-			action: "provision"
+			action: "provision",
+			email:props.userid[6],
+			username:props.userid[0],
+			firstName: props.userid[4],
+			lastName: props.userid[5],
+			url:new URL(window.location.href).origin,
 		};
 		setLoading("Provisioning Token...");
 		const data = await provisions(tokeninfo);
