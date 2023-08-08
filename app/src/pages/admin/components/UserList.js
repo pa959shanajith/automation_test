@@ -127,7 +127,9 @@ const UserList = (props) => {
                 <DataTable value={data} editMode="row"
                     globalFilter={globalFilter}
                     header={header}
-                    emptyMessage="No users found">
+                    emptyMessage="No users found"
+                    scrollable
+                    scrollHeight='28rem'>
                     <Column field="useName" header="User Name" style={{ width: '20%' }}></Column>
                     <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
                     <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column>
