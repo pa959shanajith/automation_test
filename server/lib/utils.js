@@ -100,7 +100,7 @@ module.exports.cloneSession = async (req) => {
 		sessClient.ttl(sessid, (err, ttl) => {
 			if (err) return rsv(err);
 			var args = [sessid,JSON.stringify(req.session),'EX',ttl];
-			// req.clearSession();
+			req.clearSession();
 			sessClient.set(args, err => rsv(err));
 		});
 	}));
