@@ -308,6 +308,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
         { name: 'qTest', code: 'LDN' },
     ];
 
+    const showLogin = () => {
+        setIsShowConfirm(true);
+    };
+
+
     const handleCloseManageIntegrations = () => {
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
@@ -352,7 +357,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     
         //     </div>
         setFooterIntegrations(
-            <div className='btn-11'>
+            <div className='btn-footer-jira'>
                 {index === 0 &&(
                     <div className="btn__2">
                         <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
@@ -534,10 +539,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    const showLogin = () => {
-        setIsShowConfirm(true);
-    };
-
+    
     const acceptFunc = () => {
         setIsShowConfirm(false);
         dispatchAction(resetIntergrationLogin());
@@ -617,29 +619,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
         if (scnData.length) {
             let filterScns = scnData.filter(el => el.project_id === reduxDefaultselectedProject.projectId)[0]['scenario_details'] || [];
             setListofScenarios(filterScns);
-
-            const dummyTestCases = [
-                {
-                    _id: 'testcase-1',
-                    name: 'Test Case 1',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-            ];
 
             let treeData = selectedAvoproject
                 ? filterScns.map((scenario) => ({
@@ -816,7 +795,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <div className="dropdown_div">
                                                                 <div className="dropdown-map1">
                                                                     <span>Select Jira Project <span style={{ color: 'red' }}>*</span></span>
-                                                                    <span className="release_span"> Select Jira workItems<span style={{ color: 'red' }}>*</span></span>
+                                                                    <span className="release_span"> Select Jira Work items<span style={{ color: 'red' }}>*</span></span>
                                                                 </div>
                                                                 <div className="dropdown-map2">
                                                                     <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e)} placeholder="Select Project" />
