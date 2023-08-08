@@ -1807,6 +1807,18 @@ exports.provisionICE = async (req, res) => {
 			query: tokeninfo.action
 		};
 		const result = await utils.fetchData(inputs, "admin/provisionICE", fnName);
+		if(result !== 'fail'){
+			const uData = {
+				uid: tokeninfo.userid,
+				email: tokeninfo.email,
+				token:result,
+				url:tokeninfo.url,
+			    firstname: tokeninfo.firstName,
+			    lastname: tokeninfo.lastName,
+				username: tokeninfo.username,
+			}
+			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+		}
 		res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName+":", exception);

@@ -17,7 +17,6 @@ import { TabMenu } from 'primereact/tabmenu';
 import TokenManagement from '../containers/TokenMangement';
 import { Checkbox } from 'primereact/checkbox';
 import IceProvision from '../containers/IceProvision';
-// import { generateEmailPayload } from '../../../../../server/notifications/generator';
 
 
 /*Component CreateUser
