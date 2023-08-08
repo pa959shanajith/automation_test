@@ -161,6 +161,10 @@ default_sub.on("message", (channel, message) => {
 		mySocket.emit("getSerialNumber");
 		break;
 
+	case "checkingMobileClient":
+		mySocket.emit("checkingMobileClient");
+		break;
+
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		server_pub.publish("ICE2_" + data.username, dataToNode);
@@ -404,6 +408,10 @@ module.exports.initListeners = mySocket => {
 	});
 	mySocket.on("get_serial_number", value => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "get_serial_number", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
+	});
+	mySocket.on("checking_Mobile_Client", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "checking_Mobile_Client", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 };
