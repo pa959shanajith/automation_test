@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
 import "../styles/LaunchApplication.scss";
-import {getDeviceSerialNumber_ICE} from "../api";
+import {getDeviceSerialNumber_ICE, checkingMobileClient_ICE} from "../api";
 
 const LaunchApplication = props => {
 
     const [error, setError] = useState({});
     const [serialNumbers, setSerialNumber] = useState([]);
+    const [iceLable, setIceLable] = useState(true);
 
     // DESKTOP
 
@@ -136,11 +137,23 @@ const LaunchApplication = props => {
         })
     }
 
+    const checkingMobileClient = () => {
+        setOS("android"); 
+        setError(false);
+        checkingMobileClient_ICE().then(data => {
+            if(data) {}
+            setIceLable(data)
+            console.log(data);
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
     const mobileApp = {
         'content': <div className="ss__mblapp_inputs">
                 { !os && <div className="ss__mblapp_os_op">Choose OS</div>}
                 <div className="ss__mblapp_chooseApp">
-                <button data-test="chooseAndriod" className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={handleSerialNumber}>Android</button>
+                <button data-test="chooseAndriod" className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={() => { handleSerialNumber(); checkingMobileClient(); }}>Android</button>
                     <button data-test="chooseIOS"className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
                 </div>
                 { os === "ios" && <>
@@ -160,7 +173,40 @@ const LaunchApplication = props => {
                 </> }
         </div>,
 
-        'footer': <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" />
+        // 'footer': <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" />
+        'footer': iceLable ? <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" /> : 
+        <div>
+                <span style={{ 
+                    color: 'red', 
+                    fontWeight: 'bold', 
+                    fontSize: '14px', 
+                    float: 'left',
+                    display: 'block',
+                    // Add any other styles you want here
+                }}>
+                    {/* Required packages for mobile testing are missing. Please download the same from the below link and move them to AvoAssureClient\AvoAssure folder <a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">Download Mobile Client</a> */}
+                    Required packages for mobile testing in Avo Assure client folder are missing. Please download the same from the below link and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure) 
+                </span>
+                <span style={{ 
+                    fontWeight: 'bold', 
+                    fontSize: '14px',
+                    display: 'block',
+                }}>
+                    <a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">Download Mobile Client</a>
+                </span>
+                <input
+                    type="submit"
+                    data-test="mobileAppLaunch"
+                    onClick={onMobileAppLaunch}
+                    // style={{ width: "100px" }}
+                    style={{ 
+                        width: "100px",
+                        float: 'right', // Add float to move the button to the right
+                    }}
+                    value="Launch"
+                />
+                <div style={{ clear: 'both' }}></div> {/* Add a clearing element to prevent overlap */}
+            </div>
     }
 
     // OEBS

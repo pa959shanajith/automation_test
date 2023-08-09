@@ -46,7 +46,7 @@ const ScrapeObject = props => {
         setChecked(props.object.checked);
         setEdit(false);
     }, [props]);
-    
+   
     const handleOutsideClick = () => {
         setObjName(props.object.title);
         setEdit(false);        
@@ -136,8 +136,8 @@ elementVals.find(v => v.key === key).value = value;
 
 const getElementCordinates=(e)=>{
     let cordinates=e.target.getBoundingClientRect()
-    if(window.innerHeight -cordinates.bottom<280){
-        setCardBottom(window.innerHeight -cordinates.bottom-10)
+    if(window.innerHeight -cordinates.bottom<237){
+        setCardBottom(window.innerHeight -e.clientY-10)
         setMoveCardUp(true)
     }
 }
@@ -218,9 +218,9 @@ const openElementProperties=()=>{
 
         </div>
         {isIdentifierVisible?(props.object.identifier!==undefined)?
-        <div className={moveCardUp?'arrow-bottom':'arrow-top'} style={moveCardUp?{position: 'absolute',bottom:cardBottom, padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}:{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:<div className='arrow-top'style={moveCardUp?{position: 'absolute',bottom:cardBottom, padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}:{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{defaultIdentifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:null}
+        <div className={moveCardUp?'arrow-bottom':'arrow-top'} style={moveCardUp?{position: 'absolute',bottom:cardBottom, padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500',zIndex:'9999'}:{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{props.object.identifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:<div className='arrow-top'style={moveCardUp?{position: 'absolute',bottom:cardBottom, padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}:{position: 'absolute', padding:'10px' , borderRadius:'1rem',border: 'gray',background:'#997cb8',color:'white',fontFamily:'LatoWebLight',fontWeight:'500'}}><span >Element Identifier Order:</span><br></br>{defaultIdentifier.map((item,idx)=><><span>{`${idx+1}. ${defaultNames[item.identifier]}`}</span><br></br></>)}</div>:null}
         
-        <Dialog header={"Element Properties"} editMode="cell" style={{width:'70vw'}} visible={elementProperties}  onHide={() =>setElementProperties(false)}  footer={footerContent}>
+        <Dialog header={`Element Properties : ${props.object?.custname?.length>40?props.object?.custname?.substr(0,40)+"...":props.object?.custname}`} editMode="cell" style={{width:'70vw'}} visible={elementProperties}  onHide={() =>setElementProperties(false)}  footer={footerContent}>
         <div className="card">
             <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
                 <Column rowReorder style={{ width: '3rem' }} />

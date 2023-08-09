@@ -276,6 +276,10 @@ async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo
 	}
 	Object.assign(userInfo,profile);
 	const execIds = { "batchid": "generate", "execid": {} };
+	if ('scenarioParallelExecutionId' in batchExecutionData) {
+			execIds['batchid'] = batchExecutionData['scenarioParallelBatchId'];
+			execIds['execid'][batchExecutionData.batchInfo[0]['testsuiteId']] = batchExecutionData['scenarioParallelExecutionId']
+	}
 	//add to test queue
 	var result = await queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"ACTIVE",poolid);
 	delete userInfo;

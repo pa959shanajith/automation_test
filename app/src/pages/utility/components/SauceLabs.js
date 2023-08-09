@@ -101,6 +101,13 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     const [showRealdevice, setShowRealdevice] = useState('emulator');
 
     useEffect(() => {
+        setSelectedPlatforms('')
+        setSelectedMobileVersion('')
+        setSelectedEmulator('')
+        setShowRealdevice('emulator')
+        setPlatforms([])
+        setPlatformVersions([])
+        setEmulator([])
         if (Object.keys(browserDetails).length) {
             setNewOsNames(browserDetails.os_names.map((element, index) => {
                 return { key: element, text: element, title: element, index: index };
@@ -230,7 +237,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
 
     return (
         <>
-            <Dialog id='SauceLab_Integration' header='SauceLabs Intergration' visible={displayBasic5} onHide={() => onHide('displayBasic5')}>
+            <Dialog id='SauceLab_Integration' header='SauceLabs Integration' visible={displayBasic5} onHide={() => onHide('displayBasic5')}>
             {showSauceLabs && <>
             <div className='saucelab_toggle_button'>
                 <label className='toggle_saucelabs_emulator'>Emulator </label>
@@ -289,7 +296,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             options={platformVersions}
                             selectedKey={selectedMobileVersion}
                             width='15rem'
-                            placeholder='select android versions'
+                            placeholder={'select ' + selectedPlatforms + ' versions'}
                             calloutMaxHeight='12rem'
                         />
                     </>}
@@ -318,7 +325,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             selectedKey={selectedEmulator}
                             disabled={selectedMobileVersion == ''}
                             width='15rem'
-                            placeholder='select Emulator'
+                            placeholder={showRealdevice == 'emulator'?"Select Emulator":'Select Real Devices'}
                             calloutMaxHeight='12rem'
                         />
                     </>}

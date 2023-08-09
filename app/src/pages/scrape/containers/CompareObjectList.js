@@ -93,7 +93,7 @@ const CompareObjectList = (props) => {
             compareContent={
                 <div className="ss__compareContents">
                     <div className="ss__comparebtngroup">
-                        {changedObj && changedObj.length && <button className="ss__compareAction" onClick={updateObjects}>Update</button>}
+                        {(changedObj && changedObj.length) ? <button className="ss__compareAction" onClick={updateObjects}>Update</button> : null}
                         <button className="ss__compareAction" onClick={closeCompare}>Cancel</button>
                     </div>
                     <div className="ss__compareboxes">
@@ -145,13 +145,17 @@ const MapObjectModal = props => {
     const [map, setMap] = useState({});
     const [showName, setShowName] = useState("");
     const [selectedItems, setSelectedItems] = useState([]);
+    const [activeEye, setActiveEye] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const { user_id, role } = useSelector(state => state.login.userinfo);
     const compareData = useSelector(state => state.scrape.compareData);
+    const objValue = useSelector(state=>state.scrape.objValue);
+
     const { changedObj, notChangedObj, notFoundObj, fullScrapeData } = useSelector(state => state.scrape.compareObj);
     const dispatch = useDispatch();
     const history = useHistory();
     const { fetchScrapeData, orderList } = useContext(ScrapeContext);
+    const[hightlightcustname,setHighlightedCustname]=useState("")
 
     useEffect(() => {
         let tempScrapeList = {};
@@ -182,6 +186,10 @@ const MapObjectModal = props => {
             setFilteredList(tempFilteredList);
         }
     }, [])
+    useEffect(()=>{
+        if (objValue.custname === hightlightcustname) setActiveEye(true);
+        else if (activeEye) setActiveEye(false);
+    }, [objValue])
 
     const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
 
@@ -218,7 +226,7 @@ const MapObjectModal = props => {
     const submitMap = () => {
 
         if (!Object.keys(map).length) {
-            setErrorMsg("Please select atleast one object to Map");
+            setErrorMsg("Please select atleast one object to Replace");
             return;
         }
 
@@ -291,6 +299,13 @@ const MapObjectModal = props => {
         setShowName(showName);
         setSelectedItems(updatedSelectedItems);
     }
+    
+    const onHighlight = (object) => {
+        // props.setActiveEye(props.object.val);
+        setHighlightedCustname(object.custname)
+        let objVal = { ...object };
+        dispatch({type: actions.SET_OBJVAL, payload: objVal});
+    }
 
     return (
         <div data-test="mapObject" className="ss__mapObj">
@@ -331,14 +346,24 @@ const MapObjectModal = props => {
                                             <div className="mo_listContent" id="moListId">
                                                 <ScrollBar scrollId="moListId">
                                                     <div data-test="mapObjectCustomContainer" className="ss__mo_customInContainer">
-                                                        {Object.keys(FilteredList).map((elementType, i) => (
+                                                        {Object.keys(FilteredList).length > 0 ? Object.keys(FilteredList).map((elementType, i) => (
                                                             <Fragment key={i}>
                                                                 <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={() => setSelectedTag(elementType === selectedTag ? "" : elementType)}>{elementType}</div>
                                                                 {selectedTag === elementType && <div className="mo_tagItemList">
                                                                     {FilteredList[selectedTag].map((object, j) =>
+                                                                    <>
+                                                                    <div style={{display:'flex',gap:'5px'}}><div> 
+                                                                    <img data-test="eyeIcon" className="ss_eye_icon" 
+                                                                    onClick={()=>onHighlight(object)} 
+                                                                    src={(activeEye && object.custname===objValue.custname) ? 
+                                                                            "static/imgs/ic-highlight-element-active.png" : 
+                                                                            "static/imgs/ic-highlight-element-inactive.png"} 
+                                                                    alt="eyeIcon"
+                                                                    />
+                                                                    </div>
                                                                         <div data-test="mapObjectCustomListItem" key={j}
                                                                             title={object.custname}
-                                                                            className={"mo_tagItems" + (selectedItems.includes(object.xpath) ? " mo_selectedTag" : "")}
+                                                                            className={"mo_tagItems_rep" + (selectedItems.includes(object.xpath) ? " mo_selectedTag" : "")}
                                                                             onDragOver={onDragOver} onDrop={(e) => onDrop(e, object)}>
                                                                             {object.xpath in map ?
                                                                                 <>
@@ -347,12 +372,17 @@ const MapObjectModal = props => {
                                                                                     </span>
                                                                                     <span data-test="mapObjectFlipName" className="mo_nameFlip" onClick={() => onCustomClick(object.xpath, object.xpath)}></span>
                                                                                 </> :
-                                                                                <span data-test="h3">{object.custname}</span>}
+                                                                                <span data-test="h3">{object.custname}</span>
+                                                                                 }
 
-                                                                        </div>)}
+                                                                        </div>
+                                                                        </div>
+                                                                        </>)}
                                                                 </div>}
                                                             </Fragment>
-                                                        ))}
+                                                        )) : 
+                                                        <span style={{color:'red'}}>{`No elements found that can be replaced with "Not found element"`}</span>
+                                                        }
                                                     </div>
                                                 </ScrollBar>
                                             </div>

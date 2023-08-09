@@ -112,7 +112,7 @@ exports.connectAzure_ICE = function(req, res) {
 
                             function azure_login_2_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "issue_id"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "issue_id","auto_populate"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", azure_login_2_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectAzure_ICE - createIssueInAzure: Socket Disconnected");
@@ -120,7 +120,7 @@ exports.connectAzure_ICE = function(req, res) {
                                             var soc = myserver.socketMapNotify[username];
                                             soc.emit("ICEnotAvailable");
                                         }
-                                    } else if (data.onAction == "issue_id") {
+                                    } else if (data.onAction == "issue_id" || data.onAction == "auto_populate") {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail") {
@@ -159,9 +159,8 @@ exports.connectAzure_ICE = function(req, res) {
             var createObj = req.body.azure_input_dict;
             var project = '';
             if(req.body.projects && req.body.projects.length){
-                project = req.body.projects[0].text
+                project = req.body.projects.filter((el) => el.key === req.body.project)[0]['text'];
             }
-             
             var issuetype = req.body.issuetype;
             var url =req.body.url;
             var username= req.body.username;
