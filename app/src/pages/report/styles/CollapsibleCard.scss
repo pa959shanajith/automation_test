@@ -145,12 +145,13 @@
             display: flex;
             justify-content: flex-start;
             align-content: center;
+            margin-bottom: 0.5rem;
             .red-dot{
                 align-self: center;
                 height: 8px;
                 width: 8px;
                 border-radius: 50%;
-                background-color: $moderateFail;
+                background-color: $majorFail;
                 margin-right: 10px;
             }
             .terminate-dot{
@@ -298,6 +299,7 @@
     min-height: 20px;
     color: $greyishText;
     grid-area: mainContent;
+    padding-left: 0.2rem;
 }
 
 .data-heading-nolimit, .data-value-nolimit{
@@ -325,13 +327,8 @@
 }
 
 .rp__card_item{
-    display: grid;
-    grid-template-areas:
-        "title subContent"
-        "mainContent subContent";
-    grid-column-gap: 40px;
-    grid-template-columns: auto 1fr;
-
+    display: flex;
+    align-items: baseline;
     .r__jira_login-container {
         grid-area: subContent;
     }

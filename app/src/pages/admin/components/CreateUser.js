@@ -15,6 +15,8 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { TabMenu } from 'primereact/tabmenu';
 import TokenManagement from '../containers/TokenMangement';
+import { Checkbox } from 'primereact/checkbox';
+import IceProvision from '../containers/IceProvision';
 
 
 /*Component CreateUser
@@ -65,9 +67,11 @@ const CreateUser = (props) => {
     const [showEditUser, setShowEditUser] = useState(false);
     const [allRolesUpdate, setAllRolesUpdate] = useState([]);
     const [roleDropdownValue, setRoleDropdownValue] = useState("");
-    const [userCreateDialog , setUserCreateDialog] = useState(props.userCreateDialog);
+    const [userCreateDialog, setUserCreateDialog] = useState(props.userCreateDialog);
     const [selectedTab, setSelectedTab] = useState('userDetails');
-    const [forTokenMngmtUserName, setForTokenMngmtUserName] = useState('');
+    const [userNameForIceToken, setUserNameForIceToken] = useState('');
+    // const [userIdforIceToken, setUserIdForIceToken] = useState('');
+    const [adminCheck, setAdminCheck] = useState(false);
 
     useEffect(() => {
         click();
@@ -81,11 +85,12 @@ const CreateUser = (props) => {
         let allRolesList = [];
         if (allRoles.length) {
             allRoles.map(role => {
-
                 let roleObject = {};
-                roleObject.name = role[0];
-                roleObject.value = role[1];
-                allRolesList.push(roleObject);
+                if (role[0] !== "Admin") {
+                    roleObject.name = role[0];
+                    roleObject.value = role[1];
+                    allRolesList.push(roleObject);
+                }
             })
             setAllRolesUpdate(allRolesList);
         }
@@ -93,7 +98,7 @@ const CreateUser = (props) => {
 
     const tabHeader = [
         { label: 'User Details', key: 'userDetails', text: 'User Details' },
-        { label: 'Token Authorization', key: 'tokenAuthorization', text: 'Token Authorization' },
+        { label: 'Avo Assure Client Provision', key: 'avoAzzureClient', text: 'Avo Assure Client Provision' },
     ];
 
     useOnClickOutside(node, () => setToggleAddRoles(false));
@@ -142,7 +147,7 @@ const CreateUser = (props) => {
 
     //Transaction Activity for Create/ Update/ Delete User button Action
     const manage = (props) => {
-        setForTokenMngmtUserName(userName);
+        setUserNameForIceToken(userName);
         const action = props.action;
         if (!validate({ action: action })) return;
         const bAction = action.charAt(0).toUpperCase() + action.substr(1);
@@ -163,7 +168,8 @@ const CreateUser = (props) => {
             addRole: addRole,
             type: uType,
             createdbyrole: createdbyrole,
-            server: server
+            server: server,
+            isAdminUser: adminCheck // if user is Test Manager, she/he has the Admin rights and it is optional
         };
         if (uType === "ldap") userObj.ldapUser = ldap.user;
         setLoading(bAction.slice(0, -1) + "ing User...");
@@ -174,7 +180,7 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
-                    if (action === "create") { click(); setSelectedTab("tokenAuthorization") }
+                    if (action === "create") { click(); setSelectedTab("avoAzzureClient") }
                     else edit();
                     // toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "delete") {
@@ -595,21 +601,31 @@ const CreateUser = (props) => {
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(value))
     }
 
+    const userCreateHandler = async () => {
+        toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
+    }
+
     const createUserFooter = () => <>
         <Button
             data-test="cancelButton"
             label="Cancel"
-            disabled={selectedTab === "tokenAuthorization"}
+            disabled={selectedTab === "avoAzzureClient"}
             text
             onClick={() => props.setUserCreateDialog(false)}
         >
         </Button>
-        <Button
+        {selectedTab === "userDetails" && <Button
             data-test="createButton"
-            label={selectedTab === "tokenAuthorization" ? "Create" : "Next"}
-            onClick={() => {manage({ action: "create" }); if(selectedTab === "tokenAuthorization") toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS)); }} 
+            label="Next"
+            onClick={() => { manage({ action: "create" }); }}
             disabled={nocreate}>
-        </Button>
+        </Button>}
+        {selectedTab === "avoAzzureClient" && <Button
+            data-test="createButton"
+            label={"Create"}
+            onClick={() => userCreateHandler()}
+            disabled={nocreate}>
+        </Button>}
     </>
 
     const createUserDialogHide = () => {
@@ -619,7 +635,7 @@ const CreateUser = (props) => {
 
     return (
         <Fragment>
-            <Toast ref={toast} position='bottom' />
+            <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={1300} />
             {loading ? <ScreenOverlay content={loading} /> : null}
 
             <Dialog
@@ -718,6 +734,11 @@ const CreateUser = (props) => {
                             // style={(props.showEditUser === true) ? { backgroundColor: "#eee", cursor: "not-allowed" } : {}}
                             />
                         </div>
+                        {/* Admin Check */}
+                        {roleDropdownValue === "5db0022cf87fdec084ae49ab" && <div className="flex flex-row "> {/* Test Manager role ID */}
+                            <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
+                            <label htmlFor="admin_check" className="ml-2">Admin</label>
+                        </div>}
                         {/* 
                 {( rolename!=='Admin' && props.showEditUser === true  && userIdName!=='')?
                     <div  className="col-xs-6 selectRole" >
@@ -740,7 +761,7 @@ const CreateUser = (props) => {
 
                     </div>
                 </div>}
-                {selectedTab === "tokenAuthorization" && <TokenManagement username={forTokenMngmtUserName} />}
+                {selectedTab === "avoAzzureClient" && <IceProvision userName={userNameForIceToken}  toastError={toastError} toastSuccess={toastSuccess}/>}
             </Dialog>
         </Fragment>
     );

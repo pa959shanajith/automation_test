@@ -29,12 +29,12 @@ const TokenMgmtForm = (props) => {
 	const [time, setTime] = useState(null);
 
 
-	let inputProps1 = {
-		placeholder: "Select Time",
-		readOnly: "readonly",
-		disabled: inputProps1Disable,
-		className: "fc-timePicker"
-	};
+	// let inputProps1 = {
+	// 	placeholder: "Select Time",
+	// 	readOnly: "readonly",
+	// 	disabled: inputProps1Disable,
+	// 	className: "fc-timePicker"
+	// };
 
 	const displayError = (error) => {
 		setLoading(false)
@@ -54,20 +54,7 @@ const TokenMgmtForm = (props) => {
 		// eslint-disable-next-line
 	}, [props.runLoadData])
 
-	useEffect(() => {
-		(async () => {
-			var data = await getUserDetails("user");
-			if (data.error) { displayError(data.error); return; }
-			else {
-				data.sort();
-				data.map(user => {
-					if(props.username && user.includes(props.username)){
-						props.setUserId(user[1])
-					}
-				})
-			}
-		})()
-	});
+
 
 	// useEffect(() => {
 	// 	if (isUsrSetting) {
@@ -291,10 +278,16 @@ const TokenMgmtForm = (props) => {
 				<div className='flex flex-row'>
 					<InputTextarea id="ciToken" name="ciToken" value={props.token} rows={3} cols={50} placeholder="Click on Generate to get the Token" readOnly />
 					<label className='pl-3 flex flex-column justify-content-between '>
-						<span className="pi pi-copy token_copy" style={{ fontSize: '1.5rem', cursor: 'pointer' }} data-for="copy" data-tip={copyToolTip} onClick={() => { copyTokenFunc() }} ></span>
-						<Tooltip target=".token_copy" content={copyToolTip} position="right"/>
+						<span
+							className="pi pi-copy token_copy"
+							style={{ fontSize: '1.5rem', cursor: 'pointer' }}
+							data-for="copy"
+							data-tip={copyToolTip}
+							onClick={() => { copyTokenFunc() }}
+						></span>
+						<Tooltip target=".token_copy" content={copyToolTip} position="right" />
 						<span className="pi pi-download downlod_token" style={{ fontSize: '1.5rem', cursor: 'pointer' }} data-for="download" data-tip={downloadToolTip} onClick={() => { downloadToken() }}></span>
-						<Tooltip target=".downlod_token" content={downloadToolTip} position="right"/>
+						<Tooltip target=".downlod_token" content={downloadToolTip} position="right" />
 					</label>
 				</div>
 			</div>

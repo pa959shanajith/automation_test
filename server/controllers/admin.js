@@ -3,6 +3,9 @@ const TokenGenerator = require('uuid-token-generator')
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const generator = require('../notifications/generator');
+const email = require('../notifications/email');
+
 const archiver = require('archiver');
 const activeDirectory = require('activedirectory');
 const Client = require("node-rest-client").Client;
@@ -60,7 +63,8 @@ exports.manageUserDetails = async (req, res) => {
 				action,
 				user:reqData,
 				name:reqData.username,
-				userimage:reqData.userimage || ''
+				userimage:reqData.userimage || '',
+				isAdminUser : reqData.isAdminUser
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -71,6 +75,7 @@ exports.manageUserDetails = async (req, res) => {
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
 			userimage: reqData.userimage || '',
+			isAdminUser : reqData.isAdminUser,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -209,7 +214,7 @@ exports.getUserDetails = async (req, res) => {
 			let data = [];
 			if (action == "user") {
 				for (let row of result) {
-					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email]);
+					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email, row.profileimage]);
 				}
 			} else {
 				data = {
@@ -220,6 +225,7 @@ exports.getUserDetails = async (req, res) => {
 					lastname: result.lastname,
 					email: result.email,
 					role: result.defaultrole,
+					profileimage: result.profileimage,
 					rolename: result.rolename,
 					addrole: result.addroles,
 					type: result.auth.type,
@@ -1801,6 +1807,18 @@ exports.provisionICE = async (req, res) => {
 			query: tokeninfo.action
 		};
 		const result = await utils.fetchData(inputs, "admin/provisionICE", fnName);
+		if(result !== 'fail'){
+			const uData = {
+				uid: tokeninfo.userid,
+				email: tokeninfo.email,
+				token:result,
+				url:tokeninfo.url,
+			    firstname: tokeninfo.firstName,
+			    lastname: tokeninfo.lastName,
+				username: tokeninfo.username,
+			}
+			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+		}
 		res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName+":", exception);
@@ -2534,7 +2552,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		const userid = req.session.userid;
 		const activeRole = req.session.activeRole;
 		const roleId = req.session.activeRoleId;
-		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin") return next();
+		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin" && isAdminUser === true) return next();
 		switch (req.path) {
 			case "/manageUserDetails":
 				if (req.body.user.userid == userid && req.body.action == 'update') return next();
@@ -2543,7 +2561,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 				if (req.body.CIUser.userId) return next();
 				break;
 			case "/provisionIce":
-				if (req.body.tokeninfo.userid == userid) return next();
+				if (req.body.tokeninfo.userid) return next();
 				break;
 			case "/gitSaveConfig":
 				if (req.body.userId == userid) return next();

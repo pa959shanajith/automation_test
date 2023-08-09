@@ -308,7 +308,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings|genius)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius)$/, function(req, res) {
 			var roles = ["Quality Manager", "Quality Lead", "Quality Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});

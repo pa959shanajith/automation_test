@@ -72,32 +72,32 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
         return;
     }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
-    dNodes.forEach((e, i)=>{
-        if (i === 0) return;
-        temp_data[i] = {
-            idx: i,
-            x: e.x,
-            y: e.y,
-            type: e.type
-        };
-    });
-    if (verticalLayout) {
-        temp_data.sort((a, b)=>a.x - b.x);
-    } else {
-        temp_data.sort((a, b)=>a.y - b.y);
-    }
-    temp_data.forEach((e)=>{
-        // var key_1=undefined;
-        if(dNodes[e.idx].parent === null) return;
-        var key_1= dNodes[e.idx].parent.id;
-        var key=e.type+'_'+key_1;
-        if(counter[key] === undefined)  counter[key]=1;
-        if (dNodes[e.idx].childIndex !== counter[key]) {
-            dNodes[e.idx].childIndex = counter[key];
-            dNodes[e.idx].cidxch = 'true'; // child index updated
-        }
-        counter[key] = counter[key] + 1;
-    })
+    // dNodes.forEach((e, i)=>{
+    //     if (i === 0) return;
+    //     temp_data[i] = {
+    //         idx: i,
+    //         x: e.x,
+    //         y: e.y,
+    //         type: e.type
+    //     };
+    // });
+    // if (verticalLayout) {
+    //     temp_data.sort((a, b)=>a.x - b.x);
+    // } else {
+    //     temp_data.sort((a, b)=>a.y - b.y);
+    // }
+    // temp_data.forEach((e)=>{
+    //     // var key_1=undefined;
+    //     if(dNodes[e.idx].parent === null) return;
+    //     var key_1= dNodes[e.idx].parent.id;
+    //     var key=e.type+'_'+key_1;
+    //     if(counter[key] === undefined)  counter[key]=1;
+    //     if (dNodes[e.idx].childIndex !== counter[key]) {
+    //         dNodes[e.idx].childIndex = counter[key];
+    //         dNodes[e.idx].cidxch = 'true'; // child index updated
+    //     }
+    //     counter[key] = counter[key] + 1;
+    // })
     treeIterator(mapData, dNodes[0], error);
     var data = {
         write: flag,

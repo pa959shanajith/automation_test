@@ -11,34 +11,31 @@ import { Chart } from 'primereact/chart';
 */
 
 const ExecutionSummaryLabels = {
-    scenarioName: "Scenario Name",
-    cycleName: "Cycle",
-    StartTime: "StartDate Time",
-    projectName: "Project",
-    releaseName: "Release",
-    EndTime: "EndDate Time",
-    domainName: "Domain",
-    overallstatus: "Overall Status",
-    EllapsedTime: "TimeElapsed",
-    _order_: ['scenarioName', 'cycleName', 'StartTime', 'projectName', 'releaseName', 'EndTime', 'domainName', 'overallstatus', 'EllapsedTime'],
+    scenarioName: "Testcase Name : ",
+    StartTime: "StartDate Time : ",
+    projectName: "Project : ",
+    EndTime: "EndDate Time : ",
+    overallstatus: "Overall Status : ",
+    EllapsedTime: "TimeElapsed : ",
+    _order_: ['scenarioName', 'StartTime', 'projectName', 'EndTime', 'overallstatus', 'EllapsedTime'],
 };
 
 const TestCaseSummaryLabels = {
-    EllapsedTime: "Time Elapsed",
-    actualResult_pass_AR: "Actual Result",
-    actualResult_pass_ER: "Expected Result",
-    comments: "Comments",
-    JiraID: "Jira ID",
+    EllapsedTime: "Time Elapsed : ",
+    actualResult_pass_AR: "Actual Result : ",
+    actualResult_pass_ER: "Expected Result : ",
+    comments: "Comments : ",
+    JiraID: "Jira ID : ",
     _order_: ['actualResult_pass_AR', 'actualResult_pass_ER', "JiraID", 'EllapsedTime', 'comments']
 }
 
 const AccessibiltySummaryLabels = {
-    standardName: "Standard Name",
-    numOfRulesTested: "No. of Rules Tested",
-    screeName: "Screen Name",
-    numOfElementsTested: "No. of Elements Tested",
-    url: "URL",
-    browserUsed: "Browser used for Testing",
+    standardName: "Standard Name : ",
+    numOfRulesTested: "No. of Rules Tested : ",
+    screeName: "Screen Name : ",
+    numOfElementsTested: "No. of Elements Tested : ",
+    url: "URL : ",
+    browserUsed: "Browser used for Testing : ",
     _order_: ['standardName', 'numOfRulesTested', 'screeName', 'numOfElementsTested', 'url', 'browserUsed'],
 }
 
@@ -181,7 +178,7 @@ const SummaryBar = ({ summaryValues , type }) => {
 
     return (
         <>
-            {/* <div className="summary-bar-container">
+            <div className="summary-bar-container">
                 <div className="data-bar">
                     <DataHeading>{type === "Execution" ? "Testcase Status" : "Result Status of Elements"}</DataHeading>
                     <div className="chart-bar">
@@ -227,10 +224,10 @@ const SummaryBar = ({ summaryValues , type }) => {
                         }
                     </div>
                 </div>
-            </div> */}
-             <div className="card flex justify-content-center">
-                <Chart type="doughnut" data={chartData} options={chartOptions} className="w-full md:w-15rem" />
             </div>
+             {/* <div className="card flex justify-content-center">
+                <Chart type="doughnut" data={chartData} options={chartOptions} className="w-full md:w-15rem" />
+            </div> */}
         </>
     );
 }

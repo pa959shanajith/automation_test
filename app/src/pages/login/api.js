@@ -171,3 +171,52 @@ export const storeUserDetails = async(userData) => {
         console.log(err);
     }
 }
+/*Component Login
+  api returns true / false
+*/
+export const shouldShowVerifyPassword = async(user_id) => {
+    try{
+        const res = await axios(url+"/verifyUser", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: { user_id },
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            return {error: 'Failed to verify user'}
+        }
+    }
+    catch(err){
+        return {error: 'Failed to verify user'}
+    }
+}
+
+/*Component Login
+  api returns flag and/or user
+*/
+export const shouldResetPassword = async(uid) => {
+    try{
+        const res = await axios(url+"/checkForgotExpiry", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: { uid },
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            return {error: 'Failed to verify user'}
+        }
+    }
+    catch(err){
+        return {error: 'Failed to verify user'}
+    }
+  }

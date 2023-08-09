@@ -25,8 +25,9 @@
         .p-datatable-wrapper {
             height: 75vh;
             .p-datatable-tbody>tr>td:nth-child(4) {
-                width: 60rem;
+                width: 80rem;
                 vertical-align: top;
+                padding: 0;
             }
         }
     }
@@ -44,15 +45,15 @@
                 vertical-align: middle;
         }
     }
+    .nested_table>.p-datatable-tbody>tr>td:nth-child(1) {
+        text-align: center;
+    }
     .nested_table{
         .p-datatable-wrapper {
             height: auto;
         }
-        .p-datatable-tbody>tr>td:nth-child(1) {
-            text-align: center;
-        }
         .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 30rem;
+            width: 42rem;
         }
     }
     .module_table {
@@ -63,7 +64,7 @@
             text-align: center;
         }
         .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 30rem;
+            width: 42rem;
         }
     }
     .statusTable {
@@ -77,15 +78,15 @@
     }
     .textSuite {
         display: inline-block;
-        width: 30rem;
+        width: 42rem;
     }
     .textCase {
         display: inline-block;
-        width: 30rem;
+        width: 42rem;
     }
     .suite_text {
         display: inline-block;
-        width: 30rem;
+        width: 40.5rem;
     }
     .case_text {
         display: inline-block;

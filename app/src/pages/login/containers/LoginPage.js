@@ -21,7 +21,7 @@ const LoginPage = () => {
 
     return (
         <StaticElements>
-             <LoginFields />
+             <LoginFields verifyPage={window.location.pathname==="/verify"?true:false} resetPassword={window.location.pathname==="/reset"?true:false}/>
         </StaticElements>
     );
 }
