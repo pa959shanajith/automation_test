@@ -316,12 +316,12 @@ const DesignModal = (props) => {
                                                 testcase[i].keywordVal = testcase[i].keywordVal[0].toLowerCase() + testcase[i].keywordVal.slice(1,);
                                                 if(testcase[i].custname !== "OBJECT_DELETED"){
                                                     let objType = getKeywordList(testcase[i].custname,keywordData,props.appType,scriptData.view)
-                                                    testcase[i]["keywordTooltip"] = keywordData[objType.obType][temp]?.tooltip!==undefined?keywordData[objType.obType][temp].tooltip:'--';
-                                                    testcase[i]["keywordDescription"] = keywordData[objType.obType][temp]?.description!==undefined?keywordData[objType.obType][temp].description:'--';
+                                                    testcase[i]["keywordTooltip"] = keywordData[objType.obType][temp]?.tooltip!==undefined?keywordData[objType.obType][temp].tooltip:testcase[i].keywordVal;
+                                                    testcase[i]["keywordDescription"] = keywordData[objType.obType][temp]?.description!==undefined?keywordData[objType.obType][temp].description:testcase[i].keywordVal;
                                                 }else{
                                                     // let objType = getKeywordList(testcase[i].custname,keywordData,props.appType)
-                                                    testcase[i]["keywordTooltip"] = '--';
-                                                    testcase[i]["keywordDescription"] = '--';
+                                                    testcase[i]["keywordTooltip"] = testcase[i].keywordVal;
+                                                    testcase[i]["keywordDescription"] = testcase[i].keywordVal ;
                                                 }
                                                 testcaseArray.push(testcase[i]);
                                             }
