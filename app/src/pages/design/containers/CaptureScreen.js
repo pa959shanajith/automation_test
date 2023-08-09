@@ -1460,7 +1460,8 @@ const CaptureModal = (props) => {
                 </div>}
                 <div>
                   <span onClick={togglePanel}>
-                    <i className={showPanel ? 'pi pi-chevron-circle-down' : 'pi pi-chevron-circle-up'} style={{ fontSize: '1rem' }}></i>
+                    {showPanel ? <img className="" src="static/imgs/collapse_rounded_icon.svg"></img> : <img className="" src="static/imgs/expand_rounded_icon.svg" ></img>}
+                    {/* <i className={showPanel ? 'pi pi-chevron-circle-up' : 'pi pi-chevron-circle-down'} style={{ fontSize: '1rem' }}></i> */}
                   </span>
                 </div>
             </div>
