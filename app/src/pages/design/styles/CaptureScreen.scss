@@ -699,7 +699,7 @@
 
 .utility__block {
   border-right: 1px solid #E2E2ED;
-  cursor: pointer;
+  cursor: not-allowed;
 
   .insprint__text {
     position: relative;
@@ -707,7 +707,7 @@
     right: 1rem;
     font-size: 16px;
     font-family: "Open sans";
-    cursor: pointer;
+    cursor: not-allowed;
     font-weight: bold;
   }
 
