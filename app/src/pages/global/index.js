@@ -11,6 +11,7 @@ import ResetSession from './components/ResetSession';
 import Thumbnail from './components/Thumbnail';
 import Footer from './components/FooterTwo';
 import ValidationExpression from './components/ValidationExpression';
+import BrowserFp from './components/BrowserFp';
 
 
 export { 
@@ -29,4 +30,5 @@ export {
         Thumbnail,
         Footer,
         ValidationExpression,
+        BrowserFp,
     };
