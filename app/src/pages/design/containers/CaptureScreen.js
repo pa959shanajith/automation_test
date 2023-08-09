@@ -1460,7 +1460,7 @@ const footerSave = (
                 </div>)} */}
               </div>
               <div className='utility__block'>
-                <p className='insprint__text'>Capture from PDF</p>
+                <p className='insprint__text text-400'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_utility" position="bottom" content="  Capture the elements from a PDF." />
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} >
