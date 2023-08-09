@@ -345,28 +345,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const handleTabChange = (index) => {
         setActiveIndex(index);
-        // <div className='btn-11'>
-        //         {activeIndex === 0 &&(
-        //             <div className="btn__2">
-        //                 <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
-        //                 <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-        //             </div>)}
-    
-        //         {activeIndex === 1 &&(
-        //             <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-    
-        //     </div>
-        setFooterIntegrations(
-            <div className='btn-footer-jira'>
-                {index === 0 &&(
-                    <div className="btn__2">
-                        <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
-                        <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-                    </div>)}
-    
-                {index === 1 &&(
-                    <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-            </div>);
     };
 
     const showCard2 = () => {
@@ -742,26 +720,19 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    // const footerIntegrations = ()=>{
-    //     <div className='btn-11'>
-    //         {activeIndex === 0 &&(
-    //             <div className="btn__2">
-    //                 <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
-    //                 <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-    //             </div>)}
-
-    //         {activeIndex === 1 &&(
-    //             <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-
-    //     </div>
-    // }
-    const [footerIntegrations, setFooterIntegrations] = useState(
-        <div className='btn-11'>
+    const footerIntegrations = useCallback(()=>{
+        return (<div className='btn-11'>
+            {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
+                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:callAzureSaveButton} />
                     <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-                </div>
-        </div>);
+                </div>)}
+
+            {activeIndex === 1 &&(
+                <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
+
+        </div>)
+    },[activeIndex,selectedscreen.name,mappedData])
 
     const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} handleIntegration={handleIntegration}
      setShowLoginCard={setShowLoginCard} setAuthType={setAuthType} authType={authType} />, [isSpin, showCard2,
@@ -772,7 +743,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     return (
         <>
             <div className="card flex justify-content-center">
-                <Dialog className="manage_integrations" header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations : ""}>
+                <Dialog className="manage_integrations" header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations() : ""}>
                     <div className="card">
                         {showLoginCard ? <TabMenu model={integrationItems} /> : ""}
                     </div>
@@ -891,7 +862,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={setFooterIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
