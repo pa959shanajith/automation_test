@@ -34,6 +34,7 @@ const AdminSidePanel = () => {
                     </div>
                 </AccordionTab>
             </Accordion>
+            <Button className="email_button" onClick={() => { setHeader('Email Server Configuration'); setScreen('Email Server Configuration'); }}>Email Server Configuration</Button>
         </div>
     )
 }
