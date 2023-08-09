@@ -49,7 +49,7 @@ const ProjectCreation = () => {
         {/* </div> */}
 
         {/* <div  className="gotoadmin-card">  */}
-        <Card className="gotoadmin-card" title="Do you wish to do some housekeeping today?">
+        <Card className="gotoadmin-card" title=" Wish to do some housekeeping today?">
           <div className="list_btns">
             <Link>   <li className="list1">Configure a new user</li></Link>
             <Link>   <li className="list1">Manage License</li></Link>

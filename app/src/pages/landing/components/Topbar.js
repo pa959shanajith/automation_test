@@ -89,6 +89,7 @@ const MenubarDemo = (props) => {
     </NavLink>
   );
 
+
   const end = (
     <div className='Headers'>
       <div className='Tab_Menu_Header'>
@@ -101,6 +102,10 @@ const MenubarDemo = (props) => {
       <UserProfile />
     </div>
   );
+
+  const tooltip_needhelp = {
+    fontSize: "12px",fontfamily:"Open Sans",  fontWeight: "normal",marginleft:"2rem"
+  };
 
   return (
     <div className='Topbar_Menu'>
@@ -115,7 +120,7 @@ const MenubarDemo = (props) => {
     </div>
                  
                 </div>)} */}
-          <Tooltip target=".needHelp_img" position="left" content="View training videos and documents." />
+          <Tooltip target=".needHelp_img" position="left" content="View training videos and documents." style={tooltip_needhelp} />
           <Menu className='needHelp_Menu w-13rem' id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft} />
         </div>
       </div>
