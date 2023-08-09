@@ -1394,7 +1394,6 @@ const CaptureModal = (props) => {
         <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
-              <div className="">
                 {showPanel && <div className='insprint__block'>
                   <p className='insprint__text'>In Sprint Automation</p>
                   <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
@@ -1464,8 +1463,6 @@ const CaptureModal = (props) => {
                     <i className={showPanel ? 'pi pi-chevron-circle-down' : 'pi pi-chevron-circle-up'} style={{ fontSize: '1rem' }}></i>
                   </span>
                 </div>
-              </div>
-
             </div>
           </Card>
         </div>
