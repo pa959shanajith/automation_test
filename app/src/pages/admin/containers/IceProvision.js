@@ -20,7 +20,7 @@ const IceProvision = (props) => {
     const [op,setOp] = useState('normal')
     const [token,setToken] = useState("Click on Provision/Reregister to generate token")
     const [icename,setIcename] = useState("")
-    const [userid,setUserid] = useState(" ")
+    const [userid,setUserid] = useState([])
     const [tokeninfoToken,setTokeninfoToken] = useState("")
     const [tokeninfoIcename,setTokeninfoIcename] = useState("")
     const [defaultICE, setDefaultICE] = useState('')
@@ -38,7 +38,7 @@ const IceProvision = (props) => {
           data.sort();
           data.map(user => {
             if(props.userName && user.includes(props.userName)){
-              setUserid(user[1])
+              setUserid(user)
             }
           })
         }

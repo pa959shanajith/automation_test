@@ -8,7 +8,7 @@ import { Button } from 'primereact/button';
 import '../styles/StaticElements.scss'
 import { Toast } from 'primereact/toast';
 
-const Login = () => {
+const Login = (props) => {
     let serverList = [{ "name": "License Server", "active": false }, { "name": "DAS Server", "active": false }, { "name": "Web Server", "active": false }];
     const regEx_email = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const [showForgotPasswordScreen, setShowForgotPasswordScreen] = useState(false);
@@ -21,6 +21,11 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
     const toast = useRef(null);
+    const [overlayText, setOverlayText] = useState("");
+    const [initialFormPos,setInitialFormPos] = useState(0)
+    const [userResetData, setResetUserData] = useState({});
+    const [showResetPass, setShowResetPass] = useState(false);
+    const [showChangePass, setShowChangePass] = useState(false);
 
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {
@@ -174,6 +179,66 @@ const Login = () => {
     //         toastError(err)
     //     }
     // }
+    const redirectToHomePage = ()=>{
+        setTimeout(()=>{
+            setRedirectTo("/");
+        },2000)
+    }
+    useEffect(()=>{
+        setInitialFormPos(-20);
+        if(props.verifyPage){
+            setOverlayText("Loading...");
+            (async()=>{
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                let user_id = urlParams.get('user_id')
+                if(!user_id){
+                    setOverlayText("");
+                    redirectToHomePage();
+                    return
+                }
+                api.shouldShowVerifyPassword(user_id).then((res)=>{
+                    if(res){
+                        setOverlayText("");
+                        setShowResetPass(true);
+                    } else {
+                        setOverlayText("");
+                        redirectToHomePage();
+                    }
+                }).catch((error)=>{
+                    console.log(error);
+                    setOverlayText("");
+                    redirectToHomePage();
+                })
+            })();
+        } else if (props.resetPassword){
+          setOverlayText("Loading...");
+            (async()=>{
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                let user_id = urlParams.get('user_id')
+                if(!user_id){
+                    setOverlayText("");
+                    redirectToHomePage();
+                    return
+                }
+                api.shouldResetPassword(user_id).then((res)=>{
+                    if(res.flag && res.flag === "changePwd"){
+                        setOverlayText("");
+                        setResetUserData(res.user)
+                        setShowChangePass(true);
+                    } else {
+                        setOverlayText("");
+                        redirectToHomePage();
+                    }
+                }).catch((error)=>{
+                    console.log(error);
+                    setOverlayText("");
+                    redirectToHomePage();
+                })
+            })();
+        }
+    },[])
 
     return (
         <>

@@ -61,6 +61,7 @@
     position: relative;
     top: 12rem;
     right: 1.1rem;
+    font: $f6_regular !important;
 }
 
 .card_Azure1 {
@@ -366,4 +367,17 @@
 
     max-width: 10rem;
 
+}
+
+.testcase__AVO__paginator{
+    position: absolute;
+    /* bottom: 103rem; */
+    top: 35rem;
+    left: 42rem;
+    .p-paginator-first {
+        display: none !important;
+    }
+    .p-paginator-last {
+        display: none !important;
+    }
 }

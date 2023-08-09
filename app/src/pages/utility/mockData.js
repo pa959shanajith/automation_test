@@ -152,3 +152,25 @@ export const reportsBar = {
   Inprogress: "#DEE2E6",
   fail: "rgba(254, 80, 70, 1)",
 };
+
+export const testTypes = [
+  {
+    icon: 'pi pi-align-left',
+    value: 'Functional Test'
+  },
+  {
+    icon: 'pi pi-align-left',
+    value: 'Accessibility Test'
+  }
+];
+
+export const viewBy = [
+  {
+    icon: 'pi pi-align-left',
+    value: 'Execution Profile'
+  },
+  {
+    icon: 'pi pi-align-left',
+    value: 'Test Suites'
+  }
+];
