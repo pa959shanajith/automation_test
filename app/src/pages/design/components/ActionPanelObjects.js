@@ -1037,7 +1037,7 @@ const ActionPanel = (props) => {
         header="Replace: Sign up screen 1"
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
-        visible={props.isOpen === "replaceObject"}
+        visible={props.isOpen === "replaceObjectPhase2"}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">
