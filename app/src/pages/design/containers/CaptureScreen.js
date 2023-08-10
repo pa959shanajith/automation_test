@@ -322,17 +322,17 @@ const CaptureModal = (props) => {
   };
 
   const toastError = (erroMessage) => {
-    if (erroMessage.CONTENT) {
+    if (erroMessage && erroMessage.CONTENT) {
       toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: JSON.stringify(erroMessage), life: 5000 });
   }
 
   const toastSuccess = (successMessage) => {
-    if (successMessage.CONTENT) {
+    if (successMessage && successMessage.CONTENT) {
       toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -953,7 +953,8 @@ else{
 
   const footerCapture = (
     <div className='footer__capture'>
-      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>
+    {visible === 'capture' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>}
+    {visible === 'replace' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, "", "replace");}}>Replace</button>}
       
     </div>
   )
