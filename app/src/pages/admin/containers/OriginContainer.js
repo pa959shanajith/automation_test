@@ -5,6 +5,7 @@ import '../styles/OriginContainer.scss'
 import LdapConfig from './LdapConfig';
 import CreateUser from '../components/CreateUser';
 import UserCreation from './UserCreation';
+import EmailConfiguration from './EmailConfiguration';
 import { validateUserState } from '../../login/api';
 
 const OriginContainer = (props) => {
@@ -18,6 +19,7 @@ const OriginContainer = (props) => {
             {currentTab === "ldapConf" && <LdapConfig/>}
             {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
             {currentTab === "users" && <UserCreation createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog} />}
+            {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
 
         </div>
     </>)

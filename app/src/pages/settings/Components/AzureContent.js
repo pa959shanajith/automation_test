@@ -94,22 +94,11 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
     useImperativeHandle(ref, () => ({
         callSaveButton,
         callViewMappedFiles
-    }));
+    }));    
 
        
     const handleTabChange = (index) => {
         setActiveIndex(index);
-        setFooterIntegrations(
-            <div className='btn-11'>
-                {index === 0 && (
-                    <div className="btn__2">
-                        <Button label="Save" severity="primary" className='btn1' onClick={callAzureSaveButton} />
-                        <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-                    </div>)}
-
-                {index === 1 && (
-                    <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-            </div>);
     };
     
     //////////////////////////////////////// left side tree/////////////////////////////////////
