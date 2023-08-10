@@ -369,6 +369,21 @@
 
 }
 
+.avotest__data__zephyr{
+    margin-left: -1.5rem;
+    .p-tree{
+        border: none !important;
+        background: none !important;
+        overflow: auto;
+        height: 21rem;
+        }
+        .avoProject_tree{
+            .p-treenode-content{
+                padding: 0 !important;
+            }
+        }
+  }
+
 .testcase__AVO__paginator{
     position: absolute;
     /* bottom: 103rem; */
