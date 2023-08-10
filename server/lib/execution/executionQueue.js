@@ -16,6 +16,7 @@ const suitFunctions = require('../../controllers/suite');
 const reportFunctions = require('../../controllers/report');
 const screenshotpath = require('../../config/config');
 const { deleteConfigureKey } = require('../../controllers/devOps');
+const notifications = require('../../notifications');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -926,6 +927,54 @@ module.exports.Execution_Queue = class Execution_Queue {
                             }
                             if(checkForScenarioParallel && testSuite.moduleid == resultData.testsuiteId){
                                 this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED';
+                                this.key_list[resultData.configkey][listIndex][moduleIndex]['executionId'] = resultData.executionId;
+
+                                // check all the execution are completed for a configkey in cache
+                                const dataFromCache = this.key_list[resultData.configkey][listIndex];
+                                const isCompleted = dataFromCache.map((executionListItem) => {
+                                    return executionListItem.status === "COMPLETED"
+                                })
+                                const isAllExecutionCompleted = isCompleted.every((element) => element === true);
+                                if (isAllExecutionCompleted === true) {
+                                    // call the API to get the data and prepare the data from report
+                                    const fnName = "getExecutionListDetails";
+                                    const inputs = {
+                                        "executionListId": this.key_list[resultData.configkey][listIndex][moduleIndex]['executionListId'],
+                                        "key": resultData.configkey
+                                    };
+                                    const dataFromCache = this.key_list[resultData.configkey][listIndex];
+                                    const executionData = await utils.fetchData(inputs, "devops/getExecutionListDetails", fnName);
+
+                                    const excutionIds = dataFromCache.map((data) => data.executionId);
+                                    const fnName1 = "reportStatusScenario";
+                                    const inputs1 = {
+                                        "query": "executiondetails",
+                                        "executionId": excutionIds
+                                    };
+                                    const statusList = await utils.fetchData(inputs1, "reports/reportStatusScenario", fnName1);
+
+                                    const reportExecutionData = {};
+                                    reportExecutionData.reportData = [];
+                                    executionData[0].executionData.batchInfo.forEach((suiteDetails, index) => {
+                                        const suiteDetailsInfo = [];
+                                        suiteDetails.suiteDetails.forEach((scenarioName, suiteIndex) => {
+                                            const reportData = {
+                                                reportId: statusList[index][suiteIndex]["reportId"],
+                                                scenarioName: scenarioName.scenarioName,
+                                                testsuiteName: suiteDetails.testsuiteName,
+                                                status: statusList[index][suiteIndex]["status"],
+                                                projectName: suiteDetails.projectName,
+                                                cycleName: suiteDetails.cycleName,
+                                                releaseId: suiteDetails.releaseId
+                                            }
+                                            suiteDetailsInfo.push(reportData);
+                                        })
+                                        reportExecutionData.reportData.push({ suiteDetails: suiteDetailsInfo });
+                                    })
+                                    if (executionData[0].executionData.isEmailNotificationEnabled === true) {
+                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey });
+                                    }
+                                }
                                 
                                 //Adding details for synchronous report
                                 if(resultData.execReq.executiontype != 'asynchronous') {
