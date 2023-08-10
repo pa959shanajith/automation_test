@@ -76,76 +76,16 @@ const Profile = () => {
         key: i.toString(),
         label: (
           <div className="grid">
-            <div className="col-6">
-              <div>Execution Progress</div>
-              <HSBar
-                showTextIn
-                data={[
-                  {
-                    value:
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Terminate" ||
-                            item === "Skipped" ||
-                            item === "Incomplete"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0),
-                    description: `${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Terminate" ||
-                            item === "Skipped" ||
-                            item === "Incomplete"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    } / ${Object.values(
+            <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
                       el.scenarioStatus.reduce(
                         (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                         {}
                       )
-                    ).reduce((ac, cv) => ac + cv, 0)} Executed`,
-                    color: "rgba(96, 154, 248, 1)",
-                  },
-                  {
-                    value: Object.keys(
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
                       el.scenarioStatus.reduce(
                         (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                         {}
@@ -164,63 +104,207 @@ const Profile = () => {
                             {}
                           )[e]
                       )
-                      .reduce((ac, cv) => ac + cv, 0),
-                    color: "#DEE2E6",
-                  },
-                ]}
-              />
-            </div>
-            <div className="col-6">
-              <div>Execution Status</div>
-              <HSBar
-                showTextIn
-                data={Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter((el) => el === "Pass" || el === "Fail")
-                  .map((item, ind) => {
-                    return {
-                      value: el.scenarioStatus.reduce(
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${Object.values(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
+                  ).reduce((ac, cv) => ac + cv, 0)}`}
+                  severity="info"
+                ></Badge> Executed
+                </div>
+                <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
+                      el.scenarioStatus.reduce(
                         (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                         {}
-                      )[item],
-                      description:
-                        item === "Pass"
-                          ? `${
-                              el.scenarioStatus.reduce(
-                                (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                                {}
-                              )[item]
-                            } / ${Object.values(
-                              Object.keys(
-                                el.scenarioStatus.reduce(
-                                  (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                                  {}
-                                )
-                              )
-                                .filter(
-                                  (key) => key === "Pass" || key === "Fail"
-                                )
-                                .reduce((obj, key) => {
-                                  return Object.assign(obj, {
-                                    [key]: el.scenarioStatus.reduce(
-                                      (ac, cv) => (
-                                        (ac[cv] = ac[cv] + 1 || 1), ac
-                                      ),
-                                      {}
-                                    )[key],
-                                  });
-                                }, {})
-                            ).reduce((ac, cv) => ac + cv, 0)} Passed`
-                          : "",
-                      color: reportsBar[item],
-                    };
-                  })}
-              />
-            </div>
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "fail"||
+                          item === "Fail"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`
+                }
+                  severity="success"
+                ></Badge> Passed
+                </div>
+                <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "pass"||
+                          item === "Pass"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`
+                }
+                  severity="danger"
+                ></Badge> Failed
+                </div>
+                <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "fail"||
+                          item === "Fail" || 
+                          item === "pass"||
+                          item === "Pass"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`
+                }
+                  severity="warning"
+                ></Badge> Terminated
+                </div>
           </div>
         ),
         data: el.id,
@@ -284,76 +368,16 @@ const Profile = () => {
         key: i.toString(),
         label: (
           <div className="grid">
-            <div className="col-6">
-              <div>Execution Progress</div>
-              <HSBar
-                showTextIn
-                data={[
-                  {
-                    value:
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Terminate" ||
-                            item === "Skipped" ||
-                            item === "Incomplete"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0),
-                    description: `${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Terminate" ||
-                            item === "Skipped" ||
-                            item === "Incomplete"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    } / ${Object.values(
+                <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
                       el.scenarioStatus.reduce(
                         (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                         {}
                       )
-                    ).reduce((ac, cv) => ac + cv, 0)} Executed`,
-                    color: "rgba(96, 154, 248, 1)",
-                  },
-                  {
-                    value: Object.keys(
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
                       el.scenarioStatus.reduce(
                         (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                         {}
@@ -372,63 +396,207 @@ const Profile = () => {
                             {}
                           )[e]
                       )
-                      .reduce((ac, cv) => ac + cv, 0),
-                    color: "#DEE2E6",
-                  },
-                ]}
-              />
-            </div>
-            <div className="col-6">
-              <div>Execution Status</div>
-              <HSBar
-                showTextIn
-                data={Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter((el) => el === "Pass" || el === "Fail")
-                  .map((item, ind) => {
-                    return {
-                      value: el.scenarioStatus.reduce(
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${Object.values(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
+                  ).reduce((ac, cv) => ac + cv, 0)}`}
+                  severity="info"
+                ></Badge> Executed
+                </div>
+                <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
+                      el.scenarioStatus.reduce(
                         (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                         {}
-                      )[item],
-                      description:
-                        item === "Pass"
-                          ? `${
-                              el.scenarioStatus.reduce(
-                                (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                                {}
-                              )[item]
-                            } / ${Object.values(
-                              Object.keys(
-                                el.scenarioStatus.reduce(
-                                  (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                                  {}
-                                )
-                              )
-                                .filter(
-                                  (key) => key === "Pass" || key === "Fail"
-                                )
-                                .reduce((obj, key) => {
-                                  return Object.assign(obj, {
-                                    [key]: el.scenarioStatus.reduce(
-                                      (ac, cv) => (
-                                        (ac[cv] = ac[cv] + 1 || 1), ac
-                                      ),
-                                      {}
-                                    )[key],
-                                  });
-                                }, {})
-                            ).reduce((ac, cv) => ac + cv, 0)} Passed`
-                          : "",
-                      color: reportsBar[item],
-                    };
-                  })}
-              />
-            </div>
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "fail"||
+                          item === "Fail"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`
+                }
+                  severity="success"
+                ></Badge> Passed
+                </div>
+                <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "pass"||
+                          item === "Pass"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`
+                }
+                  severity="danger"
+                ></Badge> Failed
+                </div>
+                <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"||
+                          item === "fail"||
+                          item === "Fail" || 
+                          item === "pass"||
+                          item === "Pass"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(
+                      el.scenarioStatus.reduce(
+                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                        {}
+                      )
+                    )
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map(
+                        (e) =>
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )[e]
+                      )
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } Terminated`
+                }
+                  severity="warning"
+                ></Badge>
+                </div>
             {row?.index === i ? (
               <DataTable
                 showHeaders={false}
@@ -537,88 +705,129 @@ const Profile = () => {
       key: e.key,
       label: (
         <div className="grid">
-          <div className="col-3">
-            <div>Execution Progress</div>
-            <HSBar
-              showTextIn
-              data={[
-                {
-                  value:
+          <div className="col-6 table_seperator">
+            <div className="grid">
+              <div className="col-3">
+                <Badge
+                  value={`${
                     Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
                     Object.keys(e.testSuites)
                       .filter(
-                        (item) => item === "Queued" || item === "Inprogress"
-                      )
-                      .map((el) => e.testSuites[el])
-                      .reduce((ac, cv) => ac + cv, 0),
-                  description: `${
-                    Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
-                    Object.keys(e.testSuites)
-                      .filter(
-                        (item) => item === "Queued" || item === "Inprogress"
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress"
                       )
                       .map((el) => e.testSuites[el])
                       .reduce((ac, cv) => ac + cv, 0)
                   } / ${Object.values(e.testSuites).reduce(
                     (ac, cv) => ac + cv,
                     0
-                  )} Executed`,
-                  color: "rgba(96, 154, 248, 1)",
-                },
-                {
-                  value: Object.keys(e.testSuites)
-                    .filter(
-                      (item) => item === "Queued" || item === "Inprogress"
-                    )
-                    .map((el) => e.testSuites[el])
-                    .reduce((ac, cv) => ac + cv, 0),
-                  color: "#DEE2E6",
-                },
-              ]}
-            />
-          </div>
-          <div className="col-3">
-            <div>Execution Status</div>
-            <HSBar
-              showTextIn
-              data={Object.keys(e.testSuites)
-                .filter((el) => el === "pass" || el === "fail")
-                .map((item, ind) => ({
-                  value: e.testSuites[item],
-                  description:
-                    item === "pass"
-                      ? `${e.testSuites[item]} / ${Object.values(
-                          Object.keys(e.testSuites)
-                            .filter((key) => key === "pass" || key === "fail")
-                            .reduce((obj, key) => {
-                              return Object.assign(obj, {
-                                [key]: e.testSuites[key],
-                              });
-                            }, {})
-                        ).reduce((ac, cv) => ac + cv, 0)} Passed`
-                      : "",
-                  color: reportsBar[item],
-                }))}
-            />
-          </div>
-          <div className="col-3">
-            <div>Execution Progress</div>
-            <HSBar
-              showTextIn
-              data={[
-                {
-                  value:
-                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
-                    Object.keys(e.testCases)
+                  )}`}
+                  severity="info"
+                ></Badge> Executed
+              </div>
+              <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
                       .filter(
                         (item) =>
-                          item === "Terminate" ||
-                          item === "Skipped" ||
-                          item === "Incomplete"
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress" ||
+                          item === "fail" ||
+                          item === "Fail" ||
+                          item === "Terminate"
                       )
-                      .map((el) => e.testCases[el])
-                      .reduce((ac, cv) => ac + cv, 0),
-                  description: `${
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`}
+                  severity="success"
+                ></Badge> Passed
+              </div>
+              <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress" ||
+                          item === "pass" ||
+                          item === "Pass" ||
+                          item === "Terminate"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`}
+                  severity="danger"
+                ></Badge> Failed
+              </div>
+              <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress" ||
+                          item === "fail" ||
+                          item === "Fail" ||
+                          item === "pass" ||
+                          item === "Pass"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`}
+                  severity="warning"
+                ></Badge> Terminated
+              </div>
+            </div>
+          </div>
+          <div className="col-6">
+            <div className="grid">
+              <div className="col-3">
+                <Badge
+                  value={`${
                     Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
                     Object.keys(e.testCases)
                       .filter(
@@ -632,49 +841,103 @@ const Profile = () => {
                   } / ${Object.values(e.testCases).reduce(
                     (ac, cv) => ac + cv,
                     0
-                  )} Executed`,
-                  color: "rgba(96, 154, 248, 1)",
-                },
-                {
-                  value: Object.keys(e.testCases)
-                    .filter(
-                      (item) =>
-                        item === "Terminate" ||
-                        item === "Skipped" ||
-                        item === "Incomplete"
-                    )
-                    .map((el) => e.testCases[el])
-                    .reduce((ac, cv) => ac + cv, 0),
-                  color: "#DEE2E6",
-                },
-              ]}
-            />
-          </div>
-          <div className="col-3">
-            <div>Execution Status</div>
-            <HSBar
-              showTextIn
-              data={Object.keys(e.testCases)
-                .filter((el) => el === "Pass" || el === "Fail")
-                .map((item, ind) => {
-                  return {
-                    value: e.testCases[item],
-                    description:
-                      item === "Pass"
-                        ? `${e.testCases[item]} / ${Object.values(
-                            Object.keys(e.testCases)
-                              .filter((key) => key === "Pass" || key === "Fail")
-                              .reduce((obj, key) => {
-                                return Object.assign(obj, {
-                                  [key]: e.testCases[key],
-                                });
-                              }, {})
-                          ).reduce((ac, cv) => ac + cv, 0)} Passed`
-                        : "",
-                    color: reportsBar[item],
-                  };
-                })}
-            />
+                  )}`}
+                  severity="info"
+                ></Badge> Executed
+              </div>
+              <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete" ||
+                          item === "fail" ||
+                          item === "Fail"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`}
+                  severity="success"
+                ></Badge> Passed
+              </div>
+              <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete" ||
+                          item === "pass" ||
+                          item === "Pass"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`}
+                  severity="danger"
+                ></Badge> Failed
+              </div>
+              <div className="col-3">
+                <Badge
+                  value={`${
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete" ||
+                          item === "pass" ||
+                          item === "Pass" ||
+                          item === "fail" ||
+                          item === "Fail"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  } / ${
+                    Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testCases)
+                      .filter(
+                        (item) =>
+                          item === "Terminate" ||
+                          item === "Skipped" ||
+                          item === "Incomplete"
+                      )
+                      .map((el) => e.testCases[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }`}
+                  severity="warning"
+                ></Badge> Terminated
+              </div>
+            </div>
           </div>
         </div>
       ),
@@ -718,7 +981,7 @@ const Profile = () => {
       <DataTable
         value={reportsTable}
         tableStyle={{ minWidth: "50rem" }}
-        header={tableHeader}
+        header={tableHeader}        
         globalFilter={searchScenario}
         className="reports_table"
       >

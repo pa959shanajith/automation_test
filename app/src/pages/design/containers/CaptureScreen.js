@@ -112,6 +112,9 @@ const CaptureModal = (props) => {
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [showEmptyMessage, setShowEmptyMessage] = useState(true);
   let addMore = useRef(false);
 
   useEffect(() => {
@@ -210,7 +213,23 @@ const CaptureModal = (props) => {
   const handleBrowserClose = () => {
     setVisible(false);
   }
+  const textline4= {
+    borderBottom: '1px solid black',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              width: '70%',
+              padding: '0.9rem 0rem 1rem 0rem',
+              outline: 'none !important',
+  };
 
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleReset = () => {
+    setInputValue('');
+  };
 
   const parentScreen = props.fetchingDetails["parent"]["children"];
   useEffect(() => {
@@ -1145,7 +1164,10 @@ const footerSave = (
   }, [objValues])
 
 
-
+  const handleDataTableContentChange = (newData) => {
+    setShowEmptyMessage(newData.length === 0);
+    setCaptureData(newData); // Assuming setCaptureData is the function to update DataTable content
+  };
 
   const headerScreenshot = (
     <>
@@ -1282,7 +1304,7 @@ const footerSave = (
     <div>
       <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div>
       <Button label="Cancel" onClick={() => { setElementProperties(false) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
-      <Button label="Save" onClick={saveElementProperties} autoFocus style={{ borderRadius: '20px', height: '2.2rem' }} />
+      <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} />
     </div>
   )
   const onCellEditCompleteElementProperties = (e) => {
@@ -1401,6 +1423,8 @@ const footerSave = (
       {label: 'Response'},
   ];
 
+  
+
      // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
      const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -1417,6 +1441,27 @@ const footerSave = (
       </>
       )
      }
+
+     const APPtype_name = {
+      width: '45.5rem',
+      marginTop:'2rem'
+    };
+    const certificate_password={
+      width:"45.5rem",
+      marginTop:"2rem"
+    }
+    const AuthUser={
+      width: "45.4rem",
+      marginTop: "2rem"
+    }
+const AuthPassword={
+  width: "45.4rem",
+  marginTop: "2rem"
+}
+const headerstyle={
+ textAlign: "center !important",
+}
+
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -1436,9 +1481,9 @@ const footerSave = (
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('mapObject')}>
-                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element'></img>
-                  {isWebApp &&<Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
+                <span className={`insprint_auto ${!isWebApp || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && handleDialog('mapObject')}>
+                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
+                  {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
                   <p>Map Element</p>
                 </span>
@@ -1456,12 +1501,12 @@ const footerSave = (
                 <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
-                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={() =>isWebApp && setVisible("compare")}>
+                <span className={`upgrade_auto ${!isWebApp || captureData.length === 0? "disabled" : ""}`}  onClick={() =>captureData.length > 0 && isWebApp && setVisible("compare")}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
                   {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
-                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && setVisible('replace')}>
+                <span className={`upgrade_auto ${!isWebApp  || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && setVisible('replace')}>
                   <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
                   {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
@@ -1473,7 +1518,7 @@ const footerSave = (
                 </div>)} */}
               </div>
               <div className='utility__block'>
-                <p className='insprint__text'>Capture from PDF</p>
+                <p className='insprint__text text-400'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_utility" position="bottom" content="  Capture the elements from a PDF." />
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} >
@@ -1490,7 +1535,7 @@ const footerSave = (
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
-                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={() => isWebApp &&  handleDialog('createObject')}>
+                <span className={`insprint_auto create__block ${!isWebApp  || captureData.length === 0 ? "disabled" : ""}`}   onClick={() =>captureData.length > 0 &&  isWebApp &&  handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
@@ -1507,8 +1552,8 @@ const footerSave = (
                     <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
                     <p className='imp__text'>Import Screen</p>
                   </span>
-                  <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
-                    <img className='add_obj_export' src="static/imgs/ic-export.png"  />
+                  <span className="export__block" style={captureData.length === 0 ? { color: "#cccccc" }: {}} onClick={() => captureData.length !== 0 && setShowObjModal("exportModal")}>
+                    <img  className={`add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} src="static/imgs/ic-export.png" style={captureData.length === 0 ? { color: "#cccccc" }: {}} />
                     <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
                     <p className='imp__text'>Export Screen</p>
 
@@ -1537,7 +1582,58 @@ const footerSave = (
                 </div>
                 <div className='input2' ><InputText placeholder='Enter URL or paste text' /></div>
                 <div className='input3' ><InputText placeholder='Operation' /></div>
-                <img className='' src='static/imgs/certificateOfWebServiceApptype.svg' />
+                {/* <img className='' src='static/imgs/certificateOfWebServiceApptype.svg' onClick={handleApptypeDialogOpen} />
+                 */}
+             <Button lable="click"  onClick={() => setIsDialogOpen(true)} >click</Button>
+<Dialog header="Add Certificate" visible={isDialogOpen} style={{ width: '50vw',height:'70vh',margin: "0px",
+    position: "fixed",
+    left:"557px",
+    top:"77.4px" }} onHide={() => setIsDialogOpen(false)}
+    footer={ 
+      <div style={{ display: 'flex', justifyContent: 'flex-end', height: '3rem' }}>
+        <Button className="reset_button" onClick={handleReset}>Reset</Button>
+        <Button className="submit_button">Submit</Button>
+      </div>
+    }>
+  <>
+  <div>
+<InputText
+            type="text"
+            style={APPtype_name}
+            placeholder="Enter certificate path; Enter Certificate Key(optional)"
+          />
+          </div>
+          <div>
+          <InputText
+            type="text"
+            style={certificate_password }
+            placeholder="Enter Certificate Password(AES Encrypted); EnterServer Certificate Path(Optional) "
+          />
+          </div>
+          <div>
+          <InputText
+            type="text"
+            style={AuthUser}
+            placeholder="Enter AuthUserName"
+            onChange={handleInputChange}
+          />
+          </div>
+          <div>
+          <InputText
+            type="text"
+            style={AuthPassword}
+            onChange={handleInputChange}
+            placeholder="Enter AuthPassWord(AES Encrypted)"
+          />
+          </div>
+         
+          {/* <div>
+            <Button className="reset_button" onClick={handleReset}>Reset</Button>
+            <Button className="submit_button">Submit</Button>
+          </div> */}
+          </>
+
+</Dialog>
               </div>
               {/* <div className='secondRow'>
                 
@@ -1583,7 +1679,7 @@ const footerSave = (
             onSelectionChange={onRowClick}
             tableStyle={{ minWidth: '50rem' }}
             headerCheckboxToggleAllDisabled={false}
-            emptyMessage={emptyMessage}
+            emptyMessage={showEmptyMessage ? emptyMessage : null} 
             scrollable 
             scrollHeight="400px"
           >
@@ -1592,7 +1688,7 @@ const footerSave = (
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-            <Column field="selectall" header="Element Name"
+            <Column field="selectall" header="Element Name" headerStyle={{ textAlign: 'center' }} 
               editor={(options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
