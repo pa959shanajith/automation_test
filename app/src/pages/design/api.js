@@ -1368,3 +1368,66 @@ export const getDeviceSerialNumber_ICE = () =>	{
         .catch(error=>reject(error))
     })
 }
+
+export const launchWSDLGo = wsdlUrl => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlListGenerator_ICE',
+                wsdlurl: wsdlUrl
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const wsdlAdd = (wsdlUrl, wsdlSelectedMethod, resultFile) => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlServiceGenerator_ICE',
+                wsdlurl: wsdlUrl,
+                method : wsdlSelectedMethod,
+                resultFile:resultFile
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const initScrapeWS_ICE = arg => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'debugTestCaseWS_ICE',
+                testCaseWS: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
