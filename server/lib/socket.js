@@ -86,7 +86,16 @@ io.on('connection', async socket => {
 			} else {
 				socket.send('connected', result.ice_check);
 				if (result.node_check === "allow") {
-					socketMap[icename] = socket;
+					host = JSON.parse(icesession).host;
+					let clientName="avoassure";
+					if(host != null && host != undefined)
+					{
+						if(!(host.includes("localhost") || host.includes("127.0.0.1"))){
+							clientName=host.split('.')[0]
+						}
+					}
+					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
+					socketMap[clientName][icename] = socket;
 					if(!userICEMap[result.username]) userICEMap[result.username] = []
 					iceUserMap[icename] = result.username;
 					if(!userICEMap[result.username].includes(icename)) userICEMap[result.username].push(icename);
@@ -128,6 +137,7 @@ io.on('connection', async socket => {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
 			address = socket.handshake.query.icename;
+			const icesession = socket.handshake.query.icesession;
 			if (socketMap[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
@@ -154,7 +164,8 @@ io.on('connection', async socket => {
 			if (connect_flag) {
 				inputs = {
 					"icename": address,
-					"query": 'disconnect'
+					"query": 'disconnect',
+					"icesession": icesession
 				};
 				const disConnResult = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
 				if (disConnResult == "fail") {

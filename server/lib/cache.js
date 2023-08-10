@@ -33,6 +33,25 @@ class Cache {
 			rsv(data);
 		})));
 	}
+	
+	async gethmap(host) {
+		let clientName="avoassure";
+		if(host != null && host != undefined)
+		{
+			if(!(host.includes("localhost") || host.includes("127.0.0.1"))){
+				clientName=host.split('.')[0]
+			}
+		}
+		return (new Promise((rsv, rej) => this.client.hgetall(clientName, (err, data) => {
+			if (err) {
+				logger.error("Error occurred while fetching cached request data. Error:" + err);
+				return rsv(null);
+			}
+			if (data) data = data;
+			else data = {}
+			rsv(data);
+		})));
+	}
 
 	async getapi(url, query) {
 		const key = url + ':' + JSON.stringify(query);
@@ -50,6 +69,29 @@ class Cache {
 			rsv(true);
 		})));
 	};
+
+	async sethmap(key, data, ttl) {
+		let clientName="avoassure";
+		if(ttl){
+			if(!(ttl.includes("localhost") || ttl.includes("127.0.0.1"))){
+				clientName=ttl.split('.')[0]
+			}
+		}else {
+			if(!(data.host.includes("localhost") || data.host.includes("127.0.0.1"))){
+				clientName=data.host.split('.')[0]
+			}
+		}
+		data = JSON.stringify(data);
+		const args = (ttl)? [key, data, 'EX', ttl] : [key, data];
+		return (new Promise((rsv, rej) => this.client.hset(clientName,key,data, (err) => {
+			if (err) {
+				logger.error("Error occurred while caching request data. Error:" + err);
+				return rsv(null);
+			}
+			rsv(true);
+		})));
+	};
+
 
 	async setx(key, data, ttl) {
 		return this.set(key, data, ttl);

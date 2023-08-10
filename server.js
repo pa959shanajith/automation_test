@@ -187,6 +187,7 @@ if (cluster.isMaster) {
 			const report = require('./server/controllers/report');
 			const zephyr = require('./server/controllers/zephyr');
 			const executionInvoker = require('./server/lib/execution/executionInvoker');
+			const redisSocketHandler = require('./server/lib/redisSocketHandler');
 			req.session.executionInvoker = executionInvoker.setReq(req)
 			req.session.zephyr = zephyr.setReq(req)
 			req.session.report = report.setReq(req)
@@ -199,6 +200,7 @@ if (cluster.isMaster) {
 			req.session.create_ice = create_ice.setReq(req)
 			req.session.utils = utils.setReq(req)
 			req.session.admin = admin.setReq(req)
+			req.session.redisSocketHandler = redisSocketHandler.setReq(req)
 			next();	
 		});
 
