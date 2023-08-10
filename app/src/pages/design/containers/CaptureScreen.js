@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import '../styles/CaptureScreen.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
 import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
@@ -546,7 +547,8 @@ const elementTypeProp =(elementProperty) =>{
               {
                 selectall: item.custname,
                 objectProperty: elementTypeProp(item.tag),
-                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
+                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={(event) => {
+                  setScreenshotY(event.clientY);
                   setScreenshotData({
                     header: item.custname,
                     imageUrl: data.mirror || "",
@@ -934,8 +936,8 @@ else{
 
   const footerCapture = (
     <div className='footer__capture'>
-      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>
-      
+      {visible === 'capture' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>}
+      {visible === 'replace' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</button>}
     </div>
   )
 
@@ -1032,7 +1034,7 @@ const footerSave = (
       else if (activeEye) setActiveEye(false);
       setHighlight(true);
     })
-    let objVal = selectedCapturedElement[0].objectDetails;
+    let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
     dispatch(objValue(objVal));
     setHighlight(true);
   }
@@ -1129,7 +1131,7 @@ const footerSave = (
         }
         // highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
       } else setHighlight(false);
-      if (!ScrapedObject.xpath.startsWith('iris')) {
+      if (ScrapedObject.xpath && !ScrapedObject.xpath.startsWith('iris')) {
         scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
           .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
@@ -1219,6 +1221,7 @@ const footerSave = (
       objects.screenshots = '';
       objects.actions = '';
       objects.objectDetails = {};
+      objects.isCustom=true
       addElementData.push(objects)
     })
     setCaptureData([...captureData, ...addElementData])
@@ -1404,13 +1407,23 @@ const footerSave = (
      if (localStorageDefaultProject) {
          NameOfAppType = JSON.parse(localStorageDefaultProject);
      }
+     const renderElement=(rowdata)=>{
+      return (
+        <>
+        <div style={{display:'flex',justifyContent:'space-between'}}>
+        <div >{rowdata.selectall}</div>
+      {(rowdata.objectDetails.isCustom || rowdata.isCustom) && <Tag severity="primary" value="Added"></Tag>}
+      </div>
+      </>
+      )
+     }
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
-      <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "WebService" ? null : footerSave}>
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }} />
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={footerSave}>
         {showPanel && (<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
@@ -1423,7 +1436,7 @@ const footerSave = (
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('mapObject')}>
                   <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element'></img>
                   {isWebApp &&<Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
@@ -1584,16 +1597,19 @@ const footerSave = (
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
+              body={renderElement}
             >
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshot"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
-          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
-            <div className="screenshot_pop__content" >
-              {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-              <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+          <Dialog header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `94vh`, position:"right" }}>
+            <div className="ref_pop screenshot_pop">
+              <div className="screenshot_pop__content" >
+                {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
+                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+              </div>
             </div>
           </Dialog>
         </div>
@@ -1787,6 +1803,7 @@ const footerSave = (
         addCustomElement={addedCustomElement}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        elementTypeProp ={elementTypeProp}
       />}
 
       {currentDialog === 'mapObject' && <ActionPanel
@@ -1798,6 +1815,7 @@ const footerSave = (
         setShow={setCurrentDialog}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        elementTypeProp ={elementTypeProp}
       />}
 
       {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel

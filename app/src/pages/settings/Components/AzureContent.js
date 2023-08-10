@@ -216,7 +216,8 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
 
             let unsyncMap = completeTreeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
             let unsyncMappedData = mappedData.filter((item) => item.scenarioId[0] !== node.key);
-            setTreeData(unsyncMap);
+            setTreeData(unsyncMap.slice(indexOfFirstScenario, indexOfFirstScenario + scenariosPerPage));
+            // setTreeData(unsyncMap);
             setCompleteTreeData(unsyncMap);
             dispatchAction(mappedTree(unsyncMap));
             dispatchAction(mappedPair(unsyncMappedData));
@@ -409,7 +410,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
             if (secondOption && secondOption.name === 'TestPlans') {
                 const filterTestCase = testsToDisplay.filter((testCase) => testCase.id == selectedId).map(el => ({ key: el.id, label: el.name, data: { type: 'testcase' } }))
                 // checking the current map obj is already present with any other scenario
-                const findDuplicate = treeData.map((parent, index) => {
+                const findDuplicate = completeTreeData.map((parent, index) => {
                     const duplicateChildIndex = parent.children.findIndex(
                         (child) => child.key === selectedTC[0]
                     );
@@ -422,8 +423,8 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
                     }
                 });
                 let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? { ...scenario, checked: true, children: filterTestCase } : scenario)
-                setTreeData(updatedTreeData);
-                // setCompleteTreeData(updatedTreeData);
+                setTreeData(updatedTreeData.slice(indexOfFirstScenario, indexOfFirstScenario + scenariosPerPage));
+                setCompleteTreeData(updatedTreeData);
                 dispatchAction(mappedTree(updatedTreeData));
                 const updateCheckbox = testsToDisplay.map((item) => ({ ...item, checked: false }));
                 setTestsToDisplay(updateCheckbox);
@@ -434,7 +435,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
             if (secondOption && secondOption.name === 'Story') {
                 const filterTestCase = userStories.filter((testCase) => testCase.id == selectedId).map(el => ({ key: el.id, label: el.id + ' ' + el.fields['System.Title'], data: { type: 'testcase' } }))
                 // checking the current map obj is already present with any other scenario
-                const findDuplicate = treeData.map((parent, index) => {
+                const findDuplicate = completeTreeData.map((parent, index) => {
                     const duplicateChildIndex = parent.children.findIndex(
                         (child) => child.key === selectedTC[0]
                     );
@@ -447,8 +448,8 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
                     }
                 });
                 let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? { ...scenario, checked: true, children: filterTestCase } : scenario)
-                setTreeData(updatedTreeData);
-                // setCompleteTreeData(updatedTreeData);
+                setTreeData(updatedTreeData.slice(indexOfFirstScenario, indexOfFirstScenario + scenariosPerPage));
+                setCompleteTreeData(updatedTreeData);
                 dispatchAction(mappedTree(updatedTreeData));
                 const updateCheckbox = storiesToDisplay.map((item) => ({ ...item, checked: false }));
                 setStoriesToDisplay(updateCheckbox);
@@ -737,7 +738,7 @@ const onPageAvoChange = (event) => {
                                         <Card className="mapping_data_card_azure">
                                             <div className="dropdown_div">
                                                 <div className="dropdown-map">
-                                                    <span>Select Project <span style={{ color: 'red' }}>*</span></span>
+                                                    <span>Project <span style={{ color: 'red' }}>*</span></span>
                                                 </div>
                                                 <div className="dropdown-map">
                                                     {/* <Dropdown  style={{ width: '11rem', height: '2.5rem' }}  className="dropdown_project" value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={cities}  placeholder="Select Project" /> */}
@@ -748,7 +749,7 @@ const onPageAvoChange = (event) => {
 
                                                 <div>
                                                     {/* {currentScenarios.map((scenario) => ( */}
-                                                        <div className="avotest__data">
+                                                        <div className="avotest__data__zephyr">
 
                                                             <Tree value={treeData} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
                                                         </div>
