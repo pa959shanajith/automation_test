@@ -25,6 +25,7 @@ import { ScrollPanel } from 'primereact/scrollpanel';
 import CompareElement from './CompareElement';
 import AddElement from './AddElement';
 import MapElement from './MapElement';
+import { Divider } from 'primereact/divider';
 
 
 
@@ -32,6 +33,7 @@ const ActionPanel = (props) => {
   const [selectObjectType, setSelectObjectType] = useState(null);
   const history = useNavigate();
   const dispatch = useDispatch();
+  const toast = useRef();
   const userInfo = useSelector((state) => state.landing.userinfo);
   const { changedObj, notChangedObj, notFoundObj } = useSelector(state => state.design.compareObj);
   const compareData = useSelector(state => state.design.compareData);
@@ -126,6 +128,20 @@ const ActionPanel = (props) => {
     setActiveIndex(index);
   };
 
+  // const toastError = (erroMessage) => {
+  //   if (erroMessage.CONTENT) {
+  //     toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+  //   }
+  //   else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+  // }
+
+  // const toastSuccess = (successMessage) => {
+  //   if (successMessage.CONTENT) {
+  //     // toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+  //   }
+  //   else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+  // }
+
 
   const newField = () => {
     let updatedObjects = [...objects];
@@ -195,12 +211,14 @@ const ActionPanel = (props) => {
         .then(data => {
           if (data === "unavailableLocalServer") {
             props.toastError(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`, VARIANT.ERROR));
+              //  toastError(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`))
             return null;
           }
           else if (data === "Invalid Session")
             return RedirectPage(history);
           else if (data === "fail") {
             props.toastError({ VARIANT: VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object` });
+            // toastError(`Failed to ${props.editFlag ? "edit" : "create"} object`)
             return null;
           }
           else {
@@ -223,7 +241,7 @@ const ActionPanel = (props) => {
         })
         .catch(error => console.error(error));
     }
-    props.toastError(errorObj)
+    // props.toastError(errorObj)
   }
 
 
@@ -267,7 +285,6 @@ const ActionPanel = (props) => {
       let errorFlag = null;
       let errorObj = {};
       let newOrderList = [];
-      console.log('hello');
       for (let tempId of Object.keys(newCustomObjectsList)) {
         let custname = newCustomObjectsList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
 
@@ -343,7 +360,7 @@ const ActionPanel = (props) => {
         ]);
         props.setSaved({ flag: false });
         props.setShow(false);
-        props.toastError(MSG.SCRAPE.SUCC_OBJ_CREATE);
+        props.toastSuccess(MSG.SCRAPE.SUCC_OBJ_CREATE);
 
       }
     }
@@ -438,7 +455,7 @@ const ActionPanel = (props) => {
 //     // setReplaceVisible = (true);
 // }
 
-  // ============================ compare element ==================================
+  // ============================ Create element ==================================
 
   const renderAccordionHeader = (objName, index, objects) => {
     return (
@@ -883,7 +900,7 @@ const ActionPanel = (props) => {
       }).catch((err) => {
         props.setOverlay(null)
         console.log(err)
-        // props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+        props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
       });
     }
   }
@@ -943,6 +960,7 @@ const ActionPanel = (props) => {
       
 
       {/* Create Element */}
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
       <Dialog
         className='create__object__modal' header='Create Element'
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
@@ -981,6 +999,8 @@ const ActionPanel = (props) => {
                       <span className='object__text'>Name Attribute <span style={{ color: "red" }}> *</span></span>
                       <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
                     </div>
+                    <Divider className='divider-CE' />
+                    <p className='msg-CE'>Fill at least any one of the details</p>
                     <div className='create-elem'>
                       <span className='object__text' >Relative Xpath</span>
                       <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, index)} value={object.relXpath} />
@@ -1003,7 +1023,7 @@ const ActionPanel = (props) => {
                     </div>
                     <div className='create-elem'>
                       <span className='object__text'>CSS Selector</span>
-                      <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
+                      <InputText className='input__text' type='text' name="css"/>
                     </div>
                   </>
                   {/* } */}
@@ -1037,7 +1057,7 @@ const ActionPanel = (props) => {
         header="Replace: Sign up screen 1"
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
-        visible={props.isOpen === "replaceObject"}
+        visible={props.isOpen === "replaceObjectPhase2"}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">
@@ -1120,7 +1140,7 @@ const ActionPanel = (props) => {
                       key="keywords"
                       field="keywords"
                       header="Keyword Used"
-                      style={{ width: "14rem" }}
+                      style={{ width: "14rem"}}
                     />
                     <Column
                       key="newObj"

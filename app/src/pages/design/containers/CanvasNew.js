@@ -25,6 +25,7 @@ import { Checkbox } from "primereact/checkbox";
 import { ContextMenu } from 'primereact/contextmenu';
 import { deletedNodes } from '../designSlice';
 import { showGenuis } from '../../global/globalSlice';
+import { deleteScenario } from '../api';
 
 
 /*Component Canvas
@@ -108,13 +109,13 @@ const CanvasNew = (props) => {
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
     const [showTooltip, setShowTooltip] = useState("");
     const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
-    const typesOfAppType = NameOfAppType.appType;
+    const typesOfAppType = props.appType;
     const imageRef = useRef(null);
     const appType = typesOfAppType
 
     const handleTooltipToggle = (nodeType) => {
-      const rect = imageRef.current.getBoundingClientRect();
-      setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
+      const rect = imageRef.current?.getBoundingClientRect();
+      setCardPosition({ right: rect?.right, left: rect?.left, top: rect?.top ,bottom:rect?.bottom});
       setShowTooltip(nodeType);
     };
   
@@ -122,6 +123,40 @@ const CanvasNew = (props) => {
       setShowTooltip("");
     };
     
+    useEffect(()=>{
+      if(deletedNodes && deletedNodes.length>0){
+          var scenarioIds=[]
+          var screenIds=[]
+          var testcaseIds=[]
+          for(let i = 0 ;i<deletedNodes.length; i++){
+              if(deletedNodes[i].length>1){
+                  if(deletedNodes[i][1]==="scenarios"){
+                      scenarioIds.push(deletedNodes[i][0]);                    
+                  }
+                  if(deletedNodes[i][1]==="screens"){
+                      screenIds.push(deletedNodes[i][0]);                    
+                  }
+                  if(deletedNodes[i][1]==="testcases"){
+                      testcaseIds.push(deletedNodes[i][0]);                    
+                  }
+              }
+              
+          } 
+          (async()=>{
+              setBlockui({show:true,content:'Loading ...'})
+              var res = await deleteScenario({scenarioIds:scenarioIds,screenIds:screenIds,testcaseIds:testcaseIds})
+              if(res.error){displayError(res.error);return;}                
+              setDelSnrWarnPop(false)                
+              dispatch(deletedNodes([]))
+              setBlockui({show:false})
+              setMsg(MSG.MINDMAP.SUCC_DELETE_NODE.CONTENT)
+              setCreateNew('autosave')                             
+          })()
+
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[deletedNodes]
+  )
     useEffect(() => {
         var tree;
         count = {
@@ -332,6 +367,7 @@ const CanvasNew = (props) => {
                 setReuseDelContent("Selected Test Scenario is used in End To End flow.\n \n Are you sure you want to delete it permenantly?")
                 setSelectedDelNode(id);
                 setEndToEndDelConfirm(true)
+                clickDeleteNodeHere(id);
                 return;
             }
             else if([...dNodes][sid]['children']){
@@ -349,6 +385,7 @@ const CanvasNew = (props) => {
             }} 
             setSelectedDelNode(id);
             setDelConfirm(true);
+            clickDeleteNodeHere(id);
             return;
         }        
         else if (type==='screens'){
@@ -362,6 +399,7 @@ const CanvasNew = (props) => {
                 else{
                     setSelectedDelNode(id);
                     setDelConfirm(true);
+                    clickDeleteNodeHere(id);
                     return;
                 }
 
@@ -378,6 +416,7 @@ const CanvasNew = (props) => {
             else{
                 setSelectedDelNode(id);
                 setDelConfirm(true);
+                clickDeleteNodeHere(id);
                 return;
             }
         }
@@ -448,8 +487,8 @@ const CanvasNew = (props) => {
     const clickDeleteNodeHere=(id)=>{
         var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
         if(res){
-            dispatch(deletedNodes([...deletedNoded,...res.deletedNoded]))
-            setReuseDelConfirm(false)
+            dispatch(deletedNodes([...deletedNoded,...res.deletedNodes]))
+            setReuseDelConfirm(true)
             setNodes(res.nodeDisplay)
             setLinks(res.linkDisplay)
             setdLinks(res.dLinks)
@@ -1090,10 +1129,8 @@ const footerContentScreen =(
                 {Object.entries(nodes).map((node)=>
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} ref={imageRef} onMouseEnter={() => handleTooltipToggle(node[1].type)} onMouseLeave={() => handleMouseLeave1()}>
                        <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src} title="reused"></image>
-                   
-                        <text className="ct-nodeLabel" textAnchor="middle" x="20" title= {node[1].name}
-                       
-                         y="50">{node[1].name}</text>
+                       <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
+                        <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='testcases')?
                         <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                         :null}
@@ -1115,193 +1152,29 @@ const footerContentScreen =(
             {Object.entries(nodes).map((node, nodeIdx)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
                    <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle(nodeIdx)} onMouseLeave={() => handleMouseLeave1()}  title=  {node[1].name} ></image>
-                    <text className="ct-nodeLabel" textAnchor="middle" x="20" 
-                    
-                           y="50">{node[1].name}</text>
-                          
-
-<title val={node[0]} className="ct-node-title" >
-{showTooltip !== "" && (
-      ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
-        <div className="tooltip">
-        <span className="tooltiptext">
-          <span className="tooltip-line">testsuite_name:{node[1].name}</span>
-          {/* <div className="tooltip-line1">Click here to add new testcase(s).</div> */}
-        </span>
-      </div>
-        
-      )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
-        <div className="tooltip">
- 
- <span className="tooltiptext">testcase_name:{node[1].name} </span>
- <br />
- {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
-</div> 
-      
-      )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
-        <div className="tooltip">
- 
- <span className="tooltiptext">screen_name:{node[1].name}</span>
- <br />
- {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
-</div> 
-       
-      )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
-        <div className="tooltip">
- 
- <span className="tooltiptext">teststep_name:{node[1].name}</span>
- <br />
- {/* <span  className='tooltipchild'>Click here to add new testcase(s).</span> */}
-</div> 
-       
-      ))
-  )}
-
- {/* <div className="tooltip">
- 
- <span className="tooltiptext">"module_name":{node[1].name}</span>
- <br />
- <span  className='tooltipchild'>Click here to add new testcase(s).</span>
-</div> */}
-
-
-
-</title> 
-
-
-
-{/* <g val={node[0]} className="ct-node-title">
-  {showTooltip !== "" && (
-      ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
-        <g>
-          <rect
-            x={verticalLayout ? -80 : cardPosition.left - 80}
-            y={verticalLayout ? cardPosition.top - 720 : -3120}
-            width="400"
-            height="80"
-            rx="4"
-            ry="4"
-            fill="#495057"
-            stroke="#ccc"
-            strokeWidth="1"
-            className="tooltip-background"
-            z-index= "20"
-          ></rect>
-          <text
-            x={verticalLayout ? 20 : cardPosition.left + 20}
-            y={verticalLayout ? cardPosition.top - 700 : -3060}
-            className="tooltip-text"
-          >
-            {node[1].name}
-          </text>
-          <text
-            x={verticalLayout ? 20 : cardPosition.left + 20}
-            y={verticalLayout ? cardPosition.top - 680 : -3040}
-            className="tooltip-subtext"
-          >
-            Click here to add new testcase(s).
-          </text>
-        </g>
-      )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
-        <g>
-          <rect
-            x={verticalLayout ? -80 : cardPosition.left - 80}
-            y={verticalLayout ? cardPosition.top - 720 : -3120}
-            width="400"
-            height="80"
-            rx="10"
-            ry="4"
-            fill="#495057"
-            stroke="#ccc"
-            strokeWidth="1"
-            className="tooltip-background_sceen"
-            z-index="20"
-          ></rect>
-          <text
-            x={verticalLayout ? 20 : cardPosition.right + 80}
-            y={verticalLayout ? cardPosition.top - 700 : -3060}
-            className="tooltip-text"
-          >
-            {node[1].name}
-          </text>
-          <text
-            x={verticalLayout ? 20 : cardPosition.right + 80}
-            y={verticalLayout ? cardPosition.top - 680 : -3040}
-            className="tooltip-subtext"
-          >
-           Click here to add screen(s) or record a testcase using Avo Genius (Smart Recorder)
-          </text>
-        </g>
-      )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
-        <g>
-          <rect
-            x={verticalLayout ? -80 : cardPosition.left - 80}
-            y={verticalLayout ? cardPosition.top - 720 : -3120}
-            width="400"
-            height="80"
-            rx="4"
-            ry="4"
-            fill="#495057"
-            stroke="#ccc"
-            strokeWidth="1"
-            className="tooltip-background_sceen"
-            z-index="20"
-          ></rect>
-          <text
-            x={verticalLayout ? 20 : cardPosition.left + 60}
-            y={verticalLayout ? cardPosition.top - 700 : -3060}
-            className="tooltip-text"
-          >
-            {node[1].name}
-          </text>
-          <text
-            x={verticalLayout ? 20 : cardPosition.left + 60}
-            y={verticalLayout ? cardPosition.top - 680 : -3040}
-            className="tooltip-subtext"
-          >
-          Click here to add test steps folder, capture element, rename or delete screen
-          </text>
-        </g>
-      )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
-        <g>
-          <rect
-            x={verticalLayout ? -80 : cardPosition.left - 60}
-            y={verticalLayout ? cardPosition.top - 720 : -3120}
-            width="400"
-            height="80"
-            rx="4"
-            ry="4"
-            fill="#495057"
-            stroke="#ccc"
-            strokeWidth="1"
-            className="tooltip-background_sceen"
-            z-indez="20"
-          ></rect>
-          <text
-            x={verticalLayout ? 20 : cardPosition.left + 60}
-            y={verticalLayout ? cardPosition.top - 700 : -3060}
-            className="tooltip-text"
-          >
-            {node[1].name}
-          </text>
-          <text
-            x={verticalLayout ? 20 : cardPosition.left + 60}
-            y={verticalLayout ? cardPosition.top - 680 : -3040}
-            className="tooltip-subtext"
-          >
-          Click here to design test step(s), rename or delete test steps folder.
-          </text>
-        </g>
-      ))
-  )}
-</g> */}
-
-
-
-
-
-
-                             
+                    <text className="ct-nodeLabel" textAnchor="middle" x="20" y="50">{node[1].name}</text>
+                    <title val={node[0]} className="ct-node-title" >
+                    {showTooltip !== "" && (
+                      ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
+                        <div className="tooltip">
+                          <span className="tooltiptext">
+                            <span className="tooltip-line">{node[1].title}</span>
+                          </span>
+                        </div>
+                      )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
+                        <div className="tooltip">
+                          <span className="tooltiptext">{node[1].title} </span>
+                        </div> 
+                     )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
+                      <div className="tooltip">
+                        <span className="tooltiptext">{node[1].title}</span>
+                      </div> 
+                     )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
+                      <div className="tooltip">
+                        <span className="tooltiptext">{node[1].title}</span>
+                      </div> 
+                     ))
+                    )}</title>         
                     {(node[1].type!=='testcases')?
                     <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                     :null}
@@ -1427,10 +1300,10 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
         }
     }
     else if (d3.select('.node-selected').attr('data-nodetype') === 'scenarios') {
-        setMsg(MSG.MINDMAP.WARN_SELECT_SCENARIO_PASTE)
+        setMsg(MSG.MINDMAP.WARN_SELECT_SCENARIO_PASTE.CONTENT)
         return false
     } else if(d3.select('.node-selected').attr('data-nodetype') === 'modules') {
-        setMsg(MSG.MINDMAP.WARN_SELECT_MODULE_PASTE)
+        setMsg(MSG.MINDMAP.WARN_SELECT_MODULE_PASTE.CONTENT)
         return false
     }
     return {cnodes,clinks,cdNodes,cdLinks,csections,count};

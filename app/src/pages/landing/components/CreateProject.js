@@ -41,6 +41,20 @@ const CreateProject = (props) => {
   const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
   const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
 
+
+  const isBase64 = (str) => {
+    if (typeof str !== 'string') {
+    return false;
+    }
+    const len = str.length;
+    if (len === 0 || len % 4 !== 0 || /[^A-Z0-9+/=]/i.test(str)) {
+    return false;
+    }
+    const firstPaddingChar = str.indexOf('=');
+    return firstPaddingChar === -1 || firstPaddingChar === len - 1 || (firstPaddingChar === len - 2 && str[len - 1] === '=');
+    };
+
+
   const userDetails = async () => {
     userInfo = JSON.parse(localStorage.getItem('userInfo'));
   if(userInfo){
@@ -48,12 +62,11 @@ const CreateProject = (props) => {
       let userData = [];
       if(props.handleManageProject) {
         const users_obj = await getUsers_ICE(reduxDefaultselectedProject.projectId);
-        console.log(users_obj)
         userData = users_obj["unassignedUsers"];
         let formattedData = [];
         for(let user of userData) {
-          const {name, _id, defaultrole, firstname, lastname, email} = user;
-          formattedData.push({ id: _id, name, primaryRole: defaultrole.name, firstname, lastname, email });
+          const {name, _id, defaultrole, firstname, lastname, email,profileimage} = user;
+          formattedData.push({ id: _id, name, primaryRole: defaultrole.name, firstname, lastname, email,profileimage });
         }
         // const formattedData = userData.map((user) => {
         //   const {name, _id, defaultrole, firstname, lastname, email} = user;
@@ -61,6 +74,9 @@ const CreateProject = (props) => {
         // });
         let newFormattedData = [];
         for (let item of formattedData) {
+          if (item.profileimage && isBase64(item.profileimage)) {
+            item.profileimage = `data:image/jpeg;base64,${item.profileimage}`;
+            }
           if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
             newFormattedData.push({
               ...item, selectedRole: '',
@@ -76,22 +92,26 @@ const CreateProject = (props) => {
           initials: getInitials(user.firstname, user.lastname),
           lastname: user.lastname,
           name: user.name,
+          profileimage: user.profileimage,
           primaryRole: user.assignedrole.name,
           selectedRole: user.assignedrole.name
         })));
-        const selectedProjectAppType = appTypes.find(appTypes => appTypes.value === reduxDefaultselectedProject.appType);
-        setSelectedApp({code:selectedProjectAppType.code, image:selectedProjectAppType.image, name:selectedProjectAppType.name});
+        const selectedProjectAppType = appTypes.find(appType => appType.code === reduxDefaultselectedProject.appType);
+        setSelectedApp({code:selectedProjectAppType.code, image:selectedProjectAppType?.image, name:selectedProjectAppType?.name});
         setValue(reduxDefaultselectedProject.projectName);
-        console.log(selectedProjectAppType.name);
-      } else {
+      }
+      else {
         userData = await getUserDetails("user");
         const formattedData = userData.map((user) => {
-          const [name, id, , primaryRole, firstname, lastname, email] = user;
-          return { id, name, primaryRole, firstname, lastname, email };
-        });
+          const [name, id, ,primaryRole, firstname, lastname, email,profileimage] = user;
+          return { id, name, primaryRole, firstname, lastname, email,profileimage};
+        });    
         let loggedInUser = null;
         let newFormattedData = [];
         for (let item of formattedData) {
+          if (item.profileimage && isBase64(item.profileimage)) {
+            item.profileimage = `data:image/jpeg;base64,${item.profileimage}`;
+            }
           if ((item.name.toLowerCase().includes(query.toLowerCase())) && (item.primaryRole !== "Admin")) {
             if(item.id ===  userInfo.user_id) {
               loggedInUser = {
@@ -123,7 +143,6 @@ const CreateProject = (props) => {
     return initials;
   }
 
-console.log(reduxDefaultselectedProject);
   const apps = [
     { name: 'Web', code: 'Web', image: 'static/imgs/web.png' },
     { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg' },
@@ -140,16 +159,16 @@ console.log(reduxDefaultselectedProject);
     { name: 'SAP', code: 'SAP', value:'5db0022cf87fdec084ae49b4', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', value:'5db0022cf87fdec084ae49b3', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', value:'5db0022cf87fdec084ae49af', image: 'static/imgs/desktop.png' },
-    { name: 'Web Services', code: 'Webservice',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/webService.png' },
-    { name: 'Mainframe', code: 'Mainframe', value:'5db0022cf87fdec084ae49b0',image: '/static/imgs/mainframe.png' },
+    { name: 'Web Services', code: 'WebService',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/webService.png' },
+    { name: 'Mainframe', code: 'Mainframes', value:'5db0022cf87fdec084ae49b0',image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'MobileWeb',value:"5db0022cf87fdec084ae49b2", image: 'static/imgs/mobileWeb.png' },
-    { name: 'Mobile Application', code: 'MobileApp',value:'5db0022cf87fdec084ae49b1', image: '/static/imgs/mobileApps.png' },
-    { name: 'System Application', code: 'SystemApp',value:'5db0022cf87fdec084ae49b1',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
+    { name: 'Mobile Application', code: 'MobileApps',value:'5db0022cf87fdec084ae49b1', image: '/static/imgs/mobileApps.png' },
+    { name: 'System Application', code: 'System_application',value:'5db0022cf87fdec084ae49b1',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
 
   const roles = [
-    { name: 'Test Manager' },
-    { name: 'Test Lead' },
+    { name: 'Quality Manager' },
+    { name: 'Quality Lead' },
     { name: 'QA' },
   ];
 
@@ -221,8 +240,6 @@ console.log(reduxDefaultselectedProject);
     const assignedUsers = items.filter(
       (item) => selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
     );
-
-   console.log(props.handleManageProject)
 
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
@@ -453,7 +470,12 @@ console.log(reduxDefaultselectedProject);
                   <Checkbox className=" checkbox1" inputId={`checkbox-${item.id}`} name="item" value={item.id} checked={selectedCheckboxes.some((cb) => cb.id === item.id)} onChange={handleCheckboxChange} />
                   <div htmlFor={`checkbox-${item.id}`} className="label-2 ml-2 mr-2 mt-2 mb-2" >
                     <div  className='user-info' >
-                      <span className='user-avatar'> <Avatar className='user-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '27px', height: '26px' }} >{item.initials}</Avatar></span>
+                      <span className='user-avatar'> 
+                      <Avatar className='user-av bg-blue-300 text-900' shape="circle" style={{ width: '27px', height: '26px' }} 
+                              image= {item.profileimage ? item.profileimage : ''} 
+                               label={item.initials} 
+                               />
+                               </span>
                       <div className='name_And_Role'>
                         <span className='user-name'> {item.name}</span>
                         <span className='user-role'>{item.primaryRole}</span>
@@ -506,7 +528,11 @@ console.log(reduxDefaultselectedProject);
                   >{checkboxId} </Checkbox>
                   <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 " title={checkboxId.email}>
                     <div className="nameRole_user">
-                      <span className='asgnd-avatar'> <Avatar className='asgnd-av' shape="circle" style={{ backgroundColor: '#9c27b0', color: '#ffffff', width: '26px', height: '23px', fontSize: "13px" }} >{checkboxId.initials}</Avatar></span>
+                      <span className='asgnd-avatar'> <Avatar className='asgnd-av bg-blue-300 text-900' shape="circle" 
+                      style={checkboxId.profileimage ? { width: '26px', height: '23px', fontSize: "13px",position:'relative', top:'0.4rem'} : { width: '26px', height: '23px', fontSize: "13px"} }
+                      image={checkboxId.profileimage ? checkboxId.profileimage  : ''}
+                      label={checkboxId.initials} 
+                      /></span>
                       <span className='asgnd-name'> {checkboxId.name} </span>
                       <span className='asgnd-role'>{!checkboxId.selectedRole.name ? checkboxId.primaryRole : checkboxId.selectedRole.name}</span>
                     </div>

@@ -127,7 +127,7 @@
   color: #FFFFFF;
   position: relative;
   border: none;
-  left: 22.2rem;
+  left: 27.2rem;
   padding: 0.5rem 0.5rem;
 }
 
@@ -726,6 +726,9 @@
     bottom: 2rem;
     cursor: pointer;
   }
+  .disabled {
+    color: '#cccccc';
+  }
 
   .add_obj {
     position: relative;
@@ -748,7 +751,7 @@
 
 .utility__block {
   border-right: 1px solid #E2E2ED;
-  cursor: pointer;
+  cursor: not-allowed;
 
   .insprint__text {
     position: relative;
@@ -756,7 +759,7 @@
     right: 1rem;
     font-size: 16px;
     font-family: "Open sans";
-    cursor: pointer;
+    cursor: not-allowed;
     font-weight: bold;
   }
 
@@ -960,6 +963,10 @@
     }
 }
 
+.ss__red{
+  color: red!important;
+}
+
 
 .angle-left{
   background: none;
@@ -1022,4 +1029,41 @@
     font-family: 'Open Sans';
     border-radius: 4px;
     cursor: pointer;
+}
+.inputtext4{
+  border-bottom: '1px solid black';
+  border-top: 'none';
+  border-left: 'none';
+  border-right: 'none';
+  width: '70%';
+  padding: 0.9rem 0rem 1rem 0rem;
+  outline: none !important;
+
+}
+.reset_button{
+  margin-top: 2rem; 
+  margin-left: 30rem;
+  display: flex;
+  justify-content: flex-end;
+  /* margin-top: 2rem; */
+  top: 0rem;
+  // left:35rem;
+}
+.submit_button{
+  margin-left: 36rem;
+  bottom: 0rem;
+
+}
+
+.centerHeader {
+  text-align: center !important;
+}
+.disabled-image {
+  opacity: 0.5; 
+  pointer-events: none; 
+}
+.p-tag-value{
+  width: 34px;
+  height: 15px;
+  font-size: 10px;
 }

@@ -316,12 +316,12 @@ const DesignModal = (props) => {
                                                 testcase[i].keywordVal = testcase[i].keywordVal[0].toLowerCase() + testcase[i].keywordVal.slice(1,);
                                                 if(testcase[i].custname !== "OBJECT_DELETED"){
                                                     let objType = getKeywordList(testcase[i].custname,keywordData,props.appType,scriptData.view)
-                                                    testcase[i]["keywordTooltip"] = keywordData[objType.obType][temp]?.tooltip!==undefined?keywordData[objType.obType][temp].tooltip:'--';
-                                                    testcase[i]["keywordDescription"] = keywordData[objType.obType][temp]?.description!==undefined?keywordData[objType.obType][temp].description:'--';
+                                                    testcase[i]["keywordTooltip"] = keywordData[objType.obType][temp]?.tooltip!==undefined?keywordData[objType.obType][temp].tooltip:testcase[i].keywordVal;
+                                                    testcase[i]["keywordDescription"] = keywordData[objType.obType][temp]?.description!==undefined?keywordData[objType.obType][temp].description:testcase[i].keywordVal;
                                                 }else{
                                                     // let objType = getKeywordList(testcase[i].custname,keywordData,props.appType)
-                                                    testcase[i]["keywordTooltip"] = '--';
-                                                    testcase[i]["keywordDescription"] = '--';
+                                                    testcase[i]["keywordTooltip"] = testcase[i].keywordVal;
+                                                    testcase[i]["keywordDescription"] = testcase[i].keywordVal ;
                                                 }
                                                 testcaseArray.push(testcase[i]);
                                             }
@@ -972,8 +972,10 @@ const DesignModal = (props) => {
     const keywordEditor = (options) => {
         setFocused(true);
         return (
-            <Dropdown className='select-option'  width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel={getOptionLabel} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
-        )
+            <div className='select-option'>
+                <Dropdown width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel={getOptionLabel} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
+            </div> 
+       )
     };
     const inputEditor = (options) => {
         return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} placeholder={inputPlaceholder} />;
@@ -1092,7 +1094,7 @@ const DesignModal = (props) => {
     
     const rowExpansionTemplate = (data) => {
         return (
-            <div className="p-1">
+            <div className="p-1 dataTableChild">
                     <DataTable className='datatable__col'
                         value={data.testCases.length>0?data.testCases:[]}
                         selectionMode="checkbox" selection={selectedTestCases}

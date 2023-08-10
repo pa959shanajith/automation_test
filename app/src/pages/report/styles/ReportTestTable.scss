@@ -1,7 +1,7 @@
 @import '../../global/styles/ColorVariables.scss';
 
 .reportSummary{
-    margin: 0.5vh;
+    margin: 1.5vh;
 }
 
 .reportsTable_container {
@@ -16,6 +16,8 @@
         max-height: 81vh;
         overflow-y: auto;
         height: 80vh;
+        margin: 1.5vh;
+        border-radius: 0.6rem;
         .p-treetable-thead>tr>th {
             white-space: nowrap;
             overflow: hidden;
@@ -24,6 +26,9 @@
             top: 0;
             z-index: 1;
           }
+        .p-treetable-table {
+            border: 1px solid #dee2e6;
+        }
     }
     
     .ViewTableOnClose{
@@ -62,4 +67,14 @@
 }
 .p-treetable .p-treetable-header{
     padding: 0.5rem !important;
+}
+
+.jira_modal {
+    .jira_credentials {
+        width: 100%;
+        padding: 0.4rem;
+    }
+    .jira_user {
+        padding: 0.22rem;
+    }
 }

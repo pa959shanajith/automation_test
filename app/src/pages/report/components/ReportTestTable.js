@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import { Column } from 'primereact/column';
 import { TreeTable } from 'primereact/treetable';
 import { Button } from 'primereact/button';
-import { viewReport} from '../api';
+import { getDetails_JIRA, viewReport} from '../api';
 import { InputText } from 'primereact/inputtext';
 import "../styles/ReportTestTable.scss"
 import { OverlayPanel } from 'primereact/overlaypanel';
@@ -11,12 +11,14 @@ import CollapsibleCard from './CollapsibleCard';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { FooterTwo } from '../../global';
 import { getStepIcon } from "../containers/ReportUtils";
+import AvoModal from '../../../globalComponents/AvoModal';
 
 export default function BasicDemo() {
     const [reportData,setReportData] = useState([]);
     const [reportViewData, setReportViewData] = useState([]);
     const [expandedKeys, setExpandedKeys] = useState(null);
     const [searchTest, setSearchTest] = useState('');
+    const [visibleBug, setVisibleBug] = useState(false);
     const [reportSummaryCollaps, setReportSummaryCollaps] = useState(true);
     const filterRef = useRef(null);
     const [reportid, setReportId] = useState(null)
@@ -68,6 +70,13 @@ export default function BasicDemo() {
       setExpandedKeys(e.value);
     };
 
+    const onBugBtnClick = (getBtn) => {
+      if(getBtn==="Cancel") setVisibleBug(false);
+      else if(getBtn==="Connect") {
+
+      }
+    }
+
     const onFilterChange = (e) => {
         let _selectedFilters = [...selectedFilter];
         
@@ -80,12 +89,20 @@ export default function BasicDemo() {
         setSearchTest(_selectedFilters[0]?.name ? _selectedFilters[0].name : "");
     };
 
+  const handleBug = (getRowData) => {
+    setVisibleBug(true);
+    (async () => {
+      const resp = await getDetails_JIRA();
+      console.log(resp);
+    })();
+  };
+
     const getTableHeader = (
       <div className="grid">
-        <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
-            <img src="static/imgs/chrome_icon.svg" alt='chrome icon' style={{width:'25px',height:'25px'}} />
-            <img src="static/imgs/edge_icon.svg" alt='edge icon' style={{width:'25px',height:'25px'}}/>
-            <img src="static/imgs/safari_icon.svg" alt='safari icon' style={{width:'25px',height:'25px'}}/>
+        <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
+            <img src="static/imgs/chrome_icon.svg" alt='chrome icon' style={{width:'25px',height:'25px', margin: '0.5rem'}} />
+            <img src="static/imgs/edge_icon.svg" alt='edge icon' style={{width:'25px',height:'25px', margin: '0.5rem'}}/>
+            <img src="static/imgs/safari_icon.svg" alt='safari icon' style={{width:'25px',height:'25px', margin: '0.5rem'}}/>
         </div>
         <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex justify-content-center align-items-center">
           <div className="p-input-icon-left">
@@ -105,7 +122,7 @@ export default function BasicDemo() {
     );
     const defectIDForJiraAndAzure = (rowData) => {
         const hasChildren = rowData?.children && rowData?.children?.length > 0;
-        return hasChildren ? null :  <img src='static/imgs/bug.svg' alt='bug defect'/>;
+        return hasChildren ? null :  <img src='static/imgs/bug.svg' alt='bug defect' onClick={() => handleBug(rowData)}/>;
     }
     const convertDataToTree = (data) => {
       const treeDataArray = [];
@@ -152,26 +169,76 @@ export default function BasicDemo() {
     const treeData = convertDataToTree(reportViewData)
 
     return (
-        <div className="reportsTable_container">
-            <div className="reportSummary">
-                <Accordion tabIndex={0} onTabOpen={()=>setReportSummaryCollaps(false)} onTabClose={()=>setReportSummaryCollaps(true)}>
-                    <AccordionTab className='content' header="Result Summary">
-                        <CollapsibleCard collapsible={false} width="100%" className={"card"}  type ="Execution" summaryValues={reportData?.overallstatus}/> 
-                    </AccordionTab>
-                </Accordion>
-            </div>
-            <br></br>
-            <TreeTable globalFilter={searchTest} header={getTableHeader} value={treeData} className={reportSummaryCollaps?'viewTable':'ViewTable'} expandedKeys={expandedKeys} dataKey='id' onToggle={(e) => handdleExpend(e)} tableStyle={{ minWidth: '50rem' }} >
-                <Column field="slno" header="S No." style={{width:'8rem',padding:'0rem'}} expander/>
-                <Column field='Step' header='Steps' style={{width:'8rem',padding:'0rem'}}/>
-                <Column field='StepDescription' header="Description" style={{width:'18rem',padding:'0rem'}}/>
-                <Column field="EllapsedTime" header="Time Elapsed" style={{width:'10rem',padding:'0rem'}}/>
-                <Column field="status" header="Status" style={{width:'8rem',padding:'0rem'}}/>
-                <Column field='Comments' header='Comments'style={{width:'18rem',padding:'0rem'}}/>
-                <Column header="No. Defect ID" body={defectIDForJiraAndAzure} style={{padding:'0rem'}}/>
-                <Column header='Action' style={{padding:'0rem'}}/>
-            </TreeTable>
-            <OverlayPanel ref={filterRef} className="reports_download">
+      <div className="reportsTable_container">
+        <div className="reportSummary">
+          <Accordion
+            activeIndex={0}
+            tabIndex={0}
+            onTabOpen={() => setReportSummaryCollaps(false)}
+            onTabClose={() => setReportSummaryCollaps(true)}
+          >
+            <AccordionTab className="content" header="Result Summary">
+              <CollapsibleCard
+                collapsible={false}
+                width="100%"
+                className={"card"}
+                type="Execution"
+                summaryValues={reportData?.overallstatus}
+              />
+            </AccordionTab>
+          </Accordion>
+        </div>
+        <br></br>
+        <TreeTable
+          globalFilter={searchTest}
+          header={getTableHeader}
+          value={treeData}
+          className={reportSummaryCollaps ? "viewTable" : "ViewTable"}
+          expandedKeys={expandedKeys}
+          dataKey="id"
+          onToggle={(e) => handdleExpend(e)}
+          tableStyle={{ minWidth: "50rem" }}
+        >
+          <Column
+            field="slno"
+            header="S No."
+            style={{ width: "8rem", padding: "0rem" }}
+            align="center"
+            expander
+          />
+          <Column
+            field="Step"
+            header="Steps"
+            style={{ width: "8rem", padding: "0rem" }}
+          />
+          <Column
+            field="StepDescription"
+            header="Description"
+            style={{ width: "18rem", padding: "0rem" }}
+          />
+          <Column
+            field="EllapsedTime"
+            header="Time Elapsed"
+            style={{ width: "10rem", padding: "0rem" }}
+          />
+          <Column
+            field="status"
+            header="Status"
+            style={{ width: "8rem", padding: "0rem" }}
+          />
+          <Column
+            field="Comments"
+            header="Comments"
+            style={{ width: "18rem", padding: "0rem" }}
+          />
+          <Column
+            header="No. Defect ID"
+            body={defectIDForJiraAndAzure}
+            style={{ padding: "0rem" }}
+          />
+          <Column header="Action" style={{ padding: "0rem" }} />
+        </TreeTable>
+        <OverlayPanel ref={filterRef} className="reports_download">
           {filterValues.map((category) => {
             return (
               <div key={category.key} className="flex align-items-center">
@@ -191,7 +258,33 @@ export default function BasicDemo() {
             );
           })}
         </OverlayPanel>
-        <div><FooterTwo/></div>
+        <div>
+          <FooterTwo />
         </div>
-    )
+        <AvoModal
+          visible={visibleBug}
+          setVisible={setVisibleBug}
+          onModalBtnClick={onBugBtnClick}
+          content={
+            <div className='flex flex-column'>
+              <div className='jira_user'>Username</div>
+              <InputText className="jira_credentials" />
+              <div className='jira_user'>Password/API Key</div>
+
+              <InputText className="jira_credentials" />
+              <div className='jira_user'>URL</div>
+              <InputText className="jira_credentials" />
+            </div>
+          }
+          customClass="jira_modal"
+          headerTxt="JIRA Login"
+          modalSytle={{
+            width: "40vw",
+            height: "50vh",
+            background: "#FFFFFF",
+          }}
+          footerType="Connect"
+        />
+      </div>
+    );
 }
