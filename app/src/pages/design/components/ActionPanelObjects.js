@@ -752,7 +752,7 @@ const ActionPanel = (props) => {
           if (objectsReplaced) // this is required inside only.
             props.toastSuccess(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
         }
-        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRtoastErrorPE)
       })
       .catch(err => {
         props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
@@ -883,7 +883,7 @@ const ActionPanel = (props) => {
       }).catch((err) => {
         props.setOverlay(null)
         console.log(err)
-        props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+        // props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
       });
     }
   }

@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import { React, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Tooltip } from 'primereact/tooltip';
 import PrimeReact from "primereact/api";
@@ -12,34 +12,20 @@ import { Carousel } from 'primereact/carousel';
 
 
 import '../styles/SideNav.scss';
-import { useSelector } from "react-redux";
 
 
-const SideNav = () => {
+const SideNav = () =>{
     PrimeReact.ripple = true;
     const [tabSelected, setTabSelected] = useState("/landing");
-    // const userInfo = useSelector(state => state.landing.userinfo);
-    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-    if (!userInfo) userInfo = userInfoFromRedux;
-    else userInfo = userInfo;
     const [disableIconDialogVisible, setDisableIconDialogVisible] = useState(false);
-    const [navListItems, setNavListItems] = useState([]);
-    const [ITDM_images, setITDM_images] = useState([{ image: "ITDM_disabled_popup_img1.png" },
-                                                    { image: "ITDM_disabled_ipopup_img2.png" },
-                                                    { image: "ITDM_disabled_ipopup_img3.png" }])
-
-    useEffect(() => {
-        if(userInfo?.isadminuser) setNavListItems(menuItem);
-        else setNavListItems(menuItem.filter(obj => userInfo?.isadminuser === false && obj.name !== "Admin"));
-    }, [userInfo]);
-
-    const menuItem =  [
+    const [ITDM_images, setITDM_images] = useState([{image:"ITDM_disabled_popup_img1.png"},
+                                                    {image:"ITDM_disabled_ipopup_img2.png"},
+                                                    {image:"ITDM_disabled_ipopup_img3.png"}])
+    const menuItem = [
         {
             path: "/landing",
             name: "Projects",
-            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="Create/View all your projects."  data-pr-position="right" height="25px" />,
             disabled: false
         },
         // {
@@ -51,7 +37,7 @@ const SideNav = () => {
         {
             path: "/reports",
             name: "Reports",
-            icon: <img src={tabSelected === "/reports" ? "static/imgs/report_icon_selected.svg" : "static/imgs/report_icon.svg"} className="icon" data-pr-tooltip=" View and analyze executed test automations." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected==="/reports" ? "static/imgs/report_icon_selected.svg" :"static/imgs/report_icon.svg"} className="icon" data-pr-tooltip=" View and analyze executed test automations."  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         // {
@@ -74,10 +60,8 @@ const SideNav = () => {
         },
         
     ]
-
-
-    const onTabClickHandler = (event, route, disabled) => {
-        if (!disabled) setTabSelected(route);
+    const onTabClickHandler = (event, route, disabled)=>{
+        if(!disabled) setTabSelected(route);
         else {
             setDisableIconDialogVisible(true);
         };
@@ -92,7 +76,7 @@ const SideNav = () => {
                 <div>
                     <h4 className="mb-1">Description about ITDM</h4>
                     <div className="mt-5 flex flex-wrap gap-2 justify-content-center">
-                        <Button className="" onClick={() => setDisableIconDialogVisible(false)}>Buy Add-ON</Button>
+                        <Button  className="" onClick={()=> setDisableIconDialogVisible(false)}>Buy Add-ON</Button>
                     </div>
                 </div>
             </div>
@@ -103,28 +87,29 @@ const SideNav = () => {
         setDisableIconDialogVisible(false)
     }
 
-    return (
+    return ( 
         <>
             <div className="sidebar_container">
-                <Tooltip target=".icon" mouseTrack mouseTrackLeft={20} />
-                <Dialog visible={disableIconDialogVisible} onHide={() => itdmDialogHide} style={{ width: '30vw' }} >
-                    <Carousel value={ITDM_images} numVisible={1} numScroll={1} itemTemplate={ITDM_Template} />
-                </Dialog>
+            <Tooltip target=".icon" mouseTrack mouseTrackLeft={20}/>
+            <Dialog visible={disableIconDialogVisible} onHide={() => itdmDialogHide} style={{ width: '30vw' }} >
+                <Carousel value={ITDM_images} numVisible={1} numScroll={1} itemTemplate={ITDM_Template} />
+            </Dialog>
                 <div className="sidebar">
-                    { navListItems.length && navListItems.map((item, index) => (
-                            <NavLink to={item.path} key={index} onClick={(e) => onTabClickHandler(e, item.path, item.disabled)} className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '')} activeclassname="active" end>
+                    {
+                        menuItem.map((item, index) =>(
+                            <NavLink to={item.path} key={index} onClick={(e)=>onTabClickHandler(e, item.path, item.disabled)} className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '')} activeclassname="active" end>
                                 <div className="flex flex-column w-full">
-                                    <div className="icon flex-row p-overlay-badge">{item.icon} {item.disabled && <Badge value={<img className='lock_icon' src="static/imgs/disabled_tab_lock_icon.png" height="13px"></img>}></Badge>}</div>
+                                    <div className="icon flex-row p-overlay-badge">{item.icon} {item.disabled && <Badge value={<img  className='lock_icon' src="static/imgs/disabled_tab_lock_icon.png" height="13px"></img>}></Badge> }</div>
                                     <div className="link_text">{item.name}</div>
                                     <Ripple />
-                                </div>
+                                </div>  
                             </NavLink>
-
-                        ))}
+                        ))
+                    }
                 </div>
             </div>
         </>
-    );
+     );
 }
 
 export default SideNav;
