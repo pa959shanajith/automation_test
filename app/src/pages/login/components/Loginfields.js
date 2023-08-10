@@ -129,6 +129,7 @@ const Login = (props) => {
     }
 
     const loginSubmitHandler = async (event) => {
+        toast.current.clear();
         event.preventDefault();
         if (username.trim().length > 0 && password.length > 0) {
             checkUser();
