@@ -1493,14 +1493,6 @@ const footerSave = (
       {label: 'Response'},
   ];
 
-  
-
-     // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
-     
-     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-     if (localStorageDefaultProject) {
-         NameOfAppType = JSON.parse(localStorageDefaultProject);
-     }
      const renderElement=(rowdata)=>{
       return (
         <>
