@@ -6,6 +6,7 @@ import "../styles/CertificateModal.scss";
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
+import { Cert } from '../designSlice';
 
 
 const CertificateModal = props => {
@@ -54,7 +55,7 @@ const CertificateModal = props => {
                 certsDetails: `${certPath};;${certPass}`,
                 authDetails: `${authName};${authPass}`
             }
-            dispatch(cert(certObj));
+            dispatch(Cert(certObj));
             setMsg(MSG.SCRAPE.SUCC_CERT_SAVE);
            props.setVisible(false);
         }

@@ -2387,55 +2387,6 @@ function formatXml(xml) {
 	return formatted;
 }
 
-function parseRequest(readChild) {
-	try {
-		if ('name' in readChild) {
-			if (xpath === "") {
-				xpath = "/" + readChild.name;
-					allXpaths.push(xpath);
-				allCustnames.push(readChild.name);
-			}
-			if ('attributes' in readChild) {
-				let attrchildren = Object.keys(readChild.attributes);
-				if (attrchildren.length >= 1) {
-					let basexpath = xpath;
-					for (let attrindex = 0; attrindex < attrchildren.length; attrindex++) {
-						let newLevel = attrchildren[attrindex];
-						if (xpath === undefined) {
-							xpath = "";
-						}
-						let custname = readChild.name + "_" + newLevel;
-						xpath = xpath + "/" + newLevel;
-						allCustnames.push(custname);
-						allXpaths.push(xpath);
-						xpath = basexpath;
-					}
-				}
-			}
-			if ('children' in readChild) {
-				if (readChild.children.length >= 1) {
-					var basexpath = xpath;
-					for (var childrenindex = 0; childrenindex < readChild.children.length; childrenindex++) {
-						objectLevel = objectLevel + 1;
-						var newLevel = readChild.children[childrenindex].name;
-						if (xpath === undefined || xpath === 'undefined') {
-							xpath = "";
-						}
-						xpath = xpath + "/" + newLevel;
-						allCustnames.push(newLevel);
-						allXpaths.push(xpath);
-						parseRequest(readChild.children[childrenindex]);
-						xpath = basexpath;
-						objectLevel = objectLevel - 1;
-					}
-				}
-			}
-		}
-	} catch (exception) {
-		console.error("Exception in the function parseRequest: ERROR::::", exception);
-	}
-}
-
 function parseJsonRequest(requestedBody, base_key, cur_key, xpath) {
 	let xpaths=xpath;
 	try {

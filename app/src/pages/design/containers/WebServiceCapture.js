@@ -4,7 +4,6 @@ import XMLParser from 'react-xml-parser';
 import { useNavigate } from 'react-router-dom';
 import ScreenWrapper from './ScreenWrapper';
 // import ScrapeObject from '../components/ScrapeObject';
-import { ScrapeContext } from './ScrapeContext';
 import { RedirectPage, ResetSession, Messages as MSG, setMsg } from '../../global';
 import { disableAction,actionError, WsData, wsdlError, disableAppend} from '../designSlice';
 // import SubmitTask from '../components/SubmitTask';

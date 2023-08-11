@@ -139,6 +139,9 @@ export const designSlice = createSlice({
     ScrapeData:(state, action) =>{
       state.ScrapeData = action.payload;
     },
+    Cert:(state, action) =>{
+      state.cert = action.payload;
+    },    
     disableAction:(state, action)=>{
       state.disableAction = action.payload;
     },
@@ -216,6 +219,7 @@ unassignTask,
 toDeleteScenarios,
 appType,
 savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
+Cert,
 TestCases,
 ImpactAnalysisScreenLevel,
 CompareData,
