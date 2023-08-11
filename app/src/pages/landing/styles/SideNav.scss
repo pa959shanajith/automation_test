@@ -60,11 +60,30 @@
             }
         }
         .active{
-            border-left: solid 0.3rem rgb(150, 4, 187);
+            border-left: solid 0.2rem rgb(150, 4, 187);
             color: rgb(150, 4, 187);
             border-radius: 0.2rem;
             border-bottom: none;
             font:$f8_semibold;
         }
+        .inactive{
+            border-left:0px;
+            color: transparent;
+            color: #888484;
+        }
     }
+    .itdm_dis{
+        font: $f6_regular;
+    }
+    .Itdm_contact{
+        font: $f7_semibold;
+    }
+    .itdm_header{
+        font: $f5_semibold;
+    }
+}
+.itdm_icon{
+    position: relative;
+    left: 1.12rem;
+    color: #888484;
 }

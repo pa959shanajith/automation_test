@@ -18,9 +18,9 @@ const SideNav = () =>{
     PrimeReact.ripple = true;
     const [tabSelected, setTabSelected] = useState("/landing");
     const [disableIconDialogVisible, setDisableIconDialogVisible] = useState(false);
-    const [ITDM_images, setITDM_images] = useState([{image:"ITDM_disabled_popup_img1.png"},
-                                                    {image:"ITDM_disabled_ipopup_img2.png"},
-                                                    {image:"ITDM_disabled_ipopup_img3.png"}])
+
+    const recipientEmail = 'support@avoautomation.com';
+
     const menuItem = [
         {
             path: "/landing",
@@ -49,16 +49,15 @@ const SideNav = () =>{
         {
             path: "/admin",
             name: "Admin",
-            icon: <img src= {tabSelected==="/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Manage/Create users, agents and other advanced configurations."  data-pr-position="right" height="25px"/>,
+            icon: <img src= {tabSelected==="/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/admin_icon_selected.svg"} className="icon" data-pr-tooltip="Manage/Create users, agents and other advanced configurations."  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         {
-            path: "/itdm",
+            // path: "/itdm",
             name: "ITDM",
-            icon: <img src= {tabSelected==="/itdm" ? "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Test Data Management Tool to create, modify and provision data"  data-pr-position="right" height="25px"/>,
+            icon: <img src= { tabSelected=== "/landing" ?  "static/imgs/ITDM_icon.svg" : "static/imgs/ITDM_icon_selected.svg"} className="" data-pr-tooltip="Avo’s intelligent Test Data Management (iTDM) solution offers production-like, relevant, and compliant data with a few clicks. It streamlines the entire test data management process making testing cost-effective and faster."  data-pr-position="right" height="25px"/>,
             disabled: true
-        },
-        
+        }
     ]
     const onTabClickHandler = (event, route, disabled)=>{
         if(!disabled) setTabSelected(route);
@@ -66,23 +65,7 @@ const SideNav = () =>{
             setDisableIconDialogVisible(true);
         };
     }
-
-    const ITDM_Template = (ITDM_images) => {
-        return (
-            <div className="border-1 surface-border border-round m-2 text-center py-5 px-3">
-                <div className="mb-3">
-                    <img src={`static/imgs/${ITDM_images.image}`} alt={"ITDM"} className="w-6 shadow-2" />
-                </div>
-                <div>
-                    <h4 className="mb-1">Description about ITDM</h4>
-                    <div className="mt-5 flex flex-wrap gap-2 justify-content-center">
-                        <Button  className="" onClick={()=> setDisableIconDialogVisible(false)}>Buy Add-ON</Button>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
+ 
     const itdmDialogHide = () => {
         setDisableIconDialogVisible(false)
     }
@@ -91,16 +74,29 @@ const SideNav = () =>{
         <>
             <div className="sidebar_container">
             <Tooltip target=".icon" mouseTrack mouseTrackLeft={20}/>
-            <Dialog visible={disableIconDialogVisible} onHide={() => itdmDialogHide} style={{ width: '30vw' }} >
-                <Carousel value={ITDM_images} numVisible={1} numScroll={1} itemTemplate={ITDM_Template} />
+            <Dialog className="itdm_header" visible={disableIconDialogVisible} header="AVO iTDM" onHide={() => itdmDialogHide()} style={{ width: '30vw' }} >
+                {/* <Carousel value={ITDM_images} itemTemplate={ITDM_Template} /> */}
+                <div className="border-1 surface-border border-round m-2 text-center py-5 px-3">
+                <div className="mb-3">
+                    <img src={`static/imgs/ITDM_disabled_ipopup_img2.png`} alt={"ITDM"} className="w-6 shadow-2" />
+                </div>
+                <div>
+                    <span className="mb-1 itdm_dis">Accelerate application development speed, code quality and sustainability initiatives by providing timely access to fresh relevant data downstream for test automation purpose.</span>
+                    <div className="itdm_dis">Want to know more?</div>
+                    <div className="mt-5 flex flex-wrap gap-2 justify-content-center">
+                        <Button className="Itdm_contact" label="Contact Us" onClick={() => window.location.href = `mailto:${recipientEmail}`} />
+                    </div>
+                </div>
+            </div>
             </Dialog>
                 <div className="sidebar">
                     {
                         menuItem.map((item, index) =>(
-                            <NavLink to={item.path} key={index} onClick={(e)=>onTabClickHandler(e, item.path, item.disabled)} className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '')} activeclassname="active" end>
+
+                            <NavLink to={item.path} key={index} onClick={(e)=>onTabClickHandler(e, item.path, item.disabled)} className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '')+(item.name === "ITDM" ? 'inactive' : '')} activeclassname= {(item.name === "ITDM" ? "inactive" : "active")} end>
                                 <div className="flex flex-column w-full">
-                                    <div className="icon flex-row p-overlay-badge">{item.icon} {item.disabled && <Badge value={<img  className='lock_icon' src="static/imgs/disabled_tab_lock_icon.png" height="13px"></img>}></Badge> }</div>
-                                    <div className="link_text">{item.name}</div>
+                                    <div className={item.name === "ITDM" ? "flex-row p-overlay-badge itdm_icon" : "icon flex-row p-overlay-badge"}>{item.icon} </div>
+                                    <div className={item.name === "ITDM" ?  "link_text itdm_icon" :"link_text"}>{item.name}</div>
                                     <Ripple />
                                 </div>  
                             </NavLink>
