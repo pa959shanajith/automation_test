@@ -66,6 +66,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const [treeData, setTreeData] = useState([]);
     const [completeTreeData, setCompleteTreeData] = useState([]);
+    const [completeTestCaseData, setCompleteTestCaseData]= useState([]);
     const [selectedNodes, setSelectedNodes] = useState([]);
     const [viewMappedFiles, setViewMappedFiles] = useState([]);
     const [rows, setRows] = useState([]);
@@ -85,13 +86,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const itemsPerPageJira = 10; // Number of items per page
     const [currentPage, setCurrentPage] = useState(0);
     const [currentJiraPage, setCurrentJiraPage] = useState(1);
-
-    // const [proj, setProj] = useState('');
-    // const [projCode, setProjCode] = useState('');
-    // const [projName, setProjName] = useState('');
-    // const [releaseId, setReleaseId] = useState('');
     const toast = useRef();
-
     const dispatchAction = useDispatch();
 
     const handleIntegration = (value) => {
@@ -101,7 +96,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const handleSubmit = () => {
         setIsSpin(true);
-        // console.log(reduxDefaultselectedProject);
 
         switch (selectedscreen.name) {
             case 'Jira':
@@ -292,6 +286,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(selectedTestCase([]));
         dispatchAction(selectedScenarioIds([]));
         setTestCaseData([]);
+        setCompleteTestCaseData([]);
         setAvoProjectsList([]);
         setAvoProjects([]);
         dispatchAction(selectedAvoproject(''));
@@ -494,6 +489,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(selectedTestCase([]));
         dispatchAction(selectedScenarioIds([]));
         setTestCaseData([]);
+        setCompleteTestCaseData([]);
         setAvoProjectsList([]);
         setAvoProjects([]);
         setListofScenarios([]);
@@ -663,7 +659,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
             dispatchAction(syncedTestCases(selected));
             setSelectedNodes([]);
             dispatchAction(selectedScenarioIds([]));
-            // callSaveButton(mappedPairObj);
         }
         setDisabled(false);
     }
@@ -678,20 +673,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    // const logoutTab = {
-    //     label: '',
-    //     content: null,
-    //     template: (
-    //       <Button label={selectedscreen.name && `${selectedscreen.name} Logout`} onClick={showLogin} className="logout__btn" />
-    //     ),
-    //   };
-
-    //   if (!showLoginCard) {
-    //     integrationItems.push(logoutTab);
-    //   }
-
     const callAzureSaveButton = () => {
-        console.log("in azure", selectedscreen);
         if(azureRef.current){
             azureRef.current.callSaveButton();
         }
@@ -801,7 +783,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <Card className="mapping_data_card2">
                                                                 <div className="dropdown_div">
                                                                     <div className="dropdown-map">
-                                                                        <span>Selected Avo Assure Project <span style={{ color: 'red' }}>*</span></span>
+                                                                        <span>Project <span style={{ color: 'red' }}>*</span></span>
                                                                     </div>
                                                                     <div className="dropdown-map">
                                                                         {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}

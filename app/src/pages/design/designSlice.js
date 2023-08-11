@@ -149,7 +149,7 @@ export const designSlice = createSlice({
       state.actionError = action.payload;
     },
     WsData:(state, action)=>{
-     state.WsData = action.payload;
+     state.WsData = { ...state.WsData, ...action.payload};
     },
     wsdlError:(state,action)=>{
      state.wsdlError = action.payload;

@@ -1,0 +1,31 @@
+@import "../../global/styles/ColorVariables.scss";
+.ws__cert_container{
+    .modal__body{
+        height: 246px;
+    }
+    .modal__content{
+        width: 600px;
+    }
+}
+
+.cert_input{
+    width: 94%;
+    height: 34px;
+    color: $primaryText;
+    border-right: 0;
+    border-left: 0;
+    border-top: 0;
+    border-bottom: 1px solid $borderFive;
+    box-shadow: none;
+    font-family: $avoFont;
+    font-size: 15px;
+    padding: 0;
+    margin: 0 3% 20px;
+    &:focus{
+        outline: none;
+    }
+}
+
+.cert_error{
+    border-bottom: 1px solid  $redError!important;
+}
