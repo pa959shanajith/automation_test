@@ -17,7 +17,8 @@ import {
     resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, showOverlay
+    selectedAvoproject, showOverlay,checkedTCPhaseIds,checkedTcIds,checkedTCNames,checkedTCReqDetails,
+    checkedTreeIds,checkedParentIds,checkedProjectIds,checkedReleaseIds
 } from '../settingSlice';
 import "../styles/ZephyrContent.scss";
 
@@ -27,12 +28,23 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
     const dispatch = useDispatch();
     const mappedData = useSelector(state => state.setting.mappedPair);
     const mappedTreeList = useSelector(state => state.setting.mappedTree);
+    const selectedZphyrPhaseIds = useSelector(state=> state.setting.checkedTCPhaseIds);
+    const selectedZphyrTCIds = useSelector(state=> state.setting.checkedTcIds);
+    const selectedZphyrTCNames = useSelector(state=> state.setting.checkedTCNames);
+    const selectedZphyrTCReqs = useSelector(state=> state.setting.checkedTCReqDetails);
+    const selectedZphyrTreeIds = useSelector(state=> state.setting.checkedTreeIds);
+    const selectedZphyrParentIds = useSelector(state=> state.setting.checkedParentIds);
+    const selectedZphyrProjIds = useSelector(state=> state.setting.checkedProjectIds);
+    const selectedZphyrReleaseIds = useSelector(state=> state.setting.checkedReleaseIds);
+
+
     const [activeIndex, setActiveIndex] = useState(0);
     const [checked, setChecked] = useState(false);
     const [checkedAvo, setCheckedAvo] = useState(false);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const [treeData, setTreeData] = useState([]);
     const [selectedNodes, setSelectedNodes] = useState([]);
+    const [selectedLeftNodes, setselectedLeftNodes] = useState([]);
     const [selectedCity, setSelectedCity] = useState(null);
     const [selectetestcase, setSelectedtestcase] = useState(null);
     const dispatchAction = useDispatch();
@@ -56,6 +68,10 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
     const [selectedRel, setSelectedRel] = useState("Select Release");
     const [testCases, setTestCases] = useState([]);
     const [modules, setModules] = useState([]);
+    const [enableBounce, setEnableBounce] = useState(false);
+    const [isMutipleSelected,setMultipleSelected] = useState(false);
+    const [isMutipleScn,setMultipleScn] = useState(false);
+
     const [data, setData] = useState([
         {
             key: "grandparent1",
@@ -175,7 +191,18 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
             zephyr: 'Zephyr TestCase 3'
         },
     ];
-
+    useEffect(() => {
+        setMultipleSelected(false);
+        setMultipleScn(false);
+        setselectedLeftNodes([]);
+        dispatchAction(checkedTcIds([]));
+        dispatchAction(checkedTCNames([]));
+        dispatchAction(checkedTCReqDetails([]));
+        dispatchAction(checkedTreeIds([]));
+        dispatchAction(checkedParentIds([]));
+        dispatchAction(checkedProjectIds([]));
+        dispatchAction(checkedReleaseIds([]));
+    },[])
 
     const upload = () => {
         setError('')
@@ -199,12 +226,13 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
 
     const onCheckboxChange = (nodeKey) => {
         const nodeIndex = selectedNodes.indexOf(nodeKey);
-        const newSelectedNodes = [];
+        let newSelectedNodes = isMutipleSelected ? [] : [...selectedNodes];
         if (nodeIndex !== -1) {
             newSelectedNodes.splice(nodeIndex, 1);
         } else {
             newSelectedNodes.push(nodeKey);
         }
+        setMultipleScn(newSelectedNodes.length > 1 ? true:false);
         setSelectedNodes(newSelectedNodes);
         dispatchAction(selectedScenarioIds(newSelectedNodes));
     }
@@ -410,7 +438,6 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
         }
         else if (testAndScenarioData) {
             const convertToTree = convertDataStructure(testAndScenarioData.project_dets);
-            console.log(convertToTree,' its convertToTree');
             setProjectDetails(convertToTree);
             // setAvoProjects(testAndScenarioData.avoassure_projects);  
             setSelectedRel(releaseId);
@@ -495,14 +522,16 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
             return (
                 <div>
                     <Checkbox
-                        // checked={selectedKeys.includes(node.key)}
-                        // onChange={(e) => {
-                        //     if (e.checked) {
-                        //         setSelectedKeys([...selectedKeys, node.key]);
-                        //     } else {
-                        //         setSelectedKeys(selectedKeys.filter((key) => key !== node.key));
-                        //     }
-                        // }}
+                        checked={selectedLeftNodes.includes(node.key)}
+                        onChange={(e) => {
+                            onLeftCheckboxChange(node)
+                            // console.log(e,' its selected e');
+                            // if (e.checked) {
+                            //     setSelectedKeys([...selectedKeys, node.key]);
+                            // } else {
+                            //     setSelectedKeys(selectedKeys.filter((key) => key !== node.key));
+                            // }
+                        }}
                     />
                     <span>{node.label}</span>
                 </div>
@@ -510,10 +539,52 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
         }
     };
 
+    const onLeftCheckboxChange = (nodeKey) => {
+        console.log(nodeKey);
+        const nodeIndex = selectedLeftNodes.indexOf(nodeKey.key);
+        const newSelectedNodes = isMutipleScn ? [] : [...selectedLeftNodes];
+        let newSelectedZphyrTCIds = isMutipleScn ? [] : [ ...selectedZphyrTCIds ];
+        let newSelectedZphyrTCNames = isMutipleScn ? [] : [ ...selectedZphyrTCNames ]; 
+        let newSelectedZphyrTCReqs = isMutipleScn ? [] : [ ...selectedZphyrTCReqs ];
+        let newSelectedZphyrTreeIds = isMutipleScn ? [] : [ ...selectedZphyrTreeIds ];
+        let newSelectedZphyrParentIds = isMutipleScn ? [] : [ ...selectedZphyrParentIds ];
+        let newSelectedZphyrProjIds = isMutipleScn ? [] : [ ...selectedZphyrProjIds ];
+        let newSelectedZphyrRelIds = isMutipleScn ? [] : [ ...selectedZphyrReleaseIds ];
+
+
+        if (nodeIndex !== -1) {
+            newSelectedNodes.splice(nodeIndex, 1);
+            newSelectedZphyrTCIds.splice(nodeIndex, 1);
+            newSelectedZphyrTCNames.splice(nodeIndex, 1);
+            newSelectedZphyrTCReqs.splice(nodeIndex, 1);
+            newSelectedZphyrTreeIds.splice(nodeIndex, 1);
+            newSelectedZphyrParentIds.splice(nodeIndex, 1);
+            newSelectedZphyrProjIds.splice(nodeIndex, 1);
+            newSelectedZphyrRelIds.splice(nodeIndex, 1);
+        } else {
+            newSelectedNodes.push(nodeKey.key);
+            newSelectedZphyrTCIds.push(nodeKey.key);
+            newSelectedZphyrTCNames.push(nodeKey.label);
+            newSelectedZphyrTCReqs.push(nodeKey.reqdetails);
+            newSelectedZphyrTreeIds.push(String(nodeKey.cyclePhaseId));
+            newSelectedZphyrParentIds.push(nodeKey.parentId);
+            newSelectedZphyrProjIds.push(parseInt(selectZephyrProject.id));
+            newSelectedZphyrRelIds.push(parseInt(selectedRel.id));
+        }
+        setMultipleSelected(newSelectedZphyrTCIds.length > 1 ? true:false);
+        setselectedLeftNodes(newSelectedNodes);
+        dispatchAction(checkedTcIds(newSelectedZphyrTCIds));
+        dispatchAction(checkedTCNames(newSelectedZphyrTCNames));
+        dispatchAction(checkedTCReqDetails(newSelectedZphyrTCReqs));
+        dispatchAction(checkedTreeIds(newSelectedZphyrTreeIds));
+        dispatchAction(checkedParentIds(newSelectedZphyrParentIds));
+        dispatchAction(checkedProjectIds(newSelectedZphyrProjIds));
+        dispatchAction(checkedReleaseIds(newSelectedZphyrRelIds));
+    }
+
     const handleNodeToggle = async (nodeobj) => {
-        
-        if(Object.keys(nodeobj).length && nodeobj.node && typeof parseInt(nodeobj.node.key) === 'number'){
-            console.log(nodeobj,' its nodeobj of toggle');
+        if(Object.keys(nodeobj).length && nodeobj.node && !isNaN(parseInt(nodeobj.node.key))){
+            setEnableBounce(true);
             const data = await api.zephyrTestcaseDetails_ICE("testcase", nodeobj.node.key);
         if (data.error)
                 setToast('error','Error',data.error);
@@ -525,47 +596,162 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
                 setToast('error','Error','Invalid Session');
             }
             else {
-                // const updateTOTree = 
-                console.log(updateChildrenData(projectDetails,data.testcases),' its output');
-                console.log(projectDetails,' its updated details');
+                if(data.testcases.length){
+                    updateChildrenData(projectDetails,data.testcases,data.modules);
+                }
+                if(data.modules.length && !data.testcases.length){
+                    updateModuleData(nodeobj.node.key,data.modules);
+                }
                 setTestCases(data.testcases);
                 setModules(data.modules);
                 // setCollapse(false);
             }
         }
+        setEnableBounce(false);
        
     }
 
-    const updateChildrenData = (firstArray, secondArray) => {
-        secondArray.forEach((item) => {
-          const { parentId } = item;
-          const findParent = (nodes) => {
-            for (let i = 0; i < nodes.length; i++) {
-              const node = nodes[i];
-              if (node.key === parentId) {
-                if (!node.children) {
-                  node.children = [];
-                } else {
-                  // Remove empty object from children if exists
-                  node.children = node.children.filter((child) => Object.keys(child).length > 0);
-                }
-                node.children.push({
-                  key: String(item.id),
-                  label: item.name,
-                  children: [],
-                });
-                return true;
-              } else if (node.children) {
-                const foundInChild = findParent(node.children);
-                if (foundInChild) return true;
-              }
+    const  updateChildren =  (node, keyToUpdate, newChildren) => {
+        if (!node.children) return node;
+    
+        const updatedChildren = node.children.map(child => {
+            if (child.key === keyToUpdate) {
+                return {
+                    ...child,
+                    children: [
+                        ...(child.children || []),
+                        ...newChildren.map(obj => {
+                            const key = Object.keys(obj)[0];
+                            const label = obj[key];
+                            return { key, label, children: [] };
+                        })
+                    ]
+                };
+            } else if (child.children) {
+                return updateChildren(child, keyToUpdate, newChildren);
             }
-            return false;
-          };
-      
-          findParent(firstArray);
+            return child;
         });
-      }
+    
+        return {
+            ...node,
+            children: updatedChildren
+        };
+    }
+
+    
+
+
+
+    const updateModuleData = (selectedkey,modules) => {
+        if(projectDetails.length && modules.length){
+            const findParent = (nodes, parentId, processedNodes,item) => {
+                if(item){
+                    for (let i = 0; i < nodes.length; i++) {
+                        const node = nodes[i];
+                        // && (!node.children || node.children.length < totalLen)
+                        if (!processedNodes.has(node.key) && node.key === parentId) {
+                            processedNodes.add(node.key);
+                            if (!node.children) {
+                                node.children = [];
+                            } else {
+                                // Remove empty object from children if exists
+                                node.children = node.children.filter((child) => Object.keys(child).length > 0);
+                            }
+                           
+                                    const existingChild = node.children.find(child => child.key === Object.keys(item)[0]);
+                                    if(!existingChild){
+                                        const additionalChildren = modules.map((obj) => ({
+                                            key: Object.keys(obj)[0],
+                                            label: Object.values(obj)[0],
+                                            children: [{}],
+                                            type: 'folder'
+                                        }));
+                                        node.children.push(...additionalChildren);
+                                    }
+                            return true;
+                        } else if (node.children) {
+                            const foundInChild = findParent(node.children, parentId, processedNodes,item);
+                            if (foundInChild) return true;
+                        }
+                    }
+                }
+                
+                return false;
+            };
+            modules.forEach((item) => {
+                findParent(projectDetails, selectedkey, new Set(),item);
+            });
+            
+        }
+    }
+
+    const updateChildrenData = (firstArray, secondArray, modules) => {
+        let additionalChildrenAdded = false;
+        let totalLen = secondArray.length + modules.length;
+    
+        const findParent = (nodes, parentId, processedNodes,item) => {
+            if(item){
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    // && (!node.children || node.children.length < totalLen)
+                    if (!processedNodes.has(node.key) && node.key === parentId && node.type !== 'testcase' && (!node.children ||  (node.children.length === 1 || node.children.length < totalLen))) {
+                        processedNodes.add(node.key);
+                        if (!node.children) {
+                            node.children = [];
+                        } else {
+                            // Remove empty object from children if exists
+                            node.children = node.children.filter((child) => Object.keys(child).length > 0);
+                        }
+                       
+                        if(node && node.type !== 'testcase'){
+                            if (modules.length && !additionalChildrenAdded) {
+                                const existingChild = node.children.some(child => 
+                                    modules.some(obj => child.key === Object.keys(obj)[0])
+                                );
+                                if(!existingChild){
+                                    const additionalChildren = modules.map((obj) => ({
+                                        key: Object.keys(obj)[0],
+                                        label: Object.values(obj)[0],
+                                        children: [{}],
+                                        type: 'folder'
+                                    }));
+                                    node.children.push(...additionalChildren);
+                                }
+                                    
+                                additionalChildrenAdded = true;
+                            }
+                            const existingChild = node.children.find(child => child.key === String(item.id));
+                            if (!existingChild) {
+                                node.children.push({
+                                    key: String(item.id),
+                                    label: item.name,
+                                    type: 'testcase',
+                                    cyclePhaseId:item.cyclePhaseId || '',
+                                    parentId:item.parentId || parentId,
+                                    reqdetails:item.reqdetails || []
+                                });
+                            }
+                        }
+                        return true;
+                    } else if (node.children) {
+                        const foundInChild = findParent(node.children, parentId, processedNodes,item);
+                        if (foundInChild) return true;
+                    }
+                }
+            }
+            
+            return false;
+        };
+    
+        secondArray.forEach((item) => {
+            const { parentId } = item;
+            findParent(firstArray, parentId, new Set(),item);
+        });
+    };
+    
+    
+      
 
 
     return (
@@ -580,6 +766,12 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
                                     <div className="zephyr__mapping">
                                         <div className="card_zephyr1">
                                             <Card className="mapping_zephyr_card1">
+                                                {enableBounce && <div className="bouncing-loader">
+                                                    <div></div>
+                                                    <div></div>
+                                                    <div></div>
+                                                </div>}
+                                                
                                                 <div className="dropdown_div1">
                                                     <div className="dropdown-zephyr1">
                                                         <span>Select Project <span style={{ color: 'red' }}>*</span></span>
