@@ -1498,12 +1498,16 @@ const footerSave = (
       {label: 'Response'},
   ];
 
-     const renderElement=(rowdata)=>{
+     const renderElement=(rowdata, column)=>{
       return (
         <>
         <div style={{display:'flex',justifyContent:'space-between'}}>
         <div >{rowdata.selectall}</div>
-      {(rowdata.objectDetails.isCustom || rowdata.isCustom) && <Tag severity="primary" value="Added"></Tag>}
+        {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
+        {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+        {/* <Tooltip target={`#${column.field}-${rowdata.id}`} position="top">
+        {rowdata.selectall}
+        </Tooltip> */}
       </div>
       </>
       )
@@ -1654,7 +1658,7 @@ const headerstyle={
             className='datatable__col'
             value={captureData}
             dragHandleIcon="pi pi-bars"
-            rowReorder resizableColumns
+            resizableColumns
             reorderableRows
             onRowReorder={handleRowReorder}
             showGridlines
@@ -1666,6 +1670,7 @@ const headerstyle={
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
             scrollable 
             scrollHeight="400px"
+            columnResizeMode="expand"
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}

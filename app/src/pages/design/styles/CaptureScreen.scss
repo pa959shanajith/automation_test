@@ -96,6 +96,7 @@
   }
   .p-column-title{
     font-weight: bold !important;
+    text-align: center !important;
   }
 
   .p-datatable .p-datatable-tbody>tr>td {
@@ -105,7 +106,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 5rem;
+    max-width: 21rem;
+  }
+  .text__align{
+    text-align: center;
   }
 }
 
