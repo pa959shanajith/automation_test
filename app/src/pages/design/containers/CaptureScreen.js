@@ -696,7 +696,6 @@ const elementTypeProp =(elementProperty) =>{
                 </div>,
                 footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
               })
-              // : toastSuccess("Scraped Elements saved successfully.");
               : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
