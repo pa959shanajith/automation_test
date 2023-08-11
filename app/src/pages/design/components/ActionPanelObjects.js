@@ -227,7 +227,8 @@ const ActionPanel = (props) => {
               tag: tag,
               url: data.url,
               xpath: data.xpath,
-              editable: 'yes'
+              editable: 'yes',
+              isCustom: true,
             };
             let customObjectsList = { ...customObjList, [object.tempId]: customObject };
 
@@ -268,7 +269,8 @@ const ActionPanel = (props) => {
           tag: customObjList[1].tag,
           url: customObjList[1].url,
           xpath: customObjList[1].xpath,
-          editable: true
+          editable: true,
+          isCustom: true,
         }, true);
         props.setShow(false);
       }
@@ -316,13 +318,15 @@ const ActionPanel = (props) => {
           xpath: newCustomObjectsList[tempId].xpath,
           editable: true,
           tempOrderId: newUUID,
+          isCustom: true,
         });
         viewArray.push({
           custname: custname,
           tag: newCustomObjectsList[tempId].tag,
           url: newCustomObjectsList[tempId].url,
           xpath: newCustomObjectsList[tempId].xpath,
-          editable: true
+          editable: true,
+          isCustom: true
         });
         newOrderList.push(newUUID);
         lastIdx++
@@ -344,7 +348,7 @@ const ActionPanel = (props) => {
         props.updateScrapeItems(localScrapeList)
         // props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
         props.setCapturedDataToSave((oldCapturedDataToSave) => [...oldCapturedDataToSave, ...viewArray.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
-          isCustom: true,
+        isCustom: true,
           ...viewArray[newlyCreatedElemIndex],
           tempOrderId: newOrderList[newlyCreatedElemIndex]
         }))
@@ -355,8 +359,8 @@ const ActionPanel = (props) => {
           browserscrape: 'google chrome',
           screenshots: "",
           actions: '',
-          objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex],
-          isCustom: true,
+          objectDetails: [updatedNewScrapeData.view[newlyCreatedElemIndex],{isCustom:true}],
+          isCustomCreated: true,
         }))
         ]);
         props.setSaved({ flag: false });
