@@ -736,8 +736,8 @@ const CreateUser = (props) => {
                         </div>
                         {/* Admin Check */}
                         {roleDropdownValue === "5db0022cf87fdec084ae49ab" && <div className="flex flex-row "> {/* Test Manager role ID */}
-                            <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
-                            <label htmlFor="admin_check" className="ml-2">Admin</label>
+                            <Checkbox inputId='admin_check' aria-label="admin_check" className='adminCheckbox' onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
+                            <label htmlFor="admin_check" className=" adminlable">Admin</label>
                         </div>}
                         {/* 
                 {( rolename!=='Admin' && props.showEditUser === true  && userIdName!=='')?
