@@ -1749,7 +1749,7 @@ const headerstyle={
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
         
-      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1761,7 +1761,7 @@ const headerstyle={
             <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
           </span>
         </div>
-      </Dialog>
+      </Dialog> : null}
 
       {currentDialog === 'addObject' && <ActionPanel
         isOpen={currentDialog}
@@ -1829,12 +1829,12 @@ const headerstyle={
         setOverlay={setOverlay}
         show={showObjModal}
         setShow={setShowObjModal}
-        appType="Web"
+        appType={typesOfAppType}
         fetchingDetails={props.fetchingDetails}
         toastSuccess={toastSuccess}
         toastError={toastError}
       />}
-      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
+      {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
       {/* //Element properties  */}
 
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
@@ -2360,7 +2360,7 @@ const LaunchApplication = props => {
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"
-            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "45vh" : "33vh", background: "#FFFFFF" }}
+            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "53vh" : "33vh", background: "#FFFFFF" }}
             content={appDict[props.appPop.appType].content}
           customClass={props.typesOfAppType}
           />
