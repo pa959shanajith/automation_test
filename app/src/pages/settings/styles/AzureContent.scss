@@ -83,14 +83,14 @@
 }
 
 .tree_data_card1 {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     max-height: 21rem;
     height: 24rem;
     overflow: auto;
     width: 32rem;
 
     .azure__data__div {
-        padding-bottom: 0.3rem;
+        padding-bottom: 0.5rem;
 
         .azure__id {
             color: #007FFF;
@@ -376,9 +376,13 @@
         background: none !important;
         overflow: auto;
         height: 21rem;
+        padding: 1rem 0 0 1rem !important;
         }
         .avoProject_tree{
             .p-treenode-content{
+                padding: 0 !important;
+            }
+            .p-treenode{
                 padding: 0 !important;
             }
         }

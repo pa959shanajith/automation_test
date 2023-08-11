@@ -355,7 +355,8 @@ const ActionPanel = (props) => {
           browserscrape: 'google chrome',
           screenshots: "",
           actions: '',
-          objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex]
+          objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex],
+          isCustom: true,
         }))
         ]);
         props.setSaved({ flag: false });
@@ -947,7 +948,7 @@ const ActionPanel = (props) => {
       }
 
       {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
-        onClose={props.onClose}
+        OnClose={props.OnClose}
         captureList={props.captureList}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={props.fetchScrapeData}
