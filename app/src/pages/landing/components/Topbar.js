@@ -31,7 +31,7 @@ const MenubarDemo = (props) => {
   };
 
   useEffect(()=>{
-    if (userInfo.tandc) {
+    if (userInfo.tandc && userInfo.welcomeStepNo < 3) {
         setShowTCPopup(true);
     }
   },[userInfo])
