@@ -692,6 +692,7 @@
   .add_obj_export{
     position: relative;
     right: 1rem;
+    top: 0.7rem;
   }
 
   .imp__text {
@@ -1010,6 +1011,6 @@
   text-align: center !important;
 }
 .disabled-image {
-  opacity: 0.5; 
+  opacity: 0.5; /* Adjust opacity to indicate disabled state */
   pointer-events: none; 
 }
