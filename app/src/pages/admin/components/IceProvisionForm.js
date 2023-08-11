@@ -76,7 +76,7 @@ const IceProvisionForm = (props) => {
 			props.setTokeninfoToken(data);
 			props.setToken(data);
 			// props.setRefreshIceList(!props.refreshIceList);
-			props.toastSuccess(Messages.CUSTOM("Token generated Successfully for ICE '" + props.icename + "'!!  Copy or Download the token", VARIANT.SUCCESS));
+			props.toastSuccess(Messages.CUSTOM("Token generated Successfully for Avo Assure Client- '" + props.icename + "'.  Copy or Download the token", VARIANT.SUCCESS));
 		}
 	}
 

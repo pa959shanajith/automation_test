@@ -32,7 +32,15 @@ const initialState = {
     mappedPair: [],
     selectedAvoproject:'',
     mappedTree:[],
-    showOverlay:""
+    showOverlay:"",
+    checkedTCPhaseIds: [],
+    checkedTcIds: [],
+    checkedTCNames: [],
+    checkedTCReqDetails:[],
+    checkedTreeIds:[],
+    checkedParentIds:[],
+    checkedProjectIds:[],
+    checkedReleaseIds:[]
 }
 
 export const settingSlice=createSlice({
@@ -92,7 +100,31 @@ export const settingSlice=createSlice({
         AzureLogin:(state,action) => {
             const { fieldName, value } = action.payload;
             state.AzureLogin[fieldName] = value;
-        }, 
+        },
+        checkedTCPhaseIds: (state,action) => {
+            state.checkedTCPhaseIds =  action.payload
+        },
+        checkedTcIds: (state,action) => {
+            state.checkedTcIds =  action.payload
+        },
+        checkedTCNames: (state,action) => {
+            state.checkedTCNames =  action.payload
+        },
+        checkedTCReqDetails: (state,action) => {
+            state.checkedTCReqDetails =  action.payload
+        },
+        checkedTreeIds: (state,action) => {
+            state.checkedTreeIds =  action.payload
+        },
+        checkedParentIds: (state,action) => {
+            state.checkedParentIds =  action.payload
+        },
+        checkedProjectIds: (state,action) => {
+            state.checkedProjectIds =  action.payload
+        },
+        checkedReleaseIds: (state,action) => {
+            state.checkedReleaseIds =  action.payload
+        }
     }
 })
 // export all the action creators
@@ -113,7 +145,15 @@ export const {
     showOverlay,
     zephyrLogin,
     resetZephyrLogin,
-    AzureLogin
+    AzureLogin,
+    checkedTCPhaseIds,
+    checkedTcIds,
+    checkedTCNames,
+    checkedTCReqDetails,
+    checkedTreeIds,
+    checkedParentIds,
+    checkedProjectIds,
+    checkedReleaseIds
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

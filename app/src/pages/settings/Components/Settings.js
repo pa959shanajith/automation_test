@@ -11,6 +11,10 @@ import CreateProject from "../../landing/components/CreateProject";
 const Settings =() =>{
     const [manageIntegrationsvisible, manageIntegrationsSetVisible] = useState(false);
     const [handleManageProject, setHandleManageProject ]= useState(false);
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo);
+    if (!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo;
 
     const handleOpenDialog = () => {
         manageIntegrationsSetVisible(true); 
@@ -23,14 +27,13 @@ const Settings =() =>{
       const ManageProj=()=>{
         setHandleManageProject(!handleManageProject);
       }
-      console.log(handleManageProject)
       const Integrations = useMemo(() => <ManageIntegrations visible={manageIntegrationsvisible} onHide={handleCloseDialog} />,[manageIntegrationsvisible,handleCloseDialog])
 
     return(
         <>
          <div className='p-4 surface-100 flex flex-column'>
          <div className='projSettings_cls'>
-            <Card className="proj-card"   title="Manage project" onClick={ManageProj} >
+            <Card className="proj-card" disabled={!(userInfo && userInfo.rolename === "Quality Manager")} title="Manage project" onClick={ManageProj} >
             <div style={{ display: 'flex', alignItems: 'center',marginBottom:'0.5rem' }}>
                 <p className="sentence-cls" style={{fontSize:'14px'}}> Can change the name of the project, can manage roles of the people, can add or remove users from the project</p>
                 </div>

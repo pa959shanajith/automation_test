@@ -355,7 +355,8 @@ const ActionPanel = (props) => {
           browserscrape: 'google chrome',
           screenshots: "",
           actions: '',
-          objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex]
+          objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex],
+          isCustom: true,
         }))
         ]);
         props.setSaved({ flag: false });
@@ -769,7 +770,7 @@ const ActionPanel = (props) => {
           if (objectsReplaced) // this is required inside only.
             props.toastSuccess(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
         }
-        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRtoastErrorPE)
+        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
       })
       .catch(err => {
         props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
@@ -947,7 +948,7 @@ const ActionPanel = (props) => {
       }
 
       {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
-        onClose={props.onClose}
+        OnClose={props.OnClose}
         captureList={props.captureList}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={props.fetchScrapeData}

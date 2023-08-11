@@ -129,6 +129,7 @@ const Login = (props) => {
     }
 
     const loginSubmitHandler = async (event) => {
+        toast.current.clear();
         event.preventDefault();
         if (username.trim().length > 0 && password.length > 0) {
             checkUser();
@@ -285,7 +286,7 @@ const Login = (props) => {
                             </div>
 
                             <div className='mb-5'>
-                                <Button className='Btn' id="login" label='Login' size="small" disabled={disableLoginButton} ></Button>
+                                <Button className='Btn Login_Btn' id="login" label='Login' size="small" disabled={disableLoginButton} ></Button>
                             </div>
                             <div className='link mb-5'>
                                 <a onClick={forgotPasswordLinkHandler} > Forgot Username/Password? </a>
