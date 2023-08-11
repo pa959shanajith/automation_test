@@ -2,12 +2,13 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserDetails, getNotificationGroups } from '../api';
-import { Messages as MSG,ScreenOverlay, setMsg,RedirectPage,ModalContainer,Thumbnail} from "../../global";
+import { Messages as MSG,ScreenOverlay, setMsg,RedirectPage,ModalContainer,Thumbnail,SelectRecipients} from "../../global";
 import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
 import * as DesignApi from "../api";
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Accordion, AccordionTab } from 'primereact/accordion';
+import { Divider } from 'primereact/divider';
 import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -17,11 +18,20 @@ import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice
 import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
+import TableRow from "../components/TableRow";
+import { ReactSortable } from 'react-sortablejs';
+import ClickAwayListener from 'react-click-away-listener';
+import DetailsDialog from "../components/DetailsDialog";
+import RemarkDialog from "../components/RemarkDialog";
+import PasteStepDialog from "../components/PasteStepDialog";
+import SelectMultipleDialog from "../components/SelectMultipleDialog";
+import { Checkbox } from 'primereact/checkbox';
 
 
 const DesignModal = (props) => {
     const toast = useRef();
     const testcaseDropdownRef = useRef();
+    const headerCheckRef = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     let userInfo = useSelector((state) => state.landing.userinfo);
@@ -55,7 +65,7 @@ const DesignModal = (props) => {
     const [dependencyTestCaseFlag, setDependencyTestCaseFlag] = useState(false);
     const [deleteTestDialog, setDeleteTestDialog] = useState(false);
     const [testCase, setTestCase] = useState(null)
-    const [selectedTestCases,setSelectedTestCases]=useState(null);
+    const [selectedTestCases,setSelectedTestCases]=useState([]);
     const [selectedOptions, setSelectedOptions] = useState(null);
     const [disableStep, setDisableStep] = useState(true);
     const [idx, setIdx] = useState(0);
@@ -66,6 +76,17 @@ const DesignModal = (props) => {
     const [rowExpandedName,setRowExpandedName] = useState({name:'',id:''});
     const [selectedTestCase, setSelectedTestCase] = useState(null);
     const [visible, setVisible] = useState(false);
+    const [edit, setEdit] = useState(false);
+    const [showRemarkDlg, setShowRemarkDlg] = useState(false);
+    const [showDetailDlg, setShowDetailDlg] = useState(false);
+    const [showSM, setShowSM] = useState(false);
+    const [showConfPaste, setShowConfPaste] = useState(false);
+    const [showPS, setShowPS] = useState(false);
+    const [recipients,setRecipients] =useState({groupids:[],additionalrecepients:[]})
+    const [allUsers,setAllUsers] = useState([])
+    const [groupList,setGroupList] = useState([])
+    const [rowChange, setRowChange] = useState(false);
+    const [commentFlag, setCommentFlag] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
         "stepNo": 1,
@@ -162,12 +183,12 @@ const DesignModal = (props) => {
                 .then(data => {
                     data !== "success" &&
                         toast.current.show({severity:'warn',summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT,life:2000});
-                    //     setEdit(false);
-                    // setStepSelect({ edit: false, check: [], highlight: [] });
-                    // // headerCheckRef.current.indeterminate = false;
-                    // setDraggable(false);
-                    // setChanged(false);
-                    // setHeaderCheck(false);
+                        setEdit(false);
+                    setStepSelect({ edit: false, check: [], highlight: [] });
+                    headerCheckRef.current.indeterminate = false;
+                    setDraggable(false);
+                    setChanged(false);
+                    setHeaderCheck(false);
                     // setIsUnderReview(props.current_task.status === "underReview")
                 })
                 .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
@@ -598,6 +619,7 @@ const DesignModal = (props) => {
                     dispatch(Modified(rows));
                     dispatch(SaveEnable(!saveEnable))
                     setMsg(MSG.DESIGN.SUCC_DEBUG);
+                    setSelectedTestCases([])
                     toast.current.show({severity: 'success',summary: 'Success', detail:MSG.DESIGN.SUCC_DEBUG.CONTENT, life:3000})
                 } else {
                     setMsg(data);
@@ -625,27 +647,59 @@ const DesignModal = (props) => {
         setShowTable(true);
         console.log(e)
     };
-    const handleAdd = () => {
-        const update = { ...testCases };
-        const addTestcaseData = {};
-        const TestIDPresent = addedTestCase.filter(item => {
-            return item.testCaseID === testCases.testCaseID
-        });
-        // console.log("TestIDPresent", TestIDPresent);
-        if (TestIDPresent.length > 0) {
+    const handleAdd = (testCase) => {
+        const isTestIDPresent = addedTestCase.some(item => item.testCaseID === testCase.testCaseID);
+    
+        if (isTestIDPresent) {
             toastError("Duplicate Dependent Testcase found");
-        }
-        else {
-            addTestcaseData["testCaseID"] = update.testCaseID;
-            addTestcaseData["testCaseName"] = update.testCaseName;
-            addTestcaseData["disableAndBlock"] = update.disableAndBlock;
-            addTestcaseData["checked"] = true;
-            setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
-            setAddedTestCase([...addedTestCase, addTestcaseData]);
+        } else {
+            const addTestcaseData = {
+                testCaseID: testCase.testCaseID,
+                testCaseName: testCase.testCaseName,
+                disableAndBlock: testCase.disableAndBlock,
+                checked: true
+            };
+    
+            setTestCaseIDsList(prevIDs => [...prevIDs, testCase.testCaseID]);
+            setAddedTestCase(prevAdded => [...prevAdded, addTestcaseData]);
             setDependencyTestCaseFlag(true);
-            setTestCases(null);
         }
     };
+        //add dependant checkboxes UI functionality
+    const handleCheckboxChangeAddDependant = (event) => {
+        const testCase = testcaseList.find(item => item.testCaseName === event.value);
+
+        if (testCase) {
+            if (event.checked) {
+                setSelectedTestCases([...selectedTestCases, testCase.testCaseName]);
+                handleAdd(testCase);
+            } else {
+                setSelectedTestCases(selectedTestCases.filter(item => item !== testCase.testCaseName));
+                // Add code to handle the removal of the testCase from addedTestCase
+            }
+        }
+    };
+    // const handleAdd = () => {
+    //     const update = { ...testCases };
+    //     const addTestcaseData = {};
+    //     const TestIDPresent = addedTestCase.filter(item => {
+    //         return item.testCaseID === testCases.testCaseID
+    //     });
+    //     // console.log("TestIDPresent", TestIDPresent);
+    //     if (TestIDPresent.length > 0) {
+    //         toastError("Duplicate Dependent Testcase found");
+    //     }
+    //     else {
+    //         addTestcaseData["testCaseID"] = update.testCaseID;
+    //         addTestcaseData["testCaseName"] = update.testCaseName;
+    //         addTestcaseData["disableAndBlock"] = update.disableAndBlock;
+    //         addTestcaseData["checked"] = true;
+    //         setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
+    //         setAddedTestCase([...addedTestCase, addTestcaseData]);
+    //         setDependencyTestCaseFlag(true);
+    //         setTestCases(null);
+    //     }
+    // };
 
     const toastError = (errMessage) => {
         toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 10000 });
@@ -783,21 +837,22 @@ const DesignModal = (props) => {
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
                 {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
-                    <i className='pi pi-file-import' style={{marginTop:'0.9rem'}} onClick={()=>importTestCase()} />
+                    <img src='static/imgs/import_new_18x18_icon.svg' alt='import' onClick={()=>importTestCase()} />
                     <Tooltip target=".pi-file-import" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <i className='pi pi-file-export' style={{marginTop:'0.9rem'}}  onClick={()=>exportTestCase()} />
-                <Tooltip target=".pi-file-export" position="bottom" content="Export Test Steps"/>
+                    <img src='static/imgs/Export_new_icon_grey.svg' alt='export' style={{width:'18px'}}  onClick={()=>exportTestCase()} />
+                    <Tooltip target=".pi-file-export" position="bottom" content="Export Test Steps"/>
+                    <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
                     <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
                     <Tooltip target=".pi-plus " position="bottom" content="  Add Test Step"/>
-                    <i className='pi pi-save' style={{marginTop:'0.9rem'}} onClick={()=>saveTestCases()} />
-                    <Tooltip target=".pi-save " position="bottom" content="  save"/>
+                    <img src='static/imgs/ic-jq-editstep.png' alt='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
                     <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
                     <Tooltip target=".pi-trash " position="bottom" content="  Delete"/>
-                    <Button size='small' className='debug_but' onClick={() => { DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true) }} label='Debug' outlined>
-                    <Tooltip target=".debug_but" position="left" content=" Click to debug and optionally add dependent test steps repository." />
-                    </Button>
-                </div>:null}
+                    <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
+                    <Button label="Debug" size='small'  disabled={debugEnable} className="" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
+                    <Tooltip target=".debug_button" position="left" content=" Click to debug and optionally add dependent test steps repository." />
+                    <Button className="" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
+            </div>:null}
             </div>}
             </>
         );
@@ -812,15 +867,15 @@ const DesignModal = (props) => {
     //     </>
     // );
 
-    const emptyMessage = (
-        <div className='empty__msg1'>
-            <div className='empty__msg'>
-                <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
-                <p className="not_captured_message">No Design Step yet</p>
-            </div>
-            <Button size='small' className="btn-design-single" label='Design Test Steps' onClick={()=>addRow()}></Button>
-        </div>
-    );
+    // const emptyMessage = (
+    //     <div className='empty__msg1'>
+    //         <div className='empty__msg'>
+    //             <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
+    //             <p className="not_captured_message">No Design Step yet</p>
+    //         </div>
+    //         <Button size='small' className="btn-design-single" label='Design Test Steps' onClick={()=>addRow()}></Button>
+    //     </div>
+    // );
 
     const footerContent = (
         <div>
@@ -828,202 +883,202 @@ const DesignModal = (props) => {
             <Button label="Debug" size='small' onClick={() => debugTestCases(selectedSpan)} autoFocus />
         </div>
     );
-    const [objName, setObjName] = useState(null);
-    const [objType, setObjType] = useState(null);
+    // const [objName, setObjName] = useState(null);
+    // const [objType, setObjType] = useState(null);
     
-    const elementEditor = (options) => {
-        return (
-            <Dropdown
-                value={objName}
-                options={objNameList}
-                onChange={(e) => {options.editorCallback(e.value);setKeywordListTable(getKeywords(e.value).keywords);setKeyword(getKeywords(e.value).keywords[0]);setObjName(e.value);setObjType(getKeywords(e.value).obType); const caseData = getKeywords(e.target.value)
-                    const placeholders = getRowPlaceholders(caseData.obType, caseData.keywords[0]);
-                    setInput("");
-                    setOutput("");
-                    // setKeywordList(caseData.keywords);
-                    setObjType(caseData.obType);
-                    setOutputPlaceholder(placeholders.outputval);
-                    setInputPlaceholder(placeholders.inputval);}}
-                placeholder="Select a element"
-                style={{maxWidth:'10rem'}}
-                className='select-option'
-            />
-        );
-    };
-    const [startIndex, setStartIndex] = useState(0);
-    const [endIndex, setEndIndex] = useState(7);
-    const [inputPlaceholder, setInputPlaceholder] = useState('');
-    const [outputPlaceholder, setOutputPlaceholder] = useState('');
-    const [input, setInput] = useState('');
-    const [output, setOutput] = useState('');
-    const [ ID, setID] = useState(0);
-    const [focused, setFocused] = useState(false);
-    const [keywords, setKeywords] = useState(null);
-    const [allkeyword, setAllKeyword] = useState([]);
+    // const elementEditor = (options) => {
+    //     return (
+    //         <Dropdown
+    //             value={objName}
+    //             options={objNameList}
+    //             onChange={(e) => {options.editorCallback(e.value);setKeywordListTable(getKeywords(e.value).keywords);setKeyword(getKeywords(e.value).keywords[0]);setObjName(e.value);setObjType(getKeywords(e.value).obType); const caseData = getKeywords(e.target.value)
+    //                 const placeholders = getRowPlaceholders(caseData.obType, caseData.keywords[0]);
+    //                 setInput("");
+    //                 setOutput("");
+    //                 // setKeywordList(caseData.keywords);
+    //                 setObjType(caseData.obType);
+    //                 setOutputPlaceholder(placeholders.outputval);
+    //                 setInputPlaceholder(placeholders.inputval);}}
+    //             placeholder="Select a element"
+    //             style={{maxWidth:'10rem'}}
+    //             className='select-option'
+    //         />
+    //     );
+    // };
+    // const [startIndex, setStartIndex] = useState(0);
+    // const [endIndex, setEndIndex] = useState(7);
+    // const [inputPlaceholder, setInputPlaceholder] = useState('');
+    // const [outputPlaceholder, setOutputPlaceholder] = useState('');
+    // const [input, setInput] = useState('');
+    // const [output, setOutput] = useState('');
+    // const [ ID, setID] = useState(0);
+    // const [focused, setFocused] = useState(false);
+    // const [keywords, setKeywords] = useState(null);
+    // const [allkeyword, setAllKeyword] = useState([]);
 
-    const onKeySelect = event => {
-        if (event.value === 'show all') {
-            setEndIndex(keywordListTable.length);
-        }
-        else{
-            // const placeholders = getRowPlaceholders(objType, event.value);
-            // setOutputPlaceholder(placeholders.outputval);
-            // setInputPlaceholder(placeholders.inputval);
-            setKeywords(event.value);
-            setSelectedOptions(event.value);
-            setAllKeyword(optionKeyword);
-            testcaseDropdownRef.current.focus();
-            // testcaseDropdownRef.current.blur();
-            document.dispatchEvent(new KeyboardEvent('keypress', { key: " " }));
-        }
-    };
-    const submitChanges = event => {
-        if (event.keyCode === 13){
-            console.log({rowIdx: ID, operation: "row", objName: objName, keyword: keywords, inputVal: input, outputVal: output, appType: props.appType });
-            // setStepSelect(oldState=>({...oldState, highlight: []}));
-        }
-        else if (event.keyCode === 27) {
-            // setStepSelect(oldState=>({...oldState, highlight: []}));
-        }
-    }
-    useEffect(()=>{
-        if(screenLavelTestSteps.length>0){
-            const testCase = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
-            if(testCase !== undefined){
-                let caseData = null;
-                let placeholders = null;
-                let data = null;
-                let keyData = null;
-                if(testCase.testCases.length>0){
-                    for(var i = 0; testCase.testCases.length>i; i++){
-                        if (!testCase.testCases[i].custname || (testCase.testCases[i].custname !== "OBJECT_DELETED" && objNameList.includes(testCase.testCases[i].custname))){
-                            let obj = !testCase.testCases[i].custname ? objNameList[0] : testCase.testCases[i].custname;
-                            caseData = getKeywords(obj)
-                            data=obj;
-                            let key = (!caseData.keywords.includes(testCase.testCases[i].keywordVal) || !testCase.testCases[i].custname) ? caseData.keywords[0] : testCase.testCases[i].keywordVal;
-                            placeholders = getRowPlaceholders(caseData.obType, key);
-                            keyData = key
-                        }
-                    }
-                }
-                // let obj = !testCase.custname ? objNameList : testCase.custname;
-                // caseData = getKeywords(obj)
-                setObjName(data); 
-                setObjType(caseData.obType);
-                setKeywordListTable(caseData.keywords)
-                setOutputPlaceholder(placeholders.outputval);
-                setInputPlaceholder(placeholders.inputval);
-                setSelectedOptions(keyData);
-            }
-        }
-    },[getKeywords, getRowPlaceholders, objNameList, rowExpandedName, screenLavelTestSteps])
-    const optionKeyword = keywordListTable?.slice(startIndex, endIndex + 1).map((keyword, i) => {
-        if (i < endIndex) {
-            return {
-                value: keyword,
-                label: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "",
-                tooltip: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""
-            }
-        }
-        else {
-            return {
-                value: "show all",
-                label: "Show All"
-            }
-        }});
+    // const onKeySelect = event => {
+    //     if (event.value === 'show all') {
+    //         setEndIndex(keywordListTable.length);
+    //     }
+    //     else{
+    //         // const placeholders = getRowPlaceholders(objType, event.value);
+    //         // setOutputPlaceholder(placeholders.outputval);
+    //         // setInputPlaceholder(placeholders.inputval);
+    //         setKeywords(event.value);
+    //         setSelectedOptions(event.value);
+    //         setAllKeyword(optionKeyword);
+    //         testcaseDropdownRef.current.focus();
+    //         // testcaseDropdownRef.current.blur();
+    //         document.dispatchEvent(new KeyboardEvent('keypress', { key: " " }));
+    //     }
+    // };
+    // const submitChanges = event => {
+    //     if (event.keyCode === 13){
+    //         console.log({rowIdx: ID, operation: "row", objName: objName, keyword: keywords, inputVal: input, outputVal: output, appType: props.appType });
+    //         // setStepSelect(oldState=>({...oldState, highlight: []}));
+    //     }
+    //     else if (event.keyCode === 27) {
+    //         // setStepSelect(oldState=>({...oldState, highlight: []}));
+    //     }
+    // }
+    // useEffect(()=>{
+    //     if(screenLavelTestSteps.length>0){
+    //         const testCase = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+    //         if(testCase !== undefined){
+    //             let caseData = null;
+    //             let placeholders = null;
+    //             let data = null;
+    //             let keyData = null;
+    //             if(testCase.testCases.length>0){
+    //                 for(var i = 0; testCase.testCases.length>i; i++){
+    //                     if (!testCase.testCases[i].custname || (testCase.testCases[i].custname !== "OBJECT_DELETED" && objNameList.includes(testCase.testCases[i].custname))){
+    //                         let obj = !testCase.testCases[i].custname ? objNameList[0] : testCase.testCases[i].custname;
+    //                         caseData = getKeywords(obj)
+    //                         data=obj;
+    //                         let key = (!caseData.keywords.includes(testCase.testCases[i].keywordVal) || !testCase.testCases[i].custname) ? caseData.keywords[0] : testCase.testCases[i].keywordVal;
+    //                         placeholders = getRowPlaceholders(caseData.obType, key);
+    //                         keyData = key
+    //                     }
+    //                 }
+    //             }
+    //             // let obj = !testCase.custname ? objNameList : testCase.custname;
+    //             // caseData = getKeywords(obj)
+    //             setObjName(data); 
+    //             setObjType(caseData.obType);
+    //             setKeywordListTable(caseData.keywords)
+    //             setOutputPlaceholder(placeholders.outputval);
+    //             setInputPlaceholder(placeholders.inputval);
+    //             setSelectedOptions(keyData);
+    //         }
+    //     }
+    // },[getKeywords, getRowPlaceholders, objNameList, rowExpandedName, screenLavelTestSteps])
+    // const optionKeyword = keywordListTable?.slice(startIndex, endIndex + 1).map((keyword, i) => {
+    //     if (i < endIndex) {
+    //         return {
+    //             value: keyword,
+    //             label: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].description !== undefined ? keywordList[objType][keyword].description : "",
+    //             tooltip: keywordList[objType] && keyword !== "" && keywordList[objType][keyword] && keywordList[objType][keyword].tooltip !== undefined ? keywordList[objType][keyword].tooltip : ""
+    //         }
+    //     }
+    //     else {
+    //         return {
+    //             value: "show all",
+    //             label: "Show All"
+    //         }
+    //     }});
 
-        const getOptionLabel = (option) => {
-            return (
-              <div title={option.tooltip}>
-                {option.label === "Show All"? <div style={{color:'blue'}}>{option.label}</div>: <div>{option.label}</div>}
-              </div>
-            );
-          };
+    //     const getOptionLabel = (option) => {
+    //         return (
+    //           <div title={option.tooltip}>
+    //             {option.label === "Show All"? <div style={{color:'blue'}}>{option.label}</div>: <div>{option.label}</div>}
+    //           </div>
+    //         );
+    //       };
 
-        const customStyles = {
-            menuList: (base) => ({
-              ...base,
-              FontSize: 100,
-              width: 200,
-              fontSize: 12,
-              background: "white",
-              height:240,
-            }),
-            menuPortal: base => ({ 
-                ...base, 
-                zIndex: 9999
-             }),
-            menu: base => ({ 
-                ...base, 
-                zIndex: 9999 
-            }),
-            control: (base) => ({
-              ...base,
-              height: 25,
-              minHeight: 35,
-              width: 150
-            }),
-            option: (base) =>({
-                ...base,
-                padding: "3px",
-              fontFamily: "Lato Web",
-            })
-          };
-    const keywordEditor = (options) => {
-        setFocused(true);
-        return (
-            <div className='select-option'>
-                <Dropdown width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel={getOptionLabel} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
-            </div> 
-       )
-    };
-    const inputEditor = (options) => {
-        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} placeholder={inputPlaceholder} />;
-    };
-    const outputEditor = (options) => {
-        return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} placeholder={outputPlaceholder} />;
-    };
+    //     const customStyles = {
+    //         menuList: (base) => ({
+    //           ...base,
+    //           FontSize: 100,
+    //           width: 200,
+    //           fontSize: 12,
+    //           background: "white",
+    //           height:240,
+    //         }),
+    //         menuPortal: base => ({ 
+    //             ...base, 
+    //             zIndex: 9999
+    //          }),
+    //         menu: base => ({ 
+    //             ...base, 
+    //             zIndex: 9999 
+    //         }),
+    //         control: (base) => ({
+    //           ...base,
+    //           height: 25,
+    //           minHeight: 35,
+    //           width: 150
+    //         }),
+    //         option: (base) =>({
+    //             ...base,
+    //             padding: "3px",
+    //           fontFamily: "Lato Web",
+    //         })
+    //       };
+    // const keywordEditor = (options) => {
+    //     setFocused(true);
+    //     return (
+    //         <div className='select-option'>
+    //             <Dropdown width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel={getOptionLabel} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
+    //         </div> 
+    //    )
+    // };
+    // const inputEditor = (options) => {
+    //     return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} placeholder={inputPlaceholder} />;
+    // };
+    // const outputEditor = (options) => {
+    //     return <InputText type="text" style={{width:'10rem'}} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} placeholder={outputPlaceholder} />;
+    // };
 
-    const onRowEditComplete = (e) => {
-        let { newData, index } = e;
-        let updateNewData = { ...newData, 
-            keywordDescription:"",
-            keywordVal: newData.keywordVal !== ""?newData.keywordVal:newData.keywordDescription?newData.keywordDescription:"",
-            inputVal:Array.isArray(newData.inputVal)?newData.inputVal:[newData.inputVal]
-        }
-        let testCaseUpdate = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
-        let updatedTestCases = [...testCaseUpdate.testCases];
-        updatedTestCases[index] = updateNewData;
+    // const onRowEditComplete = (e) => {
+    //     let { newData, index } = e;
+    //     let updateNewData = { ...newData, 
+    //         keywordDescription:"",
+    //         keywordVal: newData.keywordVal !== ""?newData.keywordVal:newData.keywordDescription?newData.keywordDescription:"",
+    //         inputVal:Array.isArray(newData.inputVal)?newData.inputVal:[newData.inputVal]
+    //     }
+    //     let testCaseUpdate = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
+    //     let updatedTestCases = [...testCaseUpdate.testCases];
+    //     updatedTestCases[index] = updateNewData;
 
-        // Update the keywordDescription based on newData
-        if(updatedTestCases[index].keywordVal !== ""){
-            if (updatedTestCases[index].hasOwnProperty("keywordDescription")) {
-                updatedTestCases[index].keywordDescription = keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].description;
-            }else{
-                updatedTestCases[index] = {
-                    ...updatedTestCases[index],
-                    keywordDescription: keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].description,
-                    keywordTooltip:  keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].tooltip       
-                }
-            };
-        }
-        let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
-        if (screen.name === rowExpandedName.name) {
-            return { ...screen, testCases: updatedTestCases };
-        }
-        return screen;
-        });
-        setID(index);
-        setScreenLevelTastSteps(updatedScreenLevelTestSteps);
-        setFocused(false);
-    };
+    //     // Update the keywordDescription based on newData
+    //     if(updatedTestCases[index].keywordVal !== ""){
+    //         if (updatedTestCases[index].hasOwnProperty("keywordDescription")) {
+    //             updatedTestCases[index].keywordDescription = keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].description;
+    //         }else{
+    //             updatedTestCases[index] = {
+    //                 ...updatedTestCases[index],
+    //                 keywordDescription: keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].description,
+    //                 keywordTooltip:  keywordList[getKeywords(updateNewData.custname).obType][updateNewData.keywordVal].tooltip       
+    //             }
+    //         };
+    //     }
+    //     let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
+    //     if (screen.name === rowExpandedName.name) {
+    //         return { ...screen, testCases: updatedTestCases };
+    //     }
+    //     return screen;
+    //     });
+    //     setID(index);
+    //     setScreenLevelTastSteps(updatedScreenLevelTestSteps);
+    //     setFocused(false);
+    // };
         
     const deleteProduct = () => {
         let findData = screenLavelTestSteps.find(screen => screen.name === rowExpandedName.name);
 
         if (findData) {
         let testcases = findData.testCases.filter(objFromA => {
-            return !selectedTestCases.find(objFromB => objFromA.stepNo === objFromB.stepNo);
+            return !selectedOptions.find(objFromB => objFromA.stepNo === objFromB.stepNo);
         });
         let updatedScreenLavelTestSteps = screenLavelTestSteps.map(screen => {
             if (screen.name === rowExpandedName.name) {
@@ -1036,7 +1091,8 @@ const DesignModal = (props) => {
         }
         setDeleteTestDialog(false);
         setTestCase(emptyRowData);
-        setSelectedTestCases(null)
+        // setSelectedTestCases(null)
+        setSelectedOptions(null)
         toast.current.show({severity:'success', summary:'Success',detail:'success full deleted test steps', life:3000});
     };
         const hideDeleteProductDialog = () => {
@@ -1049,18 +1105,18 @@ const DesignModal = (props) => {
                 <Button label="Yes" icon="pi pi-check" severity="danger" onClick={deleteProduct} />
             </React.Fragment>
         );
-        const reorderTestCases=(e)=>{
-            let oldData = [...screenLavelTestSteps];
-            let findData = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
-            const reorderedTestcase = e.value;
-            const newReorderedTestCases = reorderedTestcase.map((testcase, idx) => {
-            return { ...testcase, stepNo: idx + 1 };
-            });
-            findData.testCases = newReorderedTestCases;
-            let index = screenLavelTestSteps.findIndex((screen) => screen.name === rowExpandedName.name);
-            oldData.splice(index, 1, findData);
-            setScreenLevelTastSteps(oldData);
-        }
+        // const reorderTestCases=(e)=>{
+        //     let oldData = [...screenLavelTestSteps];
+        //     let findData = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
+        //     const reorderedTestcase = e.value;
+        //     const newReorderedTestCases = reorderedTestcase.map((testcase, idx) => {
+        //     return { ...testcase, stepNo: idx + 1 };
+        //     });
+        //     findData.testCases = newReorderedTestCases;
+        //     let index = screenLavelTestSteps.findIndex((screen) => screen.name === rowExpandedName.name);
+        //     oldData.splice(index, 1, findData);
+        //     setScreenLevelTastSteps(oldData);
+        // }
 
     const DependentTestCaseDialogHideHandler = () => {
         setVisibleDependentTestCaseDialog(false);
@@ -1068,6 +1124,7 @@ const DesignModal = (props) => {
         setTestCases(null);
         setTestCaseIDsList([]);
         setAddedTestCase([]);
+        setSelectedTestCases([]);
     }
     const allowExpansion = (rowData) => {
         return rowData.testCases.length > 0;
@@ -1091,11 +1148,404 @@ const DesignModal = (props) => {
         setRowExpandedName({});
         // toast.current.show({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
     };
+    const editRow = () => {
+        let check = [...stepSelect.check];
+        let highlight = [...stepSelect.highlight]
+        let focus = [];
+        runClickAway = false;
+        if (check.length === 0 && highlight.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_DEL);
+        else {
+            if (check.length === 1) focus = check;
+            else if (highlight.length === 1 && !check.length) { focus = highlight; check = highlight }
+            else check = []
+            
+            setStepSelect({edit: true, check: check, highlight: focus});
+            setHeaderCheck(false);
+            setEdit(true);
+            setDraggable(false);
+            headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
+        }
+    }
+
+    const toggleDrag = () => {
+        setStepSelect({edit: false, check: [], highlight: []});
+        setHeaderCheck(false);
+        setEdit(false);
+        headerCheckRef.current.indeterminate = false;
+
+        // if (draggable) setDraggable(false);
+        // else
+        setDraggable(!draggable);
+    }
+
+    const copySteps = () => {
+        let selectedRows = [...stepSelect.check]
+        let copyTestCases = []
+        let copyContent = {}
+        let copyErrorFlag = false;
+        if (selectedRows.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_COPY);
+        else{
+            let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
+            for (let idx of sortedSteps) {
+                if (!testCaseData[idx].custname) {
+                    if (selectedRows.length === 1) setMsg(MSG.DESIGN.ERR_EMPTY_TC_COPY);
+                    else setMsg(MSG.DESIGN.ERR_INVALID_OBJ_REF);
+                    copyErrorFlag = true;
+                    break
+                } 
+                else{
+                    let testCase = Object.assign({}, testCaseData[idx])
+                    copyTestCases.push(testCase);
+                }
+            }
+            
+            if (!copyErrorFlag) {
+                copyContent = {'appType': props.appType, 'testCaseId': props.fetchingDetails['_id'], 'testCases': copyTestCases};
+                dispatch(copiedTestCases(copyContent));
+                setEdit(false);
+            }
+            setStepSelect({edit: false, check: [], highlight: []});
+            headerCheckRef.current.indeterminate = false;
+            setHeaderCheck(false);
+        }
+    }
+
+    const onPasteSteps = () => {
+        setStepSelect(oldState => ({...oldState, highlight: []}));
+
+        if (!copiedContent.testCaseId){
+            setMsg(MSG.DESIGN.WARN_NO_TC_PASTE);
+            return;
+        }
+
+        if (copiedContent.testCaseId !== props.fetchingDetails['_id']) {
+            let appTypeFlag = false;
+            for (let testCase of copiedContent.testCases){
+                if (["Web", "Desktop", "Mainframe", "OEBS", "MobileApp", "MobileWeb", "MobileApp", "SAP"].includes(testCase.appType)) {
+                    appTypeFlag = true;
+                    break;
+                }
+            }
+            if (copiedContent.appType !== props.appType && appTypeFlag) {
+                setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
+            }
+            else{
+                setShowConfPaste(true);
+            }
+        }
+        else setShowPS(true);
+    }
+    const commentRows = () => {
+        let selectedIndexes = [...stepSelect.check];
+        let highlighted = [...stepSelect.highlight];
+        let testCases = [ ...testCaseData ]
+        runClickAway = false;
+        if (highlighted.length === 0 && selectedIndexes.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_SKIP);
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
+        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
+        else{
+            let toComment = [...new Set([...highlighted, ...selectedIndexes])]; 
+            for(let idx of toComment){
+                if (stepSelect.edit && edit && stepSelect.highlight.includes(idx)) continue;
+                let testCase = { ...testCases[idx] }
+                let isComment = testCase.outputVal.slice(-2) === "##";
+                if (isComment) testCase.outputVal = testCase.outputVal.replace(/(;*##)$/g, "")
+                else testCase.outputVal += testCase.outputVal.length === 0 ? "##" : ";##"
+                testCases[idx] = { ...testCase }
+            }
+            setTestCaseData(testCases);
+            setStepSelect({edit: false, check: [], highlight: []});
+            setHeaderCheck(false);
+            setChanged(true);
+            if(stepSelect.edit && edit) setCommentFlag(true);
+            headerCheckRef.current.indeterminate = false;
+        }
+    }
+    const selectMultiple = () => {
+        // setHeaderCheck(false);
+        setStepSelect(oldState => ({...oldState, highlight: []}));
+        setShowSM(true);
+    }
+    const tableActionBtnGroup = [
+        // {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps',onClick: ()=>addRow() },
+        {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps',onClick:  ()=>editRow() },
+        // {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-selmulti.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
+        // {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps',onClick:  ()=>toggleDrag() },
+        // {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
+        // {'title': 'Paste Test Step', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste Steps', onClick:  ()=>onPasteSteps()},
+        // {'title': 'Skip Test Step', 'img': 'static/imgs/skip-test-step.png', 'alt': 'Comment Steps',  onClick:  ()=>commentRows() }
+    ]
+    const deleteTestcase = () => {
+        let testCases = [...testCaseData]
+        if (testCases.length === 1 && !testCases[0].custname) setMsg(MSG.DESIGN.WARN_DELETE);
+        else if (stepSelect.check.length <= 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP);
+        else if (reusedTC) props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{props.setShowConfirmPop(false);onDeleteTestStep()}});
+        else props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
+    }
+    const onDeleteTestStep = () => {
+        let testCases = []
+        let localPastedTc = [...pastedTC];
+
+        testCaseData.forEach((val, idx) => {
+            if (!stepSelect.check.includes(idx)) {
+                testCases.push(val);
+            }
+            else {
+                let tcIndex = pastedTC.indexOf(val.objectid)
+                if (tcIndex > -1) localPastedTc.splice(tcIndex, 1);
+            }
+        })
+
+        setPastedTC(localPastedTc);
+        setTestCaseData(testCases);
+        setStepSelect({edit: false, check: [], highlight: []});
+        headerCheckRef.current.indeterminate = false;
+        setHeaderCheck(false);
+        props.setShowConfirmPop(false);
+        setChanged(true);
+    }
+    const setRowData = data => {
+        const itemData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        let testCases = [...itemData.testCases];
+        let { rowIdx, operation } = data;
+        setSelectedOptions(data)
+        let changed = false;
+        if (operation === "row") {
+            const { objName, keyword, inputVal, outputVal, appType } = data;
+            if (testCases[rowIdx].custname !== objName || testCases[rowIdx].keywordVal !== keyword || testCases[rowIdx].inputVal[0] !== inputVal || testCases[rowIdx].outputVal !== outputVal || commentFlag) {
+                // Create a new object with the updated values
+                const updatedTestCase = Object.assign({}, testCases[rowIdx], {
+                    custname: objName,
+                    keywordVal: keyword,
+                    inputVal: [inputVal],
+                    appType: appType
+                });
+            
+                let outputVal2 = outputVal;
+                if (commentFlag) {
+                    let isComment = outputVal2.slice(-2) === "##";
+                    if (isComment) outputVal2 = outputVal2.replace(/(;*##)$/g, "");
+                    else outputVal2 += outputVal2.length === 0 ? "##" : ";##";
+                    setCommentFlag(false);
+                }
+            
+                updatedTestCase.outputVal = outputVal2;
+            
+                // Replace the frozen object with the updated one
+                testCases[rowIdx] = updatedTestCase;
+                changed = true;
+            }
+        }
+        else if (operation === "remarks") {
+            testCases[rowIdx].remarks = data.remarks;
+            changed = true;
+        }
+        else if (operation === "details") {
+            let testCase = {...testCases[rowIdx]};
+            testCase.addTestCaseDetailsInfo = data.details;
+            testCases[rowIdx] = testCase
+            changed = true;
+        }
+        if (changed) {
+            let testCaseUpdate = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
     
+            // Create a new array with updated test cases
+            let updatedTestCases = testCaseUpdate.testCases.map((testCase, i) => {
+                if (i === rowIdx) {
+                    let updatedTestCase = {...testCases[rowIdx]};
+                    return updatedTestCase;
+                }
+                return testCase;
+            });
+    
+            // Create a new array of screen objects with updated testCases array
+            let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
+                if (screen.name === rowExpandedName.name) {
+                    return { ...screen, testCases: updatedTestCases };
+                }
+                return screen;
+            });
+    
+            setScreenLevelTastSteps(updatedScreenLevelTestSteps);
+            setTestCaseData(testCases);
+            setChanged(true);
+            setRowChange(!rowChange);
+        }
+    }
+    const pasteSteps = (stepList) => {
+        let toFocus = []
+        const testData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        let testCases = [...testData.testCases]
+        let offset = 0;
+
+        let sortedSteps = stepList.map(step=>parseInt(step)).sort((a,b)=>a-b)
+
+        for(let step of sortedSteps){
+            let stepInt = parseInt(step)
+            let testCasesToCopy = JSON.parse(JSON.stringify(copiedContent.testCases));
+            
+            stepInt = stepInt+offset
+            if (testCases.length === 1 && !testCases[0].custname) testCases = testCasesToCopy;
+            else testCases.splice(stepInt, 0, ...testCasesToCopy);
+            for(let i=0; i<copiedContent.testCases.length; i++){
+                toFocus.push(stepInt+i);
+            }
+            offset=offset+copiedContent.testCases.length;
+        }
+
+        let localPastedTc = [...pastedTC];
+        copiedContent.testCases.forEach(testcase => testcase.objectid ? localPastedTc.push(testcase.objectid) : null)
+
+        localPastedTc = [...new Set(localPastedTc)];
+        runClickAway = false;
+        setPastedTC(localPastedTc);
+        setTestCaseData(testCases);
+        setShowPS(false);
+        setStepSelect({edit: false, check: [], highlight: toFocus});
+        headerCheckRef.current.indeterminate = false;
+        setHeaderCheck(false);
+        setChanged(true);
+    }
+    const ConfPasteStep = () => (
+        <ModalContainer 
+            title="Paste Test Step"
+            close={()=>setShowConfPaste(false)} 
+            content="Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?"
+            footer={
+                <>
+                <button onClick={()=>{
+                    setShowConfPaste(false);
+                    setShowPS(true);
+                }}>Yes</button>
+                <button onClick={()=>setShowConfPaste(false)}>No</button>
+                </>}
+        />
+    );
+    const fetchSelectRecipientsData = async () => {
+        let checkAddUsers = document.getElementById("dc__checkbox").checked
+        if(!checkAddUsers) resetData()
+        else {
+            var userOptions = [];
+            let data = await getUserDetails("user");
+            if(data.error){setMsg(data.error);return;}
+            for(var i=0; i<data.length; i++) if(data[i][3] !== "Admin") userOptions.push({_id:data[i][1],name:data[i][0]}); 
+            setAllUsers(userOptions.sort()); 
+            data = await getNotificationGroups({'groupids':[],'groupnames':[]});
+            if(data.error){
+                if(data.val === 'empty'){
+                    setMsg(data.error);
+                    data = {};
+                } else{ setMsg(data.error); return true; }
+            }
+            setGroupList(data.sort())
+        }
+    }
+    const checkAddUsers = () => {
+        if(document.getElementById("dc__checkbox") === null) return true
+        let checked = document.getElementById("dc__checkbox").checked
+        return !checked
+    }
+    const ConfirmPopup = () => (
+        <ModalContainer 
+            title={showPopup.title}
+            content={<div>
+                <span>Are you sure you want to {showPopup.content} the task ?</span>
+                <p className="dc__checkbox-addRecp" >
+                    <input  id="dc__checkbox" onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
+                    <span >Notify Additional Users</span>
+                </p>
+                <div className='dc__select-recpients'>
+                    <div>
+                        <span className="leftControl" title="Token Name">Select Recipients</span>
+                        <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+                    </div>
+                </div>
+            </div>}
+            close={()=>{setShow(false);resetData();}}
+            // footer={
+            //     <>
+            //     <button onClick={()=>{submitTask(showPopup.content)}}>
+            //         {showPopup.continueText ? showPopup.continueText : "Yes"}
+            //     </button>
+            //     <button onClick={()=>{setShow(false);resetData()}}>
+            //         {showPopup.rejectText ? showPopup.rejectText : "No"}
+            //     </button>
+            //     </>
+            // }
+        /> 
+    )
+    const selectSteps = stepList => {
+        stepList.push(...stepSelect.check)
+        let newChecks = Array.from(new Set(stepList))
+        setStepSelect({edit: false, check: newChecks, highlight: []});
+        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
+        setShowSM(false);
+    }
+
+
+    const showRemarkDialog = (rowIdx) => {
+        setStepSelect(oldState => ({ ...oldState, highlight: []}));
+        setShowRemarkDlg(String(rowIdx));
+    }
+
+    const showDetailDialog = (rowIdx) => {
+        setStepSelect(oldState => ({ ...oldState, highlight: []}));
+        setShowDetailDlg(String(rowIdx));
+    }
+
+    const updateChecklist = (RowIdx, click, msg) => {
+        let check = [...stepSelect.check]
+        let headerCheckFlag = false
+        let focusIdx = [];
+        let loc = check.indexOf(RowIdx);
+        if (loc>=0) {
+            if (click==="check") check.splice(loc, 1)
+            else focusIdx = [RowIdx]
+        }
+        else {
+            check.push(RowIdx)
+            focusIdx = [RowIdx];
+        }
+        if (check.length === testCaseData.length) headerCheckFlag = true;
+        if (msg === "noFocus") focusIdx = [];
+        // checkArray = check;
+        setHeaderCheck(headerCheckFlag);
+        setStepSelect({edit: false, check: check, highlight: focusIdx});
+        headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
+    }
+    const onDrop = () => {
+        if (!changed)setChanged(true)
+        setDraggedFlag(true);
+        setHeaderCheck(false);
+        headerCheckRef.current.indeterminate = false;
+    }
+
+    const resetData = () => {
+        setAllUsers([]);
+        setGroupList([]);
+        setRecipients({groupids:[],additionalrecepients:[]});
+    }
+    const onCheckAll = (event) => {
+        let checkList = [...stepSelect.check]
+        if (event.target.checked) {
+            const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+            checkList = new Array(findData.testCases.length);
+            for (let i=0; i<checkList.length; i++ ) {
+                checkList[i] = i;
+                // setSelectedOptions(checkList[i])
+            }
+        }
+        else {
+            checkList = []
+        }
+        setStepSelect({edit: false, check: checkList, highlight: []});
+        setHeaderCheck(event.target.checked);
+        headerCheckRef.current.indeterminate = false;
+    }
     const rowExpansionTemplate = (data) => {
         return (
             <div className="p-1 dataTableChild">
-                    <DataTable className='datatable__col'
+                    {/* <DataTable className='datatable__col'
                         value={data.testCases.length>0?data.testCases:[]}
                         selectionMode="checkbox" selection={selectedTestCases}
                         onSelectionChange={(e) => setSelectedTestCases(e.value)}  
@@ -1109,8 +1559,44 @@ const DesignModal = (props) => {
                             <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
                             <Column field="remarks" header="Remarks" style={{paddingLeft:'0.5rem'}}/>
                             <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center',paddingLeft:'0.5rem' }} ></Column>
-                            {/* <Tooltip target=".action " position="left" content="  Edit the test step."/> */}
-                    </DataTable>
+                            <Tooltip target=".action " position="left" content="  Edit the test step."/>
+                    </DataTable> */}
+                
+                <div className="d__table">
+                <div className="d__table_header">
+                    <span className="step_col d__step_head" ></span>
+                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
+                    <span className="objname_col d__obj_head" >Element Name</span>
+                    <span className="keyword_col d__key_head" >Keywords</span>
+                    <span className="input_col d__inp_head" >Input</span>
+                    <span className="output_col d__out_head" >Output</span>
+                    {/* <span className="remark_col d__rem_head" >Remarks</span> */}
+                    <span className="details_col d__det_head" >Details</span>
+                </div>
+                <div style={{height: '66vh' }}>
+                {data.testCases.length>0 && <div className="d__table_contents"  >
+                <div className="ab">
+                    <div className="min">
+                        <div className="con" id="d__tcListId">
+                            <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
+                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
+                                {
+                                data.testCases.map((item, i) => <TableRow data-test="d__tc_row" draggable={draggable}
+                                    key={i} idx={i} objList={objNameList} testCase={item} edit={edit} 
+                                    getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
+                                    updateChecklist={updateChecklist} setStepSelect={setStepSelect} editRow={editRow}
+                                    setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
+                                    rowChange={rowChange} keywordData={keywordList} setDeleteTestDialog={setDeleteTestDialog}
+                                    />)
+                                } 
+                            </ReactSortable>
+                            </ClickAwayListener>
+                        </div>
+                    </div>
+                </div>
+                </div>}
+                </div>
+                </div>
             </div>
         );
     }
@@ -1128,7 +1614,7 @@ const DesignModal = (props) => {
         <>
         {/* <Toast ref={toast} position="bottom-center" /> */}
         {overlay && <ScreenOverlay content={overlay} />}
-        <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
+        <Toast ref={toast} style={{position: 'absolute', bottom: '1rem'}} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?screenLavelTestSteps:[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
@@ -1139,10 +1625,49 @@ const DesignModal = (props) => {
                         <Column field="name" style={{background: 'white',paddingLeft:'0.5rem' }}/>
                         <Column body={bodyHeader} style={{ background: 'white',paddingLeft:'0.5rem' }}/>
                     </DataTable>
+                     {/* <Accordion activeIndex={0}>
+                     {screenLavelTestSteps.map((data,i)=><AccordionTab header={data.name}>
+                        <div className="d__table">
+                            <div className="d__table_header">
+                                <span className="step_col d__step_head" ></span>
+                                <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
+                                <span className="objname_col d__obj_head" >Element Name</span>
+                                <span className="keyword_col d__key_head" >Keywords</span>
+                                <span className="input_col d__inp_head" >Input</span>
+                                <span className="output_col d__out_head" >Output</span>
+                                {/* <span className="remark_col d__rem_head" >Remarks</span> */}
+                                {/* <span className="details_col d__det_head" >Details</span>
+                            </div>
+                            <div style={{height: '66vh' }}>
+                            {data.testCases.length>0 && <div className="d__table_contents"  >
+                            <div className="ab">
+                                <div className="min">
+                                    <div className="con" id="d__tcListId">
+                                        <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
+                                        <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
+                                            {
+                                            data.testCases.map((item, i) => <TableRow data-test="d__tc_row" draggable={draggable}
+                                                key={i} idx={i} objList={objNameList} testCase={item} edit={edit} 
+                                                getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
+                                                updateChecklist={updateChecklist} setStepSelect={setStepSelect} editRow={editRow}
+                                                setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
+                                                rowChange={rowChange} keywordData={keywordList} setDeleteTestDialog={setDeleteTestDialog}
+                                                />)
+                                            } 
+                                        </ReactSortable>
+                                        </ClickAwayListener>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>}
+                            </div>
+                            </div>
+                        </AccordionTab>)}
+                    </Accordion> */}
                 </div>
             </Dialog>
 
-            <Dialog className="debug__object__modal" header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
+            <Dialog className="debug__object__modal" header="dent" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
@@ -1156,6 +1681,30 @@ const DesignModal = (props) => {
                         </span>
                     </div>
                     <div>
+                        <div className='design__fst__card'>
+                        <span className='debug__opt'>
+                            <span className='AD__test'>Add Dependent Test Step (Optional)</span>
+                            </span>
+                            <div className='card__testcases'>
+                            <div className='add__test__case_check'>
+                                {testcaseList.map(testCase => (
+                                    <div className='test__div' key={testCase.testCaseName}>
+                                        <Checkbox className='check__testcase'
+                                            inputId={testCase.testCaseName}
+                                            value={testCase.testCaseName}
+                                            onChange={handleCheckboxChangeAddDependant}
+                                            checked={selectedTestCases.includes(testCase.testCaseName)}
+                                            disabled={rowExpandedName && rowExpandedName.id === testCase.testCaseID}
+                                        />
+                                        <label className='label__testcase' htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
+                                    </div>
+                                    
+                                ))}
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/* <div>
                         <div className='design__fst__card'>
                             <span>Add Dependent Test Case (Optional)</span>
                             <div className='add__test__case'>
@@ -1179,7 +1728,7 @@ const DesignModal = (props) => {
                                 ))}
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </Dialog>
             <Dialog visible={deleteTestDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
