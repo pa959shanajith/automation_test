@@ -2,6 +2,7 @@ const utils = require('../utils');
 var uuidV4 = require('uuid-random');
 const redisServer = require('../redisSocketHandler');
 const cache = require("../cache.js").getClient(2);
+const executionListCache = require("../cache.js").getClient(4)
 var logger = require('../../../logger.js');
 const EMPTYUSER = process.env.nulluser;
 var testSuiteInvoker = require('../execution/executionInvoker')
@@ -618,11 +619,14 @@ module.exports.Execution_Queue = class Execution_Queue {
         //To get the data from cache if key list is empty
         if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
             //check whether cache data is present
-            let cacheData = await cache.get('execution_list')
+            // let cacheData = await cache.get('execution_list')
+            
+            //New Cache Implementation - deviding into clients
+            let cacheData = await executionListCache.gethmap(req.hostname)
             if(cacheData === null) {
                 this.key_list = {};
             } else {
-                this.key_list = cacheData;
+                this.key_list = JSON.parse(cacheData['execution_list']);
             }
         }
         if(!(req.body.key in this.key_list))
@@ -664,9 +668,12 @@ module.exports.Execution_Queue = class Execution_Queue {
         keyQueue.push(newExecutionList);
 
         // Update the execution_list
-        await cache.set("execution_list", this.key_list);
+        // await cache.set("execution_list", this.key_list);
 
-        let execution_Queue = await cache.get('execution_list');
+        // New cache implementation - Dividing into clients
+        await executionListCache.sethmap("execution_list", this.key_list,req.hostname);
+
+        // let execution_Queue = await cache.get('execution_list');
 
         //Adding the reportLink in the response
         response['reportLink'] = req.protocol + "://" + (req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
@@ -734,11 +741,14 @@ module.exports.Execution_Queue = class Execution_Queue {
             // To fetch the data from cache if key_list is empty
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
                 //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
+                // let cacheData = await cache.get('execution_list')
+
+                //New Cache Implementation - dividing into clients
+                let cacheData = await executionListCache.gethmap(req.hostname)
                 if(cacheData === null) {
                     this.key_list = {};
                 } else {
-                    this.key_list = cacheData;
+                    this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
             if(agentStatus['status'] != 'inactive') {
@@ -790,11 +800,13 @@ module.exports.Execution_Queue = class Execution_Queue {
             // To store the data from cache if key_list is empty
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
                 //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
+                // let cacheData = await cache.get('execution_list')
+                //New Cache Implementation - dividing into clients
+                let cacheData = await executionListCache.gethmap(req.hostname)
                 if(cacheData === null) {
                     this.key_list = {};
                 } else {
-                    this.key_list = cacheData;
+                    this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
             if(configKey in this.key_list) {
@@ -852,7 +864,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                                 }
 
                                 //Updating the status to IN_Progress
-                                await cache.set("execution_list", this.key_list);
+                                // Old cache Implementation
+                                // await cache.set("execution_list", this.key_list);
+
+                                // New cache implementation - Dividing into clients
+                                await executionListCache.sethmap("execution_list", this.key_list,req.hostname);
                                 break;
                             }
                         }
@@ -898,11 +914,14 @@ module.exports.Execution_Queue = class Execution_Queue {
             // To store the data from cache if key list is empty.
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
                 //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
+                // let cacheData = await cache.get('execution_list')
+
+                //New Cache Implementation - deviding into clients
+                let cacheData = await executionListCache.gethmap(req.hostname)
                 if(cacheData === null) {
                     this.key_list = {};
                 } else {
-                    this.key_list = cacheData;
+                    this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
             let keyQueue = this.key_list[resultData.configkey];
@@ -992,7 +1011,12 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     console.log(synchronous_report);
                                 }
 
-                                await cache.set("execution_list", this.key_list);
+                                // Old cache implementation
+                                // await cache.set("execution_list", this.key_list);
+                                
+                                // New cache implementation - Dividing into clients
+                                await executionListCache.sethmap("execution_list", this.key_list,req.hostname);
+
                             }
                             statusCount+=(testSuite.status == 'COMPLETED');
                             if(statusCount == executionList.length) {
@@ -1030,7 +1054,11 @@ module.exports.Execution_Queue = class Execution_Queue {
             // To delete the list from the cache
             if(statusCount == -1 && dataFromIce.status == 'finished'){
                 this.key_list[resultData.configkey] = updatedKeyQueue
-                await cache.set("execution_list", this.key_list);
+                // Old cache implementation
+                // await cache.set("execution_list", this.key_list);
+                
+                // New cache implementation - Dividing into clients
+                await executionListCache.sethmap("execution_list", this.key_list,req.hostname);
             }
             if(dataFromIce.event == 'result_executeTestSuite' && dataFromIce.status) {
                 //Check if profile is being executed using the execute now button.
@@ -1063,11 +1091,14 @@ module.exports.Execution_Queue = class Execution_Queue {
             //to add the keylist if its empty,, from the cache
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
                 //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
+                // let cacheData = await cache.get('execution_list')
+
+                //New Cache Implementation - deviding into clients
+                let cacheData = await executionListCache.gethmap(req.hostname)
                 if(cacheData === null) {
                     this.key_list = {};
                 } else {
-                    this.key_list = cacheData;
+                    this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
 
@@ -1100,11 +1131,14 @@ module.exports.Execution_Queue = class Execution_Queue {
             //to add the key list if its empty,, from the cache
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
                 //check whether cache data is present
-                let cacheData = await cache.get('execution_list')
+                // let cacheData = await cache.get('execution_list')
+                
+                //New Cache Implementation - deviding into clients
+                let cacheData = await executionListCache.gethmap(req.hostname)
                 if(cacheData === null) {
                     this.key_list = {};
                 } else {
-                    this.key_list = cacheData;
+                    this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
             const configureKeyExecution = configurekey in this.key_list ? this.key_list[configurekey] : [];
@@ -1119,7 +1153,10 @@ module.exports.Execution_Queue = class Execution_Queue {
                 delete this.key_list[configurekey]
 
 
-            await cache.set("execution_list", this.key_list);
+
+            // await cache.set("execution_list", this.key_list);
+            // New cache implementation - Dividing into clients
+            await executionListCache.sethmap("execution_list", this.key_list,req.hostname);
             response['status'] = 'pass';
             console.log(this.key_list);
             return response;
