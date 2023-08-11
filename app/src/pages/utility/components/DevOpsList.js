@@ -601,7 +601,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     }
                                 }
                                 else {
-                                    setMsg(MSG.CUSTOM("Execution Added to the Queue and Email Successfully Sent.",VARIANT.SUCCESS));
+                                    setMsg(MSG.CUSTOM("Execution Added to the Queue and Email sent successfully.",VARIANT.SUCCESS));
                                 }
                             }
                             else {
