@@ -284,7 +284,7 @@ const MapElement = (props) => {
 
     const resetHandler = () => {
         dispatch(ImpactAnalysisScreenLevel(false));
-        if (props.onClose)  props.onClose();
+        if (props.OnClose)  props.OnClose();
         else setDialogVisible(false);
     }
     return (
