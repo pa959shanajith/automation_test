@@ -184,10 +184,10 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                     <div  style={{position:'relative', top:'0.4rem',fontSize:'12px'}} >40%</div>
                     <img  className='am' src='static/imgs/add.svg' alt='add'/>
                     <img className='line' src='static/imgs/line.svg' alt='line'/>
-                    <div className="flex justify-content-center gap-2">
-                        <label style={{position:'relative', top:'0.3rem',fontSize:'12px'}} htmlFor='input-metakey'>Map View</label>
-                        <InputSwitch inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
-                        <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem'}}>Table View</label>
+                    <div className="flex justify-content-center gap-2 text-500">
+                        <label style={{position:'relative', top:'0.3rem',fontSize:'12px',cursor:'not-allowed'}} htmlFor='input-metakey'>Map View</label>
+                        <InputSwitch style={{cursor:'not-allowed'}} disabled inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
+                        <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem',cursor:'not-allowed'}}>Table View</label>
                     </div>
                     <img className='line' src='static/imgs/line.svg' alt='line'/>
                 </div>
