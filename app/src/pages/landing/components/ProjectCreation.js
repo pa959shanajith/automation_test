@@ -49,14 +49,16 @@ const ProjectCreation = () => {
         {/* </div> */}
 
         {/* <div  className="gotoadmin-card">  */}
-        <Card className="gotoadmin-card" title=" Wish to do some housekeeping today?">
+
+        {userInfo && userInfo.isadminuser === true ? (
+        <Card className="gotoadmin-card" title="Wish to do some housekeeping today?">
           <div className="list_btns">
             <Link>   <li className="list1">Configure a new user</li></Link>
             <Link>   <li className="list1">Manage License</li></Link>
             <Link>   <li className="list1">Manage Elastic Execution Grid</li></Link>
           </div>
           <Button size="small" className='admin-btn' onClick={handleClick} > Go to Admin</Button>
-        </Card>
+        </Card>) : null}
         {/* </div> */}
       </div>
     </>

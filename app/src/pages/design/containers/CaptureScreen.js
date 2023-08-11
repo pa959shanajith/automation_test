@@ -696,7 +696,7 @@ const elementTypeProp =(elementProperty) =>{
                 </div>,
                 footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
               })
-              : toastSuccess("Scraped Elements saved successfully.");
+              : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
           } else { console.error(resp); addMore.current = true; }
@@ -848,6 +848,7 @@ const elementTypeProp =(elementProperty) =>{
                         handleDialog("replaceObjectPhase2");
                     } else {
                         // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                        toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
                     }
           
        }
@@ -1039,14 +1040,12 @@ else{
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
-        {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
-          <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
           <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }} >Add more</button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
-        </div> : <button className='btn_panel__single' onClick={togglePanel}>Action Panel</button>
+        </div> : null
         }
       </div>
     </>
@@ -1468,7 +1467,7 @@ const footerSave = (
       .catch(error => {
         console.log(error)
         setShowIdentifierOrder(false)
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Some Error occured while saving identifier list.', life: 5000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Some Error occured while saving identifier list.', life: 5000 });
         setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
       }
       )
@@ -1529,12 +1528,12 @@ const headerstyle={
      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
-      <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }} />
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "WebService" ? null : footerSave}>
-        {showPanel && (<div className="card_modal">
+       <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
-              <div   className='insprint__block'>
+            {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
                 <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
@@ -1558,8 +1557,9 @@ const headerstyle={
                   <a>Learn More</a>
                 </div>)
                 } */}
-              </div>
-              <div className='upgrade__block'>
+              </div>}
+
+              {showPanel && <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
@@ -1578,22 +1578,24 @@ const headerstyle={
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a href='docs.avoautomation.com'>Learn More</a>
                 </div>)} */}
-              </div>
-              <div className='utility__block'>
-                <p className='insprint__text text-400'>Capture from PDF</p>
+              </div>}
+
+               {showPanel && <div className='utility__block'>
+                <p className='insprint__text text-500'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_utility" position="bottom" content="  Capture the elements from a PDF." />
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} >
+                <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
+                <span className="insprint_auto">
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
-                  <p>PDF Utility</p>
+                  <p className='text-600'>PDF Utility</p>
                 </span>
                 {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Capture from PDF</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
                 </div>)} */}
-              </div>
-              <div className='createManual__block'>
+              </div>}
+
+              {showPanel && <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
@@ -1606,8 +1608,9 @@ const headerstyle={
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
                 </div>)} */}
-              </div>
-              <div className='imp_exp__block'>
+              </div>}
+
+              {showPanel && <div className='imp_exp__block'>
                 <span className='insprint_auto'>
                   <span className='import__block' onClick={() => setShowObjModal("importModal")}>
                     <img className='add_obj_import' src="static/imgs/ic-import.png"  />
@@ -1621,10 +1624,17 @@ const headerstyle={
 
                   </span>
                 </span>
-              </div>
+              </div>}
+                <div style={{ display: 'flex'}}>
+                  <span onClick={togglePanel} style={{ cursor: 'pointer' }}>
+                    <i className={showPanel ? 'pi pi-chevron-circle-up up_arrow' : 'pi pi-chevron-circle-down down_arrow'} style={{ fontSize: '1rem'}}></i>
+                  </span>
+                </div>
             </div>
+
           </Card>
-        </div>)}
+        </div>
+
 
 
         <div className="card-table">
