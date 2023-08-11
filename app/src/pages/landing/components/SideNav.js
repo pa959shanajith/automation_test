@@ -7,10 +7,7 @@ import { Ripple } from 'primereact/ripple';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Carousel } from 'primereact/carousel';
-
-
-
-
+import { useSelector } from 'react-redux';
 import '../styles/SideNav.scss';
 
 
@@ -20,6 +17,12 @@ const SideNav = () =>{
     const [disableIconDialogVisible, setDisableIconDialogVisible] = useState(false);
 
     const recipientEmail = 'support@avoautomation.com';
+
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if (!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo;
+  
 
     const menuItem = [
         {
@@ -49,7 +52,7 @@ const SideNav = () =>{
         {
             path: "/admin",
             name: "Admin",
-            icon: <img src= {tabSelected==="/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/admin_icon_selected.svg"} className="icon" data-pr-tooltip="Manage/Create users, agents and other advanced configurations."  data-pr-position="right" height="25px"/>,
+            icon: <img src= {tabSelected==="/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/admin_disabled_icon.svg"} className="icon" data-pr-tooltip="Manage/Create users, agents and other advanced configurations."  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         {
@@ -69,6 +72,8 @@ const SideNav = () =>{
     const itdmDialogHide = () => {
         setDisableIconDialogVisible(false)
     }
+
+    const filteredMenuItems = userInfo.isadminuser ? menuItem : menuItem.filter(item => item.name !== "Admin");
 
     return ( 
         <>
@@ -91,8 +96,7 @@ const SideNav = () =>{
             </Dialog>
                 <div className="sidebar">
                     {
-                        menuItem.map((item, index) =>(
-
+                     filteredMenuItems.map((item, index) =>(
                             <NavLink to={item.path} key={index} onClick={(e)=>onTabClickHandler(e, item.path, item.disabled)} className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '')+(item.name === "ITDM" ? 'inactive' : '')} activeclassname= {(item.name === "ITDM" ? "inactive" : "active")} end>
                                 <div className="flex flex-column w-full">
                                     <div className={item.name === "ITDM" ? "flex-row p-overlay-badge itdm_icon" : "icon flex-row p-overlay-badge"}>{item.icon} </div>
