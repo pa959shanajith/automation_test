@@ -774,7 +774,7 @@ const ActionPanel = (props) => {
           if (objectsReplaced) // this is required inside only.
             props.toastSuccess(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
         }
-        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRtoastErrorPE)
+        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
       })
       .catch(err => {
         props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)

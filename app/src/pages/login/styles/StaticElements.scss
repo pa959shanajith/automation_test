@@ -57,7 +57,6 @@
 
             .Btn{
                 font: $f7_semibold;
-                padding: 0.65rem 8rem !important;
             }
 
             .link {
@@ -79,7 +78,9 @@
             .Password_reset_link{
                 font: $f6_regular;
             }
-
+            .Login_Btn{
+                padding: 0.65rem 8rem !important;
+            }
             .login_btn {
                 display: flex;
                 justify-content: space-between;

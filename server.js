@@ -366,7 +366,34 @@ if (cluster.isMaster) {
 				return res.send({status});
 			}
 		});
-
+		app.get('/downloadExportfile', async (req, res) => {
+			let projName = req.query.projName	
+			projName = projName.replace(/\s+/g, '');
+			let exportfile =path.join(__dirname,'./assets/ExportMindmap')
+			let userid = req.session.userid;
+			exportfile=exportfile+"/"+userid+".zip";
+			var dateObj = new Date();
+			var month = dateObj.getUTCMonth() + 1;
+			var day = dateObj.getUTCDate();
+			var year = dateObj.getUTCFullYear();
+			var newdate = year + "-" + month + "-" + day;			
+			if (req.query.file == "getExportFile") {
+			  return res.download(path.resolve(exportfile),projName+"_"+(newdate?(newdate):"")+".zip")
+			} else {
+				let status = "na";
+				try {
+					let stats = await fs.promises.stat(path.resolve(exportfile))					
+					if(stats.isFile()){
+						status = "available";
+					}else {
+						console.error("Error Occurred while downloading the exported file")
+					}
+				} catch (error) {
+					console.error("Catch: Error Occurred while downloading the exported file")
+				}
+				return res.send({status});
+			}
+		});
 		app.get('/downloadAgent', async (req, res) => {
 			try {
 				let agentFile = uiConfig.avoAgentConfig;

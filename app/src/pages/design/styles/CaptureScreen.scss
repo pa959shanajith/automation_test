@@ -741,10 +741,12 @@
   .add_obj_import{
     position: relative;
     right: 1rem;
+    top: 0.2rem;
   }
   .add_obj_export{
     position: relative;
     right: 1rem;
+    top: 0.3rem;
   }
 
   .imp__text {
@@ -754,8 +756,9 @@
 }
 
 .utility__block {
-  border-right: 1px solid #E2E2ED;
+  border-right: 2px solid #E2E2ED;
   cursor: not-allowed;
+  opacity: 0.4;
 
   .insprint__text {
     position: relative;
@@ -778,7 +781,7 @@
     padding: 0 0.8rem;
     top: 1rem;
     right: 0.65rem;
-    cursor: pointer;
+    cursor: not-allowed;
   }
   .disabled {
     // float: left;
@@ -796,7 +799,7 @@
   }
 
   .info__btn_utility {
-    cursor: pointer;
+    cursor: not-allowed;
     height: 11%;
     left: 23%;
     position: relative;
@@ -1004,7 +1007,6 @@
   position: relative;
 }
 
-
 //Styles related to element properties 
 .p-dialog .p-dialog-footer {
   padding:0.5rem;
@@ -1063,8 +1065,17 @@
   text-align: center !important;
 }
 .disabled-image {
-  opacity: 0.5; 
+  opacity: 0.5; /* Adjust opacity to indicate disabled state */
   pointer-events: none; 
+}
+.up_arrow{
+  position: relative;
+    top: 5rem;
+    right: 0.2rem;
+}
+.down_arrow{
+     position: relative;
+     left: 68.8rem;
 }
 .p-tag-value{
   width: 34px;
