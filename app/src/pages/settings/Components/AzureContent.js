@@ -84,7 +84,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
     });
     const [viewMappedFiles, setViewMappedFiles] = useState([]);
     const [currentAvoPage, setCurrentAvoPage] = useState(1);
-    const scenariosPerPage = 8;
+    const scenariosPerPage = 10;
     const [indexOfFirstScenario, setIndexOfFirstScenario] = useState(0);
     const [completeTreeData, setCompleteTreeData] = useState([]);
     const [isShowPaginationAvo, setIsShowPaginationAvo] = useState(false)
@@ -613,19 +613,6 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
 
     }
 
-//     const  indexOfFirstScenario= currentAvoPage * scenariosPerPage;
-
-//     const indexOfLastScenario = (currentAvoPage + 1) * scenariosPerPage;
-
-//     const currentScenarios = listofScenarios.slice(indexOfFirstScenario, indexOfLastScenario);
-
-// //     const firstItemIndex = currentPage * itemsPerPage;
-// //   const lastItemIndex = (currentPage + 1) * itemsPerPage;
-
-
-//     const onPageAvoChange = (event) => {
-//         setCurrentAvoPage(event.page);
-//       };
 
 const onPageAvoChange = (event) => {
     setCurrentAvoPage(event.page + 1);
@@ -749,8 +736,6 @@ const onPageAvoChange = (event) => {
                                                         rows={scenariosPerPage}
                                                         totalRecords={listofScenarios.length}
                                                         onPageChange={onPageAvoChange}
-                                                        // pageLinkSize={3}
-                                                        // rowsPerPageOptions={[10, 20, 30]} 
                                                         />}
                                                         </div>
                                                 </div>
