@@ -197,7 +197,8 @@ const DevOpsConfig = props => {
     const [integration,setIntegration] = useState(props.currentIntegration.executionRequest ? props.currentIntegration.executionRequest.integration : {
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}
+        zephyr: {url:"",username:"",password:""},
+        azure: {url:"",username:"",password:""},
     });
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [dataUpdated, setDataUpdated] = useState(false);
@@ -211,6 +212,9 @@ const DevOpsConfig = props => {
         }, {
             key: 'Zephyr',
             text: 'Zephyr'
+        }, {
+            key: 'Azure',
+            text: 'Azure'
         }
     ];
     const [moduleScenarioList, setModuleScenarioList] = useState([]);
