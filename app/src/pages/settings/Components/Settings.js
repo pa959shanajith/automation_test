@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import "../styles/projectSettings.scss";
 import ManageIntegrations from './ManageIntegrations';
 import CreateProject from "../../landing/components/CreateProject";
+import { useSelector} from 'react-redux';
 
 
 
@@ -40,7 +41,7 @@ const Settings =() =>{
                 <div  className='image-settings'>
                 <img src="static/imgs/manage_project_icon.svg" alt="project" style={{  width: '50px', height: '50px' }} />
                 </div>
-              <Button className="manageProj_btn" size="small" label='Manage Project'  ></Button> 
+              <Button className="manageProj_btn" size="small" label='Manage Project' disabled={!(userInfo && userInfo.rolename === "Quality Manager")} ></Button> 
              
             </Card>
          </div>

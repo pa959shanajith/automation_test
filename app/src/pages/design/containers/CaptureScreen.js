@@ -1024,6 +1024,12 @@ else{
       {visible === 'replace' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</button>}
     </div>
   )
+  const footerCompare = (
+    <div className='footer__capture'>
+      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName,'compare'); }}>Compare</button>
+      
+    </div>
+  )
 
   const footerAddMore = (
     <div className='footer__addmore'>
@@ -1613,12 +1619,14 @@ const headerstyle={
               {showPanel && <div className='imp_exp__block'>
                 <span className='insprint_auto'>
                   <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                    <img className='add_obj_import' src="static/imgs/ic-import.png"  />
+                    <img className=' pi-file-import add_obj_import' src="static/imgs/Import_new_icon_grey.svg"  />
+                    {/* <i className="pi pi-file-import add_obj_import "  ></i> */}
                     <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
                     <p className='imp__text'>Import Screen</p>
                   </span>
                   <span className="export__block" style={captureData.length === 0 ? { color: "#cccccc" }: {}} onClick={() => captureData.length !== 0 && setShowObjModal("exportModal")}>
-                    <img  className={`add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} src="static/imgs/ic-export.png" style={captureData.length === 0 ? { color: "#cccccc" }: {}} />
+                    <img  className={` add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} src="static/imgs/Export_new_icon_grey.svg" style={captureData.length === 0 ? { color: "#cccccc" }: {}} />
+                    {/* <i className={`pi pi-file-export add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} style={captureData.length === 0 ? { color: "#cccccc" }: {}}  ></i> */}
                     <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
                     <p className='imp__text'>Export Screen</p>
 
@@ -1726,7 +1734,7 @@ const headerstyle={
          content = {"hello"}
          customClass="MobileWeb"
         />: null}
-      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={footerCapture}>
+      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible==='compare'?footerCompare:footerCapture}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1816,7 +1824,7 @@ const headerstyle={
       />}
 
       {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
-       isOpen={currentDialog} 
+       isOpen={'compareObject'} 
        OnClose={handleClose} 
       startScrape={startScrape} 
       mainScrapedData={mainScrapedData} 

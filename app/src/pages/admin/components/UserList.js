@@ -111,8 +111,17 @@ const UserList = (props) => {
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editRowData(rowData)} />
-                <Button icon="pi pi-trash" rounded outlined severity="danger"  />
+                {/* <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editRowData(rowData)} /> */}
+                <img src="static/imgs/ic-edit.png"
+
+          style={{ height: "20px", width: "20px" }}
+          className="edit__usericon" onClick={() => editRowData(rowData)} />
+          <img
+
+src="static/imgs/ic-delete-bin.png"
+style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+className="delete__usericon" />
+                {/* <Button icon="pi pi-trash" rounded outlined severity="danger"  /> */}
             </React.Fragment>
         );
     }
