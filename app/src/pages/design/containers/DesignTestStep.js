@@ -837,10 +837,10 @@ const DesignModal = (props) => {
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
                 {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
-                    <i className='pi pi-file-import' style={{marginTop:'0.9rem'}} onClick={()=>importTestCase()} />
+                    <img src='static/imgs/import_new_18x18_icon.svg' alt='import' onClick={()=>importTestCase()} />
                     <Tooltip target=".pi-file-import" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <i className='pi pi-file-export' style={{marginTop:'0.9rem'}}  onClick={()=>exportTestCase()} />
+                    <img src='static/imgs/Export_new_icon_grey.svg' alt='export' style={{width:'18px'}}  onClick={()=>exportTestCase()} />
                     <Tooltip target=".pi-file-export" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
                     <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
@@ -1667,7 +1667,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
 
-            <Dialog className="debug__object__modal" header="Design:Sign up screen 1" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
+            <Dialog className="debug__object__modal" header="dent" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
@@ -1683,7 +1683,7 @@ const DesignModal = (props) => {
                     <div>
                         <div className='design__fst__card'>
                         <span className='debug__opt'>
-                            <span className='AD__test'>Add Dependent Test Cases (Optional)</span>
+                            <span className='AD__test'>Add Dependent Test Step (Optional)</span>
                             </span>
                             <div className='card__testcases'>
                             <div className='add__test__case_check'>
