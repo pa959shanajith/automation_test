@@ -571,6 +571,7 @@ if (cluster.isMaster) {
 		app.post('/updateNotificationConfiguration', auth.protect, mindmap.updateNotificationConfiguration);
 		app.post('/getNotificationConfiguration', auth.protect, mindmap.getNotificationConfiguration);
 		app.post('/getNotificationRules', auth.protect, mindmap.getNotificationRules);
+		app.post('/sendMailOnExecutionStart', auth.protect, devOps.sendMailOnExecutionStart)
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);

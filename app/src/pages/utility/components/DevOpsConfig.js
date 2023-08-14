@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef, useMemo} from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
+import {getNotificationChannels,manageNotificationChannels} from '../../admin/api';
 
 import ReactTooltip from 'react-tooltip';
 // import classes from "../styles/DevOps.scss";
@@ -9,6 +10,8 @@ import "../styles/DevOps.scss";
 // import ReleaseCycleSelection from './ReleaseCycleSelection';
 import { prepareOptionLists } from './DevOpsUtils';
 import DevOpsModuleList from './DevOpsModuleList';
+import { EmailNotificationConfig } from './EmailNotificationConfig';
+import { useSelector } from 'react-redux';
 
 const DevOpsConfig = props => {
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
@@ -19,6 +22,10 @@ const DevOpsConfig = props => {
     const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
     const [showSelectBrowser, setShowSelectBrowser] = useState(false);
     const [text, setText] = useState(props.currentIntegration.name);
+    const [displayModal, setDisplayModal] = useState(false);
+    const [defaultValues, setDefaultValues] = useState({});
+    const userInfo = useSelector(state=>state.login.userinfo);
+    const [isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion] = useState(true);
     const notexe = useRef(
         props.currentIntegration.executionRequest != undefined ? props.currentIntegration.executionRequest.donotexe.current : {}
         );
@@ -473,6 +480,10 @@ const DevOpsConfig = props => {
             configurekey: integrationConfig.key,
             isHeadless: integrationConfig.isHeadless,
             execType:integrationConfig.execType,
+            isEmailNotificationEnabled: integrationConfig.isEmailNotificationEnabled,
+            emailNotificationSender: integrationConfig.isEmailNotificationEnabled ? integrationConfig.emailNotificationSender : null,
+            emailNotificationReciever: integrationConfig.isEmailNotificationEnabled ? integrationConfig.emailNotificationReciever : null,
+            isNotifyOnExecutionCompletion: integrationConfig.isNotifyOnExecutionCompletion ? integrationConfig.isNotifyOnExecutionCompletion : false,
             avogridId: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'g_') ? integrationConfig.avoAgentGrid.slice(2) : '',
             avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'a_') ? [integrationConfig.avoAgentGrid.slice(2)] : [],
             integration: integration,
@@ -507,6 +518,7 @@ const DevOpsConfig = props => {
         const dialogFuncMap = {
         
             'displayMaximizable': setDisplayMaximizable,
+            'displayModal': setDisplayModal
            
         }
     
@@ -520,6 +532,10 @@ const DevOpsConfig = props => {
     
         const onHide = (name) => {
             dialogFuncMap[`${name}`](false);
+
+            if (name === "displayModal") {
+                setIntegrationConfig({...integrationConfig, isEmailNotificationEnabled: false });
+            }
         }
 
     useEffect(() =>{
@@ -532,6 +548,58 @@ const DevOpsConfig = props => {
                 setText('');
             }
     },[inputConfigName])
+
+    useEffect(() => {
+        (async () => {
+            const arg = {"action":"provider","channel":"email","args":"smtp"};
+            const data = await getNotificationChannels(arg);
+            if (data) {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: data.sender.email });
+            }
+            else {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: 'avoassure-alerts@avoautomation.com' });
+            }
+        })();
+    }, []);
+
+    const handleSubmit = (defaultValues) => {
+        if ("EmailSenderAddress" in defaultValues && "EmailRecieverAddress" in defaultValues) {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (emailRegex.test(defaultValues.EmailSenderAddress)) {   
+                let allRecieverEmailAddress = defaultValues.EmailRecieverAddress.split(",");
+                const isAllValidEmail = allRecieverEmailAddress.every((recieverEmailAddress) => {
+                    return emailRegex.test(recieverEmailAddress) === true
+                })
+                if (isAllValidEmail) {
+                    setIntegrationConfig({...integrationConfig, emailNotificationSender: defaultValues.EmailSenderAddress, emailNotificationReciever: defaultValues.EmailRecieverAddress, isNotifyOnExecutionCompletion: isNotifyOnExecutionCompletion});
+                    setDisplayModal(false);
+                    
+                }
+                else {
+                    setMsg(MSG.GLOBAL.ERR_RECIEVER_EMAIL);
+                }
+            }
+            else {
+                setMsg(MSG.GLOBAL.ERR_SENDER_EMAIL);
+            }
+        }
+        else {
+            setMsg(MSG.GLOBAL.ERR_EMAILS_EMPTY);
+        }
+    }
+
+    const emailNotificationConfig = useMemo(() => 
+        <EmailNotificationConfig
+            displayModal={displayModal}
+            onHide={onHide}
+            handleSubmit={handleSubmit}
+            isEmailNotificationEnabled={integrationConfig.isEmailNotificationEnabled}
+            defaultValues={defaultValues}
+            setDefaultValues={setDefaultValues}
+            isNotifyOnExecutionCompletion={isNotifyOnExecutionCompletion}
+            setIsNotifyOnExecutionCompletion={setIsNotifyOnExecutionCompletion}
+        />, 
+        [displayModal, onHide, handleSubmit, integrationConfig.isEmailNotificationEnabled, defaultValues, setDefaultValues, isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion]);
     
     return (<>
         { showIntegrationModal ? 
@@ -649,9 +717,18 @@ const DevOpsConfig = props => {
                         <div className="devOps_dropdown_label_sync">
                             <label>Test Suite </label>
                             <Toggle checked={integrationConfig.execType} onChange={() => setIntegrationConfig({...integrationConfig, execType: !integrationConfig.execType })} label="" inlineLabel={true} />
-                            <label>Test Case</label>
+                            <label>Test Case </label>
                         </div>
                     </div>
+                    <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Email Notification : </label>
+                        <div className="devOps_dropdown_label_sync">
+                            <label>Off </label>
+                            <Toggle checked={integrationConfig.isEmailNotificationEnabled} onChange={() => { setIntegrationConfig({...integrationConfig, isEmailNotificationEnabled: !integrationConfig.isEmailNotificationEnabled }); onClick("displayModal"); setDefaultValues({ ...defaultValues, EmailRecieverAddress: integrationConfig.emailNotificationReciever ? integrationConfig.emailNotificationReciever : userInfo.email_id }); setIsNotifyOnExecutionCompletion(integrationConfig.isNotifyOnExecutionCompletion) }} label="" inlineLabel={true}/>
+                            <label>On </label>
+                        </div>
+                    </div>
+                    {emailNotificationConfig}
                     {/* <div className='devOps_seperation'>
                     </div> */}
                     {/* <div>
