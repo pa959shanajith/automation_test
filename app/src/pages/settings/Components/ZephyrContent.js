@@ -1,4 +1,4 @@
-import { React, useState, useRef, useEffect } from 'react';
+import React ,{ useState, useRef, useEffect , forwardRef, useImperativeHandle } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Dialog } from 'primereact/dialog';
 import * as api from '../api';
@@ -18,16 +18,17 @@ import {
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
     selectedAvoproject, showOverlay,checkedTCPhaseIds,checkedTcIds,checkedTCNames,checkedTCReqDetails,
-    checkedTreeIds,checkedParentIds,checkedProjectIds,checkedReleaseIds
+    checkedTreeIds,checkedParentIds,checkedProjectIds,checkedReleaseIds,mappedTree
 } from '../settingSlice';
 import "../styles/ZephyrContent.scss";
 
 
-const ZephyrContent = ({ domainDetails , setToast }) => {
+const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const uploadFileRef = useRef();
     const dispatch = useDispatch();
     const mappedData = useSelector(state => state.setting.mappedPair);
     const mappedTreeList = useSelector(state => state.setting.mappedTree);
+    const checkedScnIds = useSelector(state => state.setting.selectedScenarioIds);
     const selectedZphyrPhaseIds = useSelector(state=> state.setting.checkedTCPhaseIds);
     const selectedZphyrTCIds = useSelector(state=> state.setting.checkedTcIds);
     const selectedZphyrTCNames = useSelector(state=> state.setting.checkedTCNames);
@@ -71,6 +72,13 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
     const [enableBounce, setEnableBounce] = useState(false);
     const [isMutipleSelected,setMultipleSelected] = useState(false);
     const [isMutipleScn,setMultipleScn] = useState(false);
+    const [viewMappedFiles, setViewMappedFiles] = useState([]);
+    const [counts, setCounts] = useState({
+        totalCounts: 0,
+        mappedScenarios: 0,
+        mappedTests: 0
+    });
+    const [rows, setRows] = useState([]);
 
     const [data, setData] = useState([
         {
@@ -204,6 +212,11 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
         dispatchAction(checkedReleaseIds([]));
     },[])
 
+    useImperativeHandle(ref, () => ({
+        callSaveButton,
+        callViewMappedFiles
+    }));    
+
     const upload = () => {
         setError('')
         setFiledUpload(undefined)
@@ -237,7 +250,7 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
         dispatchAction(selectedScenarioIds(newSelectedNodes));
     }
 
-    const TreeNodeCheckbox = (node) => {
+    const TreeNodeCheckbox = (node,parentNode) => {
         if (node.data.type === 'scenario') {
             return (
                 <div style={{ width: '100%' }}>
@@ -246,64 +259,230 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
                         onChange={() => onCheckboxChange(node.key)}
                     />
                     <span className="scenario_label">{node.label} </span>
-                    {
+                    {/* {
                         node.checked && <i className="pi pi-times unmap_icon" style={{ float: 'right' }} onClick={() => handleUnSync(node)}></i>
-                    }
+                    } */}
 
                 </div>)
         }
         else if (node.data.type === 'testcase') {
             return (
                 <div style={{ width: '100%' }}>
-                    <span>{node.label} </span>
+                    <Checkbox
+                        checked={selectedZphyrTCIds.includes(node.key)}
+                        // onChange={() => onCheckboxChange(node.key)}
+                    />
+                    <span className="scenario_label">{node.label} </span>
+                    {
+                        node.checked && <i className="pi pi-times unmap_icon" style={{ float: 'right' }} onClick={() => handleUnSync(node,parentNode)}></i>
+                    }
+                    {/* <span>{node.label} </span> */}
                     {/* <i className="pi pi-times" style={{ float: 'right'}} ></i> */}
                 </div>
             )
         }
     };
 
-    const handleUnSync = async (node) => {
-        // let unSyncObj = [];
-        // if (Object.keys(node).length) {
-        //     let findMappedId = viewMappedFiles.filter((item) => item.testscenarioid === node.key);
-        //     if (findMappedId && findMappedId.length) {
-        //         unSyncObj.push({
-        //             'mapid': findMappedId[0]._id,
-        //             'testCaseNames': [].concat(secondOption && secondOption.name === 'Story' ? findMappedId[0].userStoryId : findMappedId[0].TestSuiteId ),
-        //             'testid': [].concat(null),
-        //             'testSummary': [].concat(null)
-        //         })
-        //         let args = Object.values(unSyncObj);
-        //         args['screenType'] = selectedscreen.name === 'Azure DevOps' ? 'Azure': selectedscreen.name ;
-        //         const saveUnsync = await api.saveUnsyncDetails(args);
-        //         if (saveUnsync.error){  
-        //             setToast("error", "Error", 'Failed to Unsync'); 
-        //         }
-		// 		else if(saveUnsync === "unavailableLocalServer"){
-        //                 setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
-        //                 return
-        //             }
-		// 		else if(saveUnsync === "scheduleModeOn"){
-        //             setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-        //             return
-        //         }
-		// 		else if(saveUnsync === "fail"){
-        //             setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
-        //             return
-        //         }
-		// 		else if(saveUnsync == "success"){
-        //             callViewMappedFiles()
-        //             setToast("success", "Success", 'Unsynced');
-        //         }
+   const  handleSync = () => {
+        let popupMsg = ''
+        if (checkedScnIds.length === 0) {
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO.CONTENT;
+        }
+        else if (selectedZphyrTCIds.length === 0) {
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE.CONTENT;
+        }
 
-        //     }
+        if (popupMsg) setToast("info", "Info", popupMsg);
+        else {
+            const mappedPairObj = [...mappedData,
+            {
+                    projectid: selectedZphyrProjIds,			
+                    releaseid: selectedZphyrReleaseIds,
+                    treeid: selectedZphyrTreeIds,
+                    parentid: selectedZphyrParentIds,
+                    testid: selectedZphyrTCIds,
+                    testname: selectedZphyrTCNames,
+                    reqdetails: selectedZphyrTCReqs, 
+                    scenarioId: checkedScnIds
+            }
+            ];
+            dispatchAction(mappedPair(mappedPairObj));
+            // const filterTestCase = testCaseData.filter((testCase) => testCase.id == selectedId).map(el => ({ key: el.id, label: el.summary, data: { type: 'testcase' } }))
+            // // checking the current map obj is already present with any other scenario
+            let multipleTestCases = [];
+            if(selectedZphyrTCIds.length && selectedZphyrTCNames.length){
+                selectedZphyrTCIds.forEach((id,index) => {
+                    multipleTestCases.push({ key: id, label: selectedZphyrTCNames[index],cyclePhaseId:checkedTreeIds[index],
+                        parentId:checkedParentIds[index],reqdetails:checkedTCReqDetails[index], checked:true, data: { type: 'testcase' } })
+                })
+                
+            }
+            const findDuplicate = treeData.map((scenario) => {
+                const shouldReplaceChildren = multipleTestCases.some(item => {
+                    return scenario.children.some(child => child.key === item.key);
+                });
+            
+                if (shouldReplaceChildren) {
+                    return {
+                        ...scenario,
+                        checked:false,
+                        children: []
+                    };
+                } else {
+                    return scenario;
+                }
+            });
+            
+            // let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? { ...scenario, checked: true, children: filterTestCase } : scenario)
+            let updatedTreeData = findDuplicate.map((scenario) => {
+                if (checkedScnIds && checkedScnIds.length) {
+                    checkedScnIds.forEach((scnId, index) => {
+                        if (scenario.key === scnId) {
+                            scenario = { ...scenario, checked: true, children: multipleTestCases };
+                        }
+                    });
+                }
+                return scenario;
+            });
+            // // setTreeData(updatedTreeData.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
+            setTreeData(updatedTreeData);
+            // setCompleteTreeData(updatedTreeData);
+            // dispatchAction(mappedTree(updatedTreeData));
+            // const updateCheckbox = testCaseData.map((item) => ({ ...item, checked: false }));
+            // setTestCaseData(updateCheckbox);
+            // dispatchAction(syncedTestCases(selected));
+            // setSelectedNodes([]);
+            // dispatchAction(selectedScenarioIds([]));
+        }
+        // setDisabled(false);
+    }
 
-        //     let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
-        //     let unsyncMappedData = mappedData.filter((item) => item.scenarioId[0] !== node.key);
-        //     setTreeData(unsyncMap);
-        //     dispatchAction(mappedTree(unsyncMap));
-        //     dispatchAction(mappedPair(unsyncMappedData));
-        // }
+    const handleUnSync = async (node,parentNode) => {
+        let unSyncObj = [];
+        if (Object.keys(node).length) {
+            let findMappedId = rows.filter((item) => item.scenarioId.includes(parentNode.props.parent.key)).filter((item) => item.testid.includes(node.key))
+            // let findMappedId = findScnArray.filter((item) => item.testid.includes(node.key))
+            if (findMappedId && findMappedId.length) {
+                unSyncObj.push({
+                    'mapid': findMappedId[0].mapId,
+                    'testCaseNames': [].concat(node.label),
+                    'testid': [].concat(node.key)
+                })
+                let args = Object.values(unSyncObj);
+                args['screenType'] = 'Zephyr'
+                const saveUnsync = await api.saveUnsyncDetails(args);
+                if (saveUnsync.error){  
+                    setToast("error", "Error", 'Failed to Unsync'); 
+                }
+				else if(saveUnsync === "unavailableLocalServer"){
+                        setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+                        return
+                    }
+				else if(saveUnsync === "scheduleModeOn"){
+                    setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+                    return
+                }
+				else if(saveUnsync === "fail"){
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
+                    return
+                }
+				else if(saveUnsync == "success"){
+                    callViewMappedFiles()
+                    setToast("success", "Success", 'Unsynced');
+                }
+
+            }
+            const removeTestCase = treeData.map((scenario) => {
+                if (scenario.children && scenario.children.length > 0) {
+                    const filteredChildren = scenario.children.filter((child) => child.key !== node.key);
+                    return {
+                        ...scenario,
+                        children: filteredChildren
+                    };
+                }
+                return scenario;
+            });
+            onLeftCheckboxChange(node);
+            setTreeData(removeTestCase);
+
+            // let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
+            // console.log(unsyncMap, 'its unsyncMap');
+            let unsyncMappedData = mappedData.filter((item) => item.scenarioId !== node.key);
+            // setTreeData(unsyncMap);
+            dispatchAction(mappedTree(removeTestCase));
+            dispatchAction(mappedPair(unsyncMappedData));
+        }
+    }
+
+    const callSaveButton =async()=>{
+        if (mappedData && mappedData.length) {
+        const response = await api.saveZephyrDetails_ICE(mappedData);
+        if (response.error) {
+            setToast("error", "Error", response.error.CONTENT);
+        }
+        else if (response === "unavailableLocalServer")
+            setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        else if (response === "scheduleModeOn")
+            setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        else if (response === "success") {
+            callViewMappedFiles('');
+            setToast("success", "Success", 'Synced details saved successfully');
+        }
+    }
+    else{
+        setToast("info", "Info", 'Please sync atleast one map');
+    }
+    }
+
+    const callViewMappedFiles=async(saveFlag)=>{
+        try{
+            const response = await api.viewZephyrMappedList_ICE('6440e7b258c24227f829f2a4');
+            if (response.error) {
+                setToast('error', 'Error', response.error);
+            }
+            else if (response === 'fail') {
+                setToast('error', 'Error', 'failed to fetch mapped details');
+            }
+            else if (response.length){
+                setViewMappedFiles(response);
+                let totalCounts = 0;
+                let mappedScenarios = 0;
+                let mappedTests = 0;
+                let tempRow = [];
+                let viewMappedData = response;
+
+                viewMappedData.forEach(object => {
+                     totalCounts = totalCounts + 1;
+                    mappedScenarios = mappedScenarios + object.testscenarioname.length;
+                    mappedTests = mappedTests + object.testname.length;
+                    tempRow.push({
+                        'testCaseNames': object.testname, 
+                        'scenarioNames': object.testscenarioname,
+                        'mapId': object._id,
+                        'scenarioId': object.testscenarioid,
+                        'testid':object.testid,
+                        "reqDetails": object.reqdetails
+                    });
+                });
+                setCounts({
+                    totalCounts: totalCounts,
+                    mappedScenarios: mappedScenarios,
+                    mappedTests: mappedTests
+                });
+                setRows(tempRow);
+            }
+            else if (response !== 'fail') {
+                setRows([]);
+                setCounts({
+                    totalCounts: 0,
+                    mappedScenarios: 0,
+                    mappedTests: 0
+                });
+            }
+        }
+        catch(err) {
+            setToast('error', 'Error', MSG.INTEGRATION.ERR_FETCH_DATA.CONTENT);
+        }
     }
 
 
@@ -823,7 +1002,7 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
                                         </div>
                                         <span>
                                             {/* <img className="map__btn__zephyr" src="static/imgs/map_button_icon.svg" /> */}
-                                            <Button className="map__btn__zephyr" label='Map' severity='primary' size='small'></Button>
+                                            <Button className="map__btn__zephyr" label='Map' severity='primary' size='small' onClick={()=>handleSync()}></Button>
                                         </span>
                                     </div>
 
@@ -839,22 +1018,36 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
                                         </div>
 
                                         {checked ? (<div className="accordion_testcase">
-                                            <Accordion multiple activeIndex={0} >
-                                                {avoTestCase.map((testcase) => (
-                                                    <AccordionTab header="Avo Assure Testcase">
-                                                        <span>{testcase.Zephyr}</span>
-                                                    </AccordionTab>))}
-                                            </Accordion>
+                                        <Accordion multiple activeIndex={0}>
+                                            {rows.map((item, rowIndex) => (
+                                                item.scenarioNames.map((scenarioName, scenarioIndex) => (
+                                                    <AccordionTab key={`${item.scenarioNames.join()}_${scenarioIndex}`} header={scenarioName}>
+                                                        <div>
+                                                            {item.testCaseNames.map((testCaseName, index) => (
+                                                                <div key={index}>{testCaseName}</div>
+                                                            ))}
+                                                        </div>
+                                                    </AccordionTab>
+                                                ))
+                                            ))}
+                                        </Accordion>
                                         </div>
 
                                         ) : (
 
                                             <div className="accordion_testcase">
                                                 <Accordion multiple activeIndex={0}>
-                                                    {zephyrTestCase.map((testCase) => (
-                                                        <AccordionTab header="Zephyr Testcase">
-                                                            <span>{testCase.avoassure}</span>
-                                                        </AccordionTab>))}
+                                                    {rows.map((item) => (
+                                                        item.testCaseNames.map((testCaseName, index) => (
+                                                            <AccordionTab key={`${item.testCaseNames.join()}_${index}`} header={testCaseName}>
+                                                                <div>
+                                                                    {item.scenarioNames.map((scenarioName, scenarioIndex) => (
+                                                                        <div key={scenarioIndex}>{scenarioName}</div>
+                                                                    ))}
+                                                                </div>
+                                                            </AccordionTab>
+                                                        ))
+                                                    ))}
                                                 </Accordion>
                                             </div>
                                         )}
@@ -950,4 +1143,4 @@ const ZephyrContent = ({ domainDetails , setToast }) => {
             </div>
         </>)
 }
-export default ZephyrContent;
+export default forwardRef(ZephyrContent);
