@@ -839,19 +839,16 @@ const elementTypeProp =(elementProperty) =>{
         }
         else if (data.action === "replace") {
           let viewString = data;
-
-                    if (viewString.view.length !== 0){
-                        let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
-
-                        let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
-                        setNewScrapedData(scrapeItemList);
-                        handleDialog("replaceObjectPhase2");
-                    } else {
-                        // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                        toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                    }
-          
-       }
+          if (viewString.view.length !== 0){
+              let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+              let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+              setNewScrapedData(scrapeItemList);
+              handleDialog("replaceObject");
+          } else {
+              // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+              toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+            }               
+        }
 else{
         let viewString = data;
         if (capturedDataToSave.length !== 0 && masterCapture) {
@@ -1002,21 +999,6 @@ else{
   const handleMouseLeaveRow = () => {
     setHoveredRow(null);
   };
-
-
-
-  // const renderIcons = (rowData) => {
-  //   if (rowData === hoveredRow) {
-  //     return (
-  //       <>
-  //         <img src='static/imgs/ic-edit.png' style={{height:"20px", width:"20px"}} className='edit__icon' />
-  //         <img src='static/imgs/ic-delete-bin.png'  style={{height:"20px", width:"20px"}} className='delete__icon'  />
-  //       </>
-  //     );
-  //   }
-  //   return null;
-  // };
-
 
   const footerCapture = (
     <div className='footer__capture'>
@@ -1502,13 +1484,13 @@ const footerSave = (
       return (
         <>
         <div style={{display:'flex',justifyContent:'space-between'}}>
-        <div >{rowdata.selectall}</div>
-        {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
-        {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
-        {/* <Tooltip target={`#${column.field}-${rowdata.id}`} position="top">
-        {rowdata.selectall}
-        </Tooltip> */}
-      </div>
+          <div >{rowdata.selectall}</div>
+          {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
+          {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+          {/* <Tooltip target={`#${column.field}-${rowdata.id}`} position="top">
+          {rowdata.selectall}
+          </Tooltip> */}
+        </div>
       </>
       )
      }
@@ -1672,10 +1654,6 @@ const headerstyle={
             scrollHeight="400px"
             columnResizeMode="expand"
           >
-            {/* editMode="cell"
-            onCellEdit={(e) => handleCellEdit(e)} */}
-            {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
-            {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
             <Column field="selectall" header="Element Name" headerStyle={{ textAlign: 'center' }} 
               editor={(options) => cellEditor(options)}
@@ -1762,24 +1740,10 @@ const headerstyle={
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
-        
-        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
-        <div className={"compare__object"}>
-          <span className='compare__btn'>
-            <p className='compare__text'>List of Browsers</p>
-          </span>
-          <span className='browser__col'>
-            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-          </span>
-        </div>
-      </Dialog> : null}
 
       {currentDialog === 'addObject' && <ActionPanel
         isOpen={currentDialog}
-        OnClose={handleClose}
+        onClose={handleClose}
         addCustomElement={addedCustomElement}
         toastSuccess={toastSuccess}
         toastError={toastError}
@@ -1788,7 +1752,7 @@ const headerstyle={
 
       {currentDialog === 'mapObject' && <ActionPanel
         isOpen={currentDialog}
-        OnClose={handleClose}
+        onClose={handleClose}
         captureList={capturedDataToSave}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={fetchScrapeData}
@@ -1798,7 +1762,7 @@ const headerstyle={
         elementTypeProp ={elementTypeProp}
       />}
 
-      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
+      {(currentDialog === 'replaceObject') && <ActionPanel
         isOpen={currentDialog}
         OnClose={handleClose}
         fetchingDetails={props.fetchingDetails}
@@ -2111,6 +2075,7 @@ function generateCompareObject(data, irisObjects){
       }
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
+  compareObj['fullScrapeData'] = data.view[3].newElements;
   return compareObj;
 }
 

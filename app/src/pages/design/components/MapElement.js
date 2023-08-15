@@ -297,6 +297,7 @@ const MapElement = (props) => {
                 visible={props.isOpen === 'mapObject' || dialogVisible}
                 onHide={resetHandler}
                 footer={mapElementFooter}
+                draggable={false}
             >
 
                 <p> Please select the Element type from the drop down alongside the objects to be mapped to the necessary object types captured in the screen.</p>

@@ -943,7 +943,7 @@ const ActionPanel = (props) => {
   return (
     <>
       {props.isOpen === 'addObject' && <AddElement isOpen={props.isOpen}
-        OnClose={props.OnClose}
+        onClose={props.onClose}
         addCustomElement={props.addCustomElement}
         toastSuccess={props.toastSuccess}
         toastError={props.toastError}
@@ -952,7 +952,7 @@ const ActionPanel = (props) => {
       }
 
       {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
-        OnClose={props.OnClose}
+        onClose={props.onClose}
         captureList={props.captureList}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={props.fetchScrapeData}
@@ -972,6 +972,7 @@ const ActionPanel = (props) => {
         position='right'
         visible={props.isOpen === 'createObject'}
         onHide={props.OnClose}
+        draggable={false}
         footer={createElementFooter}>
         <Accordion activeIndex={activeIndex}>
           {objects.map((object, index) => (
@@ -1062,7 +1063,8 @@ const ActionPanel = (props) => {
         header="Replace: Sign up screen 1"
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
-        visible={props.isOpen === "replaceObjectPhase2"}
+        visible={props.isOpen === "replaceObject"}
+        draggable={false}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">

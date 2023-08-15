@@ -28,6 +28,7 @@ const CreateLanding = (props) => {
     const userName = useSelector(state => state.admin.userName);
     const firstname = useSelector(state => state.admin.firstname);
     const lastname = useSelector(state => state.admin.lastname);
+    const editUser = useSelector(state => state.admin.editUser);
 
     const node = useRef();
 
@@ -51,12 +52,6 @@ const CreateLanding = (props) => {
 
     return (
         <Fragment>
-            {/* <div className="adminActionBtn">
-                <Button data-test="editButton" className=" a__btn pull-right Create-User__btn btn-create-cust" onClick={() => { props.setShowEditUser(true); props.edit(); }} title="Edit User">Edit</Button>
-                <Button data-test="createButton" className=" a__btn pull-right Create-User__btn btn-create-cust" onClick={() => { props.manage({ action: "create" }) }} disabled={nocreate} title="Create User" >Create</Button>
-                <Button data-test="clearButton" className=" a__btn pull-right Create-User__btn btn-create-cust" title="Clear" onClick={() => { props.click(); dispatch(AdminActions.UPDATE_TYPE("inhouse")) }}  >Clear</Button>
-            </div> */}
-
             <div className="Create-outer card flex justify-content-center" >
                 <div className="flex flex-column pb-2">
                     <label data-test="userTypeLabel" className="pb-2 font-medium" style={{paddingLeft: '0.7rem'}}>Select Configuration <span style={{ color: "#d50000" }}>*</span></label>
@@ -135,13 +130,13 @@ const CreateLanding = (props) => {
                     <InputText
                         data-test="userName-input__create"
                         type="text"
-                        className='w-full md:w-20rem'
+                        className='w-full md:w-20rem p-inputtext-sm'
                         autoComplete="User-name"
                         id="userName"
                         value={userName} onChange={(event) => { userNameChange(event.target.value) }}
                         name="userName" maxLength="100"
-                        // className={props.userNameAddClass ? ((props.userNameAddClass === "selectErrorBorder") ? "middle__input__border-create form-control-custom-create form-control__conv-create  selectErrorBorder username-cust" : "middle__input__border-create form-control-custom-create form-control__conv-create username-cust inputErrorBorder") : "username-cust middle__input__border-create form-control-custom-create form-control__conv-create   "}
                         placeholder="Enter User Name"
+                        disabled={editUser}
                     />
                 </div>
 
@@ -149,7 +144,7 @@ const CreateLanding = (props) => {
                     <div className='flex flex-column'>
                         <label className="pb-2 font-medium">First Name</label>
                         <InputText data-test="firstName-input__create"
-                            className='w-full md:w-20rem' type="text"
+                            className='w-full md:w-20rem p-inputtext-sm' type="text"
                             autoComplete="First-name" name="firstname" id="firstname" value={firstname}
                             onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(event.target.value)) }}
                             maxLength="100"
@@ -159,7 +154,7 @@ const CreateLanding = (props) => {
                     <div className='flex flex-column'>
                         <label className="pb-2 font-medium">Last Name</label>
                         <InputText data-test="lastName-input__create"
-                            className='w-full md:w-20rem' type="text"
+                            className='w-full md:w-20rem p-inputtext-sm' type="text"
                             autoComplete="Last-name" name="lastname" id="lastname" value={lastname}
                             onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_LASTNAME(event.target.value)) }}
                             maxLength="100"

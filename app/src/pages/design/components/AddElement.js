@@ -54,7 +54,7 @@ const AddElement = (props) => {
         if (newObjects.length > 0) {
             props.addCustomElement(newObjects, newOrderList);
         }
-        props.OnClose();
+        props.onClose();
     }
 
 
@@ -101,9 +101,10 @@ const AddElement = (props) => {
                 className='add__object__header'
                 header='Add Element'
                 visible={props.isOpen === 'addObject'}
-                onHide={props.OnClose}
+                onHide={props.onClose}
                 style={{ height: "28.06rem", width: "38.06rem", marginRight: "15rem" }}
                 position='right'
+                draggable={false}
                 footer={addElementfooter}>
                 <div className='card__add_object'>
                     <Card className='add_object__left'>
