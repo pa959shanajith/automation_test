@@ -412,3 +412,58 @@ export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
         return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
     }
 }
+
+export const saveZephyrDetails_ICE = async(mappedDetails) => {
+    try{
+        const res = await axios(url+'/saveZephyrDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            mappedDetails : mappedDetails,
+            action : 'saveZephyrDetails_ICE'
+            
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
+    }
+}
+
+export const viewZephyrMappedList_ICE = async(userID) => {
+    try{
+        const res = await axios(url+'/viewZephyrMappedList_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                user_id : userID,
+                action : 'viewZephyrMappedList_ICE'
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
+    }
+}

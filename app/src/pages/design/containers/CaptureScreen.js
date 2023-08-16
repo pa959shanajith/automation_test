@@ -1614,7 +1614,7 @@ const headerstyle={
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
-                <span className={`insprint_auto create__block ${!isWebApp  || captureData.length === 0 ? "disabled" : ""}`}   onClick={() =>captureData.length > 0 &&  isWebApp &&  handleDialog('createObject')}>
+                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={() =>captureData.length > 0 &&  isWebApp &&  handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
@@ -1644,7 +1644,8 @@ const headerstyle={
               </div>}
                 <div style={{ display: 'flex'}}>
                   <span onClick={togglePanel} style={{ cursor: 'pointer' }}>
-                    <i className={showPanel ? 'pi pi-chevron-circle-up up_arrow' : 'pi pi-chevron-circle-down down_arrow'} style={{ fontSize: '1rem'}}></i>
+                  <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
+                    <i className={showPanel ? 'pi pi-chevron-circle-up up_arrow icon-tooltip' : 'pi pi-chevron-circle-down down_arrow icon-tooltip'} style={{ fontSize: '1rem'}}></i>
                   </span>
                 </div>
             </div>

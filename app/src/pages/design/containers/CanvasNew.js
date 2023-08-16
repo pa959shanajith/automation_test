@@ -333,7 +333,7 @@ const CanvasNew = (props) => {
         setdLinks(cdLinks)
         setdNodes(cdNodes)
         setBlockui({show:false})
-        displayError(MSG.MINDMAP.SUCC_NODE_CREATE.CONTENT);
+        props.toast.current.show({ severity: 'success', summary: 'Success', detail: MSG.MINDMAP.SUCC_NODE_CREATE.CONTENT, life: 3000 });
     }
     const clickAddNode=(e)=>{
         var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
@@ -833,13 +833,13 @@ const CanvasNew = (props) => {
   };
 
   const columns = [
-    {
-      field: "checkbox",
-      header: <Checkbox className='scenario-check' onChange={headerCheckboxClicked} checked={selectedRowsScenario.length === addScenario.length && addScenario.length !== 0} />,
-      body: (rowData) => <Checkbox className='rowdata_check' onChange={(event) => rowCheckboxClicked(event, rowData)} checked={selectedRowsScenario.includes(rowData.id)} />,
-      headerStyle: { width: '50px' },
-      bodyStyle: { width: '50px' },
-    },
+    // {
+    //   field: "checkbox",
+    //   header: <Checkbox className='scenario-check' onChange={headerCheckboxClicked} checked={selectedRowsScenario.length === addScenario.length && addScenario.length !== 0} />,
+    //   body: (rowData) => <Checkbox className='rowdata_check' onChange={(event) => rowCheckboxClicked(event, rowData)} checked={selectedRowsScenario.includes(rowData.id)} />,
+    //   headerStyle: { width: '50px' },
+    //   bodyStyle: { width: '50px' },
+    // },
     {
       field: "addScenario",
       header: "Add Scenario",
@@ -902,13 +902,13 @@ const CanvasNew = (props) => {
   ];
    
   const columnsScreen = [
-    {
-      field: "checkbox",
-      header: <Checkbox className='scenario-check' onChange={headerCheckboxClickedScreen} checked={selectedRowsScreen.length === addScreen.length && addScreen.length !== 0} />,
-      body: (rowDataScreen) => <Checkbox onChange={(event) => rowCheckboxClickedScreen(event, rowDataScreen)} checked={selectedRowsScreen.includes(rowDataScreen.id)} />,
-      style: { width: '50px' },
+    // {
+    //   field: "checkbox",
+    //   header: <Checkbox className='scenario-check' onChange={headerCheckboxClickedScreen} checked={selectedRowsScreen.length === addScreen.length && addScreen.length !== 0} />,
+    //   body: (rowDataScreen) => <Checkbox onChange={(event) => rowCheckboxClickedScreen(event, rowDataScreen)} checked={selectedRowsScreen.includes(rowDataScreen.id)} />,
+    //   style: { width: '50px' },
      
-    },
+    // },
     {
       field: "addScreen",
       header: "Add Screen",
@@ -971,12 +971,12 @@ const CanvasNew = (props) => {
   ];
 
   const columnsTestStep = [
-    {
-      field: "checkbox",
-      header: <Checkbox className='scenario-check' onChange={headerCheckboxClickedTestStep} checked={selectedRowsTeststep.length === addTestStep.length && addTestStep.length !== 0} />,
-      body: (rowDataTestStep) => <Checkbox onChange={(event) => rowCheckboxClickedTestStep(event, rowDataTestStep)} checked={selectedRowsTeststep.includes(rowDataTestStep.id)} />,
+    // {
+    //   field: "checkbox",
+    //   header: <Checkbox className='scenario-check' onChange={headerCheckboxClickedTestStep} checked={selectedRowsTeststep.length === addTestStep.length && addTestStep.length !== 0} />,
+    //   body: (rowDataTestStep) => <Checkbox onChange={(event) => rowCheckboxClickedTestStep(event, rowDataTestStep)} checked={selectedRowsTeststep.includes(rowDataTestStep.id)} />,
       
-    },
+    // },
     {
       field: "addTestStep",
       header: "Add Test Step",

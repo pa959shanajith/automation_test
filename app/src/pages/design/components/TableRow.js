@@ -287,7 +287,7 @@ const TableRow = (props) => {
                         <div className="d__row_text" title={input}>{draggable ? (input.length > 40 ? input.substr(0, 34) + "......" : input) : input}</div> }
                 </span>
                 <span className="output_col" >
-                    { focused ? <input className="col_inp" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder} disabled={disableStep}/> :
+                    { focused ? <input className="col_out" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder} disabled={disableStep}/> :
                     <div className="d__row_text" title={output}>{output}</div> }
                 </span>
             </div>

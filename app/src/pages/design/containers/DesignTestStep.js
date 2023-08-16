@@ -837,11 +837,11 @@ const DesignModal = (props) => {
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
                 {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
-                    <img src='static/imgs/import_new_18x18_icon.svg' alt='import' onClick={()=>importTestCase()} />
-                    <Tooltip target=".pi-file-import" position="bottom" content="Import Test Steps"/>
+                    <img src='static/imgs/import_new_18x18_icon.svg' className='ImportSSSS' alt='import' onClick={()=>importTestCase()} />
+                    <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_grey.svg' alt='export' style={{width:'18px'}}  onClick={()=>exportTestCase()} />
-                    <Tooltip target=".pi-file-export" position="bottom" content="Export Test Steps"/>
+                    <img src='static/imgs/Export_new_icon_grey.svg' alt='export' className='ExportSSSS' style={{width:'18px'}}  onClick={()=>exportTestCase()} />
+                    <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
                     <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
                     <Tooltip target=".pi-plus " position="bottom" content="  Add Test Step"/>
@@ -849,9 +849,10 @@ const DesignModal = (props) => {
                     <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
                     <Tooltip target=".pi-trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
-                    <Button label="Debug" size='small'  disabled={debugEnable} className="" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
-                    <Tooltip target=".debug_button" position="left" content=" Click to debug and optionally add dependent test steps repository." />
-                    <Button className="" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
+                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
+                    <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
+                    <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
+                    <Tooltip target=".SaveEEEE" position="left" content="  save" />
             </div>:null}
             </div>}
             </>
@@ -1078,7 +1079,7 @@ const DesignModal = (props) => {
 
         if (findData) {
         let testcases = findData.testCases.filter(objFromA => {
-            return !selectedOptions.find(objFromB => objFromA.stepNo === objFromB.stepNo);
+            return selectedOptions === objFromA.stepNo
         });
         let updatedScreenLavelTestSteps = screenLavelTestSteps.map(screen => {
             if (screen.name === rowExpandedName.name) {
@@ -1308,10 +1309,9 @@ const DesignModal = (props) => {
         const itemData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [...itemData.testCases];
         let { rowIdx, operation } = data;
-        setSelectedOptions(data)
         let changed = false;
         if (operation === "row") {
-            const { objName, keyword, inputVal, outputVal, appType } = data;
+            const { objName, keyword, inputVal, outputVal, appType} = data;
             if (testCases[rowIdx].custname !== objName || testCases[rowIdx].keywordVal !== keyword || testCases[rowIdx].inputVal[0] !== inputVal || testCases[rowIdx].outputVal !== outputVal || commentFlag) {
                 // Create a new object with the updated values
                 const updatedTestCase = Object.assign({}, testCases[rowIdx], {
@@ -1320,7 +1320,7 @@ const DesignModal = (props) => {
                     inputVal: [inputVal],
                     appType: appType
                 });
-            
+
                 let outputVal2 = outputVal;
                 if (commentFlag) {
                     let isComment = outputVal2.slice(-2) === "##";
@@ -1495,6 +1495,7 @@ const DesignModal = (props) => {
 
     const updateChecklist = (RowIdx, click, msg) => {
         let check = [...stepSelect.check]
+        setSelectedOptions(RowIdx)
         let headerCheckFlag = false
         let focusIdx = [];
         let loc = check.indexOf(RowIdx);
@@ -1614,7 +1615,7 @@ const DesignModal = (props) => {
         <>
         {/* <Toast ref={toast} position="bottom-center" /> */}
         {overlay && <ScreenOverlay content={overlay} />}
-        <Toast ref={toast} style={{position: 'absolute', bottom: '1rem'}} position="bottom-center" baseZIndex={1000} />
+        <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?screenLavelTestSteps:[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
@@ -1667,7 +1668,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
 
-            <Dialog className="debug__object__modal" header="dent" style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
+            <Dialog className="debug__object__modal" header={props.fetchingDetails["parent"]["name"]} style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
