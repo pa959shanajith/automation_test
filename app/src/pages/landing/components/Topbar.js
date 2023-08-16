@@ -5,8 +5,8 @@ import UserProfile from './UserProfile'
 import { Menu } from 'primereact/menu';
 import '../styles/Topbar.scss';
 import { Tooltip } from 'primereact/tooltip';
-
-
+import { useSelector} from 'react-redux';
+import WelcomeWizard from "../../login/components/WelcomeWizard";
 const MenubarDemo = (props) => {
   const [showExtraheaderItem, setShowExtraheaderItem] = useState(false);
   const location = useLocation();
@@ -14,7 +14,12 @@ const MenubarDemo = (props) => {
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [showTooltip_help, setShowTooltip_help] = useState(false);
   const imageRefhelp = useRef(null);
-
+  const [showTCPopup,setShowTCPopup] = useState(false);
+  const [show_WP_POPOVER, setPopover] = useState(false);
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if(!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo ;
   const handleTooltipToggle = () => {
     const rect = imageRefhelp.current.getBoundingClientRect();
     setCardPosition({ right: rect.right, left: rect.left, top: rect.top, bottom: rect.bottom });
@@ -25,6 +30,11 @@ const MenubarDemo = (props) => {
     setShowTooltip_help(false);
   };
 
+  useEffect(()=>{
+    if (userInfo.tandc && userInfo.welcomeStepNo < 3) {
+        setShowTCPopup(true);
+    }
+  },[userInfo])
 
   const needHelpItems = [
     {
@@ -89,6 +99,7 @@ const MenubarDemo = (props) => {
     </NavLink>
   );
 
+
   const end = (
     <div className='Headers'>
       <div className='Tab_Menu_Header'>
@@ -101,6 +112,10 @@ const MenubarDemo = (props) => {
       <UserProfile />
     </div>
   );
+
+  const tooltip_needhelp = {
+    fontSize: "12px",fontfamily:"Open Sans",  fontWeight: "normal",marginleft:"2rem"
+  };
 
   return (
     <div className='Topbar_Menu'>
@@ -115,10 +130,11 @@ const MenubarDemo = (props) => {
     </div>
                  
                 </div>)} */}
-          <Tooltip target=".needHelp_img" position="left" content="View training videos and documents." />
+          <Tooltip target=".needHelp_img" position="left" content="View training videos and documents." style={tooltip_needhelp} />
           <Menu className='needHelp_Menu w-13rem' id='needHelp_font' model={needHelpItems} popup ref={needHelpmenuLeft} />
         </div>
       </div>
+      {showTCPopup && (userInfo.welcomeStepNo!==undefined)?<WelcomeWizard showWizard={setShowTCPopup} userInfo={userInfo} setPopover={setPopover}/>:null}
     </div>
   );
 }

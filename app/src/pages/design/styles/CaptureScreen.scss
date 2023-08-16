@@ -96,6 +96,7 @@
   }
   .p-column-title{
     font-weight: bold !important;
+    text-align: center !important;
   }
 
   .p-datatable .p-datatable-tbody>tr>td {
@@ -105,7 +106,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 5rem;
+    max-width: 21rem;
+  }
+  .text__align{
+    text-align: center;
   }
 }
 
@@ -127,7 +131,7 @@
   color: #FFFFFF;
   position: relative;
   border: none;
-  left: 22.2rem;
+  left: 27.2rem;
   padding: 0.5rem 0.5rem;
 }
 
@@ -293,8 +297,9 @@
       width: 100%;
       display: flex;
       flex-direction: column;
+      height: 30rem;
       .inputCard{
-        margin-top: 0.04%;
+        margin-top: 0.09%;
       .p-component{
         height: 4rem;
         width: 100%;
@@ -314,19 +319,19 @@
             align-items: center;
             .p-component{
               height: 2.3rem;
-              width: 15rem;
+              width: 11rem;
             }
             .p-button-sm{
-              width: 3.4rem;
+              width: 2.7rem;
               height: 2rem;
               justify-content: center;
               margin-left: 4px;
 
             }
             .dropdown{
-              margin-left: 1.2rem;
+              margin-left: 1rem;
             .card {
-              width: 17rem;
+              width: 14rem;
               // margin-left: 1rem;
               align-items: center;
 
@@ -335,7 +340,7 @@
 
               }
               .p-button-sm{
-                width:4rem;
+                width:3rem;
                 height: 2rem;
                 justify-content: center;
                 margin-left: 4px;
@@ -344,18 +349,28 @@
             }
           }
           .input2{
-            margin-left: 1.2rem;
+            margin-left: 1rem;
             .p-component{
-              width: 13rem;
+              width: 11rem;
 
             }
           }
+          .methodDropdown{
+            margin-left: 1rem;
+            width:11rem;
+            .p-dropdown{
+              width: 11rem;
+            }
+          }
           .input3{
-            margin-left: 1.1rem;
+            margin-left: 1rem;
             .p-inputtext{
-              width:13rem ;
+              width:11rem ;
               
             }
+            .certificateIcon{
+             margin-left: 1rem;
+          }
           }
             
     
@@ -421,6 +436,44 @@
          }
        }
       }
+    }
+  }
+  .bottomBoxes{
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+    height: 74%;
+    align-items: center;
+    .combinedBox{
+      display: flex;
+      flex-direction: column;
+      height: 99%;
+      justify-content: space-between;
+      width:99%;
+    .box1{
+      .p-component{
+        height: 10rem;
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.02), 0 1px 3px 0 rgba(0,0,0,.2)
+      }
+
+    }
+    .box2{
+      .p-component{
+        height: 10rem;
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.02), 0 1px 3px 0 rgba(0,0,0,.2)
+      }
+
+    }
+  }
+    .box3{
+      padding-top: 1rem;
+      width: 100%;
+      .p-component{
+        height: 16rem;
+        width: 100%;
+        box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.02), 0 1px 3px 0 rgba(0,0,0,.2)
+      }
+
     }
   }
       
@@ -677,6 +730,9 @@
     bottom: 2rem;
     cursor: pointer;
   }
+  .disabled {
+    color: '#cccccc';
+  }
 
   .add_obj {
     position: relative;
@@ -685,10 +741,12 @@
   .add_obj_import{
     position: relative;
     right: 1rem;
+    top: 0.2rem;
   }
   .add_obj_export{
     position: relative;
     right: 1rem;
+    top: 0.3rem;
   }
 
   .imp__text {
@@ -698,8 +756,9 @@
 }
 
 .utility__block {
-  border-right: 1px solid #E2E2ED;
-  cursor: pointer;
+  border-right: 2px solid #E2E2ED;
+  cursor: not-allowed;
+  opacity: 0.4;
 
   .insprint__text {
     position: relative;
@@ -707,7 +766,7 @@
     right: 1rem;
     font-size: 16px;
     font-family: "Open sans";
-    cursor: pointer;
+    cursor: not-allowed;
     font-weight: bold;
   }
 
@@ -722,7 +781,7 @@
     padding: 0 0.8rem;
     top: 1rem;
     right: 0.65rem;
-    cursor: pointer;
+    cursor: not-allowed;
   }
   .disabled {
     // float: left;
@@ -740,7 +799,7 @@
   }
 
   .info__btn_utility {
-    cursor: pointer;
+    cursor: not-allowed;
     height: 11%;
     left: 23%;
     position: relative;
@@ -948,7 +1007,6 @@
   position: relative;
 }
 
-
 //Styles related to element properties 
 .p-dialog .p-dialog-footer {
   padding:0.5rem;
@@ -977,4 +1035,50 @@
     font-family: 'Open Sans';
     border-radius: 4px;
     cursor: pointer;
+}
+.inputtext4{
+  border-bottom: '1px solid black';
+  border-top: 'none';
+  border-left: 'none';
+  border-right: 'none';
+  width: '70%';
+  padding: 0.9rem 0rem 1rem 0rem;
+  outline: none !important;
+
+}
+.reset_button{
+  margin-top: 2rem; 
+  margin-left: 30rem;
+  display: flex;
+  justify-content: flex-end;
+  /* margin-top: 2rem; */
+  top: 0rem;
+  // left:35rem;
+}
+.submit_button{
+  margin-left: 36rem;
+  bottom: 0rem;
+
+}
+
+.centerHeader {
+  text-align: center !important;
+}
+.disabled-image {
+  opacity: 0.5; /* Adjust opacity to indicate disabled state */
+  pointer-events: none; 
+}
+.up_arrow{
+  position: relative;
+    top: 5rem;
+    right: 0.2rem;
+}
+.down_arrow{
+     position: relative;
+     left: 68.8rem;
+}
+.p-tag-value{
+  width: 34px;
+  height: 15px;
+  font-size: 10px;
 }

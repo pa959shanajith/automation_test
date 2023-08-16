@@ -25,10 +25,9 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Checkbox } from 'primereact/checkbox';
 import { Tree } from 'primereact/tree';
 // import { checkboxTemplate } from './path/to/checkboxTemplate';
-import { Tag } from 'primereact/tag';
-import { index } from "d3";
 import ZephyrContent from "./ZephyrContent";
 import AzureContent from "./AzureContent";
+import { Paginator } from 'primereact/paginator';
 
 
 
@@ -66,6 +65,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [listofScenarios, setListofScenarios] = useState([]);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const [treeData, setTreeData] = useState([]);
+    const [completeTreeData, setCompleteTreeData] = useState([]);
+    const [completeTestCaseData, setCompleteTestCaseData]= useState([]);
     const [selectedNodes, setSelectedNodes] = useState([]);
     const [viewMappedFiles, setViewMappedFiles] = useState([]);
     const [rows, setRows] = useState([]);
@@ -78,16 +79,15 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [authType,setAuthType] = useState("basic");
     const [user, setUser] = useState([]);
     const azureRef = useRef(null);
+    const zephyrRef = useRef(null);
     const [domainDetails , setDomainDetails] = useState(null);
-
-
-
-    // const [proj, setProj] = useState('');
-    // const [projCode, setProjCode] = useState('');
-    // const [projName, setProjName] = useState('');
-    // const [releaseId, setReleaseId] = useState('');
+    const [currentAvoPage, setCurrentAvoPage] = useState(1);
+    const [indexOfFirstScenario, setIndexOfFirstScenario] = useState(0);
+    const scenariosPerPage = 10;
+    const itemsPerPageJira = 10; // Number of items per page
+    const [currentPage, setCurrentPage] = useState(0);
+    const [currentJiraPage, setCurrentJiraPage] = useState(1);
     const toast = useRef();
-
     const dispatchAction = useDispatch();
 
     const handleIntegration = (value) => {
@@ -97,7 +97,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const handleSubmit = () => {
         setIsSpin(true);
-        // console.log(reduxDefaultselectedProject);
 
         switch (selectedscreen.name) {
             case 'Jira':
@@ -117,6 +116,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 break;
         }
     }
+
     /* Jira Login handler */
     const callLogin_Jira = async () => {
         const jiraurl = loginDetails.url || '';
@@ -180,6 +180,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(domainDetails);
+            zephyrRef.current.callViewMappedFiles();
             // setLoginSuccess(true);
         }
         setIsSpin(false);
@@ -263,50 +264,19 @@ const ManageIntegrations = ({ visible, onHide }) => {
         { label: 'Cloud Based Integration' },
     ];
 
-    const jiraTestCase = [
-        {
-            id: 1,
-            name: 'Test Case 1',
-            avoassure: 'AvoTestCase 1',
-        },
-        {
-            id: 2,
-            name: 'Test Case 2',
-            avoassure: 'Avo TestCase 2'
-        },
-        {
-            id: 3,
-            name: 'Test Case 3',
-            avoassure: 'Avo TestCase 3'
-        },
-    ];
+   ////pagination for  jira testcases/////////////////////////////////////////////////////////////////////////////
+   const totalPages = Math.ceil(testCaseData.length / itemsPerPageJira);
+   const startIndex = (currentJiraPage - 1) * itemsPerPageJira;
+   const endIndex = Math.min(startIndex + itemsPerPageJira, testCaseData.length);
 
-    const avoTestCase = [
-        {
-            id: 1,
-            name: 'Test Case 1',
-            jiraCase: 'Jira TestCase 1',
-        },
-        {
-            id: 2,
-            name: 'Test Case 2',
-            jiraCase: 'Jira TestCase 2'
-        },
-        {
-            id: 3,
-            name: 'Test Case 3',
-            jiraCase: 'Jira TestCase 3'
-        },
-    ];
+   const onPageChangeJira = event => {
+    setCurrentJiraPage(event.page + 1);
+};
 
+    const showLogin = () => {
+        setIsShowConfirm(true);
+    };
 
-    const IntegrationTypes = [
-        { name: 'Jira', code: 'NY' },
-        { name: 'Zephyr', code: 'RM' },
-        { name: 'Azure DevOps', code: 'LDN' },
-        { name: 'ALM', code: 'LDN' },
-        { name: 'qTest', code: 'LDN' },
-    ];
 
     const handleCloseManageIntegrations = () => {
         dispatchAction(resetIntergrationLogin());
@@ -318,11 +288,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(selectedTestCase([]));
         dispatchAction(selectedScenarioIds([]));
         setTestCaseData([]);
+        setCompleteTestCaseData([]);
         setAvoProjectsList([]);
         setAvoProjects([]);
         dispatchAction(selectedAvoproject(''));
         dispatchAction(mappedTree([]));
         setTreeData([]);
+        setCompleteTreeData([]);
         setListofScenarios([])
         setShowLoginCard(true);
         setIsSpin(false);
@@ -330,38 +302,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         onHide();
     }
 
-
-
-    const dropdownOptions = [
-        { label: 'Option 1', value: 'option1' },
-        { label: 'Option 2', value: 'option2' },
-        { label: 'Option 3', value: 'option3' },
-    ];
-
     const handleTabChange = (index) => {
         setActiveIndex(index);
-        // <div className='btn-11'>
-        //         {activeIndex === 0 &&(
-        //             <div className="btn__2">
-        //                 <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
-        //                 <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-        //             </div>)}
-    
-        //         {activeIndex === 1 &&(
-        //             <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-    
-        //     </div>
-        setFooterIntegrations(
-            <div className='btn-11'>
-                {index === 0 &&(
-                    <div className="btn__2">
-                        <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
-                        <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-                    </div>)}
-    
-                {index === 1 &&(
-                    <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-            </div>);
     };
 
     const showCard2 = () => {
@@ -435,9 +377,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
             }
 
-            let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
+            let unsyncMap = completeTreeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
             let unsyncMappedData = mappedData.filter((item) => item.scenarioId[0] !== node.key);
-            setTreeData(unsyncMap);
+            setTreeData(unsyncMap.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
+            // setTreeData(unsyncMap);
+            setCompleteTreeData(unsyncMap);
             dispatchAction(mappedTree(unsyncMap));
             dispatchAction(mappedPair(unsyncMappedData));
         }
@@ -445,18 +389,18 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const callSaveButton = async () => {
         if (mappedData && mappedData.length) {
-            const response = await api.saveJiraDetails_ICE(mappedData);
-            if (response.error) {
-                setToast("error", "Error", response.error);
-            }
-            else if (response === "unavailableLocalServer")
-                setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
-            else if (response === "scheduleModeOn")
-                setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-            else if (response === "success") {
-                callViewMappedFiles('')
-                setToast("success", "Success", 'Synced details saved successfully');
-            }
+                const response = await api.saveJiraDetails_ICE(mappedData);
+                if (response.error) {
+                    setToast("error", "Error", response.error);
+                }
+                else if (response === "unavailableLocalServer")
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+                else if (response === "scheduleModeOn")
+                    setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+                else if (response === "success") {
+                    callViewMappedFiles('')
+                    setToast("success", "Success", 'Synced details saved successfully');
+                }
         }
         else{
             setToast("info", "Info", 'Please sync atleast one map');
@@ -534,10 +478,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    const showLogin = () => {
-        setIsShowConfirm(true);
-    };
-
+    
     const acceptFunc = () => {
         setIsShowConfirm(false);
         dispatchAction(resetIntergrationLogin());
@@ -550,12 +491,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
         dispatchAction(selectedTestCase([]));
         dispatchAction(selectedScenarioIds([]));
         setTestCaseData([]);
+        setCompleteTestCaseData([]);
         setAvoProjectsList([]);
         setAvoProjects([]);
         setListofScenarios([]);
         dispatchAction(selectedAvoproject(''))
         dispatchAction(mappedTree([]));
         setTreeData([]);
+        setCompleteTreeData([]);
         setSelectedNodes([]);
     };
 
@@ -618,29 +561,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
             let filterScns = scnData.filter(el => el.project_id === reduxDefaultselectedProject.projectId)[0]['scenario_details'] || [];
             setListofScenarios(filterScns);
 
-            const dummyTestCases = [
-                {
-                    _id: 'testcase-1',
-                    name: 'Test Case 1',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-                {
-                    _id: 'testcase-2',
-                    name: 'Test Case 2',
-                },
-            ];
-
             let treeData = selectedAvoproject
                 ? filterScns.map((scenario) => ({
                     key: scenario._id,
@@ -650,8 +570,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     children: mappedTreeList
                 }))
 
-                : []
+                : [];
+            setCompleteTreeData(treeData);
+            if(treeData.length > 8) {
+                const indexOfLastScenario = currentAvoPage * scenariosPerPage;
+                setIndexOfFirstScenario(indexOfLastScenario - scenariosPerPage);
+                // const currentScenarios = listofScenarios.slice(indexOfLastScenario - scenariosPerPage, indexOfLastScenario);
+                setTreeData(treeData.slice(indexOfLastScenario - scenariosPerPage, indexOfLastScenario));
+            }
+            else{
             setTreeData(treeData);
+            }
         }
     }
     const handleClick = (isChecked, value, id, summary) => {
@@ -679,7 +608,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    const handleSync = () => {
+    function handleSync() {
         let popupMsg = false;
         let filterProject = projectDetails.filter(el => el.value === currentProject)[0];
         let releaseId = issueTypes.filter(el => el.value === currentIssue)[0]['label'];
@@ -710,7 +639,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             dispatchAction(mappedPair(mappedPairObj));
             const filterTestCase = testCaseData.filter((testCase) => testCase.id == selectedId).map(el => ({ key: el.id, label: el.summary, data: { type: 'testcase' } }))
             // checking the current map obj is already present with any other scenario
-            const findDuplicate = treeData.map((parent, index) => {
+            const findDuplicate = completeTreeData.map((parent, index) => {
                 const duplicateChildIndex = parent.children.findIndex(
                     (child) => child.key === selectedId
                 );
@@ -723,14 +652,15 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 }
             });
             let updatedTreeData = findDuplicate.map((scenario) => scenario.key == selectedScIds[0] ? { ...scenario, checked: true, children: filterTestCase } : scenario)
-            setTreeData(updatedTreeData);
+            setTreeData(updatedTreeData.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
+            // setTreeData(updatedTreeData);
+            setCompleteTreeData(updatedTreeData);
             dispatchAction(mappedTree(updatedTreeData));
             const updateCheckbox = testCaseData.map((item) => ({ ...item, checked: false }));
             setTestCaseData(updateCheckbox);
             dispatchAction(syncedTestCases(selected));
             setSelectedNodes([]);
             dispatchAction(selectedScenarioIds([]));
-
         }
         setDisabled(false);
     }
@@ -745,44 +675,39 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
-    // const logoutTab = {
-    //     label: '',
-    //     content: null,
-    //     template: (
-    //       <Button label={selectedscreen.name && `${selectedscreen.name} Logout`} onClick={showLogin} className="logout__btn" />
-    //     ),
-    //   };
-
-    //   if (!showLoginCard) {
-    //     integrationItems.push(logoutTab);
-    //   }
-
     const callAzureSaveButton = () => {
         if(azureRef.current){
             azureRef.current.callSaveButton();
         }
     }
 
-    // const footerIntegrations = ()=>{
-    //     <div className='btn-11'>
-    //         {activeIndex === 0 &&(
-    //             <div className="btn__2">
-    //                 <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
-    //                 <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-    //             </div>)}
+    const callZephyrSaveButton = () => {
+        if(zephyrRef.current){
+            zephyrRef.current.callSaveButton();
+        }
+    }
 
-    //         {activeIndex === 1 &&(
-    //             <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-
-    //     </div>
-    // }
-    const [footerIntegrations, setFooterIntegrations] = useState(
-        <div className='btn-11'>
+    const footerIntegrations = useCallback(()=>{
+        return (<div className='btn-11'>
+            {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === ' Jira' ? callSaveButton:callAzureSaveButton} />
+                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
                     <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-                </div>
-        </div>);
+                </div>)}
+
+            {activeIndex === 1 &&(
+                <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
+
+        </div>)
+    },[activeIndex,selectedscreen.name,mappedData])
+
+
+    const onPageAvoChange = (event) => {
+        setCurrentAvoPage(event.page + 1);
+        const indexOfLastScenario = (event.page + 1) * scenariosPerPage;
+        setIndexOfFirstScenario(indexOfLastScenario - scenariosPerPage);
+        setTreeData(completeTreeData.slice(indexOfLastScenario - scenariosPerPage, indexOfLastScenario));
+      };
 
     const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} handleIntegration={handleIntegration}
      setShowLoginCard={setShowLoginCard} setAuthType={setAuthType} authType={authType} />, [isSpin, showCard2,
@@ -793,7 +718,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     return (
         <>
             <div className="card flex justify-content-center">
-                <Dialog className="manage_integrations" header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations : ""}>
+                <Dialog className="manage_integrations" header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations() : ""}>
                     <div className="card">
                         {showLoginCard ? <TabMenu model={integrationItems} /> : ""}
                     </div>
@@ -816,7 +741,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <div className="dropdown_div">
                                                                 <div className="dropdown-map1">
                                                                     <span>Select Jira Project <span style={{ color: 'red' }}>*</span></span>
-                                                                    <span className="release_span"> Select Jira workItems<span style={{ color: 'red' }}>*</span></span>
+                                                                    <span className="release_span"> Select Jira Work items<span style={{ color: 'red' }}>*</span></span>
                                                                 </div>
                                                                 <div className="dropdown-map2">
                                                                     <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={currentProject} className="dropdown_project" options={projectDetails} onChange={(e) => onProjectChange(e)} placeholder="Select Project" />
@@ -826,8 +751,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <div className="testcase__data">
                                                                 {
                                                                     testCaseData && testCaseData.length ?
-                                                                        testCaseData.map((data, i) => (
-                                                                            <div className={"test_tree_leaves" + (selected === data.code ? " test__selectedTC" : "")}>
+                                                                      testCaseData.slice(startIndex, endIndex).map((data, i) => (
+                                                                            <div key ={i} className={"test_tree_leaves" + (selected === data.code ? " test__selectedTC" : "")}>
                                                                                 {/* onClick={() => handleClick(data.code, data.id, data.summary)} */}
                                                                                 <label className="test__leaf" title={data.code} >
                                                                                     <Checkbox onChange={e => { testcaseCheck(e, i); handleClick(e.checked, data.code, data.id, data.summary) }} checked={data.checked} />
@@ -837,15 +762,28 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                             </div>
                                                                         ))
                                                                         :
-                                                                        enableBounce &&
+                                                                        enableBounce &&(
                                                                         <div className="bouncing-loader">
                                                                             <div></div>
                                                                             <div></div>
                                                                             <div></div>
                                                                         </div>
 
-                                                                }
-                                                            </div>
+                                                                        )}
+                                                     {testCaseData && testCaseData.length > itemsPerPageJira && (
+                                                            <div className="jira__paginator">
+                                                                <Paginator
+                                                                    first={startIndex}
+                                                                    rows={itemsPerPageJira}
+                                                                    totalRecords={testCaseData.length}
+                                                                    onPageChange={onPageChangeJira}
+                                                                    pageLinkSize={3}
+                                                            
+                                                                />
+                                                                </div>
+                                                           
+                                                     )}
+                                                      </div>
                                                         </Card>
                                                     </div>
                                                     <div>
@@ -853,22 +791,35 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                             <Card className="mapping_data_card2">
                                                                 <div className="dropdown_div">
                                                                     <div className="dropdown-map">
-                                                                        <span>Selected Avo Assure Project <span style={{ color: 'red' }}>*</span></span>
+                                                                        <span>Project <span style={{ color: 'red' }}>*</span></span>
                                                                     </div>
                                                                     <div className="dropdown-map">
                                                                         {/* <Dropdown options={avoProjects} style={{ width: '11rem', height: '2.5rem' }} value={selectedAvo} onChange={(e) => onAvoProjectChange(e)} className="dropdown_project" placeholder="Select Project" /> */}
                                                                         <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
                                                                     </div>
-
+                                                                    
+                                                                  <div>
+                                                                  {/* {currentScenarios.map((scenario) => ( */}
                                                                     <div className="avotest__data">
                                                                         <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
                                                                     </div>
+                                                                  {/* ))} */}
+                                                                    <div className="testcase__AVO__jira__paginator">
+
+                                                                            <Paginator
+                                                                                first={indexOfFirstScenario}
+                                                                                rows={scenariosPerPage}
+                                                                                totalRecords={listofScenarios.length}
+                                                                                onPageChange={onPageAvoChange}
+                                                                            />
+                                                                    </div>
+                                                        </div>
                                                                 </div>
                                                             </Card>
                                                         </div>
                                                     </div>
                                                     <span>
-                                                        <Button className="map__btn" label="Map" size="small" onClick={handleSync}/>
+                                                        <Button className="map__btn" label="Map" size="small" onClick={()=>handleSync()}/>
                                                     </span>
                                                 </div>
 
@@ -912,7 +863,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={setFooterIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

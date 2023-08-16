@@ -49,16 +49,21 @@ const IceProvisionForm = (props) => {
 			setIcenameErrBorder(true);
 			return false;
 		}
-		if (icetype === "normal" && (!props.userid || props.userid.trim() === "")) {
+		if (icetype === "normal" && (!props.userid[1] || props.userid[1].trim() === "")) {
 			setSelAssignUser2ErrBorder(true);
 			return false;
 		}
 
 		var tokeninfo = {
-			userid: props.userid,
+			userid: props.userid[1],
 			icename: props.icename.trim(),
 			icetype: icetype,
-			action: "provision"
+			action: "provision",
+			email:props.userid[6],
+			username:props.userid[0],
+			firstName: props.userid[4],
+			lastName: props.userid[5],
+			url:new URL(window.location.href).origin,
 		};
 		setLoading("Provisioning Token...");
 		const data = await provisions(tokeninfo);
@@ -71,7 +76,7 @@ const IceProvisionForm = (props) => {
 			props.setTokeninfoToken(data);
 			props.setToken(data);
 			// props.setRefreshIceList(!props.refreshIceList);
-			props.toastSuccess(Messages.CUSTOM("Token generated Successfully for ICE '" + props.icename + "'!!  Copy or Download the token", VARIANT.SUCCESS));
+			props.toastSuccess(Messages.CUSTOM("Token generated Successfully for Avo Assure Client- '" + props.icename + "'.  Copy or Download the token", VARIANT.SUCCESS));
 		}
 	}
 

@@ -6,13 +6,14 @@ import { Button } from 'primereact/button';
 import '../styles/CaptureScreen.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
 import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
-import { RedirectPage, ScreenOverlay } from '../../global';
+import { RedirectPage, ScreenOverlay,ResetSession,setMsg } from '../../global';
 import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
@@ -22,18 +23,14 @@ import { Toast } from 'primereact/toast';
 import { InputText } from "primereact/inputtext";
 import { Tooltip } from 'primereact/tooltip';
 import AvoModal from "../../../globalComponents/AvoModal";
-import { InputSwitch } from "primereact/inputswitch";
 import { RadioButton } from 'primereact/radiobutton';
 // import LaunchApplication from '../components/LaunchApplication';
 import "../styles/LaunchApplication.scss";
 import {getDeviceSerialNumber_ICE} from "../api";
 import { treemapSquarify } from 'd3';
-
 import { TabMenu } from 'primereact/tabmenu';
-        
+import WebserviceScrape from './WebServiceCapture';
 
-import { TreeSelect } from 'primereact/treeselect';
-        
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -64,6 +61,7 @@ const CaptureModal = (props) => {
   const [mainScrapedData, setMainScrapedData] = useState({});
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
   const [captureData, setCaptureData] = useState([]);
+  const certificateInfo = useSelector(state=>state.design.cert);
   const [screenshotData, setScreenshotData] = useState([]);
   const [endScrape, setEndScrape] = useState(false)
   const [showObjModal, setShowObjModal] = useState(false);
@@ -107,11 +105,15 @@ const CaptureModal = (props) => {
   const imageRef2 = useRef(null);
   const imageRef3 = useRef(null);
   const imageRef4 = useRef(null);
-
+const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [showEmptyMessage, setShowEmptyMessage] = useState(true);
   let addMore = useRef(false);
+
 
   useEffect(() => {
     fetchScrapeData()
@@ -209,7 +211,23 @@ const CaptureModal = (props) => {
   const handleBrowserClose = () => {
     setVisible(false);
   }
+  const textline4= {
+    borderBottom: '1px solid black',
+              borderTop: 'none',
+              borderLeft: 'none',
+              borderRight: 'none',
+              width: '70%',
+              padding: '0.9rem 0rem 1rem 0rem',
+              outline: 'none !important',
+  };
 
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleReset = () => {
+    setInputValue('');
+  };
 
   const parentScreen = props.fetchingDetails["parent"]["children"];
   useEffect(() => {
@@ -303,17 +321,17 @@ const CaptureModal = (props) => {
   };
 
   const toastError = (erroMessage) => {
-    if (erroMessage.CONTENT) {
+    if (erroMessage && erroMessage.CONTENT) {
       toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: JSON.stringify(erroMessage), life: 5000 });
   }
 
   const toastSuccess = (successMessage) => {
-    if (successMessage.CONTENT) {
+    if (successMessage && successMessage.CONTENT) {
       toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -469,13 +487,13 @@ const elementTypeProp =(elementProperty) =>{
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
-      scrapeApi.getScrapeDataScreenLevel_ICE("web", parentData.id, parentData.projectId, "")
+      scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, parentData.id, parentData.projectId, "")
         .then(data => {
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
 
           if (data === "Invalid Session") return RedirectPage(history);
-          else if (typeof data === "object" && props.appType !== "Webservice") {
+          else if (typeof data === "object" && typesOfAppType !== "WebService") {
             haveItems = data.view.length !== 0;
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
             newlyScrapeList = newScrapeList
@@ -498,24 +516,24 @@ const elementTypeProp =(elementProperty) =>{
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
           }
-          else if (typeof data === "object" && props.appType === "Webservice") {
-            haveItems = data.endPointURL && data.method;
+          else if (typeof data === "object" && typesOfAppType === "WebService") {
+            haveItems = data.view[0].endPointURL && data.view[0].method;
             if (haveItems) {
 
               let localReqBody = "";
-              if (data.body) localReqBody = getProcessedBody(data.body, 'fetch');
+              if (data.view[0].body) localReqBody = getProcessedBody(data.view[0].body, 'fetch');
 
               let localRespBody = "";
-              if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
+              if (data.view[0].responseBody) localRespBody = getProcessedBody(data.view[0].responseBody, 'fetch');
 
               dispatch(WsData({
-                endPointURL: data.endPointURL,
-                method: data.method,
-                opInput: data.operations || "",
-                reqHeader: data.header ? data.header.split("##").join("\n") : "",
+                endPointURL: data.view[0].endPointURL,
+                method: data.view[0].method,
+                opInput: data.view[0].operations || "",
+                reqHeader: data.view[0].header ? data.view[0].header.split("##").join("\n") : "",
                 reqBody: localReqBody,
-                paramHeader: data.param ? data.param.split("##").join("\n") : "",
-                respHeader: data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
+                paramHeader: data.view[0].param ? data.view[0].param.split("##").join("\n") : "",
+                respHeader: data.view[0].responseHeader ? data.view[0].responseHeader.split("##").join("\n") : "",
                 respBody: localRespBody
               }));
               setSaved({ flag: true });
@@ -546,7 +564,8 @@ const elementTypeProp =(elementProperty) =>{
               {
                 selectall: item.custname,
                 objectProperty: elementTypeProp(item.tag),
-                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
+                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={(event) => {
+                  setScreenshotY(event.clientY);
                   setScreenshotData({
                     header: item.custname,
                     imageUrl: data.mirror || "",
@@ -677,7 +696,7 @@ const elementTypeProp =(elementProperty) =>{
                 </div>,
                 footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
               })
-              : toastSuccess("Scraped Elements saved successfully.");
+              : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
           } else { console.error(resp); addMore.current = true; }
@@ -687,6 +706,71 @@ const elementTypeProp =(elementProperty) =>{
   }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
+    if (typesOfAppType === "WebService") {
+      let arg = {}
+      let testCaseWS = []
+      let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+      let wsdlInputs = [ 
+          endPointURL, method, opInput, getFormattedValue(reqHeader), 
+          getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
+      ];
+      if (Object.keys(certificateInfo).length)
+          wsdlInputs.push(...[certificateInfo.certsDetails+";", certificateInfo.authDetails]);
+
+      if (endPointURL.indexOf('https')===0) 
+          arg.res = certificateInfo;
+
+      let [ error, auth, proceed ] = validateWebserviceInputs(wsdlInputs);
+
+      if (error) dispatch(actionError(error));
+
+      if (proceed) {
+          dispatch(actionError([]));
+          if (auth)
+              keywordVal.push(...["addClientCertificate","setBasicAuth"])
+
+          if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
+          else wsdlInputs.splice(4, 1);
+
+          setOverlay("Fetching Response Header & Body...");
+          ResetSession.start();
+          for (let i = 0; i < wsdlInputs.length; i++) {
+              if (wsdlInputs[i] !== "") {
+                  testCaseWS.push(getWSTestCase(i, typesOfAppType, wsdlInputs[i], keywordVal[i]));
+              }
+          }
+          testCaseWS.push(getWSTestCase(testCaseWS.length, typesOfAppType, "", "executeRequest"));
+          arg.testcasename = "";
+          arg.apptype = "Webservice";
+          arg.testcase = testCaseWS;
+          scrapeApi.initScrapeWS_ICE(arg)
+          .then(data => {
+              setOverlay("");
+              ResetSession.end();
+              if (data === "Invalid Session") {
+                  return RedirectPage(history);
+              } else if (data === "unavailableLocalServer") {
+                  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+              } else if (data === "scheduleModeOn") {
+                  setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+              } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
+                  setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
+              } else if (typeof data === "object") {
+                  setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                  dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
+                  let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
+                  dispatch(WsData({respBody: localRespBody}));
+              } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
+          })
+          .catch(error => {
+              setOverlay("");
+              ResetSession.end();
+              console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
+              setMsg(MSG.SCRAPE.ERR_OPERATION);
+          });
+      }
+  } 
+  else{
     let screenViewObject = {};
     let blockMsg = 'Capturing in progress. Please Wait...';
     if (compareFlag) {
@@ -764,6 +848,7 @@ const elementTypeProp =(elementProperty) =>{
                         handleDialog("replaceObjectPhase2");
                     } else {
                         // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                        toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
                     }
           
        }
@@ -838,6 +923,7 @@ else{
         toastError(MSG.SCRAPE.ERR_SCRAPE);
         console.error("Fail to Load design_ICE. Cause:", error);
       });
+    }
 
   }
 
@@ -934,7 +1020,13 @@ else{
 
   const footerCapture = (
     <div className='footer__capture'>
-      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>
+      {visible === 'capture' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>}
+      {visible === 'replace' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</button>}
+    </div>
+  )
+  const footerCompare = (
+    <div className='footer__capture'>
+      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName,'compare'); }}>Compare</button>
       
     </div>
   )
@@ -954,14 +1046,13 @@ else{
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
-        {/* <img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
         {captureData.length > 0 ? <div className='Header__btn'>
-          <button className='btn_panel' onClick={togglePanel}>Action Panel</button>
           <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }} >Add more</button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
-        </div> : <button className='btn_panel__single' onClick={togglePanel}>Action Panel</button>}
+        </div> : null
+        }
       </div>
     </>
   );
@@ -1032,7 +1123,7 @@ const footerSave = (
       else if (activeEye) setActiveEye(false);
       setHighlight(true);
     })
-    let objVal = selectedCapturedElement[0].objectDetails;
+    let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
     dispatch(objValue(objVal));
     setHighlight(true);
   }
@@ -1129,7 +1220,7 @@ const footerSave = (
         }
         // highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
       } else setHighlight(false);
-      if (!ScrapedObject.xpath.startsWith('iris')) {
+      if (ScrapedObject.xpath && !ScrapedObject.xpath.startsWith('iris')) {
         scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
           .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
@@ -1143,7 +1234,10 @@ const footerSave = (
   }, [objValues])
 
 
-
+  const handleDataTableContentChange = (newData) => {
+    setShowEmptyMessage(newData.length === 0);
+    setCaptureData(newData); // Assuming setCaptureData is the function to update DataTable content
+  };
 
   const headerScreenshot = (
     <>
@@ -1219,6 +1313,7 @@ const footerSave = (
       objects.screenshots = '';
       objects.actions = '';
       objects.objectDetails = {};
+      objects.isCustom=true
       addElementData.push(objects)
     })
     setCaptureData([...captureData, ...addElementData])
@@ -1279,7 +1374,7 @@ const footerSave = (
     <div>
       <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div>
       <Button label="Cancel" onClick={() => { setElementProperties(false) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
-      <Button label="Save" onClick={saveElementProperties} autoFocus style={{ borderRadius: '20px', height: '2.2rem' }} />
+      <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} />
     </div>
   )
   const onCellEditCompleteElementProperties = (e) => {
@@ -1367,7 +1462,6 @@ const footerSave = (
     }
     scrapeApi.updateScreen_ICE(params)
       .then(response => {
-        console.log(response)
         if (response == "Success") {
           setIdentifierModiefied(true)
           setShowIdentifierOrder(false)
@@ -1379,18 +1473,24 @@ const footerSave = (
       .catch(error => {
         console.log(error)
         setShowIdentifierOrder(false)
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Some Error occured while saving identifier list.', life: 5000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Some Error occured while saving identifier list.', life: 5000 });
         setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
       }
       )
 
   }
+  // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
+     
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+      NameOfAppType = JSON.parse(localStorageDefaultProject);
+  }
+
+
      const isWebApp = NameOfAppType.appType === "Web";
      const typesOfAppType = NameOfAppType.appType;
-     console.log("typesOfAppType",typesOfAppType)
      const onLaunchBtn =()=>{
       setVisibleOtherApp(false)
-      console.log("NameOfAppType",NameOfAppType)
      }
      const items = [
       {label: 'Requests'},
@@ -1398,23 +1498,52 @@ const footerSave = (
       {label: 'Response'},
   ];
 
-     // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
-     
-     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-     if (localStorageDefaultProject) {
-         NameOfAppType = JSON.parse(localStorageDefaultProject);
+     const renderElement=(rowdata, column)=>{
+      return (
+        <>
+        <div style={{display:'flex',justifyContent:'space-between'}}>
+        <div >{rowdata.selectall}</div>
+        {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
+        {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+        {/* <Tooltip target={`#${column.field}-${rowdata.id}`} position="top">
+        {rowdata.selectall}
+        </Tooltip> */}
+      </div>
+      </>
+      )
      }
+
+     const APPtype_name = {
+      width: '45.5rem',
+      marginTop:'2rem'
+    };
+    const certificate_password={
+      width:"45.5rem",
+      marginTop:"2rem"
+    }
+    const AuthUser={
+      width: "45.4rem",
+      marginTop: "2rem"
+    }
+const AuthPassword={
+  width: "45.4rem",
+  marginTop: "2rem"
+}
+const headerstyle={
+ textAlign: "center !important",
+}
+
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
-      <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "WebService" ? null : footerSave}>
-        {showPanel && (<div className="card_modal">
+       <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
-              <div   className='insprint__block'>
+            {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
                 <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
@@ -1423,9 +1552,9 @@ const footerSave = (
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
-                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element'></img>
-                  {isWebApp &&<Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
+                <span className={`insprint_auto ${!isWebApp || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && handleDialog('mapObject')}>
+                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
+                  {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
                   <p>Map Element</p>
                 </span>
@@ -1438,17 +1567,18 @@ const footerSave = (
                   <a>Learn More</a>
                 </div>)
                 } */}
-              </div>
-              <div className='upgrade__block'>
+              </div>}
+
+              {showPanel && <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
-                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={() =>isWebApp && setVisible("compare")}>
+                <span className={`upgrade_auto ${!isWebApp || captureData.length === 0? "disabled" : ""}`}  onClick={() =>captureData.length > 0 && isWebApp && setVisible("compare")}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
                   {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
-                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && setVisible('replace')}>
+                <span className={`upgrade_auto ${!isWebApp  || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && setVisible('replace')}>
                   <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
                   {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
@@ -1458,26 +1588,28 @@ const footerSave = (
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a href='docs.avoautomation.com'>Learn More</a>
                 </div>)} */}
-              </div>
-              <div className='utility__block'>
-                <p className='insprint__text'>Capture from PDF</p>
+              </div>}
+
+               {showPanel && <div className='utility__block'>
+                <p className='insprint__text text-500'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_utility" position="bottom" content="  Capture the elements from a PDF." />
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} >
+                <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
+                <span className="insprint_auto">
                   <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
-                  <p>PDF Utility</p>
+                  <p className='text-600'>PDF Utility</p>
                 </span>
                 {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>Capture from PDF</h3>
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
                 </div>)} */}
-              </div>
-              <div className='createManual__block'>
+              </div>}
+
+              {showPanel && <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
-                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={() => isWebApp &&  handleDialog('createObject')}>
+                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={() =>captureData.length > 0 &&  isWebApp &&  handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
@@ -1486,82 +1618,47 @@ const footerSave = (
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a>Learn More</a>
                 </div>)} */}
-              </div>
-              <div className='imp_exp__block'>
+              </div>}
+
+              {showPanel && <div className='imp_exp__block'>
                 <span className='insprint_auto'>
                   <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                    <img className='add_obj_import' src="static/imgs/ic-import.png"  />
+                    <img className=' pi-file-import add_obj_import' src="static/imgs/Import_new_icon_grey.svg"  />
+                    {/* <i className="pi pi-file-import add_obj_import "  ></i> */}
                     <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
                     <p className='imp__text'>Import Screen</p>
                   </span>
-                  <span className='export__block' onClick={() => setShowObjModal("exportModal")}>
-                    <img className='add_obj_export' src="static/imgs/ic-export.png"  />
+                  <span className="export__block" style={captureData.length === 0 ? { color: "#cccccc" }: {}} onClick={() => captureData.length !== 0 && setShowObjModal("exportModal")}>
+                    <img  className={` add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} src="static/imgs/Export_new_icon_grey.svg" style={captureData.length === 0 ? { color: "#cccccc" }: {}} />
+                    {/* <i className={`pi pi-file-export add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} style={captureData.length === 0 ? { color: "#cccccc" }: {}}  ></i> */}
                     <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
                     <p className='imp__text'>Export Screen</p>
 
                   </span>
                 </span>
-              </div>
-            </div>
-          </Card>
-        </div>)}
-
-        <div style={{display:typesOfAppType === "WebService"? "": "none"}} className='WebServiceApptypeContent'>
-          <div className='inputCard'>
-          <Card>
-            <div className='mainContentCard'>
-              <div className='firstRow' >
-                {/* <h4>WSDL :</h4> */}
-                <InputText placeholder='Enter WSDL URL' /><Button size="small" >Go</Button>
-                <div className='dropdown'>
-                  <div className="card flex justify-content-center">
-                    <TreeSelect
-                      // value={selectedNodeKey} onChange={(e) => setSelectedNodeKey(e.value)} options={nodes}
-                      className="md:w-20rem w-full" placeholder="Select Operation">
-                    </TreeSelect>
-                    <Button size="small" >Add</Button>
-                  </div>
+              </div>}
+                <div style={{ display: 'flex'}}>
+                  <span onClick={togglePanel} style={{ cursor: 'pointer' }}>
+                  <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
+                    <i className={showPanel ? 'pi pi-chevron-circle-up up_arrow icon-tooltip' : 'pi pi-chevron-circle-down down_arrow icon-tooltip'} style={{ fontSize: '1rem'}}></i>
+                  </span>
                 </div>
-                <div className='input2' ><InputText placeholder='Enter URL or paste text' /></div>
-                <div className='input3' ><InputText placeholder='Operation' /></div>
-                <img className='' src='static/imgs/certificateOfWebServiceApptype.svg' />
-              </div>
-              {/* <div className='secondRow'>
-                
-              </div> */}
             </div>
-          </Card>
-          </div>
-          <div className='tabMenuCard'>
-          <Card>
-            <div className="card">
-              <div className='tabMenu'>
-                <TabMenu model={items} />
-              </div>
-              <div className='buttons'>
-              <div className='saveBut'>
-                <img src="static/imgs/edit-icon.png" />
-                <Button>Save</Button>
-              </div>
-              <div className='cancelBut'>
-                <Button label="Cancel" outlined />
-              </div>
-              </div>
 
-            </div>
           </Card>
-          </div>
         </div>
 
-        <div style={{display: typesOfAppType === "WebService"? "none" :""}}  className="card-table">
 
+
+        <div className="card-table">
+          {typesOfAppType === "WebService" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
             editMode="cell"
             className='datatable__col'
             value={captureData}
             dragHandleIcon="pi pi-bars"
-            rowReorder resizableColumns
+            resizableColumns
             reorderableRows
             onRowReorder={handleRowReorder}
             showGridlines
@@ -1570,107 +1667,44 @@ const footerSave = (
             onSelectionChange={onRowClick}
             tableStyle={{ minWidth: '50rem' }}
             headerCheckboxToggleAllDisabled={false}
-            emptyMessage={emptyMessage}
+            emptyMessage={showEmptyMessage ? emptyMessage : null} 
             scrollable 
             scrollHeight="400px"
+            columnResizeMode="expand"
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-            <Column field="selectall" header="Element Name"
+            <Column field="selectall" header="Element Name" headerStyle={{ textAlign: 'center' }} 
               editor={(options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
+              body={renderElement}
             >
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type"></Column>
             <Column field="screenshots" header="Screenshot"></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} />
           </DataTable>
-          <Dialog className="ref_pop screenshot_pop" header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right" }}>
-            <div className="screenshot_pop__content" >
-              {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-              <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+              }
+          <Dialog header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `94vh`, position:"right" }}>
+            <div className="ref_pop screenshot_pop">
+              <div className="screenshot_pop__content" >
+                {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
+                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+              </div>
             </div>
           </Dialog>
         </div>
       </Dialog>
-      {/* {typesOfAppType === "MobileWeb"? <AvoModal
-          visible={visibleOtherApp}
-          setVisible={setVisibleOtherApp}
-          onModalBtnClick={onLaunchBtn}
-          headerTxt="Mobile Web"
-          footerType="Launch"
-          modalSytle={{ width: "36vw", height: "34vh", background: "#FFFFFF" }}
-        content={<div className='inputContent'><span className="p-input">
-          <InputText placeholder="Android Device Serial Number / iOS Device Name" />
-         </span>
-         <span className="p-input">
-            <InputText placeholder="Android / iOS Version; UUID(for iOS device only)" />
-          </span></div>}
-         customClass="MobileWeb"
-        />: null} */}
 
          {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         
 
         {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
-        {/* {typesOfAppType === "Desktop"? <AvoModal
-          visible={visibleOtherApp}
-          setVisible={setVisibleOtherApp}
-          onModalBtnClick={onLaunchBtn}
-          headerTxt="Desktop"
-          footerType="Launch"
-          modalSytle={{ width: "32vw", height: "40vh", background: "#FFFFFF" }}
-          content={
-               <div className='allContent'>
-                 <div className="flex flex-wrap gap-3">
-                   <h4>Object Identification :</h4>
-                   <div className="flex align-items-center">
-                     <RadioButton inputId="ingredient1" name="pizza" value="Cheese"   />
-                     <label htmlFor="ingredient1" className="ml-2">Cheese</label>
-                   </div>
-                   <div className="flex align-items-center">
-                     <RadioButton inputId="ingredient2" name="pizza" value="Mushroom"   />
-                     <label htmlFor="ingredient2" className="ml-2">Mushroom</label>
-                   </div>
-                 </div>
-                 <div className='inputContent'>
-                   <span className="p-input">
-                     <InputText placeholder="Enter Window Name" />
-                   </span>
-                   <span className="p-input">
-                     <InputText placeholder="Enter Process ID" />
-                   </span>
-                 </div>
-               </div>}
-         customClass="Desktop"
-        />: null} */}
-        {typesOfAppType === "WebService"? <AvoModal
-          visible={visibleOtherApp}
-          setVisible={setVisibleOtherApp}
-          onModalBtnClick={onLaunchBtn}
-          headerTxt="WebService"
-          footerType="Launch"
-          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
-         content = {"hello"}
-         customClass="WebService"
-        />: null}
-        {/* {typesOfAppType === "SAP"? <AvoModal
-          visible={visibleOtherApp}
-          setVisible={setVisibleOtherApp}
-          onModalBtnClick={onLaunchBtn}
-          headerTxt="SAP"
-          footerType="Launch"
-          modalSytle={{ width: "35vw", height: "29vh", background: "#FFFFFF" }}
-          content={<span className="p-input">
-                 <InputText placeholder="Enter the .exe path; App Name" />
-                   </span>}
-         customClass="SAP"
-        />: null} */}
         {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {/* {typesOfAppType === "OEBS"? <AvoModal
           visible={visibleOtherApp}
@@ -1695,44 +1729,6 @@ const footerSave = (
          content = {"hello"}
          customClass="Mainframes"
         />: null}
-        {/* {typesOfAppType === "MobileApps"? <AvoModal
-          visible={visibleOtherApp}
-          setVisible={setVisibleOtherApp}
-          onModalBtnClick={onLaunchBtn}
-          headerTxt="MobileApps"
-          footerType="Launch"
-          modalSytle={{  width:"33vw", height:checked? "43vh": "51vh", background: "#FFFFFF" }}
-        content={<div className='inputContent'>
-          <div className="card flex justify-content-center gap-3">
-            <h4>iOS</h4>
-            <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-            <h4>Android</h4>
-          </div>
-          {checked?
-          <div className='AndroidContent'>
-            <span className="p-input">
-              <InputText placeholder="Enter Application Path" />
-            </span>
-            <span className="p-input">
-              <InputText placeholder="Enter Mobile Serial Number" />
-            </span></div>
-            :
-          <div className='iOSContent'>
-            <span className="p-input">
-              <InputText placeholder="Enter Application Path" />
-            </span>
-            <span className="p-input">
-              <InputText placeholder="Enter Version Number" />
-            </span>
-            <span className="p-input">
-              <InputText placeholder="Enter Device Name" />
-            </span>
-            <span className="p-input">
-              <InputText placeholder="Enter UUID" />
-            </span></div>}
-        </div>}
-         customClass="MobileWeb"
-        />: null} */}
         {typesOfAppType === "MobileApps"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "System_application"? <AvoModal
           visible={visibleOtherApp}
@@ -1744,7 +1740,7 @@ const footerSave = (
          content = {"hello"}
          customClass="MobileWeb"
         />: null}
-      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={footerCapture}>
+      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible==='compare'?footerCompare:footerCapture}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1767,7 +1763,7 @@ const footerSave = (
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
         
-      <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Capture Object:Sign up screen 1" style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1779,7 +1775,7 @@ const footerSave = (
             <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
           </span>
         </div>
-      </Dialog>
+      </Dialog> : null}
 
       {currentDialog === 'addObject' && <ActionPanel
         isOpen={currentDialog}
@@ -1787,6 +1783,7 @@ const footerSave = (
         addCustomElement={addedCustomElement}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        elementTypeProp ={elementTypeProp}
       />}
 
       {currentDialog === 'mapObject' && <ActionPanel
@@ -1798,6 +1795,7 @@ const footerSave = (
         setShow={setCurrentDialog}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        elementTypeProp ={elementTypeProp}
       />}
 
       {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
@@ -1832,7 +1830,7 @@ const footerSave = (
       />}
 
       {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
-       isOpen={currentDialog} 
+       isOpen={'compareObject'} 
        OnClose={handleClose} 
       startScrape={startScrape} 
       mainScrapedData={mainScrapedData} 
@@ -1840,24 +1838,22 @@ const footerSave = (
       orderList={orderList}/>}
 
 
-      
-      {/* {currentDialog === 'importModal' && <ImportModal isOpen={currentDialog} OnClose={handleClose} fetchingDetails={props.fetchingDetails} fetchScrapeData={fetchScrapeData} />} */}
       {showObjModal === "importModal" && <ImportModal
         fetchScrapeData={fetchScrapeData}
         setOverlay={setOverlay}
         show={showObjModal}
         setShow={setShowObjModal}
-        appType="Web"
+        appType={typesOfAppType}
         fetchingDetails={props.fetchingDetails}
         toastSuccess={toastSuccess}
         toastError={toastError}
       />}
-
-      {showObjModal === "exportModal" && <ExportModal appType="Web" fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError}/>}
+      {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
       {/* //Element properties  */}
+
       <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
         <div className="card">
-          <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
+        <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
             <Column rowReorder style={{ width: '3rem' }} />
             <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
             {/* <column ></column> */}
@@ -2038,6 +2034,39 @@ function getProcessedBody(body, type) {
 
   return processedBody;
 }
+
+function getFormattedValue (value, extraspace) {
+  if (extraspace) return value.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+  return value.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+}
+function validateWebserviceInputs (wsdlInputs) {
+  let error = false;
+  let auth = false;
+  let proceed = false;
+
+  if (!wsdlInputs[0]) error = ["endPointURL"];
+  else if (wsdlInputs[1]==="0") error = ["method"];
+  else if (wsdlInputs[6]){
+      auth = true;
+      proceed = true;
+  }
+  else {
+      if (wsdlInputs[1] === "POST") {
+          if (!wsdlInputs[3]) error = ["reqHeader"];
+          else if (!wsdlInputs[5]) error = ["reqBody"];
+          else proceed = true;
+      } else proceed = true;
+  }
+
+  return [error, auth, proceed];
+}
+function getWSTestCase (stepNo, appType, input, keyword) {
+  return {
+      "stepNo": stepNo + 1, "appType": appType, "objectName": "", "inputVal": [input],
+      "keywordVal": keyword, "outputVal": "", "url": "", "custname": "", "remarks": [""],
+      "addTestCaseDetails": "", "addTestCaseDetailsInfo": ""
+  }
+}
 function getCompareScrapeItem(scrapeObject) {
   return {
       ObjId: scrapeObject._id,
@@ -2123,47 +2152,6 @@ const LaunchApplication = props => {
     }
 
     const desktopApp = {
-      // content={
-      //   <div className='allContent'>
-      //     <div className="flex flex-wrap gap-3">
-      //       <h4>Object Identification :</h4>
-      //       <div className="flex align-items-center">
-      //         <RadioButton inputId="ingredient1" name="pizza" value="Cheese"   />
-      //         <label htmlFor="ingredient1" className="ml-2">Cheese</label>
-      //       </div>
-      //       <div className="flex align-items-center">
-      //         <RadioButton inputId="ingredient2" name="pizza" value="Mushroom"   />
-      //         <label htmlFor="ingredient2" className="ml-2">Mushroom</label>
-      //       </div>
-      //     </div>
-      //     <div className='inputContent'>
-      //       <span className="p-input">
-      //         <InputText placeholder="Enter Window Name" />
-      //       </span>
-      //       <span className="p-input">
-      //         <InputText placeholder="Enter Process ID" />
-      //       </span>
-      //     </div>
-      //   </div>}
-        // 'content': <div className="ss__desktop_dlg">
-        //   <span className="ss__dskp_footer_span">
-        //         Object Identification: 
-        //         <label className="ss__dsktp_method">
-        //             <input data-test="methodA" className="ss__dsktp_method_rad" type="radio" name="method" value="A" checked={selectedMethod === "A"} onChange={onMethodSelect}/>Method A
-        //         </label>
-        //         <label className="ss__dsktp_method">
-        //             <input data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
-        //         </label>
-        //     </span>
-        //   <span className="p-input">
-        //        <InputText data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder="Enter Window Name" value={windowName} onChange={windowNameHandler} name="desktopWindowName" />
-        //      </span>
-        //      <span className="p-input">
-        //        <InputText data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} value={processID} onChange={processIDHandler} name="desktopProcessId"  placeholder="Enter Process ID" />
-        //      </span>
-        //     {/* <input data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder='Enter window name' value={windowName} onChange={windowNameHandler} name="desktopWindowName" />
-        //     <input data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} placeholder='Enter process ID' value={processID} onChange={processIDHandler} name="desktopProcessId" /> */}
-        // </div>,
         'content':<div className='allContent'>
           <div className="flex flex-wrap gap-3">
             <h4>Object Identification :</h4>
@@ -2280,28 +2268,6 @@ const LaunchApplication = props => {
     }
 
     const MobileApps = {
-        // 'content': <div className="ss__mblapp_inputs">
-        //         { !os && <div className="ss__mblapp_os_op">Choose OS</div>}
-        //         <div className="ss__mblapp_chooseApp">
-        //         <button data-test="chooseAndriod" className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={handleSerialNumber}>Android</button>
-        //             <button data-test="chooseIOS"className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
-        //         </div>
-        //         { os === "ios" && <>
-        //             <input data-test="iosApppath" className={"ss__mblapp_input"+(error.appPath2 ? " la_invalid": "")} placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler} name="appPath2_i" />
-        //             <input data-test="iosVersionNumber" className={"ss__mblapp_input"+(error.verNum ? " la_invalid": "")} placeholder='Enter Version Number' value={verNum} onChange={verNumHandler} name="verNum_i" />
-        //             <input data-test="iosDeviceName" className={"ss__mblapp_input"+(error.deviceName ? " la_invalid": "")} placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler} name="deviceName_i" />
-        //             <input data-test="iosUDID" className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UUID' value={uuid} onChange={uuidHandler} name="uuidNum_i" />
-        //         </> }
-        //         { os === "android" && <>
-        //             <input data-test="andriodAppPath" className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler} name="appPath_a" />
-        //             <select data-test="andriodSerialNumber" className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
-        //                 <option value="" disabled>Select Mobile Serial Number</option>
-        //                 {serialNumbers.map((serialNumber) => ( 
-        //                     <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
-        //                 ))}
-        //             </select>
-        //         </> }
-        // </div>,
         'content':<div className='inputContent'>
             <div className="flex flex-wrap gap-3" >
             <div className="flex align-items-center">
@@ -2339,35 +2305,6 @@ const LaunchApplication = props => {
               <InputText data-test="iosUDID"  placeholder='Enter UUID' value={uuid} onChange={uuidHandler} name="uuidNum_i" />
             </span></div>}
         </div>,
-      //   'content': <div className='inputContent'>
-      //   <div className="card flex justify-content-center gap-3">
-      //     <h4>iOS</h4>
-      //     <InputSwitch checked={checkedForMobApp} onChange={(e) => setCheckedForMobApp(e.value)} />
-      //     <h4>Android</h4>
-      //   </div>
-      //   {checkedForMobApp?
-      //   <div className='AndroidContent'>
-      //     <span className="p-input">
-      //       <InputText placeholder="Enter Application Path" />
-      //     </span>
-      //     <span className="p-input">
-      //       <InputText placeholder="Enter Mobile Serial Number" />
-      //     </span></div>
-      //     :
-      //   <div className='iOSContent'>
-      //     <span className="p-input">
-      //       <InputText placeholder="Enter Application Path" />
-      //     </span>
-      //     <span className="p-input">
-      //       <InputText placeholder="Enter Version Number" />
-      //     </span>
-      //     <span className="p-input">
-      //       <InputText placeholder="Enter Device Name" />
-      //     </span>
-      //     <span className="p-input">
-      //       <InputText placeholder="Enter UUID" />
-      //     </span></div>}
-      // </div>,
 
         'footer': <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" />,
         'footerAction': onMobileAppLaunch
@@ -2428,19 +2365,6 @@ const LaunchApplication = props => {
 
     const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApps': MobileApps, 'OEBS': oebsApp, 'MobileWeb': mobileWeb}
 
-    // return (
-    //     <div className="ss__launch_app_dialog">
-    //         <ModalContainer
-    //             title="Launch Application"
-    //             content={appDict[props.appPop.appType].content}
-    //             footer={appDict[props.appPop.appType].footer}
-    //             close={()=>{
-    //                 props.setShow(false);
-    //                 setError(false);
-    //             }}
-    //         />
-    //     </div> 
-    // );
     return (
       <div className="ss__launch_app_dialog">
           <AvoModal
@@ -2450,10 +2374,84 @@ const LaunchApplication = props => {
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"
-            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "45vh" : "33vh", background: "#FFFFFF" }}
+            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "53vh" : "33vh", background: "#FFFFFF" }}
             content={appDict[props.appPop.appType].content}
           customClass={props.typesOfAppType}
           />
       </div> 
   );
+}
+
+function formatXml(xml) {
+	let formatted = '';
+	let reg = /(>)(<)(\/*)/g;
+	xml = xml.replace(reg, '$1\r\n$2$3');
+	let pad = 0;
+	xml.split('\r\n').forEach(function (node, index) {
+		let indent = 0;
+		if (node.match(/.+<\/\w[^>]*>$/)) {
+			indent = 0;
+		} else if (node.match(/^<\/\w/)) {
+			if (pad !== 0) {
+				pad -= 1;
+			}
+        } //eslint-disable-next-line
+        else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+			indent = 1;
+		} else {
+			indent = 0;
+		}
+		let padding = '';
+		for (let i = 0; i < pad; i++) {
+			padding += '  ';
+		}
+		formatted += padding + node + '\r\n';
+		pad += indent;
+	});
+	return formatted;
+}
+
+function parseJsonRequest(requestedBody, base_key, cur_key, xpath) {
+	let xpaths=xpath;
+	try {
+     	for (let key in requestedBody){
+			 var value=requestedBody[key];
+			 if (typeof(value)==="object" && !(Array.isArray(value))){
+				if (base_key!== "")  base_key+='/'+key;
+				else base_key=key;
+				xpaths.push(base_key);
+				parseJsonRequest(value,base_key,key,xpaths);
+				base_key=base_key.slice(0,-key.length-1);
+			 } else if (Array.isArray(value)) {
+				for (var i=0;i<value.length;i++){
+					base_key+=key+"["+i.toString()+"]";
+					parseJsonRequest(value[i],base_key,key,xpaths);
+				}
+			 } else {
+				xpaths.push(base_key+'/'+key);
+			 }
+		 }
+		 base_key=base_key.slice(0,-cur_key.length);
+	} catch (exception) {
+		console.error("Exception in the function parseRequest: ERROR::::", exception);
+	}
+	return xpaths;
+}
+
+function parseRequestParam(parameters){
+	let paramsArray=[];
+    try{
+		var params=parameters.split('##');
+		for (let object of params) {
+			object=object.split(":");
+			let scrapedObjectsWS = {};
+			scrapedObjectsWS.xpath = object[0].trim();
+			scrapedObjectsWS.custname = object[0].trim();
+			scrapedObjectsWS.tag = "elementWS";
+			paramsArray.push(scrapedObjectsWS);
+		}
+	}catch (Exception){
+		console.error(Exception);
+	}	
+	return paramsArray										
 }
