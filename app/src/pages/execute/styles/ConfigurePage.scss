@@ -307,7 +307,14 @@
   width: 16rem;
   margin: 0 0.5rem 0 0;
   padding: .4375rem .875rem;
+  text-align: center;
+  font-family: "Open Sans";
+  font:$f7_semibold ;
+  margin-left: 6rem;
+  right: 0rem;
+
 }
+
 .p-button-edit {
   margin: 0;
   display: inline-flex;
@@ -404,7 +411,10 @@
   font-family: "Open Sans";
   // margin-top: 2rem;
 }
+.styled-sno{
+  font-family: "Open Sans";
 
+}
 .legend-text {
   font-size: .9rem;
   margin-left: 120px;
@@ -733,6 +743,13 @@
 }
 .trash_button{
   // margin: 0;
+}
+.sno_header{
+  .p-component {
+    font-family: 'Open Sans';
+    font-size: 1rem;
+    font-weight: 400;
+}
 }
 .datatable_list {
   .p-datatable .p-datatable-thead > tr > th {
@@ -1306,6 +1323,10 @@ bottom: 21%;
   font-family: open Sans;
 }
 
+.Search_Project{
 
+  font: $f6_regular;
+
+}
 
 
