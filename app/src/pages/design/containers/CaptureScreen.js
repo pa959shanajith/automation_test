@@ -1835,7 +1835,13 @@ const headerstyle={
       startScrape={startScrape} 
       mainScrapedData={mainScrapedData} 
       fetchingDetails={props.fetchingDetails} 
-      orderList={orderList}/>}
+      orderList={orderList}
+      fetchScrapeData={fetchScrapeData}
+      setShow={setCurrentDialog}
+      toastSuccess={toastSuccess}
+      toastError={toastError}
+      elementTypeProp={elementTypeProp}
+      />}
 
 
       {showObjModal === "importModal" && <ImportModal
@@ -2111,6 +2117,8 @@ function generateCompareObject(data, irisObjects){
       }
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
+  compareObj['fullScrapeData'] = data.view[3].newElements;
+
   return compareObj;
 }
 

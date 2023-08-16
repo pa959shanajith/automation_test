@@ -1,0 +1,69 @@
+@import "../../global/styles/ColorVariables.scss";
+.overlay__container{
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.90);
+    -moz-background-color: rgba(0, 0, 0, 0.90);
+    -webkit-background-color: rgba(0, 0, 0, 0.90);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: wait;
+    z-index: 9999999;
+    display: grid;
+    grid-template-rows: 50% 50%;
+
+    &>.overlay__subContainer{
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    &>.overlay__top {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+    }
+    &>.overlay__bottom {
+        align-items: flex-start;
+    }
+}
+
+.overlay__loading{
+    height: 60px;
+    width: 60px;
+    margin-bottom: 60px;
+    position: absolute
+}
+
+.overlay__text{
+    max-width: 60%;
+    word-wrap: normal;
+    font-size: 1.2rem;
+    text-align: center;
+    color: white;
+    font-style: italic;
+    font-weight: 500;
+    margin-top: 10px;
+    margin-bottom: 2rem;
+}
+.overlay__text_marque{
+    max-width: 60%;
+    word-wrap: normal;
+    font-size: 1.2rem;
+    text-align: center;
+    color: white;
+    font-style: italic;
+    position: absolute;
+    bottom: 18rem;
+    font-weight: 500;
+}
+.align__marques{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+}
