@@ -89,11 +89,11 @@ const ExecutionPage = () => {
                     <Tree 
                     value={executionQueue.list}
                     selectionMode="multiple"
-                    style={{ height: '22.66rem', overflowY: 'auto' }}
+                    style={{ height: '22.66rem', overflowY: 'auto',fontFamily:"Open Sans" ,fontSize:"1rem"}}
                     
                 />
                 ) : (
-                  <p>You have nothing pending to execute. Try to Execute any Configure Key and come here.</p>
+                  <p style={{fontFamily:"open Sans",marginLeft:"1.1rem"}}>You have nothing pending to execute. Try to Execute any Configure Key and come here.</p>
                 )
               )}
             </>
