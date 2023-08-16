@@ -559,10 +559,18 @@ const elementTypeProp =(elementProperty) =>{
             // screenshot
           }
           resolve("success");
-          let newData = (viewString.length > 0 && !elementPropertiesUpdated) ? viewString.map((item) => {
+          let newData = (viewString.length > 0 && !elementPropertiesUpdated) ? viewString.map((item, itemIdx) => {
             return (
               {
-                selectall: item.custname,
+                
+                selectall: (
+                  <>
+                  <Tooltip target={`.selectall-tooltip${itemIdx}`} content={item.custname}></Tooltip>
+                  <span className={`selectall-tooltip selectall-tooltip${itemIdx}`}>
+                    {item.custname}
+                  </span>
+                  </>
+                ),
                 objectProperty: elementTypeProp(item.tag),
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={(event) => {
                   setScreenshotY(event.clientY);
@@ -1020,20 +1028,20 @@ else{
 
   const footerCapture = (
     <div className='footer__capture'>
-      {visible === 'capture' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>}
-      {visible === 'replace' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</button>}
+      {visible === 'capture' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</Button>}
+      {visible === 'replace' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</Button>}
     </div>
   )
   const footerCompare = (
     <div className='footer__capture'>
-      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName,'compare'); }}>Compare</button>
+      <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName,'compare'); }}>Compare</Button>
       
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
+      <Button size='small' onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
     </div>
   );
 
@@ -1505,9 +1513,6 @@ const footerSave = (
         <div >{rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
-        {/* <Tooltip target={`#${column.field}-${rowdata.id}`} position="top">
-        {rowdata.selectall}
-        </Tooltip> */}
       </div>
       </>
       )
@@ -1650,7 +1655,7 @@ const headerstyle={
 
 
 
-        <div className="card-table">
+        <div className="card-table" style={{ width: '100%', display: "flex" }}>
           {typesOfAppType === "WebService" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
@@ -1676,18 +1681,18 @@ const headerstyle={
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-            <Column field="selectall" header="Element Name" headerStyle={{ textAlign: 'center' }} 
+            <Column headerStyle={{ width: '1rem',justifyContent: "left"  }} selectionMode='multiple'></Column>
+            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
               editor={(options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
-              bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
+              bodyClassName={"ellipsis-column"}
               body={renderElement}
             >
             </Column>
-            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type"></Column>
-            <Column field="screenshots" header="Screenshot"></Column>
-            <Column field="actions" header="Actions" body={renderActionsCell} />
+            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" headerStyle={{ justifyContent: "center"}}></Column>
+            <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
+            <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
           </DataTable>
               }
           <Dialog header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `94vh`, position:"right" }}>

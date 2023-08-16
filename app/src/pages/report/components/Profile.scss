@@ -1,4 +1,13 @@
 .profile_container {
+    .vertical_line {
+        position: absolute;
+        z-index: 3;
+        right: 36vw;
+        top: 23.7vh;
+    }
+    .table_profile {
+        margin-top: 0;
+    }
     .exeprofile_txt {
         padding-bottom: 0.5rem;
         border-bottom: 1px solid #e9ecef;
@@ -14,20 +23,39 @@
         padding: 0;
         border: none;
         min-width: 20vw;
+        .p-datatable-tbody>tr>td:nth-child(1) {
+            text-align: center;
+        }
         .p-treenode-label {
             width: 100%;
         }
-        .p-treenode-content {
-            padding: 0 1rem 0 0;
+        .p-treenode-children {
+            .p-treenode-content {
+                padding: 0;
+                overflow: hidden;
+            }
         }
+        
     }
     .reports_table {
         .p-datatable-wrapper {
             height: 75vh;
             .p-datatable-tbody>tr>td:nth-child(4) {
-                width: 80rem;
-                vertical-align: top;
+                vertical-align: middle;
                 padding: 0;
+                .testSuite_col1 {
+                    width: 35vw;
+                } 
+                .testSuite_col2 {
+                    width: 33vw;
+                } 
+                .badge_icon {
+                    margin-right: 0.5rem;
+                }
+                .badge_txt {
+                    display: inline-block;
+                    margin-right: 1rem;
+                }
             }
         }
     }
@@ -44,6 +72,12 @@
                 width: 5rem;
                 vertical-align: middle;
         }
+        .p-datatable-tbody>tr>td:nth-child(1) {
+            text-align: left;
+        }
+        .p-datatable-tbody>tr>td {
+            padding: 0.3rem;
+        }
     }
     .nested_table>.p-datatable-tbody>tr>td:nth-child(1) {
         text-align: center;
@@ -53,7 +87,7 @@
             height: auto;
         }
         .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 42rem;
+            width: 39vw;
         }
     }
     .module_table {
@@ -64,7 +98,7 @@
             text-align: center;
         }
         .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 42rem;
+            width: 38.5vw;
         }
     }
     .statusTable {
@@ -72,25 +106,39 @@
         .p-datatable-wrapper {
             height: auto;
         }
+        .p-datatable-tbody>tr>td:nth-child(1) {
+            text-align: center;
+        }
+        .p-datatable-tbody>tr>td:nth-child(2) {
+            .badge_icon {
+                margin-right: 0.4rem;
+            }
+            .badge_txt {
+                display: inline-block;
+                margin-right: 0.9rem;
+            }
+        }
     }
     svg {
         border-radius: 8px;
     }
     .textSuite {
         display: inline-block;
-        width: 42rem;
+        width: 35vw;
     }
     .textCase {
         display: inline-block;
-        width: 42rem;
+        width: 33vw;
     }
     .suite_text {
         display: inline-block;
-        width: 40.5rem;
+        width: 35vw;
+        text-align: center;
     }
     .case_text {
         display: inline-block;
-        width: 28rem;
+        width: 33vw;
+        text-align: center;
     }
 }
 
