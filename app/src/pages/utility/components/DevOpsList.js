@@ -21,7 +21,7 @@ import { getPools, getICE_list } from '../../execute/api';
 import {getProjectList} from '../../mindmap/api';
 import { FormInput } from '../../settings/components/AllFormComp';
 import {getDetails_SAUCELABS} from '../../settings/api';
-import {saveSauceLabData} from '../../utility/api';
+import {saveSauceLabData, sendMailOnExecutionStart} from '../../utility/api';
 import '../../admin/styles/FormComp.scss'
 import {SauceLabLogin,SauceLabsExecute} from './SauceLabs';
 
@@ -101,6 +101,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [mobileDetails,setMobileDetails] = useState([]);
     const [dropdownSelected,setDropdownSelected] = useState([]);
     const [sauceLabUser,setSauceLabUser] = useState({});
+    const [emailNotificationEnabled, setEmailNotificationEnabled] = useState(null);
+    const [emailNotificationSender, setEmailNotificationSender] = useState(null);
+    const [emailNotificationReciever, setEmailNotificationReciever] = useState(null);
+    const [batchInfo, setBatchInfo] = useState([]);
+    const [isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion] = useState(null);
+    const [profileName, setProfileName] = useState(null);
     
 
     const [sauceLab, setSauceLab] = useState(false);
@@ -514,6 +520,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             executionType: item.executionRequest.executiontype,
             isHeadless: item.executionRequest.isHeadless,
             execType: item.executionRequest.execType ? item.executionRequest.execType : false,
+            isEmailNotificationEnabled: item.executionRequest.isEmailNotificationEnabled,
+            emailNotificationSender: item.executionRequest.emailNotificationSender,
+            emailNotificationReciever: item.executionRequest.emailNotificationReciever,
+            isNotifyOnExecutionCompletion: item.executionRequest.isNotifyOnExecutionCompletion,
             executionRequest: item.executionRequest,
             disable: true,
             selectedBrowserType: showCICD
@@ -579,7 +589,24 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
                             }
                         }else {
-                            setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
+                            if (emailNotificationEnabled === true && isNotifyOnExecutionCompletion !== true) {
+                                // send email on click of execution
+                                let result = await sendMailOnExecutionStart(emailNotificationSender, emailNotificationReciever, batchInfo, profileName);
+
+                                if(result !== "pass") {
+                                    if(result.error && result.error.CONTENT) {
+                                        setMsg(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
+                                    } else {
+                                        setMsg(MSG.CUSTOM("Error While Sending an Email.",VARIANT.ERROR));
+                                    }
+                                }
+                                else {
+                                    setMsg(MSG.CUSTOM("Execution Added to the Queue and Email sent successfully.",VARIANT.SUCCESS));
+                                }
+                            }
+                            else {
+                                setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
+                            }
                         }
                         onHide(name);
                     }
@@ -909,6 +936,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     executionType: 'asynchronous',
                     isHeadless: false,
                     execType: false,
+                    isEmailNotificationEnabled: false,
+                    emailNotificationSender: null,
+                    emailNotificationReciever: null,
+                    isNotifyOnExecutionCompletion: true,
                     isLicenseTrial: (getplugins_list.LicenseTypes === "Trial")?true:false
                 })} >Create Profile</button>:null}
             { configList.length > 0 && <>
@@ -1051,6 +1082,24 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     onClick('displayBasic2');
                                     setCurrentKey(item.configurekey);
                                     setCurrentExecutionRequest(item.executionRequest);
+                                    if ("isEmailNotificationEnabled" in item.executionRequest) {
+                                        setEmailNotificationEnabled(item.executionRequest.isEmailNotificationEnabled);
+                                        if (item.executionRequest.isEmailNotificationEnabled === true) {
+                                            setEmailNotificationSender(item.executionRequest.emailNotificationSender);
+                                            setEmailNotificationReciever(item.executionRequest.emailNotificationReciever);
+                                            setIsNotifyOnExecutionCompletion(item.executionRequest.isNotifyOnExecutionCompletion)
+                                            setBatchInfo(item.executionRequest.batchInfo);
+                                            setProfileName(item.executionRequest.configurename);
+                                        }
+                                    }
+                                    else {
+                                        setEmailNotificationEnabled(false);
+                                        setEmailNotificationSender(null);
+                                        setEmailNotificationReciever(null);
+                                        setIsNotifyOnExecutionCompletion(null);
+                                        setBatchInfo([]);
+                                        setProfileName(null)
+                                    }
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !=="Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);

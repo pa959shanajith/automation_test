@@ -53,7 +53,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 		responsedata[moduleId] = finalSuite;
 	}
 	if (fromFlg == "scheduling") {
-		const ice_status = await getICEList(req.body.readTestSuite[0].projectidts);
+		const ice_status = await getICEList(req.body.readTestSuite[0].projectidts,req.headers.host);
 		const ice_list = Object.keys(ice_status);
 		logger.debug("IP\'s connected : %s", ice_list.join());
 		const schedulingDetails = {
@@ -69,14 +69,14 @@ exports.readTestSuite_ICE = async (req, res) => {
 
 exports.getICE_list = async (req,res) => {
 	projectid = req.body.projectid;
-	const ice_status = await getICEList(projectid,req.session.userid);
+	const ice_status = await getICEList(projectid,req.session.userid,req.headers.host);
 	if(!ice_status || !ice_status['ice_list']){
 		res.send("fail");
 	}
 	res.send(ice_status)
 }
 
-async function getICEList (projectids,userid){
+async function getICEList (projectids,userid,host){
 	const fnName = "getICEList";
 	var ice_list = [];
 	var ice_status = {}
@@ -91,7 +91,7 @@ async function getICEList (projectids,userid){
 		}
 		let pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
 		unallocatedICE = await utils.fetchData({}, "admin/getAvailable_ICE");
-		ice_status = await cache.get("ICE_status");
+		ice_status = await cache.gethmap(host);
 		unallocatedICE = unallocatedICE["available_ice"];
 		if(!unallocatedICE || unallocatedICE === "fail") unallocatedICE = {}
 		if(!ice_status )ice_status = {}
@@ -103,9 +103,9 @@ async function getICEList (projectids,userid){
 			if(!ice_status )ice_status = {}
 			if(ice_name in ice_status){
 				result.unallocatedICE[id]["icename"] = ice_name;
-				result.unallocatedICE[id]["status"] = ice_status[ice_name]["status"];
-				result.unallocatedICE[id]["mode"] = ice_status[ice_name]["mode"];
-				result.unallocatedICE[id]["connected"] = ice_status[ice_name]["connected"];
+				result.unallocatedICE[id]["status"] = JSON.parse(ice_status[ice_name])["status"];
+				result.unallocatedICE[id]["mode"] = JSON.parse(ice_status[ice_name])["mode"];
+				result.unallocatedICE[id]["connected"] = JSON.parse(ice_status[ice_name])["connected"];
 			}else{
 				result.unallocatedICE[id]["icename"] = ice_name
 				result.unallocatedICE[id]["status"] = false;
