@@ -754,11 +754,29 @@ const CanvasNew = (props) => {
     
                   await DesignApi.debugTestCase_ICE(["1"], [dataObject.testcaseid], userInfo, typesOfAppType)
     
-                  .then(response => {
+      
     
-                      // setOverlay("Test cases of screen debugged.");
-    
+                    .then(d => {
+
+                      if (d === "Invalid Session") return RedirectPage(history);
+
+                      if (d === "fail")
+
+                          err=(MSG.DESIGN.ERR_DEBUG);
+
+                      else if (d === "Terminate") {
+
+                          setOverlay("");
+
+                          err=(MSG.DESIGN.WARN_DEBUG_TERMINATE);
+
+                      }
+
+                      setOverlay("Test cases of screen debugged.");
+
                   })
+    
+                  
     
                   .catch(error => {
     

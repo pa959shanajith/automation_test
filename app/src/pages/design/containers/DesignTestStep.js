@@ -14,6 +14,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
+import { Tag } from 'primereact/tag';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog } from 'primereact/confirmdialog';
@@ -31,6 +32,7 @@ import { Checkbox } from 'primereact/checkbox';
 const DesignModal = (props) => {
     const toast = useRef();
     const testcaseDropdownRef = useRef();
+    const toastImpact=useRef(null)
     const headerCheckRef = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -1604,6 +1606,8 @@ const DesignModal = (props) => {
                                     updateChecklist={updateChecklist} setStepSelect={setStepSelect} editRow={editRow}
                                     setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
                                     rowChange={rowChange} keywordData={keywordList} setDeleteTestDialog={setDeleteTestDialog}
+                                    testcaseDetailsAfterImpact={props.testcaseDetailsAfterImpact}
+                                    impactAnalysisDone={props.impactAnalysisDone}
                                     />)
                                 } 
                             </ReactSortable>
@@ -1633,7 +1637,7 @@ const DesignModal = (props) => {
         {/* <Toast ref={toast} position="bottom-center" /> */}
         {overlay && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)}>
+            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?screenLavelTestSteps:[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
