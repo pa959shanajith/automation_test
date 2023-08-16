@@ -89,7 +89,7 @@ const ExecutionPage = () => {
                     <Tree 
                     value={executionQueue.list}
                     selectionMode="multiple"
-                    style={{ height: '22.66rem', overflowY: 'auto',fontFamily:"Open Sans" ,fontSize:"1rem"}}
+                    style={{ height: '22.66rem', overflowY: 'auto',fontFamily:"Open Sans"  }}
                     
                 />
                 ) : (
