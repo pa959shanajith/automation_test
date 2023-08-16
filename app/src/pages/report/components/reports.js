@@ -220,29 +220,29 @@ const reports = () => {
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnTest">
             <div>
-            <b>Test Type: </b>
-            <SelectButton
-              value={testType}
-              itemTemplate={viewByTemplate}
-              onChange={(e) => { 
-                handleTest(e.value) 
-                setTestType(e.value) 
-              }}
-              options={testTypesOptions}
-            />
+              <b>Test Type: </b>
+              <SelectButton
+                value={testType}
+                itemTemplate={viewByTemplate}
+                onChange={(e) => {
+                  handleTest(e.value);
+                  setTestType(e.value);
+                }}
+                options={testTypesOptions}
+              />
             </div>
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnView">
             <div>
-            <b>View By: </b>
-            <SelectButton
-              value={viewBy}
-              itemTemplate={viewByTemplate}
-              onChange={(e) => {
-                setViewBy(e.value);
-              }}
-              options={viewByOptions}
-            />
+              <b>View By: </b>
+              <SelectButton
+                value={viewBy}
+                itemTemplate={viewByTemplate}
+                onChange={(e) => {
+                  setViewBy(e.value);
+                }}
+                options={viewByOptions}
+              />
             </div>
           </div>
         </div>
@@ -253,7 +253,7 @@ const reports = () => {
                 <>
                   {filteredExecutionData.length > 0 ? (
                     <>
-                      <div className='flex justify-content-between ml-4 mr-4 mt-2 mb-2'>
+                      <div className="flex justify-content-between ml-4 mr-4 mt-2 mb-2">
                         <div>
                           <h2 className="projectDropDown"></h2>
                           <Dropdown
@@ -292,9 +292,9 @@ const reports = () => {
                             </div>)} */}
                     {activeIndex === "Functional Test" &&
                       executionButon === "View by Execution Profile" && (
-                        <div className="flex flex-wrap justify-content-between">
+                        <div className="grid">
                           {filteredExecutionData.map((data, index) => (
-                            <div className="flex flex-wrap mt-4">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <NavLink
                                 to="/profile"
                                 state={{
@@ -305,29 +305,52 @@ const reports = () => {
                                 activeClassName="active"
                               >
                                 <Card key={index} className="testCards">
-                                  <div className='grid'>
-                                    <div className='col-10'>
-                                      <span className='exe_profile'>Execution Profile</span>
+                                  <div className="grid">
+                                    <div className="col-10">
+                                      <span className="exe_profile">
+                                        Execution Profile
+                                      </span>
                                     </div>
-                                    <div className='col-2 flex justify-content-center'>
-                                      <span className='exe_count'>5</span>
+                                    <div className="col-2 flex justify-content-center">
+                                      {/* <span className='exe_count'>5</span> */}
                                     </div>
-                                    <div className='col-12 exe_namebox'>
-                                      <span className='exe_name'>{data.configurename}</span>
+                                    <div className="col-12 exe_namebox">
+                                      <span className="exe_name">
+                                        {data.configurename}
+                                      </span>
                                     </div>
-                                    <div className='col-12 exe_details'>
+                                    <div className="col-12 exe_details">
                                       Last execution details
                                     </div>
-                                    <div className='col-4 lg:col-5 xl:col-5 md:col-12 sm:col-12'>
-                                      <span className='exe_details'>Executed On</span>
-                                      <span className='exe_date'>23/09/2022</span>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_details">
+                                        Executed On
+                                      </span>
+                                      <span className="exe_date">
+                                        {data.execDate.slice(5, 16)}
+                                      </span>
                                     </div>
-                                    <div className='col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12'>
-                                      <span className='exe_details'>Executed via</span>
-                                      <span className='exe_date'>{data.execDate.slice(5, 16)}</span>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_details">
+                                        Executed via
+                                      </span>
+                                      <span className="exe_date">CI/CD</span>
                                     </div>
-                                    <div className='col-4 lg:col-3 xl:col-3 md:col-12 sm:col-12'>
-                                      <span className='exe_type'><img src="static/imgs/E2E_configsetup.png" />{data.selectedModuleType === "e2eExecution" ? 'E2E' : 'Normal'}</span>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_type">
+                                        <img
+                                          src={
+                                            data.selectedModuleType ===
+                                            "e2eExecution"
+                                            ? "static/imgs/E2E_configsetup.png"
+                                            : "static/imgs/signup_module.svg"
+                                          }
+                                        />
+                                        {data.selectedModuleType ===
+                                        "e2eExecution"
+                                          ? "End2End"
+                                          : "Test Suite"}
+                                      </span>
                                     </div>
                                   </div>
                                 </Card>
@@ -338,9 +361,9 @@ const reports = () => {
                       )}
                     {activeIndex === "Functional Test" &&
                       executionButon === "View by Modules" && (
-                        <div className="grid ml-4">
+                        <div className="grid">
                           {reportDataModule.map((data) => (
-                            <div className="flex flex-wrap">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <Card key={data.key} className="testCards">
                                 <p m={handleData}>{data.key}</p>
                                 <p>{data.scenariovalue}</p>
@@ -355,9 +378,9 @@ const reports = () => {
                       )}
                     {activeIndex === "Accessibility Test" &&
                       executionButon === "View by Execution Profile" && (
-                        <div className="grid ml-4">
+                        <div className="grid">
                           {reportData.map((data) => (
-                            <div className="flex flex-wrap">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <Card key={data.key} className="testCards">
                                 <NavLink
                                   to="/reports/profile"
@@ -386,9 +409,9 @@ const reports = () => {
                       )}
                     {activeIndex === "Accessibility Test" &&
                       executionButon === "View by Modules" && (
-                        <div className="grid ml-4">
+                        <div className="grid">
                           {reportDataModule.map((data) => (
-                            <div className="flex flex-wrap">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <Card key={data.key} className="testCards">
                                 <NavLink
                                   to="/reports/profile"
