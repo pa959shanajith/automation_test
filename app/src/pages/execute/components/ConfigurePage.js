@@ -847,7 +847,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             <select
             placeholder="Search"
             title=" Search for project"
-            className="Serach_Project"
+            className="Search_Project"
               onChange={(e) => {
                 dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
