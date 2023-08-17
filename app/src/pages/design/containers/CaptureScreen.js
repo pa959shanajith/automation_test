@@ -1069,7 +1069,7 @@ else{
     <div className='empty_msg1'>
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
-        <p className="not_captured_message">Not Captured</p>
+        <p className="not_captured_message">Elements not captured</p>
         <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true);}} >Capture Elements</Button>
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
@@ -1487,6 +1487,56 @@ const footerSave = (
       )
 
   }
+
+  //showing toast msgs for map replace compare and export if the data is not captured:
+
+  const handleCaptureClickToast = () => {
+    if (captureData.length === 0 && isWebApp) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'Capture Data',
+        detail: 'Please capture the data before mapping.',
+      });
+    } else if (isWebApp) {
+      handleDialog('mapObject');
+    }
+  };
+
+  const handleCompareClick = () => {
+    if (captureData.length === 0 && isWebApp) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'Capture Data',
+        detail: 'Please capture the data before comparing elements.',
+      });
+    } else if (isWebApp) {
+      setVisible('compare');
+    }
+  };
+
+  const handleReplaceClick = () => {
+    if (captureData.length === 0 && isWebApp) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'Capture Data',
+        detail: 'Please capture the data before replacing elements.',
+      });
+    } else if (isWebApp) {
+      setVisible('replace');
+    }
+  };
+
+  const handleExportClick = () => {
+    if (captureData.length === 0) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'There is no data to export.',
+      });
+    } else {
+      setShowObjModal('exportModal');
+    }
+  };
   // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -1557,7 +1607,7 @@ const headerstyle={
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className={`insprint_auto ${!isWebApp || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && handleDialog('mapObject')}>
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
                   <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
                   {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
@@ -1578,12 +1628,12 @@ const headerstyle={
                 <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
-                <span className={`upgrade_auto ${!isWebApp || captureData.length === 0? "disabled" : ""}`}  onClick={() =>captureData.length > 0 && isWebApp && setVisible("compare")}>
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={handleCompareClick}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
                   {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
-                <span className={`upgrade_auto ${!isWebApp  || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && setVisible('replace')}>
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
                   <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
                   {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
@@ -1614,7 +1664,7 @@ const headerstyle={
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
-                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={() =>captureData.length > 0 &&  isWebApp &&  handleDialog('createObject')}>
+                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={()=> isWebApp &&  handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
@@ -1633,8 +1683,8 @@ const headerstyle={
                     <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
                     <p className='imp__text'>Import Screen</p>
                   </span>
-                  <span className="export__block" style={captureData.length === 0 ? { color: "#cccccc" }: {}} onClick={() => captureData.length !== 0 && setShowObjModal("exportModal")}>
-                    <img  className={` add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} src="static/imgs/Export_new_icon_grey.svg" style={captureData.length === 0 ? { color: "#cccccc" }: {}} />
+                  <span className="export__block"  onClick={handleExportClick}>
+                    <img  className="add_obj_export" src="static/imgs/Export_new_icon_grey.svg" />
                     {/* <i className={`pi pi-file-export add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} style={captureData.length === 0 ? { color: "#cccccc" }: {}}  ></i> */}
                     <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
                     <p className='imp__text'>Export Screen</p>
