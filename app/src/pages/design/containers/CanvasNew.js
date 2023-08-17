@@ -772,8 +772,6 @@ const CanvasNew = (props) => {
 
                       }
 
-                      setOverlay("Test cases of screen debugged.");
-
                   })
     
                   
