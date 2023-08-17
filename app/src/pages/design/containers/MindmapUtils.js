@@ -806,7 +806,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
                 parent: dNodes[pi],
                 state: 'created',
                 path: '',
-                name: '',
+                name: obj?obj:'',
                 childIndex: '',
                 type: (nNext[pt][0]).toLowerCase() + 's'
         }; 
