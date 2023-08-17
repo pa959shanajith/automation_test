@@ -242,6 +242,7 @@ if (cluster.isMaster) {
 		var devOps = require('./server/controllers/devOps');
 		var mindmap = require('./server/controllers/mindmap');
 		var admin = require('./server/controllers/admin');
+        var designscreen = require('./server/controllers/designscreen');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -256,6 +257,8 @@ if (cluster.isMaster) {
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
+		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
+		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
