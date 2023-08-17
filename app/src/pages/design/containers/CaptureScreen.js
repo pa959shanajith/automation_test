@@ -1079,7 +1079,7 @@ else{
 const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
 const elementIdentifier=()=>{
-  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]:
+  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]:
   selectedCapturedElement[0].objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
   setIdentifierList(identifierList)
   setShowIdentifierOrder(true)
@@ -1840,7 +1840,13 @@ const headerstyle={
       startScrape={startScrape} 
       mainScrapedData={mainScrapedData} 
       fetchingDetails={props.fetchingDetails} 
-      orderList={orderList}/>}
+      orderList={orderList}
+      fetchScrapeData={fetchScrapeData}
+      setShow={setCurrentDialog}
+      toastSuccess={toastSuccess}
+      toastError={toastError}
+      elementTypeProp={elementTypeProp}
+      />}
 
 
       {showObjModal === "importModal" && <ImportModal
@@ -2116,6 +2122,8 @@ function generateCompareObject(data, irisObjects){
       }
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
+  compareObj['fullScrapeData'] = data.view[3].newElements;
+
   return compareObj;
 }
 
