@@ -538,7 +538,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     configurationList.forEach((item, idx) => {
       getState.push({
         sno: (
-          <span className="sno_header">
+          <span className="sno_header" style={{marginLeft:"2rem",width:"1%"}}>
             {idx + 1}
           </span>
         ),
@@ -595,13 +595,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             >  
               CI/CD
             </Button>
-            <Button
-              className="CICD"
-              size="small"
-
-            >
-              SauceLab
-            </Button>
+          
           </div>
         ),
         actions: (
@@ -1118,7 +1112,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           >
             <Column
               field="sno"
-              style={{ width: "5%" ,height:"2.5rem",fontFamily:"Open Sans"}}
+              style={{ width: "5%" ,height:"2.5rem",fontFamily:"Open Sans",marginLeft:"2.5rem"}}
               header={<span className="SNo-header">S.No.</span>}
             />
             <Column

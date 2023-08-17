@@ -4,6 +4,7 @@ import {getQueueState,deleteExecutionListId} from '../api';
 // import CheckboxTree from 'react-checkbox-tree';
 import { Tree } from 'primereact/tree';
 import "../styles/ExecutionPage.scss";
+import { style } from 'd3';
 
 
 
@@ -43,14 +44,18 @@ const ExecutionPage = () => {
                         let executionItem = {
                             key:`0-${nodechildtemp++}`,
                             value: item+nodeItemChildrenIndex,
-                            label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" className='Terminate_Execution' onClick={async () => {
+                            label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   
+                            <span style={{display: 'flex', alignItems: 'center',  marginLeft: "6rem",    marginTop: "-1.2rem"}}>
+                            <img src={"static/imgs/cicd_terminate.png" } title="Terminate Execution" alt="Terminate icon" className='Terminate_Execution'  onClick={async () => {
                                     const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
                                     if(deleteExecutionFromQueue.status !== 'pass') {
                                         setMsg(MSG.CUSTOM("Error While Removing Execution from Execution Queue",VARIANT.ERROR));
                                     }else {
                                         getCurrentQueueState();
                                     }
-                                }}/></div>,
+                                }}/>
+                                </span>
+                         </div>,
                             showCheckbox: false,
                             // className: 'devOps_terminate_style',
                             children: executionNode.map((executionRequest) => ({
@@ -86,12 +91,14 @@ const ExecutionPage = () => {
               {console.log('executionQueue.list', executionQueue.list)}
               {executionQueue && (
                 (executionQueue.list.length > 0) ? (
+                    <div className='treeitems'>
                     <Tree 
                     value={executionQueue.list}
                     selectionMode="multiple"
                     style={{ height: '22.66rem', overflowY: 'auto',fontFamily:"Open Sans"  }}
                     
                 />
+                </div>
                 ) : (
                   <p style={{fontFamily:"open Sans",marginLeft:"1.1rem"}}>You have nothing pending to execute. Try to Execute any Configure Key and come here.</p>
                 )
