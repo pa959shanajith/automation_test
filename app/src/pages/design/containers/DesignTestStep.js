@@ -1613,7 +1613,7 @@ const DesignModal = (props) => {
                     </DataTable> */}
                     { showPopup && ConfirmPopup()}
                     { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} selectSteps={selectSteps} upperLimit={data.testCases.length} /> }
-                    { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={data.testCases.length}/> }
+                    {/* { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={data.testCases.length}/> } */}
                     { showRemarkDlg && <RemarkDialog remarks={data.testCases[parseInt(showRemarkDlg)].remarks} setShow={setShowRemarkDlg} onSetRowData={setRowData} idx={showRemarkDlg} firstname={userInfo.firstname} lastname={userInfo.lastname}/> }
                     { overlay && <ScreenOverlay content={overlay} /> }
                     {/* { showConfPaste && <ConfPasteStep />} */}
