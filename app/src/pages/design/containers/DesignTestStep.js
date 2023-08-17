@@ -1695,9 +1695,9 @@ const DesignModal = (props) => {
                                             value={testCase.testCaseName}
                                             onChange={handleCheckboxChangeAddDependant}
                                             checked={selectedTestCases.includes(testCase.testCaseName)}
-                                            disabled={rowExpandedName && rowExpandedName.id === testCase.testCaseID}
+                                            disabled={testCase.disableAndBlock}
                                         />
-                                        <label className='label__testcase' htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
+                                        <label className={testCase.disableAndBlock ?'label__testcase_disable' : "label__testcase"} htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
                                     </div>
                                     
                                 ))}
