@@ -60,7 +60,7 @@ const DetailsDialog = ({setShow,show,setIdx, onSetRowData, TCDetails, idx}) => {
     }
     return (
         <div className="d__details_container" data-test="d__ddc">
-            <Dialog visible={show} header="Add Test Step Details" onHide={()=>{setShow(false);setIdx(false)}} footer={footerDetails}>
+            <Dialog visible={show} header="Add Test Step Details" style={{width:'20rem'}} onHide={()=>{setShow(false);setIdx(false)}} footer={footerDetails}>
                 <div className="d__detail_input_group">
                     <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Expected Result" value={res} onChange={onResChange}/>
                     <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Actual Result for Pass Status" value={pass} onChange={onPassChange}/>
