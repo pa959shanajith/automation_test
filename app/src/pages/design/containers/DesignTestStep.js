@@ -831,6 +831,26 @@ const DesignModal = (props) => {
                 })
             .catch(error => console.error("ERROR::::", error));
         }
+        const handleDebug = () => {
+            if (props.appType === "Web"){
+                DependentTestCaseDialogHideHandler(); 
+                setVisibleDependentTestCaseDialog(true)
+            }else if (props.appType === "Desktop"){
+                debugTestCases('1')
+            }
+            else if (props.appType === "MobileApps"){
+                debugTestCases('1')
+            }
+            else if (props.appType === "MobileWeb"){
+                debugTestCases()
+            }
+            else if (props.appType === "WebService"){
+                debugTestCases()
+            }
+            else if (props.appType === "OEBS"){
+                debugTestCases('1')
+            }
+        }
         return (
             <>
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
@@ -845,18 +865,11 @@ const DesignModal = (props) => {
                     <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
                     <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
                     <Tooltip target=".pi-plus " position="bottom" content="  Add Test Step"/>
-                    <img src='static/imgs/ic-jq-editstep.png' alt='edit' className='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
-                    <Tooltip target=".edit " position="bottom" content="  Edit Test Step"/>
-                    {/* <img src='static/imgs/ic-selmulti.png' alt='Select Steps' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>selectMultiple()}/>
-                    <img src='static/imgs/ic-jq-dragstep.png' alt='Drag Steps' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
-                    <img src='static/imgs/ic-jq-copystep.png' alt='Copy Steps' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
-                    <img src='static/imgs/ic-jq-pastestep.png' alt='Pastw steps' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>onPasteSteps()}/> */}
-                    <img src='static/imgs/skip-test-step.png' alt='comment steps'className='comment' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>commentRows()}/>
-                    <Tooltip target=".comment " position="bottom" content="  Skip Test Step"/>
+                    <img src='static/imgs/ic-jq-editstep.png' alt='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
                     <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
                     <Tooltip target=".pi-trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
-                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
+                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>handleDebug()} outlined></Button>
                     <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
                     <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
@@ -1037,7 +1050,7 @@ const DesignModal = (props) => {
     //     return (
     //         <div className='select-option'>
     //             <Dropdown width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel={getOptionLabel} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
-    //         </div> 
+    //         </div>   
     //    )
     // };
     // const inputEditor = (options) => {
@@ -1246,12 +1259,11 @@ const DesignModal = (props) => {
     const commentRows = () => {
         let selectedIndexes = [...stepSelect.check];
         let highlighted = [...stepSelect.highlight];
-        const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
-        let testCases = [ ...findData.testCases ]
+        let testCases = [ ...testCaseData ]
         runClickAway = false;
-        if (highlighted.length === 0 && selectedIndexes.length === 0) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_SELECT_STEP_SKIP.CONTENT, life:1000});
-        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
-        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
+        if (highlighted.length === 0 && selectedIndexes.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_SKIP);
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
+        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
         else{
             let toComment = [...new Set([...highlighted, ...selectedIndexes])]; 
             for(let idx of toComment){
@@ -1262,14 +1274,7 @@ const DesignModal = (props) => {
                 else testCase.outputVal += testCase.outputVal.length === 0 ? "##" : ";##"
                 testCases[idx] = { ...testCase }
             }
-            let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
-                if (screen.name === rowExpandedName.name) {
-                    return { ...screen, testCases: testCases };
-                }
-                return screen;
-            });
-            setScreenLevelTastSteps(updatedScreenLevelTestSteps)
-            // setTestCaseData(testCases);
+            setTestCaseData(testCases);
             setStepSelect({edit: false, check: [], highlight: []});
             setHeaderCheck(false);
             setChanged(true);
@@ -1284,7 +1289,7 @@ const DesignModal = (props) => {
     }
     const tableActionBtnGroup = [
         // {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps',onClick: ()=>addRow() },
-        // {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps',onClick:  ()=>editRow() },
+        {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps',onClick:  ()=>editRow() },
         // {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-selmulti.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
         // {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps',onClick:  ()=>toggleDrag() },
         // {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
@@ -1577,7 +1582,7 @@ const DesignModal = (props) => {
                             <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center',paddingLeft:'0.5rem' }} ></Column>
                             <Tooltip target=".action " position="left" content="  Edit the test step."/>
                     </DataTable> */}
-                        { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }
+                
                 <div className="d__table">
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
@@ -1594,7 +1599,6 @@ const DesignModal = (props) => {
                 <div className="ab">
                     <div className="min">
                         <div className="con" id="d__tcListId">
-                            <div style={{overflowY:'auto'}}>
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
@@ -1608,7 +1612,6 @@ const DesignModal = (props) => {
                                 } 
                             </ReactSortable>
                             </ClickAwayListener>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1685,7 +1688,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
 
-            <Dialog className="debug__object__modal" header={props.fetchingDetails["parent"]["name"]} style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
+            <Dialog  className="debug__object__modal" header={props.fetchingDetails["parent"]["name"]} style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
@@ -1712,7 +1715,7 @@ const DesignModal = (props) => {
                                             value={testCase.testCaseName}
                                             onChange={handleCheckboxChangeAddDependant}
                                             checked={selectedTestCases.includes(testCase.testCaseName)}
-                                            disabled={testCase.disableAndBlock}
+                                            disabled={rowExpandedName && rowExpandedName.id === testCase.testCaseID}
                                         />
                                         <label className='label__testcase' htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
                                     </div>

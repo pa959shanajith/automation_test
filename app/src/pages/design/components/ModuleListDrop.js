@@ -92,6 +92,7 @@ const ModuleListDrop = (props) =>{
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [transferBut, setTransferBut] = useState( [] );
         const [inputE2EData, setInputE2EData] = useState('');
+        const [SplCharCheck, setSplCharCheck] = useState(false);
         const [ newModSceList, setNewModSceList] = useState([]);
         const [modSceTree, setModSceTree] = useState([]);
         const [selectedProject, setSelectedProject] = useState(proj);
@@ -786,7 +787,22 @@ setPreventDefaultModule(true);
               const selectedProjForSce = projectList.find(project=> project.id === e.value);
               setProjOfSce(selectedProjForSce)
              }
-            
+            const handleSplCharE2EName =(event)=>{
+              const value = event
+              // inputE2EData(value);
+              if (value !== undefined && /[!@#$%^&*()+{}\[\]:;<>,.?~\\/\-\s]/.test(value)){
+                setSplCharCheck(true)
+              } else {
+                setSplCharCheck(false)
+                if(E2EName){
+                  setE2EName(value)}
+                  else
+                  {setInputE2EData(value)}
+                
+              }
+
+
+            }
             
        
       
@@ -815,7 +831,8 @@ setPreventDefaultModule(true);
                         customClass="inputRow_for_E2E_popUp"
                         inputType="lablelRowReqInfo"
                         inputTxt={E2EName? E2EName:inputE2EData} 
-                        setInputTxt={E2EName? setE2EName:setInputE2EData}
+                        setInputTxt={E2EName? (setE2EName && handleSplCharE2EName):(setInputE2EData && handleSplCharE2EName) }
+                        charCheck={SplCharCheck}
                       />
                     </div>
                   </div>
