@@ -40,7 +40,8 @@ const initialState = {
     checkedTreeIds:[],
     checkedParentIds:[],
     checkedProjectIds:[],
-    checkedReleaseIds:[]
+    checkedReleaseIds:[],
+    reference:''
 }
 
 export const settingSlice=createSlice({
