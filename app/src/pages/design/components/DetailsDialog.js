@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer } from "../../global";
 import "../styles/DetailsDialog.scss";
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
 
 /*
     Component: Details Dialog
@@ -12,7 +14,7 @@ import "../styles/DetailsDialog.scss";
         idx -> index of row
 */
 
-const DetailsDialog = ({setShow, onSetRowData, TCDetails, idx}) => {
+const DetailsDialog = ({setShow,show,setIdx, onSetRowData, TCDetails, idx}) => {
 
     const [res, setRes] = useState("");
     const [pass, setPass] = useState("");
@@ -50,10 +52,22 @@ const DetailsDialog = ({setShow, onSetRowData, TCDetails, idx}) => {
         onSetRowData({rowIdx: idx, operation: "details", details: TCDetail === "" ? "" : JSON.stringify(TCDetail)});
         setShow(false);
     }
-
+    const footerDetails = () => {
+        <>
+            <Button data-test="d__ddbtn" onClick={onReset} label='Reset'/>
+            <Button data-test="d__ddbtn" onClick={onSave} label='Save'/>
+        </>
+    }
     return (
         <div className="d__details_container" data-test="d__ddc">
-            <ModalContainer 
+            <Dialog visible={show} header="Add Test Step Details" onHide={()=>{setShow(false);setIdx(false)}} footer={footerDetails}>
+                <div className="d__detail_input_group">
+                    <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Expected Result" value={res} onChange={onResChange}/>
+                    <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Actual Result for Pass Status" value={pass} onChange={onPassChange}/>
+                    <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Actual Result for Fail Status" value={fail} onChange={onFailChange}/>
+                </div>
+            </Dialog>
+            {/* <ModalContainer 
                 title="Add Test Step Details"
                 content={
                     <div className="d__detail_input_group">
@@ -72,7 +86,7 @@ const DetailsDialog = ({setShow, onSetRowData, TCDetails, idx}) => {
                     ()=>setShow(false)
                 }
 
-            />
+            /> */}
         </div>
     );
 }
