@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { getDetails_JIRA, viewReport } from "../api";
+import { connectAzure_ICE, connectJira_ICE, getDetails_JIRA, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
 import "../styles/ReportTestTable.scss";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -18,9 +18,13 @@ export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
   const [reportViewData, setReportViewData] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState(null);
+  const [loginName, setLoginName] = useState("");
+  const [loginKey, setLoginKey] = useState("");
+  const [loginUrl, setLoginUrl] = useState("");
   const [searchTest, setSearchTest] = useState("");
+  const [userData, setUserData] = useState({});
   const [visibleBug, setVisibleBug] = useState(false);
-  const [bugTitle, setBugTitle] = useState(false);
+  const [bugTitle, setBugTitle] = useState("");
   const [reportSummaryCollaps, setReportSummaryCollaps] = useState(true);
   const filterRef = useRef(null);
   const [reportid, setReportId] = useState(null);
@@ -31,6 +35,7 @@ export default function BasicDemo() {
   ];
   const [selectedFilter, setSelectedFilter] = useState([]);
   const bugRef = useRef(null);
+  const userRef = useRef(null);
   useEffect(() => {
     const getQueryParam = () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -73,9 +78,23 @@ export default function BasicDemo() {
     setExpandedKeys(e.value);
   };
 
-  const onBugBtnClick = (getBtn) => {
+  const onBugBtnClick = async (getBtn) => {
     if (getBtn === "Cancel") setVisibleBug(false);
     else if (getBtn === "Connect") {
+      if (bugTitle === "Jira") {
+        const jiraDetails = await connectJira_ICE(
+          loginUrl,
+          loginName,
+          loginKey
+        );
+      } else if (bugTitle === "Azure DevOps") {
+        const azureDetails = await connectAzure_ICE({
+          url: loginUrl,
+          username: loginName,
+          action: "loginToAzure",
+          pat: loginKey,
+        });
+      }
     }
   };
 
@@ -97,6 +116,7 @@ export default function BasicDemo() {
     setBugTitle(getBugtype);
     (async () => {
       const resp = await getDetails_JIRA();
+      setUserData(resp);
     })();
   };
 
@@ -232,6 +252,12 @@ export default function BasicDemo() {
 
   const treeData = convertDataToTree(reportViewData);
 
+  const onUserName = () => {
+    setLoginName(userData?.jiraUsername);
+    setLoginKey(userData?.jirakey);
+    setLoginUrl(userData?.jiraURL);
+  }
+
   return (
     <div className="reportsTable_container">
       <div className="reportSummary">
@@ -332,12 +358,11 @@ export default function BasicDemo() {
         content={
           <div className="flex flex-column">
             <div className="jira_user">Username</div>
-            <InputText className="jira_credentials" />
+            <InputText className="jira_credentials" onClick={(e) => userRef.current.toggle(e)} value={loginName} onChange={(e) => setLoginName(e.target.value)} />
             <div className="jira_user">Password/API Key</div>
-
-            <InputText className="jira_credentials" />
+            <InputText className="jira_credentials" value={loginKey} onChange={(e) => setLoginKey(e.target.value)} />
             <div className="jira_user">URL</div>
-            <InputText className="jira_credentials" />
+            <InputText className="jira_credentials" value={loginUrl} onChange={(e) => setLoginUrl(e.target.value)} />
           </div>
         }
         customClass="jira_modal"
@@ -363,6 +388,15 @@ export default function BasicDemo() {
           ]}
         />
       </OverlayPanel>
+      {userData?.jiraUsername && <OverlayPanel ref={userRef} className="jira_user">
+        <Menu
+          model={[
+            {
+              label: <span onClick={() => onUserName()}>{userData?.jiraUsername}</span>,
+            }
+          ]}
+        />
+      </OverlayPanel>}
     </div>
   );
 }
