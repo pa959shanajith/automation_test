@@ -157,11 +157,14 @@ const DesignModal = (props) => {
         }
         //eslint-disable-next-line
     }, [imported]);
-    const ConfirmPopups = () => (
-        <Dialog visible={showConfirmPop} header={showConfirmPop.title} onHide={()=>setShowConfirmPop(false)} footer={footerPopUp} >
-            <div>{showConfirmPop.content}</div>
-        </Dialog>
-    )
+    const ConfirmPopups = () => {
+        return(
+            <Dialog visible={showConfirmPop} header={showConfirmPop.title} onHide={()=>setShowConfirmPop(false)} footer={footerPopUp} >
+                <div>{showConfirmPop.content}</div>
+            </Dialog>
+        )
+    }
+       
     const footerPopUp = () =>(
         <>
             <Button onClick={showConfirmPop.onClick} label='Yes'/>
@@ -1479,11 +1482,14 @@ const DesignModal = (props) => {
         setHeaderCheck(false);
         setChanged(true);
     }
-    const ConfPasteStep = () => (
-        <Dialog visible={showConfPaste} header="Paste Test Step" onHide={setShowConfPaste(false)} footer={footerPasteStep}>
-            <div>Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?</div>
-        </Dialog>
-    );
+    const ConfPasteStep = () =>{
+         return (
+            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={setShowConfPaste(false)} footer={footerPasteStep}>
+                <div>Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?</div>
+            </Dialog>
+        );
+    }
+       
     const footerPasteStep = () =>(
         <>
             <Button onClick={()=>{setShowConfPaste(false);setShowPS(true);}} label='Yes'/>
