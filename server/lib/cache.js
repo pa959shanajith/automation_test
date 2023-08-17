@@ -38,7 +38,7 @@ class Cache {
 		let clientName="avoassure";
 		if(host != null && host != undefined)
 		{
-			if(!(host.includes("localhost") || host.includes("127.0.0.1"))){
+			if(!(host.includes("localhost") || require('net').isIP(host)>0)){
 				clientName=host.split('.')[0]
 			}
 		}
@@ -77,7 +77,7 @@ class Cache {
 				clientName=ttl.split('.')[0]
 			}
 		}else {
-			if(!(data.host.includes("localhost") || data.host.includes("127.0.0.1"))){
+			if(!(data.host.includes("localhost") || require('net').isIP(data.host)>0)){
 				clientName=data.host.split('.')[0]
 			}
 		}

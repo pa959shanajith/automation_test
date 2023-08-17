@@ -549,7 +549,7 @@ module.exports.validateUserState = async (req, res) => {
 				let clientName="avoassure";
 				if(host != null && host != undefined)
 				{
-						if(!(host.includes("localhost") || host.includes("127.0.0.1") || host.includes("0.0.0.0"))){
+						if(!(host.includes("localhost") || require('net').isIP(host)>0)){
 								clientName=host.split('.')[0]
 						}
 				}
