@@ -12,7 +12,7 @@ import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 import CanvasEnE from './CanvasEnE';
 import { Navigate } from 'react-router-dom';
-import { projectList, selectedProj, screenData, moduleList } from '../designSlice';
+import { projectList, selectedProj, screenData, moduleList,AnalyzeScenario  } from '../designSlice';
 import ModuleListDrop from '../components/ModuleListDrop';
 import { Toast } from 'primereact/toast';
 
@@ -31,6 +31,7 @@ const CreateNew = ({importRedirect}) => {
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.design.selectedModule)
   const selectProj = useSelector(state=>state.design.selectedProj);  
+  const analyzeScenario = useSelector(state=>state.design.analyzeScenario); 
   const prjList = useSelector(state=>state.design.projectList)
   const initEnEProj = useSelector(state=>state.design.initEnEProj)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
@@ -91,7 +92,38 @@ const CreateNew = ({importRedirect}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
 
+  useEffect(()=>{
+    if(!analyzeScenario){(async()=>{
+        setBlockui({show:true,content:'Loading modules ...'})
+        var res = await getProjectList()
+        if(res.error){displayError(res.error);return;}
+        var data = parseProjList(res)
+        dispatch(projectList(data))
+        
+        if(!importRedirect){
+            dispatch(selectedProj(selectProj?selectProj:res.projectId[0])) 
+            var req={
+                tab:"endToend" || "tabCreate",
+                projectid:Proj?Proj.projectId:res.projectId[0],
+                version:0,
+                cycId: null,
+                modName:"",
+                moduleid:null
+            }
+            var moduledata = await getModules(req);
 
+            if(moduledata.error){displayError(moduledata.error);return;}
+            var screendata = await getScreens(Proj?Proj.projectId:res.projectId[0])
+            if(screendata.error){displayError(screendata.error);return;}
+            dispatch(screenData(screendata))
+            dispatch(moduleList(moduledata))
+        }
+        setBlockui({show:false,content:''})
+        setLoading(false)
+    })()
+  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[analyzeScenario])
   const displayError = (error) =>{
     setBlockui({show:false})
     setLoading(false)

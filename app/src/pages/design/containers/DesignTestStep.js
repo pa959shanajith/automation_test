@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserDetails, getNotificationGroups } from '../api';
-import { Messages as MSG,ScreenOverlay, setMsg,RedirectPage,ModalContainer,Thumbnail,SelectRecipients} from "../../global";
+import { Messages as MSG,ScreenOverlay,RedirectPage,SelectRecipients} from "../../global";
 import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
 import * as DesignApi from "../api";
 import { Dialog } from 'primereact/dialog';
@@ -14,6 +14,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
+import { Tag } from 'primereact/tag';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog } from 'primereact/confirmdialog';
@@ -31,6 +32,7 @@ import { Checkbox } from 'primereact/checkbox';
 const DesignModal = (props) => {
     const toast = useRef();
     const testcaseDropdownRef = useRef();
+    const toastImpact=useRef(null)
     const headerCheckRef = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -68,7 +70,7 @@ const DesignModal = (props) => {
     const [selectedTestCases,setSelectedTestCases]=useState([]);
     const [selectedOptions, setSelectedOptions] = useState(null);
     const [disableStep, setDisableStep] = useState(true);
-    const [idx, setIdx] = useState(0);
+    const [idx, setIdx] = useState(false);
     const [imported, setImported] = useState(false);
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [screenLavelTestSteps, setScreenLevelTastSteps] = useState([]);
@@ -89,17 +91,17 @@ const DesignModal = (props) => {
     const [commentFlag, setCommentFlag] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
-        "stepNo": 1,
-        "objectName": ' ',
-        "custname": '',
-        "keywordVal": '',
+        "objectName": "",
+        "custname": "",
+        "keywordVal": "",
         "inputVal": [""],
-        "outputVal": '',
+        "outputVal": "",
+        "stepNo": "",
+        "url": "",
+        "appType": "",
+        "remarksStatus": "",
         "remarks": "",
-        "url": ' ',
-        "appType": props.appType,
-        "addDetails": "",
-        "cord": '',
+        "_id_": "",
         "addTestCaseDetails": "",
         "addTestCaseDetailsInfo": ""
     };
@@ -148,25 +150,26 @@ const DesignModal = (props) => {
                     setImported(false)
                     setStepSelect({edit: false, check: [], highlight: []});
                     setChanged(false);
-                    // headerCheckRef.current.indeterminate = false;
+                    headerCheckRef.current.indeterminate = false;
                 })
                 .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
             }
         }
         //eslint-disable-next-line
     }, [imported]);
-    const ConfirmPopups = () => (
-        <ModalContainer 
-            title={showConfirmPop.title}
-            content={showConfirmPop.content}
-            close={()=>setShowConfirmPop(false)}
-            footer={
-                <>
-                <button onClick={showConfirmPop.onClick}>Yes</button>
-                <button onClick={()=>setShowConfirmPop(false)}>No</button>
-                </>
-            }
-        />
+    const ConfirmPopups = () => {
+        return(
+            <Dialog visible={showConfirmPop} header={showConfirmPop.title} onHide={()=>setShowConfirmPop(false)} footer={footerPopUp} >
+                <div>{showConfirmPop.content}</div>
+            </Dialog>
+        )
+    }
+       
+    const footerPopUp = () =>(
+        <>
+            <Button onClick={showConfirmPop.onClick} label='Yes'/>
+            <Button onClick={()=>setShowConfirmPop(false)} label='No'/>
+        </>
     )
     useEffect(()=>{
         let _expandedRow={}
@@ -316,7 +319,7 @@ const DesignModal = (props) => {
                                 setKeywordList(sortedKeywordList);
                                     let testcaseArray = [];
                                     if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
-                                        // testcaseArray.push(emptyRowData);
+                                        testcaseArray.push(emptyRowData);
                                         // props.setDisableActionBar(true);
                                         setOverlay("");
                                     } else {
@@ -554,14 +557,45 @@ const DesignModal = (props) => {
     }
 
     const addRow = () => {
-        let oldScreenLevelTestSTeps=[...screenLavelTestSteps]
+        const updateData = screenLavelTestSteps.find((item)=>item.id === rowExpandedName.id)
+        let testCases = [...updateData.testCases]
+        let insertedRowIdx = [];
+        runClickAway = false;
+        if (stepSelect.check.length === 1) {
+            const rowIdx = stepSelect.check[0];
+            testCases.splice(rowIdx+1, 0, emptyRowData);
+            insertedRowIdx.push(rowIdx+1)
+        }
+        else if (stepSelect.highlight.length === 1 && !stepSelect.check.length) {
+            const rowIdx = stepSelect.highlight[0];
+            testCases.splice(rowIdx+1, 0, emptyRowData);
+            insertedRowIdx.push(rowIdx+1)
+        }
+        else {
+            testCases.splice(updateData.testCases.length, 0, emptyRowData);
+            insertedRowIdx.push(updateData.testCases.length)
+        }
+        let oldScreenLevelTestSTeps=[...testCases]
         let testCaseUpdated = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
         let emptyRowDataIndex = { ...emptyRowData, stepNo: testCaseUpdated.testCases.length + 1 };
         let data = [...testCaseUpdated.testCases, emptyRowDataIndex];
         let updatedTestCase = { ...testCaseUpdated, testCases: data };
-        let index=screenLavelTestSteps.findIndex(screen=>screen.name === rowExpandedName.name)
-        oldScreenLevelTestSTeps.splice(index, 1, updatedTestCase)
-        setScreenLevelTastSteps(oldScreenLevelTestSTeps);
+        // let index=screenLavelTestSteps.findIndex(screen=>screen.name === rowExpandedName.name)
+        // oldScreenLevelTestSTeps.splice(index, 1, updatedTestCase)
+        let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
+            if (screen.name === rowExpandedName.name) {
+                return { ...screen, testCases: updatedTestCase.testCases };
+            }
+            return screen;
+        });
+        setScreenLevelTastSteps(updatedScreenLevelTestSteps)
+        // setTestCaseData(testCases);
+        setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
+        setHeaderCheck(false);
+        setChanged(true);
+        headerCheckRef.current.indeterminate = false;
+        // setEdit(false);
+       
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
@@ -618,18 +652,18 @@ const DesignModal = (props) => {
                     });
                     dispatch(Modified(rows));
                     dispatch(SaveEnable(!saveEnable))
-                    setMsg(MSG.DESIGN.SUCC_DEBUG);
+                    // setMsg(MSG.DESIGN.SUCC_DEBUG);
                     setSelectedTestCases([])
                     toast.current.show({severity: 'success',summary: 'Success', detail:MSG.DESIGN.SUCC_DEBUG.CONTENT, life:3000})
                 } else {
-                    setMsg(data);
+                    // setMsg(data);
                     toast.current.show({severity: 'success',summary: 'Success', detail:data, life:3000})
                 }										
             })
             .catch(error => {
                 setOverlay("");
                 // ResetSession.end();
-                setMsg(MSG.DESIGN.ERR_DEBUG);
+                // setMsg(MSG.DESIGN.ERR_DEBUG);
                 toast.current.show({severity:'error',summary: 'Error', detail:MSG.DESIGN.ERR_DEBUG.CONTENT, life:2000})
                 console.log("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
             });
@@ -795,12 +829,12 @@ const DesignModal = (props) => {
                                 console.error("ERROR::::", error)
                             });
                         
-                    } else throw  toast.current.show({severity:'error', summary:"Error", detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT, life:2000});
+                    } else throw  toast.current.show({severity:'error', summary:"Error", detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT, life:1000});
                 }
                 catch(error){
                     setOverlay("");
-                    if (typeof(error)==="object") setMsg(error);
-                    else toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_TC_JSON_IMPORT.CONTENT, life:2000})
+                    if (typeof(error)==="object") toast.current.show({severity:'error', summary:'Error', detail:error, life:1000});
+                    else toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_TC_JSON_IMPORT.CONTENT, life:1000})
                     // setMsg(MSG.DESIGN.ERR_TC_JSON_IMPORT)
                     console.error(error);
                 }
@@ -853,22 +887,40 @@ const DesignModal = (props) => {
         }
         return (
             <>
+                { overlay && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
                 {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
+                    <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
+                    <Tooltip target=".pi-plus " position="bottom" content="  Add Test Step"/>
+                    <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
+                    <Tooltip target=".edit " position="bottom" content="  Edit Test Step"/>
+                    <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={deleteTestcase} />
+                    <Tooltip target=".pi-trash " position="bottom" content="  Delete"/>
+                    <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
+
+                    {/* <img src='static/imgs/ic-selmulti.png' alt='Select Steps' className='select' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>selectMultiple()}/>
+                    <Tooltip target='.select' position='bottom' content='  Select Test Step(s)'/> */}
+                    <img src='static/imgs/ic-jq-dragstep.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
+                    <Tooltip target='.drag' position='bottom' content='  Drag & Drop Test Step'/>
+                    <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
+                    <Tooltip target='.copy' position='bottom'content='  Copy Test Step'/>
+                    <img src='static/imgs/ic-jq-pastesteps.png' alt='Paste steps' className='paste' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>onPasteSteps()}/>
+                    <Tooltip target=".paste" position='bottom' content='  Paste Test Step'/>
+                    <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
+
+                    <img src='static/imgs/skip-test-steps.png' alt='comment steps'className='comment' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>commentRows()}/>
+                    <Tooltip target=".comment " position="bottom" content="  Skip Test Step"/>
+                    <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
+
                     <img src='static/imgs/import_new_18x18_icon.svg' className='ImportSSSS' alt='import' onClick={()=>importTestCase()} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
                     <img src='static/imgs/Export_new_icon_grey.svg' alt='export' className='ExportSSSS' style={{width:'18px'}}  onClick={()=>exportTestCase()} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
-                    <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
-                    <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
-                    <Tooltip target=".pi-plus " position="bottom" content="  Add Test Step"/>
-                    <img src='static/imgs/ic-jq-editstep.png' alt='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
-                    <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={()=>setDeleteTestDialog(true)} />
-                    <Tooltip target=".pi-trash " position="bottom" content="  Delete"/>
-                    <Divider type="solid" layout="vertical" style={{padding: '0rem'}}/>
+                    <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
+                    
                     <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>handleDebug()} outlined></Button>
                     <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
                     <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
@@ -1174,7 +1226,7 @@ const DesignModal = (props) => {
         let highlight = [...stepSelect.highlight]
         let focus = [];
         runClickAway = false;
-        if (check.length === 0 && highlight.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_DEL);
+        if (check.length === 0 && highlight.length === 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP_DEL.CONTENT,life:1000});
         else {
             if (check.length === 1) focus = check;
             else if (highlight.length === 1 && !check.length) { focus = highlight; check = highlight }
@@ -1204,13 +1256,13 @@ const DesignModal = (props) => {
         let copyTestCases = []
         let copyContent = {}
         let copyErrorFlag = false;
-        if (selectedRows.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_COPY);
+        if (selectedRows.length === 0) toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_SELECT_STEP_COPY.CONTENT,life:1000});
         else{
             let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
             for (let idx of sortedSteps) {
                 if (!testCaseData[idx].custname) {
-                    if (selectedRows.length === 1) setMsg(MSG.DESIGN.ERR_EMPTY_TC_COPY);
-                    else setMsg(MSG.DESIGN.ERR_INVALID_OBJ_REF);
+                    if (selectedRows.length === 1) toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_EMPTY_TC_COPY.CONTENT,life:1000});
+                    else toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_INVALID_OBJ_REF.CONTENT,life:1000});
                     copyErrorFlag = true;
                     break
                 } 
@@ -1221,7 +1273,7 @@ const DesignModal = (props) => {
             }
             
             if (!copyErrorFlag) {
-                copyContent = {'appType': props.appType, 'testCaseId': props.fetchingDetails['_id'], 'testCases': copyTestCases};
+                copyContent = {'appType': props.appType, 'testCaseId': rowExpandedName.id, 'testCases': copyTestCases};
                 dispatch(copiedTestCases(copyContent));
                 setEdit(false);
             }
@@ -1235,11 +1287,11 @@ const DesignModal = (props) => {
         setStepSelect(oldState => ({...oldState, highlight: []}));
 
         if (!copiedContent.testCaseId){
-            setMsg(MSG.DESIGN.WARN_NO_TC_PASTE);
+            toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_NO_TC_PASTE.CONTENT,life:1000});
             return;
         }
 
-        if (copiedContent.testCaseId !== props.fetchingDetails['_id']) {
+        if (copiedContent.testCaseId !== rowExpandedName.id) {
             let appTypeFlag = false;
             for (let testCase of copiedContent.testCases){
                 if (["Web", "Desktop", "Mainframe", "OEBS", "MobileApp", "MobileWeb", "MobileApp", "SAP"].includes(testCase.appType)) {
@@ -1248,7 +1300,8 @@ const DesignModal = (props) => {
                 }
             }
             if (copiedContent.appType !== props.appType && appTypeFlag) {
-                setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
+                // setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
+                toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_DIFF_PROJTYPE.CONTENT,life:1000});
             }
             else{
                 setShowConfPaste(true);
@@ -1297,17 +1350,18 @@ const DesignModal = (props) => {
         // {'title': 'Skip Test Step', 'img': 'static/imgs/skip-test-step.png', 'alt': 'Comment Steps',  onClick:  ()=>commentRows() }
     ]
     const deleteTestcase = () => {
-        let testCases = [...testCaseData]
-        if (testCases.length === 1 && !testCases[0].custname) setMsg(MSG.DESIGN.WARN_DELETE);
-        else if (stepSelect.check.length <= 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP);
-        else if (reusedTC) props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{props.setShowConfirmPop(false);onDeleteTestStep()}});
-        else props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
+        const updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        let testCases = [...updateData.testCases]
+        if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:1000});
+        else if (stepSelect.check.length <= 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP.CONTENT,life:1000});
+        else if (reusedTC) setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{setShowConfirmPop(false);onDeleteTestStep()}});
+        else setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
     const onDeleteTestStep = () => {
         let testCases = []
         let localPastedTc = [...pastedTC];
-
-        testCaseData.forEach((val, idx) => {
+        const deleteData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        deleteData.testCases.forEach((val, idx) => {
             if (!stepSelect.check.includes(idx)) {
                 testCases.push(val);
             }
@@ -1318,11 +1372,18 @@ const DesignModal = (props) => {
         })
 
         setPastedTC(localPastedTc);
-        setTestCaseData(testCases);
+        let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
+            if (screen.name === rowExpandedName.name) {
+                return { ...screen, testCases: testCases };
+            }
+            return screen;
+        });
+        setScreenLevelTastSteps(updatedScreenLevelTestSteps)
+        // setTestCaseData(testCases);
         setStepSelect({edit: false, check: [], highlight: []});
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
-        props.setShowConfirmPop(false);
+        setShowConfirmPop(false);
         setChanged(true);
     }
     const setRowData = data => {
@@ -1419,43 +1480,49 @@ const DesignModal = (props) => {
         localPastedTc = [...new Set(localPastedTc)];
         runClickAway = false;
         setPastedTC(localPastedTc);
-        setTestCaseData(testCases);
+        let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
+            if (screen.name === rowExpandedName.name) {
+                return { ...screen, testCases: testCases };
+            }
+            return screen;
+        });
+        setScreenLevelTastSteps(updatedScreenLevelTestSteps)
+        // setTestCaseData(testCases);
         setShowPS(false);
         setStepSelect({edit: false, check: [], highlight: toFocus});
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setChanged(true);
     }
-    const ConfPasteStep = () => (
-        <ModalContainer 
-            title="Paste Test Step"
-            close={()=>setShowConfPaste(false)} 
-            content="Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?"
-            footer={
-                <>
-                <button onClick={()=>{
-                    setShowConfPaste(false);
-                    setShowPS(true);
-                }}>Yes</button>
-                <button onClick={()=>setShowConfPaste(false)}>No</button>
-                </>}
-        />
-    );
+    const ConfPasteStep = () =>{
+         return (
+            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={setShowConfPaste(false)} footer={footerPasteStep}>
+                <div>Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?</div>
+            </Dialog>
+        );
+    }
+       
+    const footerPasteStep = () =>(
+        <>
+            <Button onClick={()=>{setShowConfPaste(false);setShowPS(true);}} label='Yes'/>
+            <Button onClick={()=>setShowConfPaste(false)} label='No'/>
+        </>
+    )
     const fetchSelectRecipientsData = async () => {
         let checkAddUsers = document.getElementById("dc__checkbox").checked
         if(!checkAddUsers) resetData()
         else {
             var userOptions = [];
             let data = await getUserDetails("user");
-            if(data.error){setMsg(data.error);return;}
+            if(data.error){ toast.current.show({severity:'error', summary:'Error', detail:data.error, life:1000});return;}
             for(var i=0; i<data.length; i++) if(data[i][3] !== "Admin") userOptions.push({_id:data[i][1],name:data[i][0]}); 
             setAllUsers(userOptions.sort()); 
             data = await getNotificationGroups({'groupids':[],'groupnames':[]});
             if(data.error){
                 if(data.val === 'empty'){
-                    setMsg(data.error);
+                    toast.current.show({severity:'error', summary:'Error', detail:data.error, life:1000});
                     data = {};
-                } else{ setMsg(data.error); return true; }
+                } else{  toast.current.show({severity:'error', summary:'Error', detail:data.error, life:1000}); return true; }
             }
             setGroupList(data.sort())
         }
@@ -1465,35 +1532,23 @@ const DesignModal = (props) => {
         let checked = document.getElementById("dc__checkbox").checked
         return !checked
     }
-    const ConfirmPopup = () => (
-        <ModalContainer 
-            title={showPopup.title}
-            content={<div>
-                <span>Are you sure you want to {showPopup.content} the task ?</span>
-                <p className="dc__checkbox-addRecp" >
-                    <input  id="dc__checkbox" onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
-                    <span >Notify Additional Users</span>
-                </p>
-                <div className='dc__select-recpients'>
-                    <div>
-                        <span className="leftControl" title="Token Name">Select Recipients</span>
-                        <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
-                    </div>
-                </div>
-            </div>}
-            close={()=>{setShow(false);resetData();}}
-            // footer={
-            //     <>
-            //     <button onClick={()=>{submitTask(showPopup.content)}}>
-            //         {showPopup.continueText ? showPopup.continueText : "Yes"}
-            //     </button>
-            //     <button onClick={()=>{setShow(false);resetData()}}>
-            //         {showPopup.rejectText ? showPopup.rejectText : "No"}
-            //     </button>
-            //     </>
-            // }
-        /> 
-    )
+    // const ConfirmPopup = () => (
+    //     <Dialog visible={showPopup} header={showPopup.title} style={{width:'20rem'}} onHide={()=>{setShow(false);resetData()}}>
+    //         <div>
+    //             <span>Are you sure you want to {showPopup.content} the task ?</span>
+    //             <p className="dc__checkbox-addRecp" >
+    //                 <input  id="dc__checkbox" onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
+    //                 <span >Notify Additional Users</span>
+    //             </p>
+    //             <div className='dc__select-recpients'>
+    //                 <div>
+    //                     <span className="leftControl" title="Token Name">Select Recipients</span>
+    //                     <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </Dialog>
+    // )
     const selectSteps = stepList => {
         stepList.push(...stepSelect.check)
         let newChecks = Array.from(new Set(stepList))
@@ -1511,6 +1566,7 @@ const DesignModal = (props) => {
     const showDetailDialog = (rowIdx) => {
         setStepSelect(oldState => ({ ...oldState, highlight: []}));
         setShowDetailDlg(String(rowIdx));
+        setIdx(true)
     }
 
     const updateChecklist = (RowIdx, click, msg) => {
@@ -1582,7 +1638,10 @@ const DesignModal = (props) => {
                             <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center',paddingLeft:'0.5rem' }} ></Column>
                             <Tooltip target=".action " position="left" content="  Edit the test step."/>
                     </DataTable> */}
-                
+                    {/* { showPopup && ConfirmPopup()} */}
+                    { showConfPaste && <ConfPasteStep />}
+                    { showConfirmPop && ConfirmPopups() }
+                    { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} show={idx} setIdx={setIdx} onSetRowData={setRowData} idx={showDetailDlg} /> }
                 <div className="d__table">
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
@@ -1608,6 +1667,8 @@ const DesignModal = (props) => {
                                     updateChecklist={updateChecklist} setStepSelect={setStepSelect} editRow={editRow}
                                     setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
                                     rowChange={rowChange} keywordData={keywordList} setDeleteTestDialog={setDeleteTestDialog}
+                                    testcaseDetailsAfterImpact={props.testcaseDetailsAfterImpact}
+                                    impactAnalysisDone={props.impactAnalysisDone}
                                     />)
                                 } 
                             </ReactSortable>
@@ -1636,7 +1697,7 @@ const DesignModal = (props) => {
         {/* <Toast ref={toast} position="bottom-center" /> */}
         {overlay && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => props.setVisibleDesignStep(false)}>
+            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?screenLavelTestSteps:[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
@@ -1646,45 +1707,6 @@ const DesignModal = (props) => {
                         <Column field="name" style={{background: 'white',paddingLeft:'0.5rem' }}/>
                         <Column body={bodyHeader} style={{ background: 'white',paddingLeft:'0.5rem' }}/>
                     </DataTable>
-                     {/* <Accordion activeIndex={0}>
-                     {screenLavelTestSteps.map((data,i)=><AccordionTab header={data.name}>
-                        <div className="d__table">
-                            <div className="d__table_header">
-                                <span className="step_col d__step_head" ></span>
-                                <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
-                                <span className="objname_col d__obj_head" >Element Name</span>
-                                <span className="keyword_col d__key_head" >Keywords</span>
-                                <span className="input_col d__inp_head" >Input</span>
-                                <span className="output_col d__out_head" >Output</span>
-                                {/* <span className="remark_col d__rem_head" >Remarks</span> */}
-                                {/* <span className="details_col d__det_head" >Details</span>
-                            </div>
-                            <div style={{height: '66vh' }}>
-                            {data.testCases.length>0 && <div className="d__table_contents"  >
-                            <div className="ab">
-                                <div className="min">
-                                    <div className="con" id="d__tcListId">
-                                        <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
-                                        <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
-                                            {
-                                            data.testCases.map((item, i) => <TableRow data-test="d__tc_row" draggable={draggable}
-                                                key={i} idx={i} objList={objNameList} testCase={item} edit={edit} 
-                                                getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
-                                                updateChecklist={updateChecklist} setStepSelect={setStepSelect} editRow={editRow}
-                                                setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
-                                                rowChange={rowChange} keywordData={keywordList} setDeleteTestDialog={setDeleteTestDialog}
-                                                />)
-                                            } 
-                                        </ReactSortable>
-                                        </ClickAwayListener>
-                                    </div>
-                                </div>
-                            </div>
-                            </div>}
-                            </div>
-                            </div>
-                        </AccordionTab>)}
-                    </Accordion> */}
                 </div>
             </Dialog>
 
@@ -1717,7 +1739,7 @@ const DesignModal = (props) => {
                                             checked={selectedTestCases.includes(testCase.testCaseName)}
                                             disabled={rowExpandedName && rowExpandedName.id === testCase.testCaseID}
                                         />
-                                        <label className='label__testcase' htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
+                                        <label className={testCase.disableAndBlock ?'label__testcase_disable' : "label__testcase"} htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
                                     </div>
                                     
                                 ))}
@@ -1750,16 +1772,6 @@ const DesignModal = (props) => {
                             </div>
                         </div>
                     </div> */}
-                </div>
-            </Dialog>
-            <Dialog visible={deleteTestDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
-                <div className="confirmation-content">
-                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {newtestcase && (
-                        <span>
-                            Are you sure you want to delete?
-                        </span>
-                    )}
                 </div>
             </Dialog>
         </>
