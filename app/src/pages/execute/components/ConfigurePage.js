@@ -537,7 +537,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setFetechConfig(configurationList);
     configurationList.forEach((item, idx) => {
       getState.push({
-        sno: idx + 1,
+        sno: (
+          <span className="sno_header">
+            {idx + 1}
+          </span>
+        ),
         // profileName: item.configurename,
         profileName: (
           <span
@@ -611,13 +615,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   style={{ height: "20px", width: "20px" }}
 className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
 />
-<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
+<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
  <img
 
 src="static/imgs/ic-delete-bin.png"
 style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
 className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
-<Tooltip target=".pencil_button" position="left" content="Edit the execution configuration."/>
+<Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
             
           </div>
         ),
@@ -843,6 +847,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             <select
             placeholder="Search"
             title=" Search for project"
+            className="Search_Project"
               onChange={(e) => {
                 dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
@@ -1095,7 +1100,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     if (!!configList.length) {
       return (
         <>
-         <Tooltip target=".execute_now " position="bottom" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+         <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
          <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
 
@@ -1113,7 +1118,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           >
             <Column
               field="sno"
-              style={{ width: "5%" ,height:"2.5rem"}}
+              style={{ width: "5%" ,height:"2.5rem",fontFamily:"Open Sans"}}
               header={<span className="SNo-header">S.No.</span>}
             />
             <Column
@@ -1542,7 +1547,7 @@ Learn More '/>
                 />
                 <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
                Add Configuration
-               <Tooltip target=".addConfig_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+               <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}

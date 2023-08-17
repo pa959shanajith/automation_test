@@ -89,14 +89,24 @@
 .datatable__col {
   // overflow-y: scroll;
   overflow: auto;
+  width: 100%;
   .p-datatable .p-datatable-thead>tr>th {
     background: rgba(96, 91, 255, 0.1) !important;
     box-shadow: inset 0px -2px 0px rgba(0, 0, 0, 0.25);
     padding: 0.5rem !important;
   }
-  .p-column-title{
+  .p-column-header-content {
+    justify-content: center;
+  }
+
+  .p-datatable-thead th {
+    text-align: center !important;
+  }
+
+  .p-column-title {
     font-weight: bold !important;
     text-align: center !important;
+    margin-left: 0 !important;
   }
 
   .p-datatable .p-datatable-tbody>tr>td {
@@ -160,19 +170,19 @@
 .btn_test_screen {
   height: 3.2vh;
   position: relative;
-    /* right: 0.5rem; */
+  /* right: 0.5rem; */
   top: 1rem;
   left: 3rem;
 }
 
 .screen__name{
   white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 4rem;
-    position: relative;
-    bottom: 0.2rem;
-    font-family: 'Open Sans';
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 4rem;
+  position: relative;
+  bottom: 0.2rem;
+  font-family: 'Open Sans';
 }
 
 .onHoverLeftIcon{
@@ -181,10 +191,10 @@
   font-size: 1.5rem;
   cursor: pointer !important;
      &:hover{
-      background: #e9ecef;
-      border-color: transparent;
-      color: #343a40;
-     }
+    background: #e9ecef;
+    border-color: transparent;
+    color: #343a40;
+  }
 }
 
 .onHoverRightIcon{
@@ -193,10 +203,10 @@
   font-size: 1.5rem;
   cursor: pointer !important;
     &:hover{
-      background: #e9ecef;
-      border-color: transparent;
-      color: #343a40;
-    }
+    background: #e9ecef;
+    border-color: transparent;
+    color: #343a40;
+  }
 }
 
 .not_captured_ele {
@@ -301,182 +311,182 @@
       .inputCard{
         margin-top: 0.09%;
       .p-component{
-        height: 4rem;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        .p-card-body{
-          align-items: center;
-          .p-card-content{
-            padding: 0;
-          }
-        }
-        .mainContentCard{
+          height: 4rem;
+          width: 100%;
           display: flex;
           align-items: center;
-          .firstRow{
+        .p-card-body{
+            align-items: center;
+          .p-card-content{
+              padding: 0;
+            }
+          }
+        .mainContentCard{
             display: flex;
             align-items: center;
-            .p-component{
-              height: 2.3rem;
-              width: 11rem;
-            }
-            .p-button-sm{
-              width: 2.7rem;
-              height: 2rem;
-              justify-content: center;
-              margin-left: 4px;
-
-            }
-            .dropdown{
-              margin-left: 1rem;
-            .card {
-              width: 14rem;
-              // margin-left: 1rem;
+          .firstRow{
+              display: flex;
               align-items: center;
-
-              .p-treeselect{
+            .p-component{
+                height: 2.3rem;
                 width: 11rem;
-
               }
-              .p-button-sm{
-                width:3rem;
+            .p-button-sm{
+                width: 2.7rem;
                 height: 2rem;
                 justify-content: center;
                 margin-left: 4px;
 
               }
-            }
-          }
-          .input2{
-            margin-left: 1rem;
-            .p-component{
-              width: 11rem;
+            .dropdown{
+                margin-left: 1rem;
+                .card {
+                  width: 14rem;
+                  // margin-left: 1rem;
+                  align-items: center;
 
-            }
-          }
+              .p-treeselect{
+                    width: 11rem;
+
+                  }
+              .p-button-sm{
+                width:3rem;
+                    height: 2rem;
+                    justify-content: center;
+                    margin-left: 4px;
+
+                  }
+                }
+              }
+          .input2{
+                margin-left: 1rem;
+            .p-component{
+                  width: 11rem;
+
+                }
+              }
           .methodDropdown{
-            margin-left: 1rem;
+                margin-left: 1rem;
             width:11rem;
             .p-dropdown{
-              width: 11rem;
-            }
-          }
+                  width: 11rem;
+                }
+              }
           .input3{
-            margin-left: 1rem;
+                margin-left: 1rem;
             .p-inputtext{
               width:11rem ;
-              
-            }
+
+                }
             .certificateIcon{
-             margin-left: 1rem;
+                  margin-left: 1rem;
+                }
+              }
+
+
+            }
+            // .secondRow{
+
+            // }
           }
-          }
-            
-    
-          }
-          // .secondRow{
-            
-          // }
         }
       }
-    }
     .tabMenuCard{
-      margin-top: 0.26%;
+        margin-top: 0.26%;
       .p-card{
-        display: flex;
-        height: 3.3rem;
-        align-items: center;
+          display: flex;
+          height: 3.3rem;
+          align-items: center;
       .card{
-        display: flex;
-        width: 100%;
+            display: flex;
+            width: 100%;
         .tabMenu{
-          // margin-right: 24.8rem;
+              // margin-right: 24.8rem;
           .p-component{
             .p-reset{
-              padding-left: 24.8rem;
-              height: 3.3rem;
+                  padding-left: 24.8rem;
+                  height: 3.3rem;
+
+                }
+
+              }
 
             }
+            .buttons {
+              display: flex;
+              align-items: center;
+              width: 24.5rem;
 
+              .saveBut {
+                display: flex;
+                align-items: center;
+                padding-left: 5rem;
+
+                img {
+                  width: 2rem;
+                  height: 2rem;
+                  margin-right: 1rem;
+                }
+
+                .p-button {
+                  width: 5.6rem;
+                  height: 2.8rem;
+                  justify-content: center;
+                }
+              }
+
+              .cancelBut {
+                padding-left: 2rem;
+
+                .p-button {
+                  width: 5.6rem;
+                  height: 2.8rem;
+                }
+
+              }
+            }
           }
-
         }
-       .buttons {
-         display: flex;
-         align-items: center;
-         width: 24.5rem;
-                
-         .saveBut {
-           display: flex;
-           align-items: center;
-           padding-left: 5rem;
-                
-           img {
-             width: 2rem;
-             height: 2rem;
-             margin-right: 1rem;
-           }
-                
-           .p-button {
-             width: 5.6rem;
-             height: 2.8rem;
-             justify-content: center;
-           }
-         }
-                
-         .cancelBut {
-           padding-left: 2rem;
-                
-           .p-button {
-             width: 5.6rem;
-             height: 2.8rem;
-           }
-                
-         }
-       }
       }
-    }
-  }
   .bottomBoxes{
-    display: flex;
-    flex-direction: column;
-    padding-top: 1rem;
-    height: 74%;
-    align-items: center;
+        display: flex;
+        flex-direction: column;
+        padding-top: 1rem;
+        height: 74%;
+        align-items: center;
     .combinedBox{
-      display: flex;
-      flex-direction: column;
-      height: 99%;
-      justify-content: space-between;
+          display: flex;
+          flex-direction: column;
+          height: 99%;
+          justify-content: space-between;
       width:99%;
     .box1{
       .p-component{
-        height: 10rem;
+              height: 10rem;
         box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.02), 0 1px 3px 0 rgba(0,0,0,.2)
-      }
+            }
 
-    }
+          }
     .box2{
       .p-component{
-        height: 10rem;
+              height: 10rem;
         box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.02), 0 1px 3px 0 rgba(0,0,0,.2)
-      }
+            }
 
-    }
-  }
+          }
+        }
     .box3{
-      padding-top: 1rem;
-      width: 100%;
+          padding-top: 1rem;
+          width: 100%;
       .p-component{
-        height: 16rem;
-        width: 100%;
+            height: 16rem;
+            width: 100%;
         box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.02), 0 1px 3px 0 rgba(0,0,0,.2)
+          }
+
+        }
       }
 
-    }
-  }
-      
     }
   }
 
@@ -495,7 +505,7 @@
     }
 
     .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
-       padding: 0.5rem;
+      padding: 0.5rem;
     }
 
     .p-dialog-title {
@@ -582,7 +592,7 @@
     }
 
   }
-  
+
 
 }
 
@@ -626,7 +636,7 @@
     .p-dialog-header {
       height: 2rem !important;
     }
-  
+
     height: 4vh;
     width: 2vw;
   }
@@ -681,7 +691,7 @@
     .p-dialog-header {
       height: 2rem !important;
     }
-  
+
     height: 4vh;
     width: 2vw;
   }
@@ -899,8 +909,8 @@
     height: 4rem !important;
   }
   .p-dialog-header-icons{
-  position: relative;
-  // bottom: 1rem;
+    position: relative;
+    // bottom: 1rem;
   }
   .p-dialog-content{
     padding: 0.6rem;
@@ -915,16 +925,16 @@
 
 .btn__screenshot{
   background: none;
-    color: black;
-    padding: 0;
-    border: none;
-    font-family: "Open Sans";
+  color: black;
+  padding: 0;
+  border: none;
+  font-family: "Open Sans";
     &:hover{
-      font-family: "Open Sans";
-      border-bottom: 2px solid #605BFF;
-      font-weight: 600;
-      color: #605BFF;
-    }
+    font-family: "Open Sans";
+    border-bottom: 2px solid #605BFF;
+    font-weight: 600;
+    color: #605BFF;
+  }
 }
 
 
@@ -961,13 +971,13 @@
 
 .confirm__popup{
   .p-dialog-header {
-       background: #E2E2ED !important;
-       height: 3rem !important;
-    }
+    background: #E2E2ED !important;
+    height: 3rem !important;
+  }
     .p-dialog-header-icons{
-      position: absolute;
-      left: 20rem;
-    }
+    position: absolute;
+    left: 20rem;
+  }
 }
 
 .ss__red{
@@ -977,15 +987,15 @@
 
 .angle-left{
   background: none;
-    border: none;
-    color: black;
-    padding: 0.8rem;
+  border: none;
+  color: black;
+  padding: 0.8rem;
 }
 .angle-right{
   background: none;
-    border: none;
-    color: black;
-    padding: 0.8rem;
+  border: none;
+  color: black;
+  padding: 0.8rem;
 }
 .header__popup{
   white-space: nowrap;
@@ -1011,30 +1021,30 @@
 .p-dialog .p-dialog-footer {
   padding:0.5rem;
 
-  
-  }
-  .p-dialog .p-dialog-header {
+
+}
+.p-dialog .p-dialog-header {
   padding: 0.75rem;
   background: #e2e2ed;
-  }
+}
   .p-dialog .p-dialog-header .p-dialog-title 
   {
-    margin-left: 0.79rem;
-  }
+  margin-left: 0.79rem;
+}
   .p-datatable .p-datatable-tbody>tr>td{
-    padding: 0.55rem;
-  }
-  .save__btn__cmp {
-    position: relative;
-    width: 24% !important;
-    height: 1.7rem;
-    background: #605BFF;
-    border: none;
-    color: white;
-    font-size: 12px;
-    font-family: 'Open Sans';
-    border-radius: 4px;
-    cursor: pointer;
+  padding: 0.55rem;
+}
+.save__btn__cmp {
+  position: relative;
+  width: 24% !important;
+  height: 1.7rem;
+  background: #605BFF;
+  border: none;
+  color: white;
+  font-size: 12px;
+  font-family: 'Open Sans';
+  border-radius: 4px;
+  cursor: pointer;
 }
 .inputtext4{
   border-bottom: '1px solid black';
@@ -1047,7 +1057,7 @@
 
 }
 .reset_button{
-  margin-top: 2rem; 
+  margin-top: 2rem;
   margin-left: 30rem;
   display: flex;
   justify-content: flex-end;
@@ -1066,16 +1076,16 @@
 }
 .disabled-image {
   opacity: 0.5; /* Adjust opacity to indicate disabled state */
-  pointer-events: none; 
+  pointer-events: none;
 }
 .up_arrow{
   position: relative;
-    top: 5rem;
-    right: 0.2rem;
+  top: 5rem;
+  right: 0.2rem;
 }
 .down_arrow{
-     position: relative;
-     left: 68.8rem;
+  position: relative;
+  left: 68.8rem;
 }
 .p-tag-value{
   width: 34px;
