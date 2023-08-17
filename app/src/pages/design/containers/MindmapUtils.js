@@ -1,4 +1,5 @@
 /*eslint eqeqeq: "off"*/
+import { name } from 'agenda/dist/agenda/name';
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
 // import { readCtScale } from './Canvas';
@@ -611,7 +612,7 @@ export const addNode = (n,screenData) =>{
     if (n.display_name.length > 10) {
         n.display_name = n.display_name.slice(0, ch) + '...';
     }
-    if(n.type==="screens"){
+    if(n.type==="screens" && n.name !== ""){
 
         currentScreen=screenData.screenList.filter(screen=>screen.name===n.name)
 

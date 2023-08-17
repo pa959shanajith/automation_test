@@ -872,17 +872,17 @@ const DesignModal = (props) => {
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
                 {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
-                    <i className='pi pi-plus' style={{marginTop:'0.9rem'}}  onClick={()=>addRow()} />
-                    <Tooltip target=".pi-plus " position="bottom" content="  Add Test Step"/>
+                    <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
+                    <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
                     <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
                     <Tooltip target=".edit " position="bottom" content="  Edit Test Step"/>
-                    <i className='pi pi-trash' style={{marginTop:'0.9rem'}} title='Delete' onClick={deleteTestcase} />
-                    <Tooltip target=".pi-trash " position="bottom" content="  Delete"/>
+                    <img className='trash' src='static/imgs/ic-jq-deletesteps.png' alt='delete' style={{marginTop:'0.5rem', width:'26px', height:'26px'}} title='Delete' onClick={deleteTestcase} />
+                    <Tooltip target=".trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
                     {/* <img src='static/imgs/ic-selmulti.png' alt='Select Steps' className='select' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>selectMultiple()}/>
                     <Tooltip target='.select' position='bottom' content='  Select Test Step(s)'/> */}
-                    <img src='static/imgs/ic-jq-dragstep.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
+                    <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
                     <Tooltip target='.drag' position='bottom' content='  Drag & Drop Test Step'/>
                     <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
                     <Tooltip target='.copy' position='bottom'content='  Copy Test Step'/>
@@ -894,10 +894,10 @@ const DesignModal = (props) => {
                     <Tooltip target=".comment " position="bottom" content="  Skip Test Step"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    <img src='static/imgs/import_new_18x18_icon.svg' className='ImportSSSS' alt='import' onClick={()=>importTestCase()} />
+                    <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_grey.svg' alt='export' className='ExportSSSS' style={{width:'18px'}}  onClick={()=>exportTestCase()} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}}  onClick={()=>exportTestCase()} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
