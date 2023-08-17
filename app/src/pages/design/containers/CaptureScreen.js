@@ -1598,6 +1598,8 @@ const headerstyle={
        <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
+              {!showPanel && <div className='insprint__block'>
+                <p className='insprint__text'>In Sprint Automation</p></div>}
             {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
@@ -1623,6 +1625,9 @@ const headerstyle={
                 </div>)
                 } */}
               </div>}
+              {!showPanel && <div className='upgrade__block'>
+                <p className='insprint__text'>Upgrade Analyzer</p>
+                </div> }
 
               {showPanel && <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
@@ -1644,7 +1649,8 @@ const headerstyle={
                   <a href='docs.avoautomation.com'>Learn More</a>
                 </div>)} */}
               </div>}
-
+              {!showPanel && <div className='utility__block'>
+                <p className='insprint__text text-500'>Capture from PDF</p> </div> }
                {showPanel && <div className='utility__block'>
                 <p className='insprint__text text-500'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
@@ -1659,6 +1665,9 @@ const headerstyle={
                   <a>Learn More</a>
                 </div>)} */}
               </div>}
+
+              {!showPanel && <div className='createManual__block'>
+                <p className='insprint__text'>Create Manually</p> </div>}
 
               {showPanel && <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
