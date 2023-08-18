@@ -1270,7 +1270,7 @@ const footerSave = (
     <>
     <div className='header__screenshot__eye'>
     <div>
-          <img data-test="eyeIcon" className="ss_eye_icon"
+          <img data-test="eyeIcon" className="ss_eye_icon_screen"
             onClick={onHighlight}
             src={activeEye ? 
               "static/imgs/eye-active.svg" : 
