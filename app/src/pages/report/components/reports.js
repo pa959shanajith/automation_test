@@ -15,6 +15,8 @@ import {FooterTwo as Footer} from '../../global';
 import { fetchConfigureList, getProjectList } from "../api";
 import { NavLink } from 'react-router-dom';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
+import { SelectButton } from 'primereact/selectbutton';
+import { testTypesOptions, viewByOptions } from '../../utility/mockData';
 
 
 
@@ -25,14 +27,75 @@ const reports = () => {
     const [testStep, setTestStep] = useState(true);
     const [testSteped, setTestSteped] = useState(false);
     const [selectedOption, setSelectedOption] = useState("");
-    const [searchReportData, setSearchReportData] = useState('');
+    const [searchReportData, setSearchReportData] = useState("");
     const [configProjectId, setConfigProjectId] = useState("");
     const [projectList, setProjectList] = useState([]);
     const [show, setShow] = useState(false);
+    const [viewBy, setViewBy] = useState(viewByOptions[0]?.value);
+    const [testType, setTestType] = useState(testTypesOptions[0]?.value);
     const [dropdownData, setDropdownData] = useState([]);
     const [project, setProject] = useState({});
-    const [executionButon, setExecutionButon] = useState('View by Execution Profile');
-    const customDropdownIcon = classNames('pi','pi-sort-amount-down');
+    const [executionButon, setExecutionButon] = useState(
+      "View by Execution Profile"
+    );
+    const customDropdownIcon = classNames("pi", "pi-sort-amount-down");
+
+    const [reportData, setReportData] = useState([]);
+    const [reportDataModule, setReportDataModule] = useState([
+      {
+        key: "moduleName_1",
+        scenariovalue: "4 scenarios",
+        value: (
+          <img className="browser__img" src="static/imgs/chrome.png" alt="" />
+        ),
+      },
+      {
+        key: "moduleName_2",
+        scenariovalue: "2 scenarios",
+        value: (
+          <img className="browser__img" src="static/imgs/fire-fox.png" alt="" />
+        ),
+      },
+      {
+        key: "moduleName_3",
+        scenariovalue: "3 scenarios",
+        value: (
+          <img className="browser__img" src="static/imgs/chrome.png" alt="" />
+        ),
+      },
+      {
+        key: "moduleName_4",
+        scenariovalue: "1 scenarios",
+        value: (
+          <img className="browser__img" src="static/imgs/edge.png" alt="" />
+        ),
+      },
+      {
+        key: "moduleName_5",
+        scenariovalue: "4 scenarios",
+        value: (
+          <img className="browser__img" src="static/imgs/chrome.png" alt="" />
+        ),
+      },
+      {
+        key: "moduleName_6",
+        scenariovalue: "5 scenarios",
+        value: (
+          <img className="browser__img" src="static/imgs/edge.png" alt="" />
+        ),
+      },
+    ]);
+    const sort = [
+      { name: "Last modified", code: "0" },
+      { name: "Report Generation Date", code: "1" },
+      { name: "Alphabetical", code: "2" },
+    ];
+    const defaultSort = sort[0].name;
+    const [selectedItem, setSelectedItem] = useState(defaultSort);
+    const filteredExecutionData = reportData.filter((data) =>
+      data.configurename.toLowerCase().includes(searchReportData.toLowerCase())
+    );
+    const [selectedProject, setSelectedProject] = useState(null);
 
     const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
     const initProj = selectProjects.projectId;
@@ -84,48 +147,6 @@ const reports = () => {
         }
         };
 
-    const [reportData, setReportData] = useState([]);
-    const [reportDataModule, setReportDataModule] = useState([
-        {
-            key: "moduleName_1",
-            scenariovalue: "4 scenarios",
-            value: <img className='browser__img' src='static/imgs/chrome.png' alt=''/>
-        }, {
-            key: "moduleName_2",
-            scenariovalue: "2 scenarios",
-            value: <img className='browser__img' src='static/imgs/fire-fox.png' alt='' />
-        }, {
-            key: "moduleName_3",
-            scenariovalue: "3 scenarios",
-            value: <img className='browser__img' src='static/imgs/chrome.png' alt='' />
-        }, {
-            key: "moduleName_4",
-            scenariovalue: "1 scenarios",
-            value: <img className='browser__img' src='static/imgs/edge.png' alt=''/>
-        }, {
-            key: "moduleName_5",
-            scenariovalue: "4 scenarios",
-            value: <img className='browser__img' src='static/imgs/chrome.png' alt='' />
-        }, {
-            key: "moduleName_6",
-            scenariovalue: "5 scenarios",
-            value: <img className='browser__img' src='static/imgs/edge.png'  alt=''/>
-        }
-    ])
-    const sort = [
-        { name: 'Last modified', code: '0' },
-        { name: 'Report Generation Date', code: '1' },
-        { name: 'Alphabetical', code: '2' },
-    ];
-    const defaultSort = sort[0].name;
-    const [selectedItem, setSelectedItem] = useState(defaultSort);
-
-    const filteredExecutionData = reportData.filter((data) =>
-        data.configurename.toLowerCase().includes(searchReportData.toLowerCase())
-    );
-
-    const [selectedProject, setSelectedProject] = useState(null);
-
     function handleTest(options) {
         if (options === "Functional Test") {
             setActiveIndex(options)
@@ -169,108 +190,286 @@ const reports = () => {
         setShow(true);
     }
 
+    const viewByTemplate = (option) => {
+      return <div><i className={option.icon}></i><span>{option.value}</span></div>;
+    };
+
     return (
-        <div className='report_landing'>
-            <div className='report'>
-                <div>
-                    <label data-test="projectLabel" className='Projectreport'>Project:</label>
-                    <select data-test="projectSelect" className='projectSelectreport' value={initProj} onChange={(e)=>{handeSelectProject(e.target.value)}}>
-                        {projectList.map((project, index)=><option key={index} value={project.id} >{project.name}</option>)}
-                    </select>
-                </div>
-                {!show && <div id="reports" className="cards">
-                    <div className="buttonReports">
-                        <Button onClick={(e) => handleTest(e.target.value)} icon={<img alt="function" style={{ height: "1.2rem" }} src="static/imgs/Functional.png" />} id="buttonF" className={testStep !== false ? "textf" : "textF"} label="Functional Test" value="Functional Test" />
-                        <Button onClick={(e) => handleTest(e.target.value)} icon={<img alt="function" style={{ height: "1.2rem" }} src="static/imgs/Accessibility.png" />} id="buttonA" className={testSteps !== false ? "textFA" : "textfa"} label="Accessibility Test" value="Accessibility Test" />
-                    </div>
-
+      <div className="reports_container">
+        <div className="grid options_box">
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+            <div className="flex flex-column ml-4">
+              <label data-test="projectLabel" className="Projectreport">
+                <b>Project:</b>
+              </label>
+              <select
+                data-test="projectSelect"
+                className="projectSelectreport"
+                value={initProj}
+                onChange={(e) => {
+                  handeSelectProject(e.target.value);
+                }}
+              >
+                {projectList.map((project, index) => (
+                  <option key={index} value={project.id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnTest">
+            <div>
+              <b>Test Type: </b>
+              <SelectButton
+                value={testType}
+                itemTemplate={viewByTemplate}
+                onChange={(e) => {
+                  handleTest(e.value);
+                  setTestType(e.value);
+                }}
+                options={testTypesOptions}
+              />
+            </div>
+          </div>
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnView">
+            <div>
+              <b>View By: </b>
+              <SelectButton
+                value={viewBy}
+                itemTemplate={viewByTemplate}
+                onChange={(e) => {
+                  setViewBy(e.value);
+                }}
+                options={viewByOptions}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="report_landing">
+          <div className="report">
+            {!show && (
+              <div id="reports" className="cards">
+                <>
+                  {filteredExecutionData.length > 0 ? (
                     <>
-                        {filteredExecutionData.length > 0 ? (<>
-                            {activeIndex === "Functional Test" &&
-                                <div className="card flex justify-content-start relative report_btn">
-                                    <div className="flex flex-wrap gap-3">
-                                        <div className="flex align-items-center">
-                                            <RadioButton inputId="View by Execution Profile" name="View by Execution Profile" value="View by Execution Profile" onChange={(e) => setExecutionButon(e.value)} checked={executionButon === 'View by Execution Profile'} />
-                                            <label htmlFor="View by Execution Profile" className="ml-2 Profile_Name" value="ExecutionProfile" checked={selectedOption === 'ExecutionProfile'}>View by Execution Profile</label>
-                                        </div>
-                                        <div className="flex align-items-center">
-                                            <RadioButton inputId="View by Modules" name="View by Modules" value="View by Modules" onChange={(e) => setExecutionButon(e.value)} checked={executionButon === 'View by Modules'} />
-                                            <label htmlFor="View by Modules" className="ml-2 Profile_Name" value="ViewByModules" checked={selectedOption === 'ViewByModules'}>View by Test Suite</label>
-                                        </div>
-                                    </div>
-                                </div>}
-                            <div>
-                                {activeIndex === "Accessibility Test" &&
-                                    <div className="card flex justify-content-start relative report_btn">
-                                        <div className="flex flex-wrap gap-3">
-                                            <div className="flex align-items-center">
-                                                <RadioButton inputId="View by Execution Profile" name="View by Execution Profile" value="View by Execution Profile" onChange={(e) => setExecutionButon(e.value)} checked={executionButon === 'View by Execution Profile'} />
-                                                <label htmlFor="View by Execution Profile" className="ml-2" value="ExecutionProfile" checked={selectedOption === 'ExecutionProfile'}>View by Execution Profile</label>
-                                            </div>
-                                            <div className="flex align-items-center">
-                                                <RadioButton inputId="View by Modules" name="View by Modules" value="View by Modules" onChange={(e) => setExecutionButon(e.value)} checked={executionButon === 'View by Modules'} />
-                                                <label htmlFor="View by Modules" className="ml-2" value="ViewByModules" checked={selectedOption === 'ViewByModules'}>View by Modules</label>
-                                            </div>
-                                        </div>
-                                    </div>}
-                            </div>
-
-                            <div>
-                                <div className="p-input-icon-left report-search">
-                                    <i className="pi pi-search" />
-                                    <InputText className='report_search_input' placeholder="Search" value={searchReportData} onChange={(e) => setSearchReportData(e.target.value)} />
-                                </div>
-                                <div className='sort'><h2 className='projectDropDown'></h2><Dropdown value={selectedItem} onChange={(e)=>handleClicked(e)} options={sort} optionLabel="name" dropdownIcon={customDropdownIcon} className="w-full md:w-10rem h-2.1rem ml-4" placeholder={selectedItem} /></div>
-                            </div>
-                        </>) : ''}
+                      <div className="flex justify-content-between ml-4 mr-4 mt-2 mb-2">
+                        <div>
+                          <h2 className="projectDropDown"></h2>
+                          <Dropdown
+                            value={selectedItem}
+                            onChange={(e) => handleClicked(e)}
+                            options={sort}
+                            optionLabel="name"
+                            dropdownIcon={customDropdownIcon}
+                            className="w-full md:w-30rem"
+                            placeholder={selectedItem}
+                          />
+                        </div>
+                        <div className="p-input-icon-left">
+                          <i className="pi pi-search" />
+                          <InputText
+                            className="report_search_input"
+                            placeholder="Search"
+                            value={searchReportData}
+                            onChange={(e) =>
+                              setSearchReportData(e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
                     </>
-
-                    
-                        {filteredExecutionData.length > 0 ? (<div className='report_Data ml-4'>
-                            {/* {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
-                                {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'><Card key={index} className='testCards'>
+                  ) : (
+                    ""
+                  )}
+                </>
+                {filteredExecutionData.length > 0 ? (
+                  <div className="report_Data ml-4 mr-4">
+                    {/* {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
+                                {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap'><Card key={index} className='testCards'>
                                 <NavLink to="/reports/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active">{data.configurename}</NavLink><p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report'>Last executed through CI/CD</p><p className='Profile_Name_report'>Last executed on {data.execDate.slice(5,16)}</p>
                                 </Card></div>))}
                             </div>)} */}
-                            {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
-                            {filteredExecutionData.map((data, index) => (<div className='flex flex-wrap p-4'> <NavLink to="/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} className='Profile_Name' activeClassName="active"><Card key={index} className='testCards'>
-                                           <div><p className='reportConfigName'>{data.configurename}</p>
-                                                <p className='Profile_Name_report'>{data.selectedModuleType}</p><p className='Profile_Name_report_sm'>Last executed through CI/CD</p><p className='Profile_Name_report_sm'>Last executed on {data.execDate.slice(5,16)}</p>
-                                           </div>
-                                        </Card>
-                                    </NavLink>
-                                </div>))}
-                            </div>)}
-                            {activeIndex === "Functional Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
-                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><p m={handleData}>{data.key}</p><p>{data.scenariovalue}</p>
-                                    <Avatar key={data.value} className='browser-avatar' />
-                                </Card></div>)}
-                            </div>)}
-                            {activeIndex === "Accessibility Test" && executionButon === 'View by Execution Profile' && (<div className="grid ml-4" >
-                                {reportData.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} activeClassName="active">{data.key}</NavLink><p>{data.Modulevalue + data.scenariovalue}</p>
-                                    <AvatarGroup>
-                                        {data.value.map((image, index) => (
-                                            <Avatar key={index} image={image.props.src} className='browser-avatar' />
-                                        ))}
-
-                                    </AvatarGroup>
-                                </Card></div>)}
-                            </div>)}
-                            {activeIndex === "Accessibility Test" && executionButon === 'View by Modules' && (<div className="grid ml-4" >
-                                {reportDataModule.map((data) => <div className='flex flex-wrap p-2'><Card key={data.key} className='testCards' ><NavLink to="/reports/profile" state= {{execution: data.configurename, configureKey: data.configurekey}} activeClassName="active">{data.key}</NavLink><p>{data.scenariovalue}</p>
-                                    <Avatar key={data.value} className='browser-avatar' />
-                                </Card></div>)}
-                            </div>)}
-                        </div>)
-                            : (<div className='Report_Image'><img id='report_icon' src="static/imgs/Functional_report_not_found.svg" alt="Empty data" />
-                            <div className='report_text'>{activeIndex === "Functional Test" ? (<div className='flex flex-column align-items-center'><span>Functional reports not found</span><span className='text-sm'>Execute one execution profile to see its reports.</span></div>)
-                            :(<div className='flex flex-column align-items-center'><span>Accessibility reports not found</span><span className='text-sm'>Execute one execution profile to see its reports.</span></div>)}</div></div>)}
-                </div>}
-                {show && <ReportTestTable />}
-            </div>
-            <div><Footer/></div>
+                    {activeIndex === "Functional Test" &&
+                      executionButon === "View by Execution Profile" && (
+                        <div className="grid">
+                          {filteredExecutionData.map((data, index) => (
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+                              <NavLink
+                                to="/profile"
+                                state={{
+                                  execution: data.configurename,
+                                  configureKey: data.configurekey,
+                                }}
+                                className="Profile_Name"
+                                activeClassName="active"
+                              >
+                                <Card key={index} className="testCards">
+                                  <div className="grid">
+                                    <div className="col-10">
+                                      <span className="exe_profile">
+                                        Execution Profile
+                                      </span>
+                                    </div>
+                                    <div className="col-2 flex justify-content-center">
+                                      {/* <span className='exe_count'>5</span> */}
+                                    </div>
+                                    <div className="col-12 exe_namebox">
+                                      <span className="exe_name">
+                                        {data.configurename}
+                                      </span>
+                                    </div>
+                                    <div className="col-12 exe_details">
+                                      Last execution details
+                                    </div>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_details">
+                                        Executed On
+                                      </span>
+                                      <span className="exe_date">
+                                        {data.execDate.slice(5, 16)}
+                                      </span>
+                                    </div>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_details">
+                                        Executed via
+                                      </span>
+                                      <span className="exe_date">CI/CD</span>
+                                    </div>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_type">
+                                        <img
+                                          src={
+                                            data.selectedModuleType ===
+                                            "e2eExecution"
+                                            ? "static/imgs/E2E_configsetup.png"
+                                            : "static/imgs/signup_module.svg"
+                                          }
+                                        />
+                                        {data.selectedModuleType ===
+                                        "e2eExecution"
+                                          ? "End2End"
+                                          : "Test Suite"}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </Card>
+                              </NavLink>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    {activeIndex === "Functional Test" &&
+                      executionButon === "View by Modules" && (
+                        <div className="grid">
+                          {reportDataModule.map((data) => (
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+                              <Card key={data.key} className="testCards">
+                                <p m={handleData}>{data.key}</p>
+                                <p>{data.scenariovalue}</p>
+                                <Avatar
+                                  key={data.value}
+                                  className="browser-avatar"
+                                />
+                              </Card>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    {activeIndex === "Accessibility Test" &&
+                      executionButon === "View by Execution Profile" && (
+                        <div className="grid">
+                          {reportData.map((data) => (
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+                              <Card key={data.key} className="testCards">
+                                <NavLink
+                                  to="/reports/profile"
+                                  state={{
+                                    execution: data.configurename,
+                                    configureKey: data.configurekey,
+                                  }}
+                                  activeClassName="active"
+                                >
+                                  {data.key}
+                                </NavLink>
+                                <p>{data.Modulevalue + data.scenariovalue}</p>
+                                <AvatarGroup>
+                                  {data?.value?.map((image, index) => (
+                                    <Avatar
+                                      key={index}
+                                      image={image.props.src}
+                                      className="browser-avatar"
+                                    />
+                                  ))}
+                                </AvatarGroup>
+                              </Card>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    {activeIndex === "Accessibility Test" &&
+                      executionButon === "View by Modules" && (
+                        <div className="grid">
+                          {reportDataModule.map((data) => (
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+                              <Card key={data.key} className="testCards">
+                                <NavLink
+                                  to="/reports/profile"
+                                  state={{
+                                    execution: data.configurename,
+                                    configureKey: data.configurekey,
+                                  }}
+                                  activeClassName="active"
+                                >
+                                  {data.key}
+                                </NavLink>
+                                <p>{data.scenariovalue}</p>
+                                <Avatar
+                                  key={data.value}
+                                  className="browser-avatar"
+                                />
+                              </Card>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                ) : (
+                  <div className="Report_Image">
+                    <img
+                      id="report_icon"
+                      src="static/imgs/Functional_report_not_found.svg"
+                      alt="Empty data"
+                    />
+                    <div className="report_text">
+                      {activeIndex === "Functional Test" ? (
+                        <div className="flex flex-column align-items-center">
+                          <span>Functional reports not found</span>
+                          <span className="text-sm">
+                            Execute one execution profile to see its reports.
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-column align-items-center">
+                          <span>Accessibility reports not found</span>
+                          <span className="text-sm">
+                            Execute one execution profile to see its reports.
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {show && <ReportTestTable />}
+          </div>
+          <div>
+            <Footer />
+          </div>
         </div>
-    )
+      </div>
+    );
 }
 
 export default reports;

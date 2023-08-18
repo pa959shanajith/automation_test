@@ -153,7 +153,7 @@ export const reportsBar = {
   fail: "rgba(254, 80, 70, 1)",
 };
 
-export const testTypes = [
+export const testTypesOptions = [
   {
     icon: 'pi pi-align-left',
     value: 'Functional Test'
@@ -164,7 +164,7 @@ export const testTypes = [
   }
 ];
 
-export const viewBy = [
+export const viewByOptions = [
   {
     icon: 'pi pi-align-left',
     value: 'Execution Profile'

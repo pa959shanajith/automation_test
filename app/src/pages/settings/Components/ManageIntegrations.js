@@ -79,6 +79,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [authType,setAuthType] = useState("basic");
     const [user, setUser] = useState([]);
     const azureRef = useRef(null);
+    const zephyrRef = useRef(null);
     const [domainDetails , setDomainDetails] = useState(null);
     const [currentAvoPage, setCurrentAvoPage] = useState(1);
     const [indexOfFirstScenario, setIndexOfFirstScenario] = useState(0);
@@ -179,6 +180,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(domainDetails);
+            zephyrRef.current.callViewMappedFiles();
             // setLoginSuccess(true);
         }
         setIsSpin(false);
@@ -679,11 +681,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
     }
 
+    const callZephyrSaveButton = () => {
+        if(zephyrRef.current){
+            zephyrRef.current.callSaveButton();
+        }
+    }
+
     const footerIntegrations = useCallback(()=>{
         return (<div className='btn-11'>
             {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:callAzureSaveButton} />
+                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
                     <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
                 </div>)}
 
@@ -855,7 +863,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
+                        : selectedscreen.name === "Zephyr" ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

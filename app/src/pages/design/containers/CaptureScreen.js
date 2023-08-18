@@ -559,9 +559,10 @@ const elementTypeProp =(elementProperty) =>{
             // screenshot
           }
           resolve("success");
-          let newData = (viewString.length > 0 && !elementPropertiesUpdated) ? viewString.map((item) => {
+          let newData = (viewString.length > 0 && !elementPropertiesUpdated) ? viewString.map((item, itemIdx) => {
             return (
               {
+                
                 selectall: item.custname,
                 objectProperty: elementTypeProp(item.tag),
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={(event) => {
@@ -575,7 +576,7 @@ const elementTypeProp =(elementProperty) =>{
                   setHighlight(true);
                 }}>View Screenshot</span> : <span>No Screenshot Available</span>,
                 actions: '',
-                objectDetails: item
+                objectDetails: item,
 
               }
             )
@@ -934,8 +935,34 @@ else{
 
 
   const handleDelete = (rowData) => {
-    const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
-    setCaptureData(updatedData);
+    // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
+
+    let deletedArr = [...deleted];
+    let scrapeItemsL = [...captureData];
+    let newOrderList = [];
+
+    const capturedDataAfterDelete = captureData.filter(item =>
+      item.objectDetails.objId !== rowData.objectDetails.objId
+    );
+
+    deletedArr.push(rowData.objectDetails.objId);
+
+    let notused = scrapeItemsL.filter(item => {
+      if (deletedArr.includes(item.objectDetails.objId)) {
+        return false
+      }
+      else {
+        newOrderList.push(item.objectDetails.objId)
+      }
+    })
+    let newCapturedDataToSave = capturedDataAfterDelete.map(item => item.objectDetails)
+    setCaptureData(capturedDataAfterDelete)
+    setDeleted(deletedArr)
+    setOrderList(newOrderList)
+    setCapturedDataToSave(newCapturedDataToSave)
+    setSelectedCapturedElement([])
+    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+    // setCaptureData(updatedData);
   };
 
   const handleEdit = (rowData) => {
@@ -1002,20 +1029,20 @@ else{
 
   const footerCapture = (
     <div className='footer__capture'>
-      {visible === 'capture' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</button>}
-      {visible === 'replace' && <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</button>}
+      {visible === 'capture' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</Button>}
+      {visible === 'replace' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</Button>}
     </div>
   )
   const footerCompare = (
     <div className='footer__capture'>
-      <button className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName,'compare'); }}>Compare</button>
+      <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName,'compare'); }}>Compare</Button>
       
     </div>
   )
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
+      <Button size='small' onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
     </div>
   );
 
@@ -1043,7 +1070,7 @@ else{
     <div className='empty_msg1'>
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
-        <p className="not_captured_message">Not Captured</p>
+        <p className="not_captured_message">Elements not captured</p>
         <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true);}} >Capture Elements</Button>
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
@@ -1053,7 +1080,7 @@ else{
 const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
 const elementIdentifier=()=>{
-  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]:
+  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]:
   selectedCapturedElement[0].objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
   setIdentifierList(identifierList)
   setShowIdentifierOrder(true)
@@ -1461,6 +1488,56 @@ const footerSave = (
       )
 
   }
+
+  //showing toast msgs for map replace compare and export if the data is not captured:
+
+  const handleCaptureClickToast = () => {
+    if (captureData.length === 0 && isWebApp) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'Capture Data',
+        detail: 'Please capture the data before mapping.',
+      });
+    } else if (isWebApp) {
+      handleDialog('mapObject');
+    }
+  };
+
+  const handleCompareClick = () => {
+    if (captureData.length === 0 && isWebApp) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'Capture Data',
+        detail: 'Please capture the data before comparing elements.',
+      });
+    } else if (isWebApp) {
+      setVisible('compare');
+    }
+  };
+
+  const handleReplaceClick = () => {
+    if (captureData.length === 0 && isWebApp) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'Capture Data',
+        detail: 'Please capture the data before replacing elements.',
+      });
+    } else if (isWebApp) {
+      setVisible('replace');
+    }
+  };
+
+  const handleExportClick = () => {
+    if (captureData.length === 0) {
+      toast.current.show({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: 'There is no data to export.',
+      });
+    } else {
+      setShowObjModal('exportModal');
+    }
+  };
   // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -1483,14 +1560,12 @@ const footerSave = (
      const renderElement=(rowdata, column)=>{
       return (
         <>
+        <Tooltip content={rowdata.selectall} target={`.tooltip__target-${rowdata.objectDetails.objId}`} tooltipOptions={{ position: 'right' }}></Tooltip>
         <div style={{display:'flex',justifyContent:'space-between'}}>
-          <div >{rowdata.selectall}</div>
-          {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
-          {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
-          {/* <Tooltip target={`#${column.field}-${rowdata.id}`} position="top">
-          {rowdata.selectall}
-          </Tooltip> */}
-        </div>
+        <div className={`tooltip__target-${rowdata.objectDetails.objId}`}>{rowdata.selectall}</div>
+        {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
+        {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+      </div>
       </>
       )
      }
@@ -1525,6 +1600,10 @@ const headerstyle={
        <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
+              {!showPanel && <div className='insprint__block'>
+                <div>
+                <p className='insprint__text'>In Sprint Automation</p></div>
+                </div>}
             {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
@@ -1534,7 +1613,7 @@ const headerstyle={
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className={`insprint_auto ${!isWebApp || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && handleDialog('mapObject')}>
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
                   <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
                   {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
@@ -1550,17 +1629,22 @@ const headerstyle={
                 </div>)
                 } */}
               </div>}
+              {!showPanel && <div className='upgrade__block'>
+                <div className='panel_head'>
+                <p className='insprint__text'>Upgrade Analyzer</p>
+                </div>
+                </div> }
 
               {showPanel && <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
-                <span className={`upgrade_auto ${!isWebApp || captureData.length === 0? "disabled" : ""}`}  onClick={() =>captureData.length > 0 && isWebApp && setVisible("compare")}>
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={handleCompareClick}>
                   <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
                   {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
-                <span className={`upgrade_auto ${!isWebApp  || captureData.length === 0 ? "disabled" : ""}`} onClick={() => captureData.length > 0 && isWebApp && setVisible('replace')}>
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
                   <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
                   {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
@@ -1571,7 +1655,10 @@ const headerstyle={
                   <a href='docs.avoautomation.com'>Learn More</a>
                 </div>)} */}
               </div>}
-
+              {!showPanel && <div className='utility__block'>
+                <div className='panel_head1'>
+                <p className='insprint__text text-500'>Capture from PDF</p> </div>
+                </div> }
                {showPanel && <div className='utility__block'>
                 <p className='insprint__text text-500'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
@@ -1587,11 +1674,16 @@ const headerstyle={
                 </div>)} */}
               </div>}
 
+              {!showPanel && <div className='createManual__block'>
+                <div className='panel_head2'>
+                <p className='insprint__text'>Create Manually</p> </div>
+                </div>}
+
               {showPanel && <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
-                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={() =>captureData.length > 0 &&  isWebApp &&  handleDialog('createObject')}>
+                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={()=> isWebApp &&  handleDialog('createObject')}>
                   <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
                   <p>Create Element</p>
                 </span>
@@ -1610,8 +1702,8 @@ const headerstyle={
                     <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
                     <p className='imp__text'>Import Screen</p>
                   </span>
-                  <span className="export__block" style={captureData.length === 0 ? { color: "#cccccc" }: {}} onClick={() => captureData.length !== 0 && setShowObjModal("exportModal")}>
-                    <img  className={` add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} src="static/imgs/Export_new_icon_grey.svg" style={captureData.length === 0 ? { color: "#cccccc" }: {}} />
+                  <span className="export__block"  onClick={handleExportClick}>
+                    <img  className="add_obj_export" src="static/imgs/Export_new_icon_grey.svg" />
                     {/* <i className={`pi pi-file-export add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} style={captureData.length === 0 ? { color: "#cccccc" }: {}}  ></i> */}
                     <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
                     <p className='imp__text'>Export Screen</p>
@@ -1632,7 +1724,7 @@ const headerstyle={
 
 
 
-        <div className="card-table">
+        <div className="card-table" style={{ width: '100%', display: "flex" }}>
           {typesOfAppType === "WebService" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
@@ -1654,18 +1746,22 @@ const headerstyle={
             scrollHeight="400px"
             columnResizeMode="expand"
           >
-            <Column headerStyle={{ width: '3rem' }} selectionMode='multiple'></Column>
-            <Column field="selectall" header="Element Name" headerStyle={{ textAlign: 'center' }} 
+            {/* editMode="cell"
+            onCellEdit={(e) => handleCellEdit(e)} */}
+            {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
+            {/* <Column rowReorder style={{ width: '3rem' }} /> */}
+            <Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>
+            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
               editor={(options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
-              bodyClassName={"ellipsis-column" + (capturedDataToSave.duplicate ? " ss__red" : "")}
+              bodyClassName={"ellipsis-column"}
               body={renderElement}
             >
             </Column>
-            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type"></Column>
-            <Column field="screenshots" header="Screenshot"></Column>
-            <Column field="actions" header="Actions" body={renderActionsCell} />
+            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" headerStyle={{ justifyContent: "center"}}></Column>
+            <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
+            <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
           </DataTable>
               }
           <Dialog header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `94vh`, position:"right" }}>
@@ -1724,7 +1820,7 @@ const headerstyle={
             <p className='compare__text'>List of Browsers</p>
           </span>
           <span className='browser__col'>
-            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
             <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
             <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
             <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
@@ -1740,6 +1836,20 @@ const headerstyle={
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+        
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
+        <div className={"compare__object"}>
+          <span className='compare__btn'>
+            <p className='compare__text'>List of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+      </Dialog> : null}
 
       {currentDialog === 'addObject' && <ActionPanel
         isOpen={currentDialog}
@@ -1775,6 +1885,7 @@ const headerstyle={
         toastError={toastError}
         setOverlay={setOverlay}
         setShowPop={setShowPop}
+        parentData={parentData}
       />}
 
       {currentDialog === 'createObject' && <ActionPanel
@@ -1799,7 +1910,13 @@ const headerstyle={
       startScrape={startScrape} 
       mainScrapedData={mainScrapedData} 
       fetchingDetails={props.fetchingDetails} 
-      orderList={orderList}/>}
+      orderList={orderList}
+      fetchScrapeData={fetchScrapeData}
+      setShow={setCurrentDialog}
+      toastSuccess={toastSuccess}
+      toastError={toastError}
+      elementTypeProp={elementTypeProp}
+      />}
 
 
       {showObjModal === "importModal" && <ImportModal

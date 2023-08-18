@@ -20,7 +20,7 @@ const Handlebars = require('../lib/handlebar.js');
 wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
 
-fs.readFile('D:\\projects\\Avo_assureDB_setup\\Webserver_Backup\\WebServer\\templates\\pdfReport\\content.handlebars', 'utf8', function(err, data) {
+fs.readFile(path.join(__dirname,"..","..","templates","pdfReport","content.handlebars"), 'utf8', function(err, data) {
     templatepdf = Handlebars.compile(data);
 });
 

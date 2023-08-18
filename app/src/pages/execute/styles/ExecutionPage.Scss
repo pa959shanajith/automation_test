@@ -6,4 +6,11 @@
 }
 .Manage_execution_Queue{
     font:$f5_semibold ;
+    margin-left: 1.1rem;
+    margin-top: 1rem;
+    .p-icon {
+        display: inline-block;
+        margin-top: 0.1rem;
+        font-family: "Open Sans";
+    }
 }
