@@ -1098,7 +1098,7 @@ else{
 const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
 const elementIdentifier=()=>{
-  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}]:
+  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]:
   selectedCapturedElement[0].objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
   setIdentifierList(identifierList)
   setShowIdentifierOrder(true)
@@ -1618,6 +1618,10 @@ const headerstyle={
        <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
+              {!showPanel && <div className='insprint__block'>
+                <div>
+                <p className='insprint__text'>In Sprint Automation</p></div>
+                </div>}
             {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
@@ -1643,6 +1647,11 @@ const headerstyle={
                 </div>)
                 } */}
               </div>}
+              {!showPanel && <div className='upgrade__block'>
+                <div className='panel_head'>
+                <p className='insprint__text'>Upgrade Analyzer</p>
+                </div>
+                </div> }
 
               {showPanel && <div className='upgrade__block'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
@@ -1664,7 +1673,10 @@ const headerstyle={
                   <a href='docs.avoautomation.com'>Learn More</a>
                 </div>)} */}
               </div>}
-
+              {!showPanel && <div className='utility__block'>
+                <div className='panel_head1'>
+                <p className='insprint__text text-500'>Capture from PDF</p> </div>
+                </div> }
                {showPanel && <div className='utility__block'>
                 <p className='insprint__text text-500'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
@@ -1679,6 +1691,11 @@ const headerstyle={
                   <a>Learn More</a>
                 </div>)} */}
               </div>}
+
+              {!showPanel && <div className='createManual__block'>
+                <div className='panel_head2'>
+                <p className='insprint__text'>Create Manually</p> </div>
+                </div>}
 
               {showPanel && <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
@@ -1911,7 +1928,13 @@ const headerstyle={
       startScrape={startScrape} 
       mainScrapedData={mainScrapedData} 
       fetchingDetails={props.fetchingDetails} 
-      orderList={orderList}/>}
+      orderList={orderList}
+      fetchScrapeData={fetchScrapeData}
+      setShow={setCurrentDialog}
+      toastSuccess={toastSuccess}
+      toastError={toastError}
+      elementTypeProp={elementTypeProp}
+      />}
 
 
       {showObjModal === "importModal" && <ImportModal
@@ -2187,6 +2210,8 @@ function generateCompareObject(data, irisObjects){
       }
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
+  compareObj['fullScrapeData'] = data.view[3].newElements;
+
   return compareObj;
 }
 

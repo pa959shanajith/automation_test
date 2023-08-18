@@ -1054,6 +1054,7 @@ const ActionPanel = (props) => {
         toastError={props.toastError}
         onClose={props.onClose}
         setShow={props.setShow}
+        elementTypeProp={props.elementTypeProp}
       />}
 
       {/* Replace Element */}

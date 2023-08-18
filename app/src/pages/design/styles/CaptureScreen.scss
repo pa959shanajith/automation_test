@@ -1028,11 +1028,11 @@
 
 .ss_eye_icon{
   cursor: pointer;
-  height: 2rem;
-  width: 1.5rem;
-  /* left: 2rem; */
-  right: 0.5rem;
+  height: 1rem;
   position: relative;
+  right: 0.5rem;
+  width: 1.5rem;
+  margin-left: 1rem;
 }
 
 //Styles related to element properties 
@@ -1103,10 +1103,22 @@
 }
 .down_arrow{
   position: relative;
-  left: 68.8rem;
+  // left: 68.8rem;
 }
 .p-tag-value{
   width: 34px;
   height: 15px;
   font-size: 10px;
+}
+.panel_head{
+  position: relative;
+  right: 5rem;
+}
+.panel_head1{
+  position: relative;
+  right: 3rem;
+}
+.panel_head2{
+  position: relative;
+  right: 4rem;
 }

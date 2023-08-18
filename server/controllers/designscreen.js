@@ -101,6 +101,15 @@ exports.initScraping_ICE = function (req, res) {
 					var data = {action: "scrape"};
 					var browserType = reqBody.browserType;
 					if (reqBody.action == 'compare') {
+					   if (reqBody.scenarioLevel){
+
+						data.view = reqBody.dataObject;
+
+						data.scenarioLevel = true;
+
+					}
+
+					    else{
 						data.viewString = reqBody.viewString.view;
 						if ("scrapedurl" in reqBody.viewString){
 							data.scrapedurl = reqBody.viewString.scrapedurl;
@@ -109,6 +118,7 @@ exports.initScraping_ICE = function (req, res) {
 							data.scrapedurl = "";
 						}
 						data.scrapedurl = reqBody.viewString.scrapedurl;
+					}
 						data.action = reqBody.action;
 					} else if (reqBody.action == 'replace') {
 						data.action = reqBody.action;
@@ -157,7 +167,47 @@ exports.initScraping_ICE = function (req, res) {
 		res.send("fail");
 	}
 };
+exports.updateScenarioComparisionStatus = async (req, res) => {
 
+    const fnName = "updateScenarioComparisionStatus";
+
+    logger.info("Inside UI service: " + fnName);
+
+    try {
+
+        const inputs = {
+
+            "scenarioID": req.body.scenarioID,
+
+            "scenarioComparisonData": req.body.scenarioComparisionData,
+
+            "query": "updatecomparisiondata"
+
+        };
+
+        if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
+
+            inputs.query = "getWSscrapedata";
+
+        }
+
+        const result = await utils.fetchData(inputs, "design/updateScenarioComparisionStatus", fnName);
+
+        if (result == "fail") return res.send("fail");
+
+        logger.info("Scenario comparision status sent successfully from designscreen/"+fnName+" service");
+
+        res.send(JSON.stringify(result))
+
+    } catch (exception) {
+
+        logger.error("Error occurred in designscreen/"+fnName+":", exception);
+
+        res.status(500).send("fail");
+
+    }
+
+};
 exports.getScrapeDataScreenLevel_ICE = async (req, res) => {
 	const fnName = "getScrapeDataScreenLevel_ICE";
 	logger.info("Inside UI service: " + fnName);
@@ -183,7 +233,45 @@ exports.getScrapeDataScreenLevel_ICE = async (req, res) => {
         res.status(500).send("fail");
 	}
 };
+exports.getScrapeDataScenarioLevel_ICE = async (req, res) => {
 
+    const fnName = "getScrapeDataScenarioLevel_ICE";
+
+    logger.info("Inside UI service: " + fnName);
+
+    try {
+
+        const inputs = {
+
+            "scenarioID": req.body.scenarioID,
+
+            "query": "getscrapedata"
+
+        };
+
+        if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
+
+            inputs.query = "getWSscrapedata";
+
+        }
+
+        const result = await utils.fetchData(inputs, "design/getScrapeDataScenarioLevel_ICE", fnName);
+
+        if (result == "fail") return res.send("fail");
+
+        logger.info("Scraped Data sent successfully from designscreen/"+fnName+" service");
+
+        res.send(JSON.stringify(result))
+
+    } catch (exception) {
+
+        logger.error("Error occurred in designscreen/"+fnName+":", exception);
+
+        res.status(500).send("fail");
+
+    }
+
+};
 exports.updateScreen_ICE = async (req, res) =>{
 	const fnName = "updateScreen_ICE";
 	try {
@@ -336,9 +424,10 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		var left = req.body.left;
 		var width = req.body.width;
 		var height = req.body.height;
+		var highlightImpact=req.body.highlightImpact;
 		logger.info("ICE Socket requesting Address: %s" , icename);
 		logger.info("Sending socket request for focus to cachedb");
-		var dataToIce = {"emitAction": "focus", "username": icename, "focusParam": focusParam, "elementURL": elementURL, "appType": appType, "top": top, "left": left, "width": width, "height": height};
+		var dataToIce = {"emitAction": "focus", "username": icename, "focusParam": focusParam, "elementURL": elementURL, "appType": appType, "top": top, "left": left, "width": width, "height": height,"impactHighlight":highlightImpact};
 		redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 		logger.info("Successfully highlighted selected object");
 		res.send('success');

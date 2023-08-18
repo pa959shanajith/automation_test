@@ -180,3 +180,57 @@ export const getDetails_JIRA = async() => {
         return {error:MSG.JIRA.WARN_FETCH_SAVED_CREDS}
     }
 }
+
+
+export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
+    try{
+
+        const res = await axios(url+'/connectJira_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {   
+           "action" : 'jiraLogin',
+            "url": jiraurl,
+            "username": jirausername,
+            "password": jirapwd,
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+export const connectAzure_ICE = async(dataObj) => {
+    try{
+
+        const res = await axios(url+'/connectAzure_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data:dataObj
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}

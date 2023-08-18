@@ -106,6 +106,8 @@
     // overflow-wrap: anywhere;
     text-overflow: ellipsis;
     margin: 0 6px;
+    display: flex;
+    justify-content: space-between;
 }
 
 
