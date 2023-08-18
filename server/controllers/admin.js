@@ -2030,13 +2030,13 @@ const removeDir = function(path) {
 
 const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
-	inputs.host = (conf.host || "").trim();
-	inputs.port = conf.port || "";
-	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
+	inputs.smtpHost = (conf.smtpHost || "").trim();
+	inputs.smtpPort = conf.smtpPort || "";
+	if (!inputs.smtpHost && !validator.isIP(inputs.smtpHost) && !validator.isFQDN(inputs.smtpHost)) { // Allow Anything as of now
 		logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
 		flag[5]='1';
 	}
-	if (!validator.isPort(inputs.port.toString())) {
+	if (!validator.isPort(inputs.smtpPort.toString())) {
 		logger.error("Error occurred in admin/"+fnName+": Invalid Port Number.");
 		flag[6]='1';
 	}

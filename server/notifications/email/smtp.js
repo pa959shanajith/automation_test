@@ -20,8 +20,8 @@ class SMTP {
 
 	async loadConfig(opts) {
 		const conf = {
-			host: opts.host,
-			port: +opts.port || 25,
+			host: opts.smtpHost ? opts.smtpHost : opts.host,
+			port: (opts.smtpPort ? +opts.smtpPort : +opts.host) || 25,
 			name: opts.name
 		};
 		
