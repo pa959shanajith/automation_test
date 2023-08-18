@@ -844,7 +844,7 @@ const elementTypeProp =(elementProperty) =>{
               let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
               let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
               setNewScrapedData(scrapeItemList);
-              handleDialog("replaceObject");
+              handleDialog("replaceObjectPhase2");
           } else {
               // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
               toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
@@ -1853,7 +1853,7 @@ const headerstyle={
 
       {currentDialog === 'addObject' && <ActionPanel
         isOpen={currentDialog}
-        onClose={handleClose}
+        OnClose={handleClose}
         addCustomElement={addedCustomElement}
         toastSuccess={toastSuccess}
         toastError={toastError}
@@ -1862,7 +1862,7 @@ const headerstyle={
 
       {currentDialog === 'mapObject' && <ActionPanel
         isOpen={currentDialog}
-        onClose={handleClose}
+        OnClose={handleClose}
         captureList={capturedDataToSave}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={fetchScrapeData}
@@ -1872,7 +1872,7 @@ const headerstyle={
         elementTypeProp ={elementTypeProp}
       />}
 
-      {(currentDialog === 'replaceObject') && <ActionPanel
+      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
         isOpen={currentDialog}
         OnClose={handleClose}
         fetchingDetails={props.fetchingDetails}

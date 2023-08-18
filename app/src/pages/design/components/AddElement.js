@@ -54,7 +54,7 @@ const AddElement = (props) => {
         if (newObjects.length > 0) {
             props.addCustomElement(newObjects, newOrderList);
         }
-        props.onClose();
+        props.OnClose();
     }
 
 
@@ -101,7 +101,7 @@ const AddElement = (props) => {
                 className='add__object__header'
                 header='Add Element'
                 visible={props.isOpen === 'addObject'}
-                onHide={props.onClose}
+                onHide={props.OnClose}
                 style={{ height: "28.06rem", width: "38.06rem", marginRight: "15rem" }}
                 position='right'
                 draggable={false}

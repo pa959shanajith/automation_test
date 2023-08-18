@@ -943,7 +943,7 @@ const ActionPanel = (props) => {
   return (
     <>
       {props.isOpen === 'addObject' && <AddElement isOpen={props.isOpen}
-        onClose={props.onClose}
+        OnClose={props.OnClose}
         addCustomElement={props.addCustomElement}
         toastSuccess={props.toastSuccess}
         toastError={props.toastError}
@@ -952,7 +952,7 @@ const ActionPanel = (props) => {
       }
 
       {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
-        onClose={props.onClose}
+        OnClose={props.OnClose}
         captureList={props.captureList}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={props.fetchScrapeData}
@@ -1064,7 +1064,7 @@ const ActionPanel = (props) => {
         header={`Replace : ${props.parentData.name}`}
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
-        visible={props.isOpen === "replaceObject"}
+        visible={props.isOpen === "replaceObjectPhase2"}
         draggable={false}
         onHide={props.OnClose} footer={footerReplace}>
         {
