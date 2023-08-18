@@ -41,10 +41,17 @@ const AvoInput = ({
           onBlur={() => setTouched(true)}
           {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}
         />
-        {required && (
+        {(required && !charCheck) && (
           <div className="validation_container">
-              <small className={(touched && (!inputTxt || charCheck)) ? 'txt_invalid' : 'txt_valid'}>
-                {charCheck ? "only Alpha Numerical and '_' is allowed" : `${labelTxt} is required` }
+              <small className={(touched && !inputTxt) ? 'txt_invalid' : 'txt_valid'}>
+                {labelTxt} is required.
+              </small>
+          </div>
+        )}
+        {charCheck && (
+          <div className="validation_container">
+              <small className='txt_invalid'>
+                Only letters, numbers, and underscore are allowed.
               </small>
           </div>
         )}

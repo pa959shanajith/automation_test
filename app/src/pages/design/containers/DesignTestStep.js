@@ -1312,11 +1312,12 @@ const DesignModal = (props) => {
     const commentRows = () => {
         let selectedIndexes = [...stepSelect.check];
         let highlighted = [...stepSelect.highlight];
-        let testCases = [ ...testCaseData ]
+        const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        let testCases = [ ...findData.testCases ]
         runClickAway = false;
-        if (highlighted.length === 0 && selectedIndexes.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_SKIP);
-        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
-        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
+        if (highlighted.length === 0 && selectedIndexes.length === 0) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_SELECT_STEP_SKIP.CONTENT, life:1000});
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
+        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
         else{
             let toComment = [...new Set([...highlighted, ...selectedIndexes])]; 
             for(let idx of toComment){
@@ -1327,7 +1328,14 @@ const DesignModal = (props) => {
                 else testCase.outputVal += testCase.outputVal.length === 0 ? "##" : ";##"
                 testCases[idx] = { ...testCase }
             }
-            setTestCaseData(testCases);
+            let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
+                if (screen.name === rowExpandedName.name) {
+                    return { ...screen, testCases: testCases };
+                }
+                return screen;
+            });
+            setScreenLevelTastSteps(updatedScreenLevelTestSteps)
+            // setTestCaseData(testCases);
             setStepSelect({edit: false, check: [], highlight: []});
             setHeaderCheck(false);
             setChanged(true);
@@ -1658,6 +1666,7 @@ const DesignModal = (props) => {
                 <div className="ab">
                     <div className="min">
                         <div className="con" id="d__tcListId">
+                        <div style={{overflowY:'auto'}}>
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
@@ -1673,6 +1682,7 @@ const DesignModal = (props) => {
                                 } 
                             </ReactSortable>
                             </ClickAwayListener>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1710,7 +1720,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
 
-            <Dialog  className="debug__object__modal" header={props.fetchingDetails["parent"]["name"]} style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
+            <Dialog className="debug__object__modal" header={props.fetchingDetails["parent"]["name"]} style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className='debug__btn'>
                     <div className={"debug__object"}>
                         <span className='debug__opt'>
@@ -1737,7 +1747,7 @@ const DesignModal = (props) => {
                                             value={testCase.testCaseName}
                                             onChange={handleCheckboxChangeAddDependant}
                                             checked={selectedTestCases.includes(testCase.testCaseName)}
-                                            disabled={rowExpandedName && rowExpandedName.id === testCase.testCaseID}
+                                            disabled={testCase.disableAndBlock}
                                         />
                                         <label className={testCase.disableAndBlock ?'label__testcase_disable' : "label__testcase"} htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
                                     </div>
