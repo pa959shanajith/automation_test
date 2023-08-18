@@ -1619,7 +1619,9 @@ const headerstyle={
           <Card className='panel_card'>
             <div className="action_panelCard">
               {!showPanel && <div className='insprint__block'>
-                <p className='insprint__text'>In Sprint Automation</p></div>}
+                <div>
+                <p className='insprint__text'>In Sprint Automation</p></div>
+                </div>}
             {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
@@ -1646,7 +1648,9 @@ const headerstyle={
                 } */}
               </div>}
               {!showPanel && <div className='upgrade__block'>
+                <div className='panel_head'>
                 <p className='insprint__text'>Upgrade Analyzer</p>
+                </div>
                 </div> }
 
               {showPanel && <div className='upgrade__block'>
@@ -1670,7 +1674,9 @@ const headerstyle={
                 </div>)} */}
               </div>}
               {!showPanel && <div className='utility__block'>
-                <p className='insprint__text text-500'>Capture from PDF</p> </div> }
+                <div className='panel_head1'>
+                <p className='insprint__text text-500'>Capture from PDF</p> </div>
+                </div> }
                {showPanel && <div className='utility__block'>
                 <p className='insprint__text text-500'>Capture from PDF</p>
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
@@ -1687,7 +1693,9 @@ const headerstyle={
               </div>}
 
               {!showPanel && <div className='createManual__block'>
-                <p className='insprint__text'>Create Manually</p> </div>}
+                <div className='panel_head2'>
+                <p className='insprint__text'>Create Manually</p> </div>
+                </div>}
 
               {showPanel && <div className='createManual__block'>
                 <p className='insprint__text'>Create Manually</p>
