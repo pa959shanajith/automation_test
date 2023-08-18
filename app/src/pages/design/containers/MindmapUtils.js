@@ -611,7 +611,7 @@ export const addNode = (n,screenData) =>{
     if (n.display_name.length > 10) {
         n.display_name = n.display_name.slice(0, ch) + '...';
     }
-    if(n.type==="screens"){
+    if(n.type==="screens" && n.name !== ""){
 
         currentScreen=screenData.screenList.filter(screen=>screen.name===n.name)
 
@@ -805,7 +805,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
                 parent: dNodes[pi],
                 state: 'created',
                 path: '',
-                name: '',
+                name: obj?obj:'',
                 childIndex: '',
                 type: (nNext[pt][0]).toLowerCase() + 's'
         }; 
