@@ -1600,9 +1600,9 @@ const headerstyle={
        <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
-              {!showPanel && <div className='insprint__block'>
+              {!showPanel && <div className='insprint__block1'>
                 <div>
-                <p className='insprint__text'>In Sprint Automation</p></div>
+                <p className='insprint__text1'>In Sprint Automation</p></div>
                 </div>}
             {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
