@@ -4,7 +4,6 @@ import Header from '../components/AdminHeader';
 import '../styles/OriginContainer.scss'
 import LdapConfig from './LdapConfig';
 import CreateUser from '../components/CreateUser';
-import UserCreation from './UserCreation';
 import EmailConfiguration from './EmailConfiguration';
 import { validateUserState } from '../../login/api';
 
