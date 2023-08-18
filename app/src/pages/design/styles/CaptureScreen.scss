@@ -901,9 +901,27 @@
 
 }
 
+// .screenshot__dialog{
+//   .p-dialog-content{
+//     padding: 0rem 1rem 0rem 1rem !important;
+//   }
+// }
+
+.ref_pop{
+  z-index: 5;
+  display: flex;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  // right: 110%;
+  border-radius: 5px;
+  width: 350px;
+}
+
 .screenshot_pop{
-  width: 39rem!important;
-  height: 25rem!important;
+  // width: 39rem!important;
+  // height: 25rem!important;
+  width: 396px!important;
   .p-dialog-header {
     background: #E2E2ED !important;
     height: 4rem !important;
@@ -1001,7 +1019,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 25rem;
+  max-width: 22rem;
 }
 
 .header__screenshot__eye{
