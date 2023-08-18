@@ -254,8 +254,6 @@ const AzureContent = props => {
                                 userStoryId:selectedTC[0] || '', 
                                 itemType:releaseId === 'Story' ? 'UserStory' : 'TestSuite' ,
                                 userStorySummary:selectedTC[1] || ''
-                               
-
                             }
                         ];
                         if(releaseId && releaseId === 'TestPlans'){
@@ -531,7 +529,7 @@ const AzureContent = props => {
                                                     phaseList={[]} 
                                                     cycleName={cycleName.name}
                                                     projectId={projectDropdn1}
-                                                    releaseId={selectedRel}
+                                                    releaseId={releaseId}
                                                     testPlansDetails = {cycleName}
                                                     selectedProject = {selectedProject}
                                                     azureLogin = {azureLogin}
