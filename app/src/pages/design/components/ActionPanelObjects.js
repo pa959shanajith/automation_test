@@ -972,6 +972,7 @@ const ActionPanel = (props) => {
         position='right'
         visible={props.isOpen === 'createObject'}
         onHide={props.OnClose}
+        draggable={false}
         footer={createElementFooter}>
         <Accordion activeIndex={activeIndex}>
           {objects.map((object, index) => (
@@ -1064,6 +1065,7 @@ const ActionPanel = (props) => {
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
         visible={props.isOpen === "replaceObjectPhase2"}
+        draggable={false}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">

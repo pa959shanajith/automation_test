@@ -840,19 +840,16 @@ const elementTypeProp =(elementProperty) =>{
         }
         else if (data.action === "replace") {
           let viewString = data;
-
-                    if (viewString.view.length !== 0){
-                        let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
-
-                        let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
-                        setNewScrapedData(scrapeItemList);
-                        handleDialog("replaceObjectPhase2");
-                    } else {
-                        // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                        toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                    }
-          
-       }
+          if (viewString.view.length !== 0){
+              let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+              let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+              setNewScrapedData(scrapeItemList);
+              handleDialog("replaceObjectPhase2");
+          } else {
+              // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+              toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+            }               
+        }
 else{
         let viewString = data;
         if (capturedDataToSave.length !== 0 && masterCapture) {
@@ -1029,21 +1026,6 @@ else{
   const handleMouseLeaveRow = () => {
     setHoveredRow(null);
   };
-
-
-
-  // const renderIcons = (rowData) => {
-  //   if (rowData === hoveredRow) {
-  //     return (
-  //       <>
-  //         <img src='static/imgs/ic-edit.png' style={{height:"20px", width:"20px"}} className='edit__icon' />
-  //         <img src='static/imgs/ic-delete-bin.png'  style={{height:"20px", width:"20px"}} className='delete__icon'  />
-  //       </>
-  //     );
-  //   }
-  //   return null;
-  // };
-
 
   const footerCapture = (
     <div className='footer__capture'>
@@ -2211,7 +2193,6 @@ function generateCompareObject(data, irisObjects){
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
   compareObj['fullScrapeData'] = data.view[3].newElements;
-
   return compareObj;
 }
 
