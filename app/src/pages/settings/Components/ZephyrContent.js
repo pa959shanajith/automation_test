@@ -1236,9 +1236,9 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                                     <div className="dropdown-zephyr2">
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrProject} className="dropdown_project" options={zephyrProj} onChange={(e) => setSelectZephyrProject(e)} placeholder="Select Project" /> */}
                                                         <Dropdown value={selectZephyrProject} onChange={(e) => handleProject(e)} options={domainDetails} optionLabel="name"
-                                                            placeholder="Select a Project" className="project_dropdown" />
+                                                            placeholder="Select Project" className="project_dropdown" />
                                                         <Dropdown value={selectedRel} onChange={(e) => onReleaseSelect(e)} options={releaseArr} optionLabel="name"
-                                                            placeholder="Select a Release" className="release_dropdown" />
+                                                            placeholder="Select Release" className="release_dropdown" />
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrRelease} className="dropdown_release" options={zephyrRelease} onChange={(e) => setSelectZephyrRelease(e)} placeholder="Select Release" /> */}
                                                     </div>
 

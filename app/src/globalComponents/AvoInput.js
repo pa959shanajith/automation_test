@@ -12,6 +12,7 @@ const AvoInput = ({
   setInputTxt,
   customClass = "",
   icon = null,
+  charCheck = false
 }) => {
   const [touched, setTouched] = useState(false);
   const inputJsx = (
@@ -40,10 +41,17 @@ const AvoInput = ({
           onBlur={() => setTouched(true)}
           {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}
         />
-        {required && (
+        {(required && !charCheck) && (
           <div className="validation_container">
               <small className={(touched && !inputTxt) ? 'txt_invalid' : 'txt_valid'}>
                 {labelTxt} is required.
+              </small>
+          </div>
+        )}
+        {charCheck && (
+          <div className="validation_container">
+              <small className='txt_invalid'>
+                Only letters, numbers, and underscore are allowed.
               </small>
           </div>
         )}

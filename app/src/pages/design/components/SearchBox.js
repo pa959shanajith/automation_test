@@ -24,7 +24,7 @@ const SearchBox = (props) => {
             return;
         }
         setErr(false)
-        var elem = document.getElementsByClassName('ct-node-title');
+        var elem = document.getElementsByClassName('ct-nodeLabel');
         filter = [...elem].filter((e)=>e.innerHTML.toUpperCase().indexOf(val.toUpperCase())!==-1)
         if (filter.length === 0) {
             if (val !== '')
@@ -64,7 +64,7 @@ const SearchBox = (props) => {
                     setInp(!inp)}
                     } 
                 className="searchimg-canvas" src="static/imgs/ic-search-icon.png"  title='Search Modules, Scenarios, Screens or Testcases'/>
-                <input data-test="searchBox" id='search-canvas' type="text" onKeyPress={(e)=>{if(e.key==='Enter')onSearch(e)}} onChange={(e)=>onSearch(e)} className={((inp?" search-visible":"")+(err?" inputErrorBorderFull":""))} style={{width:'93%',marginLeft:'6px'}} placeholder="Search"/>
+                <input data-test="searchBox" id='search-canvas' type="text" onKeyDown={(e)=>{if(e.key==='Enter')onSearch(e)}} onChange={(e)=>onSearch(e)} className={((inp?" search-visible":"")+(err?" inputErrorBorderFull":""))} style={{width:'93%',marginLeft:'6px'}} placeholder="Search"/>
             </div>
         // </Rnd>
 

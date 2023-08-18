@@ -611,6 +611,22 @@
   }
 }
 
+.insprint__block1{
+  // border-right: 1px solid #E2E2ED;
+  cursor: pointer;
+
+  .insprint__text1 {
+    position: relative;
+    top: 0rem;
+    left: 2rem;
+    font-size: 16px;
+    font-family: 'Open sans';
+    font-weight: bold;
+    border-right: 1px solid #E2E2ED;
+    padding-right: 2.4rem;
+  }
+}
+
 .insprint__block {
   border-right: 1px solid #E2E2ED;
   cursor: pointer;
@@ -901,9 +917,27 @@
 
 }
 
+// .screenshot__dialog{
+//   .p-dialog-content{
+//     padding: 0rem 1rem 0rem 1rem !important;
+//   }
+// }
+
+.ref_pop{
+  z-index: 5;
+  display: flex;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  // right: 110%;
+  border-radius: 5px;
+  width: 350px;
+}
+
 .screenshot_pop{
-  width: 39rem!important;
-  height: 25rem!important;
+  // width: 39rem!important;
+  // height: 25rem!important;
+  width: 396px!important;
   .p-dialog-header {
     background: #E2E2ED !important;
     height: 4rem !important;
@@ -1001,7 +1035,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 25rem;
+  max-width: 22rem;
 }
 
 .header__screenshot__eye{
@@ -1010,9 +1044,17 @@
 
 .ss_eye_icon{
   cursor: pointer;
-  height: 2rem;
+  height: 1rem;
+  position: relative;
+  right: 0.5rem;
   width: 1.5rem;
-  /* left: 2rem; */
+  margin-left: 1rem;
+}
+
+.ss_eye_icon_screen{
+  height: 1.5rem;
+  width: 2rem;
+  cursor: pointer;
   right: 0.5rem;
   position: relative;
 }
@@ -1085,10 +1127,22 @@
 }
 .down_arrow{
   position: relative;
-  left: 68.8rem;
+  // left: 68.8rem;
 }
 .p-tag-value{
   width: 34px;
   height: 15px;
   font-size: 10px;
+}
+.panel_head{
+  position: relative;
+  right: 5rem;
+}
+.panel_head1{
+  position: relative;
+  right: 3rem;
+}
+.panel_head2{
+  position: relative;
+  right: 4rem;
 }

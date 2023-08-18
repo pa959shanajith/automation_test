@@ -26,7 +26,8 @@ const initialState = {
     ldapAllUserList: [],
     allUsersList: [],
     fType: "Default",
-    rolename: ""
+    rolename: "",
+    editUser: false
 }
 
 export const adminSlice = createSlice({
@@ -123,6 +124,9 @@ export const adminSlice = createSlice({
         },
         ADD_ADDROLE: (state, action) => {
             state.addRole[action.payload] = true;
+        },
+        EDIT_USER: (state, action) => {
+            state.editUser = action.payload;
         },
         EDIT_ADDROLES: (state, action) => {
             if (state.addRole[action.payload] === undefined) state.addRole[action.payload] = true;
