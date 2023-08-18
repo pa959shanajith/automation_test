@@ -422,15 +422,19 @@ const ModuleListDrop = (props) =>{
         if(Object.keys(moduleSelect).length===0 || firstRender){
             loadModuleE2E(modID)
 
-        }else{
-            setWarning({modID, type});
         }
+        if(type==="endtoend"){
+          loadModuleE2E(modID)
+        }
+        // else{
+        //     setWarning({modID, type});
+        // }
         setFirstRender(false);
 
         return; 
     }    
     const loadModuleE2E = async(modID) =>{
-        setWarning(false)
+        // setWarning(false)
         setIsE2EOpen(true)
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   

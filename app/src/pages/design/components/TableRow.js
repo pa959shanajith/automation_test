@@ -77,7 +77,6 @@ const TableRow = (props) => {
         setChecked(props.stepSelect.check.includes(props.idx));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.stepSelect.check]);
-
     useEffect(()=>{
         if (props.edit){
             if (props.stepSelect.edit && props.stepSelect.highlight.includes(props.idx)){
