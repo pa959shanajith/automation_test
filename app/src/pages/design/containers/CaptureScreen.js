@@ -1134,8 +1134,8 @@ const footerSave = (
     })
     let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
     dispatch(objValue(objVal));
-    setHighlight(true);
-  }
+            setHighlight(true);
+          }
 
   useEffect(() => {
     if (mirror.scrape) {
@@ -1252,7 +1252,7 @@ const footerSave = (
     <>
     <div className='header__screenshot__eye'>
     <div>
-          <img data-test="eyeIcon" className="ss_eye_icon"
+          <img data-test="eyeIcon" className="ss_eye_icon_screen"
             onClick={onHighlight}
             src={activeEye ? 
               "static/imgs/eye-active.svg" : 
@@ -1261,7 +1261,7 @@ const footerSave = (
         </div>
       <div className='header__popup screenshot_headerName'>
         <Tooltip target=".screenshot_headerName" content={screenshotData.header} position='bottom' ></Tooltip>
-        <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
+        <span>Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
       </div>
       </div>
     </>
@@ -1764,7 +1764,7 @@ const headerstyle={
             <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
           </DataTable>
               }
-          <Dialog header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `94vh`, position:"right" }}>
+          <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right", margin:"0px", width:"29vw" }}>
             <div className="ref_pop screenshot_pop">
               <div className="screenshot_pop__content" >
                 {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
