@@ -1,5 +1,4 @@
 /*eslint eqeqeq: "off"*/
-import { name } from 'agenda/dist/agenda/name';
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
 // import { readCtScale } from './Canvas';
