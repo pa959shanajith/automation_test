@@ -865,6 +865,26 @@ const DesignModal = (props) => {
                 })
             .catch(error => console.error("ERROR::::", error));
         }
+        const handleDebug = () => {
+            if (props.appType === "Web"){
+                DependentTestCaseDialogHideHandler(); 
+                setVisibleDependentTestCaseDialog(true)
+            }else if (props.appType === "Desktop"){
+                debugTestCases('1')
+            }
+            else if (props.appType === "MobileApps"){
+                debugTestCases('1')
+            }
+            else if (props.appType === "MobileWeb"){
+                debugTestCases()
+            }
+            else if (props.appType === "WebService"){
+                debugTestCases()
+            }
+            else if (props.appType === "OEBS"){
+                debugTestCases('1')
+            }
+        }
         return (
             <>
                 { overlay && <ScreenOverlay content={overlay} />}
@@ -901,7 +921,7 @@ const DesignModal = (props) => {
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
-                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
+                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>handleDebug()} outlined></Button>
                     <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
                     <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
@@ -1082,7 +1102,7 @@ const DesignModal = (props) => {
     //     return (
     //         <div className='select-option'>
     //             <Dropdown width='10rem' value={selectedOptions} inputid="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={(e)=>{options.editorCallback(e.value);onKeySelect(e)}} onKeyDown={(e)=>{options.editorCallback(e.value);submitChanges()}} closeMenuOnSelect={true} options={optionKeyword} optionLabel={getOptionLabel} menuPlacement="auto" isSearchable={false} placeholder='Select a keyword'/>
-    //         </div> 
+    //         </div>   
     //    )
     // };
     // const inputEditor = (options) => {
@@ -1330,7 +1350,7 @@ const DesignModal = (props) => {
     }
     const tableActionBtnGroup = [
         // {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps',onClick: ()=>addRow() },
-        // {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps',onClick:  ()=>editRow() },
+        {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps',onClick:  ()=>editRow() },
         // {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-selmulti.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
         // {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps',onClick:  ()=>toggleDrag() },
         // {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
@@ -1646,7 +1666,7 @@ const DesignModal = (props) => {
                 <div className="ab">
                     <div className="min">
                         <div className="con" id="d__tcListId">
-                            <div style={{overflowY:'auto'}}>
+                        <div style={{overflowY:'auto'}}>
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setTestCaseData} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
