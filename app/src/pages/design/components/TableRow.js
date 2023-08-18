@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { updateScrollBar } from '../../global';
+import { updateScrollBar, ScreenOverlay } from '../../global';
 import "../styles/TableRow.scss";
 import {Tag} from 'primereact/tag'
 import Select from "react-select";
@@ -46,6 +46,7 @@ const TableRow = (props) => {
     const [allkeyword, setAllKeyword] = useState([]);
     const [showAllKeyword, setShowAllKeyword] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(null);
+    const [overlay, setOverlay] = useState("");
     let objList = props.objList;
     let draggable = props.draggable;
     
@@ -77,7 +78,11 @@ const TableRow = (props) => {
         setChecked(props.stepSelect.check.includes(props.idx));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.stepSelect.check]);
-
+    useEffect(()=>{
+        if(props.testCase === 0){
+            setOverlay("Loading...")
+        }
+    },[props.testCase])
     useEffect(()=>{
         if (props.edit){
             if (props.stepSelect.edit && props.stepSelect.highlight.includes(props.idx)){
@@ -123,6 +128,7 @@ const TableRow = (props) => {
                 }
             }
             updateScrollBar();
+            setOverlay("Loading...")
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.stepSelect.highlight, props.edit]);
@@ -256,6 +262,7 @@ const TableRow = (props) => {
           };
     return (
         <>
+        { overlay && <ScreenOverlay content={overlay} />}
         <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col">{props.idx + 1}</span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
