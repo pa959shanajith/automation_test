@@ -378,12 +378,10 @@ export default function BasicDemo() {
         <Menu
           model={[
             {
-              label: <span onClick={() => handleBug("Jira")}>Jira Login</span>,
-              icon: "pi pi-fw pi-file",
+              label: <span onClick={() => handleBug("Jira")}><img src="static/imgs/jira_icon.svg" className="img_jira" />Jira Login</span>,
             },
             {
-              label: <span onClick={() => handleBug("Azure DevOps")}>Azure DevOps Login</span>,
-              icon: "pi pi-fw pi-file",
+              label: <span onClick={() => handleBug("Azure DevOps")}><img src="static/imgs/azure_devops_icon.svg" className="img_azure" />Azure DevOps Login</span>,
             }
           ]}
         />
