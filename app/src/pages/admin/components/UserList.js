@@ -20,6 +20,7 @@ const UserList = (props) => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [loading, setLoading] = useState(true);
     const [editUserDialog, setEditUserDialog] = useState(false);
+    const [editUser,setEditUser]=useState('')
     const allUserList = useSelector(state => state.admin.allUsersList);
     const [showDeleteConfirmPopUp, setShowDeleteConfirmPopUp] = useState(false);
 
@@ -65,6 +66,7 @@ const UserList = (props) => {
 
 
     const editRowData = (rowData) => {
+        setEditUser(rowData);
         dispatch(AdminActions.EDIT_USER(true));
         dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
@@ -104,7 +106,7 @@ const UserList = (props) => {
                 footer={
                     <>
                         <Button label="Yes" onClick={() => props.manage({ action: "delete" })}></Button>
-                        <Button label="Yes" onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
+                        <Button label="No" onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
                     </>}
                 width={{ width: "5rem" }}
             />
@@ -123,7 +125,7 @@ const UserList = (props) => {
                 <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
             </DataTable>
 
-            {editUserDialog && <CreateUser createUserDialog={editUserDialog} setCreateUserDialog={setEditUserDialog} />}
+            {editUserDialog && <CreateUser createUserDialog={editUserDialog} setCreateUserDialog={setEditUserDialog} setEditUser={setEditUser} editUser={editUser}/>}
         </div>
     </>)
 }

@@ -31,6 +31,7 @@ const CreateUser = (props) => {
     const node = useRef();
     const toast = useRef();
     const [toggleAddRoles, setToggleAddRoles] = useState(false)
+    const [editUserIceProvision,setEditUserIceProvision] = useState();
     const [showDropdown, setShowDropdown] = useState(false)
     const [showDropdownEdit, setShowDropdownEdit] = useState(false)
     const [userNameAddClass, setUserNameAddClass] = useState(false)
@@ -502,7 +503,7 @@ const CreateUser = (props) => {
             setLoading(false);
             data.sort();
             dispatch(AdminActions.UPDATE_ALL_USERS_LIST(data));
-            // setAllUserFilList(data);
+            setAllUserFilList(data);
         }
     }
 
@@ -651,8 +652,8 @@ const CreateUser = (props) => {
                 visible={props.createUserDialog}
                 onHide={createUserDialogHide}
                 footer={createUserFooter}
-                header={"Create User"}
-                style={{ width: "50.06rem" }}
+                header={editUser ? "Edit User" : "Create User"}
+               style={editUser && (selectedTab === "avoAzzureClient") ? {width: "66.06rem" } : {width: "50.06rem" }}
                 position='centre'
             >
                 <TabMenu model={tabHeader} activeIndex={tabHeader.findIndex((item) => item.key === selectedTab)} onTabChange={(e) => setSelectedTab(tabHeader[e.index].key)} />
@@ -748,7 +749,7 @@ const CreateUser = (props) => {
                         </div>}
                     </div>
                 </div>}
-                {selectedTab === "avoAzzureClient" && <IceProvision userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
+                {selectedTab === "avoAzzureClient" && <IceProvision editUserIceProvision={props.editUser} setEditUserIceProvision={props.setEditUSer} userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
             </Dialog>
         </Fragment>
     );
