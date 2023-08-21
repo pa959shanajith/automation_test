@@ -23,6 +23,8 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import SaveMapButton from "./SaveMapButton";
 import { Tooltip } from 'primereact/tooltip';
 import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 
 
 const ModuleListDrop = (props) =>{
@@ -808,7 +810,16 @@ setPreventDefaultModule(true);
 
             }
             
-       
+       const bodyScenarionTemp = (e, idx) =>{
+        return(
+          <div className="EachScenarioNameBox" >
+            <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
+              <h4>{e.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{e.modName})</h3></h5></div>
+                <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{e.projName})</h3></h5></div>
+                </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(idx.rowIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
+          </div>
+        )
+       }
       
       
     return(
@@ -943,7 +954,7 @@ setPreventDefaultModule(true);
                             </span>
                           </div>
                           <div className="ScenairoList">
-                            {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
+                            {/* {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
                               return (
                                 <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
                                   <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
@@ -952,8 +963,13 @@ setPreventDefaultModule(true);
                                   </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(ScenarioSelectedIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
                                 </div>
                               )
-                            })}
-                          </div></>
+                            })} */}
+                            <DataTable value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
+                              <Column rowReorder headerStyle={{display:'none'}}/>
+                              <Column field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
+                            </DataTable>
+                          </div>
+                          </>
                             :
                           <div className="initialText">
                             <div className="initial1StText">
