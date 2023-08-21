@@ -1029,24 +1029,25 @@ const DesignModal = (props) => {
         let copyTestCases = []
         let copyContent = {}
         let copyErrorFlag = false;
+        let updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         if (selectedRows.length === 0) toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_SELECT_STEP_COPY.CONTENT,life:1000});
         else{
             let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
             for (let idx of sortedSteps) {
-                if (!testCaseData[idx].custname) {
+                if (!updateData.testCases[idx].custname) {
                     if (selectedRows.length === 1) toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_EMPTY_TC_COPY.CONTENT,life:1000});
                     else toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_INVALID_OBJ_REF.CONTENT,life:1000});
                     copyErrorFlag = true;
                     break
                 } 
                 else{
-                    let testCase = Object.assign({}, testCaseData[idx])
+                    let testCase = Object.assign({}, updateData.testCases[idx])
                     copyTestCases.push(testCase);
                 }
             }
             
             if (!copyErrorFlag) {
-                copyContent = {'appType': props.appType, 'testCaseId': rowExpandedName.id, 'testCases': copyTestCases};
+                copyContent = {'appType': props.appType, 'testCaseId': updateData.id, 'testCases': copyTestCases};
                 dispatch(copiedTestCases(copyContent));
                 setEdit(false);
             }
@@ -1305,21 +1306,7 @@ const DesignModal = (props) => {
         return !checked
     }
     // const ConfirmPopup = () => (
-    //     <Dialog visible={showPopup} header={showPopup.title} style={{width:'20rem'}} onHide={()=>{setShow(false);resetData()}}>
-    //         <div>
-    //             <span>Are you sure you want to {showPopup.content} the task ?</span>
-    //             <p className="dc__checkbox-addRecp" >
-    //                 <input  id="dc__checkbox" onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
-    //                 <span >Notify Additional Users</span>
-    //             </p>
-    //             <div className='dc__select-recpients'>
-    //                 <div>
-    //                     <span className="leftControl" title="Token Name">Select Recipients</span>
-    //                     <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </Dialog>
+        
     // )
     const selectSteps = stepList => {
         stepList.push(...stepSelect.check)
@@ -1423,7 +1410,22 @@ const DesignModal = (props) => {
                             <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center',paddingLeft:'0.5rem' }} ></Column>
                             <Tooltip target=".action " position="left" content="  Edit the test step."/>
                     </DataTable> */}
-                    {/* { showPopup && ConfirmPopup()} */}
+                    {/* { showPopup && <Dialog visible={showPopup} header={showPopup.title} style={{width:'20rem'}} onHide={()=>{setShow(false);resetData()}}>
+                        <div>
+                            <span>Are you sure you want to {showPopup.content} the task ?</span>
+                            <p className="dc__checkbox-addRecp" >
+                                <input  id="dc__checkbox" onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
+                                <span >Notify Additional Users</span>
+                            </p>
+                            <div className='dc__select-recpients'>
+                                <div>
+                                    <span className="leftControl" title="Token Name">Select Recipients</span>
+                                    <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+                                </div>
+                            </div>
+                        </div>
+                    </Dialog>} */}
+                    { showPS && <PasteStepDialog setShow={setShowPS} show={showPS} pasteSteps={pasteSteps} upperLimit={data.testCases.length}/> }
                     { showConfPaste && <ConfPasteStep />}
                     { showConfirmPop && ConfirmPopups() }
                     { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} show={idx} setIdx={setIdx} onSetRowData={setRowData} idx={showDetailDlg} /> }
