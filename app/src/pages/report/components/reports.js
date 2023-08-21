@@ -198,7 +198,7 @@ const reports = () => {
       <div className="reports_container">
         <div className="grid options_box">
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            <div className="flex flex-column ml-4">
+            <div className="flex align-items-center ml-4">
               <label data-test="projectLabel" className="Projectreport">
                 <b>Project:</b>
               </label>
@@ -219,7 +219,7 @@ const reports = () => {
             </div>
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnTest">
-            <div>
+            <div className="testType">
               <b>Test Type: </b>
               <SelectButton
                 value={testType}
@@ -233,7 +233,7 @@ const reports = () => {
             </div>
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnView">
-            <div>
+            <div className="testView">
               <b>View By: </b>
               <SelectButton
                 value={viewBy}
@@ -246,43 +246,33 @@ const reports = () => {
             </div>
           </div>
         </div>
-        <div className="report_landing">
+        <div className="flex justify-content-center ml-4 mr-4 mt-5 mb-3 search_container">
+          <div className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              className="report_search_input"
+              placeholder="Search"
+              value={searchReportData}
+              onChange={(e) => setSearchReportData(e.target.value)}
+            />
+          </div>
+          <div>
+            <h2 className="projectDropDown"></h2>
+            <Dropdown
+              value={selectedItem}
+              onChange={(e) => handleClicked(e)}
+              options={sort}
+              optionLabel="name"
+              dropdownIcon={customDropdownIcon}
+              className="sort_dropdown"
+              placeholder={selectedItem}
+            />
+          </div>
+        </div>
+        <div className="report_landing mt-2">
           <div className="report">
             {!show && (
               <div id="reports" className="cards">
-                <>
-                  {filteredExecutionData.length > 0 ? (
-                    <>
-                      <div className="flex justify-content-between ml-4 mr-4 mt-2 mb-2">
-                        <div>
-                          <h2 className="projectDropDown"></h2>
-                          <Dropdown
-                            value={selectedItem}
-                            onChange={(e) => handleClicked(e)}
-                            options={sort}
-                            optionLabel="name"
-                            dropdownIcon={customDropdownIcon}
-                            className="w-full md:w-30rem"
-                            placeholder={selectedItem}
-                          />
-                        </div>
-                        <div className="p-input-icon-left">
-                          <i className="pi pi-search" />
-                          <InputText
-                            className="report_search_input"
-                            placeholder="Search"
-                            value={searchReportData}
-                            onChange={(e) =>
-                              setSearchReportData(e.target.value)
-                            }
-                          />
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                </>
                 {filteredExecutionData.length > 0 ? (
                   <div className="report_Data ml-4 mr-4">
                     {/* {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
@@ -305,20 +295,35 @@ const reports = () => {
                                 activeClassName="active"
                               >
                                 <Card key={index} className="testCards">
-                                  <div className="grid">
-                                    <div className="col-10">
+                                  <div className="grid box_header">
+                                    <div className="col-6">
                                       <span className="exe_profile">
                                         Execution Profile
                                       </span>
                                     </div>
-                                    <div className="col-2 flex justify-content-center">
-                                      {/* <span className='exe_count'>5</span> */}
+                                    <div className="col-6 flex justify-content-end">
+                                    <span className="exe_type">
+                                        <img
+                                          src={
+                                            data.selectedModuleType ===
+                                            "e2eExecution"
+                                              ? "static/imgs/E2E_configsetup.png"
+                                              : "static/imgs/signup_module.svg"
+                                          }
+                                        />
+                                        {data.selectedModuleType ===
+                                        "e2eExecution"
+                                          ? "End to End"
+                                          : "Test Suite"}
+                                      </span>
                                     </div>
                                     <div className="col-12 exe_namebox">
                                       <span className="exe_name">
                                         {data.configurename}
                                       </span>
                                     </div>
+                                  </div>
+                                  <div className="grid box_body">
                                     <div className="col-12 exe_details">
                                       Last execution details
                                     </div>
@@ -334,23 +339,11 @@ const reports = () => {
                                       <span className="exe_details">
                                         Executed via
                                       </span>
-                                      <span className="exe_date">CI/CD</span>
+                                      <span className="exe_date">Manual</span>
                                     </div>
-                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
-                                      <span className="exe_type">
-                                        <img
-                                          src={
-                                            data.selectedModuleType ===
-                                            "e2eExecution"
-                                            ? "static/imgs/E2E_configsetup.png"
-                                            : "static/imgs/signup_module.svg"
-                                          }
-                                        />
-                                        {data.selectedModuleType ===
-                                        "e2eExecution"
-                                          ? "End2End"
-                                          : "Test Suite"}
-                                      </span>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12 flex justify-content-end" style={{ position: 'relative' }}>
+                                      <i className="pi pi-cog" style={{ fontSize: '2rem', marginRight: '1.2rem' }}></i>
+                                      <span className='count_exe'>5</span>
                                     </div>
                                   </div>
                                 </Card>
