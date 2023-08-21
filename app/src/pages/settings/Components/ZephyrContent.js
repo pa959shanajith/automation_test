@@ -46,6 +46,8 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const [treeData, setTreeData] = useState([]);
     const [selectedNodes, setSelectedNodes] = useState([]);
     const [selectedLeftNodes, setselectedLeftNodes] = useState([]);
+    const [selectedImportNodes, setSelectedImportNodes] = useState([]);
+    const [currentNode,setCurrentNode] = useState({});
     const [selectedCity, setSelectedCity] = useState(null);
     const [selectetestcase, setSelectedtestcase] = useState(null);
     const dispatchAction = useDispatch();
@@ -56,17 +58,23 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const [fileData, setFileData] = useState(null);
     const [selectSheet, setSelectSheet] = useState(null);
     const [selectZephyrProject, setSelectZephyrProject] = useState(null);
+    const [selectImportZephyrProject, setSelectImportZephyrProject] = useState(null);
     const [selectZephyrRelease, setSelectZephyrRelease] = useState(null);
     const [selectedKeys, setSelectedKeys] = useState([]);
+    const [importselectedKeys, setImportSelectedKeys] = useState([]);
+
     const [selectedAvoKeys, setSelectedAvoKeys] = useState([]);
     const [error, setError] = useState('');
     const [fileUpload, setFiledUpload] = useState(undefined);
     const [sheetList, setSheetList] = useState([]);
     const dropdownRef = useRef();
     const [projectDetails , setProjectDetails]=useState([]);
+    const [importProjectDetails , setImportProjectDetails]=useState([]);
     const [releaseArr, setReleaseArr] = useState([]);
+    const [importReleaseArr, setImportReleaseArr] = useState([]);
     const [avoProjects , setAvoProjects]= useState(null);
     const [selectedRel, setSelectedRel] = useState("Select Release");
+    const [importSelectedRel, setImportSelectedRel] = useState("Select Release");
     const [testCases, setTestCases] = useState([]);
     const [modules, setModules] = useState([]);
     const [enableBounce, setEnableBounce] = useState(false);
@@ -79,6 +87,8 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
         mappedTests: 0
     });
     const [rows, setRows] = useState([]);
+    const [excelContent,setExcelContent] = useState([]);
+    const [importStatus,setImportStatus] = useState(null);
 
     const [data, setData] = useState([
         {
@@ -514,7 +524,8 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 dispatch(showOverlay(''));
                 if (res.error) { setError(res.error); return; }
                 if (res.length > 0) {
-                    setFiledUpload(result)
+                    setFiledUpload(result);
+                    setExcelContent(result);
                     setSheetList(res)
                 } else {
                     setError("File is empty")
@@ -563,11 +574,6 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
         <div> <p>Note : If you import already mapped testcases will be unmapped</p></div>
     )
 
-    const importMappingFooter = (
-        <>
-        <Button label='Import' size='small' severity="primary"></Button>
-        </>
-    )
 
     // const onCheckboxChange = (nodeKey) => {
     //     const nodeIndex = selectedNodes.indexOf(nodeKey);
@@ -603,6 +609,30 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
         }
     }
 
+    const handleImportProject= async(e)=>{
+        const projectId = e.target.value;
+        const releaseData = await api.zephyrProjectDetails_ICE(projectId.id, '6440e7b258c24227f829f2a4');
+        if (releaseData.error)
+            setToast('error','Error',releaseData.error);
+        else if (releaseData === "unavailableLocalServer")
+            setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        else if (releaseData === "scheduleModeOn")
+            setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        else if (releaseData === "Invalid Session"){
+            setToast('error','Error','Invalid Session');
+        }
+        else if (releaseData === "invalidcredentials")
+            setToast('error','Error',MSG.INTEGRATION.ERR_INVALID_CRED.CONTENT);
+        else if (releaseData) {
+            setImportProjectDetails([]);
+            setImportReleaseArr(releaseData);
+            setSelectImportZephyrProject(projectId);
+            getProjectScenarios();
+            // setSelectedRel("Select Release");
+            // clearSelections();
+        }
+    }
+
     const onReleaseSelect = async(event) => {
         const releaseId = event.target.value;
         const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId.id, '6440e7b258c24227f829f2a4');
@@ -622,7 +652,25 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
             setSelectedRel(releaseId);
         }
     }
-
+    const onImportReleaseSelect = async(event) => {
+        const releaseId = event.target.value;
+        const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId.id, '6440e7b258c24227f829f2a4');
+        if (testAndScenarioData.error)
+             setToast('error','Error',testAndScenarioData.error);
+        else if (testAndScenarioData === "unavailableLocalServer")
+             setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        else if (testAndScenarioData === "scheduleModeOn")
+             setToast('error','Error',MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        else if (testAndScenarioData === "Invalid Session"){
+            setToast('error','Error','Invalid Session');
+        }
+        else if (testAndScenarioData) {
+            const convertToTree = convertDataStructure(testAndScenarioData.project_dets);
+            setImportProjectDetails(convertToTree);
+            // setAvoProjects(testAndScenarioData.avoassure_projects);  
+            setImportSelectedRel(releaseId);
+        }
+    }
     function convertDataStructure(input) {
         let output = [];
       
@@ -638,7 +686,8 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
             cycle.children.push({
               key,
               label,
-              children: [{}]
+              children: [{}],
+              checked:false
             });
           });
       
@@ -647,6 +696,143 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
       
         return output;
       }
+
+      const saveImportMapping = async() => {
+        // if(importType === 'excel'){
+            var data = await api.zephyrTestcaseDetails_ICE("testcase", selectedImportNodes[0]);
+            if (data.error){
+                setToast("error", "Error", data.error);
+                return;
+            }
+            else if (data === "unavailableLocalServer"){
+                setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);return;
+            }
+            else if (data === "scheduleModeOn"){
+                setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);return;
+            }
+            else if (data === "Invalid Session"){
+                setToast("error", "Error", 'Invalid Session');return;
+            }
+            
+            var res = await api.excelToZephyrMappings({'content':excelContent,'flag':'data',sheetname: selectSheet})
+            if(res.error){
+                setToast("error", "Error", res.error);return;
+            }
+            
+            var mappings = res.mappings;
+            const testIdToTestCase = new Map();    // will contain a map where key is testcaseid and value is the testCase object
+            const scenarioNameToScenario =new Map();// will contain a map where key is scnenarioName and value is the scenario object
+    
+            // var scenarioList = (avoProject?avoProjectList[avoProject].scenario_details:[]);
+            {listofScenarios && listofScenarios.map((e,i)=>scenarioNameToScenario.set(e.name,e))}
+    
+            var testCasesList = data.testcases;
+            {testCasesList && testCasesList.map((e,i)=> testIdToTestCase.set(e.id,e))}
+           
+            var finalMappings = [], errorTestCasesId=[], errorScenarioNames = [];
+    
+            {mappings && mappings.map((e,idx)=>{
+                var testCaseIds = e.testCaseIds;
+                var scenarios = e.scenarios;
+                var mappedpair = {
+                    projectid: [],			
+                    releaseid: [],
+                    treeid: [],
+                    parentid: [],
+                    testid:[],
+                    testname: [],
+                    reqdetails: [], 
+                    scenarioId: []
+                }
+    
+                errorTestCasesId.push({row: e.row, tcId:[]});
+
+            //     // traversing all the test case id's received from a row of excel sheet
+                testCaseIds.map((tcId,i)=>{
+                    // checking if the testCaseId exists in the selected phase/module
+                    if(testIdToTestCase.has(parseInt(tcId))){
+                        var tcObject = testIdToTestCase.get(parseInt(tcId));
+                        mappedpair.treeid.push(String(tcObject.cyclePhaseId))
+                        mappedpair.parentid.push(tcObject.parentId)
+                        mappedpair.testname.push(tcObject.name)
+                        mappedpair.testid.push(String(tcObject.id))
+                        mappedpair.reqdetails.push(tcObject.reqdetails) 
+                        mappedpair.projectid.push(parseInt(selectImportZephyrProject.id))
+                        mappedpair.releaseid.push(parseInt(importSelectedRel.id))    
+                    }
+                    else{
+                        errorTestCasesId[errorTestCasesId.length -1 ].tcId.push(tcId);
+                    }
+                });
+                console.log(mappedpair,' its mappedpair');
+                if(errorTestCasesId[errorTestCasesId.length -1 ].tcId.length === 0)
+                    errorTestCasesId.pop()
+                
+                errorScenarioNames.push({row:e.row, snrNames : []});
+    
+            //     // traversing all the scenario names received from a row of excel sheet
+                scenarios.map((scenarioName, i)=>{
+                    // checking if the scenario name exists in the selected phase/module
+                    if(scenarioNameToScenario.has(scenarioName)){
+                        mappedpair.scenarioId.push(scenarioNameToScenario.get(scenarioName)._id); 
+                    }
+                    else{
+                        errorScenarioNames[errorScenarioNames.length - 1].snrNames.push(scenarioName)
+                    }
+                })
+                if(errorScenarioNames[errorScenarioNames.length - 1].snrNames.length === 0){
+                    errorScenarioNames.pop()
+                }
+                if(mappedpair.treeid.length>0 && mappedpair.scenarioId.length>0){
+                    finalMappings.push(mappedpair)          //appending the mappedpair to the list of all mapped pairs                
+                }
+            })}
+    
+            if(finalMappings.length === 0){
+                setImportStatus("Not_Mapped");
+                setToast("error", "Error", 'Please upload the valid testcase sheet !!!');return;
+            }
+            else{
+                // saving the finalMappings 
+                const response = await api.saveZephyrDetails_ICE(finalMappings);
+                if (response.error){
+                    setToast("error", "Error", response.error);return;
+                }
+                else if(response === "unavailableLocalServer"){
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);return;
+                    }
+                else if(response === "scheduleModeOn"){
+                    setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);return;
+                }
+                if(response === 'success'){
+                    handleImportClose();
+                    setToast("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
+                }
+            }
+            
+            //Checking in case import is partially sucessfull
+            if(!res.errorRows.length && !errorScenarioNames.length && !errorTestCasesId.length){
+                handleImportClose();
+                setToast("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
+                // setMsg(MSG.INTEGRATION.SUCC_IMPORT);
+                // setImportPop(false);
+                
+            }
+            // else{
+            //     setErrorRows(res.errorRows);
+            //     setTcErrorList(errorTestCasesId)
+            //     setSnrErrorList(errorScenarioNames)
+            //     setActiveTab("")
+            // } 
+        // }
+      }
+
+
+      const importMappingFooter = (
+        <>
+        <Button label='Import' size='small' severity="primary" onClick={saveImportMapping}></Button>
+        </>
+    )
 
     const getProjectScenarios = async () => {
         // It needs to be change
@@ -712,14 +898,82 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                             // }
                         }}
                     />
-                    <span>{node.label}</span>
+                    <span>{node.key} {node.label}</span>
                 </div>
             );
         }
     };
 
+    const TreeNodeImportCheckbox = (node,parentNode) => {
+        if (!isNaN(node.key)) {
+            return (
+                <div>
+                    <Checkbox
+                        checked={selectedImportNodes.includes(node.key)}
+                        onChange={(e) => {
+                            importNodeCheckbox(node,e,parentNode);
+                        }}
+                    />
+                    <span>{node.label}</span>
+                </div>
+            );
+        }
+        else {
+            return (
+                <div>
+                    <span>{node.label}</span>
+                </div>
+            )
+        } 
+        // else {
+        //     return (
+        //         <div>
+        //             <Checkbox
+        //                 checked={selectedLeftNodes.includes(node.key)}
+        //                 onChange={(e) => {
+        //                     onLeftCheckboxChange(node);
+        //                 }}
+        //             />
+        //             <span>{node.label}</span>
+        //         </div>
+        //     );
+        // }
+    };
+    const handleImportClose = () => {
+        setImportMap(false); setFiledUpload(undefined);
+        setSelectSheet(null);setSelectImportZephyrProject(null);setImportSelectedRel("Select Release");
+        setImportSelectedKeys([]);
+    }
+
+    const importNodeCheckbox = (nodeKey,e,parentNode) => {
+        let data = importProjectDetails;
+        const nodeIndex = selectedImportNodes.indexOf(nodeKey.key);
+        const newSelectedNodes = [];
+        if (nodeIndex !== -1) {
+            newSelectedNodes.splice(nodeIndex, 1);
+        } else {
+            newSelectedNodes.push(nodeKey.key);
+        }
+        // data.forEach((item) => {
+        //     if (item.key === nodeKey.key && item.label === nodeKey.label) {
+        //       item.checked = e.checked; // Change checked value to true
+        //     }
+            
+        //     // If there are children, iterate through them as well
+        //     if (item.children) {
+        //       item.children.forEach((child) => {
+        //         if (child.key === nodeKey.key && child.label === nodeKey.label) {
+        //           child.checked = e.checked; // Change checked value to true for children
+        //         }
+        //       });
+        //     }
+        //   });
+          
+        setSelectedImportNodes(newSelectedNodes);
+        setCurrentNode(nodeKey)
+    }
+
     const onLeftCheckboxChange = (nodeKey) => {
-        console.log(nodeKey);
         const nodeIndex = selectedLeftNodes.indexOf(nodeKey.key);
         const newSelectedNodes = isMutipleScn ? [] : [...selectedLeftNodes];
         let newSelectedZphyrTCIds = isMutipleScn ? [] : [ ...selectedZphyrTCIds ];
@@ -761,6 +1015,29 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
         dispatchAction(checkedReleaseIds(newSelectedZphyrRelIds));
     }
 
+    const handleImportNodeToggle = async (nodeobj) => {
+        if(Object.keys(nodeobj).length && nodeobj.node && !isNaN(parseInt(nodeobj.node.key))){
+            const data = await api.zephyrTestcaseDetails_ICE("testcase", nodeobj.node.key);
+        if (data.error)
+                setToast('error','Error',data.error);
+            else if (data === "unavailableLocalServer")
+                setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+            else if (data === "scheduleModeOn")
+                setToast('error','Error',MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+            else if (data === "Invalid Session"){
+                setToast('error','Error','Invalid Session');
+            }
+            else {
+                if(data.modules.length){
+                    updateModuleData(nodeobj.node.key,data.modules,importProjectDetails);
+                }
+                setTestCases(data.testcases);
+                setModules(data.modules);
+                // setCollapse(false);
+            }
+        }
+    }
+
     const handleNodeToggle = async (nodeobj) => {
         if(Object.keys(nodeobj).length && nodeobj.node && !isNaN(parseInt(nodeobj.node.key))){
             setEnableBounce(true);
@@ -779,7 +1056,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                     updateChildrenData(projectDetails,data.testcases,data.modules);
                 }
                 if(data.modules.length && !data.testcases.length){
-                    updateModuleData(nodeobj.node.key,data.modules);
+                    updateModuleData(nodeobj.node.key,data.modules,projectDetails);
                 }
                 setTestCases(data.testcases);
                 setModules(data.modules);
@@ -822,8 +1099,8 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
 
 
 
-    const updateModuleData = (selectedkey,modules) => {
-        if(projectDetails.length && modules.length){
+    const updateModuleData = (selectedkey,modules,currentProjectDetails) => {
+        if(currentProjectDetails.length && modules.length){
             const findParent = (nodes, parentId, processedNodes,item) => {
                 if(item){
                     for (let i = 0; i < nodes.length; i++) {
@@ -859,7 +1136,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 return false;
             };
             modules.forEach((item) => {
-                findParent(projectDetails, selectedkey, new Set(),item);
+                findParent(currentProjectDetails, selectedkey, new Set(),item);
             });
             
         }
@@ -1067,7 +1344,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
 
                         </div>
                     </div>
-                    <Dialog header="Import mappings" visible={importMap} onHide={() => { setImportMap(false); setFiledUpload(undefined) }} style={{ height: fileUpload && selectZephyrProject ?'96vh':fileUpload ? '46vh' : '28vh', width: fileUpload && selectZephyrProject ?'36vw':fileUpload ? '39vw' : '28vw' }} footer={importMappingFooter}>
+                    <Dialog header="Import mappings" visible={importMap} onHide={handleImportClose} style={{ height: fileUpload && selectImportZephyrProject ?'96vh':fileUpload ? '46vh' : '28vh', width: fileUpload && selectImportZephyrProject ?'36vw':fileUpload ? '39vw' : '28vw' }} footer={importMappingFooter}>
                         <div>
                             <div>
                                 <label>Upload Excel File: </label>
@@ -1089,9 +1366,8 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                         <div>
                                             <label>Select Project:</label>
                                             <Dropdown
-                                                value={selectZephyrProject}
-                                                onChange={(e) => setSelectZephyrProject(e.value)}
-                                                options={zephyrProj}
+                                                value={selectImportZephyrProject} onChange={(e) => handleImportProject(e)}
+                                                options={domainDetails}
                                                 optionLabel="name"
                                                 placeholder="Select Project"
                                                 className='selectProject_dropdown'/>
@@ -1100,9 +1376,8 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                         <div>
                                             <label>Select Release:</label>
                                             <Dropdown
-                                                value={selectZephyrRelease}
-                                                onChange={(e) => setSelectZephyrRelease(e.value)}
-                                                options={zephyrRelease}
+                                                value={importSelectedRel} onChange={(e) => onImportReleaseSelect(e)}
+                                                options={importReleaseArr}
                                                 optionLabel="name"
                                                 placeholder="Select Release"
                                                 className='selectRelease_dropdown'/>
@@ -1111,7 +1386,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                 )}
                             </div>
                             <div>
-                                {fileUpload && selectZephyrProject &&(
+                                {fileUpload && selectImportZephyrProject &&(
                                     <>
                                         <div>
                                             <div className='zephyrdata-card1 selectPhase'>
@@ -1119,17 +1394,18 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                                     Select Phase/Module
                                                 </label>
                                                 <Tree
-                                                    value={data}
-                                                    selectionMode="checkbox"
-                                                    selectionKeys={selectedKeys}
-                                                    onSelectionChange={(e) => setSelectedKeys(e.value)}
+                                                        value={importProjectDetails}
+                                                        selectionMode="single"
+                                                        selectionKeys={importselectedKeys}
+                                                        onSelectionChange={(e) => setImportSelectedKeys(e.value)}
+                                                        nodeTemplate={TreeNodeImportCheckbox}
+                                                        onExpand={handleImportNodeToggle}
 
-                                                />
+                                                    />
                                             </div>
                                             <div>
-                                            <label>Select AVO Project:</label>
-                                            <Dropdown value={selectetestcase} onChange={(e) => setSelectedtestcase(e.value)} options={testcaseAvo} optionLabel="name" 
-                placeholder="Select AVO Project" className='testcase_data_2'/>
+                                            <label>Selected AVO Project:</label>
+                                            <span className="selected_projName" title={reduxDefaultselectedProject.projectName}>{reduxDefaultselectedProject.projectName}</span>
 
                                             </div>
                                         </div>
