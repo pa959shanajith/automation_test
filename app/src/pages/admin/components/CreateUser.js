@@ -17,6 +17,7 @@ import { TabMenu } from 'primereact/tabmenu';
 import TokenManagement from '../containers/TokenMangement';
 import { Checkbox } from 'primereact/checkbox';
 import IceProvision from '../containers/IceProvision';
+import UserList from '../components/UserList';
 
 
 /*Component CreateUser
@@ -63,7 +64,8 @@ const CreateUser = (props) => {
     const confirmPassword = useSelector(state => state.admin.confirmPassword);
     const allUsersList = useSelector(state => state.admin.allUsersList);
     const currentTab = useSelector(state => state.admin.screen);
-    const nocreate = useSelector(state => state.admin.nocreate)
+    const nocreate = useSelector(state => state.admin.nocreate);
+    const editUser = useSelector(state => state.admin.editUser);
     const [showEditUser, setShowEditUser] = useState(false);
     const [allRolesUpdate, setAllRolesUpdate] = useState([]);
     const [roleDropdownValue, setRoleDropdownValue] = useState("");
@@ -83,15 +85,18 @@ const CreateUser = (props) => {
 
     useEffect(() => {
         let allRolesList = [];
+        let editUserRole = "";
         if (allRoles.length) {
-            allRoles.map(role => {
+            allRoles.map(userRole => {
                 let roleObject = {};
-                if (role[0] !== "Admin") {
-                    roleObject.name = role[0];
-                    roleObject.value = role[1];
+                if (userRole[0] !== "Admin") {
+                    roleObject.name = userRole[0];
+                    roleObject.value = userRole[1];
                     allRolesList.push(roleObject);
+                    if (role === roleObject.name) editUserRole = roleObject.value;
                 }
             })
+            setRoleDropdownValue(editUserRole);
             setAllRolesUpdate(allRolesList);
         }
     }, [allRoles.length > 0]);
@@ -181,7 +186,11 @@ const CreateUser = (props) => {
                 setLoading(false);
                 if (data === "success") {
                     if (action === "create") { click(); setSelectedTab("avoAzzureClient") }
-                    else edit();
+                    else {
+                        edit();
+                        toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
+                        setSelectedTab("avoAzzureClient")
+                    };
                     // toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "delete") {
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
@@ -347,7 +356,7 @@ const CreateUser = (props) => {
         setLdapDirectoryAddClass(false);
 
         setLdapUserList(ldapUserListInitial);
-        dispatch(AdminActions.RESET_VALUES(""))
+        if (!editUser) dispatch(AdminActions.RESET_VALUES(""))
         updateUserRoles();
 
         if (props !== undefined && props.query !== undefined && props.query !== "retaintype") {
@@ -493,7 +502,7 @@ const CreateUser = (props) => {
             setLoading(false);
             data.sort();
             dispatch(AdminActions.UPDATE_ALL_USERS_LIST(data));
-            setAllUserFilList(data);
+            // setAllUserFilList(data);
         }
     }
 
@@ -611,25 +620,25 @@ const CreateUser = (props) => {
             label="Cancel"
             disabled={selectedTab === "avoAzzureClient"}
             text
-            onClick={() => props.setUserCreateDialog(false)}
+            onClick={() => { props.setUserCreateDialog(false); dispatch(AdminActions.EDIT_USER(true)); }}
         >
         </Button>
-        {selectedTab === "userDetails" && <Button
+        {(selectedTab === "userDetails") && <Button
             data-test="createButton"
-            label="Next"
-            onClick={() => { manage({ action: "create" }); }}
+            label={ "Next"}
+            onClick={() => { editUser ? manage({ action: "update" }) : manage({ action: "create" }) }}
             disabled={nocreate}>
         </Button>}
         {selectedTab === "avoAzzureClient" && <Button
             data-test="createButton"
-            label={"Create"}
+            label={editUser ? "Update" :"Create"}
             onClick={() => userCreateHandler()}
             disabled={nocreate}>
         </Button>}
     </>
 
     const createUserDialogHide = () => {
-        // setUserCreateDialog(false);
+        dispatch(AdminActions.EDIT_USER(false));
         props.setCreateUserDialog(false);
     }
 
@@ -637,7 +646,7 @@ const CreateUser = (props) => {
         <Fragment>
             <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={1300} />
             {loading ? <ScreenOverlay content={loading} /> : null}
-
+            <UserList manage={manage}/>
             <Dialog
                 visible={props.createUserDialog}
                 onHide={createUserDialogHide}
@@ -671,7 +680,7 @@ const CreateUser = (props) => {
                                         <InputText
                                             data-test="password"
                                             value={passWord}
-                                            className='w-full md:w-20rem'
+                                            className='w-full md:w-20rem p-inputtext-sm'
                                             onChange={(event) => { passwordChange(event.target.value) }}
                                             type="password"
                                             autoComplete="new-password"
@@ -686,7 +695,7 @@ const CreateUser = (props) => {
                                         <InputText
                                             data-test="confirmPassword"
                                             value={confirmPassword}
-                                            className='w-full md:w-20rem'
+                                            className='w-full md:w-20rem p-inputtext-sm'
                                             onChange={(event) => { confirmPasswordChange(event.target.value) }}
                                             type="password"
                                             autoComplete="new-password"
@@ -712,7 +721,7 @@ const CreateUser = (props) => {
                                 autoComplete="off"
                                 name="email"
                                 id="email"
-                                className='w-full md:w-20rem'
+                                className='w-full md:w-20rem p-inputtext-sm'
                                 maxLength="100"
                                 placeholder="Enter Email Id"
                             />
@@ -729,9 +738,7 @@ const CreateUser = (props) => {
                                 optionLabel="name"
                                 className='w-full md:w-20rem'
                                 placeholder='Select Role'
-                                // disabled={props.showEditUser === true}
                                 onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
-                            // style={(props.showEditUser === true) ? { backgroundColor: "#eee", cursor: "not-allowed" } : {}}
                             />
                         </div>
                         {/* Admin Check */}
@@ -739,29 +746,9 @@ const CreateUser = (props) => {
                             <Checkbox inputId='admin_check' aria-label="admin_check" className='adminCheckbox' onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
                             <label htmlFor="admin_check" className=" adminlable">Admin</label>
                         </div>}
-                        {/* 
-                {( rolename!=='Admin' && props.showEditUser === true  && userIdName!=='')?
-                    <div  className="col-xs-6 selectRole" >
-                        <label className="leftControl primaryRole" id="additionalRoleTxt">Additional Role: </label>
-                        <label className="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" onClick={()=>{setToggleAddRoles(!toggleAddRoles)}} title="Select Additional Role">Select Additional Role</label>
-                        {(toggleAddRoles===true)?
-                            <ul ref={node} className="dropdown-menu-multiselect" id="additionalRoles" >
-                                
-                                {allAddRoles.map((arid,index) => (  
-                                    (arid[1]!==role)? 
-                                        <li className='RolesCheck' key={index}  checked={addRole[arid[1]]} onClick={()=>{dispatcEDIT_ADDROLEa(rid[1)]})}>
-                                            <span className='rolesSpan'><input className='addcheckBox' name="additionalRole" type='checkbox' checked={addRole[arid[1]]} /><label className='rolesChecklabel'>{arid[0]}</label></span> 
-                                        </li>
-                                    :null
-                                ))}
-                            </ul>
-                        :null}
-                    </div>
-                :null} */}
-
                     </div>
                 </div>}
-                {selectedTab === "avoAzzureClient" && <IceProvision userName={userNameForIceToken}  toastError={toastError} toastSuccess={toastSuccess}/>}
+                {selectedTab === "avoAzzureClient" && <IceProvision userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
             </Dialog>
         </Fragment>
     );

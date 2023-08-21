@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { updateScrollBar } from '../../global';
 import "../styles/TableRow.scss";
+import {Tag} from 'primereact/tag'
 import Select from "react-select";
 /*
     Component: TableRow
@@ -76,7 +77,6 @@ const TableRow = (props) => {
         setChecked(props.stepSelect.check.includes(props.idx));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.stepSelect.check]);
-
     useEffect(()=>{
         if (props.edit){
             if (props.stepSelect.edit && props.stepSelect.highlight.includes(props.idx)){
@@ -265,7 +265,12 @@ const TableRow = (props) => {
                         { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
                         { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
                     </select> :
-                    <div className="d__row_text" title={objName} >{objName}</div>
+                    <div className="d__row_text" title={objName} >
+                        <span>{objName}</span>
+                        {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
+        {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
+                        </div>
+
                     }
                 </span>
                 <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >

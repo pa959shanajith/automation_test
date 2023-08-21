@@ -869,13 +869,13 @@ const ActionPanel = (props) => {
                 {
                   oldObj: <span title={oldObj.title}>{oldObj.title}</span>,
                   keywords: <span title={k_word}>{
-                    res.keywordList[oldObj.tag][k_word].description ? res.keywordList[oldObj.tag][k_word].description : "--"}</span>,
+                    res.keywordList[oldObj.tag][k_word].description ? res.keywordList[oldObj.tag][k_word].description : [k_word]}</span>,
                   newObj: <span title={newObj.title}>{newObj.title}</span>,
                   selectKeyword: (
                     <span style={{ width: '40%' }}>
                       <select
                         className="r-group__select"
-                        defaultValue={similarTagNames}
+                        defaultValue={ similarTagNames && newkeywords[0].includes(k_word)?(newkeywords[0][k_word].description ? newkeywords[0][k_word].description : k_word):""}
                         onFocus={(e) => { e.target.value ? e.target.classList.remove('r-group__selectError') : e.target.classList.add('r-group__selectError') }}
                         onChange={(e) => { handleSelectChange(e, k_word, oldObj) }}
                         style={{ height: '2rem' }}
@@ -885,8 +885,8 @@ const ActionPanel = (props) => {
                         </option>
                         {newkeywords && newkeywords[0] &&
                           Object.keys(newkeywords[0]).map((keyword, i) => (
-                            <option key={newkeywords[0][keyword] + i} title={newkeywords[0][keyword].description ? newkeywords[0][keyword].description : "--"} value={keyword}>
-                              {newkeywords[0][keyword].description ? (newkeywords[0][keyword].description.slice(0, 30) + (newkeywords[0][keyword].description.length > 30 ? '...' : '')) : "--"}
+                            <option key={newkeywords[0][keyword] + i} title={newkeywords[0][keyword].description ? newkeywords[0][keyword].description : keyword} value={keyword}>
+                              {newkeywords[0][keyword].description ? (newkeywords[0][keyword].description.slice(0, 30) + (newkeywords[0][keyword].description.length > 30 ? '...' : '')) : keyword}
                             </option>
                           ))}
                       </select>
@@ -972,6 +972,7 @@ const ActionPanel = (props) => {
         position='right'
         visible={props.isOpen === 'createObject'}
         onHide={props.OnClose}
+        draggable={false}
         footer={createElementFooter}>
         <Accordion activeIndex={activeIndex}>
           {objects.map((object, index) => (
@@ -1054,15 +1055,17 @@ const ActionPanel = (props) => {
         toastError={props.toastError}
         onClose={props.onClose}
         setShow={props.setShow}
+        elementTypeProp={props.elementTypeProp}
       />}
 
       {/* Replace Element */}
       <Dialog
         className='replace__object__modal'
-        header="Replace: Sign up screen 1"
+        header={`Replace : ${(props.parentData && props.parentData.name) ? props.parentData.name : ""}`}
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
         visible={props.isOpen === "replaceObjectPhase2"}
+        draggable={false}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">
