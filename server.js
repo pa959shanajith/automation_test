@@ -349,7 +349,11 @@ if (cluster.isMaster) {
 			let clientVer = String(req.query.ver);
 			let iceFile = uiConfig.avoClientConfig[clientVer];
 			if (req.query.file == "getICE") {
-				return res.download(path.resolve(iceFile),"AvoAssureClient"+(req.query.fileName?(req.query.fileName):"")+"."+iceFile.split(".").pop())
+				if (iceFile.split(".").pop() === 'zip'){
+					return res.download(path.resolve(iceFile),"AvoAssureClient.zip")
+				} else {
+					return res.download(path.resolve(iceFile),"AvoAssureClient"+(req.query.fileName))
+				}
 			} else {
 				let status = "na";
 				try {
@@ -362,6 +366,37 @@ if (cluster.isMaster) {
 					}
 				} catch (error) {
 					console.error("Catch: Error Occurred in fetching Avo Client")
+				}
+				return res.send({status});
+			}
+		});
+
+		app.get('/downloadExportfile', async (req, res) => {
+			let projName = req.query.projName	
+			projName = projName.replace(/\s+/g, '');
+			let exportfile =path.join(__dirname,'./assets/ExportMindmap')
+			let username = req.user.username;
+			username = username.split('.').join("");
+			exportfile=exportfile+"/"+username+".zip";
+			var dateObj = new Date();
+			var month = dateObj.getUTCMonth() + 1;
+			var day = dateObj.getUTCDate();
+			var year = dateObj.getUTCFullYear();
+			var newdate = year + "-" + month + "-" + day;			
+			if (req.query.file == "getExportFile") {
+			  return res.download(path.resolve(exportfile),projName+"_"+(newdate?(newdate):"")+".zip")
+			} else {
+				let status = "na";
+				try {
+					let stats = await fs.promises.stat(path.resolve(exportfile))
+					
+					if(stats.isFile()){
+						status = "available";
+					}else {
+						console.error("Error Occurred while downloading the exported file")
+					}
+				} catch (error) {
+					console.error("Catch: Error Occurred while downloading the exported file")
 				}
 				return res.send({status});
 			}
@@ -397,6 +432,18 @@ if (cluster.isMaster) {
       return res.send({isTrialUser})
     })
 
+	//To get GA configs
+	app.get('/getGTM', (req,res) => {
+		let enableGTM = false;
+		let gtmToken = "";
+		const getUiConfig = Object.keys(uiConfig);
+		if(getUiConfig.includes("enableGTM") && getUiConfig.includes("gtmToken")){
+			enableGTM = uiConfig.enableGTM;;
+			gtmToken = uiConfig.gtmToken;
+		}
+		return res.send({enableGTM, gtmToken})
+	})
+
 	app.get('/getServiceBell', (req,res) => {
 		const enableServiceBell = uiConfig.enableServiceBell;
 		return res.send({enableServiceBell})
@@ -422,6 +469,10 @@ if (cluster.isMaster) {
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
+		var devOps = require('./server/controllers/devOps');
+		var azure = require('./server/controllers/azure');
+
+
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
 		app.post('/getProjectsNeo', (req, res) => (res.send("false")));
@@ -466,6 +517,7 @@ if (cluster.isMaster) {
 		app.post('/resetPassword', login.resetPassword);
 		app.post('/updatePassword', login.updatePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
+		app.post ('/hooks/upgradeLicense', login.upgradeLicense)
 		//Admin Routes
 		// app.post('/getUserRoles', auth.protect, admin.getUserRoles);
 		app.post('/getDomains_ICE', auth.protect, admin.getDomains_ICE);
@@ -507,7 +559,9 @@ if (cluster.isMaster) {
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/getDetails_Azure',auth.protect,admin.getDetails_Azure);
 		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
+		app.post('/manageAzureDetails',auth.protect,admin.manageAzureDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
@@ -640,6 +694,8 @@ if (cluster.isMaster) {
 		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
+		app.post('/hooks/validateExecutionSteps', devOps.executionSteps);
+		app.post('/hooks/validateParallelExecutions', devOps.executionParallel);
 
 		// Azure integeration API's
 		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
@@ -692,6 +748,7 @@ if (cluster.isMaster) {
             isTrialUser = JSON.parse(data.toString()).isTrial
 						scheduler.reScheduleTestsuite();
 						scheduler.reScheduleRecurringTestsuite();
+						mindmap.dropTempExpImpColl();
 						console.info("Avo Assure Server Ready...\n");
 					}
 				} catch (exception) {

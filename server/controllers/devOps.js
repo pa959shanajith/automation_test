@@ -1,6 +1,7 @@
 var create_ice = require('../controllers/create_ice');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
+const {execAutomation} = require('./suite');
 const { default: async } = require('async');
 
 exports.fetchProjects =  async(req, res) => {
@@ -73,7 +74,14 @@ exports.storeConfigureKey = async(req,res) => {
 		};
 		const status = await utils.fetchData(inputs, "devops/configurekey", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
-		else res.send(status);
+		else if(req.body.executionData.isExecuteNow){
+			req['body'] = {"key":req.body.executionData.configurekey,"isExecuteNow":req.body.executionData.isExecuteNow}
+			// console.log(suite);
+			let result = await execAutomation(req, res);
+			if(result.status == 'pass') result.status = 'success'
+			return res.send(result.status);
+		}
+		return res.send(status);
 	} catch (exception) {
 		logger.error(exception.message);
 		return res.send("fail");
@@ -313,3 +321,25 @@ exports.fetchModuleListDevopsReport =  async(req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.executionSteps = async(req, res)=>{
+	try {
+		const inp = req.body;
+		const steps = await utils.fetchData(inp,"/hooks/validateExecutionSteps")
+		res.send(steps)
+	} catch (error) {
+		logger.error("Error occurred in devops/hooks/ExecutionSteps: "+error)
+		return res.send("fail")
+	}
+}
+
+exports.executionParallel = async(req, res)=>{
+	try {
+		const inp = {};
+		const parallel = await utils.fetchData(inp,"/hooks/validateParallelExecutions")
+		res.send(parallel)
+	} catch (error) {
+		logger.error("Error occurred in devops/hooks/ParallelExecutions: "+error)
+		return res.send("fail")
+	}
+}

@@ -15,6 +15,7 @@ const { update } = require('../../notifications');
 const suitFunctions = require('../../controllers/suite');
 const reportFunctions = require('../../controllers/report');
 const screenshotpath = require('../../config/config');
+const { deleteConfigureKey } = require('../../controllers/devOps');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -244,7 +245,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
 
                     response['status'] = "pass";
-                    response["message"] = "ICE not selected."
+                    response["message"] = "Avo Client not selected."
                     response['variant'] = "info";
                 }
             }
@@ -644,7 +645,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                 modulename:ids.testsuiteName,
                 moduleid:ids.testsuiteId,status: 'QUEUED',
                 avoagentList:gettingTestSuiteIds.executionData.avoagents,
-                startTime: new Date().toLocaleString()
+                startTime: new Date().toLocaleString(),
+                isExecuteNow: req.body.isExecuteNow
             });
 
         keyQueue.push(newExecutionList);
@@ -938,6 +940,18 @@ module.exports.Execution_Queue = class Execution_Queue {
                 this.key_list[resultData.configkey] = updatedKeyQueue
                 await cache.set("execution_list", this.key_list);
             }
+            if(dataFromIce.event == 'result_executeTestSuite' && dataFromIce.status) {
+                //Check if profile is being executed using the execute now button.
+                // and that can be deducted using the projectname + configure kye as the configurename
+                if(dataFromIce.exce_data.execReq.suitedetails[0].projectname+'_'+dataFromIce.exce_data.execReq.configurekey == dataFromIce.exce_data.execReq.configurename){
+                    // await deleteConfigureKey(dataFromIce.exce_data.execReq.configurekey);
+                    const inputs = {
+                        "key": dataFromIce.exce_data.execReq.configurekey,
+                        "query": "deleteConfigureKey"
+                    };
+                    const status = await utils.fetchData(inputs, "devops/deleteConfigureKey", fnName);
+                }
+            }
 
             return responseFromExecutionInvoker;
 
@@ -966,7 +980,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
 
             for(let configKeys in this.key_list) {
-                if(this.key_list[configKeys].length){
+                if(this.key_list[configKeys].length && this.key_list[configKeys][0].length && this.key_list[configKeys][0][0]['isExecuteNow'] != true){
                     response[configKeys] = this.key_list[configKeys]
                 }
             }

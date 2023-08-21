@@ -38,6 +38,7 @@ const ScrollBar = (props) => {
     
     const [temp] = useUpdateScrollBar();
     const scrollRef = useRef();
+    const scrnType = localStorage.getItem('integrationScreenType');
 
     useEffect(()=>{
         if (scrollRef.current) 

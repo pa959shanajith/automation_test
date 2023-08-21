@@ -569,19 +569,46 @@ module.exports.validateUserState = async (req, res) => {
 						emsg = "noProjectsAssigned";
 					} else {
 						emsg = "ok";
-						res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
-						req.session.userid = userid;
-						req.session.ip = ip;
-						req.session.loggedin = (new Date()).toISOString();
-						req.session.username = username;
-						req.session.uniqueId = req.session.id;;
-						req.session.usertype = user.type;
-						logger.rewriters[0] = function(level, msg, meta) {
-							meta.username = username;
-							meta.userid = userid;
-							meta.userip = ip;
-							return meta;
-						};
+						const vstatus = await utils.fetchData({},"/hooks/validateStatus");
+                        if(vstatus.status === 'pass'){
+							var vuser = { 'status' : 'pass'}
+							if(req.user.username != 'admin'){
+							   vuser = await utils.fetchData({},"/hooks/validateUser");
+							}
+							if(vuser.status === 'pass'){
+								res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
+								req.session.userid = userid;
+								req.session.ip = ip;
+								req.session.loggedin = (new Date()).toISOString();
+								req.session.username = username;
+								req.session.uniqueId = req.session.id;;
+								req.session.usertype = user.type;
+								logger.rewriters[0] = function(level, msg, meta) {
+									meta.username = username;
+									meta.userid = userid;
+									meta.userip = ip;
+									return meta;
+								};
+							}else{
+								return res.send(vuser)
+							}
+						}else{
+							return res.send(vstatus)
+						}
+						
+						// res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
+						// req.session.userid = userid;
+						// req.session.ip = ip;
+						// req.session.loggedin = (new Date()).toISOString();
+						// req.session.username = username;
+						// req.session.uniqueId = req.session.id;;
+						// req.session.usertype = user.type;
+						// logger.rewriters[0] = function(level, msg, meta) {
+						// 	meta.username = username;
+						// 	meta.userid = userid;
+						// 	meta.userip = ip;
+						// 	return meta;
+						// };
 					}
 				}
 			} catch (err) {
