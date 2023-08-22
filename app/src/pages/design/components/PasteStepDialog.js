@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
 import "../styles/PasteStepDialog.scss";
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button'
 
 /*
     Component: Paste Steps Dialog
@@ -55,26 +57,37 @@ const PasteStepDialog = (props) => {
         setStepNum(value)
     };
     
-    return (<ModalContainer 
-        data-test="d__psd"
-        modalClass="modal-sm"
-        title="Paste Test Step"
-        content={
+    return (
+    // <ModalContainer 
+    //     data-test="d__psd"
+    //     modalClass="modal-sm"
+    //     title="Paste Test Step"
+    //     content={
+    //     <div className="ps_dialog"> 
+    //         <div className="ps_lbl" data-test="d__pslbl">Paste after step no:</div>
+    //         <div className="ps_hint" data-test="d__pslbl">For multiple paste. Eg: 5;10;20</div>
+    //         <input data-test="d__psinp" className="ps_input" placeholder="Enter a value" onChange={PSHandler} value={stepNum}/>
+    //         { pasteError && 
+    //             <div data-test="d__pserrmsg" className="ps_error">{pasteErrors[pasteError]}</div>
+    //         }
+    //     </div>}
+    //     close={()=>{
+    //         setStepNum("");
+    //         showPasteError("");
+    //         props.setShow(false)
+    //     }}
+    //     footer={ <button onClick={pasteCopiedSteps} data-test="d__psbtn">Submit</button> }
+    // />
+    <Dialog data-test="d__psd" header="Paste Test Step" className='modal-sm'  visible={props.show} onHide={()=>{setStepNum("");showPasteError("");props.setShow(false)}} footer={ <Button onClick={pasteCopiedSteps} data-test="d__psbtn" label='Submit'/>}>
         <div className="ps_dialog"> 
             <div className="ps_lbl" data-test="d__pslbl">Paste after step no:</div>
             <div className="ps_hint" data-test="d__pslbl">For multiple paste. Eg: 5;10;20</div>
-            <input data-test="d__psinp" className="ps_input" placeholder="Enter a value" onChange={PSHandler} value={stepNum}/>
+                <input data-test="d__psinp" className="ps_input" placeholder="Enter a value" onChange={PSHandler} value={stepNum}/>
             { pasteError && 
                 <div data-test="d__pserrmsg" className="ps_error">{pasteErrors[pasteError]}</div>
             }
-        </div>}
-        close={()=>{
-            setStepNum("");
-            showPasteError("");
-            props.setShow(false)
-        }}
-        footer={ <button onClick={pasteCopiedSteps} data-test="d__psbtn">Submit</button> }
-    />
+        </div>
+    </Dialog>
 )
 }
 
