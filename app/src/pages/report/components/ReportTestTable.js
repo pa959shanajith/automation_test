@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectJira, connectJira_ICE, getDetails_JIRA, viewReport } from "../api";
+import { connectAzure_ICE, connectJira_ICE, getDetails_JIRA, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
 import "../styles/ReportTestTable.scss";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -417,7 +417,6 @@ export default function BasicDemo() {
         headerTxt={`${bugTitle} Login`}
         modalSytle={{
           width: "40vw",
-          height: "50vh",
           background: "#FFFFFF",
         }}
         footerType="Connect"
@@ -485,7 +484,6 @@ export default function BasicDemo() {
                 dropdownValue={issueDropDown}
                 onDropdownChange={async(e) => {
                   setIssueDropDown(e.target.value)
-                  const resp = await connectJira()
                 }}
                 dropdownOptions={jiraDetails?.issue_types}
                 name="issuetype"
