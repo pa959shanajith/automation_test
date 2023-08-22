@@ -840,19 +840,16 @@ const elementTypeProp =(elementProperty) =>{
         }
         else if (data.action === "replace") {
           let viewString = data;
-
-                    if (viewString.view.length !== 0){
-                        let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
-
-                        let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
-                        setNewScrapedData(scrapeItemList);
-                        handleDialog("replaceObjectPhase2");
-                    } else {
-                        // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                        toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                    }
-          
-       }
+          if (viewString.view.length !== 0){
+              let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+              let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+              setNewScrapedData(scrapeItemList);
+              handleDialog("replaceObjectPhase2");
+          } else {
+              // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+              toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+            }               
+        }
 else{
         let viewString = data;
         if (capturedDataToSave.length !== 0 && masterCapture) {
@@ -1030,21 +1027,6 @@ else{
     setHoveredRow(null);
   };
 
-
-
-  // const renderIcons = (rowData) => {
-  //   if (rowData === hoveredRow) {
-  //     return (
-  //       <>
-  //         <img src='static/imgs/ic-edit.png' style={{height:"20px", width:"20px"}} className='edit__icon' />
-  //         <img src='static/imgs/ic-delete-bin.png'  style={{height:"20px", width:"20px"}} className='delete__icon'  />
-  //       </>
-  //     );
-  //   }
-  //   return null;
-  // };
-
-
   const footerCapture = (
     <div className='footer__capture'>
       {visible === 'capture' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</Button>}
@@ -1152,8 +1134,8 @@ const footerSave = (
     })
     let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
     dispatch(objValue(objVal));
-    setHighlight(true);
-  }
+            setHighlight(true);
+          }
 
   useEffect(() => {
     if (mirror.scrape) {
@@ -1270,7 +1252,7 @@ const footerSave = (
     <>
     <div className='header__screenshot__eye'>
     <div>
-          <img data-test="eyeIcon" className="ss_eye_icon"
+          <img data-test="eyeIcon" className="ss_eye_icon_screen"
             onClick={onHighlight}
             src={activeEye ? 
               "static/imgs/eye-active.svg" : 
@@ -1279,7 +1261,7 @@ const footerSave = (
         </div>
       <div className='header__popup screenshot_headerName'>
         <Tooltip target=".screenshot_headerName" content={screenshotData.header} position='bottom' ></Tooltip>
-        <span>View Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
+        <span>Screenshot</span> : {(screenshotData && screenshotData.header) ? screenshotData.header : ""}
       </div>
       </div>
     </>
@@ -1618,9 +1600,9 @@ const headerstyle={
        <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
-              {!showPanel && <div className='insprint__block'>
+              {!showPanel && <div className='insprint__block1'>
                 <div>
-                <p className='insprint__text'>In Sprint Automation</p></div>
+                <p className='insprint__text1'>In Sprint Automation</p></div>
                 </div>}
             {showPanel && <div className='insprint__block'>
                 <p className='insprint__text'>In Sprint Automation</p>
@@ -1782,7 +1764,7 @@ const headerstyle={
             <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
           </DataTable>
               }
-          <Dialog header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `94vh`, position:"right" }}>
+          <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false) }} style={{ height: `${mirrorHeight}px`, position:"right", margin:"0px", width:"29vw" }}>
             <div className="ref_pop screenshot_pop">
               <div className="screenshot_pop__content" >
                 {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
@@ -2211,7 +2193,6 @@ function generateCompareObject(data, irisObjects){
       compareObj.notFoundObj = [...localList, ...irisObjects];
   }
   compareObj['fullScrapeData'] = data.view[3].newElements;
-
   return compareObj;
 }
 

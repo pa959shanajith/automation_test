@@ -1,10 +1,4 @@
 .profile_container {
-    .vertical_line {
-        position: absolute;
-        z-index: 3;
-        right: 36vw;
-        top: 23.7vh;
-    }
     .table_profile {
         margin-top: 0;
     }
@@ -20,19 +14,33 @@
         }
     }
     .p-tree.modules_tree {
+        .p-tree-container {
+            .p-treenode {
+                padding: 0;
+            }
+        }
         padding: 0;
         border: none;
-        min-width: 20vw;
-        .p-datatable-tbody>tr>td:nth-child(1) {
-            text-align: center;
-        }
         .p-treenode-label {
             width: 100%;
         }
         .p-treenode-children {
+            padding: 0;
+            .p-treenode-leaf>.p-treenode-content .p-tree-toggler {
+                display: none;
+            }
             .p-treenode-content {
                 padding: 0;
                 overflow: hidden;
+            }
+            .p-datatable-wrapper {
+                .p-datatable-tbody>tr>td:nth-child(1) {
+                    text-align: center;
+                    width: 35.5vw;
+                }
+                .p-datatable-tbody>tr>td:nth-child(2) {
+                    width: 36.2vw;   
+                }
             }
         }
         
@@ -43,6 +51,7 @@
             .p-datatable-tbody>tr>td:nth-child(4) {
                 vertical-align: middle;
                 padding: 0;
+                border-left: 1px solid #dee2e6;
                 .testSuite_col1 {
                     width: 35vw;
                 } 
@@ -56,6 +65,30 @@
                     display: inline-block;
                     margin-right: 1rem;
                 }
+                .p-datatable.statusTable {
+                    width: 90%;
+                    border: 1px solid #dee2e6;
+                    width: 90%;
+                    padding-right: 1rem;
+                    margin-top: 1rem;
+                    .p-datatable-wrapper { 
+                        .p-datatable-tbody>tr>td:nth-child(4) {
+                            border-left: none;  
+                        }
+                        .p-datatable-tbody>tr>td:nth-child(1) {
+                            text-align: left;   
+                        }
+                        .p-datatable-tbody>tr>td:nth-child(2) {
+                            width: auto;   
+                        }
+                        .p-datatable-tbody>tr:last-child>td {
+                            border-bottom: none;
+                        }
+                        .view_button {
+                            padding: 0.5rem;
+                        }
+                    }
+                }
             }
         }
     }
@@ -67,27 +100,12 @@
         top: 0;
         z-index: 1;
       }
-    .p-datatable.statusTable {
-            .p-datatable-tbody>tr>td:nth-child(4) {
-                width: 5rem;
-                vertical-align: middle;
-        }
-        .p-datatable-tbody>tr>td:nth-child(1) {
-            text-align: left;
-        }
-        .p-datatable-tbody>tr>td {
-            padding: 0.3rem;
-        }
-    }
     .nested_table>.p-datatable-tbody>tr>td:nth-child(1) {
         text-align: center;
     }
     .nested_table{
         .p-datatable-wrapper {
             height: auto;
-        }
-        .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 39vw;
         }
     }
     .module_table {
@@ -97,38 +115,12 @@
         .p-datatable-tbody>tr>td:nth-child(1) {
             text-align: center;
         }
-        .p-datatable-tbody>tr>td:nth-child(2) {
-            width: 38.5vw;
-        }
-    }
-    .statusTable {
-        width: 100%;
-        .p-datatable-wrapper {
-            height: auto;
-        }
-        .p-datatable-tbody>tr>td:nth-child(1) {
-            text-align: center;
-        }
-        .p-datatable-tbody>tr>td:nth-child(2) {
-            .badge_icon {
-                margin-right: 0.4rem;
-            }
-            .badge_txt {
-                display: inline-block;
-                margin-right: 0.9rem;
-            }
+        .p-datatable-tbody>tr:last-child>td {
+            border-bottom: none;
         }
     }
     svg {
         border-radius: 8px;
-    }
-    .textSuite {
-        display: inline-block;
-        width: 35vw;
-    }
-    .textCase {
-        display: inline-block;
-        width: 33vw;
     }
     .suite_text {
         display: inline-block;

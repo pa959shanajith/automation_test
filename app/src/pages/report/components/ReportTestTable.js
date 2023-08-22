@@ -13,6 +13,10 @@ import { FooterTwo } from "../../global";
 import { getStepIcon } from "../containers/ReportUtils";
 import AvoModal from "../../../globalComponents/AvoModal";
 import { Menu } from "primereact/menu";
+import AvoDropdown from "../../../globalComponents/AvoDropdown";
+import AvoMultiselect from "../../../globalComponents/AvoMultiselect";
+import { browsers, configureFields, scheduleMonths } from "../../utility/mockData";
+import { InputTextarea } from "primereact/inputtextarea";
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -24,10 +28,15 @@ export default function BasicDemo() {
   const [searchTest, setSearchTest] = useState("");
   const [userData, setUserData] = useState({});
   const [visibleBug, setVisibleBug] = useState(false);
+  const [logBug, setLogBug] = useState(false);
   const [bugTitle, setBugTitle] = useState("");
   const [reportSummaryCollaps, setReportSummaryCollaps] = useState(true);
   const filterRef = useRef(null);
   const [reportid, setReportId] = useState(null);
+  const [jiraDropDown, setJiraDropDown] = useState(null);
+  const [issueDropDown, setIssueDropDown] = useState(null);
+  const [jiraDetails, setJiraDetails] = useState({ projects: [], issue_types: [] });
+  const [configureFeilds, setConfigureFeilds] = useState(null);
   const filterValues = [
         { name: 'Pass', key: 'P' },
         { name: 'Fail', key: 'F' },
@@ -55,8 +64,8 @@ export default function BasicDemo() {
   }, [reportid]);
   useEffect(() => {
     const parent = [];
-    if (reportData && Array.isArray(reportData.rows)) {
-      for (const obj of reportData.rows) {
+    if (reportData && Array.isArray(reportData?.rows)) {
+      for (const obj of reportData?.rows) {
         if (obj.hasOwnProperty("Step") && obj?.Step !== "Terminated") {
           if (!parent[parent.length - 1]?.children) {
             parent[parent.length - 1].children = [obj]; // Push the new object into parent array
@@ -82,11 +91,13 @@ export default function BasicDemo() {
     if (getBtn === "Cancel") setVisibleBug(false);
     else if (getBtn === "Connect") {
       if (bugTitle === "Jira") {
-        const jiraDetails = await connectJira_ICE(
+        const getJiraDetails = await connectJira_ICE(
           loginUrl,
           loginName,
           loginKey
         );
+        setJiraDetails(getJiraDetails);
+        setVisibleBug(false);
       } else if (bugTitle === "Azure DevOps") {
         const azureDetails = await connectAzure_ICE({
           url: loginUrl,
@@ -94,7 +105,15 @@ export default function BasicDemo() {
           action: "loginToAzure",
           pat: loginKey,
         });
+        setVisibleBug(false);
       }
+    }
+  };
+
+  const onLogBugBtnClick = (getClick) => {
+    if (getClick === "Cancel") setLogBug(false);
+    else if (getClick === "Connect") { 
+
     }
   };
 
@@ -169,13 +188,29 @@ export default function BasicDemo() {
       </div>
     </div>
   );
+
+  const onBugClick = (e) => {
+    if(bugTitle === "Jira" || bugTitle === "Azure DevOps"){
+      setLogBug(true)
+    } else {
+      bugRef.current.toggle(e)
+    }
+  }
+
   const defectIDForJiraAndAzure = (rowData) => {
-    const hasChildren = rowData?.children && rowData?.children?.length > 0;
+    const hasChildren = rowData?.children && (rowData?.children?.length > 0);
+    const getIcon = (iconType) => {
+      let icon = "static/imgs/bug.svg";
+      if(iconType === "Jira" && !!jiraDetails?.issue_types.length) icon = "static/imgs/jira_icon.svg";
+      else if(iconType === "Azure DevOps" && !!jiraDetails?.issue_types.length) icon = "static/imgs/azure_devops_icon.svg";
+      return icon;
+    }
     return hasChildren ? null : (
       <img
-        src="static/imgs/bug.svg"
+        src={getIcon(bugTitle)}
         alt="bug defect"
-        onClick={(e) => bugRef.current.toggle(e)}
+        className={((bugTitle === "Jira" && !!jiraDetails?.issue_types.length) || (bugTitle === "Azure DevOps" && !!jiraDetails?.issue_types.length)) ? "img_jira" : "" }
+        onClick={(e) => onBugClick(e)}
       />
     );
   };
@@ -358,18 +393,30 @@ export default function BasicDemo() {
         content={
           <div className="flex flex-column">
             <div className="jira_user">Username</div>
-            <InputText className="jira_credentials" onClick={(e) => userRef.current.toggle(e)} value={loginName} onChange={(e) => setLoginName(e.target.value)} />
+            <InputText
+              className="jira_credentials"
+              onClick={(e) => userRef.current.toggle(e)}
+              value={loginName}
+              onChange={(e) => setLoginName(e.target.value)}
+            />
             <div className="jira_user">Password/API Key</div>
-            <InputText className="jira_credentials" value={loginKey} onChange={(e) => setLoginKey(e.target.value)} />
+            <InputText
+              className="jira_credentials"
+              value={loginKey}
+              onChange={(e) => setLoginKey(e.target.value)}
+            />
             <div className="jira_user">URL</div>
-            <InputText className="jira_credentials" value={loginUrl} onChange={(e) => setLoginUrl(e.target.value)} />
+            <InputText
+              className="jira_credentials"
+              value={loginUrl}
+              onChange={(e) => setLoginUrl(e.target.value)}
+            />
           </div>
         }
         customClass="jira_modal"
         headerTxt={`${bugTitle} Login`}
         modalSytle={{
           width: "40vw",
-          height: "50vh",
           background: "#FFFFFF",
         }}
         footerType="Connect"
@@ -378,25 +425,145 @@ export default function BasicDemo() {
         <Menu
           model={[
             {
-              label: <span onClick={() => handleBug("Jira")}>Jira Login</span>,
-              icon: "pi pi-fw pi-file",
+              label: (
+                <span onClick={() => handleBug("Jira")}>
+                  <img src="static/imgs/jira_icon.svg" className="img_jira" />
+                  Jira
+                </span>
+              ),
             },
             {
-              label: <span onClick={() => handleBug("Azure DevOps")}>Azure DevOps Login</span>,
-              icon: "pi pi-fw pi-file",
-            }
+              label: (
+                <span onClick={() => handleBug("Azure DevOps")}>
+                  <img
+                    src="static/imgs/azure_devops_icon.svg"
+                    className="img_azure"
+                  />
+                  Azure DevOps
+                </span>
+              ),
+            },
           ]}
         />
       </OverlayPanel>
-      {userData?.jiraUsername && <OverlayPanel ref={userRef} className="jira_user">
-        <Menu
-          model={[
-            {
-              label: <span onClick={() => onUserName()}>{userData?.jiraUsername}</span>,
-            }
-          ]}
-        />
-      </OverlayPanel>}
+      {userData?.jiraUsername && (
+        <OverlayPanel ref={userRef} className="jira_user">
+          <Menu
+            model={[
+              {
+                label: (
+                  <span onClick={() => onUserName()}>
+                    {userData?.jiraUsername}
+                  </span>
+                ),
+              },
+            ]}
+          />
+        </OverlayPanel>
+      )}
+      <AvoModal
+        visible={logBug}
+        setVisible={setLogBug}
+        onModalBtnClick={onLogBugBtnClick}
+        content={
+          <div className="grid">
+            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+              <AvoDropdown
+                dropdownValue={jiraDropDown}
+                onDropdownChange={(e) => setJiraDropDown(e.target.value)}
+                dropdownOptions={jiraDetails?.projects}
+                name="jiratype"
+                placeholder="Select Projects"
+                labelTxt="Jira Projects"
+                required={true}
+                parentClass="flex flex-column"
+              />
+            </div>
+            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+              <AvoDropdown
+                dropdownValue={issueDropDown}
+                onDropdownChange={async(e) => {
+                  setIssueDropDown(e.target.value)
+                }}
+                dropdownOptions={jiraDetails?.issue_types}
+                name="issuetype"
+                placeholder="Select Issue Type"
+                labelTxt="Issue Type"
+                required={true}
+                parentClass="flex flex-column"
+              />
+            </div>
+            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+              <AvoMultiselect
+                multiSelectValue={configureFeilds}
+                onMultiSelectChange={(e) => setConfigureFeilds(e.value)}
+                multiSelectOptions={configureFields}
+                name="configureFields"
+                placeholder="Configure Fields"
+                required={false}
+              />
+            </div>
+            <div className="col-12">
+              <div>
+              <label>
+                <span>Summary</span>
+                <img src="static/imgs/Required.svg" className="required_icon" />
+              </label>
+              </div>
+              <InputTextarea
+                placeholder="Summary"
+                rows={2}
+                cols={110}
+              />
+            </div>
+            <div className="col-12">
+              <div>
+              <label>
+                <span>Description</span>
+                <img src="static/imgs/Required.svg" className="required_icon" />
+              </label>
+              </div>
+              <InputTextarea
+                placeholder="Description"
+                rows={2}
+                cols={110}
+              />
+            </div>
+            <div className="col-12">
+              <div>
+              <label>
+                <span>Reporter</span>
+                <img src="static/imgs/Required.svg" className="required_icon" />
+              </label>
+              </div>
+              <InputTextarea
+                placeholder="Reporter"
+                rows={1}
+                cols={110}
+              />
+            </div>
+            <div className="col-12">
+              <div>
+              <label>
+                <span>Parent</span>
+              </label>
+              </div>
+              <InputTextarea
+                placeholder="Parent"
+                rows={1}
+                cols={110}
+              />
+            </div>
+          </div>
+        }
+        customClass="jira_modal"
+        headerTxt="Create Issue"
+        modalSytle={{
+          width: "60vw",
+          background: "#FFFFFF",
+        }}
+        footerType="Proceed"
+      />
     </div>
   );
 }

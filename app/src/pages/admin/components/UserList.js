@@ -7,60 +7,49 @@ import '../styles/UserList.scss';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
-import { Footer } from '../../global';
+import { Footer, ModalContainer } from '../../global';
+import CreateUser from './CreateUser';
+import { AdminActions } from '../adminSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 
 const UserList = (props) => {
-    let emptyProduct = {
-        id: null,
-        name: '',
-        image: null,
-        description: '',
-        category: null,
-        price: 0,
-        quantity: 0,
-        rating: 0,
-        inventoryStatus: 'INSTOCK'
-    };
-
+    const dispatch = useDispatch();
     const [data, setData] = useState([]);
-    const [selectedRows, setSelectedRows] = useState([]);
-    const [editingRows, setEditingRows] = useState({});
-    const [rowEditor, setRowEditor] = useState(false);
-    const [rowEditDialog, setRowEditDialog] = useState([]);
-    const [editableRowData, setEditableRowData] = useState('');
     const [globalFilter, setGlobalFilter] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [editUserDialog, setEditUserDialog] = useState(false);
+    const [editUser,setEditUser]=useState('')
+    const allUserList = useSelector(state => state.admin.allUsersList);
+    const [showDeleteConfirmPopUp, setShowDeleteConfirmPopUp] = useState(false);
+
 
     useEffect(() => {
-        // console.log("Object.keys(columnHeaders)", Object.keys(columnHeaders));
         (async () => {
-            try {
-                const UserList = await getUserDetails("user");
-                const filteredUserList = UserList.map((user) => {
-                    const dataObject = {
-                        useName: user[0],
-                        firstName: user[4],
-                        lastName: user[5],
-                        email: user[6],
-                        role: user[3]
-                    };
-                    return dataObject;
-                });
-                console.log(UserList);
-                setData(filteredUserList);
-            } catch (error) {
-                console.error('Error fetching User list:', error);
+            if (allUserList.length === 0) {
+                try {
+                    const UserList = await getUserDetails("user");
+                    const filteredUserList = UserList.map((user) => {
+                        const dataObject = {
+                            userName: user[0],
+                            userId: user[1],
+                            firstName: user[4],
+                            lastName: user[5],
+                            email: user[6],
+                            role: user[3]
+                        };
+                        return dataObject;
+                    });
+                    setData(filteredUserList);
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error fetching User list:', error);
+                }
             }
+            else setData(allUserList);
         })();
     }, []);
-
-
-    const onEditorValueChange = (rowData, field, value) => {
-        let updatedData = [...data];
-        updatedData[rowData.index][field] = value;
-        setData(updatedData);
-    };
 
     const header = (
         <div className='User_header'>
@@ -75,53 +64,32 @@ const UserList = (props) => {
         </div>
     );
 
-    const editorForRow = (rowData, field) => {
-        return (
-            <input
-                type="text"
-                value={rowData[field]}
-                onChange={(e) => onEditorValueChange(rowData, field, e.target.value)}
-            />
-        );
-    };
-
-
-    const deleteSelectedRows = () => {
-
-    };
-
-    const rowDelete = (props) => {
-        return (
-            <td>
-                <button
-                    className="p-row-editor-init p-link"
-                    onClick={() => setEditingRows({ ...editingRows, [props.rowIndex]: true })}>
-                </button>
-            </td>
-        );
-    };
 
     const editRowData = (rowData) => {
-        setRowEditDialog(true);
-        setEditableRowData({ rowData });
+        setEditUser(rowData);
+        dispatch(AdminActions.EDIT_USER(true));
+        dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
+        dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
+        dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(rowData.firstName));
+        dispatch(AdminActions.UPDATE_USERID(rowData.userId));
+        dispatch(AdminActions.UPDATE_USERIDNAME(rowData.userId + ";" + rowData.userName));
+        dispatch(AdminActions.UPDATE_INPUT_EMAIL(rowData.email));
+        dispatch(AdminActions.UPDATE_USERROLE(rowData.role));
     }
-    const textEditor = (options) => {
-        return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
-    };
+
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                {/* <Button icon="pi pi-pencil" rounded outlined className="mr-2" onClick={() => editRowData(rowData)} /> */}
                 <img src="static/imgs/ic-edit.png"
-
-          style={{ height: "20px", width: "20px" }}
-          className="edit__usericon" onClick={() => editRowData(rowData)} />
-          <img
-
-src="static/imgs/ic-delete-bin.png"
-style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-className="delete__usericon" />
-                {/* <Button icon="pi pi-trash" rounded outlined severity="danger"  /> */}
+                    style={{ height: "20px", width: "20px" }}
+                    className="edit__usericon" onClick={() => { editRowData(rowData); setEditUserDialog(true); }}
+                />
+                <img
+                    src="static/imgs/ic-delete-bin.png"
+                    style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
+                    className="delete__usericon"
+                    onClick={() => { editRowData(rowData); setShowDeleteConfirmPopUp(true) }}
+                />
             </React.Fragment>
         );
     }
@@ -129,62 +97,36 @@ className="delete__usericon" />
 
     return (<>
 
-        {/* <EditLanding   rowEditDialog={rowEditDialog}/> */}
         <div className="UserList card p-fluid" style={{ width: '69rem', padding: '1rem' }}>
-            {/* <div className="card p-fluid"> rowEditor={true} body={rowEditor}  editor={(props) => editorForRow(props.rowData, field)}*/}
-            {data.length > 0 ? (
-                <DataTable value={data} editMode="row"
-                    globalFilter={globalFilter}
-                    header={header}
-                    emptyMessage="No users found"
-                    scrollable
-                    scrollHeight='28rem'>
-                    <Column field="useName" header="User Name" style={{ width: '20%' }}></Column>
-                    <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
-                    <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column>
-                    <Column field="email" header="Email" style={{ width: '20%' }}></Column>
-                    <Column field="role" header="Role" style={{ width: '20%' }}></Column>
-                    <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
-                </DataTable>)
-                : (
-                    <div>
-                        Loading data...........
-                    </div>
-                )}
-            {/* </div> */}
+            <ModalContainer
+                title="Please Confirm"
+                show={showDeleteConfirmPopUp}
+                content={"Are you sure, you want to delete the user"}
+                close={() => setShowDeleteConfirmPopUp(false)}
+                footer={
+                    <>
+                        <Button label="Yes" onClick={() => props.manage({ action: "delete" })}></Button>
+                        <Button label="No" onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
+                    </>}
+                width={{ width: "5rem" }}
+            />
+            <DataTable value={data} editMode="row" size='normal' 
+            loading={loading}
+                globalFilter={globalFilter}
+                header={header}
+                emptyMessage="No users found"
+                scrollable
+                scrollHeight='28rem'>
+                <Column field="userName" header="User Name" style={{ width: '20%' }}></Column>
+                <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
+                <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column>
+                <Column field="email" header="Email" style={{ width: '20%' }}></Column>
+                <Column field="role" header="Role" style={{ width: '20%' }}></Column>
+                <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
+            </DataTable>
 
-
-            {/* <Dialog visible={rowEditDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
-                <div className="field">
-                    <label htmlFor="name" className="font-bold">
-                        Name
-                    </label>
-                    <InputText className={classNames({ 'p-invalid': submitted && !product.name })} />
-                </div>
-                <div className="field">
-                    <label htmlFor="description" className="font-bold">
-                        Description
-                    </label>
-                </div>
-
-            </Dialog>
-
-            <Dialog visible={deleteProductDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
-                <div className="confirmation-content">
-                    <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                    {product && (
-                        <span>
-                            Are you sure you want to delete <b>{product.name}</b>?
-                        </span>
-                    )}
-                </div>
-            </Dialog> */}
+            {editUserDialog && <CreateUser createUserDialog={editUserDialog} setCreateUserDialog={setEditUserDialog} setEditUser={setEditUser} editUser={editUser}/>}
         </div>
-        
-{/* 
-{showDeleteModal?
-                <Dialog header="Delete User"  visible={setshowDeleteModal(true)}  footer={<Footer {...submitModalButtons(props.manage, setshowDeleteModal)}/>} onHide={()=>{setshowDeleteModal(false);}} content= {"Are you sure you want to delete ? \nAll task assignment information and ICE provisions will be deleted for this user."} />
-            :null} */}
     </>)
 }
 

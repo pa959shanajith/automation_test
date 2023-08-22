@@ -101,6 +101,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
   const [currentKey, setCurrentKey] = useState("");
+  const [currentName, setCurrentName] = useState("");
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
   const [executionTypeInRequest, setExecutionTypeInRequest] =
     useState("asynchronous");
@@ -450,6 +451,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     executionData["executionEnv"] = execEnv;
     executionData["browserType"] =browserTypeExe;
     executionData["integration"] = integration;
+    executionData["configurekey"] = currentKey;
+    executionData["configurename"] = currentName;
+    executionData["executionListId"] = uuid() ;
     executionData["batchInfo"] =
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
@@ -561,6 +565,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
+                setCurrentName(item.configureName)
                 setCurrentSelectedItem(item);
                 setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                 setConfigItem(idx);

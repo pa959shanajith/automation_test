@@ -71,6 +71,60 @@ export const browsers = [
   },
 ];
 
+export const configureFields = [
+  {
+    key: "1",
+    name: "Summary *",
+    disabled: true,
+  },
+  {
+    key: "2",
+    name: "Parent",
+  },
+  {
+    key: "3",
+    name: "Sprint",
+  },
+  {
+    key: "4",
+    name: "Flagged",
+  },
+  {
+    key: "5",
+    name: "Reporter",
+  },
+  {
+    key: "6",
+    name: "Development",
+  },
+  {
+    key: "7",
+    name: "Labels",
+  },
+  {
+    key: "8",
+    name: "Story point estimate",
+  },
+  {
+    key: "9",
+    name: "Rank",
+  },
+  {
+    key: "10",
+    name: "Attachment",
+  }
+  ,
+  {
+    key: "11",
+    name: "Linked issues",
+  }
+  ,
+  {
+    key: "12",
+    name: "Assignee",
+  }
+];
+
 export const selections = ["Non-Headless", "Headless"];
 
 export const schedulePeriod = [

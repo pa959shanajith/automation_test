@@ -104,6 +104,7 @@ const AddElement = (props) => {
                 onHide={props.OnClose}
                 style={{ height: "28.06rem", width: "38.06rem", marginRight: "15rem" }}
                 position='right'
+                draggable={false}
                 footer={addElementfooter}>
                 <div className='card__add_object'>
                     <Card className='add_object__left'>
