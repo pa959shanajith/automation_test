@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {url} from '../../App';
-import { Messages as MSG,RedirectPage} from '../global/components/Messages';
+import { Messages as MSG,RedirectPage} from '../global';
 import {history} from './index'
 
 export const fetchConfigureList = async(props) => {
@@ -262,5 +262,58 @@ export const getDetails_Azure=async()=>{
         return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
     }
 
-        }
+}
     
+export const fetchAgentModuleList = async(param) => {
+    try{
+        // console.log(req);
+        const res = await axios(url+'/fetchAgentModuleList', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                executionListId: param 
+            }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return { error:MSG.DevOps.ERR_DevOps_Keys}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.DevOps.ERR_DevOps_Keys}
+    }
+}
+
+//fetching the history of execution  in Execution Profile Statistics Tab in Matrices
+export const fetchHistory = async(fromDate,toDate) => {
+    try{
+        const res = await axios(url+'/fetchHistory', {
+            method: 'POST',
+            headers:{
+                        'Content-type': 'application/json',
+                    }, 
+            data: {
+                    action: "fetchHistory",
+                    fromDate: fromDate,
+                    toDate: toDate,
+                }
+            });    
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }    
+        if(res.status === 200 && res.data !== "fail"){
+            return res.data; 
+        }
+        return { error:MSG.DevOps.ERR_DevOps_Keys}  
+    }catch(err){
+        console.error(err)
+        return {error:MSG.DevOps.ERR_DevOps_Keys}
+    }
+}

@@ -1072,6 +1072,41 @@ exports.getAvoDetails = async (req, res) => {
 	}
 };
 
+exports.fetchAgentModuleList = async (req, res) => {
+	const fnName = "fetchAgentModuleList";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		// const reqData = req.session.userid;
+		const input = {
+			'executionListId': req.body.executionListId
+		}
+		const list = await utils.fetchData(input, "devops/getAgentModuleList", "fetchAgentModuleList");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+//To fetch the History data
+exports.fetchHistory = async (req, res) => {
+	const fnName = "fetchHistory";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		// const reqData = req.session.userid;
+		const input = {
+			userid: req.session.userid,
+            fromDate: req.body.fromDate,
+            toDate:req.body.toDate
+		}
+		const list = await utils.fetchData(input, "devops/fetchHistory", "fetchHistory");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
 function getProjectsForUser(userid, cb) {
 	logger.info("Inside function getProjectsForUser");
 	var projectDetailsList = [];

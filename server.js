@@ -614,6 +614,8 @@ if (cluster.isMaster) {
 		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
 		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
 		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);	
+		app.post('/fetchAgentModuleList',auth.protect, report.fetchAgentModuleList);
+		app.post('/fetchHistory',auth.protect, report.fetchHistory);
 
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
