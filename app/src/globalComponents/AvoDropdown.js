@@ -10,11 +10,12 @@ const AvoDropdown = ({
   name,
   required = false,
   labelTxt,
-  customeClass = ""
+  customeClass = "",
+  parentClass = ""
 }) => {
   const [touched, setTouched] = useState(false);
   return (
-    <div className="avo_dropdown">
+    <div className={`${parentClass} avo_dropdown`}>
       <label>
         <span>{labelTxt}</span>
         {required && <img src="static/imgs/Required.svg" className="required_icon" />}

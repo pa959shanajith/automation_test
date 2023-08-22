@@ -136,8 +136,8 @@ const reports = () => {
                     execDate: obj?.execDate || '',
                     selectedModuleType: obj?.executionRequest?.selectedModuleType || '',
                     configurekey: obj?.configurekey || '',
+                    noOfExecution: obj?.noOfExecution || 0,
                 }));
-                console.log(executionProfileName);
                 setReportData(extractedExecutionProfileData);
             } else {
                 setReportData([]);
@@ -311,10 +311,10 @@ const reports = () => {
                                               : "static/imgs/signup_module.svg"
                                           }
                                         />
-                                        {data.selectedModuleType ===
+                                        <span style={{ display: 'inline-block', marginLeft: '0.4rem' }}>{data.selectedModuleType ===
                                         "e2eExecution"
                                           ? "End to End"
-                                          : "Test Suite"}
+                                          : "Test Suite"}</span>
                                       </span>
                                     </div>
                                     <div className="col-12 exe_namebox">
@@ -332,7 +332,7 @@ const reports = () => {
                                         Executed On
                                       </span>
                                       <span className="exe_date">
-                                        {data.execDate.slice(5, 16)}
+                                        {data?.execDate ? new Date(data.execDate).toLocaleDateString() : ""}
                                       </span>
                                     </div>
                                     <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
@@ -343,7 +343,7 @@ const reports = () => {
                                     </div>
                                     <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12 flex justify-content-end" style={{ position: 'relative' }}>
                                       <i className="pi pi-cog" style={{ fontSize: '2rem', marginRight: '1.2rem' }}></i>
-                                      <span className='count_exe'>5</span>
+                                      <span className='count_exe'>{data?.noOfExecution ? data?.noOfExecution : 0 }</span>
                                     </div>
                                   </div>
                                 </Card>
