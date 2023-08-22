@@ -82,7 +82,7 @@
                                         overflow-y: auto;
 
                                         .mo_tagItems {
-                                            align-items: center;
+                                            align-items: inherit;
                                             background: #f0f8ff;
                                             border: 2px solid #abc2ee;
                                             border-radius: 5px;
@@ -96,6 +96,8 @@
                                             white-space: nowrap !important;
                                             width: 20rem;
                                             cursor: pointer;
+                                            display: flex;
+                                            justify-content: space-between;
 
                                         }
 

@@ -400,6 +400,18 @@
     height: 2rem;
 }
 
+.update-btn-popup{
+
+    font-size: 12px;
+
+    width: 6rem;
+
+    height: 2rem;
+    border-radius:'3px';
+    font-size:'13px';
+    width:'5rem'
+
+}
 .header-name {
     position: relative;
 }
@@ -413,6 +425,10 @@
 .header-name__changedObj {
     display: inline-block;
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
 }
 
 .accordion_changedObj {
@@ -421,13 +437,17 @@
 }
 
 .accordion_unchangedObj {
-    max-height: 20vh;
+    max-height: 22vh;
     overflow-y: auto;
 
 }
+.accordion_icons{
+    height: 28px;
+    width: 28px;
+}
 
 .accordion_notfoundObj {
-    max-height: 20vh;
+    max-height: 22vh;
     overflow-y: auto;
 }
 
@@ -440,7 +460,12 @@
 // .p-accordion .p-accordion-header,:not(.p-disabled).p-highlight .p-accordion-header-link{
 //     border:1px solid #dee2e6
 // }
-
+.accordion__newlyadded{
+    .p-accordion-header-text{
+        display: inline-block;
+        width: 100%;
+            }
+}
 .p-accordion .p-accordion-tab:not(:first-child) .p-accordion-header .p-accordion-header-link,
 .p-accordion .p-accordion-tab:not(:first-child) .p-accordion-header:not(.p-disabled).p-highlight:hover .p-accordion-header-link,
 .p-accordion .p-accordion-tab:not(:first-child) .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link {
@@ -811,4 +836,13 @@
         padding-right: 75px;
     }
 
+}
+.divider-CE{
+.p-divider.p-divider-horizontal {
+    margin: 1.1rem 0 !important;
+}
+}
+.msg-CE{
+    margin-top: -0.7rem !important;
+    margin-bottom: 1rem !important;
 }

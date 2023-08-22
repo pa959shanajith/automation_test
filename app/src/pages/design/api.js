@@ -917,6 +917,91 @@ export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCase
         .catch(error=>reject(error))
     })
 }
+export const updateScenarioComparisionStatus = (type, scenarioID, scenarioComparisionData) =>   {
+
+    return new Promise((resolve, reject)=>{
+
+        axios(url+"/updateScenarioComparisionStatus", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {
+
+                param: 'updateScenarioComparisionStatus',
+
+                scenarioID: scenarioID,
+
+                type: type,
+
+                scenarioComparisionData: scenarioComparisionData
+
+            },
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200) resolve(res.data)
+
+            else reject(res.status);
+
+        })
+
+        .catch(error=>reject(error))
+
+    })
+
+}
+// API for impact analysis
+export const getScrapeDataScenarioLevel_ICE = (type, scenarioID) => {
+
+    return new Promise((resolve, reject)=>{
+
+        axios(url+"/getScrapeDataScenarioLevel_ICE", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {
+
+                param: 'getScrapeDataScenarioLevel_ICE',
+
+                scenarioID: scenarioID,
+
+                type: type
+
+            },
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200) resolve(res.data)
+
+            else reject(res.status);
+
+        })
+
+        .catch(error=>reject(error))
+
+    })
+
+}
 
 /*Component DesignContent
   api returns String (Invalid Session/Success)
@@ -1367,4 +1452,67 @@ export const getDeviceSerialNumber_ICE = () =>	{
         })
         .catch(error=>reject(error))
     })
+}
+
+export const launchWSDLGo = wsdlUrl => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlListGenerator_ICE',
+                wsdlurl: wsdlUrl
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const wsdlAdd = (wsdlUrl, wsdlSelectedMethod, resultFile) => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlServiceGenerator_ICE',
+                wsdlurl: wsdlUrl,
+                method : wsdlSelectedMethod,
+                resultFile:resultFile
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const initScrapeWS_ICE = arg => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'debugTestCaseWS_ICE',
+                testCaseWS: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
 }

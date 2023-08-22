@@ -36,6 +36,13 @@ const AvoModal = ({
     ],
     Launch: [
       { btnTxt: "Launch", autoFocus: false, btnType: null, key: "Launch", disabled: isDisabled },
+    ],
+    Connect: [
+      { btnTxt: "Connect", autoFocus: false, btnType: null, key: "Connect", disabled: isDisabled },
+    ],
+    Proceed: [
+      { btnTxt: "Proceed", autoFocus: false, btnType: null, key: "Proceed", disabled: isDisabled },
+      { btnTxt: "Cancel", autoFocus: false, btnType: "link", key: "Cancel" }
     ]
   };
   const footerContent = footerValues[footerType]?.map((el) => (

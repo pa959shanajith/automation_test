@@ -55,10 +55,27 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
     if (dNodes[pi].children.length > 0) { // new node has siblings
         index = dNodes[pi].children.length - 1;
         if (layout_vertical){
-            new_one = {
-                x: parseInt(dNodes[pi].children[index].x) + 100,
-                y: sections[node.type]
-            }; // Go beside last sibling node
+            if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type] - 100
+                };// Go beside last sibling node
+            }else if ((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?.parent?._id !== null)){
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type] - 90
+                };// Go beside last sibling node
+            }else if ((dNodes[pi].type === "modules") && (dNodes[pi]?._id !== null)){
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type] - 120
+                };// Go beside last sibling node
+            }else{
+                new_one = {
+                    x: parseInt(dNodes[pi].children[index].x) + 100,
+                    y: sections[node.type]
+                }; // Go beside last sibling node
+            } 
         }
         else{
             new_one = {
@@ -174,7 +191,7 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , dele
     }
 };
 
-export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID) =>{
+export const generateTree = (tree,sections,count,verticalLayout,screenData,isAssign,cycleID) =>{
     unfoldtree(tree)
     var translate;
     var nodeDisplay = {}
@@ -266,7 +283,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
             d.x = dNodesArray[ind].x
             d.y = dNodesArray[ind].y
             // d.parent = dNodesArray[ind].parent?dNodesArray[ind].parent.data:null
-            var node = addNode(d);
+            var node = addNode(d,screenData);
             nodeDisplay[d.id] = node
             nodeDisplay[d.id].task = false;
             nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
@@ -560,7 +577,7 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
     var node = {
         id: 0,
         childIndex: 0,
-        name: name?name:'TestSuite_0',
+        name: name?name:'',
         type: types?types:'modules',
         children: [],
         parent: null,
@@ -586,11 +603,19 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
     return{nodes:nodeDisplay,dNodes,translate,sections}
 }
 
-export const addNode = (n) =>{
+export const addNode = (n,screenData) =>{
     n.display_name = n.name;
-    var ch = 15;
-    if (n.display_name.length > 15) {
+    var ch = 10;
+    let currentScreen
+    let statusCode
+    if (n.display_name.length > 10) {
         n.display_name = n.display_name.slice(0, ch) + '...';
+    }
+    if(n.type==="screens" && n.name !== ""){
+
+        currentScreen=screenData.screenList.filter(screen=>screen.name===n.name)
+
+        statusCode=currentScreen[0]?.statusCode!==undefined ?currentScreen[0].statusCode:null
     }
     var img_src = 'static/imgs/node-' + n.type + '.png';
     if (n.type === 'scenarios') img_src = 'static/imgs/node-' + n.type + '.svg';
@@ -615,6 +640,24 @@ export const addNode = (n) =>{
         'state':n.state || "created",
         'reuse':n.reuse || false,
     };
+    if(statusCode){
+        nodeDisplay['statusCode']=statusCode
+        if(Math.round(window.devicePixelRatio * 100)>90){
+
+        
+        nodeDisplay['transformImpact']=statusCode=="SI"?"translate(" + (-24) + "," + (n.y-122) + ")":"translate(" + (5) + "," + (n.y-92) + ")"
+        }
+        else{
+        nodeDisplay['transformImpact']=statusCode=="SI"?"translate(" + (-24) + "," + (n.y-153) + ")":"translate(" + (5) + "," + (n.y-123) + ")"
+
+        }
+        if(statusCode=="SI"){
+        nodeDisplay['titleImpact']="No impact on this screen."
+        }
+        else{
+            nodeDisplay['titleImpact']="Screen is being impacted.Needs your action."
+        }
+    }
     return nodeDisplay;
 }
 
@@ -752,7 +795,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         if (obj) {
                 tempName = obj;
         } else {
-                tempName = (nNext[pt][0]==='Scenario'?'TestCase':nNext[pt][0]==='Testcase'?'TestSteps':'Screen')+'_'+count[(nNext[pt][0]).toLowerCase() + 's'];
+                tempName = (nNext[pt][0]==='Scenario'?'TestCase':nNext[pt][0]==='Testcase'?'TestSteps':'Screen')+count[(nNext[pt][0]).toLowerCase() + 's'];
         }
         var node = {
                 id: uNix,
@@ -762,7 +805,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
                 parent: dNodes[pi],
                 state: 'created',
                 path: '',
-                name: tempName,
+                name: obj?obj:'',
                 childIndex: '',
                 type: (nNext[pt][0]).toLowerCase() + 's'
         }; 

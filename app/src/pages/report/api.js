@@ -113,7 +113,9 @@ export const downloadReports = async(getDownload) => {
             method: 'GET',
             headers: {
             'Content-type': 'application/json',
-            }
+            },
+            responseType:(getDownload?.type === 'json')? 'application/json' : 'arraybuffer',
+            credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             return {error:MSG.GENERIC.INVALID_SESSION};
@@ -153,5 +155,82 @@ export const viewReport = async (reportid, reportType="json", screenshotFlag) =>
     catch(err){
         console.error(err)
         return { error: MSG.REPORT.ERR_FETCH_REPORT }
+    }
+}
+
+export const getDetails_JIRA = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_JIRA', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.JIRA.WARN_FETCH_SAVED_CREDS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.JIRA.WARN_FETCH_SAVED_CREDS}
+    }
+}
+
+
+export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
+    try{
+
+        const res = await axios(url+'/connectJira_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {   
+           "action" : 'jiraLogin',
+            "url": jiraurl,
+            "username": jirausername,
+            "password": jirapwd,
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+export const connectAzure_ICE = async(dataObj) => {
+    try{
+
+        const res = await axios(url+'/connectAzure_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data:dataObj
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }

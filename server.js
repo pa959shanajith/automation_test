@@ -242,6 +242,7 @@ if (cluster.isMaster) {
 		var devOps = require('./server/controllers/devOps');
 		var mindmap = require('./server/controllers/mindmap');
 		var admin = require('./server/controllers/admin');
+        var designscreen = require('./server/controllers/designscreen');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -256,6 +257,8 @@ if (cluster.isMaster) {
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
+		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
+		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
@@ -303,19 +306,19 @@ if (cluster.isMaster) {
 
 		//Only Test Engineer and Test Lead have access
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
-			var roles = ["Test Lead", "Test Engineer", "Test Manager"]; //Allowed roles
+			var roles = ["Quality Lead", "Quality Engineer", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
 		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
+			var roles = ["Quality Manager", "Quality Lead", "Quality Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
 		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
+			var roles = ["Quality Manager", "Quality Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
@@ -370,14 +373,12 @@ if (cluster.isMaster) {
 				return res.send({status});
 			}
 		});
-
 		app.get('/downloadExportfile', async (req, res) => {
 			let projName = req.query.projName	
 			projName = projName.replace(/\s+/g, '');
 			let exportfile =path.join(__dirname,'./assets/ExportMindmap')
-			let username = req.user.username;
-			username = username.split('.').join("");
-			exportfile=exportfile+"/"+username+".zip";
+			let userid = req.session.userid;
+			exportfile=exportfile+"/"+userid+".zip";
 			var dateObj = new Date();
 			var month = dateObj.getUTCMonth() + 1;
 			var day = dateObj.getUTCDate();
@@ -388,8 +389,7 @@ if (cluster.isMaster) {
 			} else {
 				let status = "na";
 				try {
-					let stats = await fs.promises.stat(path.resolve(exportfile))
-					
+					let stats = await fs.promises.stat(path.resolve(exportfile))					
 					if(stats.isFile()){
 						status = "available";
 					}else {
@@ -401,7 +401,6 @@ if (cluster.isMaster) {
 				return res.send({status});
 			}
 		});
-
 		app.get('/downloadAgent', async (req, res) => {
 			try {
 				let agentFile = uiConfig.avoAgentConfig;

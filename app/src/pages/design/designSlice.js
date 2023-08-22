@@ -27,6 +27,8 @@ const initialState = {
     compareFlag: false,
     compareData: {},
     compareObj: {changedObj: [], notChangedObj: [], notFoundObj: [], fullScrapeData: []},
+    scenarioLevelImpact:[],
+    analyzeScenario:false,
     impactAnalysisScreenLevel: false,
     objValue: { val: null },
     isFiltered: false,
@@ -139,6 +141,9 @@ export const designSlice = createSlice({
     ScrapeData:(state, action) =>{
       state.ScrapeData = action.payload;
     },
+    Cert:(state, action) =>{
+      state.cert = action.payload;
+    },    
     disableAction:(state, action)=>{
       state.disableAction = action.payload;
     },
@@ -149,7 +154,7 @@ export const designSlice = createSlice({
       state.actionError = action.payload;
     },
     WsData:(state, action)=>{
-     state.WsData = action.payload;
+     state.WsData = { ...state.WsData, ...action.payload};
     },
     wsdlError:(state,action)=>{
      state.wsdlError = action.payload;
@@ -192,11 +197,15 @@ export const designSlice = createSlice({
     },
     CompareElementSuccessful:(state,action)=>{
       state.compareSuccessful=action.payload
+    },
+    AnalyzeScenario:(state,action)=>{
+      state.analyzeScenario=action.payload
+    },
+    ScenarioLevelImpact:(state,action)=>{
+      state.scenarioLevelImpact=action.payload
     }
 
-
-  },
-})
+}  })
 
 // Action creators are generated for each case reducer function
 export const { projectList, moduleList,screenData,
@@ -216,6 +225,7 @@ unassignTask,
 toDeleteScenarios,
 appType,
 savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
+Cert,
 TestCases,
 ImpactAnalysisScreenLevel,
 CompareData,
@@ -223,6 +233,13 @@ CompareFlag,
 CompareObj,
 CompareElementSuccessful,
 Modified,
-SaveEnable,objValue,EnableExport,ExportProjname,EnableExportMindmapButton,dontShowFirstModule} = designSlice.actions
+SaveEnable,
+objValue,
+EnableExport,
+ExportProjname,
+EnableExportMindmapButton,
+dontShowFirstModule,
+AnalyzeScenario,
+ScenarioLevelImpact} = designSlice.actions
 
 export default designSlice.reducer

@@ -25,6 +25,7 @@ import { ScrollPanel } from 'primereact/scrollpanel';
 import CompareElement from './CompareElement';
 import AddElement from './AddElement';
 import MapElement from './MapElement';
+import { Divider } from 'primereact/divider';
 
 
 
@@ -32,6 +33,7 @@ const ActionPanel = (props) => {
   const [selectObjectType, setSelectObjectType] = useState(null);
   const history = useNavigate();
   const dispatch = useDispatch();
+  const toast = useRef();
   const userInfo = useSelector((state) => state.landing.userinfo);
   const { changedObj, notChangedObj, notFoundObj } = useSelector(state => state.design.compareObj);
   const compareData = useSelector(state => state.design.compareData);
@@ -126,6 +128,20 @@ const ActionPanel = (props) => {
     setActiveIndex(index);
   };
 
+  // const toastError = (erroMessage) => {
+  //   if (erroMessage.CONTENT) {
+  //     toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+  //   }
+  //   else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+  // }
+
+  // const toastSuccess = (successMessage) => {
+  //   if (successMessage.CONTENT) {
+  //     // toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+  //   }
+  //   else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+  // }
+
 
   const newField = () => {
     let updatedObjects = [...objects];
@@ -195,12 +211,14 @@ const ActionPanel = (props) => {
         .then(data => {
           if (data === "unavailableLocalServer") {
             props.toastError(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`, VARIANT.ERROR));
+              //  toastError(MSG.CUSTOM(`Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`))
             return null;
           }
           else if (data === "Invalid Session")
             return RedirectPage(history);
           else if (data === "fail") {
             props.toastError({ VARIANT: VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object` });
+            // toastError(`Failed to ${props.editFlag ? "edit" : "create"} object`)
             return null;
           }
           else {
@@ -209,7 +227,8 @@ const ActionPanel = (props) => {
               tag: tag,
               url: data.url,
               xpath: data.xpath,
-              editable: 'yes'
+              editable: 'yes',
+              isCustom: true,
             };
             let customObjectsList = { ...customObjList, [object.tempId]: customObject };
 
@@ -223,7 +242,7 @@ const ActionPanel = (props) => {
         })
         .catch(error => console.error(error));
     }
-    props.toastError(errorObj)
+    // props.toastError(errorObj)
   }
 
 
@@ -250,7 +269,8 @@ const ActionPanel = (props) => {
           tag: customObjList[1].tag,
           url: customObjList[1].url,
           xpath: customObjList[1].xpath,
-          editable: true
+          editable: true,
+          isCustom: true,
         }, true);
         props.setShow(false);
       }
@@ -267,7 +287,6 @@ const ActionPanel = (props) => {
       let errorFlag = null;
       let errorObj = {};
       let newOrderList = [];
-      console.log('hello');
       for (let tempId of Object.keys(newCustomObjectsList)) {
         let custname = newCustomObjectsList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
 
@@ -299,13 +318,15 @@ const ActionPanel = (props) => {
           xpath: newCustomObjectsList[tempId].xpath,
           editable: true,
           tempOrderId: newUUID,
+          isCustom: true,
         });
         viewArray.push({
           custname: custname,
           tag: newCustomObjectsList[tempId].tag,
           url: newCustomObjectsList[tempId].url,
           xpath: newCustomObjectsList[tempId].xpath,
-          editable: true
+          editable: true,
+          isCustom: true
         });
         newOrderList.push(newUUID);
         lastIdx++
@@ -327,7 +348,7 @@ const ActionPanel = (props) => {
         props.updateScrapeItems(localScrapeList)
         // props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
         props.setCapturedDataToSave((oldCapturedDataToSave) => [...oldCapturedDataToSave, ...viewArray.map((newlyCreatedElem, newlyCreatedElemIndex) => ({
-          isCustom: true,
+        isCustom: true,
           ...viewArray[newlyCreatedElemIndex],
           tempOrderId: newOrderList[newlyCreatedElemIndex]
         }))
@@ -338,12 +359,13 @@ const ActionPanel = (props) => {
           browserscrape: 'google chrome',
           screenshots: "",
           actions: '',
-          objectDetails: updatedNewScrapeData.view[newlyCreatedElemIndex]
+          objectDetails: [updatedNewScrapeData.view[newlyCreatedElemIndex],{isCustom:true}],
+          isCustomCreated: true,
         }))
         ]);
         props.setSaved({ flag: false });
         props.setShow(false);
-        props.toastError(MSG.SCRAPE.SUCC_OBJ_CREATE);
+        props.toastSuccess(MSG.SCRAPE.SUCC_OBJ_CREATE);
 
       }
     }
@@ -438,7 +460,7 @@ const ActionPanel = (props) => {
 //     // setReplaceVisible = (true);
 // }
 
-  // ============================ compare element ==================================
+  // ============================ Create element ==================================
 
   const renderAccordionHeader = (objName, index, objects) => {
     return (
@@ -752,7 +774,7 @@ const ActionPanel = (props) => {
           if (objectsReplaced) // this is required inside only.
             props.toastSuccess(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
         }
-        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRtoastErrorPE)
+        else props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
       })
       .catch(err => {
         props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
@@ -847,13 +869,13 @@ const ActionPanel = (props) => {
                 {
                   oldObj: <span title={oldObj.title}>{oldObj.title}</span>,
                   keywords: <span title={k_word}>{
-                    res.keywordList[oldObj.tag][k_word].description ? res.keywordList[oldObj.tag][k_word].description : "--"}</span>,
+                    res.keywordList[oldObj.tag][k_word].description ? res.keywordList[oldObj.tag][k_word].description : [k_word]}</span>,
                   newObj: <span title={newObj.title}>{newObj.title}</span>,
                   selectKeyword: (
                     <span style={{ width: '40%' }}>
                       <select
                         className="r-group__select"
-                        defaultValue={similarTagNames}
+                        defaultValue={ similarTagNames && newkeywords[0].includes(k_word)?(newkeywords[0][k_word].description ? newkeywords[0][k_word].description : k_word):""}
                         onFocus={(e) => { e.target.value ? e.target.classList.remove('r-group__selectError') : e.target.classList.add('r-group__selectError') }}
                         onChange={(e) => { handleSelectChange(e, k_word, oldObj) }}
                         style={{ height: '2rem' }}
@@ -863,8 +885,8 @@ const ActionPanel = (props) => {
                         </option>
                         {newkeywords && newkeywords[0] &&
                           Object.keys(newkeywords[0]).map((keyword, i) => (
-                            <option key={newkeywords[0][keyword] + i} title={newkeywords[0][keyword].description ? newkeywords[0][keyword].description : "--"} value={keyword}>
-                              {newkeywords[0][keyword].description ? (newkeywords[0][keyword].description.slice(0, 30) + (newkeywords[0][keyword].description.length > 30 ? '...' : '')) : "--"}
+                            <option key={newkeywords[0][keyword] + i} title={newkeywords[0][keyword].description ? newkeywords[0][keyword].description : keyword} value={keyword}>
+                              {newkeywords[0][keyword].description ? (newkeywords[0][keyword].description.slice(0, 30) + (newkeywords[0][keyword].description.length > 30 ? '...' : '')) : keyword}
                             </option>
                           ))}
                       </select>
@@ -883,7 +905,7 @@ const ActionPanel = (props) => {
       }).catch((err) => {
         props.setOverlay(null)
         console.log(err)
-        // props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+        props.toastError(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
       });
     }
   }
@@ -930,7 +952,7 @@ const ActionPanel = (props) => {
       }
 
       {props.isOpen === 'mapObject' && <MapElement isOpen={props.isOpen}
-        onClose={props.onClose}
+        OnClose={props.OnClose}
         captureList={props.captureList}
         fetchingDetails={props.fetchingDetails}
         fetchScrapeData={props.fetchScrapeData}
@@ -943,12 +965,14 @@ const ActionPanel = (props) => {
       
 
       {/* Create Element */}
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
       <Dialog
         className='create__object__modal' header='Create Element'
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
         visible={props.isOpen === 'createObject'}
         onHide={props.OnClose}
+        draggable={false}
         footer={createElementFooter}>
         <Accordion activeIndex={activeIndex}>
           {objects.map((object, index) => (
@@ -981,6 +1005,8 @@ const ActionPanel = (props) => {
                       <span className='object__text'>Name Attribute <span style={{ color: "red" }}> *</span></span>
                       <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
                     </div>
+                    <Divider className='divider-CE' />
+                    <p className='msg-CE'>Fill at least any one of the details</p>
                     <div className='create-elem'>
                       <span className='object__text' >Relative Xpath</span>
                       <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, index)} value={object.relXpath} />
@@ -1003,7 +1029,7 @@ const ActionPanel = (props) => {
                     </div>
                     <div className='create-elem'>
                       <span className='object__text'>CSS Selector</span>
-                      <InputText className='input__text' type='text' name="absXpath" onChange={(e) => handleInputs(e, index)} value={object.qSelect} />
+                      <InputText className='input__text' type='text' name="css"/>
                     </div>
                   </>
                   {/* } */}
@@ -1029,15 +1055,17 @@ const ActionPanel = (props) => {
         toastError={props.toastError}
         onClose={props.onClose}
         setShow={props.setShow}
+        elementTypeProp={props.elementTypeProp}
       />}
 
       {/* Replace Element */}
       <Dialog
         className='replace__object__modal'
-        header="Replace: Sign up screen 1"
+        header={`Replace : ${(props.parentData && props.parentData.name) ? props.parentData.name : ""}`}
         style={{ height: "35.06rem", width: "50.06rem", marginRight: "15rem" }}
         position='right'
-        visible={props.isOpen === "replaceObject"}
+        visible={props.isOpen === "replaceObjectPhase2"}
+        draggable={false}
         onHide={props.OnClose} footer={footerReplace}>
         {
           <div data-test="replaceObject" className="ss__replaceObj">
@@ -1120,7 +1148,7 @@ const ActionPanel = (props) => {
                       key="keywords"
                       field="keywords"
                       header="Keyword Used"
-                      style={{ width: "14rem" }}
+                      style={{ width: "14rem"}}
                     />
                     <Column
                       key="newObj"

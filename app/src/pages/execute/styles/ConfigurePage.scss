@@ -285,29 +285,36 @@
   }
 }
 .trash_button {
-  background: white;
-  // color: #5a199f;
-  border-color: #4f46e5;
-  width: 3rem;
-  padding: 0.75rem 0;
-  justify-content: center;
-  margin: 0;
-  display: inline-flex;
-  cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
-  align-items: center;
-  vertical-align: bottom;
-  text-align: center;
-  overflow: hidden;
-  position: relative;
-  margin-right: 15rem;
+  // background: white;
+  // // color: #5a199f;
+  // border-color: #4f46e5;
+  // width: 3rem;
+  // padding: 0.75rem 0;
+  // justify-content: center;
+  // margin: 0;
+  // display: inline-flex;
+  // cursor: pointer;
+  // -webkit-user-select: none;
+  // user-select: none;
+  // align-items: center;
+  // vertical-align: bottom;
+  // text-align: center;
+  // overflow: hidden;
+  // position: relative;
+  // margin-right: 15rem;
 }
 .p-button.p-button-sm.addConfig_button {
   width: 16rem;
   margin: 0 0.5rem 0 0;
   padding: .4375rem .875rem;
+  text-align: center;
+  font-family: "Open Sans";
+  font:$f7_semibold ;
+  margin-left: 6rem;
+  right: 0rem;
+
 }
+
 .p-button-edit {
   margin: 0;
   display: inline-flex;
@@ -404,7 +411,10 @@
   font-family: "Open Sans";
   // margin-top: 2rem;
 }
+.styled-sno{
+  font-family: "Open Sans";
 
+}
 .legend-text {
   font-size: .9rem;
   margin-left: 120px;
@@ -732,7 +742,14 @@
   margin-left: 2rem;
 }
 .trash_button{
-  margin: 0;
+  // margin: 0;
+}
+.sno_header{
+  .p-component {
+    font-family: 'Open Sans';
+    font-size: 1rem;
+    font-weight: 400;
+}
 }
 .datatable_list {
   .p-datatable .p-datatable-thead > tr > th {
@@ -1306,6 +1323,10 @@ bottom: 21%;
   font-family: open Sans;
 }
 
+.Search_Project{
 
+  font: $f6_regular;
+
+}
 
 

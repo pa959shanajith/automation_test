@@ -5,12 +5,14 @@ import PopupMsg, {setMsg} from './components/PopupMsg';
 import {Messages, VARIANT} from './components/Messages';
 import ModalContainer from './components/ModalContainer';
 import ChangePassword from './components/ChangePassword';
-import ScrollBar from './components/ScrollBar';
+import ScrollBar, { updateScrollBar } from './components/ScrollBar';
 import FooterTwo from './components/FooterTwo';
 import ResetSession from './components/ResetSession';
 import Thumbnail from './components/Thumbnail';
 import Footer from './components/FooterTwo';
 import ValidationExpression from './components/ValidationExpression';
+import BrowserFp from './components/BrowserFp';
+import SelectRecipients from './components/SelectRecipients'
 
 
 export { 
@@ -29,4 +31,7 @@ export {
         Thumbnail,
         Footer,
         ValidationExpression,
+        BrowserFp,
+        updateScrollBar,
+        SelectRecipients,
     };

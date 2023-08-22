@@ -71,6 +71,60 @@ export const browsers = [
   },
 ];
 
+export const configureFields = [
+  {
+    key: "1",
+    name: "Summary *",
+    disabled: true,
+  },
+  {
+    key: "2",
+    name: "Parent",
+  },
+  {
+    key: "3",
+    name: "Sprint",
+  },
+  {
+    key: "4",
+    name: "Flagged",
+  },
+  {
+    key: "5",
+    name: "Reporter",
+  },
+  {
+    key: "6",
+    name: "Development",
+  },
+  {
+    key: "7",
+    name: "Labels",
+  },
+  {
+    key: "8",
+    name: "Story point estimate",
+  },
+  {
+    key: "9",
+    name: "Rank",
+  },
+  {
+    key: "10",
+    name: "Attachment",
+  }
+  ,
+  {
+    key: "11",
+    name: "Linked issues",
+  }
+  ,
+  {
+    key: "12",
+    name: "Assignee",
+  }
+];
+
 export const selections = ["Non-Headless", "Headless"];
 
 export const schedulePeriod = [
@@ -109,10 +163,12 @@ export const scheduleWeek = [
 ];
 
 export const endMonths = [
-  { name: '1 Month', key: 1 },
-  { name: '3 Months', key: 3 },
-  { name: '6 Months', key: 6 },
-  { name: '9 Months', key: 9 }
+  { name: '1 Week', key: '1W' },
+  { name: '2 Weeks', key: '2W' },
+  { name: '1 Month', key: '1M' },
+  { name: '3 Months', key: '3M' },
+  { name: '6 Months', key: '6M' },
+  { name: '9 Months', key: '9M' }
 ];
 
 export const reportsData = [
@@ -143,10 +199,32 @@ export const reportsData = [
 ];
 
 export const reportsBar = {
-  Pass: "#1DA750",
-  pass:"#1DA750",
-  Fail: "#D9342B",
+  Pass: "rgb(118, 219, 155)",
+  pass:"rgb(118, 219, 155)",
+  Fail: "rgba(254, 80, 70, 1)",
   Queued: "#808080",
   Inprogress: "#DEE2E6",
-  fail: "#D9342B",
+  fail: "rgba(254, 80, 70, 1)",
 };
+
+export const testTypesOptions = [
+  {
+    icon: 'pi pi-align-left',
+    value: 'Functional Test'
+  },
+  {
+    icon: 'pi pi-align-left',
+    value: 'Accessibility Test'
+  }
+];
+
+export const viewByOptions = [
+  {
+    icon: 'pi pi-align-left',
+    value: 'Execution Profile'
+  },
+  {
+    icon: 'pi pi-align-left',
+    value: 'Test Suites'
+  }
+];

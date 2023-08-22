@@ -392,7 +392,7 @@ export const manageAzureDetails = async(action, userObj) => {
             RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
-        if(res.status===200 && res.data !== "fail"){            
+        if(res.status===200){            
             return res.data;
         }
         console.error(res.data)
@@ -400,5 +400,145 @@ export const manageAzureDetails = async(action, userObj) => {
     }catch(err){
         console.error(err)
         return {error:{content: "Failed to "+action+" Azure Configuration.", variant: VARIANT.ERROR}}
+    }
+}
+export const zephyrProjectDetails_ICE = async(projectId, user_id) => {
+    try{
+        const res = await axios(url+'/zephyrProjectDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+                action : 'zephyrProjectDetails_ICE',
+                projectId:	projectId,
+                zephyraction: "release",
+                user_id : user_id 
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
+    }
+}
+
+export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
+    try{
+        const res = await axios(url+'/zephyrCyclePhase_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: 'zephyrCyclePhase_ICE',
+                releaseId:	releaseId,
+                zephyraction: "cyclephase",
+                user_id : user_id
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    } catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }
+}
+
+export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
+    try{
+        const res = await axios(url+'/zephyrTestcaseDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                action : 'zephyrTestcaseDetails_ICE',
+                treeId: treeId,
+                zephyraction: zephyraction,
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
+    }
+}
+
+export const saveZephyrDetails_ICE = async(mappedDetails) => {
+    try{
+        const res = await axios(url+'/saveZephyrDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            mappedDetails : mappedDetails,
+            action : 'saveZephyrDetails_ICE'
+            
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
+    }
+}
+
+export const viewZephyrMappedList_ICE = async(userID) => {
+    try{
+        const res = await axios(url+'/viewZephyrMappedList_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                user_id : userID,
+                action : 'viewZephyrMappedList_ICE'
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }
 }

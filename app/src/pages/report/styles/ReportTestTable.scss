@@ -1,10 +1,18 @@
 @import '../../global/styles/ColorVariables.scss';
 
 .reportSummary{
-    margin: 0.5vh;
+    margin: 1.5vh;
 }
 
 .reportsTable_container {
+    .img_jira {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+    .img_azure {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
     .p-input-icon-left {
         width: 100%;
     }
@@ -16,6 +24,8 @@
         max-height: 81vh;
         overflow-y: auto;
         height: 80vh;
+        margin: 1.5vh;
+        border-radius: 0.6rem;
         .p-treetable-thead>tr>th {
             white-space: nowrap;
             overflow: hidden;
@@ -24,6 +34,9 @@
             top: 0;
             z-index: 1;
           }
+        .p-treetable-table {
+            border: 1px solid #dee2e6;
+        }
     }
     
     .ViewTableOnClose{
@@ -62,4 +75,52 @@
 }
 .p-treetable .p-treetable-header{
     padding: 0.5rem !important;
+}
+
+.jira_modal {
+    .jira_credentials {
+        width: 100%;
+        padding: 0.4rem;
+    }
+    .jira_user {
+        padding: 0.22rem;
+    }
+    .username {
+        top: 9.1rem;
+        width: 92.3%;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        color: #495057;
+        padding: 0.4rem;
+        position: absolute;
+        &:hover {
+            background: #FAF9F6;
+         }
+    }
+}
+
+.p-overlaypanel.report_bug {
+    .p-overlaypanel-content {
+        padding: 0;
+    }
+    .img_jira {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+    .img_azure {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+}
+
+.p-overlaypanel.jira_user {
+    width: 37%;
+    .p-overlaypanel-content {
+        padding: 0;
+        width: 100%;
+        .p-menu.p-component {
+            width: 100%;
+        }
+    }
 }

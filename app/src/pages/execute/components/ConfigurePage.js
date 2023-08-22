@@ -55,7 +55,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [visible_schedule, setVisible_schedule] = useState(false);
   const [visible_CICD, setVisible_CICD] = useState(false);
   const [visible_execute, setVisible_execute] = useState(false);
-  const [showIcePopup, setShowIcePopup] = useState(false);
+  const [showIcePopup, setShowIcePopup] = useState(true);
   const toast = useRef(null);
   const url = window.location.href.slice(0, -7) + "execAutomation";
   const [configProjectId, setConfigProjectId] = useState("");
@@ -100,6 +100,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
   const [currentKey, setCurrentKey] = useState("");
+  const [currentName, setCurrentName] = useState("");
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
   const [executionTypeInRequest, setExecutionTypeInRequest] =
     useState("asynchronous");
@@ -125,24 +126,18 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [dropdownDay, setDropdownDay] = useState(null);
   const [project, setProject] = useState({});
   const [scheduleOption, setScheduleOption] = useState({});
-  const [radioButton_grid, setRadioButton_grid] = useState(
-    "Execute with Avo Assure Agent/ Grid"
-  );
   const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+  const [radioButton_grid, setRadioButton_grid] = useState(
+   selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
+  );
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
-  // const [selectedAPP,setSelectedApp]=useState()
-  // const typeOfAppType = useSelector((state) => state.landing.defaultSelectProject);
-  // const nameOfAppType = typeOfAppType.apptype
-  // console.log(state.landing.defaultSelectProject)
-  // console.log(typeOfAppType)
-
-  // const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
-
-  // const initProj = selectProjects.projectId;
-  // console.log(selectProjects)
-
+  
+  useEffect(() => {
+    setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client");
+    setShowIcePopup(selectProjects?.appType==="Web"? false:true)
+  }, [selectProjects.appType]);
 
 
   const displayError = (error) => {
@@ -453,8 +448,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     executionData["executionEnv"] = execEnv;
-    executionData["browserType"] = ["1"];
+    executionData["browserType"] =browserTypeExe;
     executionData["integration"] = integration;
+    executionData["configurekey"] = currentKey;
+    executionData["configurename"] = currentName;
+    executionData["executionListId"] = uuid() ;
     executionData["batchInfo"] =
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
@@ -543,7 +541,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setFetechConfig(configurationList);
     configurationList.forEach((item, idx) => {
       getState.push({
-        sno: idx + 1,
+        sno: (
+          <span className="sno_header">
+            {idx + 1}
+          </span>
+        ),
         // profileName: item.configurename,
         profileName: (
           <span
@@ -562,7 +564,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
+                setCurrentName(item.configureName)
                 setCurrentSelectedItem(item);
+                setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                 setConfigItem(idx);
                 console.log(fetechConfig, configItem)
               }}
@@ -612,20 +616,18 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
               visible={visible}
               onHide={() => setVisible(false)}
             />
-            <Button
-              icon="pi pi-pencil"
-              className=" pencil_button p-button-edit"
-              onClick={() => configModal("CancelUpdate", item)}
-            >
-               <Tooltip target=".pencil_button" position="bottom" content="Edit the execution configuration."/>
-            </Button>
-            <Button
-              icon="pi pi-trash"
-              className="trash_button p-button-edit"
-              onClick={(event) => confirm_delete(event, item)}
-            >
-               <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution configuration."  className="small-tooltip" />
-            </Button>
+             <img src="static/imgs/ic-edit.png"
+  style={{ height: "20px", width: "20px" }}
+className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
+/>
+<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
+ <img
+
+src="static/imgs/ic-delete-bin.png"
+style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
+<Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
+            
           </div>
         ),
       });
@@ -850,6 +852,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             <select
             placeholder="Search"
             title=" Search for project"
+            className="Search_Project"
               onChange={(e) => {
                 dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
@@ -1102,7 +1105,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (!!configList.length) {
       return (
         <>
-         <Tooltip target=".execute_now " position="bottom" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+         <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
          <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
 
@@ -1120,7 +1123,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           >
             <Column
               field="sno"
-              style={{ width: "5%" }}
+              style={{ width: "5%" ,height:"2.5rem",fontFamily:"Open Sans"}}
               header={<span className="SNo-header">S.No.</span>}
             />
             <Column
@@ -1129,6 +1132,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 fontFamily: "open Sans",
                 marginLeft: "11rem",
                 width: "50%",
+                height:"2.5rem"
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
@@ -1139,6 +1143,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 fontFamily: "open Sans",
                 marginRight: "23rem",
                 width: "40%",
+                height:"2.5rem"
               }}
               field="executionOptions"
               header={
@@ -1154,6 +1159,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 marginleft: "7rem",
                 textAlign: "left",
                 width: "5%",
+                height:"2.5rem"
               }}
               field="actions"
               header={<span className="actions-header">Actions</span>}
@@ -1171,16 +1177,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
-                  // disabled={selectProjects.appType!=="5db0022cf87fdec084ae49b7"}
-                  // defaultChecked={selectProjects.appType==="5db0022cf87fdec084ae49b7"}
+                  disabled={selectProjects.appType!=="Web"}
+                  checked={ radioButton_grid === "Execute with Avo Assure Agent/ Grid"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
                       setShowIcePopup(false);
                       setRadioButton_grid(e.target.value);
                     }}
-                    checked={
-                      radioButton_grid === "Execute with Avo Assure Agent/ Grid"
-                    }
+                    
                   />
                   <label className="executeRadio_label_grid ">
                     Execute with Avo Assure Agent/ Grid
@@ -1196,10 +1200,8 @@ Learn More '/>
                         setShowIcePopup(true);
                         setRadioButton_grid(e.target.value);
                       }}
-                      // checked={nameOfAppType !== '5db0022cf87fdec084ae49b7'&&radioButton_grid === "Execute with Avo Assure Client"}
-                      // checked={nameOfAppType}
                       checked={
-                        radioButton_grid === "Execute with Avo Assure Client"
+                        radioButton_grid === "Execute with Avo Assure Client" || selectProjects.appType!=="Web"
                       }
                     />
                   </div>
@@ -1207,7 +1209,7 @@ Learn More '/>
                     Execute with Avo Assure Client
                   </label>
                   <img className='info__btn_grid'src="static/imgs/info.png" ></img>
-                  <Tooltip target=".info__btn_grid" position="bottom" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts."></Tooltip> 
+                  <Tooltip target=".info__btn_grid" position="bottom" content="Avo Assure Client is responsible for element identification, debugging, and execution of automated scripts." style={{fontFamily:"Open Sans"}}></Tooltip> 
 
                 </div>
                 {showIcePopup && (
@@ -1550,7 +1552,7 @@ Learn More '/>
                 />
                 <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
                Add Configuration
-               <Tooltip target=".addConfig_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+               <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}

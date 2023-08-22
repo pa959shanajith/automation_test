@@ -144,6 +144,8 @@ module.exports.Execution_Queue = class Execution_Queue {
             //check if target ICE was specified or not
             if (userInfo && userInfo.icename && userInfo.icename != EMPTYUSER) {
                 targetICE = userInfo.icename;
+                var fnName = 'execAutomation';
+                const storeInExecutionList =  await utils.fetchData({"executionData": batchExecutionData}, "devops/executionList", fnName);
             } else {
                 userInfo.icename = EMPTYUSER
             }
