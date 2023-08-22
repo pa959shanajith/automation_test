@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState,useMemo, useCallback } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession} from '../../global';
 import { SearchBox , SearchDropdown, Toggle  } from '@avo/designcomponents';
@@ -19,8 +19,11 @@ import "../styles/DevOps.scss";
 import DropDownList from '../../global/components/DropDownList';
 import { getPools, getICE_list } from '../../execute/api';
 import {getProjectList} from '../../mindmap/api';
-
-
+import { FormInput } from '../../settings/components/AllFormComp';
+import {getDetails_SAUCELABS} from '../../settings/api';
+import {saveSauceLabData, sendMailOnExecutionStart} from '../../utility/api';
+import '../../admin/styles/FormComp.scss'
+import {SauceLabLogin,SauceLabsExecute} from './SauceLabs';
 
 
 const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig, projectIdTypesDicts }) => {
@@ -35,6 +38,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [displayBasic1, setDisplayBasic1] = useState(false);
     const [displayBasic2, setDisplayBasic2] = useState(false);
     const [displayBasic3, setDisplayBasic3] = useState(false);
+    const [displayBasic4, setDisplayBasic4] = useState(false);
+    const [displayBasic5, setDisplayBasic5] = useState(false);
     const [position, setPosition] = useState('center');
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
     const [getProjectLists,setProjectList]=useState([]);
@@ -55,10 +60,13 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [cyclesList, setCyclesList] = useState('');
     const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
     const [currentKey,setCurrentKey] = useState('');
+    const [currentExecutionRequest,setCurrentExecutionRequest] = useState(null);
     const [projectName, setProjectName] = useState('');
     const [currentName, setCurrentName] = useState('');
     const current_task = useSelector(state=>state.plugin.PN);
     const [showCICD, setShowCICD] = useState(false);
+    const [showSauceLabs, setShowSauceLabs] = useState(false);
+    const [showSauceLabLogin,setShowSauceLabLogin] = useState(false)
     const [currentTask, setCurrentTask] = useState({});
     const userRole = useSelector(state=>state.login.SR);
     const [eachData, setEachData] = useState([]);
@@ -86,10 +94,52 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [showIcePopup,setShowIcePopup] = useState(false);
     const [accessibilityParameters, setAccessibilityParameters] = useState([]);
     const [changeLable, setChangeLable] = useState(false);
+    const [defaultValues, setDefaultValues] = useState({});
+    const [osNames, setOsNames] = useState([]);
+    const [platforms, setPlatforms] = useState([]);
+    const [browserDetails,setBrowserDetails] = useState([]);
+    const [mobileDetails,setMobileDetails] = useState([]);
+    const [dropdownSelected,setDropdownSelected] = useState([]);
+    const [sauceLabUser,setSauceLabUser] = useState({});
+    const [emailNotificationEnabled, setEmailNotificationEnabled] = useState(null);
+    const [emailNotificationSender, setEmailNotificationSender] = useState(null);
+    const [emailNotificationReciever, setEmailNotificationReciever] = useState(null);
+    const [batchInfo, setBatchInfo] = useState([]);
+    const [isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion] = useState(null);
+    const [profileName, setProfileName] = useState(null);
+    
 
+    const [sauceLab, setSauceLab] = useState(false);
+    const [browserlist, setBrowserlist] = useState([
+        {
+            key: '3',
+            text: 'Internet Explorer'
+        },
+        {
+            key: '1',
+            text: 'Google Chrome'
+        },{
+            key: '2',
+            text: 'Firefox'
+        },
+        // {
+        //     key: '7',
+        //     text: 'Microsoft Edge'
+        // },
+        {
+            key: "safari",
+            text: "Safari",
+            disabled:true,
+        },
+        {
+            key: '8',
+            text: 'Microsoft Edge'
+        }
+    ]);
 
     useEffect(()=>{
         projectIdTypesDicts[selectedProject] === "Web" ? setShowCICD(true) : setShowCICD(false)
+        projectIdTypesDicts[selectedProject] === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false)
     },[selectedProject])
 
 
@@ -211,10 +261,14 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         'displayBasic': setDisplayBasic,
         'displayBasic1': setDisplayBasic1,
         'displayBasic2': setDisplayBasic2,
-        'displayBasic3' : setDisplayBasic3
+        'displayBasic3' : setDisplayBasic3,
+        'displayBasic4' : setDisplayBasic4,
+        'displayBasic5' : setDisplayBasic5,
+        'showSauceLabLogin':setShowSauceLabLogin
     }
     const [selectedItem, setSelectedItem] = useState({});
 
+    
     const onProjectChange = async (option) => {
         setLoading('Please Wait...');
         setSelectedProject(option.key);
@@ -222,6 +276,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setSelectedCycle(option.index);
         setProjectName(option.text);
         projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
+        projectIdTypesDicts[option.key] === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false)
         const configurationList = await fetchConfigureList({
             'projectid': option.key
         });
@@ -241,6 +296,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         
         
     }
+
 
     const copyKeyUrlFunc = (id) => {
         const data = document.getElementById(id).title;
@@ -277,6 +333,59 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setCopyToolTip("Click to Copy");
         }, 1500);
     }
+
+
+    const handleSubmit = async (SauceLabPayload) => {
+        // close the existing dialog
+        setDisplayBasic4(false);
+        // open the new dialog
+        setLoading('Fetching details...') 
+        SauceLabPayload['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
+        let data = await saveSauceLabData({
+            SauceLabPayload
+        });
+        if (data && data.os_names && data.browser) {
+            // Data exists and has the expected properties
+            
+            setLoading(false);
+            setDisplayBasic5(true);
+
+            const arrayOS = data.os_names.map((element, index) => {
+              return {
+                key: element,
+                text: element,
+                title: element,
+                index: index
+              };
+            });
+            setOsNames(arrayOS);
+            setBrowserDetails(data);
+        }
+        else if (data && data.emulator && data.real_devices){
+            // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
+            //     return {
+            //         key: element,
+            //         text: element,
+            //         title: element,
+            //         index: index
+            //     }
+            // })
+            // setPlatforms(arrayPlatforms);
+
+            setMobileDetails(data);
+            setLoading(false);
+            setDisplayBasic5(true);
+          }
+           else {
+            setLoading(false);
+            // Data is empty or doesn't have expected properties
+            if (data == "unavailableLocalServer"){
+                setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+            }else{
+                setMsg({"CONTENT":"Error while fetching the data from saucelabs", "VARIANT": VARIANT.ERROR})
+            }  
+          }
+        }
 
     const copyConfigKey = (title) => {
         if (navigator.clipboard.writeText(title)) {
@@ -355,8 +464,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             showCheckbox: false,
                             // className: 'devOps_terminate_style',
                             children: executionNode.map((executionRequest) => ({
-                                label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
-                                value: executionRequest.executionListId+executionRequest.moduleid,
+                                label: executionRequest.execType != 'scenarioParallel' ? 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status : 'Scenario : '+executionRequest.scenarioName+',   Status: '+executionRequest.status ,
+                                value: executionRequest.execType != 'scenarioParallel' ? executionRequest.executionListId+executionRequest.moduleid : executionRequest.executionListId+executionRequest.scenarioIds,
                                 showCheckbox: false
                             }))
                         };
@@ -410,6 +519,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             integration: getIntegrationSelected(item.executionRequest.integration),
             executionType: item.executionRequest.executiontype,
             isHeadless: item.executionRequest.isHeadless,
+            execType: item.executionRequest.execType ? item.executionRequest.execType : false,
+            isEmailNotificationEnabled: item.executionRequest.isEmailNotificationEnabled,
+            emailNotificationSender: item.executionRequest.emailNotificationSender,
+            emailNotificationReciever: item.executionRequest.emailNotificationReciever,
+            isNotifyOnExecutionCompletion: item.executionRequest.isNotifyOnExecutionCompletion,
             executionRequest: item.executionRequest,
             disable: true,
             selectedBrowserType: showCICD
@@ -462,6 +576,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         dataExecution.poolid = ""
                         if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
                         else dataExecution.targetUser = selectedICE
+                        dataExecution['executionEnv'] = 'default'
                         CheckStatusAndExecute(dataExecution, iceNameIdMap);
                         onHide(name);
                     }
@@ -474,7 +589,24 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
                             }
                         }else {
-                            setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
+                            if (emailNotificationEnabled === true && isNotifyOnExecutionCompletion !== true) {
+                                // send email on click of execution
+                                let result = await sendMailOnExecutionStart(emailNotificationSender, emailNotificationReciever, batchInfo, profileName);
+
+                                if(result !== "pass") {
+                                    if(result.error && result.error.CONTENT) {
+                                        setMsg(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
+                                    } else {
+                                        setMsg(MSG.CUSTOM("Error While Sending an Email.",VARIANT.ERROR));
+                                    }
+                                }
+                                else {
+                                    setMsg(MSG.CUSTOM("Execution Added to the Queue and Email sent successfully.",VARIANT.SUCCESS));
+                                }
+                            }
+                            else {
+                                setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
+                            }
                         }
                         onHide(name);
                     }
@@ -514,15 +646,18 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
 
     const ExecuteTestSuite = async (executionData) => {
        
+
         if(executionData === undefined) executionData = dataExecution;
+        if(executionData["executionEnv"] != 'saucelabs') {
+            executionData["executionEnv"]=execEnv;
+            executionData["browserType"]=browserTypeExe;
+        }
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, accessibilityParameters, '');
+        const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, accessibilityParameters, '', currentExecutionRequest);
         if(modul_Info === false) return;
         setLoading("Sending Execution Request");
         executionData["source"]="task";
         executionData["exectionMode"]=execAction;
-        executionData["executionEnv"]=execEnv;
-        executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
@@ -683,6 +818,91 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setAvailableICE(ice);
     }
 
+    const sauceLabLogin = useMemo(() =>
+        <SauceLabLogin
+            setLoading={setLoading}
+            displayBasic4={displayBasic4}
+            onHide={onHide}
+            handleSubmit={handleSubmit}
+            setSauceLabUser={setSauceLabUser}
+        />,
+        [setLoading, displayBasic4, onHide, handleSubmit,setSauceLabUser]);
+
+    const sauceLabExecute = useMemo(() => <SauceLabsExecute mobileDetails={mobileDetails} browserDetails={browserDetails}
+        displayBasic5={displayBasic5} onHide={onHide} showSauceLabs={showSauceLabs}
+        changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+        availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+    />,
+        [mobileDetails, browserDetails, displayBasic5, onHide, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+            availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+    
+   const handleOptionChange = (selected,type,item,index) => {
+    // setDropdownSelected(selected);
+    setDropdownSelected(prevValues => {
+        const newValues = [...prevValues];
+        newValues[index] = selected;
+        return newValues;
+      });
+    switch (selected) {
+        case 'sauceLabs':
+            triggerSauceLab(item,type);
+            setDropdownSelected(prevValues => {
+                const newValues = [...prevValues];
+                newValues[index] = '';
+                return newValues;
+              });
+            break;
+        case 'browserStack':
+            // add changes for browserstack
+            break;
+      case 'lambdaTest':
+            // add changes for lambdaTest
+            break;      
+        default:
+            break;
+    }
+   }
+   const triggerSauceLab = (item,type) => {
+    if(type && type !== 'web'){
+        setSauceLab(true);
+    }
+    onClick('displayBasic4');
+    onClick('showSauceLabLogin');
+    setCurrentKey(item.configurekey);
+    setCurrentExecutionRequest(item.executionRequest);
+    setAppType(item.executionRequest.batchInfo[0].appType);
+    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+    setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
+    setCurrentName(item.configurename);
+    let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
+        return ({
+            assignedTime: "",
+            releaseid: element.releaseId,
+            cycleid: element.cycleId,
+            testsuiteid: element.testsuiteId,
+            testsuitename: element.testsuiteName,
+            projectidts: element.projectId,
+            assignedTestScenarioIds: "",
+            subTaskId: "",
+            versionnumber: element.versionNumber,
+            domainName: element.domainName,
+            projectName: element.projectName,
+            cycleName: element.cycleName
+        });                                   
+    });
+    setCurrentTask({
+        testSuiteDetails: testSuiteDetails
+    });
+    let accessibilityParametersValue = item.executionRequest.batchInfo.map((element) => {
+        return (element.suiteDetails[0].accessibilityParameters)
+    });
+    setAccessibilityParameters(accessibilityParametersValue);
+    readTestSuiteFunct(testSuiteDetails, item);
+    fetchData(item.executionRequest.batchInfo[0].projectId);
+    setChangeLable(true);
+    setSauceLab(true);
+    // setShowIcePopup(false);
+   }         
     return (<>
      {
             executionQueue &&
@@ -715,6 +935,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false,
+                    execType: false,
+                    isEmailNotificationEnabled: false,
+                    emailNotificationSender: null,
+                    emailNotificationReciever: null,
+                    isNotifyOnExecutionCompletion: true,
                     isLicenseTrial: (getplugins_list.LicenseTypes === "Trial")?true:false
                 })} >Create Profile</button>:null}
             { configList.length > 0 && <>
@@ -774,6 +999,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <img onClick={() =>{
                                     onClick('displayBasic2');
                                     setCurrentKey(item.configurekey);
+                                    setCurrentExecutionRequest(item.executionRequest);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
@@ -814,7 +1040,26 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`} className="action_icons" alt="Edit Icon" title='Schedule'/>&nbsp;&nbsp;&nbsp;
+                                     
+                                     {showSauceLabs && <select className='cloud-test-provider' value={dropdownSelected[index]}
+                                          onChange={(e) => handleOptionChange(e.target.value,'mobile-web',item,index)}>
+                                        <option value="">Cloud Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
+                                    </select>}&nbsp;&nbsp;&nbsp;
+                                     
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
+                                     {/* { showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" title="CI/CD" className="action_icons" alt="Edit Icon"/>}&nbsp;&nbsp;&nbsp; */}
+                                     
+                                     {showCICD && <select className='cloud-test-provider' value={dropdownSelected[index]}
+                                          onChange={!userInfo.isTrial?(e) => handleOptionChange(e.target.value,'web',item,index):""}>
+                                        <option value="">Cloud Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
+                                    </select>}&nbsp;&nbsp;&nbsp; 
+
                                     {showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""} src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} className="action_icons" alt="Edit Icon" title='CI/CD'/>}
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
@@ -836,6 +1081,25 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <img onClick={() =>{
                                     onClick('displayBasic2');
                                     setCurrentKey(item.configurekey);
+                                    setCurrentExecutionRequest(item.executionRequest);
+                                    if ("isEmailNotificationEnabled" in item.executionRequest) {
+                                        setEmailNotificationEnabled(item.executionRequest.isEmailNotificationEnabled);
+                                        if (item.executionRequest.isEmailNotificationEnabled === true) {
+                                            setEmailNotificationSender(item.executionRequest.emailNotificationSender);
+                                            setEmailNotificationReciever(item.executionRequest.emailNotificationReciever);
+                                            setIsNotifyOnExecutionCompletion(item.executionRequest.isNotifyOnExecutionCompletion)
+                                            setBatchInfo(item.executionRequest.batchInfo);
+                                            setProfileName(item.executionRequest.configurename);
+                                        }
+                                    }
+                                    else {
+                                        setEmailNotificationEnabled(false);
+                                        setEmailNotificationSender(null);
+                                        setEmailNotificationReciever(null);
+                                        setIsNotifyOnExecutionCompletion(null);
+                                        setBatchInfo([]);
+                                        setProfileName(null)
+                                    }
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !=="Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
@@ -866,6 +1130,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     readTestSuiteFunct(testSuiteDetails, item);
                                     fetchData(item.executionRequest.batchInfo[0].projectId);
                                     setChangeLable(true);
+                                    setSauceLab(false);
                                     // setShowIcePopup(false);
                                     }} src="static/imgs/Execute.png"  className="action_icons" title="Execute Now"alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
@@ -876,8 +1141,28 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic1', item)}:""} src={`static/imgs/${userInfo.isTrial?"Schedule_disabled":"Schedule"}.png`}  className="action_icons" title="Schedule" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+
+                                     {showSauceLabs && <select className='cloud-test-provider' value={dropdownSelected[index]}
+                                          onChange={(e) => handleOptionChange(e.target.value,'mobile-web',item,index)}>
+                                        <option value="">Cloud Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
+                                    </select>}&nbsp;&nbsp;&nbsp;
+                                     
+                                     
                                      {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
-                                     { showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""}  src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} title="CI/CD" className="action_icons" alt="Edit Icon"/>}
+                                     {/* {showCICD && <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon" title='CI/CD'/>}&nbsp;&nbsp;&nbsp; */}
+                                     
+                                    {showCICD && <select className='cloud-test-provider' value={dropdownSelected[index]}
+                                          onChange={!userInfo.isTrial?(e) => handleOptionChange(e.target.value,'web',item,index):""}>
+                                        <option value="">Cloud Test</option>
+                                        <option value="sauceLabs">SauceLabs</option>
+                                        {/* <option value="browserStack">Browser Stack</option>
+                                        <option value="lambdaTest">Lambda Test</option> */}
+                                    </select>}
+
+                                    { showCICD && <img onClick={!userInfo.isTrial?() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}:""}  src={`static/imgs/${userInfo.isTrial?"CICD_disabled":"CICD"}.png`} title="CI/CD" className="action_icons" alt="Edit Icon"/>}
                                      {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
                                     </td>
                                    {userRole !== "Test Engineer"? <td className="tkn-table__button" >
@@ -929,7 +1214,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <div className='adminControl-ice popup-content'>
                             <div>
                                 <span className="leftControl" title="Token Name">{"Execute on"}</span>
-                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Search'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                                <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Search'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} />
                             </div>
                         </div>
                     </div> }
@@ -954,7 +1239,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 {/* Dialog for Schedule */}
                 <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}}   onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
                 {/* Dialog for Schedule */} 
-
+                {sauceLabLogin}
+                {sauceLabExecute}
                 {/* Dialog for CI /CD  */}
 
                 <Dialog header="Execute via CI/CD" visible={displayBasic} className="cicdName" onHide={() => {
@@ -1007,7 +1293,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     </>);
 }
 
-const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType) => {
+const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType, currentExecutionRequest) => {
     for(var i =0 ;i<eachData.length;i++){
         var testsuiteDetails = current_task.testSuiteDetails[i];
         var suiteInfo = {};
@@ -1016,17 +1302,15 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
         var cycid = testsuiteDetails.cycleid;
         var projectid = testsuiteDetails.projectidts;
         
-        for(var j =0 ; j<eachData[i].executestatus.length; j++){
-            if(eachData[i].executestatus[j]===1){
-                selectedRowData.push({
-                    condition: eachData[i].condition[j],
-                    dataparam: [eachData[i].dataparam[j].trim()],
-                    scenarioName: eachData[i].scenarionames[j],
-                    scenarioId: eachData[i].scenarioids[j],
-                    scenariodescription: undefined,
-                    accessibilityParameters: accessibilityParameters
-                });
-            }
+        for(let j =0 ; j<currentExecutionRequest.batchInfo[i].suiteDetails.length; j++){
+            selectedRowData.push({
+                condition: currentExecutionRequest.batchInfo[i].suiteDetails[j].condition,
+                dataparam: [currentExecutionRequest.batchInfo[i].suiteDetails[j].dataparam[0].trim()],
+                scenarioName: currentExecutionRequest.batchInfo[i].suiteDetails[j].scenarioName,
+                scenarioId: currentExecutionRequest.batchInfo[i].suiteDetails[j].scenarioId,
+                scenariodescription: undefined,
+                accessibilityParameters: accessibilityParameters
+            });
         }
         suiteInfo.scenarioTaskType = scenarioTaskType;
         suiteInfo.testsuiteName = eachData[i].testsuitename;

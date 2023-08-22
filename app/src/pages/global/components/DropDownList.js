@@ -7,7 +7,7 @@ import '../styles/DropDownList.scss'
   use: renders searchable available ice dropdown
 */
 
-const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder, ExeScreen, poolType}) => {
+const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder, ExeScreen, poolType, sauceLab}) => {
     const inputRef = useRef()
     const [list,setList] =  useState([])
     const [dropDown,setDropDown] = useState(false)
@@ -59,7 +59,7 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
                 <input autoComplete={"off"} ref={inputRef} className={ (inputErrorBorder?" dropdownInputError ":"") + "btn-users edit-user-dropdown-edit"} onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder={placeholder}/>
-                <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
+                <div className={sauceLab !== false?"dropdown_saucelabs":"form-inp-dropdown-popup"} role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.length>0?list.map((ice,index) => (  
                         <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") && (ExeScreen===true) ) ? 'none' : 'block' }} className="dropdown-ul">

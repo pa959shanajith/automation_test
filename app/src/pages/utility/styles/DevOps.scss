@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .api-ut__btnGroup {
     width: 100%;
     margin-bottom: 1%;
@@ -270,10 +271,9 @@
     width: 45%;
     margin-top: 3vh;
     & > div {
-        margin: 4.4% 0;
+        margin: 0 0 5vh;
         display: flex;
         align-items: center;
-        margin-bottom: 7vh;
     }
 }
 .devOps__scenario_list {
@@ -634,4 +634,387 @@
 }
 .rct-text{
     width: 36em !important;
+}
+#Saucelabs_dialog{
+    // max-height: 95% !important;
+    width: 39rem !important;
+    height: 20rem;
+}
+#Saucelabs-form{
+    .input-label .left-opt {
+        display: inline-block;
+        width: 125%;
+        margin-left: 27px;
+    }
+}
+
+#Saucelabs_submit{
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    vertical-align: bottom;
+    text-align: center;
+    left: 30rem;
+    background-color: #633693;
+    border-radius: 20px;
+    outline: auto;
+    width: 6rem;
+    top: 5rem;
+    }
+
+.Saucelabs_input{
+    display: flex;
+    flex-direction: column;
+}
+.saucelabs_ilm__error_msg{
+    font-family: "LatoWeb";
+    font-size: 14px;
+    color: black;
+    position: absolute;
+    right: 19rem;
+    bottom: 3rem;
+}
+.Sacuelab_execute_button{
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    vertical-align: bottom;
+    text-align: center;
+    left: 30rem;
+    background-color: #633693;
+    border-radius: 20px;
+    outline: auto;
+    width: 6rem;
+    left: 9rem;
+    top: 0.5rem;
+}
+.Saucelabs_cancel{
+    left: 9.5rem;
+    top: 0.5rem;
+    height: 2.69rem;
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    vertical-align: bottom;
+    text-align: center;
+    background-color: #633693;
+    border-radius: 20px;
+    outline: auto;
+    width: 6rem;
+}
+.leftControl_sauce{
+    margin-right:9rem ;
+}
+.available_sauce{
+    right: 9rem;
+    position: relative;
+    bottom: 1rem;
+}
+.unavailable_sauce{
+    right: 9rem;
+    position: relative;
+    bottom: 1rem;
+}
+.dnd_sauce{
+    right: 9rem;
+    position: relative;
+    bottom: 1rem; 
+}
+.adminControl-ice-saucelabs{
+    position: relative;
+    top: 15px;
+    bottom: 1rem;
+}
+.adminControl-ice-sauce{
+    width: 17rem;
+    top: 0rem;
+    position: relative;
+}
+.dropdown_saucelabs{
+    font-size: 14px;
+    width: calc(70% - -2rem);
+    right: 2.65rem;
+    max-height: 123px;
+    box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+    display: block;
+    background: $whiteColor;
+    margin-top: 2px;
+    z-index: 1;
+    position: absolute;
+    ul{
+        padding-left: 2px;
+        margin: 4px;
+        width: calc(100% - 14px);
+    }
+    .dropdown-list-item:hover{
+        background: $primaryColor;
+        border-radius: 3px;
+        color: $whiteColor;
+        cursor: pointer;
+    }
+}
+#SauceLab_Integration{
+    .p-dialog-content {
+        overflow-x: unset !important;
+        overflow-y: unset !important;
+    }
+
+}
+.saucelabs_input{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -1rem;
+    position: relative;
+}
+.saucelabs_input_URL{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -2.5rem;
+    position: relative;
+    
+}
+.saucelabs_input_Accesskey{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -4rem;
+    position: relative;
+}
+.cloud-test-provider{
+    appearance: none;
+    font-size: 11px;
+    padding: 0px 6px;
+    border-radius: 35px; 
+    color: #333;
+    width: fit-content;
+    height: 3.5vh;
+    margin-right: 13px;
+    text-align: center;
+    color: #633693;
+    font-weight: 600;
+    cursor: pointer; 
+    outline: none; 
+}
+.toggle_saucelabs_emulator{
+    position: relative;
+    right: 0.2rem;
+
+}
+.toggle_saucelabs{
+    position: relative;
+
+}
+.toggle_saucelabs_realdevice{
+    position: relative;
+    left: 0.2rem;
+
+}
+.saucelab_toggle_button{
+    height: 2rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#email-config_dialog{
+    // max-height: 95% !important;
+    width: 45rem !important;
+    height: 26rem;
+}
+#email-config_form{
+    .input-label {
+        width: 26%;
+        font-size: medium;
+        font-weight: 700;
+        margin-top: 25px;
+    }
+}
+
+#email-config_submit{
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    vertical-align: bottom;
+    text-align: center;
+    left: 36rem;
+    background-color: #633693;
+    border-radius: 20px;
+    outline: auto;
+    width: 6rem;
+    top: 0.5rem;
+    }
+
+.Email-Config_input{
+    display: flex;
+    flex-direction: column;
+}
+
+.email-config_input{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -1rem;
+    position: relative;
+}
+.email-config_input_sender_address{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -1.2rem;
+    position: relative;
+    left: 1rem;    
+}
+
+.email-config_input_reciever_address{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -1.2rem;
+    position: relative;
+    left: 1rem;
+}
+
+.row_gap {
+    margin-bottom: 2rem
+}
+
+.email-notification__bottom_msg {
+    font-family: "LatoWeb";
+    font-size: 14px;
+    color: black;
+    position: absolute;
+    top: 8rem;
+    left: 11.5rem;
+}
+
+.email-notify__on_completion {
+    display: flex;
+    align-items: center;
+    position: relative;
+    left: 5rem
+}
+
+.email-notify__on_completion_toggle_off {
+    margin-right: 5rem;
+    margin-left: 2.5rem;
+}
+
+.email-notify__on_completion_toggle_on {
+    margin-right: 2.5rem;
+    margin-left: 5rem;
+}
+
+.row-gap__toggle {
+    margin-top: 4rem;
+    margin-bottom: 2rem
 }

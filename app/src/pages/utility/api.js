@@ -682,3 +682,57 @@ export const deleteExecutionListId = async(props) => {
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
+
+export const saveSauceLabData = async(props) => {
+    try{
+            const res = await axios(url+'/saveSauceLabData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const sendMailOnExecutionStart = async (senderEmailAddress, recieverEmailAddress, executionData, profileName) => {
+    try {
+        const result = await axios(url + '/sendMailOnExecutionStart', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                senderEmailAddress: senderEmailAddress,
+                recieverEmailAddress: recieverEmailAddress,
+                executionData: executionData,
+                profileName: profileName,
+                startDate: new Date().getFullYear() + "-" + ("0" + (new Date().getMonth() + 1)).slice(-2) + "-" + ("0" + new Date().getDate()).slice(-2) + " " + ("0" + new Date().getHours()).slice(-2) + ":" + ("0" + new Date().getMinutes()).slice(-2) + ":" + ("0" + new Date().getSeconds()).slice(-2)
+           }
+        });
+
+        if(result.status===200 && result.data !== "fail"){
+            return result.data;
+        }
+        else if(result.status === 401 || result.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.GLOBAL.ERR_SEND_EMAIL}
+    }
+    catch(error) {
+        console.error(error)
+        return {error:MSG.GLOBAL.ERR_SEND_EMAIL}
+    }
+}

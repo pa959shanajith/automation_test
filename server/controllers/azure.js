@@ -112,7 +112,7 @@ exports.connectAzure_ICE = function(req, res) {
 
                             function azure_login_2_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "issue_id"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "issue_id","auto_populate"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", azure_login_2_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectAzure_ICE - createIssueInAzure: Socket Disconnected");
@@ -120,7 +120,7 @@ exports.connectAzure_ICE = function(req, res) {
                                             var soc = myserver.socketMapNotify[username];
                                             soc.emit("ICEnotAvailable");
                                         }
-                                    } else if (data.onAction == "issue_id") {
+                                    } else if (data.onAction == "issue_id" || data.onAction == "auto_populate") {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail") {
@@ -157,8 +157,10 @@ exports.connectAzure_ICE = function(req, res) {
             }  
         } else if (req.body.action == 'getAzureConfigureFields') { //gets azure configure fields for given project and issue type
             var createObj = req.body.azure_input_dict;
-            var project = req.body.project;
-            project = 'AvoAssure'
+            var project = '';
+            if(req.body.projects && req.body.projects.length){
+                project = req.body.projects.filter((el) => el.key === req.body.project)[0]['text'];
+            }
             var issuetype = req.body.issuetype;
             var url =req.body.url;
             var username= req.body.username;
@@ -199,6 +201,11 @@ exports.connectAzure_ICE = function(req, res) {
                                         }
                                     } else if (data1.onAction == "configure_field") {
                                         var resultData = data1.value;
+                                        if(Object.keys(resultData).length && resultData.hasOwnProperty('Error')){
+                                            logger.info('Azure: '+resultData.Error.msg);
+                                            res.status(resultData.Error.status).send(resultData.Error.msg);
+                                            return;
+                                        }
                                         if (resultData != "Fail") {
                                             logger.info('Azure: configure field fetched successfully.');
                                         } else {
@@ -328,7 +335,7 @@ exports.connectAzure_ICE = function(req, res) {
 
                             function azure_login_5_listener(channel, message) {
                                 var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Azure_details"].includes(data.onAction)) {
+                                if (icename == data.username && ["unavailableLocalServer", "Azure_details","auto_populate"].includes(data.onAction)) {
                                     redisServer.redisSubServer.removeListener("message", azure_login_5_listener);
                                     if (data.onAction == "unavailableLocalServer") {
                                         logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
@@ -348,6 +355,12 @@ exports.connectAzure_ICE = function(req, res) {
                                             count++;
                                         }
                                     }
+                                    else if (data.onAction == "auto_populate") {
+                                        var resultData = data.value;
+                                        logger.error("Error occurred while fetching data from azure devOps : "+resultData);
+                                        res.status(429).send(resultData);
+                                    }
+
                                 }
                             }
                             redisServer.redisSubServer.on("message", azure_login_5_listener);

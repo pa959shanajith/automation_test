@@ -48,15 +48,20 @@ const CompareBox = props => {
         setCheckAll(localChecks.length===localItems.length);
     }
 
+    const onMapForReplace = () => {
+            props.setReplaceVisible(true);
+        };
+
     return (
         <div className="ss__cmprbox">
-            <div data-test="header"className="ss__cmprHeader">
+            <div data-test="header"className={props.showMapBtn ? "ss__cmprHeader__replace" : "ss__cmprHeader" }>
                 {!props.hideCheckbox && <input className="ss__cmprBoxChk" type="checkbox" onChange={(e)=>updateChecklist('all', e)} checked={checkAll} />}
                 {props.header}
+                {props.showMapBtn && <button className='ss__replaceActionbtn' onClick={onMapForReplace}> Replace </button>}
             </div>
             <div data-test="compareList"className="ss__cmprList" id="cmprObjId">
                 <ScrollBar scrollId="cmprObjId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    {objectList.map( (object, index) => <ScrapeObject key={index} updateChecklist={updateChecklist} hideCheckbox={props.hideCheckbox} notEditable={true} idx={index} object={object} comparedObject={true} />)}
+                    {objectList.length && objectList.map( (object, index) => <ScrapeObject key={index} updateChecklist={updateChecklist} hideCheckbox={props.hideCheckbox} notEditable={true} idx={index} object={object} comparedObject={true} />)}
                 </ScrollBar>
             </div>
         </div>

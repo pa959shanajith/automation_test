@@ -1,5 +1,5 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
-import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap} from '../api';
+import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap, singleExcelToMindmap ,checkExportVer} from '../api';
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
     const [submit,setSubmit] = useState(false)
     const [disableSubmit,setDisableSubmit] = useState(true)
     const [mindmapData,setMindmapData] = useState([])
+    const [gitExportDetails,setGitExportDetails] =useState([])
     
     useEffect(()=>{
         (async()=>{
@@ -36,13 +37,14 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
         title='Import Modules'
         close={()=>setImportPop(false)}
         footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}
-        content={<Container submit={submit} setMindmapData={setMindmapData}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>} 
+        content={<Container submit={submit} setMindmapData={setMindmapData}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui}
+         isMultiImport={isMultiImport} setGitExportDetails={setGitExportDetails} gitExportDetails={gitExportDetails}/>} 
       />
     </>
     )
 }
 
-const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,setDisableSubmit,setError,setSubmit,submit,setOptions,setImportPop,isMultiImport}) => {
+const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,setDisableSubmit,setError,setSubmit,submit,setOptions,setImportPop,isMultiImport,setGitExportDetails,gitExportDetails}) => {
     const dispatch = useDispatch()
     const ftypeRef = useRef()
     const uploadFileRef = useRef()
@@ -56,7 +58,9 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
     const [uploadFileField,setUploadFileField] = useState(false)
-    const [uploadFilezip,setUploadFilezip] = useState("") 
+    const [uploadFilezip,setUploadFilezip] = useState("")   
+    const[comMsgRef,setComMsgRef]=useState("")
+    const expProjRef =useRef()
 
     const upload = (e) => {
         let  project = "";
@@ -83,23 +87,47 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         setDisableSubmit(true)
         setError('')
         if(e.target.value==="zip"){ setUploadFileField(false); resetImportModule();}
-    }
+        if (e.target.value==="git"){ resetImportModule();setComMsgRef("");
+            setDisableSubmit(false)           
+    }}
     const resetImportModule = async() => {
       if(uploadFileRef.current)uploadFileRef.current.value = ''
         if(projRef.current.value) {
             var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
             if (moduledata.length>0){
-                setError('Please select a Project which has no Modules.')                
+                setError('Please select a Project which has no Modules.')
+                gitVerRef.current.value= null                             
                 setUploadFileField(false)
                 setFiledUpload(undefined)
                 setDisableSubmit(true)
+                setComMsgRef("")
                 return
             }
+            else{if (importType==="git"){setDisableSubmit(false)}
         }
         if(projRef.current.value) setUploadFileField(true)
         setSheetList([])
         setFiledUpload(undefined)
         setError('')        
+    }
+    }
+    const resetVersion = async(e) => {
+        setComMsgRef("");
+        gitVerRef.current.value= 'def-val'
+        setGitExportDetails([]);
+        var res = await checkExportVer({"query":"importgit","projectId": expProjRef.current.value})
+            if(res.error){displayError(res.error);return;}
+            setGitExportDetails(res);setDisableSubmit(false)}
+                   
+    
+    const resetcommsg = (e) => {
+        let version=e.target.value
+        for(let i=0;i<gitExportDetails.length;i++){
+            if (gitExportDetails[i]["version"]==version){
+                setComMsgRef(gitExportDetails[i]["commitmessage"])
+            }
+        }
+                   
     }
     const acceptType = {
         pd:".pd",
@@ -111,7 +139,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     useEffect(()=>{
         if(submit){
             setSubmit(false)                              
-            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
+            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitVerRef,sheetRef,expProjRef})
             if(err){
                 setBlockui({show:false})
                 return;
@@ -123,49 +151,60 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
             (async()=>{
                 if(importType === 'git'){
                     // setBlockui({content:'Importing ...',show:true})
+                    setMsg(MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY)
+                    ResetSession.start() 
                     var data = await importGitMindmap ({
+                        expProj: expProjRef.current.value,
                         projectid : projRef.current.value,
-                        gitname : gitconfigRef.current.value,
-                        gitbranch : gitBranchRef.current.value,
-                        gitversion : gitVerRef.current.value,
-                        gitfolderpath : gitPathRef.current.value
+                        projectName:projList[projRef.current.value].name,
+                        // gitname : gitconfigRef.current.value,
+                        // gitbranch : gitBranchRef.current.value,
+                         gitversion : gitVerRef.current.value,
+                        // gitfolderpath : gitPathRef.current.value,
+                        appType: projList[projRef.current.value].apptypeName
                     })
-                    if(data.error){
-                        if(data.error === 'No entries'){
-                            const projectname = projRef.current[projRef.current.selectedIndex].text;
-                            data.error = 'Module does not belong to project '+projectname;
-                        }
-                        setImportPop(false);
-                        displayError(data.error);
+                    if(data.error){ 
+                        if (data.error == "No entries"){displayError({CONTENT:data.error,VARIANT:VARIANT.ERROR});ResetSession.end();
+                        return;}
+                        else{                       
+                        displayError({CONTENT:data.error.CONTENT,VARIANT:VARIANT.ERROR});}
+                        ResetSession.end();
                         return;
                     }
-                    var importProj = data.projectid
-                    if(!importProj || !projList[importProj]){
-                        displayError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
-                        return;
-                    }
-                    var res = await gitToMindmap(data)
-                    if(res.error){setError(res.error);setBlockui({show:false});return;}
+
+                    if(data === "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
+                    if(data === "dupMod"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
+                    if(data === "dupSce"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
+                    if(data === "appType"){setMsg(MSG.MINDMAP.ERR_DIFF_APP_TYPE);setBlockui({show:false,content:''}); ResetSession.end();return;}
+                    // var importProj = data.projectid
+                    // if(!importProj || !projList[importProj]){
+                    //     displayError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
+                    //     return;
+                    // }
+                    // var res = await gitToMindmap(data)
+                    // if(res.error){setError(res.error);setBlockui({show:false});return;}
                     var req={
                         tab:"tabCreate",
                         projectid:data.projectid,
                         version:0,
                         cycId: null,
-                        moduleid:res._id
+                        moduleid:data._id
                     }
                     var res = await getModules(req)
-                    if(res.error){displayError(res.error);return;}
+                    if(res.error){displayError(res.error);ResetSession.end();return;}
                     importData = res
                     setBlockui({show:false})
+                    setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
+                    ResetSession.end();
                 }
                 
-                if(isMultiImport && importType === 'zip'){
+                else if(isMultiImport && importType === 'zip'){
                     // setBlockui({content:'Importing ...',show:true})
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY)
                     ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end(); return;}
+                    if(res.error){displayError({CONTENT:res.error.CONTENT,VARIANT:VARIANT.ERROR});setBlockui({show:false});ResetSession.end(); return;}
                     if(res === "InProgress"){setMsg(MSG.MINDMAP.WARN_IMPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
                     if(res === "dupMod"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
                     if(res === "dupSce"){setMsg(MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA);setBlockui({show:false,content:''}); ResetSession.end();return;}
@@ -178,7 +217,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     }
                     res = await getModules(req)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end();return;}
+                    if(res.error){displayError({CONTENT:res.error,VARIANT:VARIANT.ERROR});setBlockui({show:false});ResetSession.end();return;}
                     setFiledUpload(res)
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                     setBlockui({show:false})
@@ -235,8 +274,9 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                     <option value={'def-val'} disabled>Select Import Format</option>
                     {/* <option value={'pd'}>AvoDiscovery (.pd)</option> */}
-                    <option value={'excel'}>Structure only - Excel(.xls,.xlsx)</option>
-                    {/* <option value={'git'}>Git (.mm)</option>  */}                    
+                    <option value={'excel'}>Multi module Structure only - Excel(.xls,.xlsx)</option>
+                    <option value={'xls'}> Single module Structure only - Excel(.xls,.xlsx)</option>
+                    <option value={'git'}>Git</option>                     
 					<option value={'json'}>Structure only - Json (.json)</option>
                     <option value={'zip'}>Complete Module(S) (.zip)</option>
                 </select>
@@ -269,31 +309,45 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         <Fragment>
                             <div>
                                 <label>Project: </label>
-                                <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
+                                <select className='imp-inp' onChange={resetVersion} defaultValue={'def-val'} ref={expProjRef}>
                                     <option value={'def-val'} disabled>Select Project</option>
                                     {Object.entries(projList).map((e,i)=>
                                     <option value={e[1].id} key={i}>{e[1].name}</option>
                                 )}
                                 </select>
                             </div>
-                            <div>
+                            {/* <div>
                                 <label>Git Configuration: </label>
                                 <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Git configuration name'} ref={gitconfigRef}/>
-                            </div>
-                            <div>
+                            </div> */}
+                            {/* <div>
                                 <label>Git Branch: </label>
                                 <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Branch name'} ref={gitBranchRef}/>
-                            </div>
+                            </div>*/}
                             <div>
                                 <label>Version: </label>
-                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version'} ref={gitVerRef}/>
+                                <select className='imp-inp'  onChange={resetcommsg} defaultValue={'def-val'} ref={gitVerRef} title= {comMsgRef}>
+                                <option value={'def-val'} disabled>Select Version</option>
+                                    {Object.entries(gitExportDetails).map((e,i)=>
+                                    <option value={e[1].id} key={i}>{e[1].version}</option>
+                                    )}
+                                </select>
                             </div>
                             <div>
+                                <label>Import into: </label>
+                                <select className='imp-inp'  onChange={resetImportModule} defaultValue={'def-val'} ref={projRef}>
+                                    <option value={'def-val'} disabled>Select Import Project</option>
+                                    {Object.entries(projList).map((e,i)=>
+                                    <option value={e[1].id} key={i}>{e[1].name}</option>
+                                )}
+                                </select>
+                            </div>
+                            {/*<div>
                                 <label>Folder Path: </label>
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
-                            </div>
+                            </div> */}
                         </Fragment>:
-                        (<>{uploadFileField || (["excel","json"].includes(importType))?<div>
+                        (<>{uploadFileField || (["excel","json","xls"].includes(importType))?<div>
                             <label>Upload File: </label>
                             <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="zip"} type='file' onChange={(e) => upload(e)} ref={uploadFileRef}/>
                             </div>:null}</>)
@@ -366,6 +420,26 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     </div>
                     </Fragment>
                     :null}
+                    {(importType==='xls')?
+                    <Fragment>
+                    <div>
+                        <label>Project: </label>
+                        <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
+                            <option value={'def-val'} disabled>Select Project</option>
+                            {Object.entries(projList).map((e,i)=>
+                            <option value={e[1].id} key={i}>{e[1].name}</option>
+                        )}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Select Sheet: </label>
+                        <select defaultValue={"def-val"} ref={sheetRef}>
+                            <option value="def-val" disabled>Please Select Sheet</option>
+                            {sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
+                        </select>
+                    </div>
+                    </Fragment>
+                    :null}
                 </Fragment>
             }
         </div>
@@ -383,9 +457,9 @@ const Footer = ({error,setSubmit,disableSubmit}) =>{
     )
 }
 
-const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef}) =>{
+const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitVerRef,sheetRef,expProjRef}) =>{
     var err = false;
-    [ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
+    [ftypeRef,uploadFileRef,projRef,gitconfigRef,gitVerRef,sheetRef,expProjRef].forEach((e)=>{
         if(e.current){
             e.current.style.border = '1px solid black';
             if(e.current.value === 'def-val' || e.current.value === ''){
@@ -409,31 +483,27 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
     var mindmapData = importData
     // console.log("ImportProj: " + importProj)
     // setBlockui({content:'Importing ...',show:true})
-    // if(importType === 'excel'){
-    //     let validateNode = true;
-    //     var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheet,"importProj":importProj})
-    //     if(res.error){displayError(res.error);return;}
-    //     else{
-    //         var importexcel = await jsonToMindmap({"data":"importexcel","importproj":importProj})
-    //     if(importexcel.error){displayError(importexcel.error);return;}}
-    //     res.forEach((e, i) =>{
-    //         if (!validNodeDetails(e.name)) validateNode = false;
-    //     });
-    //     if(!validateNode){
-    //         changeImportType({target: {value: "excel"}});
-    //         displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
-    //     }
-
-         
-        
-    // }
-    if(importType === 'pd'){
-        var res =  await pdProcess({'projectid':importProj,'file':importData})
+    if(importType === 'xls'){
+        let validateNode = true;
+        var res = await singleExcelToMindmap({'content':importData,'flag':'data',sheetname: sheet})
         if(res.error){displayError(res.error);return;}
-        var data = getJsonPd(res.data)
-        mindmapData = {createnew:true,importData:{createdby:'pd',data:data}}
+        res.forEach((e, i) =>{
+            if (!validNodeDetails(e.name)) validateNode = false;
+        });
+        if(!validateNode){
+            changeImportType({target: {value: "excel"}});
+            displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
+        }
+        mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
+        
     }
-	// if(importType === 'json'){
+    // if(importType === 'pd'){
+    //     var res =  await pdProcess({'projectid':importProj,'file':importData})
+    //     if(res.error){displayError(res.error);return;}
+    //     var data = getJsonPd(res.data)
+    //     mindmapData = {createnew:true,importData:{createdby:'pd',data:data}}
+    // }
+	// if(importType === 'sel'){
     //     var res =  await pdProcess({'projectid':importProj,'file':importData})
     //     if(res.error){displayError(res.error);return;}
     //     var data = getJsonPd(res.data)
@@ -632,15 +702,15 @@ function read(file) {
     })
 }
 
-// const validNodeDetails = (value) =>{
-//     var nName, flag = !0;
-//     nName = value;
-//     var regex = /^[a-zA-Z0-9_]*$/;;
-//     if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName== 'Screen_0' || nName == 'Scenario_0' || nName == 'Testcase_0') {
-//         flag = !1;
-//     }
-//     return flag;
-// };
+const validNodeDetails = (value) =>{
+    var nName, flag = !0;
+    nName = value;
+    var regex = /^[a-zA-Z0-9_]*$/;;
+    if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName== 'Screen_0' || nName == 'Scenario_0' || nName == 'Testcase_0') {
+        flag = !1;
+    }
+    return flag;
+};
 
 
 ImportMindmap.propTypes={

@@ -629,10 +629,11 @@ exports.excelToMindmap = function (req, res){
 				if (i==4){return res.status(200).send("fail");}
 			});
 			for (let i = 0; i < cSheetRow.length; i++) {
-				row=cSheetRow[i].split(",")
-				excelrows.push(row)
-
-
+				if(cSheetRow[i] ==",,,"){
+					break
+				}
+				else{row=cSheetRow[i].split(",")
+				excelrows.push(row)}								
 			}
 			var scenarios=[]
 			var modules=[]
@@ -802,17 +803,19 @@ exports.excelToMindmap = function (req, res){
 				}
 			
 			}
-		let user =  req.session.username;
+		let userid =  req.session.userid;
 		let impPath = path.join(__dirname,'../../assets/ImportMindmap')
-		user = user.split('.').join("");
+		if (!fs.existsSync(impPath)) {
+			fs.mkdirSync(impPath);
+		  }
 		importFolderPath= impPath+"/"+"excel"
 		if (!fs.existsSync(importFolderPath)) {
 			fs.mkdirSync(importFolderPath);
-		  }
-		let importPath=importFolderPath+"/"+user+".json"
+		}
+		let importPath=importFolderPath+"/"+userid+".json"
 		if (fs.existsSync(importPath)) {
 			fs.unlinkSync(importPath)
-		  }		
+		}		
 		writedata=fs.writeFile(importPath, JSON.stringify(dataRows), (err) => {
 			if (err) {
 				res.status(500).send("fail")
@@ -989,22 +992,30 @@ exports.exportToGit = async (req, res) => {
 	logger.info("Inside UI service: " + actionName);
 	try {
 		const data = req.body;
-		const gitname = data.gitconfig;
+		// const gitname = data.gitconfig;
 		const gitVersion = data.gitVersion;
-		var gitFolderPath = data.gitFolderPath;
-		const gitBranch = data.gitBranch;
+		// var gitFolderPath = data.gitFolderPath;
+		// const gitBranch = data.gitBranch;
 		const moduleId = data.mindmapId;
-		if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
-			gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
-		}
+		const exportProjAppType=data.exportProjAppType;
+		const projectId =data.projectId;
+		const gitComMsgRef = data.gitComMsgRef;
+		const projectName =data.projectName;
+		// if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
+		// 	gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
+		// }
 		const inputs = {
 			"moduleId":moduleId,
 			"userid":req.session.userid,
 			"action":actionName,
-			"gitname":gitname,
-			"gitBranch":gitBranch,
+			// "gitname":gitname,
+			// "gitBranch":gitBranch,
 			"gitVersion": gitVersion,
-			"gitFolderPath": gitFolderPath
+			// "gitFolderPath": gitFolderPath,
+			"exportProjAppType":exportProjAppType,
+			"projectId":projectId,
+			"gitComMsgRef":gitComMsgRef,
+			"projectName":projectName
 		};
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
 		return res.send(module_data);
@@ -1041,30 +1052,32 @@ exports.exportMindmap = async (req, res) => {
 		const mindmapId = req.body.mindmapId["moduleid"];
 		const exportProjAppType=req.body.mindmapId["exportProjAppType"];
 		const exportedFilePath = path.join(__dirname,'../../assets/ExportMindmap');
-		var username=req.session.username;
-		username = username.split('.').join("");
+		if (!fs.existsSync(exportedFilePath)) {
+			fs.mkdirSync(exportedFilePath);
+		}
+		var userid=req.session.userid;
 		const inputs= {
 			"mindmapId": mindmapId,
 			"query":"exportMindmap",
-			"username":username,
+			"userid":userid,
 			"exportProjAppType":exportProjAppType
 		}
 		const result = await utils.fetchData(inputs, "mindmap/exportMindmap", fnName);
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
-			let zip_path = exportedFilePath+'/'+username+'.zip'
+			let zip_path = exportedFilePath+'/'+userid+'.zip'
 			const archive = archiver('zip', { zlib: { level: 9 }});
 			const stream = fs.createWriteStream(zip_path);
 			stream.on('close', ()=>{
-				removeDir(exportedFilePath+'/'+username);
+				removeDir(exportedFilePath+'/'+userid);
 				// res.writeHead(200, {
 				// 	'Content-Type' : 'application/zip',
 				// });
 				var filestream = fs.createReadStream(zip_path);
 				filestream.pipe(res);
 			})
-			archive.directory(exportedFilePath+'/'+username, false).pipe(stream);
+			archive.directory(exportedFilePath+'/'+userid, false).pipe(stream);
 			archive.finalize();
 			return res.send(result);
 		}
@@ -1083,13 +1096,20 @@ exports.importMindmap = async (req, res) => {
 		var userroleid = req.session.activeRoleId;
 		const inputs= {
 			"projectid": content["projid"],			
-			"query":"importMindmap",			
-			"user":req.session.username,			
+			"query":"importMindmap",						
 			"userid":userid,
 			"role":userroleid
 		}
 		const result = await utils.fetchData(inputs, "mindmap/importMindmap", fnName);
-		res.send(result)
+		if (result == "fail") {
+			return res.send("fail");
+		} else {			
+			let impPath = path.join(__dirname,'../../assets/ImportMindmap/'+userid)
+			if (fs.existsSync(impPath)) {				
+				await fs.rmdirSync(impPath, { recursive: true});
+			}
+			return res.send(result);
+		}
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
@@ -1100,18 +1120,19 @@ exports.writeZipFileServer = async(req,res) => {
 	const fnName = "writeZipFileServer";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		let user =  req.session.username;
-		let filepath = configpath.importMindmap;
-		user = user.split('.').join("");
-		const filePath = req.file.path;
-
+		let userid =  req.session.userid;	
+			
 		// Check if request contains a ZIP file
 		if (req.file && path.extname(req.file.originalname) === '.zip') {
 			// Create target directory for extracted files
-			const targetDir = path.join(__dirname, '../../assets/ImportMindmap/'+user);
+			const importZip=path.join(__dirname, '../../assets/ImportMindmap');
+			if (!fs.existsSync(importZip)) {				
+				fs.mkdirSync(importZip);
+			}
+			const targetDir = path.join(__dirname, '../../assets/ImportMindmap/'+userid);
 			if (fs.existsSync(targetDir)) {				
-				await fs.rmSync(targetDir, { recursive: true, force: true });
-			  }
+				await fs.rmdirSync(targetDir,{ recursive: true});
+			}
 			if (!fs.existsSync(targetDir)) {				
 			  fs.mkdirSync(targetDir);
 			}
@@ -1130,11 +1151,11 @@ exports.writeZipFileServer = async(req,res) => {
 			});
 			await unzipStream.on('close', async () => {
 				let jsonResponse = {msg : 'Files extracted successfully',appType:''};
-				let jsonModpath=targetDir +'\\'+ 'Modules.json';
-				let jsontscpath=targetDir +'\\'+ 'Testscenarios.json';
-				let jsonscrpath=targetDir +'\\'+ 'screens.json';
-				let jsontcpath=targetDir +'\\'+ 'Testcases.json';
-				let jsondobpath=targetDir +'\\'+ 'Dataobjects.json';
+				let jsonModpath=targetDir +'/'+ 'Modules.json';
+				let jsontscpath=targetDir +'/'+ 'Testscenarios.json';
+				let jsonscrpath=targetDir +'/'+ 'screens.json';
+				let jsontcpath=targetDir +'/'+ 'Testcases.json';
+				let jsondobpath=targetDir +'/'+ 'Dataobjects.json';
 				if (fs.existsSync(jsonModpath) && fs.existsSync(jsontscpath) && fs.existsSync(jsonscrpath) && fs.existsSync(jsontcpath) ) {
 					fs.readFile(jsontscpath, 'utf8', (err, data) => {
 						if (err) throw err;
@@ -1208,14 +1229,16 @@ exports.writeFileServer = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		let data = req.body;
-		let user =  req.session.username;
-		user = user.split('.').join("");
-		let importFolderJPath = path.join(__dirname,'../../assets/ImportMindmap')+"/"+"json";
-		let importPath=importFolderJPath +"/"+user+".json"
-		
-		if (data.status=="start" && data.type=="json"){			
+		let userid=req.session.userid;
+		let importFolderJPath = path.join(__dirname,'../../assets/ImportMindmap');
+		let importJsonPath = path.join(__dirname,'../../assets/ImportMindmap')+"/"+"json";
+		let importPath=importJsonPath +"/"+userid+".json"		
+		if (data.status=="start" && data.type=="json"){						
 			if (!fs.existsSync(importFolderJPath)) {
 				fs.mkdirSync(importFolderJPath);
+			}
+			if (!fs.existsSync(importJsonPath)) {
+				fs.mkdirSync(importJsonPath);
 			}
 			if (fs.existsSync(importPath)) {
 				fs.unlinkSync(importPath)
@@ -1285,25 +1308,31 @@ exports.importGitMindmap = async (req, res) => {
 	const fnName = "importGitMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
+		const expProj = req.body.expProj;
 		const projectid = req.body.projectid;
-		const gitname = req.body.gitname;
-		const gitbranch = req.body.gitbranch;
+		// const gitname = req.body.gitname;
+		// const gitbranch = req.body.gitbranch;
 		const gitversion = req.body.gitversion;
-		var gitfolderpath = req.body.gitfolderpath;
-		if(!gitfolderpath.startsWith("avoassuretest_artifacts")){
-			gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
-		}
+		// var gitfolderpath = req.body.gitfolderpath;
+		var appType= req.body.appType;		
+		var projectName = req.body.projectName;
+		// if(!gitfolderpath.startsWith("avoassuretest_artifacts")){
+		// 	gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
+		// }
 		const inputs= {
 			"userid": req.session.userid,
 			"roleid": req.session.activeRoleId,
 			"projectid": projectid,
-			"gitname": gitname,
-			"gitbranch": gitbranch,
-			"gitversion": gitversion,
-			"gitfolderpath": gitfolderpath
+			// "gitname": gitname,
+			// "gitbranch": gitbranch,
+			 "gitversion": gitversion,
+			// "gitfolderpath": gitfolderpath,
+			"appType":appType,			
+			"projectName":projectName,
+			"expProj":expProj
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
-		res.send(result)
+		return res.send(result)
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
@@ -1472,13 +1501,11 @@ exports.jsonToMindmap = async (req, res) => {
 	const fnName = "jsonToMindmap";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		var username = req.session.username;
 		var importproj = req.body["mindmapId"]["importproj"]
 		var importtype=req.body["mindmapId"]["type"]		
 		var userid = req.session.userid;
 		var userroleid = req.session.activeRoleId;
 		const inputs= {
-			"username": username,
 			"importproj":importproj,
 			"userid":userid,
 			"role":userroleid,
@@ -1488,6 +1515,10 @@ exports.jsonToMindmap = async (req, res) => {
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
+			let impPath = path.join(__dirname,'../../assets/ImportMindmap/'+importtype+"/"+userid+".json")
+			if (fs.existsSync(impPath)) {
+				fs.unlinkSync(impPath)
+			}
 			return res.send(result);
 		}
 	} catch(exception) {
@@ -1503,3 +1534,99 @@ exports.dropTempExpImpColl = async () => {
     if (result == "fail") logger.error( fnName + " : Error occured while deleting Temporary collections");
     else logger.info( fnName + " :Temporary collections got deleted successfully");
 }
+exports.singleExcelToMindmap = function (req, res) {
+	const fnName = "excelToMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var numSheets = myCSV.length / 2;
+		var qObj = [];
+		var err;
+		if (numSheets == 0) {
+			return res.status(200).send("emptySheet");
+		}
+		for (var k = 0; k < numSheets; k++) {
+			var cSheet = myCSV[k * 2 + 1];
+			var cSheetRow = cSheet.split('\n');
+			var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
+			var uniqueIndex = 0;
+			cSheetRow[0].split(',').forEach(function (e, i) {
+				if(i== 0 && e.toLowerCase()=="module") modIdx = i;
+				if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+				if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
+				if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+			});
+			if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
+				err = true;
+				break;
+			}
+			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
+			for (var i = 1; i < cSheetRow.length; i++) {
+				var row = cSheetRow[i].split(',');
+				if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]=="")) {
+					return res.status(200).send('valueError');
+				}
+				if (row.length < 3) continue;
+				if (row[modIdx] !== '') {
+					if (i == 1){
+					e = { id: uuidV4(), name: row[modIdx], type: 0 };
+					qObj.push(e);}
+					else{return res.status(200).send('Multiple modules');}
+				}
+				if (row[scoIdx] !== '') {
+					lastSco = uniqueIndex; lastScr = -1; scrDict = {};
+					e = { id: uuidV4(), name: row[scoIdx], type: 1 };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
+				if (row[scrIdx] !== '' && lastSco != -1) {
+					var tName = row[scrIdx];
+					var lScr = qObj[lastScr];
+					if (lScr === undefined || (lScr)) {
+						if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
+						lastScr = uniqueIndex;
+						e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
+						qObj.push(e);
+						nodeDict[e.id] = uniqueIndex;
+						uniqueIndex++;
+					}
+				}
+				if (row[sctIdx] !== '' && lastScr != -1) {
+					e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
+			}
+		}
+		if (err) res.status(200).send('fail');
+		else res.status(200).send(qObj);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.checkExportVer = async (req, res) => {
+	const fnName = "checkExportVer";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const exportname= req.body.exportname;
+		const query = req.body.query;
+		const projectId = req.body.projectId || "default"
+		const inputs= { "exportname":exportname,"query": query,"projectId":projectId}
+		const result = await utils.fetchData(inputs, "git/checkExportVer", fnName);
+		if (result == "fail") {
+			return res.send('fail');}
+		else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};

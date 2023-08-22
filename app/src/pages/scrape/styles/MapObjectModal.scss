@@ -107,16 +107,18 @@
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content:start;
     height: 28px;
     overflow: hidden;
     white-space: nowrap !important;
     text-overflow: ellipsis;
+    padding: 3px;
 }
 
 .mo_tagItemList{
-    margin: 10px 0 15px;
-    width: 60%
+    margin: 11px 0 14px;
+    margin-right: 27px;
+    width: 70%;
 }
 
 .mo_mappedName{
@@ -148,4 +150,19 @@
 .mo_errorMsg{
     font-size: 14px;
     color: $red;
+}
+.mo_tagItems_rep{
+    border: 1px solid $borderTwo;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content:start;
+    height: 28px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    padding: 3px;
+    width: 100%;
 }

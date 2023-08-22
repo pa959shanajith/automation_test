@@ -20,6 +20,7 @@ const initialState = {
     toDeleteScenarios: [],
     appType:undefined,
     savedList:false,
+    dontShowFirstModule:false,
     enableExport:false,
     exportProjname:"",
     enableExportMindmapButton:true
@@ -104,7 +105,7 @@ const reducer = (state = initialState , action) => {
                 screenData: action.payload.screendata,
                 deletedNodes: [],
                 moduleList: action.payload.moduledata,
-                selectedModule: {},
+                selectedModule: action.payload.moduleselected,
                 selectedModulelist: [],
                 scenarioList:[],
                 unassignTask:[]
@@ -139,6 +140,11 @@ const reducer = (state = initialState , action) => {
                     ...state,
                     savedList: action.payload
                 }
+                case actionTypes.Dont_Show_First_Module:
+                    return{
+                        ...state,
+                        dontShowFirstModule: action.payload
+                    }
         case actionTypes.ENABLE_EXPORT_BUTTON:
                     return{
                         ...state,

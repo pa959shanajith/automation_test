@@ -21,7 +21,7 @@
     font-size: 14px;
     color: $darkGray;
     margin-left: 10px;
-    width: 85%;
+    width: 73%;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -34,7 +34,7 @@
     display: flex;
     align-items: center;
     margin-left: 10px;
-    width: 100%;
+    width: 25%;
 }
 
 .ss_obj_chkbx{
@@ -79,3 +79,19 @@
     border-left: 15px solid transparent;
     border-bottom: 15px solid #997cb8;
   }
+.arrow-bottom:after {
+    content: " ";
+    position: absolute;
+    left: 40%;
+    /* top: -14px; */
+    bottom: -12px;
+    border: 15px solid transparent;
+    border-bottom: none;
+    border-top: 15px solid #997cb8;
+    }
+    .p-datatable-table{
+      width: 100%;
+    }
+    .p-datatable .p-datatable-tbody>tr>td{
+      padding:'0.75rem'
+    }

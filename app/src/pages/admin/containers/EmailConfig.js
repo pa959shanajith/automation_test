@@ -29,7 +29,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
     useEffect(()=>{
         //on reload mount component back
         if(reload){
-            const Ref = {"toggleStatus":createRef(),"toggleUppdate":createRef(),"toggleTest":createRef(''),"servername": createRef(),"serverstatus":createRef(),"host":createRef(),"port":createRef(),"authname":createRef(),
+            const Ref = {"toggleStatus":createRef(),"toggleUppdate":createRef(),"toggleTest":createRef(''),"servername": createRef(),"serverstatus":createRef(),"smtpHost":createRef(),"smtpPort":createRef(),"authname":createRef(),
             "authpassword":createRef(),"sendername":createRef(),"senderaddr":createRef(),"assureurl":createRef(),
             "conctimeout":createRef(),"grettimeout":createRef(),"socktimeout":createRef(),"maxconnection":createRef(),"maxmessages":createRef(),
             "proxyurl":createRef(),"proxyuser":createRef(),"proxypass":createRef(),"selectauth":createRef(),"selectprovider":createRef(),
@@ -90,8 +90,8 @@ const EmailConfig = ({resetMiddleScreen}) => {
                     <label>Status</label>
                     <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>
                 </div>
-                <FormInput inpRef={inputRef['host']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
-                <FormInput inpRef={inputRef['port']} label={'Port'} placeholder={'Server Port'}/>
+                <FormInput inpRef={inputRef['smtpHost']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
+                <FormInput inpRef={inputRef['smtpPort']} label={'Port'} placeholder={'Server Port'}/>
                 <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} label={"Authentication"} option={['none','basic']}/>
                 <FormInput inpRef={inputRef['authname']} label={'Authentication Username'} placeholder={'Authentication Username'}/>
                 <FormInput inpRef={inputRef['authpassword']} label={'Authentication Password'} placeholder={'Authentication Password'}/>
@@ -218,8 +218,8 @@ const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,sh
         inputRef.toggleUppdate.current.innerText = 'Update'
         inputRef.servername.current.value = data.name
         if(data.name)inputRef.servername.current.readOnly = true
-        inputRef.host.current.value = data.host
-        inputRef.port.current.value = data.port
+        inputRef.smtpHost.current.value = data.smtpHost ? data.smtpHost : data.host
+        inputRef.smtpPort.current.value = data.smtpPort ? data.smtpPort : data.port
         inputRef.serverstatus.current.innerText = data.active?'Active':'InActive'
         inputRef.serverstatus.current.style.color = data.active?'green':'red'
         inputRef.toggleStatus.current.innerText = data.active?"Disable":"Enable"
@@ -308,8 +308,8 @@ const getConfObj = (inputRef) => {
         channel: 'email',
         provider: 'smtp',
         name: inputRef.servername.current.value,
-        host: inputRef.host.current.value,
-        port: inputRef.port.current.value,
+        smtpHost: inputRef.smtpHost.current.value,
+        smtpPort: inputRef.smtpPort.current.value,
         auth: {
             type:inputRef.selectauth.current.value,
             username:inputRef.authname.current.value,
@@ -365,7 +365,7 @@ const validate = (inputRef,displayError)=> {
     // eslint-disable-next-line
     const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     
-    var arr = ['selectprovider','selectauth','host','servername','port','sendername','senderaddr','assureurl']
+    var arr = ['selectprovider','selectauth','smtpHost','servername','smtpPort','sendername','senderaddr','assureurl']
     if(inputRef.checkproxyurl.current.value === 'true'){
         arr.push('proxyurl')
         if(inputRef.checkproxycred.current.value === 'true')arr.push('proxyuser','proxypass')
@@ -380,7 +380,7 @@ const validate = (inputRef,displayError)=> {
             if (!popped) displayError(MSG.ADMIN.WARN_INVALID_SERVER_NAME);
             flag = false;
             popped = true;
-        }else if(e === 'port' && !((+inputRef[e].current.value  >= 0) && (+inputRef[e].current.value  < 65536))){
+        }else if(e === 'smtpPort' && !((+inputRef[e].current.value  >= 0) && (+inputRef[e].current.value  < 65536))){
             inputRef[e].current.style.outline = errBorder
             if (!popped) displayError(MSG.ADMIN.WARN_SERVER_PORT);
             flag = false;

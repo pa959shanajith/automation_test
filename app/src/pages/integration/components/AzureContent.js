@@ -20,7 +20,7 @@ const AzureContent = props => {
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
     const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
     const selectedTC = useSelector(state=>state.integration.selectedTestCase);
-    const [releaseId, setReleaseId] = useState('');
+    const [releaseId, setReleaseId] = useState('Select WorkItems');
     const [projectDetails , setProjectDetails]=useState({});
     const [avoProjects , setAvoProjects]= useState(null);
     const [scenarioArr , setScenarioArr] = useState(false);
@@ -64,7 +64,7 @@ const AzureContent = props => {
     const [totalStoriesCount, setTotalStoriesCount] = useState(0)
     const [pageSize, setPageSize] = useState(100);
     const [showCustmBtn,setShowCustmBtn] = useState(true);
- 
+    const [pageLimit,setPageLimit] = useState(['1-100'])
 
     // const callProjectDetails_ICE=async(e)=>{
     //     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
@@ -121,9 +121,15 @@ const AzureContent = props => {
         let apiObj = Object.assign({"action": azureapiKeys.stories},azureLogin,selectedProject,{'skip':e.skip || 0});
         const workItemsDetails = await api.connectAzure_ICE(apiObj);
         if(workItemsDetails && workItemsDetails.userStories){
-            setUserStories(workItemsDetails.userStories);
+            const newArray = userStories.concat(workItemsDetails.userStories)
+            setUserStories(newArray);
             setStoriesToDisplay(workItemsDetails.userStories.slice(0,9));
-            setTotalRecords(workItemsDetails.userStories.length);
+            if(e && e.currPage){
+                const startIndex = e.currPage * recordsPerPage;
+                const endIndex = startIndex + recordsPerPage;
+                setStoriesToDisplay(newArray.slice(startIndex,endIndex));
+            }
+            setTotalRecords(workItemsDetails.total_count)
             setIsShowPagination(true);
             setTotalStoriesCount(workItemsDetails.total_count)
         }
@@ -309,6 +315,16 @@ const AzureContent = props => {
         setProjectDropdn1(event.target.value);
         setSelectedProject({projectdetails:{id:event.target.value,name:selectedOption.title}});
         setSecondDropdownEnabled(true);
+        // setWorkItemsTitle([{id:1,name:'Story'},{id:2,name:'TestPlans'}]);
+        setReleaseId('Select WorkItems')
+        setUserStories([]);
+        setTestSuites([]);
+        setStoriesToDisplay([]);
+        setTestsToDisplay([]);
+        setTestPlansDropdown([]);
+        setSelectedTestplan('');
+        setIsShowPagination(false)
+        setIsShowTestplan(false);
     }
    return;
   };
@@ -357,6 +373,9 @@ const AzureContent = props => {
   const onPageChange = (e) =>{
     setCurrentPage(e.page);
     setSkipItem(e.first);
+    if( secondOption === 'Story'){
+        checkPaginator(e);
+    }
     const isLastPage = e.page === Math.ceil(totalRecords / recordsPerPage) - 1;
     setIsLastPage(isLastPage);
     const startIndex = e.page * recordsPerPage;
@@ -365,15 +384,29 @@ const AzureContent = props => {
     
   }
 
-  const handlePrevNext = (btnType) => {
-    setCurrentPage(0);setIsLastPage(false);
+  const checkPaginator = (e) => {
+    const findPageLimit = pageLimit[0].split('-');
+    let pageNumber = (e.page + 1) * 10;
+    if( pageNumber > userStories.length && pageNumber > parseInt(findPageLimit[1])){
+        let set_pagelimit = parseInt(findPageLimit[1]) + '-' + (parseInt(findPageLimit[1])+pageSize);
+        setPageLimit([set_pagelimit]);
+        handlePrevNext('next',e.page) 
+    }
+    if(pageNumber > userStories.length && pageNumber < parseInt(findPageLimit[0])){
+        let set_pagelimit = (parseInt(findPageLimit[0])-pageSize) + '-' + parseInt(findPageLimit[0]) 
+        setPageLimit([set_pagelimit]);
+        handlePrevNext('prev',e.page)
+    }
+  }
+
+  const handlePrevNext = (btnType,currPage) => {
     if(btnType === 'prev'){
         setSkipRecord(skipRecord-pageSize);
-        getWorkItems({skip:skipRecord-pageSize});
+        getWorkItems({skip:skipRecord-pageSize,currPage:currPage});
     }
     if(btnType === 'next'){
         setSkipRecord(skipRecord+pageSize);
-        getWorkItems({skip:skipRecord+pageSize});
+        getWorkItems({skip:skipRecord+pageSize,currPage:currPage});
     }
 
   }
@@ -395,20 +428,16 @@ const AzureContent = props => {
                     <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>{setRelease(true) ;onProjectSelect(e);handleFirstOptionChange(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} >
                         <option value="Select Project" disabled >Select Project</option>
                         { props &&  props.domainDetails ? 
-                            
                             props.domainDetails.projects.map(e => (<option  key={e.id} value={e.id} title={e.name}>{e.name} </option>)) : null
-                            
                         }
                        
                     </select>
                     
                      }
-
-
                      selectWorkitem={
                         <>
                         <select data-test="intg_Zephyr_project_drpdwn"value={releaseId} onChange={(e)=>{setReleaseId(e.target.value);handleSecondOptionChange(e);}} className="qcSelectDomain" style={{marginRight : "5px"}} disabled={!secondDropdownEnabled}>
-                            <option value="Select WorkItems"  >Select WorkItems</option>
+                            <option value="Select WorkItems" disabled>Select WorkItems</option>
                             {
                                 // props.domainDetails.issue_types
                                 workItemsTitle.map(e => (<option key={e.id} value={e.name} title={e.name} onChange={(e)=> {setReleaseId(e.target.value); }} >{e.name}  </option>))
@@ -517,26 +546,28 @@ const AzureContent = props => {
                 Pagination={ isShowPagination &&
                     <div className="pagination-controls-container"><div className="pagination-controls" 
                     style={{display: (secondOption === 'Story' && userStories && !userStories.length ) || (secondOption === 'TestPlans' && testSuites && !testSuites.length ) ?'none':''}}>
-                            <div className="cstm-prevbtn" style={{display:showCustmBtn?'':'none'}}>
+                            {/* <div className="cstm-prevbtn" style={{display:showCustmBtn?'':'none'}}>
                             <button style={!skipRecord ?{ pointerEvents: 'none' } : null} disabled={!skipRecord ?true:false} className="custom-button previous-btn round" onClick={(e) => handlePrevNext('prev')} >
                                 <span class="p-paginator-icon pi pi-angle-double-left"></span>
                             </button>
-                            </div>
-                        
+                            </div> */}
+                        {/* { currentPage < 4 && (  */}
                             <Paginator
                                 className='custom-paginator'
                                 first={currentPage * recordsPerPage}
                                 rows={recordsPerPage}
                                 totalRecords={totalRecords}
+                                pageLinkSize={8}
                                 rowsPerPageOptions={[10, 20, 30]}
                                 onPageChange={onPageChange}
                                 
                             />
-                        <div className="cstm-nxtbtn" style={{display:showCustmBtn?'':'none'}}>
+                             {/* )} */}
+                        {/* <div className="cstm-nxtbtn" style={{display:showCustmBtn?'':'none'}}>
                             <button style={!isLastPage || ((skipRecord+totalRecords) === totalStoriesCount) ? { pointerEvents: 'none' } : null} disabled={!isLastPage || ((skipRecord+totalRecords) === totalStoriesCount) ? true: false} className="custom-button next-btn round" onClick={(e) => handlePrevNext('next')} >
                                 <span class="p-paginator-icon pi pi-angle-double-right"></span>
                             </button>
-                        </div>
+                        </div> */}
                         </div></div>
                 }
                

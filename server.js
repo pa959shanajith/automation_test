@@ -187,6 +187,7 @@ if (cluster.isMaster) {
 			const report = require('./server/controllers/report');
 			const zephyr = require('./server/controllers/zephyr');
 			const executionInvoker = require('./server/lib/execution/executionInvoker');
+			const redisSocketHandler = require('./server/lib/redisSocketHandler');
 			req.session.executionInvoker = executionInvoker.setReq(req)
 			req.session.zephyr = zephyr.setReq(req)
 			req.session.report = report.setReq(req)
@@ -199,6 +200,7 @@ if (cluster.isMaster) {
 			req.session.create_ice = create_ice.setReq(req)
 			req.session.utils = utils.setReq(req)
 			req.session.admin = admin.setReq(req)
+			req.session.redisSocketHandler = redisSocketHandler.setReq(req)
 			next();	
 		});
 
@@ -253,7 +255,8 @@ if (cluster.isMaster) {
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);		
-
+		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
+		
 		app.use(csrf({
 			cookie: true
 		}));
@@ -368,9 +371,8 @@ if (cluster.isMaster) {
 			let projName = req.query.projName	
 			projName = projName.replace(/\s+/g, '');
 			let exportfile =path.join(__dirname,'./assets/ExportMindmap')
-			let username = req.user.username;
-			username = username.split('.').join("");
-			exportfile=exportfile+"/"+username+".zip";
+			let userid = req.session.userid;
+			exportfile=exportfile+"/"+userid+".zip";
 			var dateObj = new Date();
 			var month = dateObj.getUTCMonth() + 1;
 			var day = dateObj.getUTCDate();
@@ -464,6 +466,8 @@ if (cluster.isMaster) {
 		var flowGraph = require('./server/controllers/flowGraph');
 		var devOps = require('./server/controllers/devOps');
 		var azure = require('./server/controllers/azure');
+		var SauceLab = require('./server/controllers/sauceLab');
+
 
 
 		//-------------Route Mapping-------------//
@@ -493,6 +497,8 @@ if (cluster.isMaster) {
 		app.post('/writeZipFileServer', auth.protect,upload.single('file'),mindmap.writeZipFileServer);
 		app.post('/exportToMMSkel', auth.protect, mindmap.exportToMMSkel);
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
+		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
+		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -565,6 +571,7 @@ if (cluster.isMaster) {
 		app.post('/updateNotificationConfiguration', auth.protect, mindmap.updateNotificationConfiguration);
 		app.post('/getNotificationConfiguration', auth.protect, mindmap.getNotificationConfiguration);
 		app.post('/getNotificationRules', auth.protect, mindmap.getNotificationRules);
+		app.post('/sendMailOnExecutionStart', auth.protect, devOps.sendMailOnExecutionStart)
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);
@@ -576,6 +583,8 @@ if (cluster.isMaster) {
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
 		app.post('/importScreenfromExcel', auth.protect, designscreen.importScreenfromExcel);
 		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
+		app.post('/getDeviceSerialNumber_ICE', auth.protect, designscreen.getDeviceSerialNumber_ICE);
+		app.post('/checkingMobileClient_ICE', auth.protect, designscreen.checkingMobileClient_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);
@@ -690,6 +699,13 @@ if (cluster.isMaster) {
 		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
 		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
 		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
+
+		// SauceLab API's
+		app.post('/getDetails_SAUCELABS', auth.protect, admin.getDetails_SAUCELABS);
+		app.post('/manageSaucelabsDetails', auth.protect, admin.manageSaucelabsDetails);
+		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
+
+
 
 		
 

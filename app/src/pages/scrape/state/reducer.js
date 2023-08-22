@@ -6,12 +6,14 @@ const initialState = {
     disableAppend: false,
     compareFlag: false,
     compareData: {},
-    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: [],fullScrapeData:[]},
     objValue: { val: null },
     enableIdentifier:false,
     listofcheckeditems:[],
+    elementPropertiesUpdated:false,
     isFiltered: false,
     cert: {},
+    impactAnalysisScreenLevel:false,
     WsData: {
         endPointURL: "",
         method: "0",
@@ -88,17 +90,23 @@ const reducer = (state=initialState, action) => {
                 return {
                     ...state,
                     enableIdentifier: action.payload
-                
-                }
+            }
         case actionTypes.SET_LISTOFCHECKEDITEMS:
                 return {
                     ...state,
                     listofcheckeditems: action.payload
+            }
+        case actionTypes.SET_ELEMENT_PROPERTIES:
+                return {
+                    ...state,
+                    elementPropertiesUpdated : action.payload
+            }                
+        case actionTypes.SET_IMPACT_ANALYSIS_SCREENLEVEL:
+                return {
+                    ...state,
+                    impactAnalysisScreenLevel: action.payload
                 
                 }
-                
-
-
         default:
             return state
     }

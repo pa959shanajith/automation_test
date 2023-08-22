@@ -40,6 +40,7 @@ const SaveMapButton = (props) => {
     )
 }
 
+     
 //mindmap save funtion
 const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList)=>{
     var tab = "endToend"
@@ -173,10 +174,18 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
         moduleid:null
     }
     var moduledata = await getModules(req);
-    // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
     if(savedList){
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
-    setTimeout(() => dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected}), 150)
+
+        dispatch({type:actionTypes.Dont_Show_First_Module,payload:true})
+
+        dispatch({
+            type: actionTypes.UPDATE_MODULELIST,
+            payload: moduledata
+          });
+          dispatch({
+                   type: actionTypes.SELECT_MODULE,
+                   payload: moduleselected
+                 });
     }
     return;
 
