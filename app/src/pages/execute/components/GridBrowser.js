@@ -142,8 +142,10 @@ const displayError = (error) =>{
          placeholder="Select Integration"  
         valueTemplate={selectedToolTemplate} 
         itemTemplate={toolOptionTemplate} 
-        className="custom-dropdown w-full md:w-16rem" />
-   
+        className="custom-dropdown w-full md:w-16rem"
+        disabled={!(avodropdown.browser && avodropdown.browser.length > 0)}
+         />
+ 
         </div>
         <div className="avogrid_fields">
           <AvoSelect

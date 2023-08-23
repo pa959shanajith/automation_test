@@ -22,9 +22,9 @@ const OriginContainer = (props) => {
             </div>
             {currentTab === "ldapConf" && <LdapConfig/>}
             {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
-            {currentTab === "users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
+            {currentTab === "Users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
-            {currentTab === "agent" && <Agents/>}
+            {currentTab === "Manage Agents" && <Agents/>}
             {currentTab === "License Details" && <LicenseManagement/>}
             {/* {currentTab === "Avo Assure Client" && <IceProvision/>} */}
         </div>

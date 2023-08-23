@@ -493,6 +493,7 @@ const checkAssignedProjects = async (username, usertype) => {
 	}
 	const userid = userInfo._id;
 	const roleid = userInfo.defaultrole;
+	const isadminuser = userInfo.isadminuser ? userInfo.isadminuser : false;
 	if (userInfo.projects != null) assignedProjects = userInfo.projects.length !== 0;
 	// Get Rolename by role id
 	inputs = {
@@ -502,7 +503,7 @@ const checkAssignedProjects = async (username, usertype) => {
 	const userRole = await utils.fetchData(inputs, "login/loadPermission", fnName);
 	if (userRole == "fail") return { err: 'fail' };
 	else if (userRole === null) return { err: 'invalid_username_password'};
-	else return { err: null, userid, role: userRole.rolename, assignedProjects };
+	else return { err: null, userid, role: userRole.rolename, assignedProjects, isadminuser };
 }
 
 // Check User login State - Avo Assure
@@ -559,7 +560,7 @@ module.exports.validateUserState = async (req, res) => {
 						return res.send("fail");
 					}
 				} else {
-					const { err, userid, role, assignedProjects } = await checkAssignedProjects(username, user.type);
+					const { err, userid, role, assignedProjects, isadminuser } = await checkAssignedProjects(username, user.type);
 					const ip = (!req.headers['client-ip'])? req.headers['client-ip'] : req.ip;
 					if (err) {
 						logger.error("Error occurred in validateUserState. Cause: "+ err);
@@ -576,6 +577,7 @@ module.exports.validateUserState = async (req, res) => {
 						req.session.username = username;
 						req.session.uniqueId = req.session.id;;
 						req.session.usertype = user.type;
+						req.session.isadminuser = isadminuser;
 						logger.rewriters[0] = function(level, msg, meta) {
 							meta.username = username;
 							meta.userid = userid;

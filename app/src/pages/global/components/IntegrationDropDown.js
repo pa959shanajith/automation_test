@@ -2,6 +2,8 @@ import React , { useState, useEffect} from 'react';
 import {ModalContainer, ScreenOverlay, Messages as MSG, setMsg} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
 import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR } from '../../execute/api';
+import { InputText } from "primereact/inputtext";
+import { Button } from 'primereact/button';
 
 /*Component IntegrationDropDown
   use: renders integration popup for ALM/ qTest/ Zypher
@@ -94,6 +96,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
 
     return(
         <ModalContainer 
+        className="modal_integration"
             title={type}
             show={true}
             footer={submitModal(errorMsg, saveAction, type, isEmpty)}
@@ -113,7 +116,7 @@ const submitModal = (errorMsg, saveAction,type,  isEmpty) => {
                 }
                 {errorMsg}
             </span>
-            <button type="button" className="e__btn-md " onClick={()=>{saveAction()}} >Save</button>
+            <Button type="button" className="save_integration e__btn-md " size='small' onClick={()=>{saveAction()}} >Save</Button>
             {/* <div className="i__textFieldsContainer">
             <p align="right" className="i__textFieldsContainer-cust">
                 <span className="i__error-msg" style={{ marginTop: '-1.4rem'}}>
@@ -197,30 +200,30 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                 <div className='ilm__authtype_cont'>
                     <span className="ilm__auth" title="Authentication Type">Authentication Type</span>
                     <label className="authTypeRadio ilm__leftauth">
-                        <input type="radio" value="basic" checked={zephAuthType==="basic"} onChange={()=>{populateFields("basic")}}/>
+                        <input type="radio" value="basic" checked={zephAuthType==="basic"} onChange={()=>{populateFields("basic")}} className='radio_basic'/>
                         <span>Basic</span>
                     </label>
                     <label className="authTypeRadio">
-                        <input type="radio" value="token" checked={zephAuthType==="token"} onChange={()=>{populateFields("token")}}/>
+                        <input type="radio" value="token" checked={zephAuthType==="token"} onChange={()=>{populateFields("token")}} className='radio_token' />
                         <span>Token</span>
                     </label>
                 </div>
                 </>
                 :null}
-                <p><input value={credentials.url} onChange={(event)=>{setCredentials({url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={(urlErrBor ? " i__inputErrBor " : "")+"i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} /></p>
+                <p><input value={credentials.url} onChange={(event)=>{setCredentials({url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={(urlErrBor ? " i__inputErrBor " : "")+"i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} style={{marginBottom:"1rem"}} /></p>
                 {(type==="Zephyr" && zephAuthType==="basic") || type!=="Zephyr"?
                 <>
-                    <p className="halfWrap halfWrap-margin" ><input value={credentials.userName} onChange={(event)=>{setCredentials({url: credentials.url, userName: event.target.value, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={"i__input-cust i__input e__modal-alm-input"+ (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].username} /></p>
+                    <p className="halfWrap halfWrap-margin" ><input value={credentials.userName} onChange={(event)=>{setCredentials({url: credentials.url, userName: event.target.value, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={"i__input-cust i__input e__modal-alm-input"+ (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].username} style={{marginBottom:"1rem"}} /></p>
                     <p className="halfWrap"><input value={credentials.password} onChange={(event)=>{setCredentials({url: credentials.url, userName: credentials.userName, password: event.target.value, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="password" className={"i__input-cust i__input e__modal-alm-input"+ (passErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].password} /></p>
                 </>
                 :null}
                 {(type==="Zephyr" && zephAuthType==="token")?
                 <>
-                    <p><input value={credentials.apitoken} onChange={(event)=>{setCredentials({url: credentials.url, userName: credentials.userName, password: credentials.password, apitoken: event.target.value, authtype: credentials.authtype})}} type="text" className={"i__input-cust i__input e__modal-alm-input"+ (authErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].apitoken} /></p>
+                    <p><input value={credentials.apitoken} onChange={(event)=>{setCredentials({url: credentials.url, userName: credentials.userName, password: credentials.password, apitoken: event.target.value, authtype: credentials.authtype})}} type="text" className={"i__input-cust i__input e__modal-alm-input"+ (authErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].apitoken}  /></p>
                 </>
                 :null}
                 {type==="qTest"?
-                    <p className="qtestSteps" ><input value={qtestSteps} onChange={()=>{setqtestSteps(!qtestSteps)}} type="checkbox" title="Update steps status"/><span className="i__step">Update step status</span></p>
+                    <p className="qtestSteps"  ><input value={qtestSteps} onChange={()=>{setqtestSteps(!qtestSteps)}} type="checkbox" title="Update steps status" style={{marginTop:"1rem"}}/><span className="i__step">Update step status</span></p>
                 :null}
                 </div>
         </div>
