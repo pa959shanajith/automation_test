@@ -348,6 +348,7 @@
     &__action_icons {
         cursor: pointer;
         width: fit-content;
+        text-align: center;
     }
 }
 .checkbox{
@@ -427,13 +428,17 @@
 }
 .detailslist_status {
     display: flex;
-    align-items: baseline;
+    align-items: center;
+
     &>p {
         font-weight: 600;
         font-size: 1.125rem;
         color: rgb(50, 49, 48);
         margin: 0 16px 0 0;
         height: fit-content;
+    }
+    .status-label{
+        margin: 0 5px;
     }
 }
 .agent_state {
