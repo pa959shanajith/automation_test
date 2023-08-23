@@ -404,7 +404,7 @@ const ExecutionProfileStatistics = ({data}) => {
        </DataTable>
        {historyExecutionDataList.length === 0 && 
         <div className="null_data_in_Agent_matrices_">
-        <img src="static/imgs/Agent_metrices_no_report.png" className="Agent_matrices_landing_img"/>
+        <img src="static/imgs/no_report_data.png" className="Agent_matrices_landing_img"/>
         <h3 className="image_text">No History Data to Display</h3>
         <Button label="Refresh" className ="Agent_matrices_img_btn" icon="pi pi-refresh"  loading={showRefresh} onClick={refresherHandler}></Button>
       </div>}

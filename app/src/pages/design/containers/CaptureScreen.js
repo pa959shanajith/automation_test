@@ -1759,7 +1759,7 @@ const headerstyle={
               body={renderElement}
             >
             </Column>
-            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" headerStyle={{ justifyContent: "center"}}></Column>
+            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
           </DataTable>
