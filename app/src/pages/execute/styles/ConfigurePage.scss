@@ -210,7 +210,7 @@
   width: 9rem;
   font-Family: Open Sans;
   font-Style: normal;
-  margin-Left: 0.5rem;
+  margin-Left: 6.5rem;
   height: 2rem
 }
 .schedule{
@@ -749,6 +749,8 @@
     font-family: 'Open Sans';
     font-size: 1rem;
     font-weight: 400;
+    
+   
 }
 }
 .datatable_list {
@@ -764,7 +766,7 @@
 .actions-header {
   text-align: left !important;
   position: absolute;
-  margin-left: 3.9rem;
+  margin-left: 0.9rem;
   margin-top: -0.8rem;
   font-weight: bold;
   font-family: "Open Sans";
@@ -940,7 +942,7 @@
   font-weight: bold;
   position: relative;
     top: -0.5rem;
-    margin-left: 0.6rem;
+    margin-left: -1.4rem;
     
     .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
       padding: 0.5rem;
@@ -1328,5 +1330,12 @@ bottom: 21%;
   font: $f6_regular;
 
 }
+.sno_label{
+  min-width: 30px;
+  max-width: 60px;
+  width: 8%;
+  height: 2.5rem;
+}
+  
 
 
