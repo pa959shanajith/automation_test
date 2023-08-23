@@ -24,7 +24,7 @@ const OriginContainer = (props) => {
             {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
             {currentTab === "users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
-            {currentTab === "agent" && <Agents/>}
+            {currentTab === "Manage Agents" && <Agents/>}
             {currentTab === "License Details" && <LicenseManagement/>}
             {/* {currentTab === "Avo Assure Client" && <IceProvision/>} */}
         </div>

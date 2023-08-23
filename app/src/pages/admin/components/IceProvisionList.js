@@ -195,41 +195,8 @@ const IceProvisionList = (props) => {
 					</div>
 					{showList ?
 						<div id="activeUsersToken" className="wrap wrap-cust-ip">
-							{/* <ScrollBar scrollId='activeUsersToken-ip' thumbColor="#929397" >
-                    	<table className = "table table-hover sessionTable" id="tokensDetail">
-                            <tbody >
-                            <tr>
-								{isUsrSetting === true && <th data-test="table-heading-test">Default ICE</th>}
-								<th> ICE Name </th>
-								<th> ICE Type</th>
-								<th> Status </th>
-								<th> Username </th>
-								<th> Hostname </th>
-								<th style={{textAlign: 'center'}}>Action</th>
-								<th> </th>
-							</tr>
-                            {icelistModify.map((entry,index)=>(
-                                <tr key={index} className='provisionTokens'>
-									{isUsrSetting === true && <td data-test="radio-token-test"><input name="default" type="radio" value={entry.icename} checked={entry.icename === defaultICE ? true : false} onChange={defaultChangeHandler} /></td>}
-                                    <td> {entry.icename} </td>
-                                    <td> {entry.icetype} </td>
-                                    <td> {entry.status} </td>
-                                    <td> {entry.username} </td>
-                                    <td> {entry.hostname} </td>
-												{entry.status === 'provisioned' ? <td><button className="btn btn-cust-ip" onClick={() => { reregister(entry, "Reprovision") }} > Reprovision </button></td>
-													: null}
-												{entry.status === 'registered' || entry.status === 'deregistered' ? <td ><button className="btn btn-cust-ip" onClick={() => { reregister(entry, "Reregister") }}> Reregister </button></td>
-													: null}
-												{entry.status === 'deregistered' ? <td></td> : null}
-												{entry.status !== 'deregistered' ? <td ><button className="btn btn-cust-ip" onClick={() => { deregister(entry) }}> Deregister </button></td>
-													: null}
-                                </tr> 
-                            ))}
-                            </tbody>
-						</table>
-						</ScrollBar> */}
 							<div >
-								<DataTable value={icelistModify} selectionMode="single" selection={selectedEntry} onSelectionChange={(e) => setSelectedEntry(e.value)}>
+								<DataTable showGridlines value={icelistModify} selectionMode="single" selection={selectedEntry} onSelectionChange={(e) => setSelectedEntry(e.value)}>
 									{isUsrSetting === true && (
 										<Column
 											selectionMode="single"
