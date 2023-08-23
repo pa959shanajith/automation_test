@@ -136,8 +136,8 @@ const reports = () => {
                     execDate: obj?.execDate || '',
                     selectedModuleType: obj?.executionRequest?.selectedModuleType || '',
                     configurekey: obj?.configurekey || '',
+                    noOfExecution: obj?.noOfExecution || 0,
                 }));
-                console.log(executionProfileName);
                 setReportData(extractedExecutionProfileData);
             } else {
                 setReportData([]);
@@ -198,7 +198,7 @@ const reports = () => {
       <div className="reports_container">
         <div className="grid options_box">
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            <div className="flex flex-column ml-4">
+            <div className="flex align-items-center ml-4">
               <label data-test="projectLabel" className="Projectreport">
                 <b>Project:</b>
               </label>
@@ -219,70 +219,60 @@ const reports = () => {
             </div>
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnTest">
-            <div>
-            <b>Test Type: </b>
-            <SelectButton
-              value={testType}
-              itemTemplate={viewByTemplate}
-              onChange={(e) => { 
-                handleTest(e.value) 
-                setTestType(e.value) 
-              }}
-              options={testTypesOptions}
-            />
+            <div className="testType">
+              <b>Test Type: </b>
+              <SelectButton
+                value={testType}
+                itemTemplate={viewByTemplate}
+                onChange={(e) => {
+                  handleTest(e.value);
+                  setTestType(e.value);
+                }}
+                options={testTypesOptions}
+              />
             </div>
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnView">
-            <div>
-            <b>View By: </b>
-            <SelectButton
-              value={viewBy}
-              itemTemplate={viewByTemplate}
-              onChange={(e) => {
-                setViewBy(e.value);
-              }}
-              options={viewByOptions}
-            />
+            <div className="testView">
+              <b>View By: </b>
+              <SelectButton
+                value={viewBy}
+                itemTemplate={viewByTemplate}
+                onChange={(e) => {
+                  setViewBy(e.value);
+                }}
+                options={viewByOptions}
+              />
             </div>
           </div>
         </div>
-        <div className="report_landing">
+        <div className="flex justify-content-center ml-4 mr-4 mt-5 mb-3 search_container">
+          <div className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              className="report_search_input"
+              placeholder="Search"
+              value={searchReportData}
+              onChange={(e) => setSearchReportData(e.target.value)}
+            />
+          </div>
+          <div>
+            <h2 className="projectDropDown"></h2>
+            <Dropdown
+              value={selectedItem}
+              onChange={(e) => handleClicked(e)}
+              options={sort}
+              optionLabel="name"
+              dropdownIcon={customDropdownIcon}
+              className="sort_dropdown"
+              placeholder={selectedItem}
+            />
+          </div>
+        </div>
+        <div className="report_landing mt-2">
           <div className="report">
             {!show && (
               <div id="reports" className="cards">
-                <>
-                  {filteredExecutionData.length > 0 ? (
-                    <>
-                      <div className='flex justify-content-between ml-4 mr-4 mt-2 mb-2'>
-                        <div>
-                          <h2 className="projectDropDown"></h2>
-                          <Dropdown
-                            value={selectedItem}
-                            onChange={(e) => handleClicked(e)}
-                            options={sort}
-                            optionLabel="name"
-                            dropdownIcon={customDropdownIcon}
-                            className="w-full md:w-30rem"
-                            placeholder={selectedItem}
-                          />
-                        </div>
-                        <div className="p-input-icon-left">
-                          <i className="pi pi-search" />
-                          <InputText
-                            className="report_search_input"
-                            placeholder="Search"
-                            value={searchReportData}
-                            onChange={(e) =>
-                              setSearchReportData(e.target.value)
-                            }
-                          />
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                </>
                 {filteredExecutionData.length > 0 ? (
                   <div className="report_Data ml-4 mr-4">
                     {/* {activeIndex === "Functional Test" && executionButon === 'View by Execution Profile' && (<div className='flex flex-wrap'>
@@ -292,9 +282,9 @@ const reports = () => {
                             </div>)} */}
                     {activeIndex === "Functional Test" &&
                       executionButon === "View by Execution Profile" && (
-                        <div className="flex flex-wrap justify-content-between">
+                        <div className="grid">
                           {filteredExecutionData.map((data, index) => (
-                            <div className="flex flex-wrap mt-4">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <NavLink
                                 to="/profile"
                                 state={{
@@ -305,29 +295,55 @@ const reports = () => {
                                 activeClassName="active"
                               >
                                 <Card key={index} className="testCards">
-                                  <div className='grid'>
-                                    <div className='col-10'>
-                                      <span className='exe_profile'>Execution Profile</span>
+                                  <div className="grid box_header">
+                                    <div className="col-6">
+                                      <span className="exe_profile">
+                                        Execution Profile
+                                      </span>
                                     </div>
-                                    <div className='col-2 flex justify-content-center'>
-                                      <span className='exe_count'>5</span>
+                                    <div className="col-6 flex justify-content-end">
+                                    <span className="exe_type">
+                                        <img
+                                          src={
+                                            data.selectedModuleType ===
+                                            "e2eExecution"
+                                              ? "static/imgs/E2E_configsetup.png"
+                                              : "static/imgs/signup_module.svg"
+                                          }
+                                        />
+                                        <span style={{ display: 'inline-block', marginLeft: '0.4rem' }}>{data.selectedModuleType ===
+                                        "e2eExecution"
+                                          ? "End to End"
+                                          : "Test Suite"}</span>
+                                      </span>
                                     </div>
-                                    <div className='col-12 exe_namebox'>
-                                      <span className='exe_name'>{data.configurename}</span>
+                                    <div className="col-12 exe_namebox">
+                                      <span className="exe_name">
+                                        {data.configurename}
+                                      </span>
                                     </div>
-                                    <div className='col-12 exe_details'>
+                                  </div>
+                                  <div className="grid box_body">
+                                    <div className="col-12 exe_details">
                                       Last execution details
                                     </div>
-                                    <div className='col-4 lg:col-5 xl:col-5 md:col-12 sm:col-12'>
-                                      <span className='exe_details'>Executed On</span>
-                                      <span className='exe_date'>23/09/2022</span>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_details">
+                                        Executed On
+                                      </span>
+                                      <span className="exe_date">
+                                        {data?.execDate ? new Date(data.execDate).toLocaleDateString() : ""}
+                                      </span>
                                     </div>
-                                    <div className='col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12'>
-                                      <span className='exe_details'>Executed via</span>
-                                      <span className='exe_date'>{data.execDate.slice(5, 16)}</span>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
+                                      <span className="exe_details">
+                                        Executed via
+                                      </span>
+                                      <span className="exe_date">Manual</span>
                                     </div>
-                                    <div className='col-4 lg:col-3 xl:col-3 md:col-12 sm:col-12'>
-                                      <span className='exe_type'><img src="static/imgs/E2E_configsetup.png" />{data.selectedModuleType === "e2eExecution" ? 'E2E' : 'Normal'}</span>
+                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12 flex justify-content-end" style={{ position: 'relative' }}>
+                                      <i className="pi pi-cog" style={{ fontSize: '2rem', marginRight: '1.2rem' }}></i>
+                                      <span className='count_exe'>{data?.noOfExecution ? data?.noOfExecution : 0 }</span>
                                     </div>
                                   </div>
                                 </Card>
@@ -338,9 +354,9 @@ const reports = () => {
                       )}
                     {activeIndex === "Functional Test" &&
                       executionButon === "View by Modules" && (
-                        <div className="grid ml-4">
+                        <div className="grid">
                           {reportDataModule.map((data) => (
-                            <div className="flex flex-wrap">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <Card key={data.key} className="testCards">
                                 <p m={handleData}>{data.key}</p>
                                 <p>{data.scenariovalue}</p>
@@ -355,9 +371,9 @@ const reports = () => {
                       )}
                     {activeIndex === "Accessibility Test" &&
                       executionButon === "View by Execution Profile" && (
-                        <div className="grid ml-4">
+                        <div className="grid">
                           {reportData.map((data) => (
-                            <div className="flex flex-wrap">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <Card key={data.key} className="testCards">
                                 <NavLink
                                   to="/reports/profile"
@@ -386,9 +402,9 @@ const reports = () => {
                       )}
                     {activeIndex === "Accessibility Test" &&
                       executionButon === "View by Modules" && (
-                        <div className="grid ml-4">
+                        <div className="grid">
                           {reportDataModule.map((data) => (
-                            <div className="flex flex-wrap">
+                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
                               <Card key={data.key} className="testCards">
                                 <NavLink
                                   to="/reports/profile"

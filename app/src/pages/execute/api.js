@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {url} from '../../App';
-import { Messages as MSG,RedirectPage} from '../global/components/Messages';
+import { Messages as MSG,RedirectPage} from '../global';
 import {history} from './index'
 
 export const fetchConfigureList = async(props) => {
@@ -240,29 +240,60 @@ export const deleteExecutionListId = async(props) => {
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
-export const fetchAvoAgentAndAvoGridList = async(props) => {
+export const fetchAgentModuleList = async(param) => {
     try{
-        const res = await axios(url+'/getAvoAgentAndAvoGridList', {
+        // console.log(req);
+        const res = await axios(url+'/fetchAgentModuleList', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            data:props
+            data: {
+                executionListId: param 
+            }
         });
         if(res.status === 401){
-            // RedirectPage(history)
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
-        console.error(res.data)
-        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+        return { error:MSG.DevOps.ERR_DevOps_Keys}
     }catch(err){
         console.error(err)
-        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+        return {error:MSG.DevOps.ERR_DevOps_Keys}
     }
 }
+
+//fetching the history of execution  in Execution Profile Statistics Tab in Matrices
+export const fetchHistory = async(fromDate,toDate) => {
+    try{
+        const res = await axios(url+'/fetchHistory', {
+            method: 'POST',
+            headers:{
+                        'Content-type': 'application/json',
+                    }, 
+            data: {
+                    action: "fetchHistory",
+                    fromDate: fromDate,
+                    toDate: toDate,
+                }
+            });    
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }    
+        if(res.status === 200 && res.data !== "fail"){
+            return res.data; 
+        }
+        return { error:MSG.DevOps.ERR_DevOps_Keys}  
+    }catch(err){
+        console.error(err)
+        return {error:MSG.DevOps.ERR_DevOps_Keys}
+    }
+}
+ 
 export const loginQCServer_ICE = async(qcURL,qcUserName,qcPassword) => { 
     try{
         const res = await axios(url+'/loginQCServer_ICE', {
@@ -376,5 +407,29 @@ export const loginQTestServer_ICE = async(qcURL,qcUserName,qcPassword, qcType) =
     }catch(err){
         console.error(err)
         return {error:MSG.EXECUTE.ERR_LOGIN_QTEST}
+    }
+}
+
+export const fetchAvoAgentAndAvoGridList = async(props) => {
+    try{
+        const res = await axios(url+'/getAvoAgentAndAvoGridList', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data:props
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }

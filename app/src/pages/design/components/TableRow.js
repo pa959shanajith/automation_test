@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { updateScrollBar } from '../../global';
 import "../styles/TableRow.scss";
+import {Tag} from 'primereact/tag'
 import Select from "react-select";
 /*
     Component: TableRow
@@ -45,6 +46,7 @@ const TableRow = (props) => {
     const [allkeyword, setAllKeyword] = useState([]);
     const [showAllKeyword, setShowAllKeyword] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(null);
+    const [objetListOption,setObjetListOption] = useState(null);
     let objList = props.objList;
     let draggable = props.draggable;
     
@@ -76,7 +78,6 @@ const TableRow = (props) => {
         setChecked(props.stepSelect.check.includes(props.idx));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.stepSelect.check]);
-
     useEffect(()=>{
         if (props.edit){
             if (props.stepSelect.edit && props.stepSelect.highlight.includes(props.idx)){
@@ -149,7 +150,7 @@ const TableRow = (props) => {
     }
 
     const onObjSelect = event => {
-        const caseData = props.getKeywords(event.target.value)
+        const caseData = props.getKeywords(event.value)
         const placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
         setInput("");
         setOutput("");
@@ -157,10 +158,11 @@ const TableRow = (props) => {
         setObjType(caseData.obType);
         setOutputPlaceholder(placeholders.outputval);
         setInputPlaceholder(placeholders.inputval);
-        setObjName(event.target.value)
+        setObjName(event.value)
         setKeyword(caseData.keywords[0]);
         setTcAppType(caseData.appType);
         setDisableStep(false);
+        setObjetListOption(event)
     };
 
     const onKeySelect = event => {
@@ -214,7 +216,29 @@ const TableRow = (props) => {
                 label: "Show All"
             }
         }});
-
+    
+    const optionElement = objList?.map((object, i)=>{
+        if(objName === "OBJECT_DELETED"){
+           return {
+            value:objName,
+            label:objName
+           }
+        }
+        else{
+            return{
+                key:i,
+                value:object,
+                label:object.length >= 50 ? object.substr(0, 44)+"..." : object
+            }
+        }
+    })
+    const getOptionElementLable = (option) =>{
+        return (
+            <div title={option.label}>
+            {option.label}
+          </div>
+        );
+    }
         const getOptionLabel = (option) => {
             return (
               <div title={option.tooltip}>
@@ -261,11 +285,18 @@ const TableRow = (props) => {
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
                 <span className="objname_col">
                     { focused ? 
-                    <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} autoFocus>
-                        { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
-                        { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
-                    </select> :
-                    <div className="d__row_text" title={objName} >{objName}</div>
+                    // <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} autoFocus>
+                    //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
+                    //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
+                    // </select>
+                    <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customStyles}  id="testcaseDropdownRefID" ref={testcaseDropdownRef}  disabled={disableStep} menuPortalTarget={document.body} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
+                     :
+                    <div className="d__row_text" title={objName} >
+                        <span>{objName}</span>
+                        {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
+        {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
+                        </div>
+
                     }
                 </span>
                 <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >

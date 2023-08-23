@@ -14,6 +14,7 @@ import "../styles/ConfigurePage.scss";
 import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
 import {FooterTwo as Footer} from '../../global';
+import ExecutionProfileStatistics from "./ExecutionProfileStatistics";
 import {
   fetchConfigureList,
   getPools,
@@ -100,6 +101,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
   const [currentKey, setCurrentKey] = useState("");
+  const [currentName, setCurrentName] = useState("");
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
   const [executionTypeInRequest, setExecutionTypeInRequest] =
     useState("asynchronous");
@@ -155,7 +157,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const scheduleinfo  = useRef(null);
   const errorinfo  = useRef(null);
 
-  const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
+  const items = [{ label: "Configurations" }, { label: "Execution(s)" },{label:"Execution Profile Statistics"}];
   const handleTabChange = (e) => {
     console.log(e);
     setActiveIndex1(e.index);
@@ -449,6 +451,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     executionData["executionEnv"] = execEnv;
     executionData["browserType"] =browserTypeExe;
     executionData["integration"] = integration;
+    executionData["configurekey"] = currentKey;
+    executionData["configurename"] = currentName;
+    executionData["executionListId"] = uuid() ;
     executionData["batchInfo"] =
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
@@ -560,6 +565,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
+                setCurrentName(item.configureName)
                 setCurrentSelectedItem(item);
                 setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                 setConfigItem(idx);
@@ -1538,7 +1544,7 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {!!configList.length ? (
+            {(!!configList.length  || activeIndex1 !== 2)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"
@@ -1556,13 +1562,13 @@ Learn More '/>
             ) : null}
           </div>
         </div>
-        {activeIndex1 !== 1 ? (
+        {activeIndex1 === 0 ? (
           <div className="ConfigurePage_container m-2" showGridlines>
             {renderTable()}{" "}
             <div><Footer/></div>
           </div>
         ) : (
-          <ExecutionPage />
+          activeIndex1 === 2 ? <ExecutionProfileStatistics /> : <ExecutionPage />
         )}
         <AvoModal
           visible={visible_setup}

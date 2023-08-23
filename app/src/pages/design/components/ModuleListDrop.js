@@ -23,6 +23,8 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import SaveMapButton from "./SaveMapButton";
 import { Tooltip } from 'primereact/tooltip';
 import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 
 
 const ModuleListDrop = (props) =>{
@@ -92,6 +94,7 @@ const ModuleListDrop = (props) =>{
         const [selectedKeys, setSelectedKeys] = useState([]);
         const [transferBut, setTransferBut] = useState( [] );
         const [inputE2EData, setInputE2EData] = useState('');
+        const [SplCharCheck, setSplCharCheck] = useState(false);
         const [ newModSceList, setNewModSceList] = useState([]);
         const [modSceTree, setModSceTree] = useState([]);
         const [selectedProject, setSelectedProject] = useState(proj);
@@ -421,15 +424,19 @@ const ModuleListDrop = (props) =>{
         if(Object.keys(moduleSelect).length===0 || firstRender){
             loadModuleE2E(modID)
 
-        }else{
-            setWarning({modID, type});
         }
+        if(type==="endtoend"){
+          loadModuleE2E(modID)
+        }
+        // else{
+        //     setWarning({modID, type});
+        // }
         setFirstRender(false);
 
         return; 
     }    
     const loadModuleE2E = async(modID) =>{
-        setWarning(false)
+        // setWarning(false)
         setIsE2EOpen(true)
         setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})   
@@ -786,9 +793,33 @@ setPreventDefaultModule(true);
               const selectedProjForSce = projectList.find(project=> project.id === e.value);
               setProjOfSce(selectedProjForSce)
              }
+            const handleSplCharE2EName =(event)=>{
+              const value = event
+              // inputE2EData(value);
+              if (value !== undefined && /[!@#$%^&*()+{}\[\]:;<>,.?~\\/\-\s]/.test(value)){
+                setSplCharCheck(true)
+              } else {
+                setSplCharCheck(false)
+                if(E2EName){
+                  setE2EName(value)}
+                  else
+                  {setInputE2EData(value)}
+                
+              }
+
+
+            }
             
-            
-       
+       const bodyScenarionTemp = (e, idx) =>{
+        return(
+          <div className="EachScenarioNameBox" >
+            <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
+              <h4>{e.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{e.modName})</h3></h5></div>
+                <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{e.projName})</h3></h5></div>
+                </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(idx.rowIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
+          </div>
+        )
+       }
       
       
     return(
@@ -815,7 +846,8 @@ setPreventDefaultModule(true);
                         customClass="inputRow_for_E2E_popUp"
                         inputType="lablelRowReqInfo"
                         inputTxt={E2EName? E2EName:inputE2EData} 
-                        setInputTxt={E2EName? setE2EName:setInputE2EData}
+                        setInputTxt={E2EName? (setE2EName && handleSplCharE2EName):(setInputE2EData && handleSplCharE2EName) }
+                        charCheck={SplCharCheck}
                       />
                     </div>
                   </div>
@@ -922,7 +954,7 @@ setPreventDefaultModule(true);
                             </span>
                           </div>
                           <div className="ScenairoList">
-                            {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
+                            {/* {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
                               return (
                                 <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
                                   <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
@@ -931,8 +963,13 @@ setPreventDefaultModule(true);
                                   </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(ScenarioSelectedIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
                                 </div>
                               )
-                            })}
-                          </div></>
+                            })} */}
+                            <DataTable value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
+                              <Column rowReorder headerStyle={{display:'none'}}/>
+                              <Column field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
+                            </DataTable>
+                          </div>
+                          </>
                             :
                           <div className="initialText">
                             <div className="initial1StText">

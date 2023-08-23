@@ -26,6 +26,7 @@ const IceProvisionForm = (props) => {
 	const [users, setUsers] = useState([['Select User', ' ', '', '']])
 	const isUsrSetting = props.userConfig //for user settings
 
+
 	useEffect(() => {
 		setUsers([['Select User', ' ', '', '']]);
 		props.setTokeninfoIcename("");
@@ -55,14 +56,14 @@ const IceProvisionForm = (props) => {
 		}
 
 		var tokeninfo = {
-			userid: props.userid[1],
+			userid: props.edit?props.edit.userId:props.userid[1],
 			icename: props.icename.trim(),
 			icetype: icetype,
 			action: "provision",
-			email:props.userid[6],
-			username:props.userid[0],
-			firstName: props.userid[4],
-			lastName: props.userid[5],
+			email:props.edit?props.edit.email:props.userid[6],
+			username:props.edit?props.edit.userName:props.userid[0],
+			firstName: props.edit?props.edit.firstName:props.userid[4],
+			lastName: props.edit?props.edit.lastName:props.userid[5],
 			url:new URL(window.location.href).origin,
 		};
 		setLoading("Provisioning Token...");

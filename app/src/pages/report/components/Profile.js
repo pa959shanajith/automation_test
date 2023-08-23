@@ -14,10 +14,10 @@ import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
 import { FooterTwo } from "../../global";
-import { Divider } from "primereact/divider";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [testSuite, setTestSuite] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
   const [downloadId, setDownloadId] = useState("");
@@ -66,6 +66,7 @@ const Profile = () => {
   }, [location]);
   
   const onTestSuiteClick = async (getRow) => {
+    setSelectedProduct(getRow)
     const testSuiteList = await getTestSuite({
       query: "fetchModSceDetails",
       param: "modulestatus",
@@ -615,6 +616,7 @@ const Profile = () => {
                       severity="secondary"
                       size="small"
                       outlined
+                      className="view_button"
                       onClick={()=>handleViweReports(item._id)}
                     />
                   ),
@@ -706,6 +708,7 @@ const Profile = () => {
   };
 
   const moduleBodyTemplate = (e) => {
+    console.log(selectedProduct, e);
     let treeArr = {
       key: e.key,
       label: (
@@ -975,40 +978,56 @@ const Profile = () => {
 
   return (
     <>
-    <div className="profile_container">
-    <Divider layout="vertical" className="vertical_line" />
-      <DataTable
-        value={reportsTable}
-        tableStyle={{ minWidth: "50rem" }}
-        header={tableHeader}        
-        globalFilter={searchScenario}
-        className="reports_table"
-      >
-        {tableColumns.map((col) => (
-          <Column
-            key={col.field}
-            field={col.field}
-            header={col.header}
-            {...(col.field === "testCases"
-              ? { filter: true, filterPlaceholder: "Search by name" }
-              : {})}
-            {...(col.field === "name" || col.field === "dateTime"
-              ? { sortable: true }
-              : {})}
-            {...(col.field === "status" ? { body: statusBodyTemplate } : {})}
-            {...(col.field === "module" ? { body: moduleBodyTemplate } : {})}
+      <div className="profile_container">
+        <DataTable
+          value={reportsTable}
+          tableStyle={{ minWidth: "50rem" }}
+          header={tableHeader}
+          globalFilter={searchScenario}
+          className="reports_table"
+        >
+          {tableColumns.map((col) => (
+            <Column
+              key={col.field}
+              field={col.field}
+              header={col.header}
+              {...(col.field === "testCases"
+                ? { filter: true, filterPlaceholder: "Search by name" }
+                : {})}
+              {...(col.field === "name" || col.field === "dateTime"
+                ? { sortable: true }
+                : {})}
+              {...(col.field === "status" ? { body: statusBodyTemplate } : {})}
+              {...(col.field === "module" ? { body: moduleBodyTemplate } : {})}
+            />
+          ))}
+        </DataTable>
+        <OverlayPanel ref={downloadRef} className="reports_download">
+          <Menu
+            model={[
+              {
+                label: <span onClick={() => onDownload("json")}>JSON</span>,
+                icon: "pi pi-fw pi-file",
+              },
+              {
+                label: <span onClick={() => onDownload("pdf")}>PDF</span>,
+                icon: "pi pi-fw pi-file",
+              },
+              {
+                label: (
+                  <span onClick={() => onDownload("pdfwithimg")}>
+                    PDF with screenshots
+                  </span>
+                ),
+                icon: "pi pi-fw pi-file",
+              },
+            ]}
           />
-        ))}
-      </DataTable>
-      <OverlayPanel ref={downloadRef} className="reports_download">
-      <Menu model={[
-        {label: <span onClick={() => onDownload('json')}>JSON</span>, icon: 'pi pi-fw pi-file'},
-        {label: <span onClick={() => onDownload('pdf')}>PDF</span>, icon: 'pi pi-fw pi-file'},
-        {label: <span onClick={() => onDownload('pdfwithimg')}>PDF with screenshots</span>, icon: 'pi pi-fw pi-file'}
-    ]} />
-      </OverlayPanel>
-    </div>
-    <div><FooterTwo/></div>
+        </OverlayPanel>
+      </div>
+      <div>
+        <FooterTwo />
+      </div>
     </>
   );
 };
