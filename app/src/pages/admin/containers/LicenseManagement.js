@@ -3,10 +3,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ColumnGroup } from 'primereact/columngroup';
 import { Row } from 'primereact/row';
-import 'primereact/resources/themes/lara-light-indigo/theme.css';   // theme
-import 'primereact/resources/primereact.css';                       // core css
-import 'primeicons/primeicons.css';                                 // icons
-import 'primeflex/primeflex.css'; 
 import '../styles/LicenseManagement.scss';
 import { getAvailablePlugins } from "../api";
 function LicenseManagement() {
@@ -36,10 +32,10 @@ function LicenseManagement() {
     return(
         <>
         <div className="card-outer">
-            <div className="Right">
+            <div className="license-table">
                 <div className="Platform">
                 <h4>Avo Assure Platform License</h4>
-                <div id="top" className="Box">
+                <div id="table-data-top" className="Box">
                     <DataTable value={headerData} tableStyle={{ minWidth: '50rem' }}>
                         <Column field="Subscribed_Licenses" header="Subscribed Licenses"></Column>
                         <Column field="License_Type" header="License Type"></Column>
@@ -49,7 +45,7 @@ function LicenseManagement() {
                     <div>*All licenses are concurrent license</div>
                 </div>
                 </div>
-                <div id="bottom" className="Features">
+                <div id="table-data-bottom" className="Features">
                 <h4>Avo Assure Features</h4>
                     <DataTable  value={headerData1} tableStyle={{ minWidth: '52rem' }} scrollable scrollHeight="45vh">
                         <Column field="License_Type" header="Feature "></Column>
