@@ -6,6 +6,7 @@ import LdapConfig from './LdapConfig';
 import CreateUser from '../components/CreateUser';
 import EmailConfiguration from './EmailConfiguration';
 import { validateUserState } from '../../login/api';
+import LicenseManagement from './LicenseManagement';
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
@@ -19,6 +20,7 @@ const OriginContainer = (props) => {
             {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
             {currentTab === "users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
+            {currentTab === "License Details" && <LicenseManagement/>}
 
         </div>
     </>)
