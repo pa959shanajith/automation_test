@@ -942,7 +942,7 @@
   font-weight: bold;
   position: relative;
     top: -0.5rem;
-    margin-left: 0.6rem;
+    margin-left: -1.4rem;
     
     .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
       padding: 0.5rem;
@@ -1330,5 +1330,12 @@ bottom: 21%;
   font: $f6_regular;
 
 }
+.sno_label{
+  min-width: 30px;
+  max-width: 60px;
+  width: 8%;
+  height: 2.5rem;
+}
+  
 
 

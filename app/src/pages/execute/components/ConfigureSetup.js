@@ -40,12 +40,19 @@ const ConfigureSetup = ({
   selectedNodeKeys,
   setSelectedNodeKeys,
   dotNotExe,
+  integration,
+  setIntegration
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
   const [useDefault, setUseDefault] = useState("");
+  const [currentIntegration, setCurrentIntegration] = useState(false);
   const dispatch = useDispatch();
   const getProjectData = useSelector((store) => store.configsetup);
+
+  const isModuleRequired = modules === "e2eExecution";
+  const isTestsuiteRequired = modules === "normalExecution";
+
 
   useEffect(() => {
     const mainTree = [];
@@ -268,9 +275,10 @@ const ConfigureSetup = ({
           value="e2eExecution"
           onChange={(e) => setModules(e.value)}
           checked={modules === "e2eExecution"}
+          required={isModuleRequired}  
         />
         <label htmlFor="module1" className="ml-2">
-          End to End Flow
+          End to End Flow{isModuleRequired && <span className="required-asterisk">*</span>}
         </label>
       </div>
       <div className="flex align-items-center">
@@ -280,9 +288,10 @@ const ConfigureSetup = ({
           value="normalExecution"
           onChange={(e) => setModules(e.value)}
           checked={modules === "normalExecution"}
+          required={isTestsuiteRequired} 
         />
         <label htmlFor="module2" className="ml-2">
-          Test Suites
+          Test Suites{isTestsuiteRequired && <span className="required-asterisk">*</span>}
         </label>
       </div>
       <div className="flex align-items-center config_text">
@@ -354,6 +363,9 @@ const ConfigureSetup = ({
             setMode={setMode}
             avodropdown={avodropdown}
             onAvoSelectChange={onAvoSelectChange}
+            // setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration}
+            integration={integration}
+            setIntegration={setIntegration}
             avogrids={[
               ...configData?.avoAgentAndGrid?.avoagents,
               ...configData?.avoAgentAndGrid?.avogrids,
