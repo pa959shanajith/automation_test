@@ -46,7 +46,7 @@ const ConfigureSetup = ({
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
   const [useDefault, setUseDefault] = useState("");
-  const [currentIntegration, setCurrentIntegration] = useState(false);
+  
   const dispatch = useDispatch();
   const getProjectData = useSelector((store) => store.configsetup);
 

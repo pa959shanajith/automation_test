@@ -18,7 +18,7 @@ const GridBrowser = ({
   avogrids,
   integration,
   setIntegration,
-  props
+ 
 }) => {
   const dispatch = useDispatch();
   avogrids.forEach((el, index, arr) => {
@@ -26,7 +26,7 @@ const GridBrowser = ({
       avogrids[index] = { ...el, name: el.Hostname };
     }
   });
-  const dataParametersCollection = [];
+
   const [showIntegrationModal,setShowIntegrationModal] = useState(false)
   const [selectedTool, setSelectedTool] = useState(false);
   const toast = useRef(null);
