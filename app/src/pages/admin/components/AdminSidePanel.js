@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 const AdminSidePanel = () => {
 
     const [header, setHeader] = useState('');
-    const [screen, setScreen] = useState('')
+    const [screen, setScreen] = useState('');
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -34,7 +34,12 @@ const AdminSidePanel = () => {
                     </div>
                 </AccordionTab>
             </Accordion>
+            <div className='flex flex-column pl-2 pr-1 m-1'>
             <Button className="email_button" onClick={() => { setHeader('Email Server Configuration'); setScreen('Email Server Configuration'); }}>Email Server Configuration</Button>
+            </div>
+            <div className='flex flex-column p-2 pr-1 m-1'>
+            <Button className='Agent_btn' onClick={() => { setHeader('Agents'); setScreen('agent'); }}>Agents</Button>
+            </div>
         </div>
     )
 }

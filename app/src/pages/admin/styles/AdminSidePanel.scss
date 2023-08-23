@@ -86,5 +86,26 @@
         color: black;
         box-shadow: none !important;
     }
+}
+.Agent_btn{
+        // border-color:transparent;
+        // background: transparent;
+        // color: black;
+    .p-button{
+        color: black !important;
+                    margin: 0.2rem 0.2rem !important;
+                    padding: 0.2rem 0.5rem !important;
+                    background: white !important;
+                    border: none !important;
+                    align-items: start !important;
+                    text-align: left !important;
+                    border-radius: 5px;
+
+    &:hover {
+        background: #e3cff0 !important; 
+        border-color: #e3cff0 !important; 
+        color: black !important;
+    }
+}
     
 }

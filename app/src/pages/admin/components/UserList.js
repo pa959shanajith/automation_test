@@ -20,7 +20,7 @@ const UserList = (props) => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [loading, setLoading] = useState(true);
     const [editUserDialog, setEditUserDialog] = useState(false);
-    const [editUser,setEditUser]=useState('')
+    const [editUser, setEditUser] = useState('')
     const allUserList = useSelector(state => state.admin.allUsersList);
     const [showDeleteConfirmPopUp, setShowDeleteConfirmPopUp] = useState(false);
 
@@ -30,7 +30,7 @@ const UserList = (props) => {
             if (allUserList.length === 0) {
                 try {
                     const UserList = await getUserDetails("user");
-                    const filteredUserList = UserList.map((user) => {
+                    const filteredUserList = UserList.slice(1).map((user) => {
                         const dataObject = {
                             userName: user[0],
                             userId: user[1],
@@ -46,21 +46,23 @@ const UserList = (props) => {
                 } catch (error) {
                     console.error('Error fetching User list:', error);
                 }
-            }
-            else setData(allUserList);
+            } else{
+                setData(allUserList);
+            } 
         })();
-    }, []);
+    }, []); 
 
     const header = (
-        <div className='User_header'>
-            <p>User List</p>
-            <InputText
-                className='User_Inp'
-                type="search"
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-                placeholder="Search User Field"
-            />
+            <div className='User_header'>
+                <p>User List</p>
+                <i className="pi pi-search user_search" />
+                <InputText
+                    className='User_Inp'
+                    type="search"
+                    value={globalFilter}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                    placeholder="Search"
+                />
         </div>
     );
 
@@ -110,8 +112,8 @@ const UserList = (props) => {
                     </>}
                 width={{ width: "5rem" }}
             />
-            <DataTable value={data} editMode="row" size='normal' 
-            loading={loading}
+            <DataTable value={data} editMode="row" size='normal'
+                loading={loading}
                 globalFilter={globalFilter}
                 header={header}
                 emptyMessage="No users found"
@@ -125,7 +127,7 @@ const UserList = (props) => {
                 <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
             </DataTable>
 
-            {editUserDialog && <CreateUser createUserDialog={editUserDialog} setCreateUserDialog={setEditUserDialog} setEditUser={setEditUser} editUser={editUser}/>}
+            {editUserDialog && <CreateUser createUserDialog={editUserDialog} setCreateUserDialog={setEditUserDialog} setEditUser={setEditUser} editUser={editUser} />}
         </div>
     </>)
 }
