@@ -35,7 +35,7 @@ function LicenseManagement() {
 
     return(
         <>
-        <div className="card">
+        <div className="card-outer">
             <div className="Right">
                 <div className="Platform">
                 <h4>Avo Assure Platform License</h4>
