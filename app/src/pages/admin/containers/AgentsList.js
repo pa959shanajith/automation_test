@@ -1,41 +1,19 @@
 import React, { useEffect, useState } from "react";
-// import ReactTooltip from "react-tooltip";
 import {
-  ScrollBar,
   Messages as MSG,
   setMsg,
   VARIANT,
-  IntegrationDropDown,
-  ScreenOverlay,
 } from "../../global";
 import { fetchAvoAgentAndAvoGridList, saveAvoAgent } from "../api";
 import { useSelector } from "react-redux";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tooltip } from 'primereact/tooltip';
-// import {
-//   SearchDropdown,
-//   TextField,
-//   Toggle,
-//   MultiSelectDropdown,
-//   CheckBox,
-//   DetailsList,
-//   SpinInput,
-//   SearchBox,
-//   SmallCard,
-// } from "@avo/designcomponents";
-
-// import classes from "../styles/DevOps.scss";
 import "../styles/Agents.scss";
 import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
-// import { Selection } from "@fluentui/react";
 import { InputSwitch } from "primereact/inputswitch";
-// import { InputNumber } from "primereact/inputnumber";
-// import { Tooltip } from "primereact/tooltip";
 import { InputText } from "primereact/inputtext";
-// import { DataTable } from "primereact/datatable";
-// import "../styles/DevOps.scss";
 const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
 
   const [searchText, setSearchText] = useState("");
@@ -278,7 +256,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         <span className="page-taskName taskname">Download Agent</span>
         <pre >
           <code>
-            Click <u><a onClick={onDownloadAgentClick}>Here</a></u> to Download the Agent
+            Click <u><a onClick={onDownloadAgentClick} style={{color: "purple",cursor:'pointer'}}>Here</a></u> to Download the Agent
           </code>
         </pre>
       <div className="page-taskName">
@@ -298,94 +276,24 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
 
         {agentData.length > 0 && (
           <>
-            <div className="searchBoxInput">
-              <InputText
-                placeholder="Search"
-                width="20rem"
-                value={searchText}
-                onClear={() => handleSearchChange("")}
-                onChange={(event) =>
+            <div className="p-input-icon-left">
+          <i className="pi pi-search" />
+          <InputText className="Search_name"
+                  placeholder="Search" 
+                  value={searchText} 
+                  onChange={(event) =>
                   event &&
                   event.target &&
-                  handleSearchChange(event.target.value)
-                }
-              />
-            </div>
+                  handleSearchChange(event.target.value)}
+                   title=" Search all projects." 
+                   />
+        </div>
           </>
         )}
-        <Button
-          data-test="submit-button-test"
-          onClick={handleAgentsSave}
-          disabled={!isDataUpdated}
-        >
-          Save
-        </Button>
+        <Button label="Save" onClick={handleAgentsSave}></Button>
       </div>
       <div style={{ position: "absolute", width: "70%", height: "-webkit-fill-available" }}>
-        {/* <DataTable
-          columns={agentListHeader}
-          items={(searchText.length > 0 ? filteredList : agentData).map(
-            (agent, index) => ({
-              agent: (
-                <div className="agent_state">
-                  <Tooltip
-                    id={agent.name}
-                    effect="solid"
-                    backgroundColor="black"
-                  />
-                  <div
-                    data-for={agent.name}
-                    data-tip={agent.state}
-                    className={`agent_state__div agent_state__${agent.state}`}
-                  ></div>
-                  <p>{agent.name}</p>
-                </div>
-              ),
-              clientCount: (
-                <InputNumber
-                  disabled={agent.status !== "active"}
-                  value={agent.icecount}
-                  onValueChange={(ev, newVal) =>
-                    onClientIceCountChange("update", agent.name, newVal)
-                  }
-                  onDecrement={() => onClientIceCountChange("sub", agent.name)}
-                  onIncrement={() => onClientIceCountChange("add", agent.name)}
-                  width="5%"
-                />
-              ),
-              status: (
-                <div className="detailslist_status">
-                  <p>Inactive</p>{" "}
-                  <InputSwitch
-                    onChange={() => onAgentToggle(agent.name)}
-                    checked={agent.status === "active"}
-                    inlineLabel
-                    label="Active"
-                  />
-                </div>
-              ),
-              deleteIcon: (
-                <img
-                  onClick={() => deleteAgent(agent.name)}
-                  src="static/imgs/DeleteIcon.svg"
-                  className="agents__action_icons"
-                  alt="Delete Icon"
-                />
-              ),
-            })
-          )}
-          layoutMode={1}
-          selectionMode={0}
-          variant="variant-two"
-        /> */}
-
-
-        <DataTable value={searchText.length > 0 ? filteredList : agentData}>
-          <Column
-            field="slNo"
-            header="S.No."
-            style={{ width: '5%' }}
-          />
+        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData}>
           <Column header="Agent Name" body={(agent) => (
             <div className="agent_state">
               <Tooltip target={`agent-name-${agent.name}`} content={agent.state} position="top" />
@@ -408,27 +316,18 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           )} />
           <Column header="Status" body={(agent) => (
             <div className="detailslist_status">
-              <p>Inactive</p>
+              <label className="pr-2">Inactive</label>
               <InputSwitch
                 onChange={() => onAgentToggle(agent.name)}
                 checked={agent.status === "active"}
-                onLabel="Active"
-                offLabel="Inactive"
               />
+              <label className="pl-2">Active</label>
             </div>
           )} />
           <Column header="Created on" body={(agent) => (
-            <div className="detailslist_status">
-              <p>Inactive</p>
-              <InputSwitch
-                onChange={() => onAgentToggle(agent.name)}
-                checked={agent.status === "active"}
-                onLabel="Active"
-                offLabel="Inactive"
-              />
-            </div>
+           <></>
           )} />
-          <Column header="Action" body={(agent) => (
+          <Column className="agents__action_icons" header="Action" body={(agent) => (
             <img
               onClick={() => deleteAgent(agent.name)}
               src="static/imgs/DeleteIcon.svg"

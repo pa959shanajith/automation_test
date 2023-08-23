@@ -29,7 +29,7 @@ const AdminSidePanel = () => {
                 </AccordionTab>
                 <AccordionTab header="User management">
                     <div className='flex flex-column pl-4'>
-                        <Button onClick={() => { setHeader('Users'); setScreen('users'); }}>Users</Button>
+                        <Button onClick={() => { setHeader('Users'); setScreen('Users'); }}>Users</Button>
                         <Button onClick={() => { setHeader('License'); setScreen('License Details'); }}>License Details</Button>
                     </div>
                 </AccordionTab>
@@ -38,7 +38,7 @@ const AdminSidePanel = () => {
             <Button className="email_button" onClick={() => { setHeader('Email Server Configuration'); setScreen('Email Server Configuration'); }}>Email Server Configuration</Button>
             </div>
             <div className='flex flex-column p-2 pr-1 m-1'>
-            <Button className='Agent_btn' onClick={() => { setHeader('Agents'); setScreen('agent'); }}>Agents</Button>
+            <Button className='Agent_btn' onClick={() => { setHeader('Manage Agents'); setScreen('Manage Agents'); }}>Manage Agents</Button>
             </div>
         </div>
     )

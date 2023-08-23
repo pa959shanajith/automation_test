@@ -8,6 +8,7 @@ import { Dialog } from "primereact/dialog";
 import {Button} from 'primereact/button';
 import {InputSwitch} from 'primereact/inputswitch';
 import { Calendar } from "primereact/calendar";
+import { useSelector } from "react-redux";
 
 
 const ExecutionProfileStatistics = ({data}) => {
@@ -17,10 +18,17 @@ const ExecutionProfileStatistics = ({data}) => {
     const [moduleAgentList, setModuleAgentList] = useState([]);
     const [historymoduleAgentList, setHistoryModuleAgentList] = useState([]);
     const [historyExecutionDataList, setHistoryExecutionDataList] = useState([]);
+    const [historyExecutionDataListPerProject, setHistoryExecutionDataListPerProject] = useState([]);
     const [checked, setChecked] = useState(true);
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
     const [minDate, setMinDate] = useState();
+    const selectProjects=useSelector((state) => state.landing.defaultSelectProject);
+
+    useEffect(()=>{
+      const filteredhistoryExecutionDataList = historyExecutionDataList.filter((profileProject) => profileProject.project === ((selectProjects && selectProjects.projectName) ? selectProjects.projectName: selectProjects))
+      setHistoryExecutionDataListPerProject(filteredhistoryExecutionDataList);
+    },[selectProjects, historyExecutionDataList]);
     useEffect(() => {
         (async () => {
           const queueState = await getQueueState();
@@ -115,7 +123,7 @@ const ExecutionProfileStatistics = ({data}) => {
                     viewModuleList(exceutionProfile[0].executionListId);
                   }}
                 >
-                  View module details
+                  View Test Suite details
                 </button>
               ),
             });
@@ -195,7 +203,8 @@ const ExecutionProfileStatistics = ({data}) => {
             }
           }
           setHistoryExecutionDataList(Object.keys(historyExecutedData).map((executionRow) => ({
-            exceutionProfile: historyExecutedData[executionRow].project+" / "+historyExecutedData[executionRow].configurename,
+            project: historyExecutedData[executionRow].project,
+            exceutionProfile: historyExecutedData[executionRow].configurename,
             startTime: historyExecutedData[executionRow].startTime,
             endTime: historyExecutedData[executionRow].endTime,
             passed: historyExecutedData[executionRow].passed,
@@ -217,10 +226,39 @@ const ExecutionProfileStatistics = ({data}) => {
                   setDisplayMaximizable(true);
                 }}
               >
-                View module details
+                View Test Suite details
               </button>
             )
           })));
+          // setHistoryExecutionDataListPerProject(
+          //   Object.keys(historyExecutedData).map((executionRow) => ({
+          //     project: historyExecutedData[executionRow].project,
+          //     exceutionProfile: historyExecutedData[executionRow].configurename,
+          //     startTime: historyExecutedData[executionRow].startTime,
+          //     endTime: historyExecutedData[executionRow].endTime,
+          //     passed: historyExecutedData[executionRow].passed,
+          //     failed: historyExecutedData[executionRow].failed,
+          //     terminated: historyExecutedData[executionRow].terminated,
+          //     total: historyExecutedData[executionRow].total,
+          //     moduleStatistics: (
+          //       <button
+          //         className="btn_statistics"
+          //         label="Show"
+          //         icon="pi pi-external-link"
+          //         onClick={() => {
+          //           setHistoryModuleAgentList(historyExecutedData[executionRow].moduleList.map((module) => ({
+          //             name: module.modulename,
+          //             agent: module.agent,
+          //             status: module.status,
+          //             report: module.passed+" / "+module.total
+          //           })));
+          //           setDisplayMaximizable(true);
+          //         }}
+          //       >
+          //         View Test Suite details
+          //       </button>
+          //     )
+          //   })).filter((profileProject) => profileProject.project === localStorageDefaultProject.projectName));
         }
       }
 
@@ -380,29 +418,29 @@ const ExecutionProfileStatistics = ({data}) => {
      {(originalExecutionProfileData.length !== 0) && checked &&
       <div className="datatable-responsive">
         <DataTable value={itemsForRender}  scrollable scrollHeight="440px">
-          <Column field="exceutionProfile" header="Project/Profile"   />
+          <Column field="exceutionProfile" header="Execution Profile"   />
           <Column field="DateTime" header="Start Date and Time"   />
           <Column field="inQueue" header="In Queue"   />
           <Column field="completed" header="Completed"   />
           <Column field="inProgress" header="In Progress"   />
           <Column field="totalCount" header="Total"   />
-          <Column field="moduleStatistics" header="All Module Statistics" />
+          <Column field="moduleStatistics" header="All Test Suite Statistics" />
         </DataTable>
       </div>}
 
      {(!checked && !!originalExecutionProfileData.length) &&
        <div className="datatable-responsive">
-       <DataTable value={historyExecutionDataList} scrollable scrollHeight="440px" className='datatable-notchecked'>
-         <Column field="exceutionProfile" header="Project/Profile"   />
+       <DataTable value={historyExecutionDataListPerProject} scrollable scrollHeight="440px" className='datatable-notchecked'>
+         <Column field="exceutionProfile" header="Execution Profile"   />
          <Column field="startTime" header="Start Date"   />
          <Column field="endTime" header="End Time"  />
          <Column field="passed" header="Passed"   />
          <Column field="failed" header="Failed"   />
          <Column field="terminated" header="Terminated"   />
          <Column field="total" header="Total"   />
-         <Column field="moduleStatistics" header="All Module Statistics" />
+         <Column field="moduleStatistics" header="All Test Suite Statistics" />
        </DataTable>
-       {historyExecutionDataList.length === 0 && 
+       {historyExecutionDataListPerProject.length === 0 && 
         <div className="null_data_in_Agent_matrices_">
         <img src="static/imgs/no_report_data.png" className="Agent_matrices_landing_img"/>
         <h3 className="image_text">No History Data to Display</h3>
@@ -422,7 +460,7 @@ const ExecutionProfileStatistics = ({data}) => {
               } */}
   
 {checked ? <Dialog
-      header="Module Details"
+      header="Test Suite Details"
       visible={displayMaximizable}
       className="module_details_dialog p-dialog-metrices"
       modal
@@ -433,7 +471,7 @@ const ExecutionProfileStatistics = ({data}) => {
         <div className="dailog-maximize">
         <div className="datatable-responsive">
         <DataTable value={items} scrollable scrollHeight="200px">
-          <Column field="moduleData" header="Module"/>
+          <Column field="moduleData" header="Test Suite"/>
           <Column field="agentName" header="Agent"/>
         </DataTable>
       </div>
@@ -454,7 +492,7 @@ const ExecutionProfileStatistics = ({data}) => {
         </div>
       </div>
     </Dialog> : <Dialog
-      header="Module Details"
+      header="Test Suite Details"
       visible={displayMaximizable}
       className="module_details_dialog p-dialog-history-metrices"
       modal
@@ -465,7 +503,7 @@ const ExecutionProfileStatistics = ({data}) => {
         <div className="dailog-maximize">
         <div className="datatable-responsive">
         <DataTable value={historymoduleAgentList} scrollable scrollHeight="200px">
-          <Column field="name" header="Module"/>
+          <Column field="name" header="Test Suite"/>
           <Column field="agent" header="Agent"/>
           <Column field="status" header="Status"/>
           <Column field="report" header="Pass / Total"/>

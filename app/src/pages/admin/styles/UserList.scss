@@ -23,6 +23,12 @@
      .p-inputtext {
         width: 40%;
     }
+    .table_email{
+        text-overflow: ellipsis;
+        width: 2rem;
+        max-width: 16rem;
+        overflow: hidden;
+    }
     .user_search{
     position: relative;
     left: 40.1rem;
