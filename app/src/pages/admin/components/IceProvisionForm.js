@@ -68,11 +68,14 @@ const IceProvisionForm = (props) => {
 		};
 		setLoading("Provisioning Token...");
 		const data = await provisions(tokeninfo);
-		if (data.error) { props.toastError(data.error); return; }
 		setLoading(false);
+		if (data.error) { props.toastError(data.error); return; }
 		if (data === "Invalid Session") return RedirectPage(navigate);
 		else if (data === 'fail') props.toastError(Messages.ADMIN.ERR_PROVISION_ICE);
-		else if (data === 'DuplicateIceName') props.toastError(Messages.ADMIN.ERR__ICE_EXIST); else {
+		else if (data === 'DuplicateIceName'){
+			props.toastError(Messages.ADMIN.ERR__ICE_EXIST) ;
+		    setLoading(false);
+		} else {
 			props.setIcename(props.icename);
 			props.setTokeninfoToken(data);
 			props.setToken(data);

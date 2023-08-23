@@ -95,7 +95,7 @@ const IceProvision = (props) => {
           setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid}
           tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken}
           setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} edit={props.setEditUserIceProvision} />
-        {editUser ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE} userConfig={props.userConfig} userID={props.userID} refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}/> : null}
+        {editUser ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE} userConfig={props.userConfig} userID={props.userID} refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}  edit={props.editUserIceProvision}/> : null}
       </div>
     </div>
   );
