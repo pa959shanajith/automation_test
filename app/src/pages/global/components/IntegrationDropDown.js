@@ -1,7 +1,7 @@
 import React , { useState, useEffect} from 'react';
 import {ModalContainer, ScreenOverlay, Messages as MSG, setMsg} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
-import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR,getDetails_Azure } from '../../execute/api';
+import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR,getDetails_Azure,connectAzure_ICE } from '../../execute/api';
 
 /*Component IntegrationDropDown
   use: renders integration popup for ALM/ qTest/ Zypher
@@ -52,7 +52,8 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             var apiIntegration = loginQTestServer_ICE;
             if(type === "ALM") apiIntegration = loginQCServer_ICE;
             if(type === "Zephyr") data = await loginZephyrServer_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, latestCredentialsData.apitoken, latestCredentialsData.authtype, type);
-			else data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
+            if(type === "Azure") data = await connectAzure_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password);
+            else data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
             if(data.error){displayError(data.error);return;}
             else if (data === "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
             else if (data === "Invalid Session") setErrorMsg("Invalid Session");
@@ -84,6 +85,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
                         password: latestCredentialsData.password,
                         apitoken: latestCredentialsData.apitoken,
                         authtype: latestCredentialsData.authtype
+					}
+                }
+                else if(type === "Azure"){
+                    integration.azure = {
+						url: latestCredentialsData.url,
+						username: latestCredentialsData.userName,
+                        password: latestCredentialsData.password
 					}
                 }
                 setCredentialsExecution(integration)
