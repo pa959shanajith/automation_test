@@ -20,7 +20,7 @@ const Handlebars = require('../lib/handlebar.js');
 wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
 
-fs.readFile('D:\\projects\\Avo_assureDB_setup\\Webserver_Backup\\WebServer\\templates\\pdfReport\\content.handlebars', 'utf8', function(err, data) {
+fs.readFile(path.join(__dirname,"..","..","templates","pdfReport","content.handlebars"), 'utf8', function(err, data) {
     templatepdf = Handlebars.compile(data);
 });
 
@@ -1065,6 +1065,41 @@ exports.getAvoDetails = async (req, res) => {
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");
+	}
+};
+
+exports.fetchAgentModuleList = async (req, res) => {
+	const fnName = "fetchAgentModuleList";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		// const reqData = req.session.userid;
+		const input = {
+			'executionListId': req.body.executionListId
+		}
+		const list = await utils.fetchData(input, "devops/getAgentModuleList", "fetchAgentModuleList");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+//To fetch the History data
+exports.fetchHistory = async (req, res) => {
+	const fnName = "fetchHistory";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		// const reqData = req.session.userid;
+		const input = {
+			userid: req.session.userid,
+            fromDate: req.body.fromDate,
+            toDate:req.body.toDate
+		}
+		const list = await utils.fetchData(input, "devops/fetchHistory", "fetchHistory");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 

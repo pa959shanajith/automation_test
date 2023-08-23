@@ -30,8 +30,7 @@ const AdminSidePanel = () => {
                 <AccordionTab header="User management">
                     <div className='flex flex-column pl-4'>
                         <Button onClick={() => { setHeader('Users'); setScreen('users'); }}>Users</Button>
-                        <Button onClick={() => { setHeader('License'); setScreen('license'); }}>License</Button>
-                        {/* <Button onClick={() => { setHeader('Avo Client Provision'); setScreen('Avo Assure Client'); }}>AVO Client Provision</Button> */}
+                        <Button onClick={() => { setHeader('License'); setScreen('License Details'); }}>License Details</Button>
                     </div>
                 </AccordionTab>
             </Accordion>

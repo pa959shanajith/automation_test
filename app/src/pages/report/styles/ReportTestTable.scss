@@ -5,6 +5,14 @@
 }
 
 .reportsTable_container {
+    .img_jira {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+    .img_azure {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
     .p-input-icon-left {
         width: 100%;
     }
@@ -76,5 +84,43 @@
     }
     .jira_user {
         padding: 0.22rem;
+    }
+    .username {
+        top: 9.1rem;
+        width: 92.3%;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        color: #495057;
+        padding: 0.4rem;
+        position: absolute;
+        &:hover {
+            background: #FAF9F6;
+         }
+    }
+}
+
+.p-overlaypanel.report_bug {
+    .p-overlaypanel-content {
+        padding: 0;
+    }
+    .img_jira {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+    .img_azure {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+}
+
+.p-overlaypanel.jira_user {
+    width: 37%;
+    .p-overlaypanel-content {
+        padding: 0;
+        width: 100%;
+        .p-menu.p-component {
+            width: 100%;
+        }
     }
 }

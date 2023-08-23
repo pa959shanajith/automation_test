@@ -9,6 +9,7 @@ import EmailConfiguration from './EmailConfiguration';
 import { validateUserState } from '../../login/api';
 // import IceProvision from './IceProvision';
 import Agents from './Agents'
+import LicenseManagement from './LicenseManagement';
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
@@ -24,6 +25,7 @@ const OriginContainer = (props) => {
             {currentTab === "users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
             {currentTab === "agent" && <Agents/>}
+            {currentTab === "License Details" && <LicenseManagement/>}
             {/* {currentTab === "Avo Assure Client" && <IceProvision/>} */}
         </div>
     </>)

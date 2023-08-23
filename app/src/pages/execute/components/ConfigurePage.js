@@ -14,6 +14,7 @@ import "../styles/ConfigurePage.scss";
 import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
 import {FooterTwo as Footer} from '../../global';
+import ExecutionProfileStatistics from "./ExecutionProfileStatistics";
 import {
   fetchConfigureList,
   getPools,
@@ -100,6 +101,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mode, setMode] = useState(selections[0]);
   const [updateKey, setUpdateKey] = useState("");
   const [currentKey, setCurrentKey] = useState("");
+  const [currentName, setCurrentName] = useState("");
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
   const [executionTypeInRequest, setExecutionTypeInRequest] =
     useState("asynchronous");
@@ -155,7 +157,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const scheduleinfo  = useRef(null);
   const errorinfo  = useRef(null);
 
-  const items = [{ label: "Configurations" }, { label: "Execution(s)" }];
+  const items = [{ label: "Configurations" }, { label: "Execution(s)" },{label:"Execution Profile Statistics"}];
   const handleTabChange = (e) => {
     console.log(e);
     setActiveIndex1(e.index);
@@ -449,6 +451,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     executionData["executionEnv"] = execEnv;
     executionData["browserType"] =browserTypeExe;
     executionData["integration"] = integration;
+    executionData["configurekey"] = currentKey;
+    executionData["configurename"] = currentName;
+    executionData["executionListId"] = uuid() ;
     executionData["batchInfo"] =
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
@@ -537,7 +542,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setFetechConfig(configurationList);
     configurationList.forEach((item, idx) => {
       getState.push({
-        sno: idx + 1,
+        sno: (
+          <span className="sno_header">
+            {idx + 1}
+          </span>
+        ),
         // profileName: item.configurename,
         profileName: (
           <span
@@ -556,6 +565,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
+                setCurrentName(item.configureName)
                 setCurrentSelectedItem(item);
                 setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                 setConfigItem(idx);
@@ -611,13 +621,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   style={{ height: "20px", width: "20px" }}
 className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
 />
-<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
+<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
  <img
 
 src="static/imgs/ic-delete-bin.png"
 style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
 className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
-<Tooltip target=".pencil_button" position="left" content="Edit the execution configuration."/>
+<Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
             
           </div>
         ),
@@ -843,6 +853,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             <select
             placeholder="Search"
             title=" Search for project"
+            className="Search_Project"
               onChange={(e) => {
                 dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
@@ -1095,7 +1106,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     if (!!configList.length) {
       return (
         <>
-         <Tooltip target=".execute_now " position="bottom" content="  Execute configuration using Avo Assure Agent/Grid/Client."/>
+         <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
          <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
 
@@ -1113,7 +1124,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           >
             <Column
               field="sno"
-              style={{ width: "5%" ,height:"2.5rem"}}
+              style={{ width: "5%" ,height:"2.5rem",fontFamily:"Open Sans"}}
               header={<span className="SNo-header">S.No.</span>}
             />
             <Column
@@ -1530,7 +1541,7 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {!!configList.length ? (
+            {(!!configList.length  || activeIndex1 !== 2)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"
@@ -1542,19 +1553,19 @@ Learn More '/>
                 />
                 <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
                Add Configuration
-               <Tooltip target=".addConfig_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
+               <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
               </div>
             ) : null}
           </div>
         </div>
-        {activeIndex1 !== 1 ? (
+        {activeIndex1 === 0 ? (
           <div className="ConfigurePage_container m-2" showGridlines>
             {renderTable()}{" "}
             <div><Footer/></div>
           </div>
         ) : (
-          <ExecutionPage />
+          activeIndex1 === 2 ? <ExecutionProfileStatistics /> : <ExecutionPage />
         )}
         <AvoModal
           visible={visible_setup}

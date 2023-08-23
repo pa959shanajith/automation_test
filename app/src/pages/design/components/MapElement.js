@@ -9,7 +9,9 @@ import { Button } from "primereact/button";
 import { Dialog } from 'primereact/dialog';
 import { Tooltip } from 'primereact/tooltip';
 import { tagList } from './ListVariables';
-import { CompareObj, CompareData, ImpactAnalysisScreenLevel, CompareFlag } from '../designSlice';
+import { CompareObj, CompareData, ImpactAnalysisScreenLevel, CompareFlag,objValue } from '../designSlice';
+import * as scrapeApi from "../api";
+import { highlightScrapElement_ICE } from '../../design/api'
 import '../styles/MapElement.scss';
 
 const MapElement = (props) => {
@@ -28,8 +30,11 @@ const MapElement = (props) => {
     const userInfo = useSelector((state) => state.landing.userinfo);
     const compareData = useSelector(state => state.design.compareData);
     const impactAnalysisScreenLevel = useSelector(state => state.design.impactAnalysisScreenLevel);
+    const objVal=useSelector(state=>state.design.objValue)
     const { changedObj, notChangedObj, notFoundObj, fullScrapeData } = useSelector(state => state.design.compareObj);
     const [dialogVisible, setDialogVisible] = useState(impactAnalysisScreenLevel);
+    const[hightlightcustname,setHighlightedCustname]=useState("")
+    const [activeEye, setActiveEye] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -45,7 +50,7 @@ const MapElement = (props) => {
             // setDialogVisible(true);
             if (notFoundObj && notFoundObj.length) {
                 notFoundObj.forEach(object => {
-                    let elementType = object.tag;
+                    let elementType = props.elementTypeProp(object.tag);
                     if (object.ObjId) {
                         tempNotFound.push(object);
                         if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
@@ -58,7 +63,7 @@ const MapElement = (props) => {
             }
             if (fullScrapeData && fullScrapeData.length) {
                 fullScrapeData.forEach(object => {
-                    let elementType = object.tag;
+                    let elementType = props.elementTypeProp(object.tag);
                     if (tempFilteredList[elementType]) tempFilteredList[elementType] = [...tempFilteredList[elementType], object];
                     else tempFilteredList[elementType] = [object]
                     if (!tempScrapeList[elementType]) tempScrapeList[elementType] = []
@@ -93,7 +98,25 @@ const MapElement = (props) => {
             }
         }
     }, []);
-
+    useEffect(()=>{
+        if (objVal.custname === hightlightcustname) setActiveEye(true);
+        else if (activeEye) setActiveEye(false);
+      }, [objVal])
+      const onHighlight=(ScrapedObject)=>{
+        if(!ScrapedObject.xpath.startsWith('iris')){
+          setHighlightedCustname(ScrapedObject.custname)
+          let objVal = { ...ScrapedObject };
+          dispatch(objValue(objVal));
+      
+          
+          highlightScrapElement_ICE(ScrapedObject.xpath,ScrapedObject.url,"Web",ScrapedObject.top,ScrapedObject.left,ScrapedObject.width,ScrapedObject.height,true)
+            .then(data => {
+              if (data === "Invalid Session") return RedirectPage(navigate);
+              if (data === "fail") console.log('err')
+            })
+            .catch(error => console.error("Error while highlighting. ERROR::::", error));
+        }
+      }
 
     const mapOnDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
 
@@ -139,7 +162,33 @@ const MapElement = (props) => {
     }
 
     const mapOnShowAllObjects = () => setMapSelectedTag("");
+// Replace for IMpact analysis
+    const callAfterReplace=(updatedObjects)=>{
+        let scenarioComparisionData=[]
+        let scenarioImpact=[...props.scenraioLevelImpactedData]
+       let notfoundupdated = notFoundObj.filter(function (notfoundobj) {
+            return !updatedObjects.find(function (elementtoberemoved) {
+                return notfoundobj.ObjId === elementtoberemoved._id
+            })
+        })
+        let notchangedupdated=[...notChangedObj, ...updatedObjects];
+             let updatedScenarioImpact=scenarioImpact.map(screen=>screen.screenId==props.fetchingDetails["_id"]?{...screen,view:[{changedobject:screen.view[0].changedobject},{notchangedobject:notchangedupdated},{notfoundobject:notfoundupdated},{newElements:screen.view[3].newElements}]}:screen)
+        let screenComparisonKeys = {}
 
+                screenComparisonKeys['screenId'] = props.fetchingDetails["_id"]
+                screenComparisonKeys['unchanged'] =  notchangedupdated.length
+                screenComparisonKeys['changed']=changedObj.length
+                screenComparisonKeys['notfound'] =  notfoundupdated.length
+                screenComparisonKeys['statusCode'] = (screenComparisonKeys['notfound']==0 && screenComparisonKeys['changed']==0) ? "SI" : screenComparisonKeys['notfound']==0 ? "WI" : "DI"
+
+// setScenarionLevelImpactedData(screenToBeUpdated)'
+scenarioComparisionData.push(screenComparisonKeys)
+
+scrapeApi.updateScenarioComparisionStatus("web", props.fetchingDetails["_id"], scenarioComparisionData);
+        props.setScenarionLevelImpactedData(updatedScenarioImpact)
+        dispatch(ImpactAnalysisScreenLevel(false))
+        props.toastSuccess("Elements replaced successfully.")
+    }
     const submitMap = () => {
 
         if (!Object.keys(map).length) {
@@ -178,7 +227,7 @@ const MapElement = (props) => {
                 .then(data => {
                     if (data.toLowerCase() === "invalid session") return RedirectPage(navigate);
                     if (data.toLowerCase() === 'success') {
-                        props.fetchScrapeData()
+                        props.isReplaceImpact ?callAfterReplace(updatedObjects):props.fetchScrapeData()
                             .then(resp => {
                                 if (resp === "success") {
                                     props.toastSuccess(MSG.CUSTOM("Not Found Elements has been Successfully Replaced", VARIANT.SUCCESS));
@@ -344,8 +393,21 @@ const MapElement = (props) => {
                                                                 </span>
                                                                 <span data-test="mapObjectFlipName" className="mo_nameFlip" onClick={() => mapOnCustomClick(object.xpath, object.xpath)}></span>
                                                             </> :
-                                                            <span data-test="h3" className='pl-2' title={object.custname} >{object.custname}</span>
-                                                        }
+                                                             <>
+                                                             <span data-test="h3" className='pl-2' title={object.custname} style={{overflow:'hidden',whiteSpace: 'nowrap',textOverflow: 'ellipsis'}}>{object.custname}</span>
+                                                             <span>
+                                                             <img data-test="eyeIcon" className="ss_eye_icon" 
+                                                                     onClick={()=>onHighlight(object)} 
+ 
+                                                                     src={(activeEye && object.custname===objVal.custname) ? 
+                                                                       "static/imgs/eye_icon_blue.svg" : 
+                                                                       "static/imgs/eye_icon_black.svg"} 
+                                                                       style={{height:'1.5rem'}}
+                                                                     alt="eyeIcon"
+                                                               
+                                                               />
+                                                             </span>
+                                                             </>}
 
                                                     </div>))
 
