@@ -56,7 +56,6 @@ const ScheduleScreen = ({
         <span>
           Every{" "}
           <InputText
-          placeholder="eg:5"
           title="Enter after every how many number of day(s) you wish it to recur."
             className="every_day"
             name="everyday"
@@ -78,7 +77,6 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="monthweek"
-            placeholder="eg:5"
             title=" Enter on which day of the month you wish it to recur."
             // value={scheduleOption.monthweek}
             value={scheduleOption?.monthweek}
@@ -88,7 +86,6 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="monthday"
-            placeholder="eg:5"
             title=" Enter after every how many month(s) you wish it to recur."
             // value={scheduleOption.monthday}
             value={scheduleOption?.monthday}
@@ -125,7 +122,6 @@ const ScheduleScreen = ({
           <InputText
             className="every_day"
             name="everymonth"
-            placeholder=" eg:5"
             title=" Enter after every how many month(s) you wish it to recur."
             value={scheduleOption?.everymonth}
             onChange={(e) => onScheduleChange(e)}
@@ -160,7 +156,7 @@ const ScheduleScreen = ({
       WY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
-            Recur every <InputText placeholder="eg:5" title="Enter after every how many week(s) you wish it to recur" /> week(s) on:
+            Recur every <InputText title="Enter after every how many week(s) you wish it to recur" /> week(s) on:
           </div>
           <div className="flex flex-wrap">
             {scheduleWeeks.map((el) => (

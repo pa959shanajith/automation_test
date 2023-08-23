@@ -61,7 +61,7 @@ const IceProvisionList = (props) => {
 	const refreshIceList = async () => {
 		setLoading("Loading...");
 		setSearchTasks("");
-		const data = await fetchICE(props.userID);
+		const data = await fetchICE(props.edit.userId);
 		if (data.error) { displayError(data.error); return; }
 		setLoading(false);
 		data.sort((a, b) => a.icename.localeCompare(b.icename));
@@ -185,7 +185,7 @@ const IceProvisionList = (props) => {
 			<div className="col-xs-9 form-group-ip adminForm-ip" style={{ paddingTop: "64px", width: "60rem" }}>
 				<div className="containerWrap">
 					<div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
-						<h4 onClick={() => { setShowList(!showList); }}>ICE Provisions</h4>
+						<h4 onClick={() => { setShowList(!showList); }}>Avo Assure Client Provisions</h4>
 						<div className="search-ip">
 							<span className="searchIcon-provision search-icon-ip">
 								<img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon" />
@@ -204,8 +204,8 @@ const IceProvisionList = (props) => {
 											headerStyle={{ width: '3em' }}
 										/>
 									)}
-									<Column field="icename" header="ICE Name" />
-									<Column field="icetype" header="ICE Type" />
+									<Column field="icename" header="Avo Assure Client Name" />
+									{/* <Column field="icetype" header="ICE Type" /> */}
 									<Column field="status" header="Status" />
 									<Column field="username" header="Username" />
 									<Column field="hostname" header="Hostname" />

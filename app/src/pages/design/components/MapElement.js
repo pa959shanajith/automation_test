@@ -371,6 +371,8 @@ scrapeApi.updateScenarioComparisionStatus("web", props.fetchingDetails["_id"], s
                     <div className="custom_element">
                         <span className="header">{impactAnalysisScreenLevel ? "Full Scrape Elements" : "Custom Elements"}</span>
                         <div className="container">
+                        {((impactAnalysisScreenLevel ? Object.keys(fullScrapeFilteredList) : Object.keys(mapCustomList)).length > 0) ? (
+                            <div>
                             {(impactAnalysisScreenLevel ? Object.keys(fullScrapeFilteredList) : Object.keys(mapCustomList)).map((elementType, i) => (
                                 <div className='acoordian_container'>
                                     <Accordion activeIndex={activeIndex} onTabOpen={(e) => { setActiveIndex(e.index); onTabChanging(e) }} onTabClose={() => { setActiveIndex(""); setMapSelectedTag("") }}>
@@ -434,6 +436,10 @@ scrapeApi.updateScenarioComparisionStatus("web", props.fetchingDetails["_id"], s
                                         </AccordionTab>
                                     </Accordion>
                                 </div>))}
+                        </div>
+                         ) : (
+                            <div className="no-data-message">No elements found that can be replaced with "Not found element"</div>
+                          )}
                         </div>
                     </div>
                 </div>

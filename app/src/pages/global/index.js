@@ -12,7 +12,8 @@ import Thumbnail from './components/Thumbnail';
 import Footer from './components/FooterTwo';
 import ValidationExpression from './components/ValidationExpression';
 import BrowserFp from './components/BrowserFp';
-import SelectRecipients from './components/SelectRecipients'
+import SelectRecipients from './components/SelectRecipients';
+import IntegrationDropDown from './components/IntegrationDropDown';
 
 
 export { 
@@ -34,4 +35,5 @@ export {
         BrowserFp,
         updateScrollBar,
         SelectRecipients,
+        IntegrationDropDown
     };

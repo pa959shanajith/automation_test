@@ -543,7 +543,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     configurationList.forEach((item, idx) => {
       getState.push({
         sno: (
-          <span className="sno_header">
+          <span className="sno_header" style={{marginLeft:"2rem",width:"1%"}}>
             {idx + 1}
           </span>
         ),
@@ -601,13 +601,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             >  
               CI/CD
             </Button>
-            <Button
-              className="CICD"
-              size="small"
-
-            >
-              SauceLab
-            </Button>
+          
           </div>
         ),
         actions: (
@@ -666,6 +660,11 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setMode(
         getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
       );
+      setIntegration(getData?.executionRequest?.integration ? getData.executionRequest.integration : {
+        alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {url:"",username:"",password:""}
+      });
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
       setDotNotExe(getData);
@@ -673,6 +672,11 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setUpdateKey("");
       setAvodropdown({});
       setMode(selections[0]);
+      setIntegration({
+        alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {url:"",username:"",password:""}
+      });
       setConfigTxt("");
       setModules("normalExecution");
       setSelectedNodeKeys({});
@@ -771,11 +775,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         isHeadless: mode === "Headless",
         avogridId: "",
         avoagents: [avodropdown?.avogrid?.name],
-        integration: {
-          alm: { url: "", username: "", password: "" },
-          qtest: { url: "", username: "", password: "", qteststeps: "" },
-          zephyr: { url: "", username: "", password: "" },
-        },
+        integration,
         batchInfo: batchInfoData,
         donotexe: {
           current: getCurrent,
@@ -1101,6 +1101,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       </>
     );
   };
+
+ 
  
   const renderTable = () => {
     if (!!configList.length) {
@@ -1124,7 +1126,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           >
             <Column
               field="sno"
-              style={{ width: "5%" ,height:"2.5rem",fontFamily:"Open Sans"}}
+              className="sno_label"
+              // style={{ width: "1rem" ,height:"2.5rem",fontFamily:"Open Sans"}}
               header={<span className="SNo-header">S.No.</span>}
             />
             <Column
@@ -1591,6 +1594,8 @@ Learn More '/>
               avodropdown={avodropdown}
               setAvodropdown={setAvodropdown}
               mode={mode}
+              integration={integration}
+              setIntegration={setIntegration}
               setMode={setMode}
               selectedNodeKeys={selectedNodeKeys}
               setSelectedNodeKeys={setSelectedNodeKeys}
