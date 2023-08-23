@@ -165,7 +165,8 @@ const IceProvisionForm = (props) => {
 
 			<div className="col-xs-9" style={{ width: "83%" }}>
 				<div className='flex flex-column pb-4'>
-					<label className="pb-2 font-medium" title="Token Name">ICE Name</label>
+					<label className="pb-2 font-medium" title="Token Name">Avo Assure Client Name</label>
+					<div className="flex flex-row">
 					<InputText
 						type="text"
 						autoComplete="off"
@@ -173,12 +174,13 @@ const IceProvisionForm = (props) => {
 						name="icename"
 						value={props.icename}
 						onChange={(event) => { updateIceName(event.target.value) }} maxLength="100"
-						placeholder="ICE Name"
+						placeholder="Avo Assure Client Name"
 						className={`w-full md:w-20rem ${icenameErrBorder ? "p-invalid" : ''}`}
 					/>
+				{/* </div> */}
+				
+					<Button className="a__btn pull-right ml-3" size='small' onClick={() => { provisionsIce() }} label="Generate" title="Generate"></Button>
 				</div>
-				<div className="pb-4">
-					<Button className="a__btn pull-right" size='small' onClick={() => { provisionsIce() }} label="Generate" title="Generate"></Button>
 				</div>
 				{/* {!isUsrSetting
 					&& <div data-test="ice-type-test" className={'adminControl-ip adminControl-ip-cust'} ><div>
