@@ -36,7 +36,7 @@ function LicenseManagement() {
                 <div className="Platform">
                 <h4>Avo Assure Platform License</h4>
                 <div id="table-data-top" className="Box">
-                    <DataTable value={headerData} tableStyle={{ minWidth: '50rem' }}>
+                    <DataTable value={headerData} className="licenseData">
                         <Column field="Subscribed_Licenses" header="Subscribed Licenses"></Column>
                         <Column field="License_Type" header="License Type"></Column>
                         <Column field="License_Status" header="License Status"></Column>
@@ -47,7 +47,7 @@ function LicenseManagement() {
                 </div>
                 <div id="table-data-bottom" className="Features">
                 <h4>Avo Assure Features</h4>
-                    <DataTable  value={headerData1} tableStyle={{ minWidth: '52rem' }} scrollable scrollHeight="45vh">
+                    <DataTable  value={headerData1} className="licenseData1"  scrollable scrollHeight="45vh">
                         <Column field="License_Type" header="Feature "></Column>
                         <Column field="License_Status" header="Status"></Column>
                     </DataTable>

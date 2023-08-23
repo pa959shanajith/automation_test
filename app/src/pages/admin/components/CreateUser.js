@@ -81,7 +81,7 @@ const CreateUser = (props) => {
         dispatch(AdminActions.UPDATE_TYPE("inhouse"));
         // if (currentTab === "users") setCreateUserDialog(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentTab === "users"]);
+    }, [currentTab === "Users"]);
 
 
     useEffect(() => {

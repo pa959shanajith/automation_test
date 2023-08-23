@@ -105,8 +105,8 @@ const UserList = (props) => {
                 close={() => setShowDeleteConfirmPopUp(false)}
                 footer={
                     <>
-                        <Button label="Yes" onClick={() => props.manage({ action: "delete" })}></Button>
-                        <Button label="No" onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
+                        <Button outlined size='small' label="No" onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
+                        <Button label="Yes" size='small' onClick={() => props.manage({ action: "delete" })}></Button>
                     </>}
                 width={{ width: "5rem" }}
             />
@@ -119,8 +119,8 @@ const UserList = (props) => {
                 scrollHeight='28rem'>
                 <Column field="userName" header="User Name" style={{ width: '20%' }}></Column>
                 <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
-                <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column>
-                <Column field="email" header="Email" style={{ width: '20%' }}></Column>
+                <Column field="lastName" header="Last Name" style={{ width:'20%' }}></Column>
+                <Column field="email" header="Email" className='table_email'></Column>
                 <Column field="role" header="Role" style={{ width: '20%' }}></Column>
                 <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
             </DataTable>
