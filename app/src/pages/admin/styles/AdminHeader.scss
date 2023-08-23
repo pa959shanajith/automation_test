@@ -1,7 +1,15 @@
+@import "../../global/styles/ColorVariables.scss";
 .Create_Header {
+    margin-left: 0.5rem;
+    // padding-top: 0.4rem;
     .Create_btn {
-        position: relative;
-        left: 62.5rem;
-        bottom: 1rem;
+        top: 4rem;
+        left: 89.5rem;
+        position: absolute;
+    }
+    .header_label{
+        position: absolute;
+        bottom: 38rem;
+        font: $f5_bold;
     }
 }

@@ -81,7 +81,7 @@ const CreateUser = (props) => {
         dispatch(AdminActions.UPDATE_TYPE("inhouse"));
         // if (currentTab === "users") setCreateUserDialog(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentTab === "users"]);
+    }, [currentTab === "Users"]);
 
 
     useEffect(() => {
@@ -621,19 +621,22 @@ const CreateUser = (props) => {
             label="Cancel"
             disabled={selectedTab === "avoAzzureClient"}
             text
-            onClick={() => { props.setUserCreateDialog(false); dispatch(AdminActions.EDIT_USER(true)); }}
+            onClick={() => { props.setCreateUserDialog(false); dispatch(AdminActions.EDIT_USER(true)); props.reloadData();}}
         >
-        </Button>
+        </Button> 
         {(selectedTab === "userDetails") && <Button
             data-test="createButton"
-            label={"Next"}
-            onClick={() => { editUser ? manage({ action: "update" }) : manage({ action: "create" }) }}
+            label={ "Next"}
+            onClick={() => { 
+                editUser ? manage({ action: "update" }) : manage({ action: "create" });
+                props.reloadData();
+            }}
             disabled={nocreate}>
         </Button>}
         {selectedTab === "avoAzzureClient" && <Button
             data-test="createButton"
-            label={editUser ? "Update" : "Create"}
-            onClick={() => userCreateHandler()}
+            label={editUser ? "Update" :"Create"}
+            onClick={() => {userCreateHandler();props.setCreateUserDialog(false);props.reloadData();}}
             disabled={nocreate}>
         </Button>}
     </>
