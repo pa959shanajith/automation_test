@@ -1,4 +1,118 @@
 @import "../../global/styles/ColorVariables.scss";
+.tabAndBut{
+    display: flex;
+    .p-button-rounded{
+        margin-left: 6rem;
+    }
+
+}
+.tab-menuInAnalysis{
+    .p-reset{
+        // width: 50rem;
+        justify-content: center;
+        .p-menuitem-text{
+            font-size: 17px;
+        } 
+    }
+}
+.agentHealthStatus{
+    height: 180%;
+    overflow-y: scroll;
+.card{
+    width: 85%;
+.p-sortable-column{
+    padding: 0rem;
+}
+.p-datatable-thead{
+    height: 3rem;
+}
+.wholeTable{
+    align-items: center;
+    display: flex;
+    text-align: center;
+    .p-datatable-wrapper{
+        width:100%;
+    }
+.Agents{
+ text-align: center;
+}
+.Capacity{
+    text-align: center;
+}
+.Available{
+    text-align: center;
+}
+.Utilization{
+    // justify-content: center;
+    // display: flex;
+    .p-column-header-content{
+        // justify-content: center;
+        align-items: center;
+        display: flex;
+        text-align: center;
+        padding-left: 3rem;
+    }
+
+}
+.LastUpdated{
+    .p-column-header-content{
+        align-items: center;
+        // justify-content: center;
+        text-align: center;
+        padding-left: 3rem;
+
+    }
+
+}
+.CurrentStatus{
+    text-align: center;
+
+}
+}
+.progressBar_card {
+    height: 1.5rem;
+    width: 230px;
+    background-color: #e0e0de;
+    border-radius: 50px;
+  }
+  .agent_state {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 0rem;
+    &__div {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      margin: 0.6rem 0.5rem;
+    }
+    & > p {
+      margin: 0.5rem 0rem;
+    }
+    &__p {
+      margin: 0 0 0 1.5rem;
+    }
+    &__active {
+      background-color: #008c5d;
+    }
+    &__in-progress {
+      background-color: #ffbf00;
+    }
+    &__busy {
+      background-color: #d81b1f;
+    }
+    &__offline {
+      background-color: #323130;
+    }
+    &__inactive {
+      background-color: #a19f9d;
+    }
+    &__legends {
+      display: flex;
+      width: inherit;
+    }
+  }
+}
+}
 .analysis_container{
     display: flex;
     flex-direction: row;
@@ -38,11 +152,13 @@
     display: flex;
     flex-direction: column;
     width: 35%;
+    height: 84%;
 }
 .right_card_container{
     display: flex;
     flex-direction: column;
-    width: 54%;
+    width: 50%;
+    height: 84%;
 }
 .analysis_small_card{
     height: -webkit-fill-available;
