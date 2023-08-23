@@ -855,7 +855,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             title=" Search for project"
             className="Search_Project"
               onChange={(e) => {
-                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
+                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: projectList.find((project)=>project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
@@ -1544,7 +1544,7 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {(!!configList.length  || activeIndex1 !== 2)?  (
+            {(!!configList.length  && activeIndex1 === 0)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"
