@@ -112,7 +112,7 @@ const submitModal = (errorMsg, saveAction,type,  isEmpty) => {
         <div className="i__popupWrapRow" style={{ display: 'flex', justifyContent: 'space-between'}}>
             <span className="i__error-msg" style={{ marginTop: '-1.4rem'}}>
                 {
-                    type==="Zephyr" && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '16%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
+                    type==="Zephyr" && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '6%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
                 }
                 {errorMsg}
             </span>

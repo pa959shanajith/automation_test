@@ -11,8 +11,8 @@ const AdminHeader = (props) => {
     
     return (
         <div className="Create_Header">
-            <h3>{currentTab}</h3>
-            {currentTab === "users" && <Button className="Create_btn" label ="create" onClick={() => {props.setCreateUserDialog(true); dispatch(AdminActions.RESET_VALUES(""))}}> </Button>}
+            <h3 className="header_label">{currentTab}</h3>
+            {currentTab === "Users" && <Button className="Create_btn" label ="create" onClick={() => {props.setCreateUserDialog(true); dispatch(AdminActions.RESET_VALUES(""))}}> </Button>}
         </div>
     )
 }
