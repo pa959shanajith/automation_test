@@ -54,11 +54,11 @@ const TableRow = (props) => {
     useEffect(()=>{
         if (!focused){
             setObjName(props.testCase.custname);
-            setObjetListOption({value: props.testCase.custname,label:props.testCase.custname === ""?objList[0]:props.testCase.custname})
             const caseData = props.getKeywords(props.testCase.custname);
             setObjType(caseData.obType);
             setKeyword(props.testCase.keywordVal);
             setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal === ''?props.keywordData[caseData.obType][caseData.keywords[0]].description: props.keywordData[caseData.obType][props.testCase.keywordVal].description})
+            setObjetListOption({value: props.testCase.custname,label:props.testCase.custname === ""?caseData.obType === "defaultList"?"@Generic":objList[0]:props.testCase.custname})
             setInput(props.testCase.inputVal[0]);
             setOutput(props.testCase.outputVal);
             setInputPlaceholder(null);

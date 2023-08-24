@@ -2338,8 +2338,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                     :null}
                     {(node[1].type!=='modules')?
                     <circle 
-                    onMouseUpCapture={(e)=>moveNode(e,'KeyUp')}
-                    onMouseDownCapture={(e)=>moveNode(e,'KeyDown')}
+                    onMouseUp={(e)=>moveNode(e,'KeyUp')}
+                    onMouseDown={(e)=>moveNode(e,'KeyDown')}
                     cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
                     className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
                     :null}
