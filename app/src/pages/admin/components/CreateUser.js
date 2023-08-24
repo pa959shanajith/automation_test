@@ -31,6 +31,7 @@ const CreateUser = (props) => {
     const node = useRef();
     const toast = useRef();
     const [toggleAddRoles, setToggleAddRoles] = useState(false)
+    const [editUserIceProvision, setEditUserIceProvision] = useState();
     const [showDropdown, setShowDropdown] = useState(false)
     const [showDropdownEdit, setShowDropdownEdit] = useState(false)
     const [userNameAddClass, setUserNameAddClass] = useState(false)
@@ -80,7 +81,7 @@ const CreateUser = (props) => {
         dispatch(AdminActions.UPDATE_TYPE("inhouse"));
         // if (currentTab === "users") setCreateUserDialog(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentTab === "users"]);
+    }, [currentTab === "Users"]);
 
 
     useEffect(() => {
@@ -502,7 +503,7 @@ const CreateUser = (props) => {
             setLoading(false);
             data.sort();
             dispatch(AdminActions.UPDATE_ALL_USERS_LIST(data));
-            // setAllUserFilList(data);
+            setAllUserFilList(data);
         }
     }
 
@@ -620,19 +621,22 @@ const CreateUser = (props) => {
             label="Cancel"
             disabled={selectedTab === "avoAzzureClient"}
             text
-            onClick={() => { props.setUserCreateDialog(false); dispatch(AdminActions.EDIT_USER(true)); }}
+            onClick={() => { props.setCreateUserDialog(false); dispatch(AdminActions.EDIT_USER(true)); props.reloadData();}}
         >
-        </Button>
+        </Button> 
         {(selectedTab === "userDetails") && <Button
             data-test="createButton"
             label={ "Next"}
-            onClick={() => { editUser ? manage({ action: "update" }) : manage({ action: "create" }) }}
+            onClick={() => { 
+                editUser ? manage({ action: "update" }) : manage({ action: "create" });
+                props.reloadData();
+            }}
             disabled={nocreate}>
         </Button>}
         {selectedTab === "avoAzzureClient" && <Button
             data-test="createButton"
             label={editUser ? "Update" :"Create"}
-            onClick={() => userCreateHandler()}
+            onClick={() => {userCreateHandler();props.setCreateUserDialog(false);props.reloadData();}}
             disabled={nocreate}>
         </Button>}
     </>
@@ -646,13 +650,13 @@ const CreateUser = (props) => {
         <Fragment>
             <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={1300} />
             {loading ? <ScreenOverlay content={loading} /> : null}
-            <UserList manage={manage}/>
+            <UserList manage={manage} />
             <Dialog
                 visible={props.createUserDialog}
                 onHide={createUserDialogHide}
                 footer={createUserFooter}
-                header={"Create User"}
-                style={{ width: "50.06rem" }}
+                header={editUser ? "Edit User" : "Create User"}
+                style={editUser && (selectedTab === "avoAzzureClient") ? { width: "66.06rem" } : { width: "50.06rem" }}
                 position='centre'
             >
                 <TabMenu model={tabHeader} activeIndex={tabHeader.findIndex((item) => item.key === selectedTab)} onTabChange={(e) => setSelectedTab(tabHeader[e.index].key)} />
@@ -664,7 +668,7 @@ const CreateUser = (props) => {
                             ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown}
                             ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap} ldapDirectoryAddClass={ldapDirectoryAddClass}
                             confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
-                            ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
+                            ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} />
                         : <EditLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass}
                             confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm}
                             allUserFilList={allUserFilList} manage={manage} setAllUserFilList={setAllUserFilList} searchFunctionUser={searchFunctionUser}
@@ -676,7 +680,7 @@ const CreateUser = (props) => {
                             <Fragment>
                                 <div className='flex flex-row justify-content-between pl-2 pb-2' >
                                     <div className="flex flex-column">
-                                        <label htmlFor="username" className="pb-2 font-medium">Password</label>
+                                        <label htmlFor="username" className="pb-2 font-medium">Password<span style={{ color: "#d50000" }}>*</span></label>
                                         <InputText
                                             data-test="password"
                                             value={passWord}
@@ -691,7 +695,7 @@ const CreateUser = (props) => {
                                         />
                                     </div>
                                     <div className="flex flex-column">
-                                        <label htmlFor="username" className="pb-2 font-medium">Confirm Password</label>
+                                        <label htmlFor="username" className="pb-2 font-medium">Confirm Password <span style={{ color: "#d50000" }}>*</span></label>
                                         <InputText
                                             data-test="confirmPassword"
                                             value={confirmPassword}
@@ -712,7 +716,7 @@ const CreateUser = (props) => {
                         }
 
                         {/* PRESENT FOR EACH USERTYPE */}
-                        <div className='flex flex-column pl-2 pb-2'>
+                        {/* <div className='flex flex-column pl-2 pb-2'>
                             <label htmlFor="username" className="pb-2 font-medium">Email Id</label>
                             <InputText
                                 data-test="email"
@@ -726,29 +730,34 @@ const CreateUser = (props) => {
                                 placeholder="Enter Email Id"
                             />
 
+                        </div> */}
+                        <div className="flex flex-row items-center">
+                            <div className="flex flex-column">
+                                <label data-test="primaryRoleLabel" className='pb-2 font-medium' style={{ paddingLeft: '0.7rem' }}>Primary Role <span style={{ color: "#d50000" }}>*</span></label>
+                                <Dropdown
+                                    data-test="primaryRoleDropdown"
+                                    id="userRoles"
+                                    defaultValue={""}
+                                    value={roleDropdownValue}
+                                    options={allRolesUpdate}
+                                    optionLabel="name"
+                                    className='w-full md:w-20rem'
+                                    placeholder='Select Role'
+                                    onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
+                                />
+                            </div>
+                            {/* Admin Check */}
+                            {roleDropdownValue === "5db0022cf87fdec084ae49ab" && (
+                                <div className="flex flex-column items-center secondaryRole_admin"> {/* Test Manager role ID */}
+                                    <label htmlFor="admin_check" className="adminlable_header pb-2 font-medium">Secondary Role</label>
+                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
+                                    <label htmlFor="admin_check" className="ml-5 -mt-4">Admin</label>
+                                </div>
+                            )}
                         </div>
-                        <div className="flex flex-column " >
-                            <label data-test="primaryRoleLabel" className='pb-2 font-medium' style={{ paddingLeft: '0.7rem' }}>Primary Role</label>
-                            <Dropdown
-                                data-test="primaryRoleDropdown"
-                                id="userRoles"
-                                defaultValue={""}
-                                value={roleDropdownValue}
-                                options={allRolesUpdate}
-                                optionLabel="name"
-                                className='w-full md:w-20rem'
-                                placeholder='Select Role'
-                                onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
-                            />
-                        </div>
-                        {/* Admin Check */}
-                        {roleDropdownValue === "5db0022cf87fdec084ae49ab" && <div className="flex flex-row "> {/* Test Manager role ID */}
-                            <Checkbox inputId='admin_check' aria-label="admin_check" className='adminCheckbox' onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
-                            <label htmlFor="admin_check" className=" adminlable">Admin</label>
-                        </div>}
                     </div>
                 </div>}
-                {selectedTab === "avoAzzureClient" && <IceProvision userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
+                {selectedTab === "avoAzzureClient" && <IceProvision editUserIceProvision={props.editUser} setEditUserIceProvision={props.setEditUSer} userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
             </Dialog>
         </Fragment>
     );

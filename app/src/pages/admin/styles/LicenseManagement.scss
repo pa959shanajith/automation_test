@@ -1,0 +1,44 @@
+.card-outer{
+    display: flex;
+    flex-direction: row;
+}
+
+.license-table{
+    display: flex;
+    flex-direction: column;
+    margin-left: 2em;
+}
+.Platform{
+    padding-top: 1em;
+}
+.Features{
+    padding-top: 5em;
+}
+.licenseData{
+    width: 65rem;
+}
+
+.licenseData1{
+    width: 65rem;
+    .p-column-header-content{
+        justify-content: center;
+    }
+}
+
+#table-data-bottom{
+    .p-datatable .p-datatable-tbody > tr > td{
+        text-align: center !important;
+     }
+     .p-datatable-scrollable .p-datatable-wrapper {
+        overflow-y: auto !important;
+        overflow-x: unset !important;
+    }
+}
+#table-data-top{
+    .p-datatable .p-datatable-tbody > tr > td{
+        text-align: center !important;
+     }
+     .p-datatable .p-column-header-content{
+        margin-left: 2em !important;
+     }
+}

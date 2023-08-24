@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollBar } from '../../global';
 import '../styles/IceProvision.scss';
+import { useDispatch, useSelector } from 'react-redux';
 import { getUserDetails } from '../api';
 import IceProvisionForm from '../components/IceProvisionForm';
 import IceProvisionList from '../components/IceProvisionList';
@@ -24,7 +25,7 @@ const IceProvision = (props) => {
   const [tokeninfoToken, setTokeninfoToken] = useState("")
   const [tokeninfoIcename, setTokeninfoIcename] = useState("")
   const [defaultICE, setDefaultICE] = useState('');
-  // const editUser = useSelector(state => state.admin.editUser);
+  const editUser = useSelector(state => state.admin.editUser);
 
   useEffect(() => {
     setOp('normal');
@@ -93,8 +94,8 @@ const IceProvision = (props) => {
           setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token}
           setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid}
           tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken}
-          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} />
-        {/* <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE} userConfig={props.userConfig} userID={props.userID} refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}/> */}
+          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} edit={props.setEditUserIceProvision} />
+        {editUser ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE} userConfig={props.userConfig} userID={props.userID} refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}  edit={props.editUserIceProvision}/> : null}
       </div>
     </div>
   );

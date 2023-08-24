@@ -20,6 +20,7 @@ const UserList = (props) => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [loading, setLoading] = useState(true);
     const [editUserDialog, setEditUserDialog] = useState(false);
+    const [editUser, setEditUser] = useState('')
     const allUserList = useSelector(state => state.admin.allUsersList);
     const [showDeleteConfirmPopUp, setShowDeleteConfirmPopUp] = useState(false);
 
@@ -45,26 +46,44 @@ const UserList = (props) => {
                 } catch (error) {
                     console.error('Error fetching User list:', error);
                 }
-            }
-            else setData(allUserList);
+            } else{
+                setData(allUserList);
+            } 
         })();
-    }, []);
+    }, []); 
+    const reloadData = async() => {
+        const UserList = await getUserDetails("user");
+        let filteredUserList=[];
+        for (let user of UserList){
+            filteredUserList.push({
+                userName: user[0],
+                userId: user[1],
+                firstName: user[4],
+                lastName: user[5],
+                email: user[6],
+                role: user[3]
+            });
+        }
+        setData(filteredUserList);
+    }
 
     const header = (
-        <div className='User_header'>
-            <p>User List</p>
-            <InputText
-                className='User_Inp'
-                type="search"
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-                placeholder="Search User Field"
-            />
+            <div className='User_header'>
+                <p>User List</p>
+                <i className="pi pi-search user_search" />
+                <InputText
+                    className='User_Inp'
+                    type="search"
+                    value={globalFilter}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                    placeholder="Search"
+                />
         </div>
     );
 
 
     const editRowData = (rowData) => {
+        setEditUser(rowData);
         dispatch(AdminActions.EDIT_USER(true));
         dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
@@ -102,28 +121,29 @@ const UserList = (props) => {
                 content={"Are you sure, you want to delete the user"}
                 close={() => setShowDeleteConfirmPopUp(false)}
                 footer={
-                    <>
-                        <Button label="Yes" onClick={() => props.manage({ action: "delete" })}></Button>
-                        <Button label="Yes" onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
+                    <> 
+                        <Button outlined label="No" size='small' onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
+                        <Button label="Yes" size='small' onClick={() => {props.manage({ action: "delete" });setShowDeleteConfirmPopUp(false);reloadData();}}></Button>
                     </>}
                 width={{ width: "5rem" }}
             />
-            <DataTable value={data} editMode="row" size='normal' 
-            loading={loading}
+            <DataTable value={data} editMode="row" size='normal'
+                loading={loading}
                 globalFilter={globalFilter}
                 header={header}
                 emptyMessage="No users found"
                 scrollable
-                scrollHeight='28rem'>
+                scrollHeight='28rem'
+                showGridlines>
                 <Column field="userName" header="User Name" style={{ width: '20%' }}></Column>
                 <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
-                <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column>
-                <Column field="email" header="Email" style={{ width: '20%' }}></Column>
+                <Column field="lastName" header="Last Name" style={{ width:'20%' }}></Column>
+                <Column field="email" header="Email" className='table_email'></Column>
                 <Column field="role" header="Role" style={{ width: '20%' }}></Column>
                 <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
             </DataTable>
 
-            {editUserDialog && <CreateUser createUserDialog={editUserDialog} setCreateUserDialog={setEditUserDialog} />}
+            {editUserDialog && <CreateUser createUserDialog={editUserDialog} reloadData={reloadData} setCreateUserDialog={setEditUserDialog} setEditUser={setEditUser} editUser={editUser} />}
         </div>
     </>)
 }

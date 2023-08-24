@@ -26,6 +26,7 @@ const IceProvisionForm = (props) => {
 	const [users, setUsers] = useState([['Select User', ' ', '', '']])
 	const isUsrSetting = props.userConfig //for user settings
 
+
 	useEffect(() => {
 		setUsers([['Select User', ' ', '', '']]);
 		props.setTokeninfoIcename("");
@@ -55,23 +56,26 @@ const IceProvisionForm = (props) => {
 		}
 
 		var tokeninfo = {
-			userid: props.userid[1],
+			userid: props.edit?props.edit.userId:props.userid[1],
 			icename: props.icename.trim(),
 			icetype: icetype,
 			action: "provision",
-			email:props.userid[6],
-			username:props.userid[0],
-			firstName: props.userid[4],
-			lastName: props.userid[5],
+			email:props.edit?props.edit.email:props.userid[6],
+			username:props.edit?props.edit.userName:props.userid[0],
+			firstName: props.edit?props.edit.firstName:props.userid[4],
+			lastName: props.edit?props.edit.lastName:props.userid[5],
 			url:new URL(window.location.href).origin,
 		};
 		setLoading("Provisioning Token...");
 		const data = await provisions(tokeninfo);
-		if (data.error) { props.toastError(data.error); return; }
 		setLoading(false);
+		if (data.error) { props.toastError(data.error); return; }
 		if (data === "Invalid Session") return RedirectPage(navigate);
 		else if (data === 'fail') props.toastError(Messages.ADMIN.ERR_PROVISION_ICE);
-		else if (data === 'DuplicateIceName') props.toastError(Messages.ADMIN.ERR__ICE_EXIST); else {
+		else if (data === 'DuplicateIceName'){
+			props.toastError(Messages.ADMIN.ERR__ICE_EXIST) ;
+		    setLoading(false);
+		} else {
 			props.setIcename(props.icename);
 			props.setTokeninfoToken(data);
 			props.setToken(data);
@@ -164,7 +168,8 @@ const IceProvisionForm = (props) => {
 
 			<div className="col-xs-9" style={{ width: "83%" }}>
 				<div className='flex flex-column pb-4'>
-					<label className="pb-2 font-medium" title="Token Name">ICE Name</label>
+					<label className="pb-2 font-medium" title="Token Name">Avo Assure Client Name</label>
+					<div className="flex flex-row">
 					<InputText
 						type="text"
 						autoComplete="off"
@@ -172,12 +177,13 @@ const IceProvisionForm = (props) => {
 						name="icename"
 						value={props.icename}
 						onChange={(event) => { updateIceName(event.target.value) }} maxLength="100"
-						placeholder="ICE Name"
+						placeholder="Avo Assure Client Name"
 						className={`w-full md:w-20rem ${icenameErrBorder ? "p-invalid" : ''}`}
 					/>
+				{/* </div> */}
+				
+					<Button className="a__btn pull-right ml-3" size='small' onClick={() => { provisionsIce() }} label="Generate" title="Generate"></Button>
 				</div>
-				<div className="pb-4">
-					<Button className="a__btn pull-right" size='small' onClick={() => { provisionsIce() }} label="Generate" title="Generate"></Button>
 				</div>
 				{/* {!isUsrSetting
 					&& <div data-test="ice-type-test" className={'adminControl-ip adminControl-ip-cust'} ><div>
