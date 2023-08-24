@@ -6,6 +6,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { fetchAvoAgentAndAvoGridList } from "../api";
 import { Button } from 'primereact/button';
+import { setMsg, VARIANT, Messages as MSG } from '../../global'
 
 const Analysis = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
