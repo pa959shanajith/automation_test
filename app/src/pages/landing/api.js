@@ -319,7 +319,6 @@ export const fetchAvoAgentAndAvoGridList = async(props) => {
             data:props
         });
         if(res.status === 401){
-            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
