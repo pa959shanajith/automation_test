@@ -10,6 +10,7 @@ import { validateUserState } from '../../login/api';
 // import IceProvision from './IceProvision';
 import Agents from './Agents'
 import LicenseManagement from './LicenseManagement';
+import Privileges from './preferences';
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
@@ -26,6 +27,7 @@ const OriginContainer = (props) => {
             {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
             {currentTab === "Manage Agents" && <Agents/>}
             {currentTab === "License Details" && <LicenseManagement/>}
+            {currentTab === "Privileges" && <Privileges/>}
             {/* {currentTab === "Avo Assure Client" && <IceProvision/>} */}
         </div>
     </>)
