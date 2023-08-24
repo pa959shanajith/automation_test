@@ -14,10 +14,12 @@ const AvoMultiselect = ({
   const [touched, setTouched] = useState(false);
   return (
     <div className="avo_multiselect">
+      { required && 
       <label>
         <span>{labelTxt}</span>
         <img src="static/imgs/Required.svg" className="required_icon" />
       </label>
+      }
       <MultiSelect
         value={multiSelectValue}
         onChange={(e) => onMultiSelectChange(e)}
