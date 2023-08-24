@@ -202,6 +202,7 @@ const Login = (props) => {
                     if(res){
                         setOverlayText("");
                         setShowResetPass(true);
+                        forgotPasswordLinkHandler()
                     } else {
                         setOverlayText("");
                         redirectToHomePage();
@@ -228,6 +229,7 @@ const Login = (props) => {
                         setOverlayText("");
                         setResetUserData(res.user)
                         setShowChangePass(true);
+                        forgotPasswordLinkHandler()
                     } else {
                         setOverlayText("");
                         redirectToHomePage();
