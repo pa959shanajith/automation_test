@@ -317,3 +317,143 @@ export const fetchHistory = async(fromDate,toDate) => {
         return {error:MSG.DevOps.ERR_DevOps_Keys}
     }
 }
+ 
+export const loginQCServer_ICE = async(qcURL,qcUserName,qcPassword) => { 
+    try{
+        const res = await axios(url+'/loginQCServer_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: "loginQCServer_ICE",
+                qcURL: qcURL,
+                qcUsername: qcUserName,
+                qcPassword : qcPassword,
+                qcaction: "domain"},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.EXECUTE.ERR_LOGIN_QC}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.EXECUTE.ERR_LOGIN_QC}
+    }
+}
+export const loginZephyrServer_ICE = async(zephyrURL, zephyrUserName, zephyrPassword, zephyrApiToken, zephyrAuthType, integrationType) => { 
+    try{
+        var zephyrPayload = {};
+        zephyrPayload.authtype = zephyrAuthType;
+        zephyrPayload.zephyrURL = zephyrURL;
+        zephyrPayload.zephyrUserName = zephyrUserName;
+        zephyrPayload.zephyrPassword = zephyrPassword;
+        zephyrPayload.zephyrApiToken = zephyrApiToken;
+        const res = await axios(url+'/loginToZephyr_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: { action: "loginToZephyr_ICE",
+                action: "loginToZephyr_ICE",
+                zephyrPayload: zephyrPayload,
+                integrationType : integrationType,
+                zephyraction: "login"
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.EXECUTE.ERR_LOGIN_ZEPHYR}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.EXECUTE.ERR_LOGIN_ZEPHYR}
+    }
+}
+export const getDetails_ZEPHYR = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_Zephyr', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
+
+export const loginQTestServer_ICE = async(qcURL,qcUserName,qcPassword, qcType) => { 
+    try{
+        const res = await axios(url+'/loginToQTest_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: "loginToQTest_ICE",
+            qcURL: qcURL,
+            qcUsername: qcUserName,
+            qcPassword : qcPassword,
+            qcType : qcType,
+            qcaction: "domain"},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.EXECUTE.ERR_LOGIN_QTEST}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.EXECUTE.ERR_LOGIN_QTEST}
+    }
+}
+
+export const fetchAvoAgentAndAvoGridList = async(props) => {
+    try{
+        const res = await axios(url+'/getAvoAgentAndAvoGridList', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data:props
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }
+}

@@ -1,0 +1,37 @@
+.integration_label{
+    font-size: 13px;
+    font-weight: 700;
+    margin-left: 0.6rem;
+    font-family: 'Open Sans';
+    line-height: 1.9rem;
+    color: #495057;
+    
+}
+/* Apply some basic styling to the selected option */
+.selected-option {
+    background-color: #f0f0f0;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+.custom-dropdown{
+margin-left: 0.5rem;
+line-height: 0.7rem;
+}
+/* Add some spacing and styling to the dropdown options */
+.custom-dropdown .p-dropdown-item {
+    padding: 0.5rem;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    margin-left: 0.5rem;
+
+}
+
+.custom-dropdown .p-dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+.custom-dropdown .p-dropdown-panel {
+margin-left: 3rem; /* Adjust the left position */
+    max-height: 150px; /* Adjust the maximum height */
+    overflow-y: auto;
+    
+}

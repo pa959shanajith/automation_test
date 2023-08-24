@@ -61,7 +61,7 @@ const IceProvisionList = (props) => {
 	const refreshIceList = async () => {
 		setLoading("Loading...");
 		setSearchTasks("");
-		const data = await fetchICE(props.userID);
+		const data = await fetchICE(props.edit.userId);
 		if (data.error) { displayError(data.error); return; }
 		setLoading(false);
 		data.sort((a, b) => a.icename.localeCompare(b.icename));
@@ -185,7 +185,7 @@ const IceProvisionList = (props) => {
 			<div className="col-xs-9 form-group-ip adminForm-ip" style={{ paddingTop: "64px", width: "60rem" }}>
 				<div className="containerWrap">
 					<div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
-						<h4 onClick={() => { setShowList(!showList); }}>ICE Provisions</h4>
+						<h4 onClick={() => { setShowList(!showList); }}>Avo Assure Client Provisions</h4>
 						<div className="search-ip">
 							<span className="searchIcon-provision search-icon-ip">
 								<img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon" />
@@ -195,41 +195,8 @@ const IceProvisionList = (props) => {
 					</div>
 					{showList ?
 						<div id="activeUsersToken" className="wrap wrap-cust-ip">
-							{/* <ScrollBar scrollId='activeUsersToken-ip' thumbColor="#929397" >
-                    	<table className = "table table-hover sessionTable" id="tokensDetail">
-                            <tbody >
-                            <tr>
-								{isUsrSetting === true && <th data-test="table-heading-test">Default ICE</th>}
-								<th> ICE Name </th>
-								<th> ICE Type</th>
-								<th> Status </th>
-								<th> Username </th>
-								<th> Hostname </th>
-								<th style={{textAlign: 'center'}}>Action</th>
-								<th> </th>
-							</tr>
-                            {icelistModify.map((entry,index)=>(
-                                <tr key={index} className='provisionTokens'>
-									{isUsrSetting === true && <td data-test="radio-token-test"><input name="default" type="radio" value={entry.icename} checked={entry.icename === defaultICE ? true : false} onChange={defaultChangeHandler} /></td>}
-                                    <td> {entry.icename} </td>
-                                    <td> {entry.icetype} </td>
-                                    <td> {entry.status} </td>
-                                    <td> {entry.username} </td>
-                                    <td> {entry.hostname} </td>
-												{entry.status === 'provisioned' ? <td><button className="btn btn-cust-ip" onClick={() => { reregister(entry, "Reprovision") }} > Reprovision </button></td>
-													: null}
-												{entry.status === 'registered' || entry.status === 'deregistered' ? <td ><button className="btn btn-cust-ip" onClick={() => { reregister(entry, "Reregister") }}> Reregister </button></td>
-													: null}
-												{entry.status === 'deregistered' ? <td></td> : null}
-												{entry.status !== 'deregistered' ? <td ><button className="btn btn-cust-ip" onClick={() => { deregister(entry) }}> Deregister </button></td>
-													: null}
-                                </tr> 
-                            ))}
-                            </tbody>
-						</table>
-						</ScrollBar> */}
 							<div >
-								<DataTable value={icelistModify} selectionMode="single" selection={selectedEntry} onSelectionChange={(e) => setSelectedEntry(e.value)}>
+								<DataTable showGridlines value={icelistModify} selectionMode="single" selection={selectedEntry} onSelectionChange={(e) => setSelectedEntry(e.value)}>
 									{isUsrSetting === true && (
 										<Column
 											selectionMode="single"
@@ -237,8 +204,8 @@ const IceProvisionList = (props) => {
 											headerStyle={{ width: '3em' }}
 										/>
 									)}
-									<Column field="icename" header="ICE Name" />
-									<Column field="icetype" header="ICE Type" />
+									<Column field="icename" header="Avo Assure Client Name" />
+									{/* <Column field="icetype" header="ICE Type" /> */}
 									<Column field="status" header="Status" />
 									<Column field="username" header="Username" />
 									<Column field="hostname" header="Hostname" />

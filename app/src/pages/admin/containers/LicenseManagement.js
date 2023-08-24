@@ -3,10 +3,6 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { ColumnGroup } from 'primereact/columngroup';
 import { Row } from 'primereact/row';
-import 'primereact/resources/themes/lara-light-indigo/theme.css';   // theme
-import 'primereact/resources/primereact.css';                       // core css
-import 'primeicons/primeicons.css';                                 // icons
-import 'primeflex/primeflex.css'; 
 import '../styles/LicenseManagement.scss';
 import { getAvailablePlugins } from "../api";
 function LicenseManagement() {
@@ -16,10 +12,11 @@ function LicenseManagement() {
         (async()=>{
             const LicenseData = await getAvailablePlugins()
             setLicenseData(LicenseData)
-            setHeaderData1(LicenseData.FeatureDetails.map(finalData=>{
+            console.log(LicenseData)
+            setHeaderData1(Object.entries(LicenseData).map(([key, value])=>{
                 return{
-                    License_Type:finalData.featurename,
-                    License_Status:finalData.value==="true"?"Enabled":finalData.value==="false"?"Disabled":finalData.value
+                    License_Type:key,
+                    License_Status:value===true?"Enabled":value===false?"Disabled":value
                 }
             }))
         })()
@@ -35,12 +32,12 @@ function LicenseManagement() {
 
     return(
         <>
-        <div className="card">
-            <div className="Right">
+        <div className="card-outer">
+            <div className="license-table">
                 <div className="Platform">
                 <h4>Avo Assure Platform License</h4>
-                <div id="top" className="Box">
-                    <DataTable value={headerData} tableStyle={{ minWidth: '50rem' }}>
+                <div id="table-data-top" className="Box">
+                    <DataTable value={headerData} className="licenseData">
                         <Column field="Subscribed_Licenses" header="Subscribed Licenses"></Column>
                         <Column field="License_Type" header="License Type"></Column>
                         <Column field="License_Status" header="License Status"></Column>
@@ -49,9 +46,9 @@ function LicenseManagement() {
                     <div>*All licenses are concurrent license</div>
                 </div>
                 </div>
-                <div id="bottom" className="Features">
+                <div id="table-data-bottom" className="Features">
                 <h4>Avo Assure Features</h4>
-                    <DataTable  value={headerData1} tableStyle={{ minWidth: '52rem' }} scrollable scrollHeight="45vh">
+                    <DataTable  value={headerData1} className="licenseData1"  scrollable scrollHeight="40vh">
                         <Column field="License_Type" header="Feature "></Column>
                         <Column field="License_Status" header="Status"></Column>
                     </DataTable>

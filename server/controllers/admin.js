@@ -2685,7 +2685,8 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		const userid = req.session.userid;
 		const activeRole = req.session.activeRole;
 		const roleId = req.session.activeRoleId;
-		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin" && isAdminUser === true) return next();
+		const isAdminUser = req.session.isadminuser;
+		if (roleId === '5db0022cf87fdec084ae49ab' && activeRole === "Quality Manager" && isAdminUser === true) return next();
 		switch (req.path) {
 			case "/manageUserDetails":
 			    if(req.body.action == "stepUpdate") return next();

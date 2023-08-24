@@ -9,8 +9,13 @@
     margin-left: 1.1rem;
     margin-top: 1rem;
     .p-icon {
-        display: inline-block;
-        margin-top: 0.1rem;
-        font-family: "Open Sans";
+        display: inline-block !important;
+        margin-top: 0.3rem !important; 
+    }
+}
+.treeitems{
+    .p-icon {
+        display: inline-block !important;
+        margin-bottom: -0.3rem !important; 
     }
 }
