@@ -13,18 +13,30 @@ const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
 const utils = require("./utils");
 const queue = require("./execution/executionQueue")
+module.exports.setReq = async (req) =>
+{
+        this.avoreq=req;
+}
 default_sub.on("message", (channel, message) => {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
 	const data = JSON.parse(message);
 	const socketchannel = channel.split('_')[1];
 	const sockets = require("./socket");
 	var mySocket;
+	let host = module.exports.avoreq.headers.host
+	let clientName="avoassure";
+	if(host != null && host != undefined)
+	{
+			if(!(host.includes("localhost") || require('net').isIP(host)>0)){
+					clientName=host.split('.')[0]
+			}
+	}
 	if (socketchannel === "notify")
 		mySocket = sockets.socketMapNotify[data.username];
 	else if (socketchannel === "scheduling")
 		mySocket = sockets.allSchedulingSocketsMap[data.username];
 	else
-		mySocket = sockets.allSocketsMap[data.username];
+		mySocket = sockets.allSocketsMap[clientName][data.username];
 	if (mySocket === undefined) {
 		const dataToNode = JSON.stringify({"username": data.username, "onAction": "unavailableLocalServer", "value": {}});
 		server_pub.publish("ICE2_" + data.username, dataToNode);
@@ -159,6 +171,10 @@ default_sub.on("message", (channel, message) => {
 
 	case "getSerialNumber":
 		mySocket.emit("getSerialNumber");
+		break;
+
+	case "checkingMobileClient":
+		mySocket.emit("checkingMobileClient");
 		break;
 
 	default:
@@ -387,8 +403,6 @@ module.exports.initListeners = mySocket => {
 		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
 	mySocket.on('ICE_status_change', async value => {
-		pulse_ICE = await cache.get("ICE_status")
-		pulse_ICE[username] = value;
 		if (value.connected){
 			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 			server_pub.publish('ICE_STATUS_' + username, dataToExecute);
@@ -400,7 +414,15 @@ module.exports.initListeners = mySocket => {
 			queue.Execution_Queue.ice_list[username]["connected"] = false
 			server_sub.unsubscribe('ICE_STATUS_' + username);
 		}
-		cache.set("ICE_status",pulse_ICE)
+		cache.sethmap(username,value)
+	});
+	mySocket.on("get_serial_number", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "get_serial_number", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
+	});
+	mySocket.on("checking_Mobile_Client", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "checking_Mobile_Client", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 	mySocket.on("get_serial_number", value => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "get_serial_number", "value": value});

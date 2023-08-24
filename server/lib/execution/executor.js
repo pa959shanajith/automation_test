@@ -115,6 +115,17 @@ class TestSuiteExecutor {
             "reportType": "functionalTesting",
             "version":"-"
         };
+        if(batchData.executionEnv == 'saucelabs' && batchData.batchInfo.length) {
+            execReq['sauce_username'] = batchData.sauce_username
+            execReq['sauce_access_key'] = batchData.sauce_access_key
+            execReq['remote_url'] = batchData.remote_url
+            if(batchData.batchInfo[0].appType == 'Web') {
+                execReq['browserVersion'] = batchData.browserVersion
+                execReq['platform'] = batchData.platform
+            } else {
+                execReq["mobile"] = batchData.mobile
+            }
+        }
         const gitInfo = batchData.gitInfo;
         if(gitflag){
             var folderPath = gitInfo['folderPath'];
@@ -564,7 +575,7 @@ class TestSuiteExecutor {
                     // rsv(execStatus);
                 }
             } else if (status === "started") {
-                await _this.updateExecutionStatus([executionid], { starttime: data.startTime });
+                await _this.updateExecutionStatus([executionid], { starttime: data.startTime,scenarioParallelExec: resultData.execReq.scenarioParallelExec });
                 if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
             } else if (status === "finished") {
                 const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);

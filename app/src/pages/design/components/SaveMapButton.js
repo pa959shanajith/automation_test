@@ -40,6 +40,7 @@ const SaveMapButton = (props) => {
     )
 }
 
+     
 //mindmap save funtion
 const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList,toast)=>{
     var tab = "endToend"

@@ -654,3 +654,75 @@ function projectAllocation(data) {
 		})
 	});
 }
+
+generateEmailPayload.onExecutionStart = async data => {
+	const fnName = 'generateEmailPayload';
+	const subj = msgTitle = "Below modules have been successfully added to the Test Execution Queue.";
+	const recv = data.recieverEmailAddress.split(",");
+
+	data.executionData.forEach(execData => {
+		execData.suiteDetails.forEach(suiteInfo => {
+			suiteInfo.projectName = execData.projectName;
+			suiteInfo.testsuiteName = execData.testsuiteName;
+		})
+	});
+
+	const msg = {
+		'subject': subj,
+		'template': 'report-on-cicd-execution-starts',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'status': 'Queued',
+			'msgTitle': msgTitle,
+			'executionType': "Avo Agent/Avo Grid/Pipeline",
+			'profileName': data.profileName,
+			'startDate': data.startDate,
+			'executionData': data.executionData
+		}
+	};
+
+	return {
+		error: null,
+		msg,
+		receivers: recv
+	};
+};
+
+generateEmailPayload.reportOnCICDExecution = async data => {
+	const fnName = 'generateEmailPayload'
+	const subj = msgTitle = 'Below modules have been executed successfully.';
+	const recv = data.recieverEmailAddress.split(",");
+
+	data.reportExecutionData.reportData.forEach(reportDataItem => {
+		reportDataItem.suiteDetails.forEach(reportItem => {
+			if (reportItem.reportId.length > 0) reportItem.url = data.url + "/reports/?" + "executionid="+reportItem.reportId
+
+			if (reportItem.status.toLowerCase() == "pass") reportItem.pass = true;
+			else if (reportItem.status.toLowerCase() == "fail") reportItem.fail = true;
+			else if (reportItem.status.toLowerCase() == "terminate") reportItem.terminate = true;
+			else if (reportItem.status.toLowerCase() == "incomplete") reportItem.incomplete = true;
+			else if (reportItem.status.toLowerCase() == "skipped") reportItem.skipped = true;
+		})
+	});
+
+	const msg = {
+		'subject': subj,
+		'template': 'report-on-cicd-execution-completes',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'msgTitle': msgTitle,
+			'executionType': "Avo Agent/Avo Grid/Pipeline",
+			'executionData': data.reportExecutionData.reportData,
+			'profileName': data.profileName,
+			'startDate': new Date().getFullYear() + "-" + ("0" + (new Date().getMonth() + 1)).slice(-2) + "-" + ("0" + new Date().getDate()).slice(-2) + " " + ("0" + new Date().getHours()).slice(-2) + ":" + ("0" + new Date().getMinutes()).slice(-2) + ":" + ("0" + new Date().getSeconds()).slice(-2)
+		}
+	};
+
+	return {
+		error: null,
+		msg,
+		receivers: recv
+	};
+};

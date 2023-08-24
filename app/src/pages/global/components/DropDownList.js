@@ -7,7 +7,7 @@ import '../styles/DropDownList.scss'
   use: renders searchable available ice dropdown
 */
 
-const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder, ExeScreen, poolType}) => {
+const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder, ExeScreen, poolType, sauceLab}) => {
     const inputRef = useRef()
     const [list,setList] =  useState([])
     const [dropDown,setDropDown] = useState(false)

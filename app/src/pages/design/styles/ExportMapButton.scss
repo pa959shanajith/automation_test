@@ -31,6 +31,13 @@
     select:focus{
         outline: none;
     }
+    textarea {
+        width: 70%;
+        height: 75px;
+        resize: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 .export-rec-row{
     margin: 20px 2%;

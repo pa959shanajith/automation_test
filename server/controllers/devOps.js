@@ -3,6 +3,7 @@ var logger = require('../../logger');
 var utils = require('../lib/utils');
 const {execAutomation} = require('./suite');
 const { default: async } = require('async');
+const notifications = require('../notifications');
 
 exports.fetchProjects =  async(req, res) => {
 	const fnName = "fetchProjects";
@@ -341,5 +342,41 @@ exports.executionParallel = async(req, res)=>{
 	} catch (error) {
 		logger.error("Error occurred in devops/hooks/ParallelExecutions: "+error)
 		return res.send("fail")
+	}
+}
+
+exports.sendMailOnExecutionStart = async (req, res) => {
+	const fnName = "sendMailOnExecutionStart";
+	try {
+		const config = {"action":"provider","channel":"email","args":"smtp"};
+
+		const inputs = {
+			action: config.action,
+			name: config.args,
+			channel: config.channel
+		};
+		
+		const result = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
+		if (result == "fail") {
+			res.status(500).send("fail");
+		}
+		else if (result.length == 0) { 
+			res.send("empty");
+		} 
+		else {
+			const rawConf = result[0];
+			const executionData = {};
+			executionData.executionData = req.body.executionData;
+			executionData.recieverEmailAddress = req.body.recieverEmailAddress;
+			executionData.profileName = req.body.profileName;
+			executionData.startDate = req.body.startDate;
+
+			await notifications.notify("onExecutionStart", executionData, rawConf.channel);
+			return res.status(200).send("pass");
+		}
+	}
+	catch (exception) {
+		logger.error("Error occurred in devOps/"+fnName, exception);
+		res.status(500).send("fail");
 	}
 }

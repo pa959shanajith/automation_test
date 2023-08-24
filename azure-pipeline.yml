@@ -204,7 +204,10 @@ stages:
             echo "Adding Reports Server in the package"
             set FOLDERS_TO_ZIP=!FOLDERS_TO_ZIP! ReportServer
             git clone %reportlink% --branch master --single-branch ReportServer
-            cd ReportServer/app
+            xcopy /I /Q /Y /E /S C:\portable_pythons\wkhtmltox wkhtmltox
+            cd ReportServer
+            move /Y ../wkhtmltox ./
+            cd app
             REM python -c "import json;p=open('package.json');d=json.load(p);p.close();d['homepage']='.';p=open('package.json','w');json.dump(d,p,indent=2);p.close()"
             call npm install
 
