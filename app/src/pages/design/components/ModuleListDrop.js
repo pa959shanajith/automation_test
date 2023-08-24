@@ -22,7 +22,6 @@ import { Avatar } from 'primereact/avatar';
 import AvoInput from "../../../globalComponents/AvoInput";
 import SaveMapButton from "./SaveMapButton";
 import { Tooltip } from 'primereact/tooltip';
-import { setShouldSaveResult } from 'agenda/dist/job/set-shouldsaveresult';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 

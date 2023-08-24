@@ -12,7 +12,6 @@ import '../styles/VerticalSteps.scss';
 import { useNavigate } from "react-router-dom";
 import { useSelector,useDispatch  } from 'react-redux';
 import { updateSteps } from './VerticalComponentsSlice';
-import { disable } from 'agenda/dist/job/disable';
 import { getProjectIDs } from "../api"
 import { selectedProj } from '../../design/designSlice';
 // this component renders the "get started Box" in the landing page with the help of MUI framework
