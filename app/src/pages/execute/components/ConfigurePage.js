@@ -240,6 +240,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
+      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
