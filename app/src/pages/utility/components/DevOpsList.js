@@ -660,8 +660,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         executionData["exectionMode"]=execAction;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
-        executionData["profileName"] = currentName;
-        executionData["recieverEmailAddress"] = emailNotificationReciever;
         executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
         ResetSession.start();
         try{
@@ -1002,24 +1000,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     onClick('displayBasic2');
                                     setCurrentKey(item.configurekey);
                                     setCurrentExecutionRequest(item.executionRequest);
-                                    if ("isEmailNotificationEnabled" in item.executionRequest) {
-                                        setEmailNotificationEnabled(item.executionRequest.isEmailNotificationEnabled);
-                                        if (item.executionRequest.isEmailNotificationEnabled === true) {
-                                            setEmailNotificationSender(item.executionRequest.emailNotificationSender);
-                                            setEmailNotificationReciever(item.executionRequest.emailNotificationReciever);
-                                            setIsNotifyOnExecutionCompletion(item.executionRequest.isNotifyOnExecutionCompletion)
-                                            setBatchInfo(item.executionRequest.batchInfo);
-                                            setProfileName(item.executionRequest.configurename);
-                                        }
-                                    }
-                                    else {
-                                        setEmailNotificationEnabled(false);
-                                        setEmailNotificationSender(null);
-                                        setEmailNotificationReciever(null);
-                                        setIsNotifyOnExecutionCompletion(null);
-                                        setBatchInfo([]);
-                                        setProfileName(null)
-                                    }
                                     setAppType(item.executionRequest.batchInfo[0].appType);
                                     setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
