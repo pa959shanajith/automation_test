@@ -42,63 +42,82 @@ generateEmailPayload.report = async data => {
 	const username = data.user && data.user.invokingusername || '';	
 	const execNode = (data.scenarioFlag) ? "scenarios" : "modules"
 	const apiType = (data.scenarioFlag) ? "onScenariosExecute" : "onModulesExecute"
+	const subj = msgTitle = 'Below modules have been executed successfully.';
 	var inputs = {
 		"fetchby": "testsuiteid",
-		"id": data.testsuiteid,
+		"id": data.testsuite[0].testsuiteid,
 		"nodetype": execNode,
 		"actiontype": '5',
 		"invokerid": data.user.invokinguser
 	}
-	result = await getReceivers(inputs, data.scenarioIds[0], apiType)
-	recv = result['emails']
 
-	for(var email in recv){
-		if (!validator.isEmail(email)){
-			delete recv[email]
-			logger.error(email + ' is not a valid email, notification can not be sent to this address')
+	if (data.recieverEmailAddress) {
+		const emails = data.recieverEmailAddress.split(',');
+		for (email of emails) {
+			recv[email] = -1;
 		}
 	}
-	if (!recv || Object.keys(recv).length == 0){
-		return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
-	}
-	let prioirtyRecv = Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '1'))
-	if (Object.keys(prioirtyRecv).length > 0){
-		recv = Object.assign({},prioirtyRecv,Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '-1')))
-	} 
-	data.reportData.forEach(r => {
-		if (r.reportid.length > 0) r.url = data.url + '/reports/?executionid=' + r.reportid;
-		if (r.status.toLowerCase() == "pass") r.pass = true;
-		else if (r.status.toLowerCase() == "fail") r.fail = true;
-		else if (r.status.toLowerCase() == "terminate") r.terminate = true;
-		else if (r.status.toLowerCase() == "incomplete") r.incomplete = true;
-		else if (r.status.toLowerCase() == "skipped") r.skipped = true;
-	});
-
-	let fStatus = 'fail';
-	if (data.suiteStatus == 'pass') fStatus = 'pass';
-	else if (data.status !== undefined) fStatus = data.status.toLowerCase();
 	else {
-		const userTerm = data.reportData.map(r => r.terminated);
-		if (userTerm.includes("user")) fStatus = "userterminate";
-		else if (userTerm.includes("program")) fStatus = "terminate";
+		result = await getReceivers(inputs, data.testsuite[0].scenarioIds[0], apiType)
+		recv = result['emails']
+
+		for(var email in recv){
+			if (!validator.isEmail(email)){
+				delete recv[email]
+				logger.error(email + ' is not a valid email, notification can not be sent to this address')
+			}
+		}
+		if (!recv || Object.keys(recv).length == 0){
+			return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+		}
+		let prioirtyRecv = Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '1'))
+		if (Object.keys(prioirtyRecv).length > 0){
+			recv = Object.assign({},prioirtyRecv,Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '-1')))
+		} 
 	}
-	let subj = msgTitle = 'Execution of ' + data.testsuitename;
-	if (fStatus === 'pass') {
-		subj = 'Execution of ' + data.testsuitename + ' completed';
-		msgTitle = subj + ' successfully.';
-	} else if (fStatus === 'userterminate') {
-		subj = 'Execution of ' + data.testsuitename + ' terminated';
-		msgTitle = 'Execution of ' + data.testsuitename + ' failed. Reason: Manually terminated by user.';
-	} else if (fStatus === 'terminate') {
-		subj = 'Execution of ' + data.testsuitename + ' failed';
-		msgTitle = subj + '. Reason: Terminated by program.';
-	} else if (fStatus === 'skipped') {
-		subj = 'Execution of ' + data.testsuitename + ' skipped';
-		msgTitle = 'Execution of ' + data.testsuitename + ' is skipped.';
-	} else {
-		subj = 'Execution of ' + data.testsuitename + ' failed';
-		msgTitle = subj + '.';
-	}
+
+	data.testsuite.forEach((testSuiteDetails) => {
+		testSuiteDetails.reportData.forEach((reportDataItem) => {
+			if (reportDataItem.reportid.length > 0) {
+				reportDataItem.url = data.url + '/reports/?executionid=' + reportDataItem.reportid;
+				reportDataItem.projectName = testSuiteDetails.projectname;
+				reportDataItem.testsuiteName = testSuiteDetails.testsuitename;
+			}
+
+			if (reportDataItem.status.toLowerCase() == "pass") reportDataItem.pass = true;
+			else if (reportDataItem.status.toLowerCase() == "fail") reportDataItem.fail = true;
+			else if (reportDataItem.status.toLowerCase() == "terminate") reportDataItem.terminate = true;
+			else if (reportDataItem.status.toLowerCase() == "incomplete") reportDataItem.incomplete = true;
+			else if (reportDataItem.status.toLowerCase() == "skipped") reportDataItem.skipped = true;
+		})
+
+	})
+
+	// let fStatus = 'fail';
+	// if (data.suiteStatus == 'pass') fStatus = 'pass';
+	// else if (data.status !== undefined) fStatus = data.status.toLowerCase();
+	// else {
+	// 	const userTerm = data.reportData.map(r => r.terminated);
+	// 	if (userTerm.includes("user")) fStatus = "userterminate";
+	// 	else if (userTerm.includes("program")) fStatus = "terminate";
+	// }
+	// let subj = msgTitle = 'Execution of ' + data.testsuitename;
+	// if (fStatus === 'pass') {
+	// 	subj = 'Execution of ' + data.testsuitename + ' completed';
+	// 	msgTitle = subj + ' successfully.';
+	// } else if (fStatus === 'userterminate') {
+	// 	subj = 'Execution of ' + data.testsuitename + ' terminated';
+	// 	msgTitle = 'Execution of ' + data.testsuitename + ' failed. Reason: Manually terminated by user.';
+	// } else if (fStatus === 'terminate') {
+	// 	subj = 'Execution of ' + data.testsuitename + ' failed';
+	// 	msgTitle = subj + '. Reason: Terminated by program.';
+	// } else if (fStatus === 'skipped') {
+	// 	subj = 'Execution of ' + data.testsuitename + ' skipped';
+	// 	msgTitle = 'Execution of ' + data.testsuitename + ' is skipped.';
+	// } else {
+	// 	subj = 'Execution of ' + data.testsuitename + ' failed';
+	// 	msgTitle = subj + '.';
+	// }
 
 	const msg = {
 		'subject': subj,
@@ -106,13 +125,16 @@ generateEmailPayload.report = async data => {
 		'context': {
 			'companyLogo': data.url + companyLogo,
 			'productLogo': data.url + productLogo,
-			'status': fStatus[0].toUpperCase() + fStatus.substr(1).toLowerCase(),
+			'status': data.suiteStatus,
 			'msgTitle': msgTitle,
 			'suiteName': data.testsuitename,
 			'projectName': data.projectname,
 			'releaseName': data.releaseid,
 			'cycleName': data.cyclename,
-			'reports': data.reportData
+			'reports': data.testsuite,
+			'profileName': data.profileName,
+			'executionType': data.executionType === "ACTIVE" ? "Avo Assure Client" : data.executionType === "SCHEDULE" ? "Scheduled Execution" : "Avo Assure Client",
+			'startDate': new Date().getFullYear() + "-" + ("0" + (new Date().getMonth() + 1)).slice(-2) + "-" + ("0" + new Date().getDate()).slice(-2) + " " + ("0" + new Date().getHours()).slice(-2) + ":" + ("0" + new Date().getMinutes()).slice(-2) + ":" + ("0" + new Date().getSeconds()).slice(-2)
 		}
 	};
 
