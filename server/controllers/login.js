@@ -132,8 +132,8 @@ exports.resetPassword = async (req, res) => {
 	const fnName = "resetPassword";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-    if(req.body.userData){
-      const user = req.body.userData;
+    if(req.body.currpassword){
+      const user = req.body.currpassword;
       const newpassword = req.body.newpassword;
       const userData = {username:user.name, newpass: newpassword, oldpass: user.auth.password?user.auth.password:""};
       const fresh = await verifyPasswordHistory(userData);

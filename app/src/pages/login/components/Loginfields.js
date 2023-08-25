@@ -25,6 +25,7 @@ const Login = (props) => {
     const [overlayText, setOverlayText] = useState("");
     const [initialFormPos,setInitialFormPos] = useState(0)
     const [userResetData, setResetUserData] = useState({});
+    const [userInfo, setUserInfo] = useState({});
     const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
 
     const toastError = (erroMessage) => {
@@ -199,7 +200,8 @@ const Login = (props) => {
                     return
                 }
                 api.shouldShowVerifyPassword(user_id).then((res)=>{
-                    if(res){
+                    setUserInfo(res.userInfo)
+                    if(res.proceed){
                         setOverlayText("");
                         setShowChangePasswordDialog(true)
                     } else {
@@ -353,7 +355,7 @@ const Login = (props) => {
                         </div>
                     </form>
                 </>}
-                {showChangePasswordDialog && < ChangePassword showDialogBox={showChangePasswordDialog} setShowDialogBox={setShowChangePasswordDialog} toastError={toastErrored}  toastSuccess={toastSuccessed}  />}
+                {showChangePasswordDialog && < ChangePassword showDialogBox={showChangePasswordDialog} setShowDialogBox={setShowChangePasswordDialog} userInfo={userInfo} toastError={toastErrored}  toastSuccess={toastSuccessed}  />}
             </>
         </>
     );
