@@ -240,6 +240,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
+      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
@@ -855,7 +856,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             title=" Search for project"
             className="Search_Project"
               onChange={(e) => {
-                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
+                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: projectList.find((project)=>project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
@@ -910,17 +911,16 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         } else {
           setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
         }
-        if (btnType === "Execute") {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: " Execution started.",
-            life: 5000,
-          });
 
-        }
         // onHide(name);
       }
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: " Execution started.",
+        life: 5000,
+      });
+      setVisible_execute(false);
     }
     if (btnType === 'Cancel') {
       setVisible_execute(false);
@@ -1544,7 +1544,7 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {(!!configList.length  || activeIndex1 !== 2)?  (
+            {(!!configList.length  && activeIndex1 === 0)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"

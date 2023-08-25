@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { manageUserDetails } from '../../admin/api';
 import { Button } from "primereact/button"
 import { loadUserInfoActions } from '../../landing/LandingSlice'
-import { LinearProgress } from "@mui/material";
+import { ProgressBar } from 'primereact/progressbar';
 const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
   const [percentComplete,setPercentComplete] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
@@ -90,7 +90,7 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
   },[activeStep])
 
   useEffect(()=>{
-    if (percentComplete === 1) {
+    if (percentComplete === 100) {
         updateStepNumber(1);
         showDownloadPopover();
     }
@@ -110,7 +110,9 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
         welcomeStepNo:stepNo
     }
     try{
+        const dataUser = {...userInfo, welcomeStepNo:stepNo}
         dispatch(loadUserInfoActions.setUserInfo({...userInfo,welcomeStepNo:stepNo}));
+        localStorage.setItem("userInfo", JSON.stringify(dataUser))
         var data = await manageUserDetails("stepUpdate", userObj);
     } catch(err) {
         console.log(err)
@@ -151,7 +153,9 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
             RedirectPage(history, { reason: "userPrefHandle" });
         }
         else {
+            const data = {...userInfo, tandc:false}
             dispatch(loadUserInfoActions.setUserInfo({...userInfo,tandc:false}));
+            localStorage.setItem("userInfo", JSON.stringify(data))
             setPopover(true);
             setActiveStep((prevStep)=>prevStep+1);
             setTimeout(()=>{showWizard(false)},1000);
@@ -202,7 +206,9 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
                 method: "GET",
                 responseType: "blob", 
                 onDownloadProgress(progress) {
-                    setPercentComplete(progress.loaded/progress.total)
+                    // setPercentComplete(progress.loaded/progress.total)
+                    const newPercentComplete = Math.round((progress.loaded / progress.total) * 100);
+                    setPercentComplete(newPercentComplete);
                 }
             }).then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -558,7 +564,7 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
                     {/* <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/> */}
                 </span>}
 
-                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 5 - 10 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
+                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 1 - 5 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
                 // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
                 }
 
@@ -566,16 +572,7 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
                     <>
                         <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading the Avo Assure Client"}</div>
                         <div className="downloadProgress">
-                            <LinearProgress 
-                            barHeight={30}
-                            styles = {{
-                                root:{width:"90%"},
-                                bar: { background:"#643693"},
-                                label: { fontSize: '1em', marginBottom: '0.6em',color:"black", display:"none" },
-                                description: { fontSize: '1em', marginTop: '0.6em' },
-                            }} label={'Downloading ICE Package...'} variant="determinate" percentComplete={percentComplete} />
-                             <p style={{fontSize: '1em', marginBottom: '0.6em',color:"black", display:"none"}}>Downloading ICE Package...</p>
-                             <p style={{fontSize: '1em', marginTop: '0.6em' }}>{percentComplete}% complete</p>
+                        <ProgressBar value={percentComplete} style={{width:'100rem'}}  showValue={false}></ProgressBar>
                         </div>
                     </>
                 :
@@ -612,10 +609,10 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
         <div className="progressbar">
              <Stepper
                 steps={[
-                    { label: 'Accept Terms and Conditions', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
-                    { label: 'Download Avo Assure Client', active:activeStep===1, completed:activeStep>1, children:activeStep<=1?2:<i className="fa fa-check"></i>},
-                    { label: 'Setup Avo Assure Client', active:activeStep===2, completed:activeStep>2, children:(activeStep<=2)?3:<i className="fa fa-solid fa-check"></i>},
-                    { label: 'Getting Started', active:activeStep===3, completed:activeStep>3, children:(activeStep<=3)?4:<i className="fa fa-solid fa-check"></i>}]}
+                    { label: 'Accept Terms and Conditions', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="pi pi-check"></i>},
+                    { label: 'Download Avo Assure Client', active:activeStep===1, completed:activeStep>1, children:activeStep<=1?2:<i className="pi pi-check"></i>},
+                    { label: 'Setup Avo Assure Client', active:activeStep===2, completed:activeStep>2, children:(activeStep<=2)?3:<i className="pi pi-solid pi-check"></i>},
+                    { label: 'Getting Started', active:activeStep===3, completed:activeStep>3, children:(activeStep<=3)?4:<i className="pi pi-solid pi-check"></i>}]}
                 className="stepper"
                 stepClassName="stepButtons"
                 styleConfig={{

@@ -7,6 +7,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { Button } from 'primereact/button';
 import '../styles/StaticElements.scss'
 import { Toast } from 'primereact/toast';
+import ChangePassword from '../../global/components/ChangePassword';
 
 const Login = (props) => {
     let serverList = [{ "name": "License Server", "active": false }, { "name": "DAS Server", "active": false }, { "name": "Web Server", "active": false }];
@@ -24,8 +25,7 @@ const Login = (props) => {
     const [overlayText, setOverlayText] = useState("");
     const [initialFormPos,setInitialFormPos] = useState(0)
     const [userResetData, setResetUserData] = useState({});
-    const [showResetPass, setShowResetPass] = useState(false);
-    const [showChangePass, setShowChangePass] = useState(false);
+    const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
 
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {
@@ -201,7 +201,7 @@ const Login = (props) => {
                 api.shouldShowVerifyPassword(user_id).then((res)=>{
                     if(res){
                         setOverlayText("");
-                        setShowResetPass(true);
+                        setShowChangePasswordDialog(true)
                     } else {
                         setOverlayText("");
                         redirectToHomePage();
@@ -227,7 +227,7 @@ const Login = (props) => {
                     if(res.flag && res.flag === "changePwd"){
                         setOverlayText("");
                         setResetUserData(res.user)
-                        setShowChangePass(true);
+                        setShowChangePasswordDialog(true)
                     } else {
                         setOverlayText("");
                         redirectToHomePage();
@@ -241,6 +241,20 @@ const Login = (props) => {
         }
     },[])
 
+    const toastErrored = (erroMessage) => {
+        if (erroMessage.CONTENT) {
+            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+    }
+
+    const toastSuccessed = (successMessage) => {
+        if (successMessage.CONTENT) {
+            toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+    }
+    
     return (
         <>
             <Toast ref={toast} position="bottom-center" />
@@ -339,6 +353,7 @@ const Login = (props) => {
                         </div>
                     </form>
                 </>}
+                {showChangePasswordDialog && < ChangePassword showDialogBox={showChangePasswordDialog} setShowDialogBox={setShowChangePasswordDialog} toastError={toastErrored}  toastSuccess={toastSuccessed}  />}
             </>
         </>
     );
