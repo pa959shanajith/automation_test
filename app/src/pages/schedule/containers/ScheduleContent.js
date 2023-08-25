@@ -228,6 +228,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["type"] = schedulePoolDetails.type;
         executionData["configureKey"]=item.configurekey;
         executionData["configureName"]=item.configurename;
+        executionData["recieverEmailAddress"] = item.executionRequest.emailNotificationReciever;
         
         setLoading("Scheduling...");
         let data = "";
