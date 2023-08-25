@@ -347,7 +347,7 @@ module.exports.verifyUser = async (req, res) => {
 		let proceed = false;
 		if (userInfo === "fail") return res.send(proceed);
 
-		if (userInfo || userInfo.firstTimeLogin){
+		if (userInfo && userInfo.welcomeStepNo === 0){
 			proceed = true;
 		}
 

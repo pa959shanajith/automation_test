@@ -577,7 +577,7 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
     var node = {
         id: 0,
         childIndex: 0,
-        name: name?name:'',
+        name: name?name:'TestSuite0',
         type: types?types:'modules',
         children: [],
         parent: null,
@@ -805,7 +805,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
                 parent: dNodes[pi],
                 state: 'created',
                 path: '',
-                name: obj?obj:'',
+                name: tempName,
                 childIndex: '',
                 type: (nNext[pt][0]).toLowerCase() + 's'
         }; 
