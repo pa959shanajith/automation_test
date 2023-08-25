@@ -503,7 +503,6 @@ class TestSuiteExecutor {
         executionRequest.profileName = batchExecutionData.profileName || batchExecutionData.configureName || null;
         executionRequest.recieverEmailAddress = batchExecutionData.recieverEmailAddress;
 
-        // if execution is schedule
         if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
         const result = await this.executionRequestToICE(executionRequest, execType, userInfo);
         return result;
