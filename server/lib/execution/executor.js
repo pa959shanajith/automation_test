@@ -500,7 +500,7 @@ class TestSuiteExecutor {
         executionRequest.invokinguser = userInfo.invokinguser;
         executionRequest.executionListId = batchExecutionData.executionListId;
         executionRequest.isHeadless = batchExecutionData.isHeadless;
-        executionRequest.profileName = batchExecutionData.profileName ? batchExecutionData.profileName : batchExecutionData.configureName ? batchExecutionData.configureName : null;
+        executionRequest.profileName = batchExecutionData.profileName || batchExecutionData.configureName || null;
         executionRequest.recieverEmailAddress = batchExecutionData.recieverEmailAddress;
 
         if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
