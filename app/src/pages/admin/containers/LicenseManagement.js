@@ -16,7 +16,7 @@ function LicenseManagement() {
             setHeaderData1(Object.entries(LicenseData).map(([key, value])=>{
                 return{
                     License_Type:key,
-                    License_Status:value===true?"Enabled":value===false?"Disabled":value
+                    License_Status:value==="true"?"Enabled":value==="false"?"Disabled":value
                 }
             }))
         })()

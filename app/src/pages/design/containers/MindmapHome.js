@@ -36,19 +36,19 @@ const MindmapHome = () => {
     'newmindmap': React.memo(() => (<CreateNew />)),
     'importmodules': React.memo(() => (<CreateNew importRedirect={true} />))
   }
-  const [showCard, setShowCard] = useState(true);
+  // const [showCard, setShowCard] = useState(true);
   const [show, setShow] = useState(false);
   const [initBlockUi, setInitBlockUi] = useState(false)
 
   var Component = createType["newmindmap"];
-  const handleModule = () => {
-    setShowCard(false);
-    setShow(true);
-  }
-  const handleGenius = () => {
-    setShowCard(false);
-    setShow(true);
-  }
+  // const handleModule = () => {
+  //   setShowCard(false);
+  //   setShow(true);
+  // }
+  // const handleGenius = () => {
+  //   setShowCard(false);
+  //   setShow(true);
+  // }
   const setOptions1 = (data) => {
     setOptions(data)
   }
@@ -72,11 +72,11 @@ const MindmapHome = () => {
       var moduledata = await getModules(req);
       if (moduledata.length > 0) {
         setOptions1('newmindmap');
-        setShowCard(false);
+        // setShowCard(false);
         setShow(true);
 
       } else {
-        setShowCard(true);
+        // setShowCard(true);
         setShow(false);
         setInitBlockUi(true)
       }
@@ -91,7 +91,7 @@ const MindmapHome = () => {
       {(blockui.show) ? <ScreenOverlay content="Loading Content" /> : null}
       <div className='mp__body'>
         {!show && <ModuleListDrop />}
-        <Fragment>
+        {/* <Fragment>
           {((showCard && !show) && initBlockUi) && <div className='cardMindmap'>
             <Card id='p_card' className='Module'>
               <span className='cardText'>
@@ -111,8 +111,8 @@ const MindmapHome = () => {
               <img className='avoGeniusImg' src='static\imgs\AvoGenius.png' alt='Start Avo Genius' />
             </Card>
           </div>}
-          </Fragment>
-          {show &&  <Component/>}
+        </Fragment> */}
+        <Component/>
       </div>
         <div className='mp__footer'><Footer/></div>
     </div> 

@@ -172,7 +172,7 @@ const InputBox = (props) => {
             if(e.target.className.baseVal !== "ct-nodeIcon")props.setInpBox(false);
             }}>
             <div id="ct-inpBox" className='no-disp'>
-                <input  autoComplete="off" autoFocus={true} ref={InpBox} defaultValue={p.select('.ct-node-title').text()} id="ct-inpAct" maxLength="255" className="ct-inp" onChange={(e)=>{filterSuggest(e.target.value)}} onKeyPress={(e)=>{if(e.key==='Enter')onEnter(e.target.value)}}/>
+                <input  autoComplete="off" autoFocus={true} ref={InpBox} defaultValue={p.select('.ct-nodeLabel').text()} id="ct-inpAct" maxLength="255" className="ct-inp" onChange={(e)=>{filterSuggest(e.target.value)}} onKeyDown={(e)=>{if(e.key==='Enter')onEnter(e.target.value)}}/>
                 {(suggestList.length>0)?
                 <ul id='ct-inpSugg'>
                     {/* <ScrollBar trackColor={'white'} thumbColor={'grey'} hideXbar={true} verticalbarWidth='3px'> */}
