@@ -92,3 +92,27 @@
         color: black !important;
     }
 }
+
+.Session_btn {
+    background: transparent;
+    color: black;
+    border-color: transparent;
+    margin-left: 0rem;
+    width: 21.5rem;
+    height: 2rem;
+    font: $f6_bold;
+
+    &:hover {
+        background: #e3cff0 !important;
+        border-color: #e3cff0 !important;
+        box-shadow: none !important;
+        color: black !important;
+    }
+
+    &:focus {
+        background: #e3cff0 !important;
+        border-color: #e3cff0 !important;
+        box-shadow: none !important;
+        color: black !important;
+    }
+}

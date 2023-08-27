@@ -40,6 +40,9 @@ const AdminSidePanel = () => {
             <div className='flex flex-column p-2 pr-1 m-1'>
             <Button className='Agent_btn' onClick={() => { setHeader('Manage Agents'); setScreen('Manage Agents'); }}>Manage Agents</Button>
             </div>
+            <div className='flex flex-column p-2 pr-1 m-1'>
+            <Button className='Session_btn' onClick={() => { setHeader('SessionManagement'); setScreen('SessionManagement'); }}>Session Management</Button>
+            </div>
         </div>
     )
 }
