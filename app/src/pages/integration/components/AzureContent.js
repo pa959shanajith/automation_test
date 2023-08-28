@@ -6,7 +6,7 @@ import domainDetails from '../containers/Jira.js';
 import MappingPage from '../containers/MappingPage';
 import { Messages as MSG, setMsg, RedirectPage } from '../../global';
 // import CycleNode from './ZephyrTree';
-import * as actionTypes from '../state/action';
+import * as actionTypes from "../state/action";
 import "../styles/TestList.scss";
 import { Paginator } from 'primereact/paginator';
 
