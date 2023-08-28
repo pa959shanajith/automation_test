@@ -679,7 +679,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     </div>
                     </Fragment>
                     :null}
-                    {(importType==='xls')?
+                    {/* {/* {(importType==='xls')?
                     <Fragment>
                     <div>
                         <label>Project: </label>
@@ -698,7 +698,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         </select>
                     </div>
                     </Fragment>
-                    :null}
+                    :null} */}
                 </Fragment>
             }
         </div>
@@ -972,7 +972,7 @@ const validNodeDetails = (value) =>{
     var nName, flag = !0;
     nName = value;
     var regex = /^[a-zA-Z0-9_]*$/;;
-    if (nName.length === 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName=== 'Screen_0' || nName === 'Scenario_0' || nName === 'Testcase_0') {
+    if (nName.length === 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName=== 'Screen0' || nName === 'Testcase0' || nName === 'TestSteps0') {
         flag = !1;
     }
     return flag;

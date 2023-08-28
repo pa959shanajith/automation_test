@@ -1105,7 +1105,8 @@ setPreventDefaultModule(true);
                             <i className="pi pi-times"  onClick={click_X_ButtonE2E}></i>
                         </div>)}
                      </div > */}
-                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true);setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" />
+                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true);setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
+                  <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
                   {/* {showE2EPopup && <LongContentDemo setShowE2EOpen={setShowE2EPopup}  module={moduleSelect} />} */}
                 </div>
                 {/* <div className='searchBox pxBlack'>
@@ -1142,9 +1143,10 @@ setPreventDefaultModule(true);
                           <div style={{ textOverflow: 'ellipsis', width: '9rem', overflow: 'hidden', textAlign: 'left', height: '1.3rem', display: 'flex', alignItems: "center", width: '99%' }}>
                             <img src="static/imgs/checkBoxIcon.png" alt="AddButton" /><img src="static/imgs/E2EModuleSideIcon.png" style={{ marginLeft: '10px', width: '20px', height: '20px' }} alt="modules" />
                             <span style={{ textOverflow: 'ellipsis' }} className='modNmeE2E'>{e.name}</span>
-                            <img src="static/imgs/edit-icon.png" onClick={() => { setWarning(true); setShowE2EPopup(true); handleEditE2E();  }}
+                            <img src="static/imgs/edit-icon.png" className='E2Eedit' onClick={() => { setWarning(true); setShowE2EPopup(true); handleEditE2E();  }}
                               disabled={(moduleSelect._id === e._id) && moduleSelect.type !== "endtoend"}
                               style={{ width: '20px', height: '20px',display:moduleSelect._id !== e._id?  "none" : ''   }} alt="AddButton" />
+                               <Tooltip target=".E2Eedit" content=" Edit End To End Flow" position="bottom" />
                             <div></div></div>
 
 
