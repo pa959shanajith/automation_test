@@ -39,7 +39,7 @@ export const resetPassword = (newpassword, currpassword=null, userData=null) => 
             headers: {
                 "Content-type": "application/json"
             },
-            data: {'newpassword': newpassword, currpassword, userData},
+            data: {'newpassword': newpassword, userData,currpassword},
             credentials : 'include'
         })
         .then(res => {

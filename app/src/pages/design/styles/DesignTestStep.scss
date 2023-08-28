@@ -34,9 +34,29 @@
 }
 
 .debug__object__modal {
+    height: 31.06rem;
+     width: 47.06rem;
     .p-dialog-header {
         background: #E2E2ED !important;
+       
     }
+}
+.debug__object__modal_ForOtherAppTypes {
+
+    height: 29rem;
+    width: 27.06rem;
+
+    .p-dialog-content {
+        background: #fff;
+        color: #495057;
+        padding-top: 0.6rem;
+        justify-content: center;
+        display: flex;
+    }
+
+}
+.debug__object_ForOtherAppTypes{
+    display: none;
 }
 
 .toggle__tab {

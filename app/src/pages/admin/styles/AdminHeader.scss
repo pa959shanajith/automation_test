@@ -8,8 +8,8 @@
         position: absolute;
     }
     .header_label{
-        position: absolute;
-        bottom: 38rem;
+        position: relative;
+        top: 2.5rem;
         font: $f5_bold;
     }
 }

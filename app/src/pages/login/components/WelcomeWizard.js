@@ -153,7 +153,9 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
             RedirectPage(history, { reason: "userPrefHandle" });
         }
         else {
+            const data = {...userInfo, tandc:false}
             dispatch(loadUserInfoActions.setUserInfo({...userInfo,tandc:false}));
+            localStorage.setItem("userInfo", JSON.stringify(data))
             setPopover(true);
             setActiveStep((prevStep)=>prevStep+1);
             setTimeout(()=>{showWizard(false)},1000);
