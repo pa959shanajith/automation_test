@@ -1,0 +1,123 @@
+
+    [
+        {
+         "features": "Test Suite Creation",
+         "admin": "true",
+         "qualityManager":"true",
+         "qalityLead":"true",
+         "qualityEngineer":"false",
+         "area": {
+               "name": "Design Studio"
+            }
+        },
+        {
+            "features": "Capture Element",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"true",
+            "area": {
+                  "name": "Design Studio"
+               }
+        },
+        {
+            "features": "Design Test Steps",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"true",
+            "area": {
+                  "name": "Design Studio"
+               }
+        },
+        {
+            "features": "Impact Analysis",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"false",
+            "area": {
+                  "name": "Design Studio"
+               }
+        },
+        {
+            "features": "Create Execution Profile",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"false",
+            "area": {
+                  "name": "Execution"
+               }
+        },
+        {
+            "features": "Execute",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"true",
+            "area": {
+                  "name": "Execution"
+               }
+        },
+        {
+            "features": "Configure Integration",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"false",
+            "area": {
+                  "name": "Project Settings"
+               }
+        },
+        {
+            "features": "Create Projects",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"false",
+            "qualityEngineer":"false",
+            "area": {
+                  "name": "Project Settings"
+               }
+        },
+        {
+            "features": "Manage Project",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"false",
+            "qualityEngineer":"false",
+            "area": {
+                  "name": "Project Settings"
+               }
+        },
+        {
+            "features": "View Reports",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"true",
+            "area": {
+                  "name": "Report & Dahsboard"
+               }
+        },
+        {
+            "features": "Log a bug",
+            "admin": "true",
+            "qualityManager":"true",
+            "qalityLead":"true",
+            "qualityEngineer":"true",
+            "area": {
+                  "name": "Report & Dahsboard"
+               }
+        },
+        {
+            "features": "AVO Assure setup",
+            "admin": "true",
+            "qualityManager":"false",
+            "qalityLead":"false",
+            "qualityEngineer":"false",
+            "area": {
+                  "name": "Admin"
+               }
+        }
+    ]
