@@ -35,6 +35,8 @@ const CreateProject = (props) => {
   const [unassignedUsers, setUnassignedUsers] = useState([]);
   const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
   const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+  const [unFilteredData, setUnFilteredData] = useState([]);
+  const [unFilteredAssaignedData, setUnFiltereAssaignedData] = useState([]);
 
 
   const isBase64 = (str) => {
@@ -80,7 +82,19 @@ const CreateProject = (props) => {
           }
         }
         setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
+        setUnFilteredData(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
         setDisplayUser(users_obj["assignedUsers"].map((user)=> ({
+          email: user.email,
+          firstname: user.firstname,
+          id: user._id,
+          initials: getInitials(user.firstname, user.lastname),
+          lastname: user.lastname,
+          name: user.name,
+          profileimage: user.profileimage,
+          primaryRole: user.assignedrole.name,
+          selectedRole: user.assignedrole.name
+        })));
+        setUnFiltereAssaignedData(users_obj["assignedUsers"].map((user)=> ({
           email: user.email,
           firstname: user.firstname,
           id: user._id,
@@ -124,7 +138,9 @@ const CreateProject = (props) => {
           }
         }
         setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
+        setUnFilteredData(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
         setDisplayUser([loggedInUser]);
+        setUnFiltereAssaignedData([loggedInUser])
       }
     } catch (error) {
       console.error(error);
@@ -164,7 +180,7 @@ const CreateProject = (props) => {
   const roles = [
     { name: 'Quality Manager' },
     { name: 'Quality Lead' },
-    { name: 'QA' },
+    { name: 'Quality Engineer' },
   ];
 
   const handleCheckboxChange = (event) => {
@@ -200,9 +216,23 @@ const CreateProject = (props) => {
 
   function handleSearch(event) {
     setQuery(event.target.value);
+    if(event.target.value !== ""){
+    const filterData = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
+    setItems(filterData)
+    }else{
+      setItems(unFilteredData)
+    }
   }
+
   function handleSearchDisplayUser(event) {
     setQueryDisplayUser(event.target.value);
+    if(event.target.value !== ""){
+    const filterDataDisplayUser = displayUser.filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
+    setDisplayUser(filterDataDisplayUser)
+    }
+    else{
+      setDisplayUser(unFilteredAssaignedData)
+    }
   }
 
   // function getFilteredItems() {
