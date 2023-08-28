@@ -58,7 +58,7 @@ const SideNav = () =>{
         {
             // path: "/itdm",
             name: "ITDM",
-            icon: <img src= { tabSelected=== "/landing" ?  "static/imgs/ITDM_icon.svg" : "static/imgs/ITDM_icon_selected.svg"} className="" data-pr-tooltip="Avo’s intelligent Test Data Management (iTDM) solution offers production-like, relevant, and compliant data with a few clicks. It streamlines the entire test data management process making testing cost-effective and faster."  data-pr-position="right" height="25px"/>,
+            icon: <img src= { tabSelected=== "/landing" ?  "static/imgs/ITDM_icon.svg" : "static/imgs/ITDM_icon_selected.svg"} className="icon" data-pr-tooltip="Avo’s intelligent Test Data Management (iTDM) solution offers production-like, relevant, and compliant data with a few clicks. It streamlines the entire test data management process making testing cost-effective and faster."  data-pr-position="right" height="25px"/>,
             disabled: true
         }
     ]
