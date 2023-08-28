@@ -102,6 +102,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const startIdx = (currentZepPage - 1) * itemsPerPage;
     const endIdx = startIdx + itemsPerPage;
     const paginatedDataZephyr = projectDetails.slice(startIdx, endIdx);
+    const [saveEnable, setSaveEnable] = useState(false);
 
     const [data, setData] = useState([
         {
@@ -304,6 +305,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
             // dispatchAction(selectedScenarioIds([]));
         }
         // setDisabled(false);
+        setSaveEnable(true);
     }
 
     const handleUnSync = async (node,parentNode) => {

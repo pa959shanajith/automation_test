@@ -936,7 +936,7 @@ else{
 
   const handleDelete = (rowData) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
-
+    if(rowData.objectDetails.objId!== undefined){
     let deletedArr = [...deleted];
     let scrapeItemsL = [...captureData];
     let newOrderList = [];
@@ -962,6 +962,10 @@ else{
     setCapturedDataToSave(newCapturedDataToSave)
     setSelectedCapturedElement([])
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+  }
+  else {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
+  }
     // setCaptureData(updatedData);
   };
 
@@ -1406,6 +1410,8 @@ const footerSave = (
     setElementValues(e.value)
   }
   const openElementProperties = (rowdata) => {
+    if(rowdata.objectDetails.objId!==undefined)
+    {
     console.log(rowdata)
     let element = rowdata.objectDetails.xpath.split(';')
     let dataValue = []
@@ -1428,6 +1434,11 @@ const footerSave = (
     dataValue.sort((a, b) => a.id - b.id)
     setElementValues(dataValue)
     setElementProperties(true)
+  }
+  else {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the Captured Element before delete', life: 5000 });
+  }
+
   }
   const Header = () => {
     return (
@@ -1814,7 +1825,7 @@ const headerstyle={
          content = {"hello"}
          customClass="MobileWeb"
         />: null}
-      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible==='compare'?footerCompare:footerCapture}>
+      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible==='compare'?footerCompare:footerCapture} draggable={false}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -1837,7 +1848,7 @@ const headerstyle={
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
         
-        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore}>
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
