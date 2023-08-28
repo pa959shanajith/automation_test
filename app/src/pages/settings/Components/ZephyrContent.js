@@ -21,6 +21,7 @@ import {
     checkedTreeIds,checkedParentIds,checkedProjectIds,checkedReleaseIds,mappedTree
 } from '../settingSlice';
 import "../styles/ZephyrContent.scss";
+import { Paginator } from 'primereact/paginator';
 
 
 const ZephyrContent = ({ domainDetails , setToast },ref) => {
@@ -44,6 +45,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const [checkedAvo, setCheckedAvo] = useState(false);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const [treeData, setTreeData] = useState([]);
+    const [completeTreeData, setCompleteTreeData] = useState([]);
     const [selectedNodes, setSelectedNodes] = useState([]);
     const [selectedLeftNodes, setselectedLeftNodes] = useState([]);
     const [selectedImportNodes, setSelectedImportNodes] = useState([]);
@@ -89,6 +91,17 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const [rows, setRows] = useState([]);
     const [excelContent,setExcelContent] = useState([]);
     const [importStatus,setImportStatus] = useState(null);
+    const [currentAvoPage, setCurrentAvoPage] = useState(1);
+    const [indexOfFirstScenario, setIndexOfFirstScenario] = useState(0);
+    const scenariosPerPage = 10;
+    ////Pagination For Zephyr Projects
+    const itemsPerPage = 10;
+    const [currentZepPage, setCurrentZepPage] = useState(1);
+
+    const totalPages = Math.ceil(projectDetails.length / itemsPerPage);
+    const startIdx = (currentZepPage - 1) * itemsPerPage;
+    const endIdx = startIdx + itemsPerPage;
+    const paginatedDataZephyr = projectDetails.slice(startIdx, endIdx);
 
     const [data, setData] = useState([
         {
@@ -135,80 +148,6 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
         },
     ]);
 
-    const avotestcases = [
-        {
-            key: "screnario1",
-            label: "Scenario 1",
-            children: [
-                { key: "testCase1", label: "Testcase 1" },
-                { key: "testCase2", label: "Testcase 2" },
-            ],
-        },
-        {
-            key: "screnario2",
-            label: "Scenario 2",
-            children: [
-                { key: "testCase3", label: "Testcase 3" },
-                { key: "testCase4", label: "Testcase 4" },
-            ],
-        }
-    ]
-
-    const testcaseAvo = [
-        { name: 'testcase1', code: 'NY' },
-        { name: 'testcase2', code: 'RM' },
-        { name: 'testcase3', code: 'LDN' },
-    ];
-
-    const zephyrProj = [
-        { name: 'project 1', code: 'NY' },
-        { name: 'project 2', code: 'RM' },
-        { name: 'project 3', code: 'LDN' },
-        { name: 'project 4', code: 'IST' },
-    ];
-
-    const zephyrRelease = [
-        { name: 'Release 1', code: 'NY' },
-        { name: 'Release 2', code: 'RM' },
-        { name: 'Release 3', code: 'LDN' },
-        { name: 'Release 4', code: 'IST' },
-    ];
-
-    const zephyrTestCase = [
-        {
-            id: 1,
-            name: 'Test Case 1',
-            avoassure: 'AvoTestCase 1',
-        },
-        {
-            id: 2,
-            name: 'Test Case 2',
-            avoassure: 'Avo TestCase 2'
-        },
-        {
-            id: 3,
-            name: 'Test Case 3',
-            avoassure: 'Avo TestCase 3'
-        },
-    ];
-
-    const avoTestCase = [
-        {
-            id: 1,
-            name: 'Test Case 1',
-            Zephyr: 'Zephyr TestCase 1',
-        },
-        {
-            id: 2,
-            name: 'Test Case 2',
-            zephyr: 'Zephyr TestCase 2'
-        },
-        {
-            id: 3,
-            name: 'Test Case 3',
-            zephyr: 'Zephyr TestCase 3'
-        },
-    ];
     useEffect(() => {
         setMultipleSelected(false);
         setMultipleScn(false);
@@ -327,7 +266,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 })
                 
             }
-            const findDuplicate = treeData.map((scenario) => {
+            const findDuplicate = completeTreeData.map((scenario) => {
                 const shouldReplaceChildren = multipleTestCases.some(item => {
                     return scenario.children.some(child => child.key === item.key);
                 });
@@ -354,9 +293,9 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 }
                 return scenario;
             });
-            // // setTreeData(updatedTreeData.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
-            setTreeData(updatedTreeData);
-            // setCompleteTreeData(updatedTreeData);
+            setTreeData(updatedTreeData.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
+            // setTreeData(updatedTreeData);
+            setCompleteTreeData(updatedTreeData);
             // dispatchAction(mappedTree(updatedTreeData));
             // const updateCheckbox = testCaseData.map((item) => ({ ...item, checked: false }));
             // setTestCaseData(updateCheckbox);
@@ -402,7 +341,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 }
 
             }
-            const removeTestCase = treeData.map((scenario) => {
+            const removeTestCase = completeTreeData.map((scenario) => {
                 if (scenario.children && scenario.children.length > 0) {
                     const filteredChildren = scenario.children.filter((child) => child.key !== node.key);
                     return {
@@ -413,11 +352,14 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 return scenario;
             });
             onLeftCheckboxChange(node);
-            setTreeData(removeTestCase);
+           
 
             // let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
             // console.log(unsyncMap, 'its unsyncMap');
             let unsyncMappedData = mappedData.filter((item) => item.scenarioId !== node.key);
+            setTreeData(removeTestCase.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
+            setCompleteTreeData(removeTestCase);
+            // setCompleteTreeData(unsyncMappedData);
             // setTreeData(unsyncMap);
             dispatchAction(mappedTree(removeTestCase));
             dispatchAction(mappedPair(unsyncMappedData));
@@ -872,9 +814,26 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 }))
 
                 : []
+                setCompleteTreeData(treeData);
+                if(treeData.length > 8) {
+                    const indexOfLastScenario = currentAvoPage * scenariosPerPage;
+                    setIndexOfFirstScenario(indexOfLastScenario - scenariosPerPage);
+                    // const currentScenarios = listofScenarios.slice(indexOfLastScenario - scenariosPerPage, indexOfLastScenario);
+                    setTreeData(treeData.slice(indexOfLastScenario - scenariosPerPage, indexOfLastScenario));
+                }
+                else{
             setTreeData(treeData);
+                }
         }
     }
+
+    /////Pagination for AVO selected projects
+    const onPageAvoChange = (event) => {
+        setCurrentAvoPage(event.page + 1);
+        const indexOfLastScenario = (event.page + 1) * scenariosPerPage;
+        setIndexOfFirstScenario(indexOfLastScenario - scenariosPerPage);
+        setTreeData(completeTreeData.slice(indexOfLastScenario - scenariosPerPage, indexOfLastScenario));
+      };
 
     const TreeNodeProjectCheckbox = (node) => {
         if (node.children) {
@@ -1253,6 +1212,15 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                                         onExpand={handleNodeToggle}
 
                                                     />
+                                                 <div className="jira__paginator">
+                                                <Paginator
+                                                    first={currentZepPage - 1}
+                                                    rows={itemsPerPage}
+                                                    totalRecords={projectDetails.length}
+                                                    onPageChange={(e) => setCurrentZepPage(e.page + 1)}
+                                                    totalPages={totalPages} // Set the totalPages prop
+                                                />
+                                                </div>
                                                 </div>)}
                                             </Card>
                                         </div>
@@ -1273,6 +1241,15 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                                         <div className="avotest__zephyr">
                                                             <Tree value={treeData} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
                                                         </div>
+                                                        <div className="testcase__AVO__jira__paginator">
+
+                                                        <Paginator
+                                                            first={indexOfFirstScenario}
+                                                            rows={scenariosPerPage}
+                                                            totalRecords={listofScenarios.length}
+                                                            onPageChange={onPageAvoChange}
+                                                        />
+                                                    </div>
                                                     </div>
                                                 </Card>
                                             </div>
