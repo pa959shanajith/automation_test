@@ -6,6 +6,7 @@ import ServiceBell from "@servicebell/widget";
 import store from './store';
 // import HomePage from './pages/landing/containers/HomePage';
 import HomePage from './pages/landing/containers/HomePage';
+import TagManager from 'react-gtm-module';
 import Report from './pages/report/components/reports';
 import More from './pages/more/more';
 import Integration from './pages/integration/Integration';

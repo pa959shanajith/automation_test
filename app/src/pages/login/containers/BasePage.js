@@ -62,7 +62,12 @@ const BasePage = () => {
             else {
                 setLoginAgain(false);
                 try {
-                    let data = await api.validateUserState()
+                    let resdata = await api.validateUserState()
+                    let data
+                    if (resdata.status == undefined) 
+                    data=resdata;
+                    else
+                    data=resdata.status;
                     // SetProgressBar("stop");
                     setLoginValidation("Loading Profile...");
                     if(resdata.message == "License is not active "){
