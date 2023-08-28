@@ -109,7 +109,7 @@ const TableRow = (props) => {
                     setObjName(props.testCase.custname);
                     setObjetListOption({value:props.testCase.custname,label:props.testCase.custname === ""? objList[0]:props.testCase.custname})
                     setKeyword(props.testCase.keywordVal);
-                    setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal === '' ?props.getKeywords(props.testCase.custname).obType !== null?props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description !== undefined?props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description:keywordList[0] :props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description:props.testCase.keywordVal})
+                    // setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal === '' ?props.getKeywords(props.testCase.custname).obType !== null?props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description !== undefined?props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description:keywordList[0] :props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description:props.testCase.keywordVal})
                     setInput(props.testCase.inputVal[0]);
                     setOutput(props.testCase.outputVal);
                 }
@@ -164,7 +164,7 @@ const TableRow = (props) => {
         setInputPlaceholder(placeholders.inputval);
         setObjName(event.value)
         setKeyword(caseData.keywords[0]);
-        setSelectedOptions({vlaue:caseData.keywords[0] ,label:props.testCase.keywordVal === '' ?props.testCase.keywordVal:caseData.obType !== null?props.keywordData[caseData.obType][caseData.keywords[0]].description:caseData.keywordList[0]})
+        setSelectedOptions({value:caseData.keywords[0] ,label:props.keywordData[caseData.obType][caseData.keywords[0]].description})
         setTcAppType(caseData.appType);
         setDisableStep(false);
         setObjetListOption(event)
