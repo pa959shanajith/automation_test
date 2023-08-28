@@ -73,7 +73,7 @@ const MindmapHome = () => {
       if (moduledata.length > 0) {
         setOptions1('newmindmap');
         // setShowCard(false);
-        setShow(true);
+        // setShow(true);
 
       } else {
         // setShowCard(true);
@@ -90,7 +90,7 @@ const MindmapHome = () => {
     <div className='mp__container'>
       {(blockui.show) ? <ScreenOverlay content="Loading Content" /> : null}
       <div className='mp__body'>
-        {!show && <ModuleListDrop />}
+        {/* {!show && <ModuleListDrop />} */}
         {/* <Fragment>
           {((showCard && !show) && initBlockUi) && <div className='cardMindmap'>
             <Card id='p_card' className='Module'>
@@ -112,7 +112,10 @@ const MindmapHome = () => {
             </Card>
           </div>}
         </Fragment> */}
-        <Component/>
+       <Fragment>
+          {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={setOptions} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
+          <Component/>
+        </Fragment>  
       </div>
         <div className='mp__footer'><Footer/></div>
     </div> 
