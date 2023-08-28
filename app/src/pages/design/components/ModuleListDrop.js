@@ -6,7 +6,7 @@ import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
-import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule} from '../designSlice';
+import { isEnELoad, savedList , initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -325,14 +325,14 @@ const ModuleListDrop = (props) =>{
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
-        dispatch(selectedModule({createnew:true}))
+        dispatch(selectedModuleReducer({createnew:true}))
         dispatch(initEnEProj({proj, isE2ECreate: false}));
         dispatch(isEnELoad(false));
         setFirstRender(false);
     }
     const clickCreateNew = () =>{
-        dispatch(selectedModule({createnew:true}))
-        dispatch(initEnEProj({proj, isE2ECreate: false}));
+      dispatch(selectedModuleReducer({createnew:true}))
+      dispatch(initEnEProj({proj, isE2ECreate: false}));
         dispatch(isEnELoad(false));
         setFirstRender(false);
     }
@@ -349,8 +349,8 @@ const ModuleListDrop = (props) =>{
         setFilterSc(val)
     }
      const loadModule = async(modID) =>{
-        dispatch(selectedModule({}))
-        dispatch(isEnELoad(false));
+      dispatch(selectedModuleReducer({}))
+      dispatch(isEnELoad(false));
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
         // if(moduleSelect._id === modID){
@@ -368,7 +368,7 @@ const ModuleListDrop = (props) =>{
         
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
-        dispatch(selectedModule(res))
+        dispatch(selectedModuleReducer(res))
         setBlockui({show:false})
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
@@ -443,7 +443,7 @@ const ModuleListDrop = (props) =>{
             
             
         // }
-        dispatch(selectedModule({}))
+        dispatch(selectedModuleReducer({}))
         var req={
             tab:"endToend",
             projectid:proj,
@@ -454,7 +454,7 @@ const ModuleListDrop = (props) =>{
         }
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
-        dispatch(selectedModule(res))
+        dispatch(selectedModuleReducer({}))
         setBlockui({show:false})
     }
     const addScenario = (e) => {	
@@ -688,7 +688,7 @@ const ModuleListDrop = (props) =>{
           dispatch(saveMindMap({screendata,moduledata,moduleselected}))
           
           dispatch(moduleList(moduledata));
-          dispatch(selectedModule(moduleselected))
+          dispatch(selectedModuleReducer(moduleselected))
 
 //           // Assuming you have access to the 'dispatch' function
 //           dispatch(dontShowFirstModule(true))

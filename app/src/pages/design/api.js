@@ -1516,3 +1516,25 @@ export const initScrapeWS_ICE = arg => {
         .catch(error=>reject(error));
     });
 }
+export const getAvailablePlugins = async() => { 
+    try{
+        const res = await axios(url+'/getAvailablePlugins', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_FETCH_PLUGINS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_FETCH_PLUGINS}
+    }
+}

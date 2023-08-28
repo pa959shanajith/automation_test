@@ -80,7 +80,7 @@ export const designSlice = createSlice({
     isEnELoad: (state, action)=>{
       state.isEnELoad = action.payload
     },
-    selectedModule: (state, action)=>{
+    selectedModuleReducer: (state, action)=>{
       state.selectedModule = action.payload
     },
     selectedModulelist:(state, action)=>{
@@ -213,7 +213,7 @@ selectedProj,
 searchModule,
 initEnEProj,
 isEnELoad,
-selectedModule,
+selectedModuleReducer,
 selectedModulelist,
 selectBoxState,
 selectNodes,
