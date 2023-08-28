@@ -297,8 +297,8 @@ const TableRow = (props) => {
                     <Select  value={objetListOption?objetListOption:objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customStyles}  id="testcaseDropdownRefID" ref={testcaseDropdownRef}  disabled={disableStep} menuPortalTarget={document.body} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
-                        <span>{objName}</span>
-                        {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
+                        <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>
+                        {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'6px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
         {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
                         </div>
 
