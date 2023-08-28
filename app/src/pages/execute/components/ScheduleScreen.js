@@ -324,7 +324,7 @@ const ScheduleScreen = ({
           inputType="searchIcon"
         />
         <TabView>
-          <TabPanel header="Scheduled Taks">
+          <TabPanel header="Scheduled Tasks">
             <DataTable
               value={getScheduledList?.scheduledList
                 .map((el) => ({
@@ -345,13 +345,13 @@ const ScheduleScreen = ({
               globalFilter={tableFilter}
             >
               <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
-              <Column align="center" field="target" header="Envrionment"></Column>
+              <Column align="center" field="target" header="Environment"></Column>
               <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
               <Column align="center" field="endafter" header="End After"></Column>
               <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
-          <TabPanel header="Recurring Taks">
+          <TabPanel header="Recurring Tasks">
             <DataTable
               value={getScheduledList?.scheduledList
                 .map((el) => ({
