@@ -2303,7 +2303,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {Object.entries(nodes).map((node, nodeIdx)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
                    <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type,node[1].state)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle(nodeIdx)} onMouseLeave={() => handleMouseLeave1()}  title=  {node[1].name} ></image>
-                    <text className="ct-nodeLabel" textAnchor="middle" x="20" y="50">{node[1].name}</text>
+                    <text className="ct-nodeLabel" textAnchor="middle" x="20" y="50" title={node[1].title}>{node[1].name}</text>
                     {(node[1].type==="screens" && (node[1].statusCode!==undefined)) ? (
                 <g transform={node[1].transformImpact} className='node_'>
                   <image style={node[1].statusCode==="SI"?{height:'40px',width:'40px',opacity:1,transform:'scale(2.5,2.5)'}:{height:'40px',width:'40px',opacity:1}}  xlinkHref={node[1].statusCode==="SI"?"static/imgs/success.gif":"static/imgs/danger_tri.gif"} className="ct-nodeIcon" ></image>
@@ -2338,8 +2338,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                     :null}
                     {(node[1].type!=='modules')?
                     <circle 
-                    onMouseUpCapture={(e)=>moveNode(e,'KeyUp')}
-                    onMouseDownCapture={(e)=>moveNode(e,'KeyDown')}
+                    onMouseUp={(e)=>moveNode(e,'KeyUp')}
+                    onMouseDown={(e)=>moveNode(e,'KeyDown')}
                     cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
                     className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
                     :null}

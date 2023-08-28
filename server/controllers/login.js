@@ -159,7 +159,8 @@ exports.resetPassword = async (req, res) => {
         modifiedby: userData.user._id,
         modifiedbyrole: userData.user.defaultrole,
         password: password,
-        oldPassword: userData.oldpass
+        oldPassword: userData.oldpass,
+		userimage:''
       };
       const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
       if (status == "fail" || status == "forbidden") return res.send("fail");
@@ -212,7 +213,8 @@ exports.resetPassword = async (req, res) => {
 			modifiedby: userData.user._id,
 			modifiedbyrole: userData.user.defaultrole,
 			password: password,
-			oldPassword: userData.oldpass
+			oldPassword: userData.oldpass,
+			userimage:''
 		};
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");

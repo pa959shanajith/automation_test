@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectJira_ICE, getDetails_JIRA, viewReport } from "../api";
+import { connectAzure_ICE, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewAzureMappedList_ICE, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
 import "../styles/ReportTestTable.scss";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -15,8 +15,9 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import { Menu } from "primereact/menu";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
 import AvoMultiselect from "../../../globalComponents/AvoMultiselect";
-import { browsers, configureFields, scheduleMonths } from "../../utility/mockData";
+import { browsers, scheduleMonths } from "../../utility/mockData";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Divider } from "primereact/divider";
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -36,7 +37,13 @@ export default function BasicDemo() {
   const [jiraDropDown, setJiraDropDown] = useState(null);
   const [issueDropDown, setIssueDropDown] = useState(null);
   const [jiraDetails, setJiraDetails] = useState({ projects: [], issue_types: [] });
-  const [configureFeilds, setConfigureFeilds] = useState(null);
+  const [azureDetails, setAzureDetails] = useState({ projects: [] });
+  const [configureFeilds, setConfigureFeilds] = useState([]);
+  const [logSummary, setLogSummary] = useState("");
+  const [logDesc, setLogDesc] = useState("");
+  const [selectedFiels, setSelectedFiels] = useState([]);
+  const [configValues, setConfigValues] = useState({});
+  const [selectedRow, setSelectedRow] = useState(null);
   const filterValues = [
         { name: 'Pass', key: 'P' },
         { name: 'Fail', key: 'F' },
@@ -57,8 +64,10 @@ export default function BasicDemo() {
 
   useEffect(() => {
     (async () => {
-      const view = await viewReport(reportid);
-      setReportData(JSON.parse(view));
+      if(reportid){
+        const view = await viewReport(reportid);
+        setReportData(JSON.parse(view));
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportid]);
@@ -78,7 +87,7 @@ export default function BasicDemo() {
       }
     } else {
       // Handle the case when reportData or reportData.rows is not as expected.
-      console.error("reportData.rows is not defined or not an array.");
+      // console.error("reportData.rows is not defined or not an array.");
     }
     setReportViewData(parent);
   }, [reportData]);
@@ -97,23 +106,51 @@ export default function BasicDemo() {
           loginKey
         );
         setJiraDetails(getJiraDetails);
+        // await viewAzureMappedList_ICE("646b3f5695cef4ee0ababfdd", reportData?.overallstatus?.scenarioName);
         setVisibleBug(false);
       } else if (bugTitle === "Azure DevOps") {
-        const azureDetails = await connectAzure_ICE({
+        const getAzureDetails = await connectAzure_ICE({
           url: loginUrl,
           username: loginName,
           action: "loginToAzure",
           pat: loginKey,
         });
+        setJiraDetails(getAzureDetails);
         setVisibleBug(false);
       }
     }
   };
 
-  const onLogBugBtnClick = (getClick) => {
+  const onLogBugBtnClick = async(getClick) => {
     if (getClick === "Cancel") setLogBug(false);
-    else if (getClick === "Connect") { 
-
+    else if (getClick === "Proceed") { 
+      const userDetails = await connectJira_ICE_create({
+        issue_dict: {
+          project: jiraDropDown?.id,
+          issuetype: issueDropDown?.name,
+          summary: selectedRow?.data?.Comments,
+          description: selectedRow?.data?.Keyword,
+          url: "https://mnb.atlassian.net/",
+          username: "priyanka.r@slkgroup.com",
+          password: "B8RUqqKt8B28MSz9zq1Q14AD",
+          parentissue: "",
+          reportId: "64b0f70e48152fb936bc9663",
+          slno: 3,
+          executionId: "64b0f6f648152fb936bc9661",
+          Reporter: {
+              field_name: "reporter",
+              userInput: "priyanka.r",
+              type: "user"
+          },
+          Environment: {
+              field_name: "environment",
+              userInput: "yes",
+              type: "string"
+          },
+          executionReportNo: "Execution No: E7"
+        },
+        action: "createIssueInJira"
+      });
     }
   };
 
@@ -189,8 +226,11 @@ export default function BasicDemo() {
     </div>
   );
 
-  const onBugClick = (e) => {
-    if(bugTitle === "Jira" || bugTitle === "Azure DevOps"){
+  const onBugClick = (e, rowData) => {
+    setLogSummary(rowData?.data?.Comments);
+    setLogDesc(rowData?.data?.Keyword);
+    setSelectedRow(rowData);
+    if((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (azureDetails?.projects && !!azureDetails?.projects.length))){
       setLogBug(true)
     } else {
       bugRef.current.toggle(e)
@@ -201,16 +241,16 @@ export default function BasicDemo() {
     const hasChildren = rowData?.children && (rowData?.children?.length > 0);
     const getIcon = (iconType) => {
       let icon = "static/imgs/bug.svg";
-      if(iconType === "Jira" && !!jiraDetails?.issue_types.length) icon = "static/imgs/jira_icon.svg";
-      else if(iconType === "Azure DevOps" && !!jiraDetails?.issue_types.length) icon = "static/imgs/azure_devops_icon.svg";
+      if(iconType === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/jira_icon.svg";
+      else if(iconType === "Azure DevOps" && (azureDetails?.projects && !!azureDetails?.projects.length)) icon = "static/imgs/azure_devops_icon.svg";
       return icon;
     }
     return hasChildren ? null : (
       <img
         src={getIcon(bugTitle)}
         alt="bug defect"
-        className={((bugTitle === "Jira" && !!jiraDetails?.issue_types.length) || (bugTitle === "Azure DevOps" && !!jiraDetails?.issue_types.length)) ? "img_jira" : "" }
-        onClick={(e) => onBugClick(e)}
+        className={((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (azureDetails?.projects && !!azureDetails?.projects.length))) ? "img_jira" : "" }
+        onClick={(e) => onBugClick(e, rowData)}
       />
     );
   };
@@ -249,7 +289,7 @@ export default function BasicDemo() {
                     top: "0rem",
                   }}
                 />
-                <p>{stepDesc}</p>
+                <p className="desc_text">{stepDesc}</p>
               </div>
             );
           }
@@ -273,7 +313,7 @@ export default function BasicDemo() {
                 top: "0.3rem",
               }}
             />
-            <p>{statusDesc}</p>
+            <p className="desc_text">{statusDesc}</p>
           </div>
         );
         rootNode.children.push({
@@ -292,6 +332,49 @@ export default function BasicDemo() {
     setLoginKey(userData?.jirakey);
     setLoginUrl(userData?.jiraURL);
   }
+
+  useEffect(() => {
+    if(jiraDropDown && issueDropDown){
+      (async() => {
+        const getFields = await connectJira_ICE_Fields(jiraDropDown?.id, issueDropDown?.name, 'https://mnb.atlassian.net/', 'priyanka.r@slkgroup.com', 'B8RUqqKt8B28MSz9zq1Q14AD', jiraDetails?.projects);
+        const fieldValues = Object.keys(getFields).map((el) => ({
+          key: getFields[el].key,
+          name: el,
+          disabled: getFields[el].required
+        }));
+        setSelectedFiels(fieldValues);
+      })();
+    }
+  }, [jiraDropDown, issueDropDown]);
+
+  useEffect(() => {
+    const autoFill = [];
+    const fieldValue = (getItem) => {
+      console.log(getItem);
+      let fieldVal;
+      if(getItem === "Summary") fieldVal = logSummary;
+      else if(getItem === "Reporter") fieldVal = logDesc;
+      return fieldVal;
+    };
+    selectedFiels.forEach((item) => {
+      if (item.disabled) {
+        setConfigValues({
+          ...configValues,
+          [item.name] : fieldValue(item.name)
+        });
+        autoFill.push({ key: item.key, name: item.name, disabled: item.disabled });
+      }
+    })
+    setConfigureFeilds(autoFill);
+  }, [selectedFiels]);
+  console.log(configValues);
+
+  const handleConfigValues = (e) => {
+    setConfigValues({
+      ...configValues,
+      [e.target.name] : e.target.value
+    });
+  };
 
   return (
     <div className="reportsTable_container">
@@ -359,7 +442,7 @@ export default function BasicDemo() {
         <Column
           header="No. Defect ID"
           body={defectIDForJiraAndAzure}
-          style={{ padding: "0rem" }}
+          style={{ padding: "0rem", textAlign: "center" }}
         />
         <Column header="Action" style={{ padding: "0rem" }} />
       </TreeTable>
@@ -474,7 +557,7 @@ export default function BasicDemo() {
                 dropdownOptions={jiraDetails?.projects}
                 name="jiratype"
                 placeholder="Select Projects"
-                labelTxt="Jira Projects"
+                labelTxt={`${bugTitle} Projects`}
                 required={true}
                 parentClass="flex flex-column"
               />
@@ -482,8 +565,8 @@ export default function BasicDemo() {
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
               <AvoDropdown
                 dropdownValue={issueDropDown}
-                onDropdownChange={async(e) => {
-                  setIssueDropDown(e.target.value)
+                onDropdownChange={async (e) => {
+                  setIssueDropDown(e.target.value);
                 }}
                 dropdownOptions={jiraDetails?.issue_types}
                 name="issuetype"
@@ -493,67 +576,39 @@ export default function BasicDemo() {
                 parentClass="flex flex-column"
               />
             </div>
-            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
               <AvoMultiselect
                 multiSelectValue={configureFeilds}
                 onMultiSelectChange={(e) => setConfigureFeilds(e.value)}
-                multiSelectOptions={configureFields}
-                name="configureFields"
+                multiSelectOptions={selectedFiels}
+                name="configureFeilds"
                 placeholder="Configure Fields"
                 required={false}
               />
             </div>
-            <div className="col-12">
-              <div>
-              <label>
-                <span>Summary</span>
-                <img src="static/imgs/Required.svg" className="required_icon" />
-              </label>
+            <Divider />
+            {configureFeilds.map((el) => (
+              <div className="col-12">
+                <div>
+                  <label>
+                    <span>{el.name}</span>
+                    {
+                     el.disabled && <img
+                        src="static/imgs/Required.svg"
+                        className="required_icon"
+                      />
+                    }
+                  </label>
+                </div>
+                <InputTextarea
+                  className="text_desc"
+                  rows={1}
+                  name={el.name}
+                  value={configValues[el.name]}
+                  onChange={(e) => handleConfigValues(e)}
+                />
               </div>
-              <InputTextarea
-                placeholder="Summary"
-                rows={2}
-                cols={110}
-              />
-            </div>
-            <div className="col-12">
-              <div>
-              <label>
-                <span>Description</span>
-                <img src="static/imgs/Required.svg" className="required_icon" />
-              </label>
-              </div>
-              <InputTextarea
-                placeholder="Description"
-                rows={2}
-                cols={110}
-              />
-            </div>
-            <div className="col-12">
-              <div>
-              <label>
-                <span>Reporter</span>
-                <img src="static/imgs/Required.svg" className="required_icon" />
-              </label>
-              </div>
-              <InputTextarea
-                placeholder="Reporter"
-                rows={1}
-                cols={110}
-              />
-            </div>
-            <div className="col-12">
-              <div>
-              <label>
-                <span>Parent</span>
-              </label>
-              </div>
-              <InputTextarea
-                placeholder="Parent"
-                rows={1}
-                cols={110}
-              />
-            </div>
+            ))}
           </div>
         }
         customClass="jira_modal"

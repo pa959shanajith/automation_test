@@ -149,6 +149,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
             ...agent,
             name: agent.Hostname,
             state: "idle",
+            createdOn: agent.createdon,
           }))
         );
         setAgentData(
@@ -156,6 +157,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
             ...agent,
             name: agent.Hostname,
             state: "idle",
+            createdOn: agent.createdon, 
           }))
         );
       }
@@ -250,6 +252,19 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
   const onDownloadAgentClick = () => {
     window.location.href = "https://driver.avoautomation.com/driver/avoagent.exe";
   }
+  function formatDate(dateString) {
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+  
+    const parts = dateString.split(/[\/, :]/);
+    const day = parseInt(parts[1], 10);
+    const monthIndex = parseInt(parts[0], 10) - 1;
+    const year = parseInt(parts[2], 10);
+  
+    return `${day} ${months[monthIndex]} ${year}`;
+  }
 
   return (
     <>
@@ -276,7 +291,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
 
         {agentData.length > 0 && (
           <>
-            <div className="p-input-icon-left">
+            <div className="p-input-icon-left search__agent">
           <i className="pi pi-search" />
           <InputText className="Search_name"
                   placeholder="Search" 
@@ -289,11 +304,13 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
                    />
         </div>
           </>
-        )}
-        <Button label="Save" onClick={handleAgentsSave}></Button>
+         )}
+         <div className="savebtn_div">
+        <Button className="save__agent" label="Save" onClick={handleAgentsSave}></Button>
+        </div>
       </div>
       <div style={{ position: "absolute", width: "70%", height: "-webkit-fill-available" }}>
-        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData}>
+        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData} scrollable>
           <Column header="Agent Name" body={(agent) => (
             <div className="agent_state">
               <Tooltip target={`agent-name-${agent.name}`} content={agent.state} position="top" />
@@ -325,7 +342,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
             </div>
           )} />
           <Column header="Created on" body={(agent) => (
-           <></>
+            <>{formatDate((agent.createdOn).slice(0,9))}</>
           )} />
           <Column className="agents__action_icons" header="Action" body={(agent) => (
             <img

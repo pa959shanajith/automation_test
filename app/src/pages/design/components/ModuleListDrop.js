@@ -495,17 +495,14 @@ const ModuleListDrop = (props) =>{
     const selectedCheckbox=(e,arg="checkbox")=>{
         let modID = e.target.getAttribute("value")
         if(arg==='checkbox'){
-
-            let selectedModList = [];
-            if(moduleSelectlist.length>0){
-                selectedModList=moduleSelectlist;              
-            }
-            if(selectedModList.indexOf(modID)===-1){
-                selectedModList.push(modID);
-            }else{
-                selectedModList = selectedModList.filter(item => item !== modID)
-            }              
-            dispatch(selectedModulelist([...selectedModList]))         
+          let newSelectedModList = [...moduleSelectlist]; // Create a new array
+          const modIndex = newSelectedModList.indexOf(modID);
+          if (modIndex === -1) {
+            newSelectedModList.push(modID);
+          } else {
+            newSelectedModList.splice(modIndex, 1);
+          }
+          dispatch(selectedModulelist(newSelectedModList));       
             return;
         }
     }
@@ -1043,7 +1040,7 @@ setPreventDefaultModule(true);
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
                       <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
                                     if (!allModSelected) {
-                                        dispatch(selectedModulelist( moduleList.filter(module=> module.type==='basic').map((modd) => modd._id) ))
+                                        dispatch(selectedModulelist( moduleLists.filter(module=> module.type==='basic').map((modd) => modd._id) ))
                                     } else {
                                         dispatch(selectedModulelist([]) )
                                     }

@@ -5,6 +5,9 @@
 }
 
 .reportsTable_container {
+    .desc_text {
+        padding-left: 0.4rem;
+    }
     .img_jira {
         height: 1rem;
         margin-right: 0.3rem;
@@ -97,6 +100,15 @@
         &:hover {
             background: #FAF9F6;
          }
+    }
+    .text_desc {
+        width: 100%;
+    }
+    .avo_multiselect {
+        width: 100%;
+        .p-multiselect {
+            padding: 0.4rem;
+        }
     }
 }
 

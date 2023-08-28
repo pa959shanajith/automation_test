@@ -240,6 +240,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
+      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
@@ -910,17 +911,16 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         } else {
           setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
         }
-        if (btnType === "Execute") {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: " Execution started.",
-            life: 5000,
-          });
 
-        }
         // onHide(name);
       }
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: " Execution started.",
+        life: 5000,
+      });
+      setVisible_execute(false);
     }
     if (btnType === 'Cancel') {
       setVisible_execute(false);
