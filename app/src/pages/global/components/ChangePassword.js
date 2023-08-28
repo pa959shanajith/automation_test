@@ -75,7 +75,7 @@ const ChangePassword = (props) => {
             setSuccessMsg('');
             let errorMsg = "";
             let successMsg = "";
-            resetPassword(newpassword, null, null)
+            resetPassword(newpassword, props.userInfo?props.userInfo:null, null)
                 .then(data => {
                     if (data === "Invalid Session") { errorMsg = 'Invalid Session'; }
                     else if (data === "success") {

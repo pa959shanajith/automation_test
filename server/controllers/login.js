@@ -132,8 +132,8 @@ exports.resetPassword = async (req, res) => {
 	const fnName = "resetPassword";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-    if(req.body.userData){
-      const user = req.body.userData;
+    if(req.body.currpassword){
+      const user = req.body.currpassword;
       const newpassword = req.body.newpassword;
       const userData = {username:user.name, newpass: newpassword, oldpass: user.auth.password?user.auth.password:""};
       const fresh = await verifyPasswordHistory(userData);
@@ -159,7 +159,8 @@ exports.resetPassword = async (req, res) => {
         modifiedby: userData.user._id,
         modifiedbyrole: userData.user.defaultrole,
         password: password,
-        oldPassword: userData.oldpass
+        oldPassword: userData.oldpass,
+		userimage:''
       };
       const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
       if (status == "fail" || status == "forbidden") return res.send("fail");
@@ -212,7 +213,8 @@ exports.resetPassword = async (req, res) => {
 			modifiedby: userData.user._id,
 			modifiedbyrole: userData.user.defaultrole,
 			password: password,
-			oldPassword: userData.oldpass
+			oldPassword: userData.oldpass,
+			userimage:''
 		};
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");

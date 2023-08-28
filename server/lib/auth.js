@@ -351,7 +351,7 @@ module.exports.verifyUser = async (req, res) => {
 			proceed = true;
 		}
 
-		return res.send(proceed);
+		return res.send({proceed,userInfo});
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");

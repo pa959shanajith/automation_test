@@ -869,26 +869,7 @@ const DesignModal = (props) => {
                 })
             .catch(error => console.error("ERROR::::", error));
         }
-        const handleDebug = () => {
-            if (props.appType === "Web"){
-                DependentTestCaseDialogHideHandler(); 
-                setVisibleDependentTestCaseDialog(true)
-            }else if (props.appType === "Desktop"){
-                debugTestCases('1')
-            }
-            else if (props.appType === "MobileApps"){
-                debugTestCases('1')
-            }
-            else if (props.appType === "MobileWeb"){
-                debugTestCases()
-            }
-            else if (props.appType === "WebService"){
-                debugTestCases()
-            }
-            else if (props.appType === "OEBS"){
-                debugTestCases('1')
-            }
-        }
+       
         return (
             <>
                 { ((screenLavelTestSteps.length === 0) && overlay ) && <ScreenOverlay content={overlay} />}
@@ -925,7 +906,7 @@ const DesignModal = (props) => {
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
-                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>handleDebug()} outlined></Button>
+                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
                     <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
                     <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
@@ -934,11 +915,30 @@ const DesignModal = (props) => {
             </>
         );
     }
-
+    const handleDebug = (selectedSpan) => {
+        if (props.appType === "Web"){
+            debugTestCases(selectedSpan)
+        }
+        else if (props.appType === "Desktop"){
+            debugTestCases('1')
+        }
+        else if (props.appType === "MobileApps"){
+            debugTestCases('1')
+        }
+        else if (props.appType === "MobileWeb"){
+            debugTestCases()
+        }
+        else if (props.appType === "WebService"){
+            debugTestCases()
+        }
+        else if (props.appType === "OEBS"){
+            debugTestCases('1')
+        }
+    }
     const footerContent = (
         <div>
             <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
-            <Button label="Debug" size='small' onClick={() => debugTestCases(selectedSpan)} autoFocus />
+            <Button label="Debug" size='small' onClick={() => handleDebug(selectedSpan)} autoFocus />
         </div>
     );
     const deleteProduct = () => {
@@ -1499,9 +1499,9 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
 
-            <Dialog className="debug__object__modal" header={props.fetchingDetails["parent"]["name"]} style={{ height: "31.06rem", width: "47.06rem" }} visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
-                <div className='debug__btn'>
-                    <div className={"debug__object"}>
+            <Dialog className={props.appType !== "Web"?  "debug__object__modal_ForOtherAppTypes" :"debug__object__modal" } header={props.fetchingDetails["parent"]["name"]}  visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
+                <div className={props.appType !== "Web"? "debug__btn_ForOtherAppTypes" : 'debug__btn'}>
+                    <div className={props.appType !== "Web"? "debug__object_ForOtherAppTypes" : "debug__object"}>
                         <span className='debug__opt'>
                             <p className='debug__otp__text'>Choose Browsers</p>
                         </span>
