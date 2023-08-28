@@ -269,8 +269,8 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
   return (
     <>
         <span className="page-taskName taskname">Download Agent</span>
-        <pre >
-          <code>
+        <pre>
+          <code className="downld_cls">
             Click <u><a onClick={onDownloadAgentClick} style={{color: "purple",cursor:'pointer'}}>Here</a></u> to Download the Agent
           </code>
         </pre>

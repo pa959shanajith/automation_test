@@ -12,11 +12,6 @@ import { getUserDetails, userCreateProject_ICE ,getUsers_ICE , userUpdateProject
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
 
-
-
-
-
-
 const CreateProject = (props) => {
   const [value, setValue] = useState('');
   const [selectedApp, setSelectedApp] = useState(null);
@@ -226,7 +221,7 @@ const CreateProject = (props) => {
   // }
 
   const handleClose = () => {
-    // props.onHide;
+    props.onHide();
     setRefreshData(!refreshData);
     props.setHandleManageProject(false);
   };
