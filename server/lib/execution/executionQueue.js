@@ -984,7 +984,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                                                 status: statusList[index][suiteIndex]["status"],
                                                 projectName: suiteDetails.projectName,
                                                 cycleName: suiteDetails.cycleName,
-                                                releaseId: suiteDetails.releaseId
+                                                releaseId: suiteDetails.releaseId,
+                                                timeEllapsed: statusList[index][suiteIndex]["timeEllapsed"]
                                             }
                                             suiteDetailsInfo.push(reportData);
                                         })
