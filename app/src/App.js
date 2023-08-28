@@ -30,6 +30,7 @@ import MindmapHome from './pages/design/containers/MindmapHome';
 import Profile from './pages/report/components/Profile';
 import ReportTestTable from './pages/report/components/ReportTestTable';
 import AdminContainer from './pages/admin/containers/AdminContainer';
+import GeniusDialog from './pages/global/components/GeniusDialog';
 
 
 
@@ -71,6 +72,7 @@ const App = () => {
 const RouteApp = () => {
   return (
     <>
+    <GeniusDialog />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path='/verify' element={<Login/>}/>

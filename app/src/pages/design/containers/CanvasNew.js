@@ -96,6 +96,7 @@ const CanvasNew = (props) => {
     const [endToEndDelConfirm,setEndToEndDelConfirm] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true);
     const proj = useSelector(state=>state.design.selectedProj)
+    const projectList = useSelector(state=>state.design.projectList)
     const impactAnalysis=useSelector(state=>state.design.impactAnalysis)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
@@ -990,7 +991,7 @@ const CanvasNew = (props) => {
     dispatch(showGenuis({
       showGenuisWindow:true,
       geniusWindowProps:{
-        selectedProject:{key: proj,text: ""},
+        selectedProject:{key: proj,text: projectList[proj]["name"]},        
         selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
         selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
         geniusFromMindmap:true

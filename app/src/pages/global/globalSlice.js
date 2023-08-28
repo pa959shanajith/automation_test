@@ -24,8 +24,8 @@ export const globleSlice = createSlice({
             state.popup = action.payload
          },
          showGenuis:(state, action) =>{
-            state.showGenuisWindow = action.payload
-            state.geniusWindowProps = action.payload
+            state.showGenuisWindow = action.payload.showGenuisWindow 
+            state.geniusWindowProps = action.payload.geniusWindowProps
          },
          showGenuisWindow:(state, action) =>{
             state.showGenuisWindow = action.payload
