@@ -30,7 +30,7 @@ const CreateLanding = (props) => {
     const lastname = useSelector(state => state.admin.lastname);
     const editUser = useSelector(state => state.admin.editUser);
     const email = useSelector(state => state.admin.email);
-
+    
     const node = useRef();
 
     const serverItems = [
@@ -132,18 +132,20 @@ const CreateLanding = (props) => {
                     <InputText
                         data-test="userName-input__create"
                         type="text"
-                        className='w-full md:w-20rem p-inputtext-sm'
+                        className='w-full md:w-20rem p-inputtext-sm placeHolder'
                         autoComplete="User-name"
-                        id="userName"
-                        value={userName} onChange={(event) => { userNameChange(event.target.value) }}
-                        name="userName" maxLength="100"
+                        id="create_username"
+                        value={userName} 
+                        onChange={(event) => { userNameChange(event.target.value) }}
+                        name="create_username" 
+                        maxLength="100"
                         placeholder="Enter User Name"
                         disabled={editUser}
                     />
                 </div>
 
                 <div className='flex flex-column pl-2 pb-2'>
-                            <label htmlFor="username" className="pb-2 font-medium">Email Id <span style={{ color: "#d50000" }}>*</span></label>
+                            <label htmlFor="email" className="pb-2 font-medium">Email Id <span style={{ color: "#d50000" }}>*</span></label>
                             <InputText
                                 data-test="email"
                                 value={email}
