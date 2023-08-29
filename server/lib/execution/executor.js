@@ -411,7 +411,7 @@ class TestSuiteExecutor {
                                     }
                                     const reportStatus = reportData.overallstatus.overallstatus;
                                     const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-                                    const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
+                                    const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy, timeEllapsed: reportData.overallstatus.EllapsedTime };
                                     if (reportid == "fail") {
                                         logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
                                         reportItem[reportid] = '';
