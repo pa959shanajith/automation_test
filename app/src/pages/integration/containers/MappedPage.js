@@ -129,12 +129,12 @@ const MappedPage = props =>{
                 mappedScenarios = mappedScenarios + object.testscenarioname.length;
                 mappedTests = mappedTests + 1;
                 tempRow.push({
-                    'testCaseNames': object.itemType === "UserStory" ? object.userStoryId : object.TestSuiteId, 
+                    'testCaseNames': object.itemType === "UserStory" ? object.userStoryId : object[object.itemType+'Id'],
                     'scenarioNames': object.testscenarioname,
                     'mapId': object._id,
                     'scenarioId': object.testscenarioid,
                     'testid':object.itemId,
-                    'itemSummary': object.itemType === "UserStory" ? object.userStorySummary : object.testSuiteSummary
+                    'itemSummary': object.itemType === "UserStory" ? object.userStorySummary : object.itemType === "TestSuite" ? object.testSuiteSummary : object.testCaseSummary
                 });
             });
             setCounts({
