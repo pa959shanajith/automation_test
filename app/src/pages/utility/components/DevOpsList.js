@@ -77,7 +77,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [integration,setIntegration] = useState({
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}
+        zephyr: {url:"",username:"",password:""},
+        azure:{url:"",username:"",password:""}
     });
     const [appType, setAppType] = useState('');
     const [cycleName, setCycleName] = useState('');
@@ -194,9 +195,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
-                   const integrationData = configurationList.map((item,idx)=>{
-                        setIntegration(item.executionRequest.integration)
-                    })
+                //    const integrationData = configurationList.map((item,idx)=>{
+                //         setIntegration(item.executionRequest.integration)
+                //     })
                     setConfigList(configurationList);
                 }
             }
@@ -287,9 +288,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
             }
         }else {
-            const integrationData = configurationList.map((item,idx)=>{
-                setIntegration(item.executionRequest.integration)
-            })
+            // const integrationData = configurationList.map((item,idx)=>{
+            //     setIntegration(item.executionRequest.integration)
+            // })
             setConfigList(configurationList);
         }
         setLoading(false);
@@ -501,6 +502,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         if(selectedIntegration === 'qtest') selectedIntegration = 'qTest'
         if(selectedIntegration === 'alm') selectedIntegration = 'ALM'
         if(selectedIntegration === 'zephyr') selectedIntegration = 'Zephyr'
+        if(selectedIntegration === 'azure') selectedIntegration = 'Azure'
         return selectedIntegration;
     }
     const handleEdit = (item) => {
@@ -1080,6 +1082,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <td className="tkn-table__button" >
                                 <img onClick={() =>{
                                     onClick('displayBasic2');
+                                    setIntegration(item.executionRequest.integration);
                                     setCurrentKey(item.configurekey);
                                     setCurrentExecutionRequest(item.executionRequest);
                                     if ("isEmailNotificationEnabled" in item.executionRequest) {

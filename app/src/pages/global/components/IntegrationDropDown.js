@@ -53,8 +53,8 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             if(type === "ALM") apiIntegration = loginQCServer_ICE;
             if(type === "Zephyr") data = await loginZephyrServer_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, latestCredentialsData.apitoken, latestCredentialsData.authtype, type);
             if(type === "Azure") data = await connectAzure_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password);
-            else data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
-            if(data.error){displayError(data.error);return;}
+            if(type === "qTest") data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
+            if(data.error){displayError(data.error);return;}    
             else if (data === "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
             else if (data === "Invalid Session") setErrorMsg("Invalid Session");
             else if (data === "invalidcredentials") setErrorMsg("Invalid Credentials");
@@ -167,16 +167,16 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                 if(data !=="empty"){
                     setIsEmpty(false);
                     let credentialsData = {
-                        // authtype: 'basic',
-                        // url: '',
-                        // apitoken: '',
+                        authtype: 'basic',
+                        url: '',
+                        apitoken: '',
                         userName: '',
                         password: ''
                     };
                     
-                    // if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
-                    // if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
-                    // if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
+                    if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
+                    if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
+                    if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
                     if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
                     if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
                     
