@@ -884,11 +884,16 @@ setPreventDefaultModule(true);
                          {/* <MemorizedCheckboxSelectionDemo/> */}
                         {/* <CheckboxSelectionDemo /> */}
                         <div>
-                          {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and Testcases in this project ...</h5>: 
+                          {/* {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and Testcases in this project ...</h5>:  */}
                           <>
                           {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and Testcases...</h5>:
                             <Tree
                               value={
+                                filterModSceList[0] === "" ?[{
+                                  key:0,
+                                  label: (<div className='labelOfArrayText'> No Test Suites and Testcases in this project ... </div>),
+                                  children:(<></>)
+                                }]:
                                 filterModSceList[0].mindmapList.map((module, modIndx) => ({
                                   key: modIndx,
                                   label: (
@@ -919,8 +924,8 @@ setPreventDefaultModule(true);
                                 }))}
                             // selectionMode="multiple"
 
-                            />}</>}
-
+                            />}</>
+                          
                           {/* <button onClick={handleTransferScenarios}>Transfer Scenarios</button> */}
                         </div>
                       </div>
