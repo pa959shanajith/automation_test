@@ -20,17 +20,18 @@ const UserList = (props) => {
     const [globalFilter, setGlobalFilter] = useState('');
     const [loading, setLoading] = useState(true);
     const [editUserDialog, setEditUserDialog] = useState(false);
-    const [editUser, setEditUser] = useState('')
+    const [editUserData, setEditUserData] = useState('')
     const allUserList = useSelector(state => state.admin.allUsersList);
     const [showDeleteConfirmPopUp, setShowDeleteConfirmPopUp] = useState(false);
 
 
     useEffect(() => {
         (async () => {
-            if (allUserList.length === 0) {
-                try {
-                    const UserList = await getUserDetails("user");
-                    const filteredUserList = UserList.map((user) => {
+            try {
+                const UserList = await getUserDetails("user");
+                let filteredUserList = [];
+                UserList.map((user) => {
+                    if (user[3] !== "Admin") {
                         const dataObject = {
                             userName: user[0],
                             userId: user[1],
@@ -39,51 +40,53 @@ const UserList = (props) => {
                             email: user[6],
                             role: user[3]
                         };
-                        return dataObject;
-                    });
-                    setData(filteredUserList);
-                    setLoading(false);
-                } catch (error) {
-                    console.error('Error fetching User list:', error);
-                }
-            } else{
-                setData(allUserList);
-            } 
+                        filteredUserList.push(dataObject);
+                    }
+                });
+                setData(filteredUserList);
+                setLoading(false);
+                props.setRefreshUserList(!props.refreshUserList);
+            } catch (error) {
+                console.error('Error fetching User list:', error);
+            }
         })();
-    }, []); 
-    const reloadData = async() => {
+    }, [props.refreshUserList]);
+
+    const reloadData = async () => {
         const UserList = await getUserDetails("user");
-        let filteredUserList=[];
-        for (let user of UserList){
-            filteredUserList.push({
-                userName: user[0],
-                userId: user[1],
-                firstName: user[4],
-                lastName: user[5],
-                email: user[6],
-                role: user[3]
-            });
-        }
+        let filteredUserList = [];
+        UserList.map((user) => {
+            if (user[3] !== "Admin") {
+                const dataObject = {
+                    userName: user[0],
+                    userId: user[1],
+                    firstName: user[4],
+                    lastName: user[5],
+                    email: user[6],
+                    role: user[3]
+                };
+                filteredUserList.push(dataObject);
+            }
+        });
         setData(filteredUserList);
     }
 
     const header = (
-            <div className='User_header'>
-                <p>User List</p>
-                <i className="pi pi-search user_search" />
-                <InputText
-                    className='User_Inp'
-                    type="search"
-                    value={globalFilter}
-                    onChange={(e) => setGlobalFilter(e.target.value)}
-                    placeholder="Search"
-                />
+        <div className='User_header'>
+            <p>User List</p>
+            <i className="pi pi-search user_search" />
+            <InputText
+                className='User_Inp'
+                type="search"
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                placeholder="Search"
+            />
         </div>
     );
 
 
     const editRowData = (rowData) => {
-        setEditUser(rowData);
         dispatch(AdminActions.EDIT_USER(true));
         dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
@@ -92,6 +95,8 @@ const UserList = (props) => {
         dispatch(AdminActions.UPDATE_USERIDNAME(rowData.userId + ";" + rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(rowData.email));
         dispatch(AdminActions.UPDATE_USERROLE(rowData.role));
+        setEditUserData(rowData);
+        setEditUserDialog(true);
     }
 
     const actionBodyTemplate = (rowData) => {
@@ -99,7 +104,7 @@ const UserList = (props) => {
             <React.Fragment>
                 <img src="static/imgs/ic-edit.png"
                     style={{ height: "20px", width: "20px" }}
-                    className="edit__usericon" onClick={() => { editRowData(rowData); setEditUserDialog(true); }}
+                    className="edit__usericon" onClick={() => editRowData(rowData)}
                 />
                 <img
                     src="static/imgs/ic-delete-bin.png"
@@ -121,9 +126,9 @@ const UserList = (props) => {
                 content={"Are you sure, you want to delete the user"}
                 close={() => setShowDeleteConfirmPopUp(false)}
                 footer={
-                    <> 
+                    <>
                         <Button outlined label="No" size='small' onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
-                        <Button label="Yes" size='small' onClick={() => {props.manage({ action: "delete" });setShowDeleteConfirmPopUp(false);reloadData();}}></Button>
+                        <Button label="Yes" size='small' onClick={() => { props.manage({ action: "delete" }); setShowDeleteConfirmPopUp(false); reloadData(); }}></Button>
                     </>}
                 width={{ width: "5rem" }}
             />
@@ -137,13 +142,17 @@ const UserList = (props) => {
                 showGridlines>
                 <Column field="userName" header="User Name" style={{ width: '20%' }}></Column>
                 <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
-                <Column field="lastName" header="Last Name" style={{ width:'20%' }}></Column>
+                <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column>
                 <Column field="email" header="Email" className='table_email'></Column>
                 <Column field="role" header="Role" style={{ width: '20%' }}></Column>
                 <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
             </DataTable>
 
-            {editUserDialog && <CreateUser createUserDialog={editUserDialog} reloadData={reloadData} setCreateUserDialog={setEditUserDialog} setEditUser={setEditUser} editUser={editUser} />}
+            {editUserDialog && <CreateUser createUserDialog={editUserDialog}
+                reloadData={reloadData}
+                setCreateUserDialog={setEditUserDialog}
+                setEditUserData={setEditUserData}
+                editUserData={editUserData} />}
         </div>
     </>)
 }

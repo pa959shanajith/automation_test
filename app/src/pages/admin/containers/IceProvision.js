@@ -26,10 +26,10 @@ const IceProvision = (props) => {
   const [tokeninfoIcename, setTokeninfoIcename] = useState("")
   const [defaultICE, setDefaultICE] = useState('');
   const editUser = useSelector(state => state.admin.editUser);
+  const userName = useSelector(state => state.admin.userName);
 
   useEffect(() => {
     setOp('normal');
-    setIcename('');
     // setRefreshIceList((prevRefreshIceList)=>(!prevRefreshIceList))
     // eslint-disable-next-line
 
@@ -39,7 +39,7 @@ const IceProvision = (props) => {
       else {
         data.sort();
         data.map(user => {
-          if (props.userName && user.includes(props.userName)) {
+          if (userName && user.includes(userName)) {
             setUserid(user)
           }
         })
@@ -74,12 +74,12 @@ const IceProvision = (props) => {
   //   }
   // },[])
 
-  // const refreshIceProvision = () =>{
-  //     setIcelist([]);
-  //     setIcename('');
-  //     setRefreshIceList((prevRefreshIceList)=>(!prevRefreshIceList))
-  //     setSelectProvisionType(!selectProvisionType);
-  // }
+  const refreshIceProvision = () =>{
+      setIcelist([]);
+      setIcename('');
+      setRefreshIceList((prevRefreshIceList)=>(!prevRefreshIceList))
+      setSelectProvisionType(!selectProvisionType);
+  }
 
   return (
     <div className="ip_container">
@@ -87,15 +87,23 @@ const IceProvision = (props) => {
       {/* <div className="adminActionBtn">
                 {!props.userConfig && <button className="a__btn pull-right" onClick={()=>{setRunProvisionsIce(!runProvisionsIce)}}  title="Provision">Provision</button>}
                 <button className="a__btn pull-right adminBtn-ice-provision " onClick={()=>{refreshIceProvision()}} title="Refresh">Refresh</button>            
-            </div> */}
+            </div> */} 
       <div className="ip-content_wrapper">
-        <IceProvisionForm defaultICE={defaultICE} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList}
+        <IceProvisionForm  defaultICE={defaultICE} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList}
           op={op} setOp={setOp} runProvisionsIce={runProvisionsIce} selectProvisionType={selectProvisionType}
           setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token}
           setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid}
           tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken}
-          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} edit={props.setEditUserIceProvision} />
-        {editUser ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE} userConfig={props.userConfig} userID={props.userID} refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}  edit={props.editUserIceProvision}/> : null}
+          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} edit={props.editUserIceProvision} />
+        {editUser ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE}
+          userConfig={props.userConfig} 
+          refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp}
+          setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist}
+          token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid}
+          setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename}
+          tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken} edit={props.editUserIceProvision}
+          toastError={props.toastError} toastSuccess={props.toastSuccess}
+        /> : null}
       </div>
     </div>
   );
