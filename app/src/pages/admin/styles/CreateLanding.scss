@@ -193,3 +193,6 @@
 .username-cust{
     padding-right: 175px;
 }
+.placeHolder::placeholder {
+    text-transform: capitalize;
+}

@@ -291,7 +291,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
 
         {agentData.length > 0 && (
           <>
-            <div className="p-input-icon-left search__agent">
+            <div className="p-input-icon-left search_agent">
           <i className="pi pi-search" />
           <InputText className="Search_name"
                   placeholder="Search" 

@@ -30,7 +30,7 @@ const CreateLanding = (props) => {
     const lastname = useSelector(state => state.admin.lastname);
     const editUser = useSelector(state => state.admin.editUser);
     const email = useSelector(state => state.admin.email);
-
+    
     const node = useRef();
 
     const serverItems = [
@@ -132,7 +132,7 @@ const CreateLanding = (props) => {
                         <InputText
                             data-test="userName-input__create"
                             type="text"
-                            className='w-full md:w-20rem p-inputtext-sm'
+                            className='w-full md:w-20rem p-inputtext-sm placeHolder'
                             id="userName"
                             value={userName} onChange={(event) => { userNameChange(event.target.value) }}
                             name="userName" maxLength="100"
