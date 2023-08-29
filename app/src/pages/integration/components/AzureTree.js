@@ -405,6 +405,8 @@ const PhaseNode = props => {
                                                 setPhaseDets={props.setPhaseDets}
                                                 selectedPhase={props.selectedPhase}
                                                 itemType ={props.itemType}
+                                                testSuiteData = {props.phase}
+                                                testPlansDetails = {props.testPlansDetails}
                                             />)
                     } </div>
                     : null
@@ -420,7 +422,7 @@ const TestCaseNode = props => {
     const syncedTestCases = useSelector(state=>state.integration.syncedTestCases);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
 
-    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}\\${props.testCase.name}\\${props.testCase.parentId}|`;
+    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.workItem.id}\\${props.testCase.workItem.name}\\${props.testCase.workItem.parentId}|`;
 
     const handleClick = e => {
         let newSelectedTCDetails = { ...selectedZTCDetails };
@@ -428,11 +430,20 @@ const TestCaseNode = props => {
 
         if (!e.ctrlKey) {
             newSelectedTCDetails.selectedTCPhaseId = [props.phaseId];
-            newSelectedTCDetails.selectedTcId = [String(props.testCase.id)];
-            newSelectedTCDetails.selectedTCNames = [props.testCase.name];
-            newSelectedTCDetails.selectedTCReqDetails = [props.testCase.reqdetails];
-            newSelectedTCDetails.selectedTreeId = [String(props.testCase.cyclePhaseId)];
-            newSelectedTCDetails.selectedParentID = [props.testCase.parentId];
+            newSelectedTCDetails.selectedTcId = [String(props.testCase.workItem.id)];
+            newSelectedTCDetails.selectedTCNames = [props.testCase.workItem.name];
+
+            newSelectedTCDetails.selectedTestPlanId = [props.testPlansDetails.id];
+            newSelectedTCDetails.selectedTestPlanName = [props.testPlansDetails.name];
+
+            newSelectedTCDetails.selectedTestSuiteId = [props.testSuiteData.id];
+            newSelectedTCDetails.selectedTestSuiteName = [props.testSuiteData.name];
+
+            newSelectedTCDetails.selectedTestPoints = props.testCase.points;
+
+            newSelectedTCDetails.selectedTCReqDetails = [props.testCase.workItem.reqdetails];
+            newSelectedTCDetails.selectedTreeId = [String(props.testCase.workItem.cyclePhaseId)];
+            newSelectedTCDetails.selectedParentID = [props.testCase.workItem.parentId];
             newSelectedTCDetails.selectedProjectID = props.projectId;
             newSelectedTCDetails.selectedProjectName = props.projectName;
             newSelectedTCDetails.selectedReleaseID = [parseInt(props.releaseId)];
@@ -452,11 +463,11 @@ const TestCaseNode = props => {
                 newSelectedTC.splice(index, 1);
             } else {
                 newSelectedTCDetails.selectedTCPhaseId.push(props.phaseId);
-                newSelectedTCDetails.selectedTcId.push(String(props.testCase.id));
-                newSelectedTCDetails.selectedTCNames.push(props.testCase.name);
-                newSelectedTCDetails.selectedTCReqDetails.push(props.testCase.reqdetails);
-                newSelectedTCDetails.selectedTreeId.push(String(props.testCase.cyclePhaseId));
-                newSelectedTCDetails.selectedParentID.push(props.testCase.parentId);
+                newSelectedTCDetails.selectedTcId.push(String(props.testCase.workItem.id));
+                newSelectedTCDetails.selectedTCNames.push(props.testCase.workItem.name);
+                newSelectedTCDetails.selectedTCReqDetails.push(props.testCase.workItem.reqdetails);
+                newSelectedTCDetails.selectedTreeId.push(String(props.testCase.workItem.cyclePhaseId));
+                newSelectedTCDetails.selectedParentID.push(props.testCase.workItem.parentId);
                 newSelectedTCDetails.selectedProjectID.push(parseInt(props.projectId));
                 newSelectedTCDetails.selectedReleaseID.push(parseInt(props.releaseId));
                 newSelectedTC.push(uniqueTCpath)
@@ -492,7 +503,10 @@ const TestCaseNode = props => {
                     testname: selectedZTCDetails.selectedTCNames,
                     reqdetails: selectedZTCDetails.selectedTCReqDetails,
                     itemType:'TestCase',
-                    scenarioId: selectedScIds
+                    scenarioId: selectedScIds,
+                    testPlanId:selectedZTCDetails.selectedTestPlanId,
+                    testSuiteId:selectedZTCDetails.selectedTestSuiteId,
+                    testPoints:selectedZTCDetails.selectedTestPoints
                 }
             ]
             dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
@@ -513,7 +527,7 @@ const TestCaseNode = props => {
         var phaseDetsVal = props.phaseDets;
         var parentid = '-1';
         if(props.type==="module") {
-            parentid = props.testCase.parentId;
+            parentid = props.testCase.workItem.parentId;
         }
         if(Array.from(Object.keys(phaseDetsVal[props.cyclephaseid])).includes(parentid)) {
             checkList = new Set(phaseDetsVal[props.cyclephaseid][parentid])
@@ -544,27 +558,27 @@ const TestCaseNode = props => {
 
     const checkTC = () => {
         var ph = document.getElementById('ph-'+props.phaseId);
-        var tc = document.getElementById('test-'+props.testCase.id);
+        var tc = document.getElementById('test-'+props.testCase.workItem.id);
         return ph.checked || (tc!=null&&tc.checked);
     }
 
     return (props.section !== "right" && props.section != undefined)? 
             <div className={"test_tree_leaves"}>
                 <span className="sel_up">
-                    <input id={`test-${props.testCase.id}`} checked={checkTC()} className="sel_up mp-tcs" type="checkbox" onChange={(e)=>onCheckAll(e)}></input></span>
-                <label className="test__leaf" title={props.testCase.name} onClick={handleClick}>
-                    <span className="leafId">{props.testCase.id}</span>
-                    <span className="test__tcName">{props.testCase.name}</span>
+                    <input id={`test-${props.testCase.workItem.id}`} checked={checkTC()} className="sel_up mp-tcs" type="checkbox" onChange={(e)=>onCheckAll(e)}></input></span>
+                <label className="test__leaf" title={props.testCase.workItem.name} onClick={handleClick}>
+                    <span className="leafId">{props.testCase.workItem.id}</span>
+                    <span className="test__tcName">{props.testCase.workItem.name}</span>
                 </label>
             </div> :
-            <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(props.testCase.name) ? " test__syncedTC" : "")}>
-                <label className="test__leaf" title={props.testCase.name} onClick={handleClick}>
-                    <span className="leafId">{props.testCase.id}</span>
-                    <span className="test__tcName">{props.testCase.name}</span>
+            <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(props.testCase.workItem.name) ? " test__syncedTC" : "")}>
+                <label className="test__leaf" title={props.testCase.workItem.name} onClick={handleClick}>
+                    <span className="leafId">{props.testCase.workItem.id}</span>
+                    <span className="test__tcName">{props.testCase.workItem.name}</span>
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(props.testCase.name) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        { !syncedTestCases.includes(props.testCase.workItem.name) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
                         <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                 }

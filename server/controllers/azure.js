@@ -643,6 +643,9 @@ exports.saveAzureDetails_ICE = async (req, res) => {
             } else {
                 inputs['TestCaseId'] = itr.testid[0];
                 inputs['testCaseSummary'] = itr.testname[0]
+                inputs['TestPlanId'] = itr.testPlanId[0]
+                inputs['TestSuiteId'] = itr.testSuiteId[0]
+                inputs['TestPoints'] = itr.testPoints
             }
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
 			if (result == "fail") flag = false;
