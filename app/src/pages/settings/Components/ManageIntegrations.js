@@ -18,7 +18,7 @@ import {
     screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree
+    selectedAvoproject, mappedTree,enableSaveButton
 } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -42,6 +42,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const selectedAvo = useSelector(state => state.setting.selectedAvoproject);
     const AzureLoginDetails = useSelector(state => state.setting.AzureLogin);
     const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
+    const enabledSaveButton = useSelector(state => state.setting.enableSaveButton);
     // state
     const [activeIndex, setActiveIndex] = useState(0);
     const [activeIndexViewMap, setActiveIndexViewMap] = useState(0);
@@ -300,7 +301,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setShowLoginCard(true);
         setIsSpin(false);
         setSelectedNodes([]);
+        dispatchAction(enableSaveButton(false))
         onHide();
+
     }
 
     const handleTabChange = (index) => {
@@ -664,7 +667,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             dispatchAction(selectedScenarioIds([]));
         }
         setDisabled(false);
-        setSaveEnabale(true);
+        dispatchAction(enableSaveButton(true));
     }
 
 
@@ -693,7 +696,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         return (<div className='btn-11'>
             {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Save" severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
+                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
                     <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
                 </div>)}
 

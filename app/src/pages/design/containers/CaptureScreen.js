@@ -82,7 +82,6 @@ const CaptureModal = (props) => {
   const [modified, setModified] = useState([]);
   const [editingCell, setEditingCell] = useState(null);
   const [deleted, setDeleted] = useState([]);
-  const [deletedItems, setDeletedItems] = useState(false)
   const[browserName,setBrowserName]=useState(null)
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
@@ -112,6 +111,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [showEmptyMessage, setShowEmptyMessage] = useState(true);
+  const [deletedItems, setDeletedItems] = useState(false);
   let addMore = useRef(false);
 
 
@@ -565,7 +565,7 @@ const elementTypeProp =(elementProperty) =>{
                 
                 selectall: item.custname,
                 objectProperty: elementTypeProp(item.tag),
-                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={(event) => {
+                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId?(event) => {
                   setScreenshotY(event.clientY);
                   setScreenshotData({
                     header: item.custname,
@@ -573,8 +573,8 @@ const elementTypeProp =(elementProperty) =>{
                     enable: true
                   });
                   onHighlight();
-                  setHighlight(true);
-                }}>View Screenshot</span> : <span>No Screenshot Available</span>,
+                  // setHighlight(true);
+                }:()=>toastError('Please save element')}>View Screenshot</span> : <span>No Screenshot Available</span>,
                 actions: '',
                 objectDetails: item,
 
@@ -586,7 +586,7 @@ const elementTypeProp =(elementProperty) =>{
                 selectall: item.custname,
                 objectProperty: elementTypeProp(item.tag),
                 browserscrape: 'google chrome',
-                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={() => {
+                screenshots: (item.left && item.top && item.width)  ?  <span className="btn__screenshot" onClick={item.objId?() => {
                   setScreenshotData({
                     header: item.custname,
                     imageUrl: mirror.scrape || "",
@@ -594,7 +594,7 @@ const elementTypeProp =(elementProperty) =>{
                   });
                   onHighlight();
                   setHighlight(true);
-                }}>View Screenshot</span> : <span>No screenshot available</span>,
+                }:()=>toastError('Please save element')}>View Screenshot</span> : <span>No screenshot available</span>,
                 actions: '',
                 objectDetails: item
               }
@@ -641,6 +641,7 @@ const elementTypeProp =(elementProperty) =>{
     setCapturedDataToSave(newCapturedDataToSave)
     setSelectedCapturedElement([])
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+    setDeletedItems(true);
   }
   // {console.log(captureData[0].selectall)}
 
@@ -1094,7 +1095,7 @@ const footerSave = (
     {selectedCapturedElement.length>0?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} ></Button>
+    <Button label='Save' onClick={onSave} disabled={captureData.length === 0 && !deletedItems}></Button>
     </>
   )
   
@@ -1573,7 +1574,7 @@ const footerSave = (
         <>
         <Tooltip content={rowdata.selectall} target={`.tooltip__target-${rowdata.objectDetails.objId}`} tooltipOptions={{ position: 'right' }}></Tooltip>
         <div style={{display:'flex',justifyContent:'space-between'}}>
-        <div className={`tooltip__target-${rowdata.objectDetails.objId}`}>{rowdata.selectall}</div>
+        <div className={`tooltip__target-${rowdata.objectDetails.objId }`} style={!rowdata.objectDetails.objId? {color:'blue'}:null}>{rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
       </div>
