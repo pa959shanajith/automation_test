@@ -110,7 +110,7 @@ const CreateProject = (props) => {
         setValue(reduxDefaultselectedProject.projectName);
       }
       else {
-        userData = await getUserDetails("user");
+        userData = await getUserDetails("user"); 
         const formattedData = userData.map((user) => {
           const [name, id, ,primaryRole, firstname, lastname, email,profileimage] = user;
           return { id, name, primaryRole, firstname, lastname, email,profileimage};
@@ -452,7 +452,7 @@ const CreateProject = (props) => {
   return (
     <>
       <Toast ref={toast} position="bottom-right" baseZindex={10000}/>
-      <Dialog className='Project-Dialog' header={dialogHeader} visible={props.visible} style={{ width: "74.875rem" }} onHide={props.onHide} footer={footerContent}>
+      <Dialog className='Project-Dialog' header={dialogHeader} visible={props.visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>
         <Card className='project-name-1'>
           <div className='pro-name1'>
             < h5 className='proj__name' disabled={isDisabledProjectName} style={{opacity:!isDisabledAppType ? 1 : 0.5, cursor:isDisabledProjectName ? 'not-allowed ' : 'pointer'}} > Project Name <span className="imp-cls"> * </span> </h5>
