@@ -15,7 +15,7 @@ import {
     resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree
+    selectedAvoproject, mappedTree,enableSaveButton
 } from '../settingSlice';
 import { Toast } from "primereact/toast";
 import { Paginator } from 'primereact/paginator';
@@ -35,6 +35,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
     const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
     const selectedTC = useSelector(state => state.setting.selectedTestCase);
     const selectedscreen = useSelector(state => state.setting.screenType);
+   
 
     // const toast = useRef(null);
     const dispatchAction = useDispatch();
@@ -449,7 +450,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
             }
         }
         setDisabled(false);
-        setSaveEnable(true);
+        dispatchAction(enableSaveButton(true));
     }
 
     const callViewMappedFiles = async (saveFlag) => {

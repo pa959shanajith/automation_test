@@ -41,7 +41,8 @@ const initialState = {
     checkedParentIds:[],
     checkedProjectIds:[],
     checkedReleaseIds:[],
-    reference:''
+    reference:'',
+    enableSaveButton:false
 }
 
 export const settingSlice=createSlice({
@@ -125,6 +126,9 @@ export const settingSlice=createSlice({
         },
         checkedReleaseIds: (state,action) => {
             state.checkedReleaseIds =  action.payload
+        },
+        enableSaveButton :(state, action) => {
+            state.enableSaveButton =  action.payload
         }
     }
 })
@@ -154,7 +158,8 @@ export const {
     checkedTreeIds,
     checkedParentIds,
     checkedProjectIds,
-    checkedReleaseIds
+    checkedReleaseIds,
+    enableSaveButton
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;
