@@ -128,14 +128,15 @@ const EditProfile = (props) => {
             userConfig: true,//hardcoded only for inhouse
             type: 'inhouse' //hardcoded only for inhouse
         };
-        const userdetail = { ...userInfo, ['email_id']: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, userimage: userObj.userimage };
+        const userdetail = { ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, userimage: userObj.userimage };
         (async () => {
             try {
                 var data = await manageUserDetails("update", userObj);
                 setLoading(false);
                 if (data === 'success') {
                     successMsg = 'Profile changed successfully';
-                    dispatch(loadUserInfoActions.setUserInfo(userdetail))
+                    localStorage.setItem("userInfo", JSON.stringify(userdetail))
+                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, userimage: userObj.userimage }))
                 } else if (data === "exists") {
                     successMsg = 'User already Exists.';
                     // setMsg(MSG.ADMIN.WARN_USER_EXIST);

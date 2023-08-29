@@ -75,6 +75,7 @@ const CreateUser = (props) => {
     const [userNameForIceToken, setUserNameForIceToken] = useState('');
     // const [userIdforIceToken, setUserIdForIceToken] = useState('');
     const [adminCheck, setAdminCheck] = useState(false);
+    const [refreshUserList, setRefreshUserList] = useState(false);
 
     useEffect(() => {
         click();
@@ -88,7 +89,7 @@ const CreateUser = (props) => {
         let allRolesList = [];
         let editUserRole = "";
         if (allRoles.length) {
-            allRoles.map(userRole => {
+            allRoles.forEach(userRole => {
                 let roleObject = {};
                 if (userRole[0] !== "Admin") {
                     roleObject.name = userRole[0];
@@ -96,11 +97,18 @@ const CreateUser = (props) => {
                     allRolesList.push(roleObject);
                     if (role === roleObject.name) editUserRole = roleObject.value;
                 }
-            })
+            });
+
+            allRolesList.sort((a, b) => {
+                if (a.name === 'Quality Manager') return -1;
+                if (a.name === 'Quality Lead' && b.name === 'Quality Engineer') return -1;
+                return 1;
+            });
+
             setRoleDropdownValue(editUserRole);
             setAllRolesUpdate(allRolesList);
         }
-    }, [allRoles.length > 0]);
+    }, [allRoles.length > 0, role]);
 
     const tabHeader = [
         { label: 'User Details', key: 'userDetails', text: 'User Details' },
@@ -123,8 +131,6 @@ const CreateUser = (props) => {
 
     const toastWarn = (warnMessage) => {
         if (warnMessage.CONTENT) {
-            // toast.current.show({severity:'warn', summary: 'Warning', detail:'Message Content', life: 3000});
-
             toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
         }
         else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
@@ -186,7 +192,7 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
-                    if (action === "create") { click(); setSelectedTab("avoAzzureClient") }
+                    if (action === "create") { setSelectedTab("avoAzzureClient") }
                     else {
                         edit();
                         toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
@@ -503,7 +509,7 @@ const CreateUser = (props) => {
             setLoading(false);
             data.sort();
             dispatch(AdminActions.UPDATE_ALL_USERS_LIST(data));
-            setAllUserFilList(data);
+            // setAllUserFilList(data);
         }
     }
 
@@ -621,22 +627,21 @@ const CreateUser = (props) => {
             label="Cancel"
             disabled={selectedTab === "avoAzzureClient"}
             text
-            onClick={() => { props.setCreateUserDialog(false); dispatch(AdminActions.EDIT_USER(true)); props.reloadData();}}
+            onClick={() => { props.setCreateUserDialog(false); dispatch(AdminActions.EDIT_USER(true)); props.reloadData(); }}
         >
-        </Button> 
+        </Button>
         {(selectedTab === "userDetails") && <Button
             data-test="createButton"
-            label={ "Next"}
-            onClick={() => { 
+            label={editUser ? "Update" : "Next"}
+            onClick={() => {
                 editUser ? manage({ action: "update" }) : manage({ action: "create" });
-                props.reloadData();
             }}
             disabled={nocreate}>
         </Button>}
         {selectedTab === "avoAzzureClient" && <Button
             data-test="createButton"
-            label={editUser ? "Update" :"Create"}
-            onClick={() => {userCreateHandler();props.setCreateUserDialog(false);props.reloadData();}}
+            label={editUser ? "Reprovision" : "Create"}
+            onClick={() => { userCreateHandler(); props.setCreateUserDialog(false); setRefreshUserList(!refreshUserList); }}
             disabled={nocreate}>
         </Button>}
     </>
@@ -644,13 +649,14 @@ const CreateUser = (props) => {
     const createUserDialogHide = () => {
         dispatch(AdminActions.EDIT_USER(false));
         props.setCreateUserDialog(false);
+        setRefreshUserList(!refreshUserList);
     }
 
     return (
         <Fragment>
             <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={1300} />
             {loading ? <ScreenOverlay content={loading} /> : null}
-            <UserList manage={manage} />
+            <UserList manage={manage} refreshUserList={refreshUserList} setRefreshUserList={setRefreshUserList}/>
             <Dialog
                 visible={props.createUserDialog}
                 onHide={createUserDialogHide}
@@ -663,17 +669,12 @@ const CreateUser = (props) => {
                 {selectedTab === "userDetails" && <div data-test="create__container" className="createUser-container">
                     {/* <div data-test="heading" id="page-taskName"><span>{(showEditUser === false) ? "Create User" : "Edit User"}</span></div> */}
 
-                    {(showEditUser === false) ?
-                        <CreateLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass}
-                            ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown}
-                            ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap} ldapDirectoryAddClass={ldapDirectoryAddClass}
-                            confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
-                            ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} />
-                        : <EditLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass}
-                            confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm}
-                            allUserFilList={allUserFilList} manage={manage} setAllUserFilList={setAllUserFilList} searchFunctionUser={searchFunctionUser}
-                            click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
-                    }
+                    <CreateLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass}
+                        ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown}
+                        ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap} ldapDirectoryAddClass={ldapDirectoryAddClass}
+                        confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
+                        ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} 
+                        showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} />
 
                     <div style={{ paddingLeft: '1.5rem' }}>
                         {(type === "inhouse") ?
@@ -715,22 +716,6 @@ const CreateUser = (props) => {
                             : null
                         }
 
-                        {/* PRESENT FOR EACH USERTYPE */}
-                        {/* <div className='flex flex-column pl-2 pb-2'>
-                            <label htmlFor="username" className="pb-2 font-medium">Email Id</label>
-                            <InputText
-                                data-test="email"
-                                value={email}
-                                onChange={(event) => { emailChange(event.target.value) }}
-                                autoComplete="off"
-                                name="email"
-                                id="email"
-                                className='w-full md:w-20rem p-inputtext-sm'
-                                maxLength="100"
-                                placeholder="Enter Email Id"
-                            />
-
-                        </div> */}
                         <div className="flex flex-row items-center">
                             <div className="flex flex-column">
                                 <label data-test="primaryRoleLabel" className='pb-2 font-medium' style={{ paddingLeft: '0.7rem' }}>Primary Role <span style={{ color: "#d50000" }}>*</span></label>
@@ -749,7 +734,7 @@ const CreateUser = (props) => {
                             {/* Admin Check */}
                             {roleDropdownValue === "5db0022cf87fdec084ae49ab" && (
                                 <div className="flex flex-column items-center secondaryRole_admin"> {/* Test Manager role ID */}
-                                    <label htmlFor="admin_check" className="adminlable_header pb-2 font-medium">Secondary Role</label>
+                                    <label htmlFor="admin_check" className="adminlable_header pb-4 font-medium">Secondary Role</label>
                                     <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
                                     <label htmlFor="admin_check" className="ml-5 -mt-4">Admin</label>
                                 </div>
@@ -757,7 +742,7 @@ const CreateUser = (props) => {
                         </div>
                     </div>
                 </div>}
-                {selectedTab === "avoAzzureClient" && <IceProvision editUserIceProvision={props.editUser} setEditUserIceProvision={props.setEditUSer} userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
+                {selectedTab === "avoAzzureClient" && <IceProvision editUserIceProvision={props.editUserData} setEditUserIceProvision={props.setEditUserData} userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
             </Dialog>
         </Fragment>
     );

@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import Legends from './Legends';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Divider } from 'primereact/divider';
-import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
+import { screenData, moduleList, selectedModuleReducer, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
 
 
 
@@ -67,7 +67,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         const defaultProjectData = {...localStorageDefaultProject, projectId:proj,projectName:prjList[proj]?.name, appType:prjList[proj]?.apptypeName}
         localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData))
         dispatch(moduleList([]))
-        dispatch(selectedModule({}))
+        dispatch(selectedModuleReducer({}))
         var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)
@@ -90,7 +90,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         dispatch(moduleList(filter))
     }
     const CreateNew = () =>{
-        dispatch(selectedModule({createnew:true}))
+        dispatch(selectedModuleReducer({createnew:true}))
     }
     const clickExport = () => {
         // if(!selectedModule._id || selectedModulelist.length==0)return;

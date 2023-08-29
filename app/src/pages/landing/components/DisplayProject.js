@@ -33,7 +33,8 @@ const DisplayProject = (props) => {
   // const defaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
   const dispatch = useDispatch();
   const imageRefadd = useRef(null);
-
+  const menuRef = useRef(null);
+  const sortButtonRef = useRef(null);
 
 
   const sortItems = [
@@ -174,13 +175,13 @@ const DisplayProject = (props) => {
     setSortVisible(false);
   };
   const sortByCreated = (item) => {
-    const sortedProjects = [...getProjectLists].sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
+    const sortedProjects = [...getProjectLists].sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
     setProjectList(sortedProjects);
     setSelectedsortItems(item);
     setSortVisible(false);
   };
   const sortByModified = (item) => {
-    const sortedProjects = [...getProjectLists].sort((a, b) => new Date(b.modifiedDate) - new Date(a.modifiedDate));
+    const sortedProjects = [...getProjectLists].sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
     setProjectList(sortedProjects);
     setSelectedsortItems(item);
     setSortVisible(false);
@@ -191,10 +192,20 @@ const DisplayProject = (props) => {
   };
 
 
-  function showSortMenu(event) {
+  const showSortMenu=()=> {
     setSortVisible(!sortVisible);
   }
-
+  const handleClickOutside = (event) => {
+    if (
+      sortVisible &&
+      menuRef.current &&
+      !menuRef.current.contains(event.target) &&
+      sortButtonRef.current &&
+      !sortButtonRef.current.contains(event.target)
+    ) {
+      setSortVisible(false);
+    }
+  };
 
   const handleOpenDialog = () => {
     setVisible(true);
@@ -204,6 +215,12 @@ const DisplayProject = (props) => {
     setVisible(false);
   };
 
+  useEffect(() => {
+    window.addEventListener('click', handleClickOutside);
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+    };
+  }, [sortVisible]);
 
   useEffect(() => {
     const selectedProject = filteredProjects.find(project => project.projectId === defaultProjectId);
@@ -225,11 +242,12 @@ const DisplayProject = (props) => {
         <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
 
         <CreateProject visible={visible} onHide={handleCloseDialog} />
-        {sortVisible && <Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color" />}
+        {sortVisible && (<div ref={menuRef}><Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color"/>
+        </div>)}
         <div className="flex flex-row All_Project">
           <div className="All_Project_font" >ALL PROJECTS</div>
           <div className="add_sort_btn">
-            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} />
+            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} ref={sortButtonRef}/>
             {userInfo && userInfo.rolename === "Quality Manager" ? (
               <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
             ) : null}

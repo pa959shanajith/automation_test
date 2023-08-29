@@ -9,7 +9,7 @@ import { useDispatch, useSelector} from 'react-redux';
 import {Messages as MSG, setMsg} from '../../global';
 import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin,createNode,createNewMap,deleteNode} from './MindmapUtils'
 import '../styles/CanvasEnE.scss'
-import { selectedModule, deletedNodes, scenarioList } from '../designSlice'
+import { selectedModuleReducer, deletedNodes, scenarioList } from '../designSlice'
 import { deleteScenarioETE } from '../api'
 
 const types = {
@@ -88,7 +88,7 @@ const CanvasEnE =(props)=>{
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
         return ()=>{
-            dispatch(selectedModule({}))
+            dispatch(selectedModuleReducer({}))
         }
     },[dispatch])
     useEffect(()=>{

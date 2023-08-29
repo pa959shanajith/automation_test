@@ -30,7 +30,7 @@ const CreateLanding = (props) => {
     const lastname = useSelector(state => state.admin.lastname);
     const editUser = useSelector(state => state.admin.editUser);
     const email = useSelector(state => state.admin.email);
-
+    
     const node = useRef();
 
     const serverItems = [
@@ -55,7 +55,7 @@ const CreateLanding = (props) => {
         <Fragment>
             <div className="Create-outer card flex justify-content-center" >
                 <div className="flex flex-column pb-2">
-                    <label data-test="userTypeLabel" className="pb-2 font-medium" style={{paddingLeft: '0.7rem'}}>Select Configuration <span style={{ color: "#d50000" }}>*</span></label>
+                    <label data-test="userTypeLabel" className="pb-2 font-medium" style={{ paddingLeft: '0.7rem' }}>Select Configuration <span style={{ color: "#d50000" }}>*</span></label>
                     <Dropdown
                         data-test="userTypeDropdown"
                         id="userTypes-create"
@@ -126,56 +126,54 @@ const CreateLanding = (props) => {
                     </Fragment>
                     : null
                 }
-                 <div className='flex flex-row justify-content-between pl-2 pb-2'>
-                <div className="flex flex-column pl-2 pb-2">
-                    <label className="pb-2 font-medium">User Name <span style={{ color: "#d50000" }}>*</span></label>
-                    <InputText
-                        data-test="userName-input__create"
-                        type="text"
-                        className='w-full md:w-20rem p-inputtext-sm'
-                        autoComplete="User-name"
-                        id="userName"
-                        value={userName} onChange={(event) => { userNameChange(event.target.value) }}
-                        name="userName" maxLength="100"
-                        placeholder="Enter User Name"
-                        disabled={editUser}
-                    />
+                <div className='flex flex-row justify-content-between pl-2 pb-2'>
+                    <div className="flex flex-column">
+                        <label htmlFor='userName' className="pb-2 font-medium">User Name <span style={{ color: "#d50000" }}>*</span></label>
+                        <InputText
+                            data-test="userName-input__create"
+                            type="text"
+                            className='w-full md:w-20rem p-inputtext-sm placeHolder'
+                            id="userName"
+                            value={userName} onChange={(event) => { userNameChange(event.target.value) }}
+                            name="userName" maxLength="100"
+                            placeholder="Enter Your User Name"
+                            disabled={editUser}
+                        />
+                    </div>
+
+                    <div className='flex flex-column'>
+                        <label htmlFor="email" className="pb-2 font-medium">Email Id <span style={{ color: "#d50000" }}>*</span></label>
+                        <InputText
+                            data-test="email"
+                            value={email}
+                            onChange={(event) => { props.emailChange(event.target.value) }}
+                            name="email"
+                            id="email"
+                            className='w-full md:w-20rem p-inputtext-sm'
+                            maxLength="100"
+                            placeholder="Enter Email Id"
+                        />
+
+                    </div>
                 </div>
-
-                <div className='flex flex-column pl-2 pb-2'>
-                            <label htmlFor="username" className="pb-2 font-medium">Email Id <span style={{ color: "#d50000" }}>*</span></label>
-                            <InputText
-                                data-test="email"
-                                value={email}
-                                onChange={(event) => {props.emailChange(event.target.value) }}
-                                autoComplete="off"
-                                name="email"
-                                id="email"
-                                className='w-full md:w-20rem p-inputtext-sm'
-                                maxLength="100"
-                                placeholder="Enter Email Id"
-                            />
-
-                        </div>
-                        </div>
 
 
                 <div className='flex flex-row justify-content-between pl-2 pb-2'>
                     <div className='flex flex-column'>
-                        <label className="pb-2 font-medium">First Name <span style={{ color: "#d50000" }}>*</span></label>
+                        <label htmlFor='firstname' className="pb-2 font-medium">First Name <span style={{ color: "#d50000" }}>*</span></label>
                         <InputText data-test="firstName-input__create"
                             className='w-full md:w-20rem p-inputtext-sm' type="text"
-                            autoComplete="First-name" name="firstname" id="firstname" value={firstname}
+                            name="firstname" id="firstname" value={firstname}
                             onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(event.target.value)) }}
                             maxLength="100"
                             // className={props.firstnameAddClass ? "middle__input__border-create form-control__conv-create form-control-custom-create inputErrorBorder" : "middle__input__border-create form-control__conv-create form-control-custom-create "}
                             placeholder="Enter First Name" />
                     </div>
                     <div className='flex flex-column'>
-                        <label className="pb-2 font-medium">Last Name <span style={{ color: "#d50000" }}>*</span></label>
+                        <label htmlFor='lastname' className="pb-2 font-medium">Last Name <span style={{ color: "#d50000" }}>*</span></label>
                         <InputText data-test="lastName-input__create"
                             className='w-full md:w-20rem p-inputtext-sm' type="text"
-                            autoComplete="Last-name" name="lastname" id="lastname" value={lastname}
+                            name="lastname" id="lastname" value={lastname}
                             onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_LASTNAME(event.target.value)) }}
                             maxLength="100"
                             //  className={props.lastnameAddClass ? "middle__input__border-create form-control__conv-create form-control-custom-create inputErrorBorder" : "middle__input__border-create form-control__conv-create form-control-custom-create  "}
