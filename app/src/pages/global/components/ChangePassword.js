@@ -43,7 +43,7 @@ const ChangePassword = (props) => {
     const newPasswordOnChangeHandler = (event) => {
         let password = event.target.value.replace(/\s/g, "");
         setNewpassword(password);
-        (password.length > 7 && password.length < 33) ? setPasswordLength(true) : setPasswordLength(false);
+        (password.length > 7 && password.length < 17) ? setPasswordLength(true) : setPasswordLength(false);
         /(?=.*?[0-9])/.test(password) ? setDigitPresent(true) : setDigitPresent(false);
         /(?=.*[a-z])/.test(password) ? setLowerCasePresent(true) : setLowerCasePresent(false);
         /(?=.*[A-Z])/.test(password) ? setUpperCasePresent(true) : setUpperCasePresent(false);

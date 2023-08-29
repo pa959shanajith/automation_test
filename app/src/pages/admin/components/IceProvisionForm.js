@@ -1,12 +1,16 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { ScreenOverlay, RedirectPage, Messages, VARIANT, ValidationExpression, setMsg } from '../../global'
-import { getUserDetails, provisions } from '../api';
+import { getUserICE } from '../../global/api';
+
+import { getUserDetails, provisions, fetchICE, manageSessionData} from '../api';
 import { useNavigate } from 'react-router-dom';
 import '../styles/IceProvisionForm.scss'
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Tooltip } from 'primereact/tooltip';
+import { useSelector } from 'react-redux';
+
 
 
 /*Component IceProvisionForm
@@ -18,28 +22,20 @@ const IceProvisionForm = (props) => {
 
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false)
-	const [firstStop, setFirstStop] = useState(false)
 	const [copyToolTip, setCopyToolTip] = useState("Click To Copy")
 	const [downloadToolTip, setDownloadToolTip] = useState("Download Token")
 	const [icenameErrBorder, setIcenameErrBorder] = useState(false)
 	const [selAssignUser2ErrBorder, setSelAssignUser2ErrBorder] = useState(false)
-	const [users, setUsers] = useState([['Select User', ' ', '', '']])
 	const isUsrSetting = props.userConfig //for user settings
+    const editUser = useSelector(state => state.admin.editUser);
+	const [ editUserICEData, setEditUserICEData] = useState({});
 
 
 	useEffect(() => {
-		setUsers([['Select User', ' ', '', '']]);
 		props.setTokeninfoIcename("");
 		props.setTokeninfoToken("");
-		// refreshForm();
-		// eslint-disable-next-line
 	}, [props.selectProvisionType])
 
-	// useEffect(() => {
-	// 	if (firstStop === false) setFirstStop(true);
-	// 	else provisionsIce();
-	// 	// eslint-disable-next-line
-	// }, [props.runProvisionsIce])
 
 	const provisionsIce = async () => {
 		setIcenameErrBorder(false);
@@ -55,12 +51,12 @@ const IceProvisionForm = (props) => {
 			return false;
 		}
 
-		var tokeninfo = {
+		let tokeninfo = {
 			userid: props.edit?props.edit.userId:props.userid[1],
 			icename: props.icename.trim(),
 			icetype: icetype,
 			action: "provision",
-			email:props.edit?props.edit.email:props.userid[6],
+			email:props.edit? props.edit.email:props.userid[6],
 			username:props.edit?props.edit.userName:props.userid[0],
 			firstName: props.edit?props.edit.firstName:props.userid[4],
 			lastName: props.edit?props.edit.lastName:props.userid[5],
@@ -79,26 +75,11 @@ const IceProvisionForm = (props) => {
 			props.setIcename(props.icename);
 			props.setTokeninfoToken(data);
 			props.setToken(data);
-			// props.setRefreshIceList(!props.refreshIceList);
+			props.setRefreshIceList(!props.refreshIceList);
 			props.toastSuccess(Messages.CUSTOM("Token generated Successfully for Avo Assure Client- '" + props.icename + "'.  Copy or Download the token", VARIANT.SUCCESS));
 		}
 	}
 
-	// const refreshForm = async () => {
-	// 	setIcenameErrBorder(false);
-	// 	setSelAssignUser2ErrBorder(false);
-	// 	props.setToken("Click on Provision/Reregister to generate token");
-	// 	if (props.userConfig) props.setToken("Click on Reprovision/Reregister to generate token");
-	// 	props.setIcename("");
-	// 	props.setUserid(" ");
-	// 	if (props.op === "normal" && !isUsrSetting) {
-	// 		const data = await getUserDetails("user");
-	// 		if (data.error) { displayError(data.error); return; }
-	// 		data.sort((a, b) => a[0].localeCompare(b[0]));
-	// 		data.splice(0, 0, ['Select User', ' ', '', '']);
-	// 		setUsers(data.filter((e) => (e[3] !== "Admin")));
-	// 	}
-	// }
 
 	const updateIceName = (value) => {
 		value = ValidationExpression(value, "iceName")
@@ -157,10 +138,10 @@ const IceProvisionForm = (props) => {
 		else setIcenameErrBorder(false);
 	}
 
-	const displayError = (error) => {
-		setLoading(false)
-		setMsg(error)
-	}
+	// const displayError = (error) => {
+	// 	setLoading(false)
+	// 	setMsg(error)
+	// }
 
 	return (
 		<Fragment>
@@ -180,7 +161,6 @@ const IceProvisionForm = (props) => {
 						placeholder="Avo Assure Client Name"
 						className={`w-full md:w-20rem ${icenameErrBorder ? "p-invalid" : ''}`}
 					/>
-				{/* </div> */}
 				
 					<Button className="a__btn pull-right ml-3" size='small' onClick={() => { provisionsIce() }} label="Generate" title="Generate"></Button>
 				</div>

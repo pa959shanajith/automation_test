@@ -18,7 +18,7 @@ const IceProvisionList = (props) => {
 	const [loading, setLoading] = useState(false)
 	const [searchTasks, setSearchTasks] = useState("")
 	const [icelistModify, setIcelistModify] = useState(props.icelist)
-	const [showList, setShowList] = useState(false)
+	const [showList, setShowList] = useState(true);
 	const [allActiveIce, setAllActiveIce] = useState([])
 	const [doFetchICE, setDoFetchICE] = useState(false);
 	const [selectedEntry, setSelectedEntry] = useState(null);
@@ -73,12 +73,11 @@ const IceProvisionList = (props) => {
 		}
 		props.setIcelist(data1);
 		setIcelistModify(data1);
-		setShowList(true);
 	}
 
 	const displayError = (error) => {
 		setLoading(false)
-		setMsg(error)
+		props.toastError(error)
 	}
 
 	const searchIceList = (val) => {
@@ -101,23 +100,26 @@ const IceProvisionList = (props) => {
 			const data = await provisions(tokeninfo);
 			if (data.error) { displayError(data.error); return; }
 			setLoading(false);
-			if (data === 'fail') setMsg(Messages.CUSTOM("ICE " + event + " Failed", VARIANT.ERROR));
+			if (data === 'fail') props.toastError(Messages.CUSTOM("ICE " + event + " Failed", VARIANT.ERROR));
 			else {
+				// if(entry.status === 'deregistered'){
+				// 	 props.setIcename(''); props.setToken('');
+				// }
 				const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
 				if (data1.error) { displayError(data1.error); return; }
 				props.setTokeninfoIcename(icename);
-				props.setIcename(icename);
+				entry.status === 'deregistered' ? props.setIcename('') : props.setIcename(icename);
 				props.setTokeninfoToken(data);
-				props.setToken(data);
+				entry.status === 'deregistered' ? props.setToken('') : props.setToken(data);
 				props.setOp(provisionDetails.icetype);
 				props.setUserid(provisionDetails.provisionedto || ' ');
-				setMsg(Messages.CUSTOM("ICE " + event + "ed Successfully: '" + icename + "'!!  Copy or Download the token", VARIANT.SUCCESS));
+				props.toastSuccess(Messages.CUSTOM("ICE " + event + "ed Successfully: '" + icename + "'!!  Copy or Download the token", VARIANT.SUCCESS));
 				refreshIceList();
 			}
 		}
 		catch (e) {
 			setLoading(false);
-			setMsg(Messages.CUSTOM(`ICE ${event} Failed`, VARIANT.ERROR));
+			props.toastError(Messages.CUSTOM(`ICE ${event} Failed`, VARIANT.ERROR));
 		}
 	}
 
@@ -145,7 +147,7 @@ const IceProvisionList = (props) => {
 			}
 		} catch (e) {
 			setLoading(false)
-			setMsg(Messages.ADMIN.ERR_ICE_DEREGISTER);
+			props.toastError(Messages.ADMIN.ERR_ICE_DEREGISTER);
 		}
 	}
 
@@ -153,7 +155,7 @@ const IceProvisionList = (props) => {
 		const found = allActiveIce.find((element) => event.target.value === element);
 		if (!found) {//prevent defaut event
 			event.preventDefault();
-			setMsg(Messages.ADMIN.ERR_SELECTED_ICE_NOT_ACTIVE);
+			props.toastError(Messages.ADMIN.ERR_SELECTED_ICE_NOT_ACTIVE);
 			return;
 		}
 		else {
@@ -164,16 +166,16 @@ const IceProvisionList = (props) => {
 				setLoading(false);
 				if (data == 'success') {
 					setDefaultICE(ice);
-					setMsg(Messages.GLOBAL.SUCC_CHANGE_DEFAULT_ICE);
+					props.toastSuccess(Messages.GLOBAL.SUCC_CHANGE_DEFAULT_ICE);
 				} else {
 					event.preventDefault();
-					setMsg(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
+					props.toastSuccess(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
 				}
 			} catch (error) {
 				event.preventDefault();
 				setLoading(false)
 				console.error(error)
-				setMsg(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
+				props.toastError(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
 			}
 		}
 	}
@@ -196,7 +198,8 @@ const IceProvisionList = (props) => {
 					{showList ?
 						<div id="activeUsersToken" className="wrap wrap-cust-ip">
 							<div >
-								<DataTable showGridlines value={icelistModify} selectionMode="single" selection={selectedEntry} onSelectionChange={(e) => setSelectedEntry(e.value)}>
+								<DataTable showGridlines value={icelistModify} loading={icelistModify > 0}
+								selectionMode="single" selection={selectedEntry} onSelectionChange={(e) => setSelectedEntry(e.value)}>
 									{isUsrSetting === true && (
 										<Column
 											selectionMode="single"
