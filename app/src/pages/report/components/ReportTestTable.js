@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewAzureMappedList_ICE, viewReport } from "../api";
+import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewAzureMappedList_ICE, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
 import "../styles/ReportTestTable.scss";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -34,16 +34,14 @@ export default function BasicDemo() {
   const [reportSummaryCollaps, setReportSummaryCollaps] = useState(true);
   const filterRef = useRef(null);
   const [reportid, setReportId] = useState(null);
+  const [executed, setExecuted] = useState(null);
   const [jiraDropDown, setJiraDropDown] = useState(null);
   const [issueDropDown, setIssueDropDown] = useState(null);
-  const [jiraDetails, setJiraDetails] = useState({ projects: [], issue_types: [] });
-  const [azureDetails, setAzureDetails] = useState({ projects: [] });
+  const [jiraDetails, setJiraDetails] = useState({ projects: [], issuetype: [] });
   const [configureFeilds, setConfigureFeilds] = useState([]);
-  const [logSummary, setLogSummary] = useState("");
-  const [logDesc, setLogDesc] = useState("");
   const [selectedFiels, setSelectedFiels] = useState([]);
   const [configValues, setConfigValues] = useState({});
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRow, setSelectedRow] = useState([]);
   const filterValues = [
         { name: 'Pass', key: 'P' },
         { name: 'Fail', key: 'F' },
@@ -59,6 +57,9 @@ export default function BasicDemo() {
       return id;
     };
     const id = getQueryParam();
+    const getUrl = new URLSearchParams(window.location.search);
+    const execution = getUrl.get("execution");
+    setExecuted(execution);
     setReportId(id);
   }, []);
 
@@ -115,12 +116,22 @@ export default function BasicDemo() {
           action: "loginToAzure",
           pat: loginKey,
         });
-        setJiraDetails(getAzureDetails);
+        setJiraDetails({
+          ...getAzureDetails,
+          issuetype: [
+            {
+              id: "10000",
+              name: "Bug",
+            },
+          ],
+        });
         setVisibleBug(false);
       }
     }
   };
 
+  console.log(reportData);
+  console.log(selectedRow);
   const onLogBugBtnClick = async(getClick) => {
     if (getClick === "Cancel") setLogBug(false);
     else if (getClick === "Proceed") { 
@@ -128,15 +139,15 @@ export default function BasicDemo() {
         issue_dict: {
           project: jiraDropDown?.id,
           issuetype: issueDropDown?.name,
-          summary: selectedRow?.data?.Comments,
-          description: selectedRow?.data?.Keyword,
+          summary: selectedRow[0]?.Comments,
+          description: selectedRow[0]?.StepDescription,
           url: "https://mnb.atlassian.net/",
           username: "priyanka.r@slkgroup.com",
           password: "B8RUqqKt8B28MSz9zq1Q14AD",
           parentissue: "",
-          reportId: "64b0f70e48152fb936bc9663",
-          slno: 3,
-          executionId: "64b0f6f648152fb936bc9661",
+          reportId: reportData?.overallstatus?.reportId,
+          slno: selectedRow[0]?.slno,
+          executionId: reportData?.overallstatus?.executionId,
           Reporter: {
               field_name: "reporter",
               userInput: "priyanka.r",
@@ -147,7 +158,7 @@ export default function BasicDemo() {
               userInput: "yes",
               type: "string"
           },
-          executionReportNo: "Execution No: E7"
+          executionReportNo: `Execution No: ${executed}`
         },
         action: "createIssueInJira"
       });
@@ -227,10 +238,8 @@ export default function BasicDemo() {
   );
 
   const onBugClick = (e, rowData) => {
-    setLogSummary(rowData?.data?.Comments);
-    setLogDesc(rowData?.data?.Keyword);
-    setSelectedRow(rowData);
-    if((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (azureDetails?.projects && !!azureDetails?.projects.length))){
+    setSelectedRow(reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments));
+    if((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length))){
       setLogBug(true)
     } else {
       bugRef.current.toggle(e)
@@ -242,14 +251,14 @@ export default function BasicDemo() {
     const getIcon = (iconType) => {
       let icon = "static/imgs/bug.svg";
       if(iconType === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/jira_icon.svg";
-      else if(iconType === "Azure DevOps" && (azureDetails?.projects && !!azureDetails?.projects.length)) icon = "static/imgs/azure_devops_icon.svg";
+      else if(iconType === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/azure_devops_icon.svg";
       return icon;
     }
     return hasChildren ? null : (
       <img
         src={getIcon(bugTitle)}
         alt="bug defect"
-        className={((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (azureDetails?.projects && !!azureDetails?.projects.length))) ? "img_jira" : "" }
+        className={((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length))) ? "img_jira" : "" }
         onClick={(e) => onBugClick(e, rowData)}
       />
     );
@@ -336,11 +345,28 @@ export default function BasicDemo() {
   useEffect(() => {
     if(jiraDropDown && issueDropDown){
       (async() => {
-        const getFields = await connectJira_ICE_Fields(jiraDropDown?.id, issueDropDown?.name, 'https://mnb.atlassian.net/', 'priyanka.r@slkgroup.com', 'B8RUqqKt8B28MSz9zq1Q14AD', jiraDetails?.projects);
+        const getFields =
+          bugTitle === "Jira"
+            ? await connectJira_ICE_Fields(
+                jiraDropDown?.id,
+                issueDropDown?.name,
+                "https://mnb.atlassian.net/",
+                "priyanka.r@slkgroup.com",
+                "B8RUqqKt8B28MSz9zq1Q14AD",
+                jiraDetails?.projects
+              )
+            : connectAzure_ICE_Fields(
+                jiraDropDown?.id,
+                issueDropDown?.name,
+                "https://dev.azure.com/AvoAutomation",
+                "krishna_azure",
+                "2mf2gzlewrvjcb3rbqbrnq3lcnanlytv7idaf6bqd22ht5czndcq",
+                jiraDetails?.projects
+              );
         const fieldValues = Object.keys(getFields).map((el) => ({
           key: getFields[el].key,
           name: el,
-          disabled: getFields[el].required
+          disabled: getFields[el].required,
         }));
         setSelectedFiels(fieldValues);
       })();
@@ -349,25 +375,20 @@ export default function BasicDemo() {
 
   useEffect(() => {
     const autoFill = [];
-    const fieldValue = (getItem) => {
-      console.log(getItem);
-      let fieldVal;
-      if(getItem === "Summary") fieldVal = logSummary;
-      else if(getItem === "Reporter") fieldVal = logDesc;
-      return fieldVal;
-    };
+    const autoValue = {};
     selectedFiels.forEach((item) => {
       if (item.disabled) {
-        setConfigValues({
-          ...configValues,
-          [item.name] : fieldValue(item.name)
-        });
+        if(item.name === "Summary")autoValue[item.name] = selectedRow[0]?.Comments;
+        else if(item.name === "Description")autoValue[item.name] = selectedRow[0]?.StepDescription;
         autoFill.push({ key: item.key, name: item.name, disabled: item.disabled });
       }
     })
     setConfigureFeilds(autoFill);
+    setConfigValues({
+      ...configValues,
+      ...autoValue
+    });
   }, [selectedFiels]);
-  console.log(configValues);
 
   const handleConfigValues = (e) => {
     setConfigValues({
@@ -568,7 +589,7 @@ export default function BasicDemo() {
                 onDropdownChange={async (e) => {
                   setIssueDropDown(e.target.value);
                 }}
-                dropdownOptions={jiraDetails?.issue_types}
+                dropdownOptions={jiraDetails?.issuetype}
                 name="issuetype"
                 placeholder="Select Issue Type"
                 labelTxt="Issue Type"

@@ -89,6 +89,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [currentJiraPage, setCurrentJiraPage] = useState(1);
     const toast = useRef();
     const dispatchAction = useDispatch();
+    const [saveEnable, setSaveEnabale] = useState(false);
 
     const handleIntegration = (value) => {
         dispatchAction(screenType(value));
@@ -663,6 +664,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             dispatchAction(selectedScenarioIds([]));
         }
         setDisabled(false);
+        setSaveEnabale(true);
     }
 
 

@@ -13,7 +13,7 @@ import { Checkbox } from "primereact/checkbox";
 import { Toast } from 'primereact/toast';
 import { MultiSelect } from 'primereact/multiselect';
 import { Avatar } from 'primereact/avatar';
-import { selectedProj, selectedModule, isEnELoad, initEnEProj,savedList } from '../designSlice';
+import { selectedProj, selectedModuleReducer, isEnELoad, initEnEProj,savedList } from '../designSlice';
 import AvoInput from "../../../globalComponents/AvoInput";
 import SaveMapButton from "./SaveMapButton";
 // import { Icon } from 'primereact/icon';
@@ -149,7 +149,7 @@ const ModuleListSidePanel =()=>{
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
-        dispatch(selectedModule({createnew:true}))
+        dispatch(selectedModuleReducer({createnew:true}))
         dispatch(initEnEProj({proj, isE2ECreate: false}));
         dispatch(isEnELoad(false));
         setFirstRender(false);
@@ -173,7 +173,7 @@ const ModuleListSidePanel =()=>{
     //     setFilterSc(val)
     // }
      const loadModule = async(modID) =>{
-        dispatch(selectedModule({}))
+        dispatch(selectedModuleReducer({}))
         dispatch(isEnELoad(false));
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
@@ -192,7 +192,7 @@ const ModuleListSidePanel =()=>{
         
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
-        dispatch(selectedModule(res))
+        dispatch(selectedModuleReducer(res))
         setBlockui({show:false})
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
@@ -274,7 +274,7 @@ const ModuleListSidePanel =()=>{
         }
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
-        dispatch(selectedModule(res))
+        dispatch(selectedModuleReducer(res))
         setBlockui({show:false})
     }
     const addScenario = (e) => {	

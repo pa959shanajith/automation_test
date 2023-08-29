@@ -17,6 +17,7 @@ import { FooterTwo } from "../../global";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
+  const [selectedExe, setSelectedExe] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [testSuite, setTestSuite] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
@@ -66,6 +67,7 @@ const Profile = () => {
   }, [location]);
   
   const onTestSuiteClick = async (getRow) => {
+    setSelectedExe(getRow?.node?.key);
     setSelectedProduct(getRow)
     const testSuiteList = await getTestSuite({
       query: "fetchModSceDetails",
@@ -346,7 +348,7 @@ const Profile = () => {
     });
   };
  const handleViweReports = async (reportid) =>{
-    const win = window.open(`/viewReports?reportID=${reportid}`, "_blank"); 
+    const win = window.open(`/viewReports?reportID=${reportid}&execution=${selectedExe}`, "_blank"); 
     win.focus();
   }
  
@@ -708,7 +710,6 @@ const Profile = () => {
   };
 
   const moduleBodyTemplate = (e) => {
-    console.log(selectedProduct, e);
     let treeArr = {
       key: e.key,
       label: (

@@ -6,7 +6,7 @@ import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
-import { isEnELoad, savedList , initEnEProj, selectedModule,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule} from '../designSlice';
+import { isEnELoad, savedList , initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -325,14 +325,14 @@ const ModuleListDrop = (props) =>{
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
-        dispatch(selectedModule({createnew:true}))
+        dispatch(selectedModuleReducer({createnew:true}))
         dispatch(initEnEProj({proj, isE2ECreate: false}));
         dispatch(isEnELoad(false));
         setFirstRender(false);
     }
     const clickCreateNew = () =>{
-        dispatch(selectedModule({createnew:true}))
-        dispatch(initEnEProj({proj, isE2ECreate: false}));
+      dispatch(selectedModuleReducer({createnew:true}))
+      dispatch(initEnEProj({proj, isE2ECreate: false}));
         dispatch(isEnELoad(false));
         setFirstRender(false);
     }
@@ -349,8 +349,8 @@ const ModuleListDrop = (props) =>{
         setFilterSc(val)
     }
      const loadModule = async(modID) =>{
-        dispatch(selectedModule({}))
-        dispatch(isEnELoad(false));
+      dispatch(selectedModuleReducer({}))
+      dispatch(isEnELoad(false));
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."}) 
         // if(moduleSelect._id === modID){
@@ -368,7 +368,7 @@ const ModuleListDrop = (props) =>{
         
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
-        dispatch(selectedModule(res))
+        dispatch(selectedModuleReducer(res))
         setBlockui({show:false})
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
@@ -443,7 +443,7 @@ const ModuleListDrop = (props) =>{
             
             
         // }
-        dispatch(selectedModule({}))
+        dispatch(selectedModuleReducer({}))
         var req={
             tab:"endToend",
             projectid:proj,
@@ -454,7 +454,7 @@ const ModuleListDrop = (props) =>{
         }
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
-        dispatch(selectedModule(res))
+        dispatch(selectedModuleReducer({}))
         setBlockui({show:false})
     }
     const addScenario = (e) => {	
@@ -688,7 +688,7 @@ const ModuleListDrop = (props) =>{
           dispatch(saveMindMap({screendata,moduledata,moduleselected}))
           
           dispatch(moduleList(moduledata));
-          dispatch(selectedModule(moduleselected))
+          dispatch(selectedModuleReducer(moduleselected))
 
 //           // Assuming you have access to the 'dispatch' function
 //           dispatch(dontShowFirstModule(true))
@@ -1105,7 +1105,8 @@ setPreventDefaultModule(true);
                             <i className="pi pi-times"  onClick={click_X_ButtonE2E}></i>
                         </div>)}
                      </div > */}
-                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true);setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" />
+                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true);setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
+                  <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
                   {/* {showE2EPopup && <LongContentDemo setShowE2EOpen={setShowE2EPopup}  module={moduleSelect} />} */}
                 </div>
                 {/* <div className='searchBox pxBlack'>
@@ -1142,9 +1143,10 @@ setPreventDefaultModule(true);
                           <div style={{ textOverflow: 'ellipsis', width: '9rem', overflow: 'hidden', textAlign: 'left', height: '1.3rem', display: 'flex', alignItems: "center", width: '99%' }}>
                             <img src="static/imgs/checkBoxIcon.png" alt="AddButton" /><img src="static/imgs/E2EModuleSideIcon.png" style={{ marginLeft: '10px', width: '20px', height: '20px' }} alt="modules" />
                             <span style={{ textOverflow: 'ellipsis' }} className='modNmeE2E'>{e.name}</span>
-                            <img src="static/imgs/edit-icon.png" onClick={() => { setWarning(true); setShowE2EPopup(true); handleEditE2E();  }}
+                            <img src="static/imgs/edit-icon.png" className='E2Eedit' onClick={() => { setWarning(true); setShowE2EPopup(true); handleEditE2E();  }}
                               disabled={(moduleSelect._id === e._id) && moduleSelect.type !== "endtoend"}
                               style={{ width: '20px', height: '20px',display:moduleSelect._id !== e._id?  "none" : ''   }} alt="AddButton" />
+                               <Tooltip target=".E2Eedit" content=" Edit End To End Flow" position="bottom" />
                             <div></div></div>
 
 
