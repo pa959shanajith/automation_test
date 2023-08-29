@@ -427,10 +427,15 @@ const DesignModal = (props) => {
                 let errorFlag = false;
                 let testCases = [];
                 let findData = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
-                testCases = [...findData.testCases]
+               
+                const modifiedTestCases = findData.testCases.map((testCase, index) => ({
+                    ...testCase,
+                    stepNo: index + 1
+                  }));
+                testCases = modifiedTestCases
                 for (let i = 0; i < testCases.length; i++) {
                     // let step = i + 1
-                    // testCases[i].stepNo = step;
+                    // testCases[i].stepNo = step
 
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
@@ -459,7 +464,7 @@ const DesignModal = (props) => {
                     // if (!testCases[i].cord) testCases[i].cord = "";
 
                 }
-
+                
                 if (!errorFlag) {
                         DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, 0 /**versionnumber*/, import_status, pastedTC)
                         .then(data => {
@@ -567,28 +572,31 @@ const DesignModal = (props) => {
         runClickAway = false;
         if (stepSelect.check.length === 1) {
             const rowIdx = stepSelect.check[0];
-            testCases.splice(rowIdx+1, 0, emptyRowData);
+            let emptyRowDataIndex = {...emptyRowData, stepNo:rowIdx+2}
+            testCases.splice(rowIdx+1, 0, emptyRowDataIndex);
             insertedRowIdx.push(rowIdx+1)
         }
         else if (stepSelect.highlight.length === 1 && !stepSelect.check.length) {
             const rowIdx = stepSelect.highlight[0];
-            testCases.splice(rowIdx+1, 0, emptyRowData);
+            let emptyRowDataIndex = {...emptyRowData, stepNo:rowIdx+2}
+            testCases.splice(rowIdx+1, 0, emptyRowDataIndex);
             insertedRowIdx.push(rowIdx+1)
         }
         else {
-            testCases.splice(updateData.testCases.length, 0, emptyRowData);
+            let emptyRowDataIndex = {...emptyRowData, stepNo:updateData.testCases.length+1}
+            testCases.splice(updateData.testCases.length, 0, emptyRowDataIndex);
             insertedRowIdx.push(updateData.testCases.length)
         }
         let oldScreenLevelTestSTeps=[...testCases]
-        let testCaseUpdated = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
-        let emptyRowDataIndex = { ...emptyRowData, stepNo: testCaseUpdated.testCases.length + 1 };
-        let data = [...testCaseUpdated.testCases, emptyRowDataIndex];
-        let updatedTestCase = { ...testCaseUpdated, testCases: data };
+        // let testCaseUpdated = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
+        // let emptyRowDataIndex = { ...emptyRowData, stepNo: testCaseUpdated.testCases.length + 1 };
+        // let data = [...testCaseUpdated.testCases, emptyRowDataIndex];
+        // let updatedTestCase = { ...testCaseUpdated, testCases: data };
         // let index=screenLavelTestSteps.findIndex(screen=>screen.name === rowExpandedName.name)
         // oldScreenLevelTestSTeps.splice(index, 1, updatedTestCase)
         let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
             if (screen.name === rowExpandedName.name) {
-                return { ...screen, testCases: updatedTestCase.testCases };
+                return { ...screen, testCases: testCases };
             }
             return screen;
         });
@@ -631,7 +639,10 @@ const DesignModal = (props) => {
 
         // globalSelectedBrowserType = selectedBrowserType;5
         let findTestCaseId = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
-        if (dependencyTestCaseFlag) testcaseID = testCaseIDsList;
+        if (dependencyTestCaseFlag){
+            testCaseIDsList.push(findTestCaseId.id);
+            testcaseID = testCaseIDsList
+        } 
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
         // ResetSession.start();
