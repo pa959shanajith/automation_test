@@ -10,17 +10,24 @@ export const loadUserInfo = createSlice({
         dateformat: "DD-MM-YYYY",
         showChangePasswordDialog: false,
         projectDetails: {},
-        projectModifiedDetails:{},
-        selectedProject:null,
-        savedNewProject:false,
-        defaultSelectProject:{},
+        projectModifiedDetails: {},
+        selectedProject: null,
+        savedNewProject: false,
+        defaultSelectProject: {},
+        reportData: {
+            'cycleid': undefined,
+            'releaseid': undefined,
+            'testsuiteid': undefined,
+            'projectid': undefined,
+            'testsuitename': undefined
+        },
     },
     reducers: {
         setUserInfo: (state, action) => {
             state.userinfo = action.payload;
         },
-        savedNewProject:(state,action)=>{
-            state.savedNewProject=action.payload;
+        savedNewProject: (state, action) => {
+            state.savedNewProject = action.payload;
         },
         setRole: (state, action) => {
             state.userRole = action.payload;
@@ -29,9 +36,9 @@ export const loadUserInfo = createSlice({
         setSocket: (state, action) => {
             state.socket = action.payload;
         },
-        showChangePasswordDialog:(state) => {
+        showChangePasswordDialog: (state) => {
             state.showChangePasswordDialog = !state.showChangePasswordDialog;
-        }, 
+        },
         setProjectDetails: (state, action) => {
             state.projectDetails = action.payload;
         },
@@ -44,38 +51,18 @@ export const loadUserInfo = createSlice({
         setDefaultProject: (state, action) => {
             state.defaultSelectProject = action.payload;
         },
-        // setApptype: (state, action) => {
-        //     state.apptype = action.payload;
-        // },
-        // case actionTypes.UPDATE_NOTIFY:
-        // var value = action.payload
-        //     value.dateTime = new Date().toLocaleString();
-        // var arr = [...state.notify.data]
-        //     var val = state.notify.unread
-        //     var isDuplicateNotificationMsg = false;
-        // arr.forEach(e => {
-        //     if (value.notifyMsg === e.notifyMsg) {
-        //         isDuplicateNotificationMsg = true;
-        //     }
-        // });
-        // if(isDuplicateNotificationMsg)return{ ...state }
-        //     arr =[value, ...arr]
-        //     val = val + 1
-        //     return {
-        //     ...state, notify: { data: arr, unread: val }
-        // }
-        // case actionTypes.CLEAR_NOTIFY:
-        // if(action.payload === 'all'){
-        //     return {
-        //         ...state, notify: { ...initialState.notify }
-        //     }
-        // } else return state
-        // case actionTypes.UPDATE_NOTIFY_COUNT:
-        // return {
-        //     ...state, notify: { ...state.notify, unread: action.payload }
-        // }
         setDateFormat: (state, payload) => {
             state.dateformat = payload
+        },
+        updateReport: (state, payload) => {
+            let data = payload.testSuiteDetails[0];
+            state.reportData = {
+                'cycleid': data.cycleid,
+                'releaseid': data.releaseid,
+                'testsuiteid': data.testsuiteid,
+                'projectid': data.projectid,
+                'testsuitename': data.testsuitename
+            }
         }
     }
 })

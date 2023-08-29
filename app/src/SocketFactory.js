@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ModalContainer, VARIANT, RedirectPage, Messages as MSG, setMsg } from './pages/global';
 import {v4 as uuid} from 'uuid';
-import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
+import { loadUserInfoActions }  from './pages/landing/LandingSlice';
 import * as actionTypes from './pages/login/state/action';
 import {url} from './App'
 import {UpdateUserInfoforLicence} from './pages/login/api'; 
@@ -107,7 +107,7 @@ const SocketFactory = () => {
     };
     
     const redirectToReports = () =>{
-        dispatch({type: UPDATE_REPORTDATA, payload: reportData});
+        dispatch(loadUserInfoActions.updateReport(reportData));
         setMsg(false)
         window.localStorage['navigateScreen'] = "reports";
         window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
