@@ -4,20 +4,20 @@ import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
 import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewAzureMappedList_ICE, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
-import "../styles/ReportTestTable.scss";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
 import CollapsibleCard from "./CollapsibleCard";
 import { Accordion, AccordionTab } from "primereact/accordion";
+import { Menu } from "primereact/menu";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Divider } from "primereact/divider";
+import AvoDropdown from "../../../globalComponents/AvoDropdown";
+import AvoMultiselect from "../../../globalComponents/AvoMultiselect";
 import { FooterTwo } from "../../global";
 import { getStepIcon } from "../containers/ReportUtils";
 import AvoModal from "../../../globalComponents/AvoModal";
-import { Menu } from "primereact/menu";
-import AvoDropdown from "../../../globalComponents/AvoDropdown";
-import AvoMultiselect from "../../../globalComponents/AvoMultiselect";
-import { browsers, scheduleMonths } from "../../utility/mockData";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Divider } from "primereact/divider";
+import "../styles/ReportTestTable.scss";
+
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -130,8 +130,6 @@ export default function BasicDemo() {
     }
   };
 
-  console.log(reportData);
-  console.log(selectedRow);
   const onLogBugBtnClick = async(getClick) => {
     if (getClick === "Cancel") setLogBug(false);
     else if (getClick === "Proceed") { 
@@ -239,6 +237,11 @@ export default function BasicDemo() {
 
   const onBugClick = (e, rowData) => {
     setSelectedRow(reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments));
+    setConfigValues({
+      ...configValues,
+      Summary: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.Comments,
+      Description: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.StepDescription
+    });
     if((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length))){
       setLogBug(true)
     } else {
@@ -355,7 +358,7 @@ export default function BasicDemo() {
                 "B8RUqqKt8B28MSz9zq1Q14AD",
                 jiraDetails?.projects
               )
-            : connectAzure_ICE_Fields(
+            : await connectAzure_ICE_Fields(
                 jiraDropDown?.id,
                 issueDropDown?.name,
                 "https://dev.azure.com/AvoAutomation",
@@ -364,9 +367,10 @@ export default function BasicDemo() {
                 jiraDetails?.projects
               );
         const fieldValues = Object.keys(getFields).map((el) => ({
-          key: getFields[el].key,
-          name: el,
-          disabled: getFields[el].required,
+          key: bugTitle === "Jira" ? getFields[el].key : getFields[el].referenceName,
+          name: bugTitle === "Jira" ? el : getFields[el].name,
+          disabled: bugTitle === "Jira" ? getFields[el].required : getFields[el].alwaysRequired,
+          data: bugTitle === "Jira" ? getFields[el].value : getFields[el].dependentFields
         }));
         setSelectedFiels(fieldValues);
       })();
@@ -375,19 +379,12 @@ export default function BasicDemo() {
 
   useEffect(() => {
     const autoFill = [];
-    const autoValue = {};
     selectedFiels.forEach((item) => {
       if (item.disabled) {
-        if(item.name === "Summary")autoValue[item.name] = selectedRow[0]?.Comments;
-        else if(item.name === "Description")autoValue[item.name] = selectedRow[0]?.StepDescription;
-        autoFill.push({ key: item.key, name: item.name, disabled: item.disabled });
+        autoFill.push({ key: item.key, name: item.name, disabled: item.disabled, data: item.data });
       }
     })
     setConfigureFeilds(autoFill);
-    setConfigValues({
-      ...configValues,
-      ...autoValue
-    });
   }, [selectedFiels]);
 
   const handleConfigValues = (e) => {
@@ -608,26 +605,72 @@ export default function BasicDemo() {
               />
             </div>
             <Divider />
+            <div className="col-12">
+              <div>
+                <label>
+                  <span>Summary</span>
+                  <img
+                    src="static/imgs/Required.svg"
+                    className="required_icon"
+                  />
+                </label>
+              </div>
+              <InputTextarea
+                name="Summary"
+                rows={2}
+                className="text_desc"
+                value={configValues.Summary}
+                onChange={(e) => handleConfigValues(e)}
+              />
+            </div>
+            <div className="col-12">
+              <div>
+                <label>
+                  <span>Description</span>
+                  <img
+                    src="static/imgs/Required.svg"
+                    className="required_icon"
+                  />
+                </label>
+              </div>
+              <InputTextarea
+                name="Description"
+                rows={2}
+                className="text_desc"
+                value={configValues.Description}
+                onChange={(e) => handleConfigValues(e)}
+              />
+            </div>
             {configureFeilds.map((el) => (
               <div className="col-12">
                 <div>
                   <label>
                     <span>{el.name}</span>
-                    {
-                     el.disabled && <img
+                    {el.disabled && (
+                      <img
                         src="static/imgs/Required.svg"
                         className="required_icon"
                       />
-                    }
+                    )}
                   </label>
                 </div>
-                <InputTextarea
-                  className="text_desc"
-                  rows={1}
-                  name={el.name}
-                  value={configValues[el.name]}
-                  onChange={(e) => handleConfigValues(e)}
-                />
+                {Array.isArray(el.data) ? (
+                  <AvoDropdown
+                    dropdownValue={configValues[el.name]}
+                    name={el.name}
+                    onDropdownChange={(e) => handleConfigValues(e)}
+                    dropdownOptions={el.data.map((e) => ({ ...e, id: e?.key, name: e?.text }))}
+                    parentClass="flex flex-column"
+                  />
+                ) : (
+                  <InputTextarea
+                    className="text_desc"
+                    rows={1}
+                    name={el.name}
+                    value={configValues[el.name]}
+                    onChange={(e) => handleConfigValues(e)}
+                  />
+                )}
               </div>
             ))}
           </div>
