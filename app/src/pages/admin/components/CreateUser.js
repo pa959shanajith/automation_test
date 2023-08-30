@@ -181,7 +181,7 @@ const CreateUser = (props) => {
             type: uType,
             createdbyrole: createdbyrole,
             server: server,
-            isAdminUser: adminCheck // if user is Test Manager, she/he has the Admin rights and it is optional
+            isadminuser: adminCheck // if user is Quality Manager, she/he has the Admin rights and it is optional
         };
         if (uType === "ldap") userObj.ldapUser = ldap.user;
         setLoading(bAction.slice(0, -1) + "ing User...");

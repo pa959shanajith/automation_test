@@ -10,17 +10,24 @@ export const loadUserInfo = createSlice({
         dateformat: "DD-MM-YYYY",
         showChangePasswordDialog: false,
         projectDetails: {},
-        projectModifiedDetails:{},
-        selectedProject:null,
-        savedNewProject:false,
-        defaultSelectProject:{},
+        projectModifiedDetails: {},
+        selectedProject: null,
+        savedNewProject: false,
+        defaultSelectProject: {},
+        reportData: {
+            'cycleid': undefined,
+            'releaseid': undefined,
+            'testsuiteid': undefined,
+            'projectid': undefined,
+            'testsuitename': undefined
+        },
     },
     reducers: {
         setUserInfo: (state, action) => {
             state.userinfo = action.payload;
         },
-        savedNewProject:(state,action)=>{
-            state.savedNewProject=action.payload;
+        savedNewProject: (state, action) => {
+            state.savedNewProject = action.payload;
         },
         setRole: (state, action) => {
             state.userRole = action.payload;
@@ -29,9 +36,9 @@ export const loadUserInfo = createSlice({
         setSocket: (state, action) => {
             state.socket = action.payload;
         },
-        showChangePasswordDialog:(state) => {
+        showChangePasswordDialog: (state) => {
             state.showChangePasswordDialog = !state.showChangePasswordDialog;
-        }, 
+        },
         setProjectDetails: (state, action) => {
             state.projectDetails = action.payload;
         },
@@ -44,39 +51,70 @@ export const loadUserInfo = createSlice({
         setDefaultProject: (state, action) => {
             state.defaultSelectProject = action.payload;
         },
-        // setApptype: (state, action) => {
-        //     state.apptype = action.payload;
+        setDateFormat: (state, action) => {
+            state.dateformat = action.payload
+        },
+        updateReport: (state, action) => {
+            let data = action.payload.testSuiteDetails[0];
+            state.reportData = {
+                'cycleid': data.cycleid,
+                'releaseid': data.releaseid,
+                'testsuiteid': data.testsuiteid,
+                'projectid': data.projectid,
+                'testsuitename': data.testsuitename
+            }
+        },
+        setSocket: (state, action) => {
+            state.socket = action.payload
+        },
+
+        updateNotify: (state, action) => {
+            var value = action.payload
+            value.dateTime = new Date().toLocaleString();
+            var arr = [...state.notify.data]
+            var val = state.notify.unread
+            var isDuplicateNotificationMsg = false;
+            arr.forEach(e => {
+                if (value.notifyMsg === e.notifyMsg) {
+                    isDuplicateNotificationMsg = true;
+                }
+            });
+            if (isDuplicateNotificationMsg) return { ...state }
+            arr = [value, ...arr]
+            val = val + 1
+            return {
+                ...state, notify: { data: arr, unread: val }
+            }
+        },
+        // need it in future
+        // ----------------------------------
+        // CLEAR_NOTIFY: (state, action) => {
+        //     if (action.payload === 'all') {
+        //         return {
+        //             ...state, notify: { ...initialState.notify }
+        //         }
+        //     }
         // },
-        // case actionTypes.UPDATE_NOTIFY:
-        // var value = action.payload
-        //     value.dateTime = new Date().toLocaleString();
-        // var arr = [...state.notify.data]
-        //     var val = state.notify.unread
-        //     var isDuplicateNotificationMsg = false;
-        // arr.forEach(e => {
-        //     if (value.notifyMsg === e.notifyMsg) {
-        //         isDuplicateNotificationMsg = true;
-        //     }
-        // });
-        // if(isDuplicateNotificationMsg)return{ ...state }
-        //     arr =[value, ...arr]
-        //     val = val + 1
+
+        // UPDATE_NOTIFY_COUNT: (state, action) => {
         //     return {
-        //     ...state, notify: { data: arr, unread: val }
-        // }
-        // case actionTypes.CLEAR_NOTIFY:
-        // if(action.payload === 'all'){
-        //     return {
-        //         ...state, notify: { ...initialState.notify }
+        //         ...state, notify: { ...state.notify, unread: action.payload }
         //     }
-        // } else return state
-        // case actionTypes.UPDATE_NOTIFY_COUNT:
-        // return {
-        //     ...state, notify: { ...state.notify, unread: action.payload }
+        // },
+        // SET_DATEFORMAT: (state, action) => {
+        //     return {
+        //         ...state, dateformat: action.payload
+        //     }
+        // },
+        // HIGHLIGHT_AGS: (state, action) => {
+        //     return {
+        //         ...state,
+        //         highlightAGS: action.payload
+
+        //     }
         // }
-        setDateFormat: (state, payload) => {
-            state.dateformat = payload
-        }
+        // -----------------------------------
+        // need it in future
     }
 })
 // export all the action creators

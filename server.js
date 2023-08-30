@@ -314,13 +314,13 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius|admin)$/, function(req, res) {
 			var roles = ["Quality Manager", "Quality Lead", "Quality Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
+		app.get(/^\/(webocular|neuronGraphs\/|integration|admin)$/, function(req, res) {
 			var roles = ["Quality Manager", "Quality Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
