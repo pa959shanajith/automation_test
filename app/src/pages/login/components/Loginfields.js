@@ -35,7 +35,7 @@ const Login = (props) => {
         else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 10000 });
     }
     const toastSuccess = (successMessage) => {
-        if (erroMessage.CONTENT) {
+        if (successMessage.CONTENT) {
             toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
         }
         else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });

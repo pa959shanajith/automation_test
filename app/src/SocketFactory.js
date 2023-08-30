@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ModalContainer, VARIANT, RedirectPage, Messages as MSG, setMsg } from './pages/global';
 import {v4 as uuid} from 'uuid';
-import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
+import { loadUserInfoActions }  from './pages/landing/LandingSlice';
 import * as actionTypes from './pages/login/state/action';
 import {url} from './App'
 import {UpdateUserInfoforLicence} from './pages/login/api'; 
@@ -19,15 +19,15 @@ const SocketFactory = () => {
     const [showAfterExecution,setShowAfterExecution] = useState({show:false})
     const [showAfterExecutionIsTrial,setShowAfterExecutionIsTrial] = useState({show:false})
     const [reportData,setReportData] = useState(undefined)
-    const userInfo = useSelector(state=>state.login.userinfo);
-    const socket = useSelector(state=>state.login.socket);
-    const dispatch = useDispatch()
+    const userInfo = useSelector(state=>state.landing.userinfo);
+    const socket = useSelector(state=>state.landing.socket);
+    const dispatch = useDispatch();
     const history = useNavigate();
     useEffect(()=>{
       if(socket){
         socket.on('notify',(value)=> {
           if (value.count === 0 && 'notifyMsg' in value) {
-            dispatch({type: actionTypes.UPDATE_NOTIFY, payload: value});
+            dispatch(loadUserInfoActions.updateNotify( value));
           }
         });
         socket.on("result_ExecutionDataInfo",(result)=> {
@@ -42,10 +42,13 @@ const SocketFactory = () => {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },[socket])
+
     useEffect(()=>{
         var userName = Buffer.from((userInfo && userInfo.username)?userInfo.username:uuid()).toString('base64')
+        // console.log(userName, "userName");
         var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: {check: 'notify', key: userName}});
-        dispatch({type:actionTypes.SET_SOCKET,payload:socket})
+        // console.log(socket, "socket");
+        dispatch(loadUserInfoActions.setSocket(socket));
         return(() => {
             socket.close();
         });
@@ -75,7 +78,7 @@ const SocketFactory = () => {
     const closeTrial = () => {
         if(userInfo.isTrial){
             userInfo.isTrial = false;    
-            dispatch({type:actionTypes.SET_USERINFO, payload: userInfo});
+            dispatch(loadUserInfoActions.setUserInfo(userInfo));
         }
     }
 
@@ -107,8 +110,8 @@ const SocketFactory = () => {
     };
     
     const redirectToReports = () =>{
-        dispatch({type: UPDATE_REPORTDATA, payload: reportData});
-        setMsg(false)
+        dispatch(loadUserInfoActions.updateReport(reportData));
+        setMsg(false);
         window.localStorage['navigateScreen'] = "reports";
         window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
         window.localStorage['popupRedirect'] = "true";

@@ -353,23 +353,3 @@ export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenrai
   }
 
 
-export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused) => {
-  try{
-      const res = await axios(url+'/getGeniusData', {
-          method: 'POST',
-          credentials: 'include',
-          data:{data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused}
-      });
-      if(res.status===200 && res.data !== "fail"){            
-          return res.data;
-      }else if(res.status===200 && res.data === "fail"){            
-          return {error : MSG.PLUGIN.ERR_SAVING_GENIUS_DATA};
-      }
-      else if(res.status === 401 || res.data === "Invalid Session"){
-          return {error:MSG.GENERIC.INVALID_SESSION};
-      }
-      return {error:MSG.PLUGIN.ERR_SAVING_GENIUS_DATA}
-  }catch(err){
-      return {error:MSG.PLUGIN.ERR_SAVING_GENIUS_DATA}
-  }
-}
