@@ -96,18 +96,17 @@ const UserList = (props) => {
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(rowData.email));
         dispatch(AdminActions.UPDATE_USERROLE(rowData.role));
         setEditUserData(rowData);
-        setEditUserDialog(true);
     }
 
     const actionBodyTemplate = (rowData) => {
         return (
             <React.Fragment>
-                <img src="static/imgs/ic-edit.png"
+                <img src="static/imgs/ic-edit.png" alt="editUserIcon"
                     style={{ height: "20px", width: "20px" }}
-                    className="edit__usericon" onClick={() => editRowData(rowData)}
+                    className="edit__usericon" onClick={() => { editRowData(rowData); setEditUserDialog(true) }}
                 />
                 <img
-                    src="static/imgs/ic-delete-bin.png"
+                    src="static/imgs/ic-delete-bin.png" alt="deleteUserIcon"
                     style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
                     className="delete__usericon"
                     onClick={() => { editRowData(rowData); setShowDeleteConfirmPopUp(true) }}
