@@ -139,9 +139,9 @@ export default function BasicDemo() {
           issuetype: issueDropDown?.name,
           summary: selectedRow[0]?.Comments,
           description: selectedRow[0]?.StepDescription,
-          url: "https://mnb.atlassian.net/",
-          username: "priyanka.r@slkgroup.com",
-          password: "B8RUqqKt8B28MSz9zq1Q14AD",
+          url: loginUrl,
+          username: loginName,
+          password: loginKey,
           parentissue: "",
           reportId: reportData?.overallstatus?.reportId,
           slno: selectedRow[0]?.slno,
@@ -353,17 +353,17 @@ export default function BasicDemo() {
             ? await connectJira_ICE_Fields(
                 jiraDropDown?.id,
                 issueDropDown?.name,
-                "https://mnb.atlassian.net/",
-                "priyanka.r@slkgroup.com",
-                "B8RUqqKt8B28MSz9zq1Q14AD",
+                loginUrl,
+                loginName,
+                loginKey,
                 jiraDetails?.projects
               )
             : await connectAzure_ICE_Fields(
                 jiraDropDown?.id,
                 issueDropDown?.name,
-                "https://dev.azure.com/AvoAutomation",
-                "krishna_azure",
-                "2mf2gzlewrvjcb3rbqbrnq3lcnanlytv7idaf6bqd22ht5czndcq",
+                loginUrl,
+                loginName,
+                loginKey,
                 jiraDetails?.projects
               );
         const fieldValues = Object.keys(getFields).map((el) => ({
