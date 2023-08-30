@@ -47,6 +47,7 @@ const ActionPanel = (props) => {
   const [error, setError] = useState({ type: '', tempId: '' });
   const [showFields, setShowFields] = useState([tempIdCounter]);
   const [activeIndex, setActiveIndex] = useState("");
+  const [submitEnable, setSubmitEnable] = useState(false);
 
 
 
@@ -243,6 +244,7 @@ const ActionPanel = (props) => {
         .catch(error => console.error(error));
     }
     // props.toastError(errorObj)
+    setSubmitEnable(true);
   }
 
 
@@ -400,8 +402,8 @@ const ActionPanel = (props) => {
 
   const createElementFooter = (
     <div className='save_clear'>
-      <button className='add_object_clear' >Clear</button>
-      <button className='add_object_save' onClick={() => { onSubmit(customObjList); }} disabled={objects.length == 0}>Submit</button>
+      <Button className='add_object_clear' >Clear</Button>
+      <Button className='add_object_save' onClick={() => { onSubmit(customObjList); }} disabled={!submitEnable}>Submit</Button>
     </div>
   );
   const handleInputChange = (e) => {
