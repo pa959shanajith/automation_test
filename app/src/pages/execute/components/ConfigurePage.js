@@ -68,6 +68,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [dotNotExe, setDotNotExe] = useState({});
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
+  const [readTestSuite, setReadTestSuite] = useState({});
   const [allocateICE, setAllocateICE] = useState(false);
   const [eachData, setEachData] = useState([]);
   const [currentTask, setCurrentTask] = useState({});
@@ -460,7 +461,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
         currentSelectedItem.executionRequest.batchInfo
-        ? currentSelectedItem.executionRequest.batchInfo
+        ? currentSelectedItem.executionRequest.batchInfo.map((el) => ({ ...el, testsuiteId: readTestSuite?.testSuiteDetails[el?.testsuiteId]?.testsuiteid }))
         : [];
     executionData["scenarioFlag"] =
       currentTask.scenarioFlag == "True" ? true : false;
@@ -536,6 +537,25 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
   };
 
+  const handleTestSuite = async(getItem) => {
+    const readTestSuiteParams = getItem?.executionRequest?.batchInfo && getItem?.executionRequest?.batchInfo.map((el) => ({
+      assignedTime: "",
+      releaseid: el?.releaseId,
+      cycleid: el?.cycleId,
+      testsuiteid: el?.testsuiteId,
+      testsuitename: el?.testsuiteName,
+      projectidts: el?.projectId,
+      assignedTestScenarioIds: "",
+      subTaskId: "",
+      versionnumber: el?.versionNumber,
+      domainName: el?.domainName,
+      projectName: el?.projectName,
+      cycleName: el?.cycleName,
+    }));
+    const getReadTestSuite = await readTestSuite_ICEuser(readTestSuiteParams);
+    setReadTestSuite(getReadTestSuite);
+  };
+
   const tableUpdate = async () => {
     const getState = [];
     const configurationList = await fetchConfigureList({
@@ -571,12 +591,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setCurrentSelectedItem(item);
                 setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                 setConfigItem(idx);
-                console.log(fetechConfig, configItem)
+                handleTestSuite(item);
               }}
               size="small"
-              
-            >
-                  
+            >  
               Execute Now
             </Button>
             {/* <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/> */}
@@ -884,21 +902,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
   const onExecuteBtnClick = async (btnType) => {
     if (btnType === "Execute") {
-      const readTestSuiteParams = currentSelectedItem?.executionRequest?.batchInfo && currentSelectedItem?.executionRequest?.batchInfo.map((el) => ({
-        assignedTime: "",
-        releaseid: el?.releaseId,
-        cycleid: el?.cycleId,
-        testsuiteid: el?.testsuiteId,
-        testsuitename: el?.testsuiteName,
-        projectidts: el?.projectId,
-        assignedTestScenarioIds: "",
-        subTaskId: "",
-        versionnumber: el?.versionNumber,
-        domainName: el?.domainName,
-        projectName: el?.projectName,
-        cycleName: el?.cycleName,
-      }));
-      await readTestSuite_ICEuser(readTestSuiteParams);
       if (showIcePopup) {
         dataExecution.type =
           ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
