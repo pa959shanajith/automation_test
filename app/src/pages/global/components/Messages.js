@@ -405,7 +405,7 @@ const Messages={
         SUCC_SCREEN_EXCEL_IMPORT: {"CONTENT":"Screen Excel imported successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_OBJ_ADD: {"CONTENT":"Element(s) added successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_CERT_SAVE: {"CONTENT":"Certificate Saved successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_OBJ_CREATE: {"CONTENT":"Objects has been created successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_OBJ_CREATE: {"CONTENT":"Elemnts has been created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_IRIS_SAVE: {"CONTENT":"Submitted Successfully. IRIS image saved.", "VARIANT": VARIANT.SUCCESS},
         SUCC_MAPPED_SCRAPED: {"CONTENT":"Mapped captured element(s) Successfully.", "VARIANT": VARIANT.SUCCESS},
