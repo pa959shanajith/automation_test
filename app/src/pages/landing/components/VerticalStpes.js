@@ -12,9 +12,10 @@ import '../styles/VerticalSteps.scss';
 import { useNavigate } from "react-router-dom";
 import { useSelector,useDispatch  } from 'react-redux';
 import { updateSteps } from './VerticalComponentsSlice';
-import { disable } from 'agenda/dist/job/disable';
 import { getProjectIDs } from "../api"
 import { selectedProj } from '../../design/designSlice';
+import { showGenuis } from '../../global/globalSlice';
+
 // this component renders the "get started Box" in the landing page with the help of MUI framework
 
 const VerticalSteps = (props) => {
@@ -50,7 +51,7 @@ const VerticalSteps = (props) => {
     {
         label: activeStep  > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows',
         description: ` Visualize testcases through mindmaps, capture elements and design test steps. `,
-        title:<div><Button  type = "AVOgenius" size="small" style={buttonStyle_genius} ><img style={{color:"white", fill:"white",marginRight:"10px"}} src="static/imgs/avo_genius_18x18_icon.svg"   />  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold",fontFamily: "Open Sans" ,padding: "0.1rem 0.2rem"}}> OR </span><Button type = "designStudio" size="small" style={buttonStyle_design} onClick={(e)=>handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg"  style={{ marginRight: '10px' }} />Design Studio</Button> </div>
+        title:<div><Button  type = "AVOgenius" size="small" style={buttonStyle_genius} onClick={(e)=>handleNext("AVO Genius")}><img style={{color:"white", fill:"white",marginRight:"10px"}} src="static/imgs/avo_genius_18x18_icon.svg"/>  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold",fontFamily: "Open Sans" ,padding: "0.1rem 0.2rem"}}> OR </span><Button type = "designStudio" size="small" style={buttonStyle_design} onClick={(e)=>handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg"  style={{ marginRight: '10px' }} />Design Studio</Button> </div>
        
     },
     {
@@ -81,11 +82,15 @@ const VerticalSteps = (props) => {
               navigate("/reports");
             }
             else if(value==="AVO Genius"){
-              dispatch(updateSteps(3))
-              navigate("/reports");
+              openGen()
             }
 
   };
+  const openGen=()=>{
+    dispatch(showGenuis({showGenuisWindow:true,geniusWindowProps:{}
+            })
+            )
+  } 
 
 
   return (

@@ -338,10 +338,16 @@
 }
 
 .view_map_zephyr {
-    height: 30rem;
+    height: 30.5rem;
     max-height: 32.5rem;
     box-shadow: none !important;
     border: 1px solid lightgray !important;
+
+     .p-card-body{
+        margin-top: 1rem;
+        overflow: auto;
+        height: 30rem;
+    }
 
     .toggle_btn {
         position: relative;
@@ -350,6 +356,7 @@
     }
 
     .accordion_testcase {
+        margin-top:-1.5rem;
         max-height: 30rem !important;
         overflow-y: auto !important;
     }
@@ -438,6 +445,7 @@
     }
     .p-tree-container{
         margin-top: 1rem !important;
+        height: 18.5rem !important;
     }
 }
 
@@ -462,6 +470,7 @@
     }
     .p-tree-container{
         margin-top: 1rem !important;
+        height: 18.5rem !important;
     }
 }
 
@@ -509,4 +518,7 @@
     &:hover{
         opacity: 0.5;
       }
+}
+.dropdown-zephyr1{
+    margin-bottom: 0.5rem !important;
 }

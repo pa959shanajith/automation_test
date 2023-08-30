@@ -50,7 +50,7 @@ const ProjectCreation = () => {
 
         {/* <div  className="gotoadmin-card">  */}
 
-        {userInfo && userInfo.isadminuser === "true" ? (
+        {userInfo && userInfo.isadminuser === true ? (
         <Card className="gotoadmin-card" title="Wish to do some housekeeping today?">
           <div className="list_btns">
             <Link>   <li className="list1">Configure a new user</li></Link>

@@ -6,6 +6,7 @@ import ServiceBell from "@servicebell/widget";
 import store from './store';
 // import HomePage from './pages/landing/containers/HomePage';
 import HomePage from './pages/landing/containers/HomePage';
+import TagManager from 'react-gtm-module';
 import Report from './pages/report/components/reports';
 import More from './pages/more/more';
 import Integration from './pages/integration/Integration';
@@ -30,6 +31,7 @@ import MindmapHome from './pages/design/containers/MindmapHome';
 import Profile from './pages/report/components/Profile';
 import ReportTestTable from './pages/report/components/ReportTestTable';
 import AdminContainer from './pages/admin/containers/AdminContainer';
+import GeniusDialog from './pages/global/components/GeniusDialog';
 
 
 
@@ -42,11 +44,28 @@ const { REACT_APP_DEV } = process.env
 export const url = REACT_APP_DEV ? "https://" + window.location.hostname + ":8443" : window.location.origin;
 
 const App = () => {
-  // const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
-  const [blockui, setBlockui] = useState({ show: false });
+  const [blockui,setBlockui] = useState({show:false});
   const location = useLocation();
+  const [gtmToken, setGtmToken] = useState("");
+  const [gtmEnable, setGtmEnable] = useState(false);
+  
+  const tagManagerArgs = {
+    gtmId: gtmToken
+  }
+  if(gtmEnable){
+    TagManager.initialize(tagManagerArgs)
+  }
 
-  useEffect(() => {
+  useEffect(()=>{
+    (async()=>{
+      const response = await fetch("/getGTM")
+      let { enableGTM, gtmToken } = await response.json();
+      setGtmToken(gtmToken);
+      setGtmEnable(enableGTM);
+    })();
+  },[])
+
+  useEffect(()=>{
     TabCheck(setBlockui);
     (async () => {
       const response = await fetch("/getServiceBell")
@@ -71,6 +90,7 @@ const App = () => {
 const RouteApp = () => {
   return (
     <>
+    <GeniusDialog />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path='/verify' element={<Login/>}/>

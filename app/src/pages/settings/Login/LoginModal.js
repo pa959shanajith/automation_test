@@ -155,7 +155,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
                                 </span>
                             </div>
                             <div className="passwrd-cls">
-                                <span>Password <span style={{ color: 'red' }}>*</span></span>
+                                <span> API Token <span style={{ color: 'red' }}>*</span></span>
                                 <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
                                 <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} />
                                 {(loginDetails.password || zephyrLoginDetails.password) && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={togglePasswordVisibility}>

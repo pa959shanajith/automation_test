@@ -189,6 +189,10 @@ const Messages={
         ERR_PACKAGE: {"CONTENT":"Package is not available", "VARIANT": VARIANT.ERROR},
         ERR_UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"Unavailable LocalServe.r", "VARIANT": VARIANT.ERROR},
         ERR_SOMETHING_WRONG: {"CONTENT": "Something went wrong!", "VARIANT": VARIANT.ERROR},
+        ERR_EMAILS_EMPTY: {"CONTENT": "Emails cannot be empty!", "VARIANT": VARIANT.ERROR},
+        ERR_SENDER_EMAIL: {"CONTENT": "Not a valid sender email address!", "VARIANT": VARIANT.ERROR},
+        ERR_RECIEVER_EMAIL: {"CONTENT": "Not a valid reciever email address!", "VARIANT": VARIANT.ERROR},
+        ERR_SEND_EMAIL: {"CONTENT": "Failed to send the email notification!", "VARIANT": VARIANT.ERROR},
         
         SUCC_CHANGE_DEFAULT_ICE: {"CONTENT":"Changed default ICE successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_CHANGE_PASSWORD: {"CONTENT":"Password change successfull. Please login again with new password.", "VARIANT": VARIANT.SUCCESS},

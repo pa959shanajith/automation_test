@@ -1,7 +1,9 @@
 var create_ice = require('../controllers/create_ice');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
+const {execAutomation} = require('./suite');
 const { default: async } = require('async');
+const notifications = require('../notifications');
 
 exports.fetchProjects =  async(req, res) => {
 	const fnName = "fetchProjects";
@@ -73,7 +75,14 @@ exports.storeConfigureKey = async(req,res) => {
 		};
 		const status = await utils.fetchData(inputs, "devops/configurekey", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
-		else res.send(status);
+		else if(req.body.executionData.isExecuteNow){
+			req['body'] = {"key":req.body.executionData.configurekey,"isExecuteNow":req.body.executionData.isExecuteNow}
+			// console.log(suite);
+			let result = await execAutomation(req, res);
+			if(result.status == 'pass') result.status = 'success'
+			return res.send(result.status);
+		}
+		return res.send(status);
 	} catch (exception) {
 		logger.error(exception.message);
 		return res.send("fail");
@@ -313,3 +322,61 @@ exports.fetchModuleListDevopsReport =  async(req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.executionSteps = async(req, res)=>{
+	try {
+		const inp = req.body;
+		const steps = await utils.fetchData(inp,"/hooks/validateExecutionSteps")
+		res.send(steps)
+	} catch (error) {
+		logger.error("Error occurred in devops/hooks/ExecutionSteps: "+error)
+		return res.send("fail")
+	}
+}
+
+exports.executionParallel = async(req, res)=>{
+	try {
+		const inp = {};
+		const parallel = await utils.fetchData(inp,"/hooks/validateParallelExecutions")
+		res.send(parallel)
+	} catch (error) {
+		logger.error("Error occurred in devops/hooks/ParallelExecutions: "+error)
+		return res.send("fail")
+	}
+}
+
+exports.sendMailOnExecutionStart = async (req, res) => {
+	const fnName = "sendMailOnExecutionStart";
+	try {
+		const config = {"action":"provider","channel":"email","args":"smtp"};
+
+		const inputs = {
+			action: config.action,
+			name: config.args,
+			channel: config.channel
+		};
+		
+		const result = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
+		if (result == "fail") {
+			res.status(500).send("fail");
+		}
+		else if (result.length == 0) { 
+			res.send("empty");
+		} 
+		else {
+			const rawConf = result[0];
+			const executionData = {};
+			executionData.executionData = req.body.executionData;
+			executionData.recieverEmailAddress = req.body.recieverEmailAddress;
+			executionData.profileName = req.body.profileName;
+			executionData.startDate = req.body.startDate;
+
+			await notifications.notify("onExecutionStart", executionData, rawConf.channel);
+			return res.status(200).send("pass");
+		}
+	}
+	catch (exception) {
+		logger.error("Error occurred in devOps/"+fnName, exception);
+		res.status(500).send("fail");
+	}
+}

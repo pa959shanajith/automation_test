@@ -64,7 +64,7 @@ exports.manageUserDetails = async (req, res) => {
 				user:reqData,
 				name:reqData.username,
 				userimage:reqData.userimage || '',
-				isadminuser : reqData.isAdminUser
+				isadminuser : reqData.isadminuser
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -75,7 +75,7 @@ exports.manageUserDetails = async (req, res) => {
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
 			userimage: reqData.userimage || '',
-			isadminuser : reqData.isAdminUser,
+			isadminuser : reqData.isadminuser,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -504,12 +504,18 @@ exports.createProject_ICE = async (req, res) => {
 			modifiedby: userid,
 			modifiedbyrole: roleId
 		};
-		const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
-		if (result == "fail") {
-			return res.send("fail");
-		} else {
-			return res.send(result)
+		const valiproject = await utils.fetchData(inputs, "/hooks/validateProject");
+		if(valiproject.status === 'pass'){
+			const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
+			if (result == "fail") {
+				return res.send("fail");
+			} else {
+				return res.send(result)
+			}
+		}else {
+			return res.send(valiproject);
 		}
+		
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName+":", exception);
 		res.status(500).send("fail");
@@ -2044,13 +2050,13 @@ const removeDir = function(path) {
 
 const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
-	inputs.host = (conf.host || "").trim();
-	inputs.port = conf.port || "";
-	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
+	inputs.smtpHost = (conf.smtpHost || "").trim();
+	inputs.smtpPort = conf.smtpPort || "";
+	if (!inputs.smtpHost && !validator.isIP(inputs.smtpHost) && !validator.isFQDN(inputs.smtpHost)) { // Allow Anything as of now
 		logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
 		flag[5]='1';
 	}
-	if (!validator.isPort(inputs.port.toString())) {
+	if (!validator.isPort(inputs.smtpPort.toString())) {
 		logger.error("Error occurred in admin/"+fnName+": Invalid Port Number.");
 		flag[6]='1';
 	}
@@ -2407,6 +2413,8 @@ exports.getDetails_JIRA = async (req, res) => {
 
 };
 
+
+
 /* manageJiraDetails */
 exports.manageJiraDetails = async (req, res) => {
 	const actionName = "manageJiraDetails";
@@ -2471,7 +2479,59 @@ exports.getDetails_Zephyr = async (req, res) => {
 	}
 
 };
+exports.getDetails_Azure= async (req, res) => {
+	const actionName = "getDetails_Azure";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_Azure", actionName);
 
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				AzureURL: result['url'],
+				AzureUsername: result['username'],
+				AzurePAT: result['PAT']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_Azure: %s", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
+exports.getDetails_SAUCELABS= async (req, res) => {
+	const actionName = "getDetails_SAUCELABS";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_SAUCELABS", actionName);
+
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				SaucelabsURL: result['url'],
+				SaucelabsUsername: result['username'],
+				Saucelabskey: result['api']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_SAUCELABS: %s", exception);
+		return res.status(500).send("fail");
+	}
+
+};
 /* manageZephyrDetails */
 exports.manageZephyrDetails = async (req, res) => {
 	const actionName = "manageZephyrDetails";
@@ -2510,7 +2570,80 @@ exports.manageZephyrDetails = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+exports.manageAzureDetails = async (req, res) => {
+	const actionName = "manageAzureDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		let inputs;
+		if(action==='delete'){
+			inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
 
+		}else{
+			const AzureUrl = data.user.AzureURL;
+			const AzureUsername = data.user.AzureUsername;
+			const AzurePAT = data.user.AzurePAT;
+			
+			inputs = {
+				"AzureUrl": AzureUrl,
+				"AzureUsername": AzureUsername,
+				"AzurePAT":AzurePAT,
+				"action": action,
+				"userId": userId,
+			};
+		
+		result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service manageAzureDetails: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.manageSaucelabsDetails = async (req, res) => {
+	const actionName = "manageSaucelabsDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		let inputs;
+		if(action==='delete'){
+			inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageSaucelabsDetails", actionName);
+
+		}else{
+			const SaucelabsURL = data.user.SaucelabsURL;
+			const SaucelabsUsername = data.user.SaucelabsUsername;
+			const SaucelabsAPI = data.user.SaucelabsAPI;
+			let inputs = {
+				"userId": userId,
+				"SaucelabsUrl": SaucelabsURL,
+				"SaucelabsUsername": SaucelabsUsername,
+				"SaucelabsAPI": SaucelabsAPI,
+				"action": action
+			};
+		
+		result = await utils.fetchData(inputs, "admin/manageSaucelabsDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
 exports.getNotificationGroups = async(req,res) => {
 	const fnName = "getNotificationGroups"
 	logger.info("Inside UI service: " + fnName)
@@ -2556,6 +2689,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		if (roleId === '5db0022cf87fdec084ae49ab' && activeRole === "Quality Manager" && isAdminUser === true) return next();
 		switch (req.path) {
 			case "/manageUserDetails":
+			    if(req.body.action == "stepUpdate") return next();
 				if (req.body.user.userid == userid && req.body.action == 'update') return next();
 				break;
 			case "/manageCIUsers":
@@ -2572,7 +2706,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 					const iceName = req.body.user;
 					const inputs = { user: userid };
 					const result = await utils.fetchData(inputs, "admin/fetchICE", "fetchICE");
-					if (result.some(x => x.icename === iceName)) return next()
+					if (result != 'fail') return next()
 				} catch (exception) {
 					logger.error("Error occurred in adminPrivilegeCheck:", exception);
 					return res.status("500").send("fail");

@@ -1,81 +1,289 @@
-<html><head>
-    <style>
-      .mar-b-1{
-        margin-bottom: 1rem;
-      }
-      .mar-b-2{
-        margin-bottom: 2rem;
-      }
-      .mar-b-3{
-        margin-bottom: 3rem;
-      }
-      .header {
-        height: 118px;
-        background: #391F56;
-        width: 100%;
-        border-radius: 8px 8px 0px 0px;
-        color: white;
-        font: 42px Calibri;
-        text-align: center;
-      }
-      .activate_button {
-        /* flex-direction: column; */
-        /* justify-content: center !important; */
-        width: 100px;
-        /* height: 55px; */
-        background: #5F338F;
-        border-radius: 10px;
-        border: none;
-        color: white;
-        font: 20px Calibri;
-        margin: 0 auto;
-        text-decoration: none !important;
-        text-align: center;
-        padding: 15px 100px;
-      }
-      .anchor_purple {
-        font-size: 24px;
-        line-height: 30px;
-        text-decoration: none !important;
-        color: #5F338F;
-        margin-right: 20px;
-      }
-    </style>
-  </head>
-  <body>
-  <div style="font-family:Calibri !important;font-size: 16px;box-shadow: 0px 0.6px 1.8px rgba(0, 0, 0, 0.4), 0px 3.2px 7.2px rgba(0, 0, 0, 0.4);width: 840px;border-radius: 8px;">
-    <div class="mar-b-1 header">
-      <span class="helper" style="
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
-"></span>
-<img style="vertical-align: middle;/* float: left; *//* height: 100%; */margin-right: 40px;" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzMiIGhlaWdodD0iNTMiIHZpZXdCb3g9IjAgMCAzMyA1MyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAuODY1OTY3IDIxLjYwMjJDMS43ODk2OCAyMS4wNjE4IDIuNzAwMTUgMjAuNDMwNiAzLjY5ODYzIDE5Ljk3MDZDNS42Nzg1NiAxOS4wNTU0IDcuNzYxNjUgMTguODcyNyA5LjkwNjI1IDE5LjI3ODhDMTMuMTQxMSAxOS44OTAxIDE1LjgyMTQgMjEuNTI2NSAxOC4zNDY1IDIzLjUxMjFDMTcuOTQwNSAyMy4yNDQzIDE1LjY2MzQgMjIuMjY4NSAxNC4wNDIxIDIzLjcyOThDMTMuOTI3NiAyMy44MzMgOS41NzQwNSAyNy4yNTYyIDcuNDYzNTIgMjguNzk4OUM1LjQxNDUgMzAuMjk3MSAyLjQwMDEzIDI5LjUwMyAwLjg3MzUzOSAyNy40NjA2Qy0wLjkxMDQ3OSAyNS4wNzQ3IDAuNzg3NDE0IDIxLjczNDcgMC44NjU5NjcgMjEuNjAyMloiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8xNl80MikiLz4KPHBhdGggZD0iTTMyLjIwMTMgMjIuMDEySDMyLjIwMzJMMzEuMTc4MiAyMC4zNTg2QzI4Ljk0NzQgMTYuNTIzNyAyMC45NjcyIDIuODExODMgMjAuOTY3MiAyLjgxMTgzQzE4Ljc1NjMgLTAuOTU0OTUzIDEzLjI3NjUgLTAuODUzNjg1IDExLjIwNTcgMi45OTA3MUMxMS4yMDU3IDIuOTkwNzEgOC4xNzYxOCA4LjQ5NTE0IDcuMjI1MDIgMTAuMTkyMUM3LjI2MDA0IDEwLjEzODEgNy4zMDA3MyAxMC4wOTA4IDcuMzM3NjUgMTAuMDM4OEM2Ljc5NTM0IDEwLjk2OTEgMS4wOTIxNiAyMS4xNzA3IDAuODY1OTY3IDIxLjU5MjhDMC44Njk3NTMgMjEuNTg5IDAuODcyNTkyIDIxLjU4NzEgMC44NzU0MzIgMjEuNTc5NUMwLjg3MTY0NiAyMS41Nzk1IDAuODY1OTY3IDIxLjU4OTkgMC44NjU5NjcgMjEuNTkzN0MxLjc5MDYzIDIxLjA1MTQgMi43MDI5OSAyMC40MTkyIDMuNzAwNTIgMTkuOTU5MkM1LjY4NDI0IDE5LjA0MzEgNy43NjgyNyAxOC44NjA0IDkuOTEzODIgMTkuMjY1NUMxMi41MzQ1IDE5Ljc2MTQgMTQuNzkwOCAyMC45MjQ2IDE2Ljg5NTYgMjIuNDAzOUwyMy42NDQ2IDI3LjU0NThDMjMuNjQ0NiAyNy41NDU4IDI4LjMyIDMxLjQ3ODIgMzEuODI2NSAyNy4yMDUxQzMyLjE5NDYgMjYuNzU2NSAzMy43NDg3IDI0LjYwNzEgMzIuMTk5NCAyMi4wMTExTDMyLjIwMTMgMjIuMDEyWiIgZmlsbD0idXJsKCNwYWludDFfbGluZWFyXzE2XzQyKSIvPgo8cGF0aCBkPSJNMTEuODA3NiA1Mi42MDkxQzExLjU0NTUgNTIuNjExIDExLjMxMzYgNTIuNTc0MSAxMS4xMTI5IDUyLjQ5NjVDMTAuOTEyMyA1Mi40MTg5IDEwLjc1NjEgNTIuMzM3NSAxMC42NDQ1IDUyLjI1MTRMMTAuNzkyMSA1MS44NDQ0QzEwLjkwNTcgNTEuOTI2NyAxMS4wNDk1IDUyLjAwMDYgMTEuMjI0NiA1Mi4wNjU5QzExLjM5OTcgNTIuMTMxMiAxMS41Nzc2IDUyLjE2MzMgMTEuNzU5NCA1Mi4xNjI0QzEyLjE2MTYgNTIuMTU5NiAxMi4zNjIyIDUyLjAxIDEyLjM1OTQgNTEuNzEzOEMxMi4zNTg0IDUxLjU4OTggMTIuMzEyMSA1MS40OTcxIDEyLjIyMTIgNTEuNDM2NUMxMi4xMzA0IDUxLjM3NTkgMTEuOTUyNCA1MS4zMDIxIDExLjY4OTMgNTEuMjE2TDExLjQyODEgNTEuMTI4OUMxMS4zMjY4IDUxLjA5MzkgMTEuMjQxNyA1MS4wNjE3IDExLjE3MTYgNTEuMDMwNUMxMS4xMDE2IDUwLjk5OTIgMTEuMDMwNiA1MC45NjA0IDEwLjk1ODcgNTAuOTEyMkMxMC44ODc3IDUwLjg2NDggMTAuODMgNTAuODEyOCAxMC43ODU1IDUwLjc1N0MxMC43NDEgNTAuNzAxMSAxMC43MDYgNTAuNjMzIDEwLjY3ODUgNTAuNTUzNUMxMC42NTExIDUwLjQ3NCAxMC42MzY5IDUwLjM4NDEgMTAuNjM1OSA1MC4yODI4QzEwLjYzNSA1MC4xMzg5IDEwLjY2MzQgNTAuMDExMiAxMC43MjMgNDkuODk4NUMxMC43ODI2IDQ5Ljc4NjkgMTAuODY0IDQ5LjY5NzkgMTAuOTY4MSA0OS42MzM1QzExLjA3MjMgNDkuNTY5MiAxMS4xODY4IDQ5LjUxOSAxMS4zMTM2IDQ5LjQ4NTlDMTEuNDM5NSA0OS40NTI4IDExLjU3NTggNDkuNDM0OCAxMS43MjE1IDQ5LjQzMzhDMTIuMTIxOCA0OS40MzEgMTIuNDU5NyA0OS41MTUyIDEyLjczNjEgNDkuNjg5NEwxMi41ODg0IDUwLjA4MTJDMTIuMzIwNiA0OS45NDExIDEyLjA1MzcgNDkuODcyIDExLjc4NzggNDkuODc0OUMxMS41OTI4IDQ5Ljg3NjggMTEuNDQxNCA0OS45MTA4IDExLjMzNTQgNDkuOTc5QzExLjIyOTQgNTAuMDQ3MSAxMS4xNzczIDUwLjE0MTggMTEuMTc4MiA1MC4yNjQ4QzExLjE3ODIgNTAuMzc1NSAxMS4yMTIzIDUwLjQ1NiAxMS4yNzY3IDUwLjUwOEMxMS4zNDEgNTAuNTYwMSAxMS40Njk4IDUwLjYxOTcgMTEuNjYwOSA1MC42ODY5QzExLjgzMzIgNTAuNzQyOCAxMS45MzQ0IDUwLjc3NjggMTEuOTY2NiA1MC43ODgyQzEyLjA5MTYgNTAuODMwOCAxMi4xOTA5IDUwLjg2NzcgMTIuMjY2NiA1MC44OThDMTIuMzQyNCA1MC45MjgzIDEyLjQyMjggNTAuOTY5OSAxMi41MDg5IDUxLjAyMkMxMi41OTUxIDUxLjA3NCAxMi42NjEzIDUxLjEyOCAxMi43MDg2IDUxLjE4NDdDMTIuNzU1OSA1MS4yNDE1IDEyLjc5NDggNTEuMzEyNSAxMi44MjYgNTEuMzk4NkMxMi44NTcyIDUxLjQ4MzggMTIuODczMyA1MS41ODEzIDEyLjg3NDMgNTEuNjkwMUMxMi44NzUyIDUxLjg1MiAxMi44NDU5IDUxLjk5MzkgMTIuNzg2MiA1Mi4xMTUxQzEyLjcyNTcgNTIuMjM3MiAxMi42NDQzIDUyLjMzMTggMTIuNTQwMiA1Mi40MDA5QzEyLjQzNjEgNTIuNDcgMTIuMzIzNCA1Mi41MjExIDEyLjIwMTMgNTIuNTU2MUMxMi4wNzkzIDUyLjU5MDIgMTEuOTQ4NiA1Mi42MDgyIDExLjgwODYgNTIuNjEwMUwxMS44MDc2IDUyLjYwOTFaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTUuNDg5MiA1Mi41Nzg4QzE1LjIyNzEgNTIuNTgwNyAxNC45OTUyIDUyLjU0MzggMTQuNzk0NiA1Mi40NjYyQzE0LjU5MzkgNTIuMzg4NiAxNC40Mzc4IDUyLjMwNzIgMTQuMzI2MSA1Mi4yMjExTDE0LjQ3MzcgNTEuODE0MUMxNC41ODczIDUxLjg5NjQgMTQuNzMxMSA1MS45NzAzIDE0LjkwNjIgNTIuMDM1NkMxNS4wODEzIDUyLjEwMDkgMTUuMjU5MyA1Mi4xMzMgMTUuNDQxIDUyLjEzMjFDMTUuODQzMiA1Mi4xMjkzIDE2LjA0MzggNTEuOTc5NyAxNi4wNDEgNTEuNjgzNUMxNi4wNDAxIDUxLjU1OTUgMTUuOTkzNyA1MS40NjY4IDE1LjkwMjggNTEuNDA2MkMxNS44MTIgNTEuMzQ1NiAxNS42MzQgNTEuMjcxOCAxNS4zNzA5IDUxLjE4NTdMMTUuMTA5NyA1MS4wOTg2QzE1LjAwODUgNTEuMDYzNiAxNC45MjMzIDUxLjAzMTQgMTQuODUzMiA1MS4wMDAyQzE0Ljc4MzIgNTAuOTY4OSAxNC43MTIyIDUwLjkzMDEgMTQuNjQwMyA1MC44ODE5QzE0LjU2OTMgNTAuODM0NSAxNC41MTE2IDUwLjc4MjUgMTQuNDY3MSA1MC43MjY2QzE0LjQyMzYgNTAuNjcwOCAxNC4zODc2IDUwLjYwMjcgMTQuMzYwMSA1MC41MjMyQzE0LjMzMjcgNTAuNDQzNyAxNC4zMTg1IDUwLjM1MzggMTQuMzE3NiA1MC4yNTI1QzE0LjMxNjYgNTAuMTA4NiAxNC4zNDUgNDkuOTgwOSAxNC40MDQ2IDQ5Ljg2ODJDMTQuNDY0MyA0OS43NTY2IDE0LjU0NTYgNDkuNjY3NiAxNC42NDk4IDQ5LjYwMzJDMTQuNzUzOSA0OS41Mzg5IDE0Ljg2ODQgNDkuNDg4NyAxNC45OTUyIDQ5LjQ1NTZDMTUuMTIxMSA0OS40MjI1IDE1LjI1NzQgNDkuNDA0NSAxNS40MDMxIDQ5LjQwMzVDMTUuODAzNSA0OS40MDA3IDE2LjE0MTMgNDkuNDg0OSAxNi40MTc3IDQ5LjY1OTFMMTYuMjcgNTAuMDUwOUMxNi4wMDIyIDQ5LjkxMDggMTUuNzM1MyA0OS44NDE3IDE1LjQ2OTQgNDkuODQ0NkMxNS4yNzQ0IDQ5Ljg0NjUgMTUuMTIzIDQ5Ljg4MDUgMTUuMDE3IDQ5Ljk0ODdDMTQuOTExIDUwLjAxNjggMTQuODU4OSA1MC4xMTE1IDE0Ljg1OTkgNTAuMjM0NUMxNC44NTk5IDUwLjM0NTIgMTQuODkzOSA1MC40MjU3IDE0Ljk1ODMgNTAuNDc3N0MxNS4wMjI2IDUwLjUyOTggMTUuMTUxNCA1MC41ODk0IDE1LjM0MjUgNTAuNjU2NkMxNS41MTQ4IDUwLjcxMjUgMTUuNjE2MSA1MC43NDY1IDE1LjY0ODIgNTAuNzU3OUMxNS43NzMyIDUwLjgwMDUgMTUuODcyNSA1MC44Mzc0IDE1Ljk0ODMgNTAuODY3N0MxNi4wMjQgNTAuODk4IDE2LjEwNDQgNTAuOTM5NiAxNi4xOTA1IDUwLjk5MTdDMTYuMjc2NyA1MS4wNDM3IDE2LjM0MjkgNTEuMDk3NiAxNi4zOTAyIDUxLjE1NDRDMTYuNDM3NiA1MS4yMTEyIDE2LjQ3NjQgNTEuMjgyMiAxNi41MDc2IDUxLjM2ODNDMTYuNTM4OCA1MS40NTM1IDE2LjU1NDkgNTEuNTUxIDE2LjU1NTkgNTEuNjU5OEMxNi41NTY4IDUxLjgyMTcgMTYuNTI3NSA1MS45NjM2IDE2LjQ2NzggNTIuMDg0OEMxNi40MDczIDUyLjIwNjkgMTYuMzI1OSA1Mi4zMDE1IDE2LjIyMTggNTIuMzcwNkMxNi4xMTc3IDUyLjQzOTcgMTYuMDA1IDUyLjQ5MDggMTUuODgzIDUyLjUyNThDMTUuNzYwOSA1Mi41NTk5IDE1LjYzMDMgNTIuNTc3OSAxNS40OTAyIDUyLjU3OThMMTUuNDg5MiA1Mi41Nzg4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE5LjI4MDYgNTIuNTUxNEMxOC44OTE3IDUyLjU1NDIgMTguNTk5MiA1Mi40NDYzIDE4LjQwMjQgNTIuMjI1OEMxOC4yMDU1IDUyLjAwNTMgMTguMTA1MiA1MS43MDgxIDE4LjEwMjMgNTEuMzMzM0wxOC4wODcyIDQ5LjQ1NzVMMTguNjI4NSA0OS40NTI4TDE4LjY0MzcgNTEuMzI4NkMxOC42NDU2IDUxLjU4ODkgMTguNzA5IDUxLjc4MzggMTguODMzIDUxLjkxNDRDMTguOTU3IDUyLjA0NSAxOS4xMzU4IDUyLjEwODQgMTkuMzY4NyA1Mi4xMDY2QzE5LjYzNDYgNTIuMTA0NyAxOS44NDI4IDUyLjAyNyAxOS45OTE0IDUxLjg3MzdDMjAuMTQgNTEuNzIwNCAyMC4yMTM4IDUxLjUyMzUgMjAuMjExOSA1MS4yODMyTDIwLjE5NjggNDkuNDM5NUwyMC43NDEgNDkuNDM0OEwyMC43NTkgNTEuNzE5NUMyMC43NjA5IDUxLjk5MDEgMjAuNzcyMiA1Mi4yNCAyMC43OTIxIDUyLjQ3MDlMMjAuMjM4NCA1Mi40NzU3TDIwLjIxOTUgNTEuOTg3M0MyMC4xMzYyIDUyLjE0MzUgMjAuMDE3IDUyLjI3NjkgMTkuODYxNyA1Mi4zODQ4QzE5LjcwNjUgNTIuNDkyNyAxOS41MTI1IDUyLjU0ODUgMTkuMjc5NyA1Mi41NTA0TDE5LjI4MDYgNTIuNTUxNFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMi42MDY0IDUyLjQ1NjdMMjIuNTg3NSA1MC4xNjY0QzIyLjU4NzUgNTAuMDk5MiAyMi41ODI3IDUwLjAwMzYgMjIuNTc1MSA0OS44Nzk2QzIyLjU2NzYgNDkuNzU1NiAyMi41NiA0OS42NDc3IDIyLjU1MzQgNDkuNTU2OUwyMi41NDMgNDkuNDIwNkwyMy4xMjAzIDQ5LjQxNTlMMjMuMTI5OCA0OS44ODkxQzIzLjMxMDUgNDkuNTI0NyAyMy41NzkzIDQ5LjM0MTEgMjMuOTM2MSA0OS4zMzgzQzI0LjA0ODcgNDkuMzM4MyAyNC4xNTEgNDkuMzQ4NyAyNC4yNDM3IDQ5LjM3MTRWNDkuODU0MUMyNC4xMjgyIDQ5LjgyMzggMjQuMDE2NiA0OS44MDg2IDIzLjkwOTYgNDkuODA5NkMyMy42NzY4IDQ5LjgxMTUgMjMuNDkwMyA0OS44OTQ4IDIzLjM0OTMgNTAuMDU4NUMyMy4yMDgzIDUwLjIyMjIgMjMuMTM5MiA1MC40NTY5IDIzLjE0MjEgNTAuNzYyNkwyMy4xNTUzIDUyLjQ1MkwyMi42MDQ1IDUyLjQ1NjdIMjIuNjA2NFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yNy4xMTggNTIuNDg1MUMyNi42MzQ0IDUyLjQ4ODkgMjYuMjUwMSA1Mi4zNDg4IDI1Ljk2MzQgNTIuMDY0QzI1LjY3NjYgNTEuNzc5MSAyNS41MzE4IDUxLjM5OTYgMjUuNTI4IDUwLjkyMzVDMjUuNTI0MiA1MC40NTYgMjUuNjU3NyA1MC4wNzA4IDI1LjkyODMgNDkuNzY3OUMyNi4xOTkgNDkuNDY1MSAyNi41NTk2IDQ5LjMxMTcgMjcuMDA5MiA0OS4zMDhDMjcuMjkzMSA0OS4zMDYxIDI3LjUzNzMgNDkuMzY5NSAyNy43Mzk4IDQ5LjUwMDFDMjcuOTQyMyA0OS42MzA3IDI4LjA5NDcgNDkuODA4NiAyOC4xOTQxIDUwLjAzNDhDMjguMjkzNSA1MC4yNjEgMjguMzQ0NiA1MC41MjQxIDI4LjM0NzQgNTAuODI0MUMyOC4zNDc0IDUwLjg2MiAyOC4zNDU1IDUwLjkxMDMgMjguMzM5OCA1MC45Njg5TDI2LjA5MTEgNTAuOTg2OUMyNi4wOTk2IDUxLjMyNTcgMjYuMiA1MS41ODcgMjYuMzkwMiA1MS43NzA2QzI2LjU4MTQgNTEuOTUzMiAyNi44MzIyIDUyLjA0NDEgMjcuMTQ0NSA1Mi4wNDEyQzI3LjUwNzkgNTIuMDM4NCAyNy44Mjc4IDUxLjkyMjkgMjguMTA2MSA1MS42OTU4TDI4LjI3MTcgNTIuMDk3MUMyNy45NDggNTIuMzUyNiAyNy41NjM4IDUyLjQ4MTMgMjcuMTE4IDUyLjQ4NTFaTTI2LjEwMjUgNTAuNjE0TDI3Ljg0NTggNTAuNTk5OEMyNy44MjQgNTAuMzIxNiAyNy43NDA4IDUwLjEwODYgMjcuNTk3OCA0OS45NjAxQzI3LjQ1NDkgNDkuODExNSAyNy4yNjQ3IDQ5LjczNzYgMjcuMDI4MSA0OS43Mzk1QzI2Ljc3OTIgNDkuNzQxNCAyNi41NzI5IDQ5LjgyIDI2LjQwNzIgNDkuOTc1MkMyNi4yNDE2IDUwLjEzMDQgMjYuMTQwMyA1MC4zNDM0IDI2LjEwMzQgNTAuNjE0SDI2LjEwMjVaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNOS45NDk4IDQ0LjMzMTZDOS45NzM0NiA0NC4zNzE0IDkuOTkyMzkgNDQuNDE0IDEwLjAwNjYgNDQuNDU4NUMxMC4wMTMyIDQ0LjUwNDggMTAuMDE0MiA0NC41NTEyIDEwLjAwNzUgNDQuNTk3NkMxMC4wMDg1IDQ0LjY2MjkgOS45OTYxOCA0NC43MjcyIDkuOTcwNjIgNDQuNzg2OUM5Ljk0MDM0IDQ0Ljg0NjUgOS44OTk2NCA0NC44OTk1IDkuODQ5NDggNDQuOTQzQzkuNzk4MzcgNDQuOTkxMyA5LjczNTkxIDQ1LjAyNDQgOS42NjY4MiA0NS4wMzg2QzkuNjAyNDYgNDUuMDY2MSA5LjUzMjQyIDQ1LjA4MDMgOS40NjE0NCA0NS4wNzkzQzkuMzU2MzkgNDUuMDgzMSA5LjI1MjI4IDQ1LjA1NzYgOS4xNjE0MiA0NS4wMDQ2QzkuMDczNDEgNDQuOTQzIDkuMDA1MjcgNDQuODU2OSA4Ljk2NTUyIDQ0Ljc1NjZDOC4xMjYwMyA0Mi45MTQ4IDYuODczOTEgNDAuMTUxMyA1LjIxMDA5IDM2LjQ2NjhMMS42MDUxNCA0NC44MTYyQzEuNTY2MzQgNDQuOTE5NCAxLjQ5NDQxIDQ1LjAwNzQgMS40MDE2NiA0NS4wNjdDMS4zMTQ1OSA0NS4xMTkxIDEuMjE1MjEgNDUuMTQ3NSAxLjExMzk0IDQ1LjE0NzVDMS4wMzgyMyA0NS4xNTAzIDAuOTYyNTE0IDQ1LjEzOCAwLjg5MTUzMiA0NS4xMTA2QzAuODI2MjI4IDQ1LjA4NDEgMC43NjY2MDMgNDUuMDQ3MSAwLjcxMzYwMyA0NS4wMDA4QzAuNjU2ODE3IDQ0Ljk1NTMgMC42MDg1NSA0NC44OTk1IDAuNTczNTMyIDQ0LjgzNTFDMC41NDUxMzkgNDQuNzc2NSAwLjUyOTk5NyA0NC43MTIxIDAuNTI4MTA0IDQ0LjY0NjhDMC41MjE0NzkgNDQuNjA0MiAwLjUyMTQ3OSA0NC41NjE2IDAuNTI3MTU4IDQ0LjUxOUMwLjUyNzE1OCA0NC40OTE2IDAuNTI3MTU3IDQ0LjQ1ODUgMC41NjUwMTUgNDQuNDA3NEMxLjQ0NzA5IDQyLjQwMzggMi43NzY4MiAzOS4zOTAzIDQuNTUyMzIgMzUuMzY3MUM0LjU3Nzg3IDM1LjMwNDYgNC42MTQ3OCAzNS4yNDc4IDQuNjYyMSAzNS4xOTk2QzQuNzA2NTggMzUuMTUyMiA0Ljc1Njc1IDM1LjExMTUgNC44MTA2OSAzNS4wNzY1QzQuODU5OTEgMzUuMDQwNiA0LjkxNjY5IDM1LjAxNTkgNC45NzYzMiAzNS4wMDI3QzUuMDQwNjggMzQuOTkzMiA1LjEwNTk4IDM0Ljk5MzIgNS4xNzAzNCAzNS4wMDA4QzUuMjMyOCAzNC45OTEzIDUuMjk2MjEgMzQuOTkwNCA1LjM1ODY3IDM0Ljk5ODlDNS40Mjc3NiAzNS4wMTU5IDUuNDkzMDcgMzUuMDQzNCA1LjU1MzY0IDM1LjA4MDNDNS42MDc1OCAzNS4xMTYzIDUuNjU3NzUgMzUuMTU3IDUuNzA0MTIgMzUuMjAxNEM1Ljc0ODYgMzUuMjQ1IDUuNzgyNjcgMzUuMjk4IDUuODA1MzkgMzUuMzU1N0M2LjQ5NDM5IDM2Ljg1MyA3LjE4MzM5IDM4LjM1MTIgNy44NjEwMyAzOS44NDg0QzguNTM4NjcgNDEuMzQ1NyA5LjI2NjQ4IDQyLjgzMjUgOS45NDk4IDQ0LjMyOThWNDQuMzMxNloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xOC44NzY1IDM0Ljk2ODZDMTguOTYyNiAzNC45MTQ3IDE5LjA2MiAzNC44ODQ0IDE5LjE2NDIgMzQuODgzNUMxOS4zMTY2IDM0Ljg3OTcgMTkuNDY1MiAzNC45MzE3IDE5LjU4MTYgMzUuMDMwMkMxOS42OTA0IDM1LjExNzIgMTkuNzUyOSAzNS4yNDk3IDE5Ljc1MSAzNS4zODk4QzE5Ljc0OTEgMzUuNDY1NSAxOS43MzAyIDM1LjUzOTMgMTkuNjk3MSAzNS42MDY1QzE4LjgxNSAzNy42MTc3IDE3LjQ4OTEgNDAuNjIzNiAxNS43MjExIDQ0LjYyNDFDMTUuNjc2NiA0NC43NDYyIDE1LjU5MTUgNDQuODQ5NCAxNS40Nzk4IDQ0LjkxNDdDMTUuMzY4MSA0NC45ODI4IDE1LjIzOTQgNDUuMDE3OCAxNS4xMDg4IDQ1LjAxNzhDMTQuOTgyIDQ1LjAxODggMTQuODU3IDQ0Ljk4NTYgMTQuNzQ3MiA0NC45MjEzQzE0LjYyOCA0NC44NjA3IDE0LjUzNDMgNDQuNzU5NCAxNC40ODQxIDQ0LjYzNDVDMTMuNTgwMyA0Mi42NDg5IDEyLjIxMjcgMzkuNjY0OCAxMC4zNzk1IDM1LjY4MjJDMTAuMzUzIDM1LjYxNjkgMTAuMzM5NyAzNS41NDc5IDEwLjMzODggMzUuNDc2OUMxMC4zMzMxIDM1LjMyNzMgMTAuNDA1IDM1LjE4NjMgMTAuNTMgMzUuMTA0QzEwLjYzOTcgMzUuMDA1NiAxMC43ODA4IDM0Ljk1MTYgMTAuOTI4NCAzNC45NTA3QzExLjE0MzIgMzQuOTQwMyAxMS4zNDExIDM1LjA2NDIgMTEuNDI0MyAzNS4yNjNDMTIuMjQxMSAzNy4wODMgMTMuNDc0MyAzOS44MTE1IDE1LjEyMzkgNDMuNDQ3N0MxNS43MTkyIDQyLjA3ODIgMTYuOTAyMyAzOS4zMzA3IDE4LjY3NCAzNS4yMDQzQzE4LjcyMzIgMzUuMTExNiAxOC43OTMyIDM1LjAzMjEgMTguODc3NSAzNC45Njk2TDE4Ljg3NjUgMzQuOTY4NloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMS4zOTQgMzkuOTMzNkMyMS4zODA4IDM5LjE5OTIgMjEuNTE5OSAzOC40Njk1IDIxLjgwNDggMzcuNzkxOEMyMi4wNzM1IDM3LjE0NDUgMjIuNDYxNiAzNi41NTMgMjIuOTUwOSAzNi4wNTA0QzIzLjQ0MjEgMzUuNTUwNyAyNC4wMjUxIDM1LjE0OTQgMjQuNjY4NyAzNC44NzEyQzI2LjAxMDcgMzQuMjkgMjcuNTMwNyAzNC4yNzc3IDI4Ljg4MTIgMzQuODM3MUMzMC4xODYzIDM1LjM4MDMgMzEuMjI5MyAzNi40MTE5IDMxLjc4NTggMzcuNzExNEMzMi4zNjY5IDM5LjA1NTMgMzIuMzc5MiA0MC41NzYyIDMxLjgxOTkgNDEuOTI5NkMzMS4yNzg1IDQzLjIyOTEgMzAuMjUzNSA0NC4yNjkyIDI4Ljk2MTcgNDQuODI5NUMyNy42MTU4IDQ1LjQxMDYgMjYuMDkzIDQ1LjQyMjkgMjQuNzM3NyA0NC44NjM1QzIzLjQ0MDIgNDQuMzIxMiAyMi40MDEgNDMuMyAyMS44Mzc5IDQyLjAxMUMyMS41NTAyIDQxLjM1NjEgMjEuMzk4NyA0MC42NSAyMS4zOTMxIDM5LjkzNDVMMjEuMzk0IDM5LjkzMzZaTTIyLjM2MTMgMzkuOTI2QzIyLjM2MTMgNDAuNTIxMyAyMi40ODcxIDQxLjExMSAyMi43Mjg1IDQxLjY1NTFDMjIuOTU5NCA0Mi4xNzc2IDIzLjI4NTkgNDIuNjUxNyAyMy42OTEgNDMuMDU0QzI0LjEwMTcgNDMuNDU1MyAyNC41ODQ0IDQzLjc3NTIgMjUuMTE1NCA0My45OTM4QzI2LjIyNTUgNDQuNDU1NiAyNy40NzY3IDQ0LjQ0NTIgMjguNTc5MyA0My45NjU0QzI5LjEwMzYgNDMuNzM2MyAyOS41ODA2IDQzLjQwODkgMjkuOTgyOSA0My4wMDE5QzMwLjM4MzIgNDIuNTk1IDMwLjcwMzEgNDIuMTE1MSAzMC45MjI3IDQxLjU4OEMzMS4zODQ1IDQwLjQ3ODcgMzEuMzc0MSAzOS4yMzA0IDMwLjg5NDMgMzguMTI4OEMzMC42NjgxIDM3LjYwMDYgMzAuMzQwNiAzNy4xMjE4IDI5LjkzMDggMzYuNzE5NUMyOS41MjE5IDM2LjMxOTIgMjkuMDQwMiAzNi4wMDAyIDI4LjUxMjEgMzUuNzc5N0MyNy40MDE5IDM1LjMxNzkgMjYuMTUwOCAzNS4zMjgzIDI1LjA0ODIgMzUuODA4MUMyMy45ODI1IDM2LjI2NTIgMjMuMTM5MiAzNy4xMjI3IDIyLjY5OTEgMzguMTk2QzIyLjQ2OTIgMzguNzM5MiAyMi4zNTM3IDM5LjMyNSAyMi4zNjAzIDM5LjkxNDdWMzkuOTI1MUwyMi4zNjEzIDM5LjkyNloiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik05LjQwMjc2IDUyLjU1MDRDOS40MTQxMiA1Mi41NzAzIDkuNDIzNTggNTIuNTkxMSA5LjQzMTE1IDUyLjYxMjlDOS40MzQ5NCA1Mi42MzU2IDkuNDM0OTQgNTIuNjU4MyA5LjQzMTE1IDUyLjY4MUM5LjQzMTE1IDUyLjcxMzIgOS40MjU0OCA1Mi43NDU0IDkuNDEyMjMgNTIuNzc0N0M5LjM5NzA4IDUyLjgwNDEgOS4zNzcyMSA1Mi44MzA2IDkuMzUyNiA1Mi44NTIzQzkuMzI3MDUgNTIuODc2IDkuMjk1ODIgNTIuODkyMSA5LjI2MjY5IDUyLjg5OTdDOS4yMzA1MSA1Mi45MTM5IDkuMTk2NDQgNTIuOTIwNSA5LjE2MTQyIDUyLjkxOTVDOS4xMDkzNyA1Mi45MjE0IDkuMDU4MjYgNTIuOTA4MiA5LjAxMjg0IDUyLjg4MjZDOC45NjkzIDUyLjg1MjMgOC45MzUyMyA1Mi44MDk4IDguOTE1MzUgNTIuNzU5NkM4LjQ5OTg3IDUxLjg0ODIgNy44ODA5MSA1MC40ODA2IDcuMDU3NTEgNDguNjU3OEw1LjI3NDQ0IDUyLjc4ODlDNS4yNTU1MSA1Mi44NCA1LjIxOTU1IDUyLjg4MzYgNS4xNzQxMiA1Mi45MTI5QzUuMTMxNTMgNTIuOTM4NSA1LjA4MjMyIDUyLjk1MjcgNS4wMzIxNiA1Mi45NTI3QzQuOTk0MyA1Mi45NTQ2IDQuOTU3MzkgNTIuOTQ3OSA0LjkyMjM3IDUyLjkzNDdDNC44OTAxOSA1Mi45MjE0IDQuODU5OTEgNTIuOTAzNSA0LjgzNDM1IDUyLjg4MDdDNC44MDU5NiA1Mi44NTggNC43ODIzIDUyLjgzMDYgNC43NjUyNiA1Mi43OTkzQzQuNzUxMDcgNTIuNzcgNC43NDM0OSA1Mi43Mzg4IDQuNzQyNTUgNTIuNzA2NkM0LjczOTcxIDUyLjY4NTggNC43Mzg3NiA1Mi42NjQgNC43NDI1NSA1Mi42NDMyQzQuNzQyNTUgNTIuNjI5OSA0Ljc0MjU1IDUyLjYxMjkgNC43NjE0OCA1Mi41ODgzQzUuMTk3NzggNTEuNTk2NCA1Ljg1NTU1IDUwLjEwNTggNi43MzM4MyA0OC4xMTU1QzYuNzQ2MTQgNDguMDg0MiA2Ljc2NTA3IDQ4LjA1NjggNi43ODc3OCA0OC4wMzMxQzYuODA5NTUgNDguMDA5NSA2LjgzNDE2IDQ3Ljk4OTYgNi44NjE2IDQ3Ljk3MjZDNi44ODYyMSA0Ny45NTQ2IDYuOTEzNjUgNDcuOTQyMyA2Ljk0Mzk0IDQ3LjkzNjZDNi45NzYxMiA0Ny45MzE5IDcuMDA4MyA0Ny45MzE5IDcuMDM5NTMgNDcuOTM2NkM3LjA3MDc2IDQ3LjkzMTkgNy4xMDE5OSA0Ny45MzE5IDcuMTMzMjMgNDcuOTM2NkM3LjE2NzMgNDcuOTQ1MSA3LjE5OTQ4IDQ3Ljk1ODQgNy4yMjk3NiA0Ny45NzczQzcuMjU2MjYgNDcuOTk1MyA3LjI4MDg3IDQ4LjAxNTEgNy4zMDQ1MyA0OC4wMzY5QzcuMzI2MyA0OC4wNTg3IDcuMzQzMzMgNDguMDg0MiA3LjM1NDY5IDQ4LjExMzZDNy42OTU0IDQ4Ljg1NDYgOC4wMzYxMiA0OS41OTU3IDguMzcxMTYgNTAuMzM2N0M4LjcwNjE5IDUxLjA3NzggOS4wNjY3OCA1MS44MTMyIDkuNDA0NjUgNTIuNTU0Mkw5LjQwMjc2IDUyLjU1MDRaIiBmaWxsPSJ3aGl0ZSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzE2XzQyIiB4MT0iMjMuOTAzNSIgeTE9IjIzLjY4MjUiIHgyPSIyLjA1ODA4IiB5Mj0iMjQuNDgyNiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgo8c3RvcCBvZmZzZXQ9IjAuMjkiIHN0b3AtY29sb3I9IiNEMENGQ0QiLz4KPHN0b3Agb2Zmc2V0PSIwLjc0IiBzdG9wLWNvbG9yPSJ3aGl0ZSIvPgo8c3RvcCBvZmZzZXQ9IjAuOTkiIHN0b3AtY29sb3I9IndoaXRlIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0icGFpbnQxX2xpbmVhcl8xNl80MiIgeDE9IjM3Ljc3MjQiIHkxPSIzOC44MzA5IiB4Mj0iNi45Njc2OSIgeTI9IjguMTM3NTgiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0id2hpdGUiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSJ3aGl0ZSIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=">
-      <span>Welcome to Avo Assure</span>
-    </div>
-    <div class="mar-b-1" style="
-    text-align: center;
-">Click the button below to <b>activate your account</b> and <b>set password</b></div>
-    <a class="mar-b-2" href="{{domain}}/verify?user_id={{uid}}" target="_blank" style="
-    text-decoration: none !important;
-"><div class="activate_button mar-b-2">Activate</div></a>
-    <div style="margin-bottom: 0.2rem;text-align: center;margin-top: 2rem;">Your <b>Username</b></div>
-    <div class="mar-b-2" style="font-size: 24px;text-align: center;">{{username}}</div>
-    <div style="margin-bottom: 0.2rem;text-align: center;">To help you get going with the product quickly, please use Avo Test Lab and other information below</div>
-    <div class="mar-b-2" style="/* flex-direction: row; *//* display: flex; *//* gap: 20px; */text-align: center;">
-      <a href="https://avotestlab.avoassure.ai/avo/" target="_blank" class="anchor_purple">Avo Test Lab</a>
-      <a href="https://elearning.avoassure.ai/#/" target="_blank" class="anchor_purple">Avo Video Tutorial</a>
-      <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" class="anchor_purple">Avo Trial User Guide</a>
-    </div>
-    <div class="mar-b-1" style="font-style: italic;padding: 0 10px;text-align: center;">If you have any problems accessing your account, feedback or ideas for new features,  please feel free to reach out to us at:</div>
-    <div class="mar-b-2" style="
-    text-align: center;
-">
-      <a href="mailto:sales@avoautomation.com" class="anchor_purple">sales@avoautomation.com</a>
-    </div>
-    <div class="mar-b-1" style="
-    text-align: center;
-">© 2022 Avo Automation. All rights reserved.</div>
-  </div>
+<html>
 
-</body></html>
+<head>
+    <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+    <meta name=Generator content="Microsoft Word 15 (filtered)">
+    <style>
+        <!-- .EFFECT {
+            background-image: linear-gradient(60deg,#421864,#4e258f);
+            border-radius: 1em;
+            text-transform: capitalize;
+        }
+
+        .BUTTON {
+            display: flex;
+            justify-content: center;
+        }
+
+        .EFFECT {
+            background-image: linear-gradient(60deg,#421864,#4e258f);
+            border-radius: 1em;
+            text-transform: capitalize;
+        }
+
+        .BUTTON {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Font Definitions */
+        @font-face {
+            font-family: "Cambria Math";
+            panose-1: 2 4 5 3 5 4 6 3 2 4;
+        }
+
+        @font-face {
+            font-family: Calibri;
+            panose-1: 2 15 5 2 2 2 4 3 2 4;
+        }
+
+        @font-face {
+            font-family: "Calibri Light";
+            panose-1: 2 15 3 2 2 2 4 3 2 4;
+        }
+
+        @font-face {
+            font-family: "Segoe UI";
+            panose-1: 2 11 5 2 4 2 4 2 2 3;
+        }
+        /* Style Definitions */
+        li.MsoNormal, div.MsoNormal {
+            margin: 0in;
+            font-size: 12.0pt;
+            font-family: "Times New Roman",serif;
+        }
+
+        h1 {
+            mso-style-link: "Heading 1 Char";
+            margin-right: 0in;
+            margin-left: 0in;
+            font-size: 24.0pt;
+            font-family: "Times New Roman",serif;
+            font-weight: bold;
+        }
+
+        a:link, span.MsoHyperlink {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        p {
+            margin-right: 0in;
+            margin-left: 0in;
+            font-size: 12.0pt;
+            font-family: "Calibri",sans-serif;
+        }
+
+        span.Heading1Char {
+            mso-style-name: "Heading 1 Char";
+            mso-style-link: "Heading 1";
+            font-family: "Times New Roman",serif;
+            font-weight: bold;
+        }
+
+        p.username, li.username, div.username {
+            mso-style-name: username;
+            margin-right: 0in;
+            margin-left: 0in;
+            font-size: 11.0pt;
+            font-family: "Calibri",sans-serif;
+            color: black;
+        }
+
+        p.url, li.url, div.url {
+            mso-style-name: url;
+            margin-right: 0in;
+            margin-left: 0in;
+            font-size: 11.0pt;
+            font-family: "Calibri",sans-serif;
+        }
+
+        p.name, li.name, div.name {
+            mso-style-name: name;
+            margin-right: 0in;
+            margin-left: 0in;
+            font-size: 11.0pt;
+            font-family: "Calibri",sans-serif;
+        }
+
+        p.details, li.details, div.details {
+            mso-style-name: details;
+            margin-right: 0in;
+            margin-left: 0in;
+            font-size: 11.0pt;
+            font-family: "Calibri",sans-serif;
+        }
+
+        .MsoChpDefault {
+            font-size: 10.0pt;
+        }
+
+        @page WordSection1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in 1.0in 1.0in 1.0in;
+        }
+
+        div.WordSection1 {
+            page: WordSection1;
+        }
+        -->
+    </style>
+
+</head>
+
+<body lang=EN-US link=blue vlink="#954F72" style='word-wrap:break-word'>
+
+    <div class=WordSection1>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 align=left style='border-collapse:collapse;margin-left:6.75pt;margin-right:6.75pt; border:double windowtext 4.5pt;margin-bottom:3.5pt'>
+            <tr>
+                <td width=58 valign=top style='width:.6in;border-top:double windowtext 4.5pt;border-left:double windowtext 4.5pt;border-bottom:none;border-right:none;background:#381550;padding:0in 5.4pt 0in 5.4pt'>
+                    <p class=MsoNormal align=center style='margin-top:12.0pt;text-align:center;line-height:105%'>
+                        <span lang=X-NONE style='font-size:0pt;line-height:105%;color:black;background:black'>
+                            <img width=20 height=32 id="Picture 1"
+                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACEAAAA1CAYAAADPo4LiAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAPlSURBVHgB7VhNchJBFH6NrEP8qXKTquBCy10SLwA3QE9AbmA8wegJEk8AniBygoETRJeWlkM2WUUhlSpIZgae7zGvSdMMwzAMpsryS5qe7ul+/fX76Z8ByABErFByKXmUevJch78FGuwYF4NJ7cImQQM4uBwubAokvIzpsRnTkODGCiTYT7YhT6yoBQ0H8gQJPMXVwdrIx0lJUB2zIx8nxSjs1kEF1sGaWtDwYB3g+lrQeAtZgOkWprRYPWQxCske5ovjVUk0cDNI56SYbWFKi3Qhi9kWplVQX0agjpuHh0lOivmF5DI496kFjfl9BSNn9IxGY0no+z4OBoMepfHt7a0WkAemTlqUnJ2lrDmZ/JRSnJcC31eDIMDReATFYhG2tkqTfA1UiUiF5HcUa4EqflJSQsDMIQxDDIIAQkp+4HOugjDAwA+gVCqpR4+fwBroUjoo0I+5rmsCGqgz/mOtTNnRz+WvS/jx/RubDDKizOMziT1jQDTIzHDjP37Lv5RdKfXg3WBw8/D5i5eFi4uLA9JWE7Khyubo0UPJGNw0CYxGIfik+jAMgEygKPcgHL15urPz1ZaG0W55Aquhy5rom3LiWin+j7TQHgxvXsURmLRT6iNlzyCydWoS5mY1DUuzTGrGIYXn9fV16oMr9dvG9Jtg3dy2xxaZSXk0Gv0eDodVyABcfiZxzMbmYmVqxMU1T8wiu2ENzpOeRqWyOrymTO/5LbJxG3IEyd+nrE9yu/AfMNHIrjYzO7GCewANfEhZT4rd+yJRlkdeJM9zJTFRrVJ9uw7udml+94XatMw2hRhBDsbcmiTMnAQCPFDDquMwPKM0iQqpPsJlX3SkwRlax3OMvlMtvMRIv7o9mbjBmNxCIhgd8VwZ0I1578ZpQ/p5RllfGxbOVki6ibOR5zhteAvI1S1SDUgARvvLrGbtAURl7gKiFZidtWcKE/9Z+t1KzL5vOuYRpfdG+ROlfZy/up1Y7dg8bSsq+pAOfZNRrA3FbrbHazVWEvod4pIrn/TtmRWNOBvG2u2OnLvI9tLPw4QLMEYfZR2T0dxsYhvPk+OBqgv67aEVtkZflnlmVtaSVMeOM6O2u3onpcpdIXMqyZO+U+0qzc5ebvMERnsFJx6ju8mx/lGI52f76rYiCgnvygDTrVg7GTtUTcp7UtYnpIqdy6q7KxHh2A6ZSELCqgPRqqm1oa+LHcn5UMxng3MpV62cL0EdeV8zxNdSkWBBfNIWLy4bgzOpyeJE7z5QdmWYTM+wbMjRoc1y2pT4htZaSkLU1TaqmsbKxxpqSjueEWvns7xriwabUubF6EoIt4Rc7Kb2B5w+XOwlctCLAAAAAElFTkSuQmCC" />
+                        </span>
+                    </p>
+                </td>
+                <td width=726 valign=top style='width:600pt;border-top:double windowtext 4.5pt;border-left:none;border-bottom:none;border-right:double windowtext 4.5pt;background:#381550;padding:0in 5.4pt 0in 5.4pt'>
+                    <h1 align=center style='margin-top:12.0pt;margin-right:22.5pt;margin-bottom:5.0pt;margin-left:0in;text-align:center;line-height:105%'>
+                        <span lang=EN
+                              style='font-size:22.0pt;line-height:105%;font-family:"Segoe UI",sans-serif;color:white'>Welcome to Avo Assure ! </span>
+                    </h1>
+                </td>
+            </tr>
+            <tr style='height:24.85pt'>
+                <td width=784 colspan=2 valign=top style='width:587.7pt;border-top:none;border-left:double windowtext 4.5pt;border-bottom:none;border-right:double windowtext 4.5pt;padding:0in 5.4pt 0in 5.4pt;height:24.85pt'>
+                    <p class=MsoNormal align=center style='text-align:center;line-height:105%'>&nbsp;</p>
+                    <p class=MsoNormal align=center style='text-align:center;line-height:105%'>
+                        Click here to <a href="{{domain}}">Login</a> to your account                         
+                    </p>
+
+                </td>
+            </tr>
+            <tr>
+                <td width=784 colspan=2 valign=top style='width:587.7pt;border-top:none;border-left:double windowtext 4.5pt;border-bottom:none;border-right:double windowtext 4.5pt;padding:0in 5.4pt 0in 5.4pt'>
+                    <p class=username align=center style='text-align:center;line-height:105%'>
+                        <span lang=EN>
+                            <br><b>Username : &nbsp;</b>
+                        </span><span lang=EN style='color:#302929'>{{username}}</span>
+                    </p>
+                    <p class=name align=center style='text-align:center;line-height:100%'>
+                        <span lang=EN style='color:#302929'>
+                            To help you get going with the product quickly,
+                            please use the Avo Test Lab and additional resources provided below
+                        </span>
+                    </p>
+                    <div align=center>
+                        <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0
+                               style='border-collapse:collapse'>
+                            <tr style='page-break-inside:avoid;height:20.95pt'>
+                                <td width=184 valign=top style='width:138.3pt;padding:0in 5.4pt 0in 5.4pt;height:20.95pt'>
+                                    <a href="https://avotestlabnew.avoassure.ai/">
+                                        <p align=center style='margin-bottom:0in;text-align:center;line-height:105%'>
+                                            <b>
+                                                <span lang=EN style='font-size:10.0pt;line-height:105%;font-family:"Arial",sans-serif;color:#593BA0'>Avo Test Lab</span>
+                                            </b>
+                                        </p>
+                                    </a>
+                                </td>
+                                <td width=187 valign=top style='width:1.95in;padding:0in 5.4pt 0in 5.4pt;height:20.95pt'>
+                                    <a href="https://elearning.avoassure.ai">
+                                        <p align=center style='margin-bottom:0in;text-align:center;line-height:105%'>
+                                            <b>
+                                                <span lang=EN style='font-size:10.0pt;line-height:105%;font-family:"Arial",sans-serif;color:#593BA0'>Avo Video Tutorial</span>
+                                            </b>
+                                        </p>
+                                    </a>
+                                </td>
+                                <td width=186 valign=top style='width:139.4pt;padding:0in 5.4pt 0in 5.4pt;height:20.95pt'>
+                                    <a href="[##guideurl##]">
+                                        <p align=center style='margin-bottom:0in;text-align:center;line-height:105%'>
+                                            <b>
+                                                <span lang=EN style='font-size:10.0pt;line-height:105%;font-family:"Arial",sans-serif;color:#593BA0'>Avo Assure User Guide</span>
+                                            </b>
+                                        </p>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <p class=details align=center style='text-align:center;line-height:105%'>
+                        <i>
+                            <span lang=EN style='color:#302929'>
+                                If you have any problems accessing your
+                                account, feedback or ideas for new features, please feel free to reach out to
+                                us at:
+                            </span>
+                        </i>
+                    </p>
+                    <p align=center style='margin-top:0in;text-align:center;line-height:105%'>
+                        <span lang=EN style='font-family:"Arial",sans-serif;color:#593BA0'>
+                            <a href="mailto:support@avoautomation.com">support@avoautomation.com</a>
+                        </span>
+                    </p>
+                    <p class=MsoNormal align=center style='text-align:center;line-height:105%'>&nbsp;</p>
+                </td>
+            </tr>
+
+
+
+            <tr>
+                <td width=58 valign=top style='width:.6in;border-top:none;border-left:double windowtext 4.5pt;
+  border-bottom:double windowtext 4.5pt;border-right:none;padding:0in 5.4pt 0in 5.4pt'>
+                    <p class=MsoNormal style='line-height:105%'>&nbsp;</p>
+                </td>
+                <td width=726 valign=top style='width:544.5pt;border-top:none;border-left:
+  none;border-bottom:double windowtext 4.5pt;border-right:double windowtext 4.5pt;
+  padding:0in 5.4pt 0in 5.4pt'>
+                    <p class=MsoNormal style='line-height:105%'>&nbsp;</p>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+        <p class=MsoNormal>&nbsp;</p>
+
+    </div>
+
+</body>
+
+</html>

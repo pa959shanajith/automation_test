@@ -187,6 +187,7 @@ if (cluster.isMaster) {
 			const report = require('./server/controllers/report');
 			const zephyr = require('./server/controllers/zephyr');
 			const executionInvoker = require('./server/lib/execution/executionInvoker');
+			const redisSocketHandler = require('./server/lib/redisSocketHandler');
 			req.session.executionInvoker = executionInvoker.setReq(req)
 			req.session.zephyr = zephyr.setReq(req)
 			req.session.report = report.setReq(req)
@@ -199,6 +200,7 @@ if (cluster.isMaster) {
 			req.session.create_ice = create_ice.setReq(req)
 			req.session.utils = utils.setReq(req)
 			req.session.admin = admin.setReq(req)
+			req.session.redisSocketHandler = redisSocketHandler.setReq(req)
 			next();	
 		});
 
@@ -264,6 +266,7 @@ if (cluster.isMaster) {
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
 		app.get('/viewReport', report.viewReport);	
 		app.post('/getUserRoles', admin.getUserRoles);
+		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -352,7 +355,11 @@ if (cluster.isMaster) {
 			let clientVer = String(req.query.ver);
 			let iceFile = uiConfig.avoClientConfig[clientVer];
 			if (req.query.file == "getICE") {
-				return res.download(path.resolve(iceFile),"AvoAssureClient"+(req.query.fileName?(req.query.fileName):"")+"."+iceFile.split(".").pop())
+				if (iceFile.split(".").pop() === 'zip'){
+					return res.download(path.resolve(iceFile),"AvoAssureClient.zip")
+				} else {
+					return res.download(path.resolve(iceFile),"AvoAssureClient"+(req.query.fileName))
+				}
 			} else {
 				let status = "na";
 				try {
@@ -427,6 +434,18 @@ if (cluster.isMaster) {
       return res.send({isTrialUser})
     })
 
+	//To get GA configs
+	app.get('/getGTM', (req,res) => {
+		let enableGTM = false;
+		let gtmToken = "";
+		const getUiConfig = Object.keys(uiConfig);
+		if(getUiConfig.includes("enableGTM") && getUiConfig.includes("gtmToken")){
+			enableGTM = uiConfig.enableGTM;;
+			gtmToken = uiConfig.gtmToken;
+		}
+		return res.send({enableGTM, gtmToken})
+	})
+
 	app.get('/getServiceBell', (req,res) => {
 		const enableServiceBell = uiConfig.enableServiceBell;
 		return res.send({enableServiceBell})
@@ -452,6 +471,12 @@ if (cluster.isMaster) {
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
+		var devOps = require('./server/controllers/devOps');
+		var azure = require('./server/controllers/azure');
+		var SauceLab = require('./server/controllers/sauceLab');
+
+
+
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
 		app.post('/getProjectsNeo', (req, res) => (res.send("false")));
@@ -496,6 +521,7 @@ if (cluster.isMaster) {
 		app.post('/resetPassword', login.resetPassword);
 		app.post('/updatePassword', login.updatePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
+		app.post ('/hooks/upgradeLicense', login.upgradeLicense)
 		//Admin Routes
 		// app.post('/getUserRoles', auth.protect, admin.getUserRoles);
 		app.post('/getDomains_ICE', auth.protect, admin.getDomains_ICE);
@@ -537,7 +563,9 @@ if (cluster.isMaster) {
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/getDetails_Azure',auth.protect,admin.getDetails_Azure);
 		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
+		app.post('/manageAzureDetails',auth.protect,admin.manageAzureDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
@@ -551,6 +579,7 @@ if (cluster.isMaster) {
 		app.post('/updateNotificationConfiguration', auth.protect, mindmap.updateNotificationConfiguration);
 		app.post('/getNotificationConfiguration', auth.protect, mindmap.getNotificationConfiguration);
 		app.post('/getNotificationRules', auth.protect, mindmap.getNotificationRules);
+		app.post('/sendMailOnExecutionStart', auth.protect, devOps.sendMailOnExecutionStart)
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);
@@ -562,6 +591,8 @@ if (cluster.isMaster) {
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
 		app.post('/importScreenfromExcel', auth.protect, designscreen.importScreenfromExcel);
 		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
+		app.post('/getDeviceSerialNumber_ICE', auth.protect, designscreen.getDeviceSerialNumber_ICE);
+		app.post('/checkingMobileClient_ICE', auth.protect, designscreen.checkingMobileClient_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);
@@ -672,11 +703,18 @@ if (cluster.isMaster) {
 		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
 		app.get('/getQueueState', auth.protect, suite.getQueueState);
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
+		app.post('/hooks/validateExecutionSteps', devOps.executionSteps);
+		app.post('/hooks/validateParallelExecutions', devOps.executionParallel);
 
 		// Azure integeration API's
 		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);
 		app.post('/saveAzureDetails_ICE', auth.protect, azure.saveAzureDetails_ICE);
 		app.post('/viewAzureMappedList_ICE', auth.protect, azure.viewAzureMappedList_ICE);
+
+		// SauceLab API's
+		app.post('/getDetails_SAUCELABS', auth.protect, admin.getDetails_SAUCELABS);
+		app.post('/manageSaucelabsDetails', auth.protect, admin.manageSaucelabsDetails);
+		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
@@ -724,6 +762,7 @@ if (cluster.isMaster) {
             isTrialUser = JSON.parse(data.toString()).isTrial
 						scheduler.reScheduleTestsuite();
 						scheduler.reScheduleRecurringTestsuite();
+						mindmap.dropTempExpImpColl();
 						console.info("Avo Assure Server Ready...\n");
 					}
 				} catch (exception) {

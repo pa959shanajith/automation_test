@@ -15,7 +15,7 @@ import {
     resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree
+    selectedAvoproject, mappedTree,enableSaveButton
 } from '../settingSlice';
 import { Toast } from "primereact/toast";
 import { Paginator } from 'primereact/paginator';
@@ -35,6 +35,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
     const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
     const selectedTC = useSelector(state => state.setting.selectedTestCase);
     const selectedscreen = useSelector(state => state.setting.screenType);
+   
 
     // const toast = useRef(null);
     const dispatchAction = useDispatch();
@@ -87,7 +88,8 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
     const scenariosPerPage = 10;
     const [indexOfFirstScenario, setIndexOfFirstScenario] = useState(0);
     const [completeTreeData, setCompleteTreeData] = useState([]);
-    const [isShowPaginationAvo, setIsShowPaginationAvo] = useState(false)
+    const [isShowPaginationAvo, setIsShowPaginationAvo] = useState(false);
+    const [saveEnable, setSaveEnable] = useState(false);
 
 
 
@@ -448,6 +450,7 @@ const AzureContent = ({ setToast, issueTypes, projectDetails, selectedNodes, set
             }
         }
         setDisabled(false);
+        dispatchAction(enableSaveButton(true));
     }
 
     const callViewMappedFiles = async (saveFlag) => {
@@ -648,10 +651,10 @@ const onPageAvoChange = (event) => {
                                                 <Dropdown value={selectedProject} onChange={(e) => onProjectChange(e)} options={projectDetails} optionLabel="name"
                                                     placeholder="Select Project" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_project1" />
                                                 <Dropdown value={secondOption} onChange={(e) => handleSecondOptionChange(e)} options={issueTypes} optionLabel="name"
-                                                    placeholder="Select Project" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release1" />
+                                                    placeholder="Select Work Items" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release1" />
                                                 {secondOption && secondOption.name === 'TestPlans' && (
                                                     <Dropdown value={selectedTestplan} onChange={(e) => handleTestSuite(e)} options={testPlansDropdown} optionLabel="name"
-                                                        placeholder="Select Project" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release2" />)}
+                                                        placeholder="Select TestPlans" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release2" />)}
                                             </div>
                                         </div>
                                         {secondOption && selectedProject && (

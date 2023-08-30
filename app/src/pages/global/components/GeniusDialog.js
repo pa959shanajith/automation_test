@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
-import Genius from "../../plugin/components/Genius";
+import Genius from "../../landing/components/Genius";
 import { useDispatch, useSelector } from "react-redux";
 import { showGenuis } from '../globalSlice';
 import "../styles/GeniusDialog.scss";

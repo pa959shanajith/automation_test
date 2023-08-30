@@ -81,11 +81,11 @@ module.exports.delSession = async (data) => {
 	}
 };
 
-module.exports.findSessID = async (username) => {
+module.exports.findSessID = async (username,clientName) => {
 	let sid = "";
 	const sessList = await this.allSess();
 	for (let ki of sessList) {
-		if (username == ki.username) {
+		if (username == ki.username && clientName == ki.client) {
 			sid = ki.uniqueId;
 			break;
 		}
