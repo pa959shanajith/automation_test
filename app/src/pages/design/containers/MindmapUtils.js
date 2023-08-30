@@ -834,6 +834,11 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
                 if (dNodes[0].children[k].children[j].name === dNodes[uNix].parent.name) {
                   const newObject = { ...dNodes[0].children[k].children[j], children: [...dNodes[0].children[k].children[j].children, dNodes[uNix]] };
                   dNodes[0].children[k].children[j] = newObject;
+                  for (var m = 0; dNodes.length>m;m++){
+                    if(newObject.parent.name === dNodes[m].name){
+                        dNodes[m].children = [newObject]
+                    }
+                  } 
                 }
               }
             }

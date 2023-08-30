@@ -89,7 +89,7 @@ const CreateUser = (props) => {
         let allRolesList = [];
         let editUserRole = "";
         if (allRoles.length) {
-            allRoles.map(userRole => {
+            allRoles.forEach(userRole => {
                 let roleObject = {};
                 if (userRole[0] !== "Admin") {
                     roleObject.name = userRole[0];
@@ -97,11 +97,18 @@ const CreateUser = (props) => {
                     allRolesList.push(roleObject);
                     if (role === roleObject.name) editUserRole = roleObject.value;
                 }
-            })
+            });
+
+            allRolesList.sort((a, b) => {
+                if (a.name === 'Quality Manager') return -1;
+                if (a.name === 'Quality Lead' && b.name === 'Quality Engineer') return -1;
+                return 1;
+            });
+
             setRoleDropdownValue(editUserRole);
             setAllRolesUpdate(allRolesList);
         }
-    }, [allRoles.length > 0]);
+    }, [allRoles.length > 0, role]);
 
     const tabHeader = [
         { label: 'User Details', key: 'userDetails', text: 'User Details' },

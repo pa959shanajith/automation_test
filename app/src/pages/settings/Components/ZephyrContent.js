@@ -18,7 +18,7 @@ import {
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
     selectedAvoproject, showOverlay,checkedTCPhaseIds,checkedTcIds,checkedTCNames,checkedTCReqDetails,
-    checkedTreeIds,checkedParentIds,checkedProjectIds,checkedReleaseIds,mappedTree
+    checkedTreeIds,checkedParentIds,checkedProjectIds,checkedReleaseIds,mappedTree, enableSaveButton
 } from '../settingSlice';
 import "../styles/ZephyrContent.scss";
 import { Paginator } from 'primereact/paginator';
@@ -306,6 +306,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
         }
         // setDisabled(false);
         setSaveEnable(true);
+        dispatch(enableSaveButton(true))
     }
 
     const handleUnSync = async (node,parentNode) => {

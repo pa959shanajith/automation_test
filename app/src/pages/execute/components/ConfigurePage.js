@@ -21,6 +21,7 @@ import {
   getICE_list,
   getProjectList,
   ExecuteTestSuite_ICE,
+  readTestSuite_ICEuser,
   execAutomation,
   deleteConfigureKey,
 } from "../api";
@@ -883,6 +884,21 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
   const onExecuteBtnClick = async (btnType) => {
     if (btnType === "Execute") {
+      const readTestSuiteParams = currentSelectedItem?.executionRequest?.batchInfo && currentSelectedItem?.executionRequest?.batchInfo.map((el) => ({
+        assignedTime: "",
+        releaseid: el?.releaseId,
+        cycleid: el?.cycleId,
+        testsuiteid: el?.testsuiteId,
+        testsuitename: el?.testsuiteName,
+        projectidts: el?.projectId,
+        assignedTestScenarioIds: "",
+        subTaskId: "",
+        versionnumber: el?.versionNumber,
+        domainName: el?.domainName,
+        projectName: el?.projectName,
+        cycleName: el?.cycleName,
+      }));
+      await readTestSuite_ICEuser(readTestSuiteParams);
       if (showIcePopup) {
         dataExecution.type =
           ExeScreen === true ? (smartMode === "normal" ? "" : smartMode) : "";
