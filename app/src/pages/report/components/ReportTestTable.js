@@ -659,7 +659,7 @@ export default function BasicDemo() {
                     dropdownValue={configValues[el.name]}
                     name={el.name}
                     onDropdownChange={(e) => handleConfigValues(e)}
-                    dropdownOptions={el.data.map((e) => ({ ...e, id: e?.key, name: e?.text }))}
+                    dropdownOptions={el.data.map((e) => ({ ...e, id: e?.referenceName, name: e?.name }))}
                     parentClass="flex flex-column"
                   />
                 ) : (
