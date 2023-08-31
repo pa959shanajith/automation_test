@@ -454,7 +454,7 @@ const ModuleListDrop = (props) =>{
         }
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
-        dispatch(selectedModuleReducer({}))
+        dispatch(selectedModuleReducer(res))
         setBlockui({show:false})
     }
     const addScenario = (e) => {	
