@@ -1356,7 +1356,7 @@ Learn More '/>
                       radioButton_grid === "Execute with Avo Assure Client"
                     }
                   />
-                  <label className=" executeRadio_label_clint ml-2 mr-2">
+                  <label className="executeRadio_label_clint_schedule ml-2 mr-2">
                     Execute with Avo Assure Client
                   </label>
                 </div>
