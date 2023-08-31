@@ -326,8 +326,8 @@ const ScheduleScreen = ({
         <TabView>
           <TabPanel header="Scheduled Tasks">
             <DataTable
-              value={getScheduledList?.scheduledList
-                .map((el) => ({
+              value={Array.isArray(getScheduledList?.scheduledList) && getScheduledList?.scheduledList
+                ?.map((el) => ({
                   ...el,
                   scheduledon: `${new Date(
                     el.scheduledon
@@ -353,8 +353,8 @@ const ScheduleScreen = ({
           </TabPanel>
           <TabPanel header="Recurring Tasks">
             <DataTable
-              value={getScheduledList?.scheduledList
-                .map((el) => ({
+              value={Array.isArray(getScheduledList?.scheduledList) && getScheduledList?.scheduledList
+                ?.map((el) => ({
                   ...el,
                   scheduledon: `${new Date(
                     el.scheduledon

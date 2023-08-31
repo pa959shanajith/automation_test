@@ -45,9 +45,9 @@ const Profile = () => {
     (async() => {
       const executionProfiles = await getReportList(
         location?.state?.configureKey
-        )
-
-        setReportsTable(executionProfiles.map((el, ind) => ({
+        );
+        let sortExecutions= [...executionProfiles].reverse();
+        setReportsTable(sortExecutions.map((el, ind) => ({
           ...el,
           id: el._id,
           key: ind.toString(),
