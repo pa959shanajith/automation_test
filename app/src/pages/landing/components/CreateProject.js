@@ -362,14 +362,14 @@ const CreateProject = (props) => {
 
 /////////////// CREATE PROJECT///////////////////////////////////////////
   const handleCreate = async () => {
-    let projectList=props.projectsDetails.map(project=>project.name.trim())
+    let projectList=props?.projectsDetails?.map(project=>project.name.trim())
     if (value !== "" && selectedApp !== "" && displayUser.length !== 0) {
       const filteredUserDetails = displayUser.map((user) => ({
         id: user.id,
         name: user.name,
         role: user.selectedRole ? user.selectedRole.name : user.primaryRole,
       }));
-      if (projectList.includes(value.trim())) {
+      if (projectList?.length>0 && projectList.includes(value.trim())) {
         toast.current.show({
           severity: 'error',
           summary: 'Project Name Exists',

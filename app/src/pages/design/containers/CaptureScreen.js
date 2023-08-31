@@ -937,7 +937,7 @@ else{
 
   const handleDelete = (rowData) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
-    if(rowData.objectDetails.objId!== undefined){
+    if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
     let deletedArr = [...deleted];
     let scrapeItemsL = [...captureData];
     let newOrderList = [];
@@ -1272,14 +1272,15 @@ const footerSave = (
     </>
   )
   const handleSave = (value, cellValue, customFlag = '') => {
-    let localScrapeItems = [...scrapeItems];
-    let updNewScrapedData = { ...newScrapedData };
+    let localScrapeItems = [...capturedDataToSave];
+    let updNewScrapedData = { ...newScrapedCapturedData };
     let objId = "";
     let isCustom = false;
     let obj = null;
     for (let scrapeItem of localScrapeItems) {
       if (scrapeItem.val === value) {
         scrapeItem.title = cellValue;
+        scrapeItem.custname=cellValue
         if (customFlag) {
           scrapeItem.tag = cellValue.tag;
           scrapeItem.url = cellValue.url;
@@ -1290,10 +1291,11 @@ const footerSave = (
         isCustom = scrapeItem.isCustom;
         console.log("mainScrapedData.view[scrapeItem.objIdx]", mainScrapedData.view[scrapeItem.objIdx]);
         if (objId) obj = { ...mainScrapedData.view[scrapeItem.objIdx], custname: cellValue };
-        else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = { ...newScrapedData.view[scrapeItem.objIdx], custname: cellValue }
+        else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = { ...newScrapedCapturedData?.view[scrapeItem.objIdx], custname: cellValue }
         // else only if customFlag is true
       };
     }
+    setCapturedDataToSave(localScrapeItems)
 
     if (objId) {
       let modifiedDict = { ...modified }
@@ -1574,7 +1576,10 @@ const footerSave = (
         <>
         <Tooltip content={rowdata.selectall} target={`.tooltip__target-${rowdata.objectDetails.objId}`} tooltipOptions={{ position: 'right' }}></Tooltip>
         <div style={{display:'flex',justifyContent:'space-between'}}>
-        <div className={`tooltip__target-${rowdata.objectDetails.objId }`} style={!rowdata.objectDetails.objId? {color:'blue'}:null}>{rowdata.selectall}</div>
+        <div 
+        className={`tooltip__target-${rowdata.objectDetails.objId }
+                  ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : "" )}`} >{rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
       </div>
@@ -1757,6 +1762,7 @@ const headerstyle={
             scrollable 
             scrollHeight="400px"
             columnResizeMode="expand"
+            virtualScrollerOptions={{ itemSize: 20 }}
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
