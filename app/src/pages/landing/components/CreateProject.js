@@ -362,12 +362,22 @@ const CreateProject = (props) => {
 
 /////////////// CREATE PROJECT///////////////////////////////////////////
   const handleCreate = async () => {
+    let projectList=props.projectsDetails.map(project=>project.name.trim())
     if (value !== "" && selectedApp !== "" && displayUser.length !== 0) {
       const filteredUserDetails = displayUser.map((user) => ({
         id: user.id,
         name: user.name,
         role: user.selectedRole ? user.selectedRole.name : user.primaryRole,
       }));
+      if (projectList.includes(value.trim())) {
+        toast.current.show({
+          severity: 'error',
+          summary: 'Project Name Exists',
+          detail: 'The project name already exists.',
+          life: 5000, // Optional: how long the toast will be visible
+        });
+        return; // Do not proceed further
+      }
 
       var projData = {
         projectName: value,
@@ -451,7 +461,7 @@ const CreateProject = (props) => {
 
   return (
     <>
-      <Toast ref={toast} position="bottom-right" baseZindex={10000}/>
+      <Toast ref={toast} position="bottom-center" baseZindex={10000}/>
       <Dialog className='Project-Dialog' header={dialogHeader} visible={props.visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>
         <Card className='project-name-1'>
           <div className='pro-name1'>
@@ -546,25 +556,24 @@ const CreateProject = (props) => {
           </div>
           <div className='check-bx3'>
             <ul>
-              {displayUser.length && displayUser.map((checkboxId) => (
+            {displayUser.length>0?displayUser.map((checkboxId) => (
                 <div className="selected_users__list">
                   <Checkbox key={checkboxId.id} className="assigned-checkbox" inputId={checkboxId.id} value={checkboxId.id} checked={selectedAssignedCheckboxes.some((ab) => ab.id === checkboxId.id)}
                     onChange={handleAssignedCheckboxChange}
                   >{checkboxId} </Checkbox>
                   <h5 htmlFor={checkboxId.id} className="label-3 ml-2 mr-2 mt-2 " title={checkboxId.email}>
                     <div className="nameRole_user">
-                      <span className='asgnd-avatar'> <Avatar className='asgnd-av bg-blue-300 text-900' shape="circle" 
+                      <span className='asgnd-avatar'> <Avatar className='asgnd-av bg-blue-300 text-900' shape="circle"
                       style={checkboxId.profileimage ? { width: '26px', height: '23px', fontSize: "13px",position:'relative', top:'0.4rem'} : { width: '26px', height: '23px', fontSize: "13px"} }
                       image={checkboxId.profileimage ? checkboxId.profileimage  : ''}
-                      label={checkboxId.initials} 
+                      label={checkboxId.initials}
                       /></span>
                       <span className='asgnd-name'> {checkboxId.name} </span>
                       <span className='asgnd-role'>{!checkboxId.selectedRole.name ? checkboxId.primaryRole : checkboxId.selectedRole.name}</span>
                     </div>
                   </h5>
                 </div>
-
-              ))}
+                )):null}
             </ul>
           </div>
           </div>
