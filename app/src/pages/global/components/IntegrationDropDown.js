@@ -19,6 +19,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
     const [isEmpty, setIsEmpty] = useState(true);
     
     const saveAction = async (autoSaveFlag=false, updatedData={}) => {
+        var integration = {
+            alm: {url:"",username:"",password:""}, 
+            qtest: {url:"",username:"",password:"",qteststeps:""}, 
+            zephyr: {url:"",username:"",password:""},
+            azure: {url:"",username:"",password:""},}
+            setCredentialsExecution(integration)
+
         setPassErrBor(false);setUrlErrBor(false);setUserNameErrBor(false);setAuthErrBor(false);setErrorMsg("");
         const latestCredentialsData = autoSaveFlag ? updatedData : credentials;
 		if(type==="Zephyr" && !latestCredentialsData.url ) {
@@ -62,7 +69,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             else if (data === "notreachable") setErrorMsg("Host not reachable.");
             else if (data === "invalidurl") setErrorMsg("Invalid URL");
             else {
-                var integration = {...integrationCred};
+                
                 if(type === "ALM"){
                     integration.alm = {
 						url:latestCredentialsData.url,
