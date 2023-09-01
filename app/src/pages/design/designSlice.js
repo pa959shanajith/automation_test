@@ -104,11 +104,12 @@ export const designSlice = createSlice({
     setImportData:(state, action)=>{
       var res = action.payload
       return {
+        ...state,
         selectedProj : res.selectProj,
         selectedModule : res.selectModule,
         screenData : res.screenData,
         moduleList : res.moduleList,
-        importData : res.importData
+        importData : res.selectModule.importData
       }
     },
     unassignTask:(state, action)=>{

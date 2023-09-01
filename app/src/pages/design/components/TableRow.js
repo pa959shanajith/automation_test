@@ -57,7 +57,7 @@ const TableRow = (props) => {
             const caseData = props.getKeywords(props.testCase.custname);
             setObjType(caseData.obType);
             setKeyword(props.testCase.keywordVal);
-            setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal === ''?caseData.obType !== null ? props.keywordData[caseData.obType][caseData.keywords[0]].description !== undefined?props.keywordData[caseData.obType][caseData.keywords[0]].description:props.testCase.keywordVal: props.keywordData[caseData.obType][props.testCase.keywordVal].description: props.testCase.keywordVal})
+            setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal !== ''?(props.testCase.custname!=="OBJECT_DELETED"?(caseData.obType !== null ? props.keywordData[caseData.obType][caseData.keywords[0]].description !== undefined?props.keywordData[caseData.obType][caseData.keywords[0]].description:props.testCase.keywordVal: props.keywordData[caseData.obType][props.testCase.keywordVal].description): props.testCase.keywordVal):props.testCase.keywordVal})
             setObjetListOption({value: props.testCase.custname,label:props.testCase.custname === ""?caseData.obType === "defaultList"?"@Generic":objList[0]:props.testCase.custname})
             setInput(props.testCase.inputVal[0]);
             setOutput(props.testCase.outputVal);
@@ -109,7 +109,15 @@ const TableRow = (props) => {
                     setObjName(props.testCase.custname);
                     setObjetListOption({value:props.testCase.custname,label:props.testCase.custname === ""? objList[0]:props.testCase.custname})
                     setKeyword(props.testCase.keywordVal);
-                    // setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal === '' ?props.getKeywords(props.testCase.custname).obType !== null?props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description !== undefined?props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description:keywordList[0] :props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description:props.testCase.keywordVal})
+                    setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal === '' ?
+                    props.getKeywords(props.testCase.custname).obType !== null?
+                    keywordList !== null?props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description !== undefined?
+                    props.keywordData[props.getKeywords(props.testCase.custname).obType][keywordList[0]].description:keywordList[0] :
+                    props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal]?.description:
+                    props.testCase.custname !== "OBJECT_DELETED"?props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description !== undefined?
+                    props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description:
+                    props.testCase.keywordVal:props.testCase.keywordVal:
+                    props.testCase.keywordVal})
                     setInput(props.testCase.inputVal[0]);
                     setOutput(props.testCase.outputVal);
                 }
@@ -222,21 +230,12 @@ const TableRow = (props) => {
             }
         }});
     
-    const optionElement = objList?.map((object, i)=>{
-        if(objName === "OBJECT_DELETED"){
-           return {
-            value:objName,
-            label:objName
-           }
-        }
-        else{
-            return{
-                key:i,
-                value:object,
-                label:object.length >= 50 ? object.substr(0, 44)+"..." : object
-            }
-        }
-    })
+        const optionElement = objList?.map((object, i) => ({
+            key: i,
+            value: object,
+            label: object.length >= 50 ? object.substr(0, 44) + "..." : object,
+            disabled: objName === "OBJECT_DELETED" ? (object !== objName) : false
+          }));
     const getOptionElementLable = (option) =>{
         return (
             <div title={option.label}>
@@ -294,7 +293,7 @@ const TableRow = (props) => {
                     //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
                     //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
                     // </select>
-                    <Select  value={objetListOption?objetListOption:objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customStyles}  id="testcaseDropdownRefID" ref={testcaseDropdownRef}  disabled={disableStep} menuPortalTarget={document.body} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
+                    <Select  value={objetListOption?objetListOption:objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customStyles}  id="testcaseDropdownRefID" ref={testcaseDropdownRef}   menuPortalTarget={document.body} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
                         <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>
@@ -307,7 +306,7 @@ const TableRow = (props) => {
                 <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
                     { focused ? 
                     <>
-                        <Select className='select-option' value={selectedOptions?selectedOptions:{label:keyword}} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""} disabled={disableStep} closeMenuOnSelect={false} options={optionKeyword} menuPortalTarget={document.body} getOptionLabel={getOptionLabel} styles={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
+                        <Select className='select-option' value={selectedOptions.label !== undefined?selectedOptions.label !== ''?selectedOptions:{label:props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]].description}:{label:props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]].description}} id="testcaseDropdownRefID" ref={testcaseDropdownRef} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""}  closeMenuOnSelect={false} options={optionKeyword} menuPortalTarget={document.body} getOptionLabel={getOptionLabel} styles={customStyles} menuPlacement="auto" isSearchable={false} placeholder='Select'/>
                     </> :
                         <div className="d__row_text" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""}>{props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].description !== undefined ? props.keywordData[objType][keyword].description : keyword}</div>}
                             
