@@ -139,8 +139,8 @@ const CreateProject = (props) => {
         }
         setItems(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
         setUnFilteredData(newFormattedData.sort((a, b) => a.name.localeCompare(b.name)));
-        setDisplayUser([loggedInUser]);
-        setUnFiltereAssaignedData([loggedInUser])
+        setDisplayUser(loggedInUser !== null ? [loggedInUser] : []);
+        setUnFiltereAssaignedData(loggedInUser !== null ? [loggedInUser] : []);
       }
     } catch (error) {
       console.error(error);
@@ -215,45 +215,52 @@ const CreateProject = (props) => {
   };
 
   function handleSearch(event) {
-    setQuery(event.target.value);
-    if(event.target.value !== ""){
-    const filterData = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-    setItems(filterData)
-    }else{
-      setItems(unFilteredData)
+    const inputValue= event.target.value.toLowerCase();
+    setQuery(inputValue);
+    if (inputValue !== "") {
+      const filterData = items.filter((item) =>
+        item.name.toLowerCase().includes(inputValue)
+      );
+      setItems(filterData);
+    } else {
+      setItems(unFilteredData);
     }
   }
+
 
   function handleSearchDisplayUser(event) {
-    setQueryDisplayUser(event.target.value);
-    if(event.target.value !== ""){
-    const filterDataDisplayUser = displayUser.filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
-    setDisplayUser(filterDataDisplayUser)
-    }
-    else{
-      setDisplayUser(unFilteredAssaignedData)
+    const inputValue = event.target.value.toLowerCase();
+    setQueryDisplayUser(inputValue);
+  
+    if (inputValue !== "") {
+      const filterDataDisplayUser = displayUser.filter((item) =>
+        item.name.toLowerCase().includes(inputValue)
+      );
+      setDisplayUser(filterDataDisplayUser);
+    } else {
+      setDisplayUser(unFilteredAssaignedData);
     }
   }
 
-  // function getFilteredItems() {
-  //   return items
-  //     .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-  //     .filter(item => item.primaryRole !== "Admin")
-  //     .sort((a, b) => a.name.localeCompare(b.name))
-  //     .map(item => ({ ...item, selectedRole: '' }));
+  // function handleSearchDisplayUser(event) {
+  //   setQueryDisplayUser(event.target.value);
+  //   if(event.target.value !== ""){
+  //   const filterDataDisplayUser = displayUser.filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
+  //   setDisplayUser(filterDataDisplayUser)
+  //   }
+  //   else{
+  //     setDisplayUser(unFilteredAssaignedData)
+  //   }
   // }
 
-
-  // function getFilteredDisplayUser() {
-  //   return displayUser
-  //     .filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
-  //     .sort((a, b) => a.name.localeCompare(b.name));
-  // }
 
   const handleClose = () => {
+    setQuery("");
+    setQueryDisplayUser(""); 
     props.onHide();
     setRefreshData(!refreshData);
     props.setHandleManageProject(false);
+   
   };
 
   const handleButtonClick = () => {
@@ -362,6 +369,9 @@ const CreateProject = (props) => {
 
 /////////////// CREATE PROJECT///////////////////////////////////////////
   const handleCreate = async () => {
+    // setItems(unFilteredData)
+    // setDisplayUser(unFilteredAssaignedData)
+
     let projectList=props.projectsDetails.map(project=>project.name.trim())
     if (value !== "" && selectedApp !== "" && displayUser.length !== 0) {
       const filteredUserDetails = displayUser.map((user) => ({
