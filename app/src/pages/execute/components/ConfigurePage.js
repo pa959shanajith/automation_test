@@ -848,7 +848,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       errorinfo.current.show({
         severity: 'error',
         summary: 'Error',
-        detail: getConfigData.setupExists.error.CONTENT,
+        detail: getConfigData?.setupExists?.error?.CONTENT,
         life: 5000
       });
     };
@@ -1136,6 +1136,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             resizableColumns
             className="  datatable_list  "
             value={configList}
+            virtualScrollerOptions={{ itemSize: 20 }}
             globalFilter={searchProfile}
             style={{
               width: "100%",
