@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as actionTypes from '../../plugin/state/action';
 import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
-import {readTestSuite_ICE} from '../../schedule/api';
+import {readTestSuite_ICE, getScheduledCount} from '../../schedule/api';
 import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 import CheckboxTree from 'react-checkbox-tree';
@@ -484,8 +484,23 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }
         setLoading(false);
     }
-    const onClickDeleteDevOpsConfig = (name, key) => {
-        setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{name}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
+    const onClickDeleteDevOpsConfig = async (name, key) => {
+        setLoading('checking scheduled execution...');
+        let message = <p>Are you sure, you want to delete <b>{name}</b> Execution Profile?</p>;
+        const result = await getScheduledCount(key);
+        if (result.error) {
+            if (result.error.CONTENT) {
+                setMsg(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
+            }
+            else {
+                setMsg(MSG.CUSTOM("Error while getting the scheduled count.",VARIANT.ERROR));
+            }
+        }
+        else if (result.count > 0) {
+            message = <p>Are you sure, you want to delete <b>{name}</b> Execution Profile? It has <b>{result.count}</b> scheduled execution.</p>;
+        }
+        setLoading(false);
+        setShowConfirmPop({'title': 'Delete Execution Profile', 'content': message, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
     }
     const handleSearchChange = (value) => {
         let filteredItems = configList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1));
