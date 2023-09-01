@@ -971,7 +971,7 @@ function read(file) {
 const validNodeDetails = (value) =>{
     var nName, flag = !0;
     nName = value;
-    var regex = /^[a-zA-Z0-9_]*$/;;
+    var regex = /^[a-zA-Z0-9]*$/;;
     if (nName.length === 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName=== 'Screen0' || nName === 'Testcase0' || nName === 'TestSteps0') {
         flag = !1;
     }
