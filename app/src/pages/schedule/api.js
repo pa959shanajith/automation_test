@@ -185,3 +185,41 @@ export const getScheduledDetailsOnDate_ICE = async(scheduledDate, configKey, con
         return {error:MSG.SCHEDULE.ERR_FETCH_SCHEDULE}
     }
 }
+
+// get schedule count using config key
+export const getScheduledCount = async (configKey) => {
+    try {
+        const result = await axios(url + '/getScheduledCount', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            data: {
+                configKey: configKey
+            },
+            credentials: 'include'
+        });
+
+        if (result.status === 401 || result.data === "Invalid Session") {
+            RedirectPage(history);
+            return {
+                error: MSG.GENERIC.INVALID_SESSION
+            };
+        }
+
+        if (result.status === 200 && result.data !== "fail") {
+            return result.data
+        }
+
+        console.error(result.data);
+        return {
+            error: MSG.SCHEDULE.ERR_FETCH_SCHEDULE
+        };
+    }
+    catch (error) {
+        console.error(error);
+        return {
+            error: MSG.SCHEDULE.ERR_FETCH_SCHEDULE
+        };
+    }
+}

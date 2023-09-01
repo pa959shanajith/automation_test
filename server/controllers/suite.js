@@ -442,3 +442,13 @@ exports.getScheduledDetailsOnDate_ICE = async (req, res) => {
 	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
 	return res.send(result);
 }
+
+exports.getScheduledCount = async(req, res) => {
+	logger.info("Inside UI service getScheduledCount");
+
+	const inputs = {
+		"configKey": req.body.configKey
+	};
+	const result = await utils.fetchData(inputs, "suite/getScheduledCount", "getScheduledCount");
+	return res.send(result);
+}
