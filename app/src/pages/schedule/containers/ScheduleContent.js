@@ -26,7 +26,8 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [closePopups, setClosePopups] = useState(false);
     const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
                                                     qtest: {url:"",username:"",password:"",qteststeps:""}, 
-                                                    zephyr: {url:"",username:"",password:""}});
+                                                    zephyr: {url:"",username:"",password:""},
+                                                    azure: {url:"",username:"",password:""}});
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleScheduledate,setModuleScheduledate] = useState({})
     const [sort,setSort] = useState(true)
@@ -267,7 +268,8 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const syncScenarioChange = (value) => {
         setIntegration({alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}})
+        zephyr: {url:"",username:"",password:""},
+        azure: {url:"",username:"",password:""}})
         if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
@@ -276,6 +278,9 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 		}
         else if (value === "2") {
             setShowIntegrationModal("Zephyr")
+		}
+        else if (value === "3") {
+            setShowIntegrationModal("Azure")
 		}
     }
 
