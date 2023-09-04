@@ -7,6 +7,7 @@ import '../styles/Topbar.scss';
 import { Tooltip } from 'primereact/tooltip';
 import { useSelector} from 'react-redux';
 import WelcomeWizard from "../../login/components/WelcomeWizard";
+
 const MenubarDemo = (props) => {
   const [showExtraheaderItem, setShowExtraheaderItem] = useState(false);
   const location = useLocation();
@@ -94,7 +95,7 @@ const MenubarDemo = (props) => {
   }, [location]);
 
   const start = (
-    <NavLink to="/landing" className="activeLanding">
+    <NavLink to={userInfo.role ==="admin" ? "/admin":"/landing"} className="activeLanding">
       <img alt="logo" src="static/imgs/logo.png" onError={(e) => e.target.src = "static/imgs/logo.png"} height="30" className="mr-2" title="Go to Home"></img>
     </NavLink>
   );
