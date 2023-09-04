@@ -1266,13 +1266,13 @@ const CanvasNew = (props) => {
     //   bodyStyle: { width: '50px' },
     // },
     {
-      field: "addTestcase",
-      header: "Add Testcases",
+      field: "addScenario",
+      header: "Add Testcase",
       headerClassName: 'scenario-header',
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Add Testcase Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
+            <InputText className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
@@ -2188,7 +2188,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} />}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
-             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple TestCase" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
+             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Testcase" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
         {/* <Toolbar  className="toolbar_scenario" start={startContent}  /> */}
        
         <div style={{ height: '100%', overflow: 'auto' }}>
