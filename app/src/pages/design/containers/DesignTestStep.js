@@ -883,7 +883,7 @@ const DesignModal = (props) => {
        
         return (
             <>
-                { ((screenLavelTestSteps.length === 0) && overlay ) && <ScreenOverlay content={overlay} />}
+                { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
