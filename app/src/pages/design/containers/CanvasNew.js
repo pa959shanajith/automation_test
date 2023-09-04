@@ -1266,13 +1266,13 @@ const CanvasNew = (props) => {
     //   bodyStyle: { width: '50px' },
     // },
     {
-      field: "addScenario",
-      header: "Add Scenario",
+      field: "addTestcase",
+      header: "Add Testcases",
       headerClassName: 'scenario-header',
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Add Scenario Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
+            <InputText className='scenario_inp' placeholder='Add Testcase Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
@@ -1464,7 +1464,7 @@ const CanvasNew = (props) => {
   
   const footerContentScenario = (
     <div>
-        <Button label="Add Scenarios"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);}} className="add_scenario_btn" /> 
+        <Button label="Add Testcase"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);}} className="add_scenario_btn" /> 
     </div> 
 );
 
@@ -2188,7 +2188,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} />}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
-             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Scenario" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
+             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple TestCase" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
         {/* <Toolbar  className="toolbar_scenario" start={startContent}  /> */}
        
         <div style={{ height: '100%', overflow: 'auto' }}>
