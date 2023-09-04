@@ -676,6 +676,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         browser: browsers.filter((el) =>
           getData.executionRequest.browserType.includes(el.key)
         ),
+        
       });
       setMode(
         getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
@@ -920,25 +921,49 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           if (temp.error && temp.error.CONTENT) {
             setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
           } else {
-            setMsg(
-              MSG.CUSTOM(
-                "Error While Adding Configuration to the Queue",
-                VARIANT.ERROR
-              )
-            );
+            // setMsg(
+            //   MSG.CUSTOM(
+            //     "Error While Adding Configuration to the Queue",
+            //     VARIANT.ERROR
+            //   )
+            // );
+            toast.current.show({
+                severity: "error",
+                summary: "error",
+                detail:(
+                      "Error While Adding Configuration to the Queue"
+                      
+                    ),
+                life: 5000,
+              });
           }
         } else {
-          setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+          // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+          toast.current.show({
+            severity: "error",
+            summary: "error",
+            detail:("Execution Added to the Queue.", VARIANT.SUCCESS),
+            life: 5000,
+          });
         }
 
         // onHide(name);
       }
-      toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: " Execution started.",
-        life: 5000,
-      });
+      // if(btnType ===  "Execute"){
+      //   toast.current.show({
+      //     severity: "success",
+      //     summary: "Success",
+      //     detail: "Execution has started",
+      //     life: 5000,
+      //   });
+        
+      //   }
+      // toast.current.show({
+      //   severity: "success",
+      //   summary: "Success",
+      //   detail: " Execution started.",
+      //   life: 5000,
+      // });
       setVisible_execute(false);
     }
     if (btnType === 'Cancel') {
