@@ -256,11 +256,14 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 		var makeReq = await makeRequestAndAddToQueue(batchExecutionData,targetUser,userInfo,poolid);
 		Object.assign(result,makeReq);
 	}
-	if(batchExecutionData['configurekey']) {
-		
-		return makeReq;
-	}
+	if(makeReq.error=== "None"){
+        return res.send(result);
+    }
+    else if(batchExecutionData['configurekey']);{
+        return makeReq;
+    }
 	return res.send(result);
+
 };
 
 async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo, poolid, invoker) {

@@ -723,6 +723,7 @@ const DesignModal = (props) => {
                 setSelectedTestCases([...selectedTestCases, testCase.testCaseName]);
                 handleAdd(testCase);
             } else {
+                handleAdd(testCase);
                 setSelectedTestCases(selectedTestCases.filter(item => item !== testCase.testCaseName));
                 // Add code to handle the removal of the testCase from addedTestCase
             }
@@ -1495,7 +1496,7 @@ const DesignModal = (props) => {
     return (
         <>
         {/* <Toast ref={toast} position="bottom-center" /> */}
-        {((screenLavelTestSteps.length === 0) && overlay ) && <ScreenOverlay content={overlay} />}
+        {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
@@ -1530,7 +1531,9 @@ const DesignModal = (props) => {
                             </span>
                             <div className='card__testcases'>
                             <div className='add__test__case_check'>
-                                {testcaseList.map(testCase => (
+                                {testcaseList.map(testCase => {
+                                    if(testCase.disableAndBlock) testCase.checked = true;
+                                    return (
                                     <div className='test__div' key={testCase.testCaseName}>
                                         <Checkbox className='check__testcase'
                                             inputId={testCase.testCaseName}
@@ -1541,7 +1544,7 @@ const DesignModal = (props) => {
                                         />
                                         <label className={testCase.disableAndBlock ?'label__testcase_disable' : "label__testcase"} htmlFor={testCase.testCaseName}>{testCase.testCaseName}</label>
                                     </div>  
-                                ))}
+                                )})}
                             </div>
                             </div>
                         </div>

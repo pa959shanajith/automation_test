@@ -17,6 +17,7 @@ const ImportModal = props => {
     const [error,setError] = useState("")
 
     const [importType,setImportType] = useState("def-val")
+    const [uploadingFile, setUploadingFile] = useState(false);
     const setOverlay = props.setOverlay
     const fetchScrapeData = props.fetchScrapeData
     let appType = props.appType;
@@ -48,6 +49,7 @@ const ImportModal = props => {
                         if (resp === "success") {
                             props.setShow(false);
                            props.toastSuccess("Screen Excel imported successfully");
+                           setUploadingFile(true);
                         }
                         else props.toastError("ERR_EXCEL_IMPORT");
                     })
@@ -103,6 +105,7 @@ const ImportModal = props => {
                                                 props.toastSuccess("Screen Json imported successfully.") 
                                                 props.setShow(false);
                                             setOverlay("");
+                                            setUploadingFile(true);
                                     });
                                 })
                                 .catch(error => {
@@ -152,14 +155,14 @@ const ImportModal = props => {
         title={'Import'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
-        content={<Content sheetRef={sheetRef} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay}/>}
-        footer={<Footer onImport={onImport} error={error}/>}
+        content={<Content sheetRef={sheetRef} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay} setUploadingFile={setUploadingFile}/>}
+        footer={<Footer onImport={onImport} error={error} uploadingFile={uploadingFile}/>}
     />
     )
     
 }
 
-const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFormat,setOverlay}) =>{
+const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFormat,setOverlay,setUploadingFile}) =>{
     const [isUpload,setIsUpload] = useState(false)
     const [sheetList,setSheetList] = useState([])
     const importTypes = [
@@ -177,6 +180,7 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
     }
     const upload = async() =>{
         var file = fileUpload.current.files[0]
+        setUploadingFile(true);
         if(!file)return;
         var extension = file.name.substr(file.name.lastIndexOf('.')+1)
         setOverlay('Uploading ...')
@@ -188,6 +192,7 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
                 if(res.length>0){
                     setSheetList(res)
                     setIsUpload(true)
+                    setUploadingFile(true);
                 }
                 else{
                     setError("File is empty")
@@ -208,6 +213,7 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
             console.error(err)
         }
         setOverlay('')
+       
     }
 
     return (
@@ -244,20 +250,21 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
     )
 }
 
-const Footer = ({onImport,error}) => {
+const Footer = ({onImport,error,uploadingFile}) => {
     return(
         <>
         <span>{error}</span>
-        <Button data-test="export" size="small" onClick={onImport} label='Import'></Button>
+        <Button data-test="export" disabled={!uploadingFile} size="small" onClick={onImport} label='Import'></Button>
         </>
     )
 }
 
-function read(file) {
+function read(file,setUploadingFile) {
     return new Promise ((res,rej)=>{
         var reader = new FileReader();
         reader.onload = function() {
         res(reader.result);
+        setUploadingFile(true)
         }
         reader.onerror = () => {
         rej("fail")

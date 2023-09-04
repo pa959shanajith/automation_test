@@ -32,7 +32,6 @@ const IceProvision = (props) => {
     setOp('normal');
     // setRefreshIceList((prevRefreshIceList)=>(!prevRefreshIceList))
     // eslint-disable-next-line
-
     (async () => {
       var data = await getUserDetails("user");
       if (data.error) { props.toastError(data.error); return; }
