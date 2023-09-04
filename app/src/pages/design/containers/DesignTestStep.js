@@ -883,7 +883,7 @@ const DesignModal = (props) => {
        
         return (
             <>
-                { ((screenLavelTestSteps.length === 0) && overlay ) && <ScreenOverlay content={overlay} />}
+                { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
             {bodyData && <div>
@@ -1495,7 +1495,7 @@ const DesignModal = (props) => {
     return (
         <>
         {/* <Toast ref={toast} position="bottom-center" /> */}
-        {((screenLavelTestSteps.length === 0) && overlay ) && <ScreenOverlay content={overlay} />}
+        {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>

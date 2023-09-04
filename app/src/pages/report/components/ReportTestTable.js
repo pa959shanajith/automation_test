@@ -17,6 +17,7 @@ import { FooterTwo } from "../../global";
 import { getStepIcon } from "../containers/ReportUtils";
 import AvoModal from "../../../globalComponents/AvoModal";
 import "../styles/ReportTestTable.scss";
+import { Toast } from "primereact/toast";
 
 
 export default function BasicDemo() {
@@ -50,6 +51,7 @@ export default function BasicDemo() {
   const [selectedFilter, setSelectedFilter] = useState([]);
   const bugRef = useRef(null);
   const userRef = useRef(null);
+  const iceinfo = useRef(null);
   useEffect(() => {
     const getQueryParam = () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -106,8 +108,10 @@ export default function BasicDemo() {
           loginName,
           loginKey
         );
+        if(getJiraDetails === "unavailableLocalServer"){
+          iceinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Ice is not connected.' });
+        };
         setJiraDetails(getJiraDetails);
-        // await viewAzureMappedList_ICE("646b3f5695cef4ee0ababfdd", reportData?.overallstatus?.scenarioName);
         setVisibleBug(false);
       } else if (bugTitle === "Azure DevOps") {
         const getAzureDetails = await connectAzure_ICE({
@@ -464,6 +468,7 @@ export default function BasicDemo() {
         />
         <Column header="Action" style={{ padding: "0rem" }} />
       </TreeTable>
+      <Toast ref={iceinfo} />
       <OverlayPanel ref={filterRef} className="reports_download">
         {filterValues.map((category) => {
           return (
@@ -659,7 +664,7 @@ export default function BasicDemo() {
                     dropdownValue={configValues[el.name]}
                     name={el.name}
                     onDropdownChange={(e) => handleConfigValues(e)}
-                    dropdownOptions={el.data.map((e) => ({ ...e, id: e?.referenceName, name: e?.name }))}
+                    dropdownOptions={el.data.map((e) => ({ ...e, id: bugTitle === "Jira" ? e?.key : e?.referenceName, name: bugTitle === "Jira" ? e?.text : e?.name }))}
                     parentClass="flex flex-column"
                   />
                 ) : (

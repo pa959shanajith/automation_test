@@ -10,6 +10,7 @@ const AvoMultiselect = ({
   placeholder,
   required,
   labelTxt,
+  disabled,
 }) => {
   const [touched, setTouched] = useState(false);
   return (
@@ -29,6 +30,7 @@ const AvoMultiselect = ({
         placeholder={placeholder}
         onBlur={() => setTouched(true)}
         {...(required && { className: touched && !multiSelectValue ? "p-invalid" : "" })}
+        disabled={disabled}
       />
       {required && (
         <div className="validation_container">
