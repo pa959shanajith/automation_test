@@ -2,7 +2,7 @@ import { browsers, selections } from "../../utility/mockData";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
 import AvoMultiselect from "../../../globalComponents/AvoMultiselect";
 import AvoSelect from "../../../globalComponents/AvoSelect";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { useEffect ,useState,useRef} from "react";
 import { checkRequired } from "../configureSetupSlice";
 import { Dropdown } from 'primereact/dropdown';
@@ -26,7 +26,8 @@ const GridBrowser = ({
       avogrids[index] = { ...el, name: el.Hostname };
     }
   });
-
+  const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
+  const typesOfAppType = NameOfAppType.appType;
   const [showIntegrationModal,setShowIntegrationModal] = useState(false)
   const [selectedTool, setSelectedTool] = useState(false);
   const toast = useRef(null);
@@ -124,6 +125,7 @@ const displayError = (error) =>{
             placeholder="Select a Browser"
             labelTxt="Select Browsers"
             required={true}
+            disabled={( typesOfAppType !== 'Web')}
           />
         </div>
         <div>
@@ -143,7 +145,7 @@ const displayError = (error) =>{
         valueTemplate={selectedToolTemplate} 
         itemTemplate={toolOptionTemplate} 
         className="custom-dropdown w-full md:w-16rem"
-        disabled={!(avodropdown.browser && avodropdown.browser.length > 0)}
+        // disabled={!(avodropdown.browser && avodropdown.browser.length > 0 && typesOfAppType === 'Web')}
          />
  
         </div>
@@ -152,6 +154,7 @@ const displayError = (error) =>{
             selectOptions={selections}
             selectMode={mode}
             setSelectMode={setMode}
+            disabled={( typesOfAppType !== 'Web')}
             labelTxt="Execution Mode"
           />
         </div>
