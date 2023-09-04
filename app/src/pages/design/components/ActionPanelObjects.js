@@ -402,7 +402,7 @@ const ActionPanel = (props) => {
 
   const createElementFooter = (
     <div className='save_clear'>
-      <Button className='add_object_clear' >Clear</Button>
+      {/* <Button className='add_object_clear' >Clear</Button> */}
       <Button className='add_object_save' onClick={() => { onSubmit(customObjList); }} disabled={!submitEnable}>Submit</Button>
     </div>
   );

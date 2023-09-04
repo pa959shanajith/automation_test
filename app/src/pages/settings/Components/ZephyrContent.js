@@ -770,6 +770,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
             //     setActiveTab("")
             // } 
         // }
+        callViewMappedFiles();
       }
 
 
@@ -1178,7 +1179,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 {/* <Dialog header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} className='zephyrDialog' visible={visible} style={{ width: '70vw', height: '45vw', overflowX: 'hidden' }} onHide={onHide} footer={footerIntegrations}> */}
                     <div>
                         <div className="tab__cls1">
-                            {activeIndex === 0 && <img className='import_img' src="static/imgs/import_icon.svg" id="lll" onClick={() => setShowNote(true)} />}
+                            {activeIndex === 0 && <img className='import_img' src="static/imgs/import_icon.svg" id="lll" onClick={() => setImportMap(true)} />}
                             <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                                 <TabPanel header="Mapping">
                                     <div className="zephyr__mapping">
@@ -1314,13 +1315,13 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
 
                             </TabView>
 
-                            <AvoConfirmDialog
+                            {/* <AvoConfirmDialog
                                 visible={showNote}
                                 onHide={() => setShowNote(false)}
                                 showHeader={false}
                                 message={confirmPopupMsg}
                                 icon="pi pi-exclamation-triangle"
-                                accept={() => { setImportMap(true); }} />
+                                accept={() => { setImportMap(true); }} /> */}
 
                         </div>
                     </div>

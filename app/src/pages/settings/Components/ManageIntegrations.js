@@ -727,7 +727,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     <div className="card">
                         {showLoginCard ? <TabMenu model={integrationItems} /> : ""}
                     </div>
-                    <ConfirmDialog visible={isShowConfirm} onHide={() => setIsShowConfirm(false)} message="Mapped data will be lost, Are you sure you want to go Back ?"
+                    <ConfirmDialog visible={isShowConfirm} onHide={() => setIsShowConfirm(false)} message="Are you sure you want to go Back ?"
                             header="Confirmation" icon="pi pi-exclamation-triangle" accept={acceptFunc} reject={rejectFunc} />
 
                     {showLoginCard ? (
