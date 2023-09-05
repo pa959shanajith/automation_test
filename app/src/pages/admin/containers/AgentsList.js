@@ -96,41 +96,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
       },
     });
   };
-  const agentListHeader = [
-    {
-      data: {
-        isSort: true,
-      },
-      fieldName: "agent",
-      isResizable: true,
-      isSortedDescending: true,
-      key: "1",
-      minWidth: 200,
-      maxWidth: 750,
-      name: "Agents",
-    },
-    {
-      fieldName: "clientCount",
-      key: "2",
-      minWidth: 200,
-      maxWidth: 500,
-      name: "Avo Client Count",
-    },
-    {
-      fieldName: "status",
-      key: "3",
-      minWidth: 200,
-      maxWidth: 500,
-      name: "Status",
-    },
-    {
-      fieldName: "deleteIcon",
-      key: "3",
-      minWidth: 30,
-      maxWidth: 30,
-      name: "",
-    },
-  ];
+
   useEffect(() => {
     (async () => {
       setLoading("Loading...");
@@ -157,7 +123,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
             ...agent,
             name: agent.Hostname,
             state: "idle",
-            createdOn: agent.createdon, 
+            createdOn: agent.createdon,
           }))
         );
       }
@@ -257,23 +223,23 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
-  
+
     const parts = dateString.split(/[\/, :]/);
     const day = parseInt(parts[1], 10);
     const monthIndex = parseInt(parts[0], 10) - 1;
     const year = parseInt(parts[2], 10);
-  
+
     return `${day} ${months[monthIndex]} ${year}`;
   }
 
   return (
     <>
-        <span className="page-taskName taskname">Download Agent</span>
-        <pre>
-          <code className="downld_cls">
-            Click <u><a onClick={onDownloadAgentClick} style={{color: "purple",cursor:'pointer'}}>Here</a></u> to Download the Agent
-          </code>
-        </pre>
+      <span className="page-taskName taskname">Download Agent</span>
+      <pre>
+        <code className="downld_cls">
+          Click <u><a onClick={onDownloadAgentClick} style={{ color: "purple", cursor: 'pointer',textDecoration: 'underline'}}>Here</a></u> to Download the Agent
+        </code>
+      </pre>
       <div className="page-taskName">
         <span data-test="page-title-test" className="taskname">
           Manage Agent
@@ -288,25 +254,20 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
           {showLegend("busy", "Active - Busy")}
           {showLegend("offline", "Offline")}
         </div>
-
-        {agentData.length > 0 && (
-          <>
-            <div className="p-input-icon-left search_agent">
+        <div className="p-input-icon-left search_agent">
           <i className="pi pi-search" />
           <InputText className="Search_name"
-                  placeholder="Search" 
-                  value={searchText} 
-                  onChange={(event) =>
-                  event &&
-                  event.target &&
-                  handleSearchChange(event.target.value)}
-                   title=" Search all projects." 
-                   />
+            placeholder="Search"
+            value={searchText}
+            onChange={(event) =>
+              event &&
+              event.target &&
+              handleSearchChange(event.target.value)}
+            title=" Search all projects."
+          />
         </div>
-          </>
-         )}
-         <div className="savebtn_div">
-        <Button className="save__agent" label="Save" onClick={handleAgentsSave}></Button>
+        <div className="savebtn_div">
+          <Button className="save__agent" label="Save" onClick={handleAgentsSave}></Button>
         </div>
       </div>
       <div style={{ position: "absolute", width: "70%", height: "-webkit-fill-available" }}>
@@ -342,7 +303,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
             </div>
           )} />
           <Column header="Created on" body={(agent) => (
-            <>{formatDate((agent.createdOn).slice(0,9))}</>
+            <>{formatDate((agent.createdOn).slice(0, 9))}</>
           )} />
           <Column className="agents__action_icons" header="Action" body={(agent) => (
             <img

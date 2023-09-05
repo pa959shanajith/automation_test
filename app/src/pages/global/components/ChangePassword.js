@@ -154,7 +154,7 @@ const ChangePassword = (props) => {
                         <div className="password_check_messages">
                             <div style={{ display: "flex" }}>
                                 <i className={`mr-2 ${passwordLength ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
-                                <span>Must be 8-32 characters long</span>
+                                <span>Must be 8-16 characters long</span>
                             </div>
                             <div style={{ display: "flex" }}>
                                 <i className={`mr-2 ${digitPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>

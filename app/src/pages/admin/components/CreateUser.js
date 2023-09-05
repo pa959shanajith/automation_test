@@ -123,6 +123,7 @@ const CreateUser = (props) => {
     }
 
     const toastError = (erroMessage) => {
+        toast.current.clear();
         if (erroMessage.CONTENT) {
             toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
         }
@@ -130,6 +131,7 @@ const CreateUser = (props) => {
     }
 
     const toastWarn = (warnMessage) => {
+        toast.current.clear();
         if (warnMessage.CONTENT) {
             toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
         }
@@ -137,6 +139,7 @@ const CreateUser = (props) => {
     }
 
     const toastSuccess = (successMessage) => {
+        toast.current.clear();
         if (successMessage.CONTENT) {
             toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
         }
@@ -625,7 +628,6 @@ const CreateUser = (props) => {
         <Button
             data-test="cancelButton"
             label="Cancel"
-            disabled={selectedTab === "avoAzzureClient"}
             text
             onClick={() => { props.setCreateUserDialog(false); dispatch(AdminActions.EDIT_USER(true)); props.reloadData(); }}
         >

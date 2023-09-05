@@ -108,9 +108,9 @@ const IceProvisionList = (props) => {
 				const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
 				if (data1.error) { displayError(data1.error); return; }
 				props.setTokeninfoIcename(icename);
-				entry.status === 'deregistered' ? props.setIcename('') : props.setIcename(icename);
+				props.setIcename(icename);
 				props.setTokeninfoToken(data);
-				entry.status === 'deregistered' ? props.setToken('') : props.setToken(data);
+				props.setToken(data);
 				props.setOp(provisionDetails.icetype);
 				props.setUserid(provisionDetails.provisionedto || ' ');
 				props.toastSuccess(Messages.CUSTOM("ICE " + event + "ed Successfully: '" + icename + "'!!  Copy or Download the token", VARIANT.SUCCESS));
@@ -139,6 +139,8 @@ const IceProvisionList = (props) => {
 			if (data.error) { displayError(data.error); return; }
 			if (data === 'fail') displayError(Messages.ADMIN.ERR_ICE_DEREGISTER);
 			else {
+				props.setIcename('');
+				props.setToken(''); 
 				const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
 				if (data1.error) { displayError(data1.error); return; }
 				displayError(Messages.ADMIN.SUCC_ICE_DEREGISTER);

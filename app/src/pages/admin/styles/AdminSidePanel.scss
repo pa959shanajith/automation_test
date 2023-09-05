@@ -52,6 +52,7 @@
     width: 21.5rem;
     height: 2rem;
     font: $f6_bold;
+    padding: 0.75rem 0.6rem !important;
     &:hover {
         background: #e3cff0 !important;
         border-color: #e3cff0 !important;
@@ -77,6 +78,7 @@
     width: 21.5rem;
     height: 2rem;
     font: $f6_bold;
+    padding: 0.75rem 0.6rem !important;
 
     &:hover {
         background: #e3cff0 !important;
@@ -101,6 +103,7 @@
     width: 21.5rem;
     height: 2rem;
     font: $f6_bold;
+    padding: 0.75rem 0.1rem !important;
 
     &:hover {
         background: #e3cff0 !important;
@@ -117,6 +120,7 @@
     }
 }
 .prefer_btn{
+    margin-top: 2rem;
     background: transparent;
     color: black;
     border-color: transparent;
@@ -124,6 +128,7 @@
     width: 21.5rem;
     height: 2rem;
     font: $f6_bold;
+    padding: 0.75rem 0.6rem !important;
 
     &:hover {
         background: #e3cff0 !important;
