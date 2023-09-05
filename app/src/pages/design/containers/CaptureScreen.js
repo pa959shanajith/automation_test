@@ -788,6 +788,7 @@ const elementTypeProp =(elementProperty) =>{
       .then(data => {
         let err = null;
         setOverlay("");
+        setVisible(false);
         // ResetSession.end();
         if (data === "Invalid Session") return RedirectPage(history);
         else if (data === "Response Body exceeds max. Limit.")
@@ -2470,7 +2471,7 @@ const LaunchApplication = props => {
           <AvoModal
             visible={props.visible}
             setVisible={()=>{}}
-            onModalBtnClick={(input)=> input ==="Cancel" ? props.setVisible(false) : appDict[props.appPop.appType].footerAction() }
+            onModalBtnClick={(input)=> input ==="Cancel"  ? props.setVisible(false) : appDict[props.appPop.appType].footerAction() }
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"
