@@ -17,11 +17,10 @@ import { FooterTwo } from "../../global";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
-  const [selectedExe, setSelectedExe] = useState(0);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [testSuite, setTestSuite] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
   const [downloadId, setDownloadId] = useState("");
+  const [selectedExe, setSelectedExe] = useState(0);
   const location = useLocation();
   const downloadRef = useRef(null);
 
@@ -68,7 +67,6 @@ const Profile = () => {
   
   const onTestSuiteClick = async (getRow) => {
     setSelectedExe(getRow?.node?.key);
-    setSelectedProduct(getRow)
     const testSuiteList = await getTestSuite({
       query: "fetchModSceDetails",
       param: "modulestatus",
@@ -348,8 +346,11 @@ const Profile = () => {
     });
   };
  const handleViweReports = async (reportid) =>{
-    const win = window.open(`/viewReports?reportID=${reportid}&execution=${selectedExe}`, "_blank"); 
-    win.focus();
+    setSelectedExe((prev) => {
+      const win = window.open(`/viewReports?reportID=${reportid}&execution=${Number(prev) + 1}`, "_blank"); 
+      win.focus();
+      return prev;
+    })
   }
  
   const onTestCaseClick = async (row, parentRow) => {
@@ -1004,26 +1005,20 @@ const Profile = () => {
           ))}
         </DataTable>
         <OverlayPanel ref={downloadRef} className="reports_download">
-          <Menu
-            model={[
-              {
-                label: <span onClick={() => onDownload("json")}>JSON</span>,
-                icon: "pi pi-fw pi-file",
-              },
-              {
-                label: <span onClick={() => onDownload("pdf")}>PDF</span>,
-                icon: "pi pi-fw pi-file",
-              },
-              {
-                label: (
-                  <span onClick={() => onDownload("pdfwithimg")}>
-                    PDF with screenshots
-                  </span>
-                ),
-                icon: "pi pi-fw pi-file",
-              },
-            ]}
-          />
+          <div className="flex downloadItem" onClick={() => onDownload("json")}>
+            <span className="pi pi-fw pi-file"></span>
+            <span>JSON</span>
+          </div>
+          <div className="flex downloadItem" onClick={() => onDownload("pdf")}>
+            <span className="pi pi-fw pi-file"></span>
+            <span>PDF</span>
+          </div>
+          <div className="flex downloadItem" onClick={() => onDownload("pdfwithimg")}>
+            <span className="pi pi-fw pi-file"></span>
+            <span>
+              PDF with screenshots
+            </span>
+          </div>
         </OverlayPanel>
       </div>
       <div>

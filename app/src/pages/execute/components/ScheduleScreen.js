@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
-import { getScheduledDetailsOnDate_ICE, getScheduledDetails_ICE } from "../configureSetupSlice";
+import { cancelScheduledJob_ICE, getScheduledDetailsOnDate_ICE, getScheduledDetails_ICE } from "../configureSetupSlice";
 import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
 import AvoModal from "../../../globalComponents/AvoModal";
@@ -224,6 +224,42 @@ const ScheduleScreen = ({
     setExestatus(false);
   }
 
+  const handleCancel = (getItem, getValue) => {
+    const dt = new Date(getValue?.scheduledon);
+    dispatch(
+      cancelScheduledJob_ICE({
+        param: "cancelScheduledJob_ICE",
+        schDetails: {
+          cycleid: getValue?.cycleid ? getValue?.cycleid : "",
+          scheduledatetime:
+            dt.getFullYear() +
+            "-" +
+            ("0" + (dt.getMonth() + 1)).slice(-2) +
+            "-" +
+            ("0" + dt.getDate()).slice(-2) +
+            " " +
+            ("0" + dt.getHours()).slice(-2) +
+            ":" +
+            ("0" + dt.getMinutes()).slice(-2),
+          scheduleid: getValue?._id,
+        },
+        host:
+          getValue?.schedulethrough === "client"
+            ? getValue?.target
+            : getValue?.schedulethrough,
+        schedUserid: JSON.stringify(getValue?.scheduledby),
+      })
+    ).then(() =>
+      dispatch(
+        getScheduledDetails_ICE({
+          param: "getScheduledDetails_ICE",
+          configKey: cardData?.configurekey,
+          configName: cardData?.configurename,
+        })
+      )
+    );
+  };
+
   return (
     <>
       <ExecutionCard cardData={cardData} />
@@ -326,55 +362,105 @@ const ScheduleScreen = ({
         <TabView>
           <TabPanel header="Scheduled Tasks">
             <DataTable
-              value={Array.isArray(getScheduledList?.scheduledList) && getScheduledList?.scheduledList
-                ?.map((el) => ({
-                  ...el,
-                  scheduledon: `${new Date(
-                    el.scheduledon
-                  ).toLocaleDateString()}, ${el.time}`,
-                  endafter: el.endafter ? el.endafter : "-",
-                  status: (
-                    <Link onClick={() => onScheduleStatus(el)}>
-                      {el.status}
-                    </Link>
-                  ),
-                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
-                }))
-                .filter((el) => el?.status !== "recurring")}
+              value={
+                Array.isArray(getScheduledList?.scheduledList) &&
+                getScheduledList?.scheduledList
+                  ?.filter((el) => el?.status !== "recurring")
+                  .map((el) => ({
+                    ...el,
+                    scheduledon: `${new Date(
+                      el.scheduledon
+                    ).toLocaleDateString()}, ${el.time}`,
+                    endafter: el.endafter ? el.endafter : "-",
+                    status: (
+                      <div className="flex align-items-center justify-content-evenly">
+                        <Link onClick={() => onScheduleStatus(el)}>
+                          {el.status}
+                        </Link>
+                        {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
+                      </div>
+                    ),
+                    target:
+                      el.schedulethrough === "client"
+                        ? el.target
+                        : el.schedulethrough,
+                  }))
+              }
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
-              <Column align="center" field="target" header="Environment"></Column>
-              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
-              <Column align="center" field="endafter" header="End After"></Column>
+              <Column
+                align="center"
+                field="scheduledon"
+                header="Start Date & Time"
+              ></Column>
+              <Column
+                align="center"
+                field="target"
+                header="Environment"
+              ></Column>
+              <Column
+                align="center"
+                field="scheduletype"
+                header="Recurrance Type"
+              ></Column>
+              <Column
+                align="center"
+                field="endafter"
+                header="End After"
+              ></Column>
               <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
           <TabPanel header="Recurring Tasks">
             <DataTable
-              value={Array.isArray(getScheduledList?.scheduledList) && getScheduledList?.scheduledList
-                ?.map((el) => ({
-                  ...el,
-                  scheduledon: `${new Date(
-                    el.scheduledon
-                  ).toLocaleDateString()}, ${el.time}`,
-                  endafter: el.endafter ? el.endafter : "-",
-                  status: (
-                    <Link onClick={() => onScheduleStatus(el)}>
-                      {el.status}
-                    </Link>
-                  ),
-                  target: el.schedulethrough === "client" ? el.target : el.schedulethrough
-                }))
-                .filter((el) => el?.status === "recurring")}
+              value={
+                Array.isArray(getScheduledList?.scheduledList) &&
+                getScheduledList?.scheduledList
+                  ?.filter((el) => el?.status === "recurring")
+                  .map((el) => ({
+                    ...el,
+                    scheduledon: `${new Date(
+                      el.scheduledon
+                    ).toLocaleDateString()}, ${el.time}`,
+                    endafter: el.endafter ? el.endafter : "-",
+                    status: (
+                      <div className="flex align-items-center justify-content-evenly">
+                        <Link onClick={() => onScheduleStatus(el)}>
+                          {el.status}
+                        </Link>
+                        {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
+                      </div>
+                    ),
+                    target:
+                      el.schedulethrough === "client"
+                        ? el.target
+                        : el.schedulethrough,
+                  }))
+              }
               tableStyle={{ minWidth: "50rem" }}
               globalFilter={tableFilter}
             >
-              <Column align="center" field="scheduledon" header="Start Date & Time"></Column>
-              <Column align="center" field="target" header="Envrionment"></Column>
-              <Column align="center" field="scheduletype" header="Recurrance Type"></Column>
-              <Column align="center" field="endafter" header="End After"></Column>
+              <Column
+                align="center"
+                field="scheduledon"
+                header="Start Date & Time"
+              ></Column>
+              <Column
+                align="center"
+                field="target"
+                header="Envrionment"
+              ></Column>
+              <Column
+                align="center"
+                field="scheduletype"
+                header="Recurrance Type"
+              ></Column>
+              <Column
+                align="center"
+                field="endafter"
+                header="End After"
+              ></Column>
               <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
@@ -387,18 +473,26 @@ const ScheduleScreen = ({
         onModalBtnClick={onStatusBtnClick}
         content={
           <DataTable
-              value={getScheduledList?.scheduledStatusList.map((el) => ({
-                ...el,
-                scenariodetails: "Test_Scenario12",
-                testsuitenames: ""
-              }))}
-              tableStyle={{ minWidth: "50rem" }}
-              globalFilter={tableFilter}
-            >
-              <Column align="center" field="testsuitenames" header="Test Suite"></Column>
-              <Column align="center" field="scenariodetails" header="Testcase Name"></Column>
-              <Column align="center" field="status" header="Status"></Column>
-            </DataTable>
+            value={getScheduledList?.scheduledStatusList.map((el) => ({
+              ...el,
+              scenariodetails: "Test_Scenario12",
+              testsuitenames: "",
+            }))}
+            tableStyle={{ minWidth: "50rem" }}
+            globalFilter={tableFilter}
+          >
+            <Column
+              align="center"
+              field="testsuitenames"
+              header="Test Suite"
+            ></Column>
+            <Column
+              align="center"
+              field="scenariodetails"
+              header="Testcase Name"
+            ></Column>
+            <Column align="center" field="status" header="Status"></Column>
+          </DataTable>
         }
         headerTxt="Execution Status"
         modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
