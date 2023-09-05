@@ -45,7 +45,6 @@ const UserList = (props) => {
                 });
                 setData(filteredUserList);
                 setLoading(false);
-                props.setRefreshUserList(!props.refreshUserList);
             } catch (error) {
                 console.error('Error fetching User list:', error);
             }
@@ -127,7 +126,7 @@ const UserList = (props) => {
                 footer={
                     <>
                         <Button outlined label="No" size='small' onClick={() => setShowDeleteConfirmPopUp(false)}></Button>
-                        <Button label="Yes" size='small' onClick={() => { props.manage({ action: "delete" }); setShowDeleteConfirmPopUp(false); reloadData(); }}></Button>
+                        <Button label="Yes" size='small' onClick={() => { props.manage({ action: "delete" }); setShowDeleteConfirmPopUp(false); }}></Button>
                     </>}
                 width={{ width: "5rem" }}
             />

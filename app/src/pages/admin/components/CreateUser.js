@@ -123,7 +123,6 @@ const CreateUser = (props) => {
     }
 
     const toastError = (erroMessage) => {
-        toast.current.clear();
         if (erroMessage.CONTENT) {
             toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
         }
@@ -131,7 +130,6 @@ const CreateUser = (props) => {
     }
 
     const toastWarn = (warnMessage) => {
-        toast.current.clear();
         if (warnMessage.CONTENT) {
             toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
         }
@@ -139,7 +137,6 @@ const CreateUser = (props) => {
     }
 
     const toastSuccess = (successMessage) => {
-        toast.current.clear();
         if (successMessage.CONTENT) {
             toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
         }
@@ -162,6 +159,7 @@ const CreateUser = (props) => {
 
     //Transaction Activity for Create/ Update/ Delete User button Action
     const manage = (props) => {
+        toast.current.clear();
         setUserNameForIceToken(userName);
         const action = props.action;
         if (!validate({ action: action })) return;
@@ -203,6 +201,7 @@ const CreateUser = (props) => {
                     };
                     // toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "delete") {
+                        setRefreshUserList(!refreshUserList);
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
                         if (data0.error) { displayError(data0.error); return; }
                         var data1 = await fetchICE(userObj.userid)
@@ -516,88 +515,6 @@ const CreateUser = (props) => {
         }
     }
 
-    const getUserData = async (props) => {
-        const userObj = props.user_idName.split(';');
-        dispatch(AdminActions.UPDATE_USERID(userObj)[0]);
-        dispatch(AdminActions.UPDATE_INPUT_USERNAME(userObj)[1]);
-        setLoading("Fetching User details...");
-        try {
-            const data = await getUserDetails("userid", userObj[0]);
-            if (data.error) { displayError(data.error); return; }
-            else {
-                setLoading(false);
-                const uType = data.type;
-                dispatch(AdminActions.UPDATE_DATA(data));
-                dispatch(AdminActions.UPDATE_ADDROLES({}))
-                data.addrole.forEach((e) => dispatch(AdminActions.ADD_ADDROLE(e)));
-                dispatch(AdminActions.UPDATE_FTYPE((uType) === "inhouse") ? "Default" : ((uType === "oidc") ? "OpenID" : uType.toUpperCase()));
-
-                if (data.type !== "inhouse") {
-                    var confserver = data.server;
-                    dispatch(AdminActions.UPDATE_SERVER(""))
-                    dispatch(AdminActions.UPDATE_CONF_SERVER_LIST([]))
-                    if (data.type === "ldap") {
-                        dispatch(AdminActions.UPDATE_LDAP({ fetch: "map", user: '' }));
-                        dispatch(AdminActions.UPDATE_NO_CREATE(true))
-                        setLoading("Fetching LDAP Server configurations...");
-                        var data1 = await getLDAPConfig("server");
-                        if (data1.error) { displayError(data1.error); return; }
-                        setLoading(false);
-                        if (data1 === "empty") {
-                            toastWarn(MSG.ADMIN.WARN_LDAP_CONFIGURE);
-                        } else {
-                            dispatch(AdminActions.UPDATE_NO_CREATE(false));
-                            data1.sort((a, b) => a.name.localeCompare(b.name));
-                            dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(data1));
-                        }
-                    }
-                    else if (data.type === "saml") {
-                        dispatch(AdminActions.UPDATE_NO_CREATE(true))
-                        setLoading("Fetching SAML Server configurations...");
-                        data1 = await getSAMLConfig();
-                        if (data1.error) { displayError(data1.error); return; }
-                        setLoading(false);
-                        if (data === "empty") {
-                            toastWarn(MSG.ADMIN.WARN_SAML_CINFIGURE);
-                        } else {
-                            dispatch(AdminActions.UPDATE_NO_CREATE(false))
-                            data1.sort();
-                            dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(data1))
-                        }
-                    }
-                    else if (data.type === "oidc") {
-                        dispatch(AdminActions.UPDATE_NO_CREATE(true))
-                        setLoading("Fetching OpenID Server configurations...");
-                        data1 = await getOIDCConfig();
-                        if (data1.error) { displayError(data1.error); return; }
-                        setLoading(false);
-                        if (data1 === "empty") {
-                            toastWarn(MSG.ADMIN.WARN_OPENID_CONFIGURE);
-                        } else {
-                            dispatch(AdminActions.UPDATE_NO_CREATE(false))
-                            data1.sort((a, b) => a.name.localeCompare(b.name));
-                            dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(data1))
-                        }
-                    }
-                    if (!data1.some(function (e) { return e.name === confserver; })) {
-                        dispatch(AdminActions.UPDATE_CONF_SERVER_LIST_PUSH({ _id: '', name: confserver }));
-                        dispatch(AdminActions.UPDATE_CONF_EXP(confserver));
-                    }
-                    dispatch(AdminActions.UPDATE_SERVER(confserver));
-                    dispatch(AdminActions.UPDATE_LDAP_USER(data).ldapuser || '');
-                }
-            }
-        } catch (error) {
-            setLoading(false);
-            toastError(MSG.ADMIN.ERR_FETCH_USER_DETAILS);
-        }
-    }
-
-    const searchFunctionUser = async (val) => {
-        setShowDropdownEdit(true);
-        const items = allUsersList.filter((e) => e[0].toUpperCase().indexOf(val.toUpperCase()) !== -1)
-        setAllUserFilList(items);
-    }
 
     const searchFunctionLdap = async (val) => {
         let items = [];
@@ -620,8 +537,24 @@ const CreateUser = (props) => {
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(value))
     }
 
-    const userCreateHandler = async () => {
-        toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
+    const createUserDialogHide = () => {
+        dispatch(AdminActions.UPDATE_INPUT_PASSWORD(""));
+        dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(""));
+        dispatch(AdminActions.UPDATE_USERROLE("")); 
+        props.setCreateUserDialog(false);
+        setRefreshUserList(!refreshUserList);
+        setRoleDropdownValue("");
+        setSelectedTab("userDetails");
+        if(editUser) {
+            props.reloadData();
+            dispatch(AdminActions.EDIT_USER(false));
+        }
+    }
+
+    const userCreateHandler = () => {
+        toast.current.clear();
+        editUser ? toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)):toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
+        createUserDialogHide();
     }
 
     const createUserFooter = () => <>
@@ -629,7 +562,7 @@ const CreateUser = (props) => {
             data-test="cancelButton"
             label="Cancel"
             text
-            onClick={() => { props.setCreateUserDialog(false); dispatch(AdminActions.EDIT_USER(true)); props.reloadData(); }}
+            onClick={createUserDialogHide}
         >
         </Button>
         {(selectedTab === "userDetails") && <Button
@@ -643,16 +576,12 @@ const CreateUser = (props) => {
         {selectedTab === "avoAzzureClient" && <Button
             data-test="createButton"
             label={editUser ? "Reprovision" : "Create"}
-            onClick={() => { userCreateHandler(); props.setCreateUserDialog(false); setRefreshUserList(!refreshUserList); }}
+            onClick={() => { userCreateHandler()}}
             disabled={nocreate}>
         </Button>}
     </>
 
-    const createUserDialogHide = () => {
-        dispatch(AdminActions.EDIT_USER(false));
-        props.setCreateUserDialog(false);
-        setRefreshUserList(!refreshUserList);
-    }
+
 
     return (
         <Fragment>
