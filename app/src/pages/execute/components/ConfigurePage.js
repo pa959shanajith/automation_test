@@ -32,6 +32,7 @@ import {
   getScheduledDetails_ICE,
   storeConfigureKey,
   testSuitesScheduler_ICE,
+  testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
@@ -1029,8 +1030,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     };
 
     if (btnType === "ScheduleIce") {
+      !!Object.keys(selectedPattren).length ?
       dispatch(
-        testSuitesScheduler_ICE({
+        testSuitesSchedulerRecurring_ICE({
           param: "testSuitesScheduler_ICE",
           executionData: {
             source: "schedule",
@@ -1047,6 +1049,55 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
               timestamp: startTime.getTime().toString(),
               recurringValue: getPattren().recurringValue,
+              recurringString: getPattren().recurringString,
+              recurringStringOnHover: getPattren().recurringStringOnHover,
+              endAfter: startDate ? "" : endDate?.name,
+              clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
+              clientTimeZone: "+0530",
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
+            })),
+            scenarioFlag: false,
+            type: "normal",
+            configureKey: selectedSchedule?.configurekey,
+            configureName: selectedSchedule?.configurename,
+          },
+        })
+      ).then(() => {
+        dispatch(
+          getScheduledDetails_ICE({
+            param: "getScheduledDetails_ICE",
+            configKey: fetechConfig[configItem]?.configurekey,
+            configName: fetechConfig[configItem]?.configurename,
+          })
+        );
+        setScheduling(false);
+        setStartDate(null);
+        setEndDate(null);
+        setStartTime(null);
+        setScheduleOption({});
+        setSelectedDaily(null);
+        setselectedWeek([]);
+        setSelectedMonthly(null);
+        setDropdownWeek(null);
+        setSelectedPattren({});
+      }) : dispatch(
+        testSuitesScheduler_ICE({
+          param: "testSuitesScheduler_ICE",
+          executionData: {
+            source: "schedule",
+            exectionMode: "serial",
+            executionEnv: "default",
+            browserType: selectedSchedule?.executionRequest?.browserType,
+            integration: selectedSchedule?.executionRequest?.integration,
+            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
+              ...el,
+              poolid: "",
+              type: "normal",
+              ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
+              date: startDate ? startDate.toLocaleDateString('es-CL') : "",
+              time: `${startTime.getHours()}:${startTime.getMinutes()}`,
+              timestamp: startTime.getTime().toString(),
+              recurringValue: getPattren().recurringValue,  
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
               endAfter: startDate ? "" : endDate?.name,
