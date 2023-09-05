@@ -276,7 +276,13 @@ const CreateProject = (props) => {
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
       ...assignedUsers
+      
 
+    ]);
+    setUnFiltereAssaignedData((prevAssignedUsers) => [
+      ...prevAssignedUsers,
+      ...assignedUsers
+      
 
     ]);
     setSelectedCheckboxes([]);
@@ -394,7 +400,7 @@ const CreateProject = (props) => {
         releases: [{ name: "R1", cycles: [{ name: "C1" }] }],
       };
 
-      const project = await userCreateProject_ICE(projData);
+     const project = await userCreateProject_ICE(projData);
 
       if (project === "invalid_name_spl") {
         setIsInvalidProject(true);
