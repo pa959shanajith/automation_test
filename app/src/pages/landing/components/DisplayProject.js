@@ -276,17 +276,17 @@ const DisplayProject = (props) => {
       case "5db0022cf87fdec084ae49af":
         return "Desktop";
       case "5db0022cf87fdec084ae49b7":
-        return "WebService";
+        return "Webservice";
       case "5db0022cf87fdec084ae49b4":
         return "SAP";
       case "5db0022cf87fdec084ae49b3":
         return "OEBS";
       case "5db0022cf87fdec084ae49b0":
-        return "Mainframes";
+        return "Mainframe";
       case "5db0022cf87fdec084ae49b1":
-        return "MobileApps";
+        return "MobileApp";
       case "5db0022cf87fdec084ae49b5":
-        return "System_application";
+        return "System";
       default:
         return "";
     }
@@ -316,12 +316,12 @@ const DisplayProject = (props) => {
                 {project.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
                 {project.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
                 {project.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "WebService" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "Webservice" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
                 {project.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
                 {project.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "Mainframes" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "MobileApps" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "System_application" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
+                {project.appType === "Mainframe" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                {project.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
+                {project.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
                 <div className="Project_name">
                 <p id="projectInside">{project.projectName}</p>
                 </div>
