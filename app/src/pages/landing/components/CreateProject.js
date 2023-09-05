@@ -163,18 +163,18 @@ const CreateProject = (props) => {
     { name: 'Mainframe', code: 'Mainframe',image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png' },
     { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png' },
-    { name: 'System Application', code: 'SystemApp',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
+    { name: 'System Application', code: 'System',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
   const appTypes = [
     { name: 'Web', code: 'Web',value:'5db0022cf87fdec084ae49b6', image: 'static/imgs/web.png' },
     { name: 'SAP', code: 'SAP', value:'5db0022cf87fdec084ae49b4', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', value:'5db0022cf87fdec084ae49b3', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', value:'5db0022cf87fdec084ae49af', image: 'static/imgs/desktop.png' },
-    { name: 'Web Services', code: 'WebService',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/webService.png' },
-    { name: 'Mainframe', code: 'Mainframes', value:'5db0022cf87fdec084ae49b0',image: '/static/imgs/mainframe.png' },
+    { name: 'Web Services', code: 'Webservice',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/webService.png' },
+    { name: 'Mainframe', code: 'Mainframe', value:'5db0022cf87fdec084ae49b0',image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'MobileWeb',value:"5db0022cf87fdec084ae49b2", image: 'static/imgs/mobileWeb.png' },
-    { name: 'Mobile Application', code: 'MobileApps',value:'5db0022cf87fdec084ae49b1', image: '/static/imgs/mobileApps.png' },
-    { name: 'System Application', code: 'System_application',value:'5db0022cf87fdec084ae49b1',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
+    { name: 'Mobile Application', code: 'MobileApp',value:'5db0022cf87fdec084ae49b1', image: '/static/imgs/mobileApps.png' },
+    { name: 'System Application', code: 'System',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
 
   const roles = [
@@ -276,7 +276,13 @@ const CreateProject = (props) => {
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
       ...assignedUsers
+      
 
+    ]);
+    setUnFiltereAssaignedData((prevAssignedUsers) => [
+      ...prevAssignedUsers,
+      ...assignedUsers
+      
 
     ]);
     setSelectedCheckboxes([]);
@@ -394,7 +400,7 @@ const CreateProject = (props) => {
         releases: [{ name: "R1", cycles: [{ name: "C1" }] }],
       };
 
-      const project = await userCreateProject_ICE(projData);
+     const project = await userCreateProject_ICE(projData);
 
       if (project === "invalid_name_spl") {
         setIsInvalidProject(true);

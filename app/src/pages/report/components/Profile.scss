@@ -135,7 +135,20 @@
 }
 
 .p-overlaypanel.reports_download {
+    width: 12rem;
     .p-overlaypanel-content {
         padding: 0;
+        width: 12rem;
+        height: auto;
+        .downloadItem {
+            width: 12rem;
+            height: 2rem;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .downloadItem:hover {
+            background-color: lightgray;
+        }
     }
 }
