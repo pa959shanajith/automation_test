@@ -601,6 +601,7 @@ const elementTypeProp =(elementProperty) =>{
             )
           })
           setCaptureData(newData);
+          addMore.current=false;
         })
         .catch(error => {
           dispatch(disableAction(haveItems));
@@ -620,14 +621,15 @@ const elementTypeProp =(elementProperty) =>{
     var capturedDataAfterSave = scrapeItemsL.filter(function (item) {
 
       return !selectedCapturedElement.find(function (objFromB) {
-        if (item.objectDetails.objId === objFromB.objectDetails.objId) {
-          deletedArr.push(item.objectDetails.objId)
+        if (item.objectDetails.custname === objFromB.objectDetails.custname) {
+          if(item.objectDetails.objId){
+            deletedArr.push(item.objectDetails.objId)}
           return true
         }
       })
     })
     let notused = scrapeItemsL.filter(item => {
-      if (deletedArr.includes(item.objectDetails.objId)) {
+      if (deletedArr.includes(item.objectDetails.custname)) {
         return false
       }
       else {
@@ -639,7 +641,9 @@ const elementTypeProp =(elementProperty) =>{
     setDeleted(deletedArr)
     setOrderList(newOrderList)
     setCapturedDataToSave(newCapturedDataToSave)
+    setNewScrapedCapturedData({...newScrapedCapturedData,view:newCapturedDataToSave})
     setSelectedCapturedElement([])
+    // setNewScrapedCapturedData(newCapturedDataToSave)
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
     setDeletedItems(true);
   }
@@ -663,6 +667,7 @@ const elementTypeProp =(elementProperty) =>{
       }
 
     }
+    // const newdeleted=deleted.filter(element=>element!==undefined)
 
     let params = {
       'deletedObj': deleted,
@@ -679,6 +684,7 @@ const elementTypeProp =(elementProperty) =>{
       .then(response => {
         if (response === "Invalid Session") return RedirectPage(history);
         else fetchScrapeData().then(resp => {
+          addMore.current=false
           if (resp === 'success' || typeof (resp) === "object") {
 
             typeof (resp) === "object" && resp.length > 0
@@ -788,6 +794,7 @@ const elementTypeProp =(elementProperty) =>{
       .then(data => {
         let err = null;
         setOverlay("");
+        setVisible(false);
         // ResetSession.end();
         if (data === "Invalid Session") return RedirectPage(history);
         else if (data === "Response Body exceeds max. Limit.")
@@ -1439,7 +1446,7 @@ const footerSave = (
     setElementProperties(true)
   }
   else {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the Captured Element before delete', life: 5000 });
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the Captured Element to view/edit the element properties', life: 5000 });
   }
 
   }
@@ -1579,7 +1586,7 @@ const footerSave = (
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : "" )}`} title={rowdata.selectall}>{rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj":"" )}`} title={rowdata.selectall}>{rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
       </div>
@@ -2470,7 +2477,7 @@ const LaunchApplication = props => {
           <AvoModal
             visible={props.visible}
             setVisible={()=>{}}
-            onModalBtnClick={(input)=> input ==="Cancel" ? props.setVisible(false) : appDict[props.appPop.appType].footerAction() }
+            onModalBtnClick={(input)=> input ==="Cancel"  ? props.setVisible(false) : appDict[props.appPop.appType].footerAction() }
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"

@@ -321,17 +321,16 @@ const CanvasNew = (props) => {
         setSelectedSpan(index);
         switch (index) {
           case 1:
-            setBrowserName("explorer")
-            break;
-          case 2:
             setBrowserName("chrome")
             break;
-          case 3:
+          case 2:
             setBrowserName("mozilla")
-            break;
-          case 4:
+            break;            
+          case 8:
             setBrowserName("chromium")
             break;
+           
+
          
         }
       }
@@ -629,7 +628,7 @@ const CanvasNew = (props) => {
      // Function for impact analysis 
      const clickAnalyzeScenario = (browserName)=>{
       
-
+    let browserNameForDebug=selectedSpan.toString()
       // setShowAppPop(false);
     let err=""
     setOverlay("Impact Analysis is in progress... ")
@@ -660,7 +659,7 @@ const CanvasNew = (props) => {
     
                   data.appType = typesOfAppType;
     
-                  data.browserType = "chrome";
+                  data.browserType = browserName;
     
                   screenAnalysisData['screenName'] = dataObject['name']
     
@@ -766,7 +765,7 @@ const CanvasNew = (props) => {
     
     
     
-                  await DesignApi.debugTestCase_ICE(["1"], [dataObject.testcaseid], userInfo, typesOfAppType)
+                  await DesignApi.debugTestCase_ICE([`${browserNameForDebug}`], [dataObject.testcaseid], userInfo, typesOfAppType)
     
       
     
@@ -2245,10 +2244,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             <p className='compare__text'>List Of Browsers</p>
           </span>
           <span className='browser__col'>
-            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8  && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
           </span>
         </div>
       </Dialog>
