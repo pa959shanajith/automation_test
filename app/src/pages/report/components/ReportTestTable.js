@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewAzureMappedList_ICE, viewReport } from "../api";
+import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
@@ -39,6 +39,7 @@ export default function BasicDemo() {
   const [jiraDropDown, setJiraDropDown] = useState(null);
   const [issueDropDown, setIssueDropDown] = useState(null);
   const [jiraDetails, setJiraDetails] = useState({ projects: [], issuetype: [] });
+  const [mappedProjects, setMappedProjects] = useState({});
   const [configureFeilds, setConfigureFeilds] = useState([]);
   const [selectedFiels, setSelectedFiels] = useState([]);
   const [responseFeilds, setResponseFeilds] = useState({});
@@ -112,6 +113,9 @@ export default function BasicDemo() {
         if(getJiraDetails === "unavailableLocalServer"){
           iceinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Ice is not connected.' });
         };
+        const getUserInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const getMappedJiraProjects = await viewJiraMappedList_ICE(getUserInfo?.user_id, reportData?.overallstatus?.scenarioName);
+        setMappedProjects(getMappedJiraProjects);
         setJiraDetails(getJiraDetails);
         setVisibleBug(false);
       } else if (bugTitle === "Azure DevOps") {
@@ -121,6 +125,12 @@ export default function BasicDemo() {
           action: "loginToAzure",
           pat: loginKey,
         });
+        if(getAzureDetails === "unavailableLocalServer"){
+          iceinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Ice is not connected.' });
+        };
+        const getUserInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const getMappedAdoProjects = await viewAzureMappedList_ICE(getUserInfo?.user_id, reportData?.overallstatus?.scenarioName);
+        setMappedProjects(getMappedAdoProjects);
         setJiraDetails({
           ...getAzureDetails,
           issuetype: [
@@ -188,6 +198,10 @@ export default function BasicDemo() {
       setUserData(resp);
     })();
   };
+
+  useEffect(() => {
+    setJiraDropDown(jiraDetails?.projects?.filter((el) => (el?.name === mappedProjects?.projectName))[0]);
+  }, [mappedProjects, jiraDetails]);
 
   const getTableHeader = (
     <div className="grid">
@@ -257,7 +271,6 @@ export default function BasicDemo() {
     const hasChildren = rowData?.children && (rowData?.children?.length > 0);
 
     const getIcon = (iconType) => {
-      console.log(rowData?.data?.jira_defect_id);
       let icon = "static/imgs/bug.svg";
       if(iconType === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/jira_icon.svg";
       else if(iconType === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/azure_devops_icon.svg";
@@ -635,6 +648,8 @@ export default function BasicDemo() {
                 value={selectedRow[0]?.StepDescription}
               />
             </div>
+            {!Array.isArray(mappedProjects) && <div className="col-12"><b>MappedType: {mappedProjects?.itemType}</b></div>}
+            {!Array.isArray(mappedProjects) && <div className="col-12"><b>{mappedProjects?.itemCode}: {mappedProjects?.itemSummary}</b></div>}
             {configureFeilds.map((el) => (
               <div className="col-12">
                 <div>
