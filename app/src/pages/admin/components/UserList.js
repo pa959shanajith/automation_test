@@ -86,7 +86,6 @@ const UserList = (props) => {
 
 
     const editRowData = (rowData) => {
-        dispatch(AdminActions.EDIT_USER(true));
         dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
         dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(rowData.firstName));
@@ -102,13 +101,13 @@ const UserList = (props) => {
             <React.Fragment>
                 <img src="static/imgs/ic-edit.png" alt="editUserIcon"
                     style={{ height: "20px", width: "20px" }}
-                    className="edit__usericon" onClick={() => { editRowData(rowData); setEditUserDialog(true) }}
+                    className="edit__usericon" onClick={() => { editRowData(rowData); dispatch(AdminActions.EDIT_USER(true)); setEditUserDialog(true) }}
                 />
                 <img
                     src="static/imgs/ic-delete-bin.png" alt="deleteUserIcon"
                     style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
                     className="delete__usericon"
-                    onClick={() => { editRowData(rowData); setShowDeleteConfirmPopUp(true) }}
+                    onClick={() => { editRowData(rowData); setShowDeleteConfirmPopUp(true); dispatch(AdminActions.EDIT_USER(false)); }}
                 />
             </React.Fragment>
         );

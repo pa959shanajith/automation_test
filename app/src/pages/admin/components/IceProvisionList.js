@@ -86,6 +86,7 @@ const IceProvisionList = (props) => {
 	}
 
 	const reregister = async (entry, eventName) => {
+		props.toast.current.clear();
 		const provisionDetails = entry
 		const icename = provisionDetails.icename;
 		const event = eventName.trim();
@@ -124,6 +125,7 @@ const IceProvisionList = (props) => {
 	}
 
 	const deregister = async (entry) => {
+		props.toast.current.clear();
 		const provisionDetails = entry;
 		const icename = provisionDetails.icename;
 		const tokeninfo = {
