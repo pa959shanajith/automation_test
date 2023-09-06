@@ -88,7 +88,7 @@ const PluginBox = ({pluginName, pluginTitle, pluginShow}) => {
 				{highlightAGS && <div className="tranparentBlocker_ags" disabled></div>}
 				{(highlightAGS && pluginName==="AGS") ?<div className="startGeniusFocus"><div className='tip_genius'></div>
 			Start Genius</div> :null}
-                <img data-test="plugin-image" className={highlightAGS === true?pluginName==="AGS"?userInfo.isTrial?"plugin-ic_ags":"plugin-ic_ags":"plugin-ic_ags":"plugin-ic"} alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}${pluginName==="AGS"?userInfo.isTrial?"_cloud":"":""}.${pluginName==="AGS"?userInfo.isTrial?"png":"png":pluginName==="TV"?"png":"svg"}`} />
+                <img data-test="plugin-image" className={highlightAGS === true?pluginName==="AGS"?userInfo.isTrial?"plugin-ic_ags":"plugin-ic_ags":"plugin-ic":"plugin-ic"} alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}${pluginName==="AGS"?userInfo.isTrial?"_cloud":"":""}.${pluginName==="AGS"?userInfo.isTrial?"png":"png":pluginName==="TV"?"png":"svg"}`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
                 {disabled?
                   <div className='disabled-info'><i class="fa fa-lock fa-fw" style={{color:"#ffcc62",paddingLeft:1,fontSize:9, marginRight:4}} aria-hidden="true"></i>Premium</div>
