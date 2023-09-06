@@ -440,7 +440,7 @@ const DesignModal = (props) => {
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
                         if (!testCases[i].keywordVal) col = "keyword";
-                        // setMsg(MSG.CUSTOM(`Please select ${col} Name a`));
+                        toast.current.show({severity:'warn', summary:'Warning', detail:`Please select ${col} Name at Step No. ${testCases[i].stepNo}`, life:2000});
                         errorFlag = true;
                         break;
                     } else {
