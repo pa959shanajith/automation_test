@@ -569,6 +569,83 @@ exports.exportScreenToExcel = async (req, res) =>{
 		var obj_count=1;
 		for (i = 0; i < curr.view.length; i++) {
 			ws.cell(2+i,1).string(curr.view[i].custname);
+			ws.cell(2+i,3).string(curr.view[i].url);
+			xpathSplit = curr.view[i].xpath.split(";");
+			if(xpathSplit[2] == "null"){
+				ws.cell(2+i,4).string((""));
+			}
+			else{
+			ws.cell(2+i,4).string(xpathSplit[2]);
+			}
+			if(xpathSplit[1] == "null"){
+				ws.cell(2+i,5).string((""));
+			}
+			else{
+				ws.cell(2+i,5).string(xpathSplit[1]);
+			}
+
+			if(xpathSplit[0] == "null"){
+				ws.cell(2+i,6).string((""));
+			}
+			else{
+			ws.cell(2+i,6).string(xpathSplit[0]);
+			}
+
+			if(xpathSplit[3] == "null"){
+				ws.cell(2+i,7).string((""));
+			}else{
+				ws.cell(2+i,7).string(xpathSplit[3]);
+			}
+
+			if(xpathSplit[4] == "null" ){
+				ws.cell(2+i,8).string((""));
+			}
+			else{
+				ws.cell(2+i,8).string(xpathSplit[4]);
+			}
+
+			if(xpathSplit[5] == "null"){
+				ws.cell(2+i,9).string((""));
+			}
+			else{
+				ws.cell(2+i,9).string(xpathSplit[5]);
+			}
+			if ("left" in curr.view[i] ){
+			ws.cell(2+i,10).string((curr.view[i].left).toString());
+			}
+			else{
+				ws.cell(2+i,10).string((""));
+			}
+			if("top" in curr.view[i]  ){
+				ws.cell(2+i,11).string((curr.view[i].top).toString());
+			}
+			else{
+				ws.cell(2+i,11).string((""));
+			}
+			if("height" in curr.view[i]  ){
+				ws.cell(2+i,12).string((curr.view[i].height).toString());
+			}
+			else{
+				ws.cell(2+i,12).string((""));
+			}
+			if("width" in curr.view[i]  ){
+				ws.cell(2+i,13).string((curr.view[i].width).toString());
+			}
+			else{
+				ws.cell(2+i,13).string((""));
+			}
+			if (xpathSplit[12] == undefined){
+			ws.cell(2+i,14).string((""));
+			}
+			else{
+			ws.cell(2+i,14).string(xpathSplit[12]);
+			}
+			if(xpathSplit[14] == undefined){
+			ws.cell(2+i,15).string((""));
+			}
+			else{
+			ws.cell(2+i,15).string(xpathSplit[14]);
+			}
 		}
 
 		//save it
