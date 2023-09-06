@@ -408,7 +408,7 @@ const CreateProject = (props) => {
     // You can display an error message to the user
     toast.current.show({
       severity: "error",
-      summary: "API Error",
+      summary: "Error",
       detail: "Failed to create Project",
       life: 5000,
     });
@@ -435,8 +435,8 @@ const CreateProject = (props) => {
 
       toast.current.show({
         severity: "error",
-        summary: "API Error",
-        detail: "An error occurred while creating the project",
+        summary: "Error",
+        detail: "Failed to create Project",
         life: 5000,
       });
       }
