@@ -366,6 +366,34 @@ export const connectAzure_ICE_Fields = async(project, type, jiraurl, jirausernam
     }
 }
 
+export const viewJiraMappedList_ICE = async(userID, scenarioName) => {
+    try{
+        const res = await axios(url+'/viewJiraMappedList_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            // responseType: 'arraybuffer',
+            credentials: 'include',
+            data: {
+                "userID": userID,
+                "scenarioName": scenarioName,
+                "action": "viewJiraMappedList_ICE"
+            },
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.AZURE.ERR_AZURE_LOGIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.AZURE.ERR_AZURE_LOGIN}
+    }
+}
+
 export const viewAzureMappedList_ICE = async(userID, scenarioName) => {
     try{
         const res = await axios(url+'/viewAzureMappedList_ICE', {
