@@ -93,7 +93,7 @@ const IceProvision = (props) => {
           setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token}
           setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid}
           tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken}
-          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} edit={props.editUserIceProvision} />
+          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} edit={props.editUserIceProvision} toast={props.toast}/>
         {editUser ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE}
           userConfig={props.userConfig} 
           refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp}
@@ -101,7 +101,7 @@ const IceProvision = (props) => {
           token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid}
           setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename}
           tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken} edit={props.editUserIceProvision}
-          toastError={props.toastError} toastSuccess={props.toastSuccess}
+          toastError={props.toastError} toastSuccess={props.toastSuccess} toast={props.toast}
         /> : null}
       </div>
     </div>

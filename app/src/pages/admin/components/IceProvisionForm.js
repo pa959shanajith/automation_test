@@ -38,6 +38,7 @@ const IceProvisionForm = (props) => {
 
 
 	const provisionsIce = async () => {
+		props.toast.current.clear()
 		setIcenameErrBorder(false);
 		setSelAssignUser2ErrBorder(false);
 		const icetype = props.op;

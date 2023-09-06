@@ -553,7 +553,7 @@ const CreateUser = (props) => {
 
     const userCreateHandler = () => {
         toast.current.clear();
-        editUser ? toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)):toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
+        editUser ? toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)) : toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
         createUserDialogHide();
     }
 
@@ -585,9 +585,9 @@ const CreateUser = (props) => {
 
     return (
         <Fragment>
-            <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={1300} />
+            <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={2000} />
             {loading ? <ScreenOverlay content={loading} /> : null}
-            <UserList manage={manage} refreshUserList={refreshUserList} setRefreshUserList={setRefreshUserList}/>
+            <UserList manage={manage} refreshUserList={refreshUserList} setRefreshUserList={setRefreshUserList} />
             <Dialog
                 visible={props.createUserDialog}
                 onHide={createUserDialogHide}
@@ -673,7 +673,12 @@ const CreateUser = (props) => {
                         </div>
                     </div>
                 </div>}
-                {selectedTab === "avoAzzureClient" && <IceProvision editUserIceProvision={props.editUserData} setEditUserIceProvision={props.setEditUserData} userName={userNameForIceToken} toastError={toastError} toastSuccess={toastSuccess} />}
+                {selectedTab === "avoAzzureClient" && <IceProvision editUserIceProvision={props.editUserData}
+                    setEditUserIceProvision={props.setEditUserData}
+                    userName={userNameForIceToken}
+                    toastError={toastError}
+                    toastSuccess={toastSuccess}
+                    toast={toast} />}
             </Dialog>
         </Fragment>
     );
