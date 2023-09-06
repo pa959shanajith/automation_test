@@ -7,8 +7,11 @@ import '../styles/Topbar.scss';
 import { Tooltip } from 'primereact/tooltip';
 import { useSelector} from 'react-redux';
 import WelcomeWizard from "../../login/components/WelcomeWizard";
+import { Toast } from "primereact/toast";
+
 
 const MenubarDemo = (props) => {
+  const toast = useRef();
   const [showExtraheaderItem, setShowExtraheaderItem] = useState(false);
   const location = useLocation();
   const needHelpmenuLeft = useRef(null);
@@ -21,6 +24,7 @@ const MenubarDemo = (props) => {
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
   if(!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo ;
+
   const handleTooltipToggle = () => {
     const rect = imageRefhelp.current.getBoundingClientRect();
     setCardPosition({ right: rect.right, left: rect.left, top: rect.top, bottom: rect.bottom });
@@ -94,8 +98,29 @@ const MenubarDemo = (props) => {
     }
   }, [location]);
 
+  const toastError = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+  }
+
+  const toastSuccess = (successMessage) => {
+    if (successMessage.CONTENT) {
+      toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+  }
+
+  const toastWarn = (warnMessage) => {
+    if (warnMessage.CONTENT) {
+        toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
+}
+
   const start = (
-    <NavLink to={userInfo.role ==="admin" ? "/admin":"/landing"} className="activeLanding">
+    <NavLink to={userInfo.rolename === "Admin" ? "/admin" : "/landing"} className="activeLanding">
       <img alt="logo" src="static/imgs/logo.png" onError={(e) => e.target.src = "static/imgs/logo.png"} height="30" className="mr-2" title="Go to Home"></img>
     </NavLink>
   );
@@ -110,7 +135,7 @@ const MenubarDemo = (props) => {
           {showExtraheaderItem && <NavLink to="/reports" activeClassName="active">Reports</NavLink>}
         </>
       </div>
-      <UserProfile />
+      <UserProfile toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/>
     </div>
   );
 
@@ -120,6 +145,7 @@ const MenubarDemo = (props) => {
 
   return (
     <div className='Topbar_Menu'>
+      <Toast ref={toast} position="bottom-center" baseZIndex={1300} />
       <Menubar className='Header_size' start={start} end={end} />
       <div className='Need_Help_menu'>
         <div className="card needHelp flex justify-content-center bg-white shadow-2">

@@ -21,7 +21,7 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
 import { ReactSortable } from 'react-sortablejs';
-import ClickAwayListener from 'react-click-away-listener';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import DetailsDialog from "../components/DetailsDialog";
 import RemarkDialog from "../components/RemarkDialog";
 import PasteStepDialog from "../components/PasteStepDialog";
@@ -440,7 +440,7 @@ const DesignModal = (props) => {
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
                         if (!testCases[i].keywordVal) col = "keyword";
-                        // setMsg(MSG.CUSTOM(`Please select ${col} Name a`));
+                        toast.current.show({severity:'warn', summary:'Warning', detail:`Please select ${col} Name at Step No. ${testCases[i].stepNo}`, life:2000});
                         errorFlag = true;
                         break;
                     } else {
@@ -934,13 +934,13 @@ const DesignModal = (props) => {
         else if (props.appType === "Desktop"){
             debugTestCases('1')
         }
-        else if (props.appType === "MobileApps"){
+        else if (props.appType === "MobileApp"){
             debugTestCases('1')
         }
         else if (props.appType === "MobileWeb"){
             debugTestCases()
         }
-        else if (props.appType === "WebService"){
+        else if (props.appType === "Webservice"){
             debugTestCases()
         }
         else if (props.appType === "OEBS"){
@@ -1458,7 +1458,7 @@ const DesignModal = (props) => {
                     <div className="min">
                         <div className="con" id="d__tcListId">
                         <div style={{overflowY:'auto'}}>
-                            <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
+                            <ClickAwayListener  mouseEvent="false" touchEvent="false" onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setnewtestcase} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
                                 data.testCases.map((item, i) => <TableRow data-test="d__tc_row" draggable={draggable}
