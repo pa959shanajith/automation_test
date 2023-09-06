@@ -51,6 +51,11 @@
             }
           }
         }
+        .radioButton{
+          text-align: center;
+          font-family: "Open Sans";
+          font:$f7_semibold ;
+        }
 
         .p-treetable {
           font-family: "Open Sans";
@@ -238,4 +243,8 @@
 }
 .required-asterisk {
   color: red;
+}
+.disabledEffect{
+  opacity:0.5;
+  margin-left: 0.5rem !important;
 }

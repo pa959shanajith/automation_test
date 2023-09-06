@@ -130,6 +130,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [dropdownDay, setDropdownDay] = useState(null);
   const [project, setProject] = useState({});
   const [scheduleOption, setScheduleOption] = useState({});
+  const [typeOfExecution, setTypeOfExecution] = useState("");
   const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
   const [radioButton_grid, setRadioButton_grid] = useState(
    selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
@@ -688,6 +689,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       });
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
+      setTypeOfExecution(getData.executionRequest.selectedModuleType)
       setDotNotExe(getData);
     } else {
       setUpdateKey("");
@@ -815,7 +817,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             testscenarioids: el?.suitescenarios,
             getparampaths:
               !!Object.values(paramPaths).length &&
-              Object.values(paramPaths[el?.key].map((el) => el?.value)),
+              Object.values(paramPaths[el?.key] && paramPaths[el?.key].map((el) => el?.value)),
             conditioncheck:
               !!Object.values(checkcondition).length &&
               Object.values(
@@ -1625,7 +1627,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small" >
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
@@ -1672,6 +1674,7 @@ Learn More '/>
               setSelectedNodeKeys={setSelectedNodeKeys}
               dotNotExe={dotNotExe}
               setDotNotExe={setDotNotExe}
+              typeOfExecution={typeOfExecution}
             />
           }
           headerTxt="Execution Configuration set up"
