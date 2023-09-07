@@ -413,7 +413,7 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
                     <h5><span className="tnc_num_idx">16.        </span> FORCE MAJEURE</h5>
                     <p>A Party will be excused from a delay in performing, or a failure to perform, its obligations under this Agreement to the extent such delay or failure is caused by the occurrence of any contingency beyond the reasonable control including epidemics and pandemics, and without any fault, of such Party. In such event, the performance times shall be extended for a period of time equivalent to the time lost because of the excusable delay. However, if an excusable delay continues more than sixty (60) days, the Party not relying on the excusable delay may, at its option, terminate the Agreement in whole or in part, upon notice to the other Party. In order to avail itself of the relief provided in this Section for an excusable delay, the Party must act with due diligence to remedy the cause of, or to mitigate or overcome, such delay or failure.</p>
                 </div>
-                <div>
+                <div id="lastStepTnC">
                     <br/>
                     <h5><span className="tnc_num_idx">17.        </span> CONSTRUCTION</h5>
                     <p><span className="tnc_num_idx">17.1.    </span> <b>Modification.</b> The terms, conditions, covenants and other provisions of this Agreement may hereafter be modified, amended, supplemented or otherwise changed only by a written instrument (excluding e-mail or similar electronic transmissions) that specifically purports to do so and is physically executed by a duly authorized representative of each Party.</p>
@@ -421,7 +421,7 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
                     
                 </div>
                 <br/>
-                <p id="lastStepTnC"><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
+                <p><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
             </div>)
   }
 
