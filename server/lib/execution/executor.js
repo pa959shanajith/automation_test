@@ -108,6 +108,7 @@ class TestSuiteExecutor {
             "smart": batchData.type == undefined ? false : batchData.type.includes('smart'),
             "integration": batchData.integration,
             "scenarioFlag": batchData.scenarioFlag,
+            "executingOn": batchData.executingOn,
             "batchId": "",
             "executionIds": [],
             "testsuiteIds": [],
