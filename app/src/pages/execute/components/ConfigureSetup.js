@@ -16,7 +16,7 @@ import GridBrowser from "./GridBrowser";
 import AvoInput from "../../../globalComponents/AvoInput";
 import { useDispatch, useSelector } from "react-redux";
 import { checkRequired, readTestSuite } from "../configureSetupSlice";
-
+import { Tooltip } from 'primereact/tooltip';
 const ConfigureSetup = ({
   configData,
   tabIndex,
@@ -41,7 +41,8 @@ const ConfigureSetup = ({
   setSelectedNodeKeys,
   dotNotExe,
   integration,
-  setIntegration
+  setIntegration,
+  typeOfExecution
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
@@ -269,28 +270,37 @@ const ConfigureSetup = ({
   const tableTreeHeader = (
     <div className="flex align-items-center justify-content-between">
       <div className="flex align-items-center">
+      <div className="radioButton"
+        tooltipOptions={{ showOnDisabled: true }}>
+          {typeOfExecution === "normalExecution" && <Tooltip target=".radioButton" position="bottom" content="You cannot switch between the test suite and end-to-end flow while editing."/>}
         <RadioButton
           inputId="module1"
           name="module"
           value="e2eExecution"
-          onChange={(e) => setModules(e.value)}
+          onChange={(e) => {setModules(e.value);setSelectedNodeKeys({});}}
           checked={modules === "e2eExecution"}
-          required={isModuleRequired}  
-        />
-        <label htmlFor="module1" className="ml-2">
+          required={isModuleRequired}
+          disabled={typeOfExecution === "normalExecution"}  
+          >
+        </RadioButton></div>
+        <label  htmlFor="module1" className={typeOfExecution === "normalExecution"? "disabledEffect":"ml-2"}>
           End to End Flow{isModuleRequired && <span className="required-asterisk">*</span>}
         </label>
       </div>
       <div className="flex align-items-center">
+        <div className="radioButton"
+        tooltipOptions={{ showOnDisabled: true }}>
+          {typeOfExecution === "e2eExecution" && <Tooltip target=".radioButton" position="bottom" content="You cannot switch between the test suite and end-to-end flow while editing."/>}
         <RadioButton
           inputId="module2"
           name="module"
           value="normalExecution"
-          onChange={(e) => setModules(e.value)}
+          onChange={(e) => {setModules(e.value);setSelectedNodeKeys({});}}
           checked={modules === "normalExecution"}
           required={isTestsuiteRequired} 
-        />
-        <label htmlFor="module2" className="ml-2">
+          disabled={typeOfExecution === "e2eExecution"}>
+        </RadioButton></div>
+        <label htmlFor="module2" className={typeOfExecution === "e2eExecution"? "disabledEffect":"ml-2"}>
           Test Suites{isTestsuiteRequired && <span className="required-asterisk">*</span>}
         </label>
       </div>
