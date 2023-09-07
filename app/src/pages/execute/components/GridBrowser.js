@@ -145,7 +145,7 @@ const displayError = (error) =>{
         valueTemplate={selectedToolTemplate} 
         itemTemplate={toolOptionTemplate} 
         className="custom-dropdown w-full md:w-16rem"
-        // disabled={!(avodropdown.browser && avodropdown.browser.length > 0 && typesOfAppType === 'Web')}
+        disabled={!(avodropdown.browser && avodropdown.browser.length > 0 && typesOfAppType === 'Web')}
          />
  
         </div>
