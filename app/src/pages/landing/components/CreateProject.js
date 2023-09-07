@@ -334,6 +334,7 @@ const CreateProject = (props) => {
     );
     setItems((prevItems) => [...prevItems, ...unassignedUsers]);
     setDisplayUser(filteredAssignedItems);
+    setUnFiltereAssaignedData(filteredAssignedItems);
     setSelectedAssignedCheckboxes([]);
     setSelectallAssaigned(false);
 
