@@ -1,0 +1,15 @@
+.Grid__box{
+    width: 25rem;
+    height: 21.5rem;
+    box-shadow: none !important;
+    border: 0.5px solid #dee2e6 !important;
+}
+.grid_arrows{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.gtbtn{
+    position: inherit;
+    margin: 1rem;
+}

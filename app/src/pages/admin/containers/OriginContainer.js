@@ -10,6 +10,7 @@ import '../styles/OriginContainer.scss'
 import { validateUserState } from '../../login/api';
 // import IceProvision from './IceProvision';
 import Agents from './Agents'
+import Grid from './Grid'
 import LicenseManagement from './LicenseManagement';
 import SessionManagement from './SessionManagement';
 import Privileges from './preferences';
@@ -29,6 +30,7 @@ const OriginContainer = (props) => {
             {currentTab === "Users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
             {currentTab === "Manage Agents" && <Agents/>}
+            {currentTab === "Grid" && <Grid/>}
             {currentTab === "License Details" && <LicenseManagement/>}
             {currentTab === "SessionManagement" && <SessionManagement/>}
             {currentTab === "Privileges" && <Privileges/>}
