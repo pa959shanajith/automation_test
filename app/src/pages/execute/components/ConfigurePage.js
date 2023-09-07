@@ -32,6 +32,7 @@ import {
   getScheduledDetails_ICE,
   storeConfigureKey,
   testSuitesScheduler_ICE,
+  testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
@@ -129,6 +130,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [dropdownDay, setDropdownDay] = useState(null);
   const [project, setProject] = useState({});
   const [scheduleOption, setScheduleOption] = useState({});
+  const [typeOfExecution, setTypeOfExecution] = useState("");
   const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
   const [radioButton_grid, setRadioButton_grid] = useState(
    selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
@@ -242,7 +244,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
-      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0] }));
+      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
@@ -687,6 +689,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       });
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
+      setTypeOfExecution(getData.executionRequest.selectedModuleType)
       setDotNotExe(getData);
     } else {
       setUpdateKey("");
@@ -814,7 +817,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             testscenarioids: el?.suitescenarios,
             getparampaths:
               !!Object.values(paramPaths).length &&
-              Object.values(paramPaths[el?.key].map((el) => el?.value)),
+              Object.values(paramPaths[el?.key] && paramPaths[el?.key].map((el) => el?.value)),
             conditioncheck:
               !!Object.values(checkcondition).length &&
               Object.values(
@@ -1029,8 +1032,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     };
 
     if (btnType === "ScheduleIce") {
+      !!Object.keys(selectedPattren).length ?
       dispatch(
-        testSuitesScheduler_ICE({
+        testSuitesSchedulerRecurring_ICE({
           param: "testSuitesScheduler_ICE",
           executionData: {
             source: "schedule",
@@ -1047,6 +1051,55 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
               timestamp: startTime.getTime().toString(),
               recurringValue: getPattren().recurringValue,
+              recurringString: getPattren().recurringString,
+              recurringStringOnHover: getPattren().recurringStringOnHover,
+              endAfter: startDate ? "" : endDate?.name,
+              clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
+              clientTimeZone: "+0530",
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
+            })),
+            scenarioFlag: false,
+            type: "normal",
+            configureKey: selectedSchedule?.configurekey,
+            configureName: selectedSchedule?.configurename,
+          },
+        })
+      ).then(() => {
+        dispatch(
+          getScheduledDetails_ICE({
+            param: "getScheduledDetails_ICE",
+            configKey: fetechConfig[configItem]?.configurekey,
+            configName: fetechConfig[configItem]?.configurename,
+          })
+        );
+        setScheduling(false);
+        setStartDate(null);
+        setEndDate(null);
+        setStartTime(null);
+        setScheduleOption({});
+        setSelectedDaily(null);
+        setselectedWeek([]);
+        setSelectedMonthly(null);
+        setDropdownWeek(null);
+        setSelectedPattren({});
+      }) : dispatch(
+        testSuitesScheduler_ICE({
+          param: "testSuitesScheduler_ICE",
+          executionData: {
+            source: "schedule",
+            exectionMode: "serial",
+            executionEnv: "default",
+            browserType: selectedSchedule?.executionRequest?.browserType,
+            integration: selectedSchedule?.executionRequest?.integration,
+            batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
+              ...el,
+              poolid: "",
+              type: "normal",
+              ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
+              date: startDate ? startDate.toLocaleDateString('es-CL') : "",
+              time: `${startTime.getHours()}:${startTime.getMinutes()}`,
+              timestamp: startTime.getTime().toString(),
+              recurringValue: getPattren().recurringValue,  
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
               endAfter: startDate ? "" : endDate?.name,
@@ -1574,7 +1627,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small" >
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
@@ -1621,6 +1674,7 @@ Learn More '/>
               setSelectedNodeKeys={setSelectedNodeKeys}
               dotNotExe={dotNotExe}
               setDotNotExe={setDotNotExe}
+              typeOfExecution={typeOfExecution}
             />
           }
           headerTxt="Execution Configuration set up"

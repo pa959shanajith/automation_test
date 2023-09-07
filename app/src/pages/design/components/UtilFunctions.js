@@ -4,7 +4,7 @@ export const getObjNameList = (appType, data) => {
     switch(appType){
         case "Web":         obnames = ["@Generic", "@Excel", "@Custom", "@Browser", "@BrowserPopUp", "@Object", "@Word"];
                             break;
-        case "WebService":  obnames = ["@Generic", "@Excel", "WebService List", "@Word"];
+        case "Webservice":  obnames = ["@Generic", "@Excel", "WebService List", "@Word"];
                             break;
         case "Mainframe":   obnames = ["@Generic", "@Excel", "Mainframe List", "@Word"];
                             break;
@@ -215,7 +215,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                         }
                     }
 
-                    if (!obType && appType === "WebService" ) {
+                    if (!obType && appType === "Webservice" ) {
                         keywords = Object.keys(keywordList.elementWS);
                         selectedKeywordList = "elementWS";
                         break;

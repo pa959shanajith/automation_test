@@ -493,7 +493,7 @@ const elementTypeProp =(elementProperty) =>{
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
 
           if (data === "Invalid Session") return RedirectPage(history);
-          else if (typeof data === "object" && typesOfAppType !== "WebService") {
+          else if (typeof data === "object" && typesOfAppType !== "Webservice") {
             haveItems = data.view.length !== 0;
             let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
             newlyScrapeList = newScrapeList
@@ -516,7 +516,7 @@ const elementTypeProp =(elementProperty) =>{
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
           }
-          else if (typeof data === "object" && typesOfAppType === "WebService") {
+          else if (typeof data === "object" && typesOfAppType === "Webservice") {
             haveItems = data.view[0].endPointURL && data.view[0].method;
             if (haveItems) {
 
@@ -601,6 +601,7 @@ const elementTypeProp =(elementProperty) =>{
             )
           })
           setCaptureData(newData);
+          addMore.current=false;
         })
         .catch(error => {
           dispatch(disableAction(haveItems));
@@ -620,14 +621,15 @@ const elementTypeProp =(elementProperty) =>{
     var capturedDataAfterSave = scrapeItemsL.filter(function (item) {
 
       return !selectedCapturedElement.find(function (objFromB) {
-        if (item.objectDetails.objId === objFromB.objectDetails.objId) {
-          deletedArr.push(item.objectDetails.objId)
+        if (item.objectDetails.custname === objFromB.objectDetails.custname) {
+          if(item.objectDetails.objId){
+            deletedArr.push(item.objectDetails.objId)}
           return true
         }
       })
     })
     let notused = scrapeItemsL.filter(item => {
-      if (deletedArr.includes(item.objectDetails.objId)) {
+      if (deletedArr.includes(item.objectDetails.custname)) {
         return false
       }
       else {
@@ -639,7 +641,9 @@ const elementTypeProp =(elementProperty) =>{
     setDeleted(deletedArr)
     setOrderList(newOrderList)
     setCapturedDataToSave(newCapturedDataToSave)
+    setNewScrapedCapturedData({...newScrapedCapturedData,view:newCapturedDataToSave})
     setSelectedCapturedElement([])
+    // setNewScrapedCapturedData(newCapturedDataToSave)
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
     setDeletedItems(true);
   }
@@ -663,6 +667,7 @@ const elementTypeProp =(elementProperty) =>{
       }
 
     }
+    // const newdeleted=deleted.filter(element=>element!==undefined)
 
     let params = {
       'deletedObj': deleted,
@@ -679,6 +684,7 @@ const elementTypeProp =(elementProperty) =>{
       .then(response => {
         if (response === "Invalid Session") return RedirectPage(history);
         else fetchScrapeData().then(resp => {
+          addMore.current=false
           if (resp === 'success' || typeof (resp) === "object") {
 
             typeof (resp) === "object" && resp.length > 0
@@ -708,7 +714,7 @@ const elementTypeProp =(elementProperty) =>{
   }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
-    if (typesOfAppType === "WebService") {
+    if (typesOfAppType === "Webservice") {
       let arg = {}
       let testCaseWS = []
       let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
@@ -788,6 +794,7 @@ const elementTypeProp =(elementProperty) =>{
       .then(data => {
         let err = null;
         setOverlay("");
+        setVisible(false);
         // ResetSession.end();
         if (data === "Invalid Session") return RedirectPage(history);
         else if (data === "Response Body exceeds max. Limit.")
@@ -1439,7 +1446,7 @@ const footerSave = (
     setElementProperties(true)
   }
   else {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the Captured Element before delete', life: 5000 });
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the Captured Element to view/edit the element properties', life: 5000 });
   }
 
   }
@@ -1579,7 +1586,7 @@ const footerSave = (
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : "" )}`} title={rowdata.selectall}>{rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj":"" )}`} title={rowdata.selectall}>{rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
       </div>
@@ -1613,7 +1620,7 @@ const headerstyle={
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
-      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "WebService" ? null : footerSave}>
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
        <div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
@@ -1742,7 +1749,7 @@ const headerstyle={
 
 
         <div className="card-table" style={{ width: '100%', display: "flex" }}>
-          {typesOfAppType === "WebService" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -1811,7 +1818,7 @@ const headerstyle={
          customClass="OEBS"
         />: null} */}
         {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
-        {typesOfAppType === "Mainframes"? <AvoModal
+        {typesOfAppType === "Mainframe"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
           onModalBtnClick={onLaunchBtn}
@@ -1821,8 +1828,8 @@ const headerstyle={
          content = {"hello"}
          customClass="Mainframes"
         />: null}
-        {typesOfAppType === "MobileApps"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
-        {typesOfAppType === "System_application"? <AvoModal
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "System"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
           onModalBtnClick={onLaunchBtn}
@@ -1997,7 +2004,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, replaceFlag, mai
     screenViewObject.applicationPath = browserType.appName;
   }
   //For Mobility
-  else if (appType === "MobileApps") {
+  else if (appType === "MobileApp") {
     if (browserType.appPath.toLowerCase().indexOf(".apk") >= 0) {
       screenViewObject.appType = appType;
       screenViewObject.apkPath = browserType.appPath;
@@ -2463,14 +2470,14 @@ const LaunchApplication = props => {
         'footerAction': onMobileWebLaunch
     }
 
-    const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApps': MobileApps, 'OEBS': oebsApp, 'MobileWeb': mobileWeb}
+    const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApp': MobileApps, 'OEBS': oebsApp, 'MobileWeb': mobileWeb}
 
     return (
       <div className="ss__launch_app_dialog">
           <AvoModal
             visible={props.visible}
             setVisible={()=>{}}
-            onModalBtnClick={(input)=> input ==="Cancel" ? props.setVisible(false) : appDict[props.appPop.appType].footerAction() }
+            onModalBtnClick={(input)=> input ==="Cancel"  ? props.setVisible(false) : appDict[props.appPop.appType].footerAction() }
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"

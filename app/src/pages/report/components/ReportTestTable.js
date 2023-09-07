@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewAzureMappedList_ICE, viewReport } from "../api";
+import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
@@ -39,8 +39,10 @@ export default function BasicDemo() {
   const [jiraDropDown, setJiraDropDown] = useState(null);
   const [issueDropDown, setIssueDropDown] = useState(null);
   const [jiraDetails, setJiraDetails] = useState({ projects: [], issuetype: [] });
+  const [mappedProjects, setMappedProjects] = useState({});
   const [configureFeilds, setConfigureFeilds] = useState([]);
   const [selectedFiels, setSelectedFiels] = useState([]);
+  const [responseFeilds, setResponseFeilds] = useState({});
   const [configValues, setConfigValues] = useState({});
   const [selectedRow, setSelectedRow] = useState([]);
   const filterValues = [
@@ -111,6 +113,9 @@ export default function BasicDemo() {
         if(getJiraDetails === "unavailableLocalServer"){
           iceinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Ice is not connected.' });
         };
+        const getUserInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const getMappedJiraProjects = await viewJiraMappedList_ICE(getUserInfo?.user_id, reportData?.overallstatus?.scenarioName);
+        setMappedProjects(getMappedJiraProjects);
         setJiraDetails(getJiraDetails);
         setVisibleBug(false);
       } else if (bugTitle === "Azure DevOps") {
@@ -120,6 +125,12 @@ export default function BasicDemo() {
           action: "loginToAzure",
           pat: loginKey,
         });
+        if(getAzureDetails === "unavailableLocalServer"){
+          iceinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Ice is not connected.' });
+        };
+        const getUserInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const getMappedAdoProjects = await viewAzureMappedList_ICE(getUserInfo?.user_id, reportData?.overallstatus?.scenarioName);
+        setMappedProjects(getMappedAdoProjects);
         setJiraDetails({
           ...getAzureDetails,
           issuetype: [
@@ -135,6 +146,14 @@ export default function BasicDemo() {
   };
 
   const onLogBugBtnClick = async(getClick) => {
+    const valueObj = {};
+    Object.keys(configValues).forEach((item) => {
+      valueObj[item] = {
+        field_name: responseFeilds[item]?.key,
+        userInput: responseFeilds[item]?.type === "array" ? { title: "", key: configValues[item]?.key , text: configValues[item]?.name } : configValues[item],
+        type: responseFeilds[item]?.type,
+      };
+    })
     if (getClick === "Cancel") setLogBug(false);
     else if (getClick === "Proceed") { 
       const userDetails = await connectJira_ICE_create({
@@ -150,16 +169,7 @@ export default function BasicDemo() {
           reportId: reportData?.overallstatus?.reportId,
           slno: selectedRow[0]?.slno,
           executionId: reportData?.overallstatus?.executionId,
-          Reporter: {
-              field_name: "reporter",
-              userInput: "priyanka.r",
-              type: "user"
-          },
-          Environment: {
-              field_name: "environment",
-              userInput: "yes",
-              type: "string"
-          },
+          ...(!!Object.keys(configValues).length) && valueObj,
           executionReportNo: `Execution No: ${executed}`
         },
         action: "createIssueInJira"
@@ -188,6 +198,10 @@ export default function BasicDemo() {
       setUserData(resp);
     })();
   };
+
+  useEffect(() => {
+    setJiraDropDown(jiraDetails?.projects?.filter((el) => (el?.name === mappedProjects?.projectName))[0]);
+  }, [mappedProjects, jiraDetails]);
 
   const getTableHeader = (
     <div className="grid">
@@ -241,11 +255,11 @@ export default function BasicDemo() {
 
   const onBugClick = (e, rowData) => {
     setSelectedRow(reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments));
-    setConfigValues({
-      ...configValues,
-      Summary: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.Comments,
-      Description: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.StepDescription
-    });
+    // setConfigValues({
+    //   ...configValues,
+    //   Summary: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.Comments,
+    //   Description: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.StepDescription
+    // });
     if((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length))){
       setLogBug(true)
     } else {
@@ -255,6 +269,7 @@ export default function BasicDemo() {
 
   const defectIDForJiraAndAzure = (rowData) => {
     const hasChildren = rowData?.children && (rowData?.children?.length > 0);
+
     const getIcon = (iconType) => {
       let icon = "static/imgs/bug.svg";
       if(iconType === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/jira_icon.svg";
@@ -262,13 +277,13 @@ export default function BasicDemo() {
       return icon;
     }
     return hasChildren ? null : (
-      <img
-        src={getIcon(bugTitle)}
-        alt="bug defect"
+      rowData?.data?.jira_defect_id ? <a href={rowData?.data?.jira_defect_id.split(',')[1].split(']')[0].replace(/['‘’"“”]/g, '')} target="_blank">{rowData?.data?.jira_defect_id.split(',')[0].split('[')[1].replace(/['‘’"“”]/g, '')}</a> : <img
+          src={getIcon(bugTitle)}
+          alt="bug defect"
         className={((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length))) ? "img_jira" : "" }
-        onClick={(e) => onBugClick(e, rowData)}
-      />
-    );
+          onClick={(e) => onBugClick(e, rowData)}
+        />
+      );
   };
   const convertDataToTree = (data) => {
     const treeDataArray = [];
@@ -370,6 +385,7 @@ export default function BasicDemo() {
                 loginKey,
                 jiraDetails?.projects
               );
+        setResponseFeilds(getFields);
         const fieldValues = Object.keys(getFields).map((el) => ({
           key: bugTitle === "Jira" ? getFields[el].key : getFields[el].referenceName,
           name: bugTitle === "Jira" ? el : getFields[el].name,
@@ -528,29 +544,17 @@ export default function BasicDemo() {
         footerType="Connect"
       />
       <OverlayPanel ref={bugRef} className="report_bug">
-        <Menu
-          model={[
-            {
-              label: (
-                <span onClick={() => handleBug("Jira")}>
-                  <img src="static/imgs/jira_icon.svg" className="img_jira" />
-                  Jira
-                </span>
-              ),
-            },
-            {
-              label: (
-                <span onClick={() => handleBug("Azure DevOps")}>
-                  <img
-                    src="static/imgs/azure_devops_icon.svg"
-                    className="img_azure"
-                  />
-                  Azure DevOps
-                </span>
-              ),
-            },
-          ]}
-        />
+        <div className="flex downloadItem" onClick={() => handleBug("Jira")}>
+          <img src="static/imgs/jira_icon.svg" className="img_jira" />
+          <span>Jira</span>
+        </div>
+        <div
+          className="flex downloadItem"
+          onClick={() => handleBug("Azure DevOps")}
+        >
+          <img src="static/imgs/azure_devops_icon.svg" className="img_azure" />
+          <span>Azure DevOps</span>
+        </div>
       </OverlayPanel>
       {userData?.jiraUsername && (
         <OverlayPanel ref={userRef} className="jira_user">
@@ -624,8 +628,7 @@ export default function BasicDemo() {
                 name="Summary"
                 rows={2}
                 className="text_desc"
-                value={configValues.Summary}
-                onChange={(e) => handleConfigValues(e)}
+                value={selectedRow[0]?.Comments}
               />
             </div>
             <div className="col-12">
@@ -642,10 +645,11 @@ export default function BasicDemo() {
                 name="Description"
                 rows={2}
                 className="text_desc"
-                value={configValues.Description}
-                onChange={(e) => handleConfigValues(e)}
+                value={selectedRow[0]?.StepDescription}
               />
             </div>
+            {!Array.isArray(mappedProjects) && <div className="col-12"><b>MappedType: {mappedProjects?.itemType}</b></div>}
+            {!Array.isArray(mappedProjects) && <div className="col-12"><b>{mappedProjects?.itemCode}: {mappedProjects?.itemSummary}</b></div>}
             {configureFeilds.map((el) => (
               <div className="col-12">
                 <div>
@@ -664,7 +668,11 @@ export default function BasicDemo() {
                     dropdownValue={configValues[el.name]}
                     name={el.name}
                     onDropdownChange={(e) => handleConfigValues(e)}
-                    dropdownOptions={el.data.map((e) => ({ ...e, id: bugTitle === "Jira" ? e?.key : e?.referenceName, name: bugTitle === "Jira" ? e?.text : e?.name }))}
+                    dropdownOptions={el.data.map((e) => ({
+                      ...e,
+                      id: bugTitle === "Jira" ? e?.key : e?.referenceName,
+                      name: bugTitle === "Jira" ? e?.text : e?.name,
+                    }))}
                     parentClass="flex flex-column"
                   />
                 ) : (
