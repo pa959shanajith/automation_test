@@ -41,7 +41,17 @@ const ConfigureSetup = ({
   setSelectedNodeKeys,
   dotNotExe,
   integration,
-  setIntegration
+  setIntegration,
+  defaultValues,
+  setDefaultValues,
+  isNotifyOnExecutionCompletion,
+  setIsNotifyOnExecutionCompletion,
+  handleSubmit,
+  isEmailNotificationEnabled,
+  setIsEmailNotificationEnabled,
+  displayModal,
+  onHide,
+  onClick
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
@@ -370,6 +380,16 @@ const ConfigureSetup = ({
               ...configData?.avoAgentAndGrid?.avoagents,
               ...configData?.avoAgentAndGrid?.avogrids,
             ]}
+            defaultValues={defaultValues}
+            setDefaultValues={setDefaultValues}
+            isNotifyOnExecutionCompletion={isNotifyOnExecutionCompletion}
+            setIsNotifyOnExecutionCompletion={setIsNotifyOnExecutionCompletion}
+            handleSubmit={handleSubmit}
+            isEmailNotificationEnabled={isEmailNotificationEnabled}
+            setIsEmailNotificationEnabled={setIsEmailNotificationEnabled}
+            displayModal={displayModal}
+            onHide={onHide}
+            onClick={onClick}
           />
         </div>
       </div>

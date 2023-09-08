@@ -25,6 +25,7 @@ const EmailConfiguration = ({resetMiddleScreen}) => {
     }
     const [selectedProvider, setSelectedProvider] = useState(''); 
     const [emailTest,setEmailTest] = useState(false);
+    const [selectedValue, setSelectedValue] = useState('');
     useEffect(()=>{
         //on reset dismount component to show loading screen
         setinputRef({})
@@ -43,20 +44,34 @@ const EmailConfiguration = ({resetMiddleScreen}) => {
             setReload(false)
         }
     },[reload])
-    useEffect(()=>{
-        //disable buttons on default screen
-        if(Object.keys(inputRef).length>0){
-            inputRef.toggleUppdate.current.disabled = true
-            inputRef.toggleStatus.current.disabled = true
-            inputRef.toggleTest.current.disabled = true
-            fn.showAll();
+    useEffect(() => {
+        // Disable buttons on the default screen if inputRef exists and the elements are available
+        if (Object.keys(inputRef).length > 0) {
+          if (inputRef.toggleUpdate?.current) {
+            inputRef.toggleUpdate.current.disabled = true;
+          }
+          if (inputRef.toggleStatus?.current) {
+            inputRef.toggleStatus.current.disabled = true;
+          }
+          if (inputRef.toggleTest?.current) {
+            inputRef.toggleTest.current.disabled = true;
+          }
+          fn.showAll();
         }
         // eslint-disable-next-line
-    },[inputRef])
+      }, [inputRef]);
+    const options = [
+        { label: 'SMTP', value: 'SMTP' },
+      ];
+      const handleDropdownChange = (event) => {
+        setSelectedValue(event.target.value); // Update the selected value in state
+      };
+    
 
-    const onSelectProvider = () => {
+    const onSelectProvider = (event) => {
         selectProvider({inputRef,...fn,displayError,setLoading});
-        // setSelectedProvider(selectedValue);
+        const selectedValue = event.value;
+    setSelectedProvider(selectedValue); 
     }
     const onClickTest = () => {
         if (!validate(inputRef,displayError)) return;
@@ -86,7 +101,7 @@ const EmailConfiguration = ({resetMiddleScreen}) => {
                     <div>
                         <label required className='provider'> select provider</label>
                     </div>
-                    <Dropdown inputRef={inputRef['selectprovider']} className='providerdropdown' value={selectedProvider}  option={['SMTP']} onChange={onSelectProvider}  placeholder="Select Provider"  id="selectprovider" />
+                    <Dropdown inputRef={inputRef['selectprovider']} className='providerdropdown' value={selectedProvider}  options={options} onChange={onSelectProvider}  placeholder="Select Provider"  id="selectprovider" />
                     <div className='email_setting_header'>
                         Email Server Settings
                     </div>
@@ -110,7 +125,7 @@ const EmailConfiguration = ({resetMiddleScreen}) => {
                             <lable className="Authname">Authentication Type</lable>
                         </div>
                         <div>
-                            <Dropdown inpRef={inputRef['selectauth']} className='Auth_dropdown' placeholder="Select Authentication Type" option={['none','basic']} />
+                            <Dropdown inpRef={inputRef['selectauth']}  value={selectedValue} className='Auth_dropdown' placeholder="Select Authentication Type" options={['none','basic']} onChange={handleDropdownChange} />
                         </div>
                         <div>
                             <label className='AuthUsername'>Authentication UserName</label>
@@ -125,9 +140,9 @@ const EmailConfiguration = ({resetMiddleScreen}) => {
                             <div className='connection_label'>
                                 <label className='selectconn_label'>Select connection</label>
                                 <label className='tLs_label'>Ignore TLS error</label></div>
-                            <div className="flex align-items-center">
-                                <RadioButton />
-                                <label className="ml-2">Auto</label>
+                            <div className="flex align-items-center connectionradio">
+                                <RadioButton className='auto_radiobutton'  />
+                                <label className="ml-2 autolabel">Auto</label>
                                 <RadioButton />
                                 <label className="ml-2">Enable</label>
                                 <RadioButton />
@@ -200,8 +215,8 @@ const EmailConfiguration = ({resetMiddleScreen}) => {
                                             </div>
                                             <div className="flex-auto">
                                                 <label className='proxypass_label'>Proxy Password</label>
-                                                <div className="Proxy_Password">
-                                                <InputText placeholder="Enter Proxy URL" ></InputText>
+                                                <div >
+                                                <InputText placeholder="Enter Proxy URL"className="Proxy_Password"></InputText>
                                                 </div>
                                             </div>
                                         </div>
@@ -364,29 +379,52 @@ const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,sh
 }
 const factoryFn = (inputRef) =>{
     const showAuth = () => {
-        inputRef.authname.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
-        inputRef.authpassword.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
-    }
-    const showProxCred = () =>{
-        inputRef.proxyuser.current.disabled = !inputRef.checkproxycred.current.checked
-        inputRef.proxypass.current.disabled = !inputRef.checkproxycred.current.checked
-    }
-    const showProxUrl = () =>{
-        if(!inputRef.checkproxyurl.current.checked){
-            inputRef.checkproxycred.current.disabled = true
-            inputRef.proxyuser.current.disabled = true
-            inputRef.proxypass.current.disabled = true
-
-        }else{
-            inputRef.checkproxycred.current.disabled = false
-            showProxCred()
+        if (inputRef.authname.current && inputRef.selectauth.current) {
+            inputRef.authname.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt");
+            inputRef.authpassword.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt");
         }
-        inputRef.proxyurl.current.disabled = !inputRef.checkproxyurl.current.checked
-    }
-    const showPool = () =>{
-        inputRef.maxconnection.current.disabled =!inputRef.checkboxpool.current.checked 
-        inputRef.maxmessages.current.disabled = !inputRef.checkboxpool.current.checked 
-    }
+    };
+    
+    const showProxCred = () => {
+        if (inputRef.proxyuser.current && inputRef.checkproxycred.current) {
+            inputRef.proxyuser.current.disabled = !inputRef.checkproxycred.current.checked;
+            inputRef.proxypass.current.disabled = !inputRef.checkproxycred.current.checked;
+        }
+    };
+    
+    const showProxUrl = () => {
+        if (inputRef.checkproxyurl.current) {
+            if (!inputRef.checkproxyurl.current.checked) {
+                if (inputRef.checkproxycred.current) {
+                    inputRef.checkproxycred.current.disabled = true;
+                }
+                if (inputRef.proxyuser.current) {
+                    inputRef.proxyuser.current.disabled = true;
+                }
+                if (inputRef.proxypass.current) {
+                    inputRef.proxypass.current.disabled = true;
+                }
+            } else {
+                if (inputRef.checkproxycred.current) {
+                    inputRef.checkproxycred.current.disabled = false;
+                }
+                showProxCred();
+            }
+            if (inputRef.proxyurl.current) {
+                inputRef.proxyurl.current.disabled = !inputRef.checkproxyurl.current.checked;
+            }
+        }
+    };
+    
+    const showPool = () => {
+        if (inputRef.maxconnection.current && inputRef.checkboxpool.current) {
+            inputRef.maxconnection.current.disabled = !inputRef.checkboxpool.current.checked;
+        }
+        if (inputRef.maxmessages.current && inputRef.checkboxpool.current) {
+            inputRef.maxmessages.current.disabled = !inputRef.checkboxpool.current.checked;
+        }
+    };
+    
     const showAll = () => {
         showAuth();
         showPool();

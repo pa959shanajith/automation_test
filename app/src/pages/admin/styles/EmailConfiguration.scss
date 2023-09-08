@@ -215,9 +215,10 @@
     line-height: 3rem;
 }
 .Proxy_srver{
-    margin-left: 1rem;
+  
    line-height: 3rem;
    width: 40%;
+   height: 10%;
 }
 .timelabel{
     margin-left: 2rem;
@@ -236,7 +237,7 @@
     line-height: 3rem;
 }
 .Proxy_username{
-    margin-left: 1rem;
+   
     margin-top: 0rem;
     width: 40%;
 }
@@ -246,7 +247,7 @@
     width: 40%;
 }
 .Proxy_Password{
-    margin-left: 1rem;
+  
     width: 40%;
 }
 .emailActionBtn{
@@ -275,4 +276,10 @@ font-family: "Open Sans";
     float: right;
     margin-right: -10rem;
     margin-top: 1.2rem;
+}
+.connectionradio{
+    margin-left: 0.9rem;
+}
+.auto_radiobutton{
+    margin-left: 1rem;
 }
