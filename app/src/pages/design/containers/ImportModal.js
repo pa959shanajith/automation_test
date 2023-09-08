@@ -7,6 +7,7 @@ import { excelToScreen, updateScreen_ICE } from '../../design/api';
 import ModalContainer from '../../global/components/ModalContainer';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import "../styles/ImportModal.scss"
 
 
 const ImportModal = props => {
@@ -25,19 +26,20 @@ const ImportModal = props => {
     const projectId = props.fetchingDetails.projectID
     const screenName = props.fetchingDetails["name"]
     let versionnumber = 0
+    const [selectedSheet, setSelectedSheet] = useState("");
     
     const history = useNavigate();
     // const {appType, screenId, screenName, projectId } = useSelector(state => state.plugin.CT);
 
     const onImport = async() => {
         setOverlay('Importing ...')
-         var err = validate([fileUpload,sheetRef,importFormat])
+         var err = validate([fileUpload,selectedSheet,importFormat])
          console.log(err);
         if(err)return
         var file = fileUpload.current.files[0]
         if(!file)return;
         if(importType === 'excel'){
-            var val = sheetRef.current.value
+            var val = selectedSheet;
             try{
                 const result =  await read(file)
                 var res = await excelToScreen({'content':result,'flag':'data','sheetname':val,'screenid':screenId,'projectid':projectId })
@@ -155,16 +157,22 @@ const ImportModal = props => {
         title={'Import'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
-        content={<Content sheetRef={sheetRef} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay} setUploadingFile={setUploadingFile}/>}
+        content={<Content selectedSheet={selectedSheet} setSelectedSheet={setSelectedSheet} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay} setUploadingFile={setUploadingFile}/>}
         footer={<Footer onImport={onImport} error={error} uploadingFile={uploadingFile}/>}
     />
     )
     
 }
 
-const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFormat,setOverlay,setUploadingFile}) =>{
+const Content = ({fileUpload,importType,setImportType,setError,importFormat,setOverlay,setUploadingFile,selectedSheet,setSelectedSheet}) =>{
     const [isUpload,setIsUpload] = useState(false)
     const [sheetList,setSheetList] = useState([])
+    // Initialize with default value
+
+  const handleSheetChange = (e) => {
+    // Set the selected value when an option is changed
+    setSelectedSheet(e.value);
+  };
     const importTypes = [
         {value: "json", name: "JSON"}, 
         {value: "excel", name: "Excel"}
@@ -217,7 +225,7 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
     }
 
     return (
-        <div className='mp__import-popup'>
+        <div className='import-popup-screen'>
             <div>
             <label>Import As: </label>
                 {/* <select defaultValue={"def-val"} data-test="addObjectTypeSelect" className="imp-inp" onChange={handleType} ref={importFormat}>
@@ -227,7 +235,7 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
                     ) }
                 </select> */}
                 <Dropdown className="imp-inp" onChange={handleType} ref={importFormat} placeholder="Select Import Format" value={importType} options={importTypes} optionLabel="name" style={{width:'20rem', marginLeft:'2.6rem', marginBottom:'1.5rem'}}/>
-            <div>
+            <div className='upload_file'>
                 <label>Upload File: </label>
                 <input disabled={importType=="def-val"} accept={acceptType[importType]} type='file' onChange={upload} ref={fileUpload}/>
             </div>
@@ -237,11 +245,12 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
             <Fragment>
             {(importType==='excel')?
             <div>
-                <label>Select Sheet: </label>
-                <select defaultValue={"def-val"} ref={sheetRef}>
+                 <label>Select Sheet: </label>
+                {/* <select defaultValue={"def-val"} ref={sheetRef}>
                     <option value="def-val" disabled>Please Select Sheet</option>
                     {sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
-                </select>
+                </select> */}
+                <Dropdown className="sheet-dropdown" value={selectedSheet} options={sheetList.map((e, i) => ({ label: e, value: e }))} onChange={handleSheetChange} placeholder="Please Select Sheet" disabled={false}/>
             </div>
             :null}
             </Fragment>
