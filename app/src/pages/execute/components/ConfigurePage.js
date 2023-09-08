@@ -136,6 +136,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [radioButton_grid, setRadioButton_grid] = useState(
    selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
   );
+  const [defaultValues, setDefaultValues] = useState({});
+  const [emailNotificationReciever, setEmailNotificationReciever] = useState(null);
+  const [isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion] = useState(false);
+  const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
+  const [displayModal, setDisplayModal] = useState(false);
+  const [position, setPosition] = useState('center');
+
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
@@ -153,8 +160,29 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const dialogFuncMap = {
-    visible_execute: setVisible_execute,
+    'displayModal': setDisplayModal
   };
+
+  const onClick = (name, position) => {
+    dialogFuncMap[`${name}`](true);
+  
+    if (position) {
+        setPosition(position);
+    }
+  
+  }
+  
+  
+  
+  const onHide = (name) => {
+    dialogFuncMap[`${name}`](false);
+  
+    if (name === "displayModal") {
+        setDisplayModal(false);
+        setIsEmailNotificationEnabled(false);
+    }
+  
+  }
 
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
@@ -681,6 +709,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         browser: browsers.filter((el) =>
           getData.executionRequest.browserType.includes(el.key)
         ),
+        
       });
       setMode(
         getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
@@ -695,6 +724,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setModules(getData.executionRequest.selectedModuleType);
       setTypeOfExecution(getData.executionRequest.selectedModuleType)
       setDotNotExe(getData);
+      setDefaultValues({ ...defaultValues, EmailSenderAddress: getData.executionRequest.emailNotificationSender, EmailRecieverAddress: getData.executionRequest.emailNotificationReciever});
+      setIsNotifyOnExecutionCompletion(getData.executionRequest.isNotifyOnExecutionCompletion);
+      setIsEmailNotificationEnabled(getData.executionRequest.isEmailNotificationEnabled);
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -709,6 +741,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setConfigTxt("");
       setModules("normalExecution");
       setSelectedNodeKeys({});
+      setDefaultValues({});
+      setIsNotifyOnExecutionCompletion(true);
+      setIsEmailNotificationEnabled(false);
     }
     setVisible_setup(true);
     setSetupBtn(getType);
@@ -811,6 +846,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         },
         scenarioFlag: false,
         isExecuteNow: false,
+        emailNotificationSender: "avoassure-alerts@avoautomation.com",
+        emailNotificationReciever: emailNotificationReciever,
+        isNotifyOnExecutionCompletion: isNotifyOnExecutionCompletion,
+        isEmailNotificationEnabled: isEmailNotificationEnabled
       };
 
       const dataObj = {
@@ -957,15 +996,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
         // onHide(name);
       }
-      // if(btnType ===  "Execute"){
-      //   toast.current.show({
-      //     severity: "success",
-      //     summary: "Success",
-      //     detail: "Execution has started",
-      //     life: 5000,
-      //   });
-        
-      //   }
       // toast.current.show({
       //   severity: "success",
       //   summary: "Success",
@@ -1203,6 +1233,32 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       </>
     );
   };
+
+  const handleSubmit = (defaultValues) => {
+    if ( "EmailRecieverAddress" in defaultValues) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (defaultValues.EmailRecieverAddress) {   
+            let allRecieverEmailAddress = defaultValues.EmailRecieverAddress.split(",");
+            const isAllValidEmail = allRecieverEmailAddress.every((recieverEmailAddress) => {
+                return emailRegex.test(recieverEmailAddress) === true
+            })
+            if (isAllValidEmail) {
+              setEmailNotificationReciever(defaultValues.EmailRecieverAddress);
+              setDisplayModal(false);
+            }
+            
+            else {
+                setMsg(MSG.GLOBAL.ERR_RECIEVER_EMAIL);
+            }
+        }
+        else {
+            setMsg(MSG.GLOBAL.ERR_SENDER_EMAIL);
+        }
+    }
+    else {
+        setMsg(MSG.GLOBAL.ERR_EMAILS_EMPTY);
+    }   
+  }
 
  
  
@@ -1706,6 +1762,16 @@ Learn More '/>
               setSelectedNodeKeys={setSelectedNodeKeys}
               dotNotExe={dotNotExe}
               setDotNotExe={setDotNotExe}
+              defaultValues={defaultValues}
+              setDefaultValues={setDefaultValues}
+              isNotifyOnExecutionCompletion={isNotifyOnExecutionCompletion}
+              setIsNotifyOnExecutionCompletion={setIsNotifyOnExecutionCompletion}
+              handleSubmit={handleSubmit}
+              isEmailNotificationEnabled={isEmailNotificationEnabled}
+              setIsEmailNotificationEnabled={setIsEmailNotificationEnabled}
+              displayModal={displayModal}
+              onHide={onHide}
+              onClick={onClick}
               typeOfExecution={typeOfExecution}
             />
           }
