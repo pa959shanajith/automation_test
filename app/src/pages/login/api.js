@@ -220,3 +220,28 @@ export const shouldResetPassword = async(uid) => {
         return {error: 'Failed to verify user'}
     }
   }
+
+  
+export const UpdateUserInfoforLicence = async(username) => {
+    try{
+        const res = await axios(url+"/hooks/upgradeLicense", {
+            method: "POST",
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                username: username
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            return {error: 'Failed to update user licence details'}
+        }
+    }
+    catch(err){
+        return {error: 'Failed to update user licence details'}
+    }
+}
