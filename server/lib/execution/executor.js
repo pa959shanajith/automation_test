@@ -108,6 +108,7 @@ class TestSuiteExecutor {
             "smart": batchData.type == undefined ? false : batchData.type.includes('smart'),
             "integration": batchData.integration,
             "scenarioFlag": batchData.scenarioFlag,
+            "executingOn": batchData.executingOn,
             "batchId": "",
             "executionIds": [],
             "testsuiteIds": [],
@@ -318,13 +319,13 @@ class TestSuiteExecutor {
         var reportType = "accessiblityTestingOnly";
         logger.info("Sending request to ICE for executeTestSuite");
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
-        if(execReq['configurekey'] && execReq['configurekey']!='' && execReq['configurename'] && execReq['configurename']!=''){
+        if(execReq['executingOn'] && execReq['executingOn'] =='Agent'){
             // const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
             // if (status == "fail" || status == "forbidden") return "fail";
             // return 'CICD'
             return dataToIce;
         }
-        else{
+        else if(execReq['executingOn'] && execReq['executingOn'] == 'ICE'){
             redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
 
             const exePromise = async (resSent) => (new Promise((rsv, rej) => {
@@ -428,6 +429,8 @@ class TestSuiteExecutor {
                                 let result = status;
                                 let report_result = {};
                                 report_result["status"] = status
+                                report_result["configurekey"] = execReq["configurekey"]
+                                report_result["configurename"] = execReq["configurename"]
                                 if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
                                 if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                                 report_result["testSuiteDetails"] = execReq["suitedetails"]

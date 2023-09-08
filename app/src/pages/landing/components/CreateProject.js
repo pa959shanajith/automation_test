@@ -276,7 +276,13 @@ const CreateProject = (props) => {
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
       ...assignedUsers
+      
 
+    ]);
+    setUnFiltereAssaignedData((prevAssignedUsers) => [
+      ...prevAssignedUsers,
+      ...assignedUsers
+      
 
     ]);
     setSelectedCheckboxes([]);
@@ -328,6 +334,7 @@ const CreateProject = (props) => {
     );
     setItems((prevItems) => [...prevItems, ...unassignedUsers]);
     setDisplayUser(filteredAssignedItems);
+    setUnFiltereAssaignedData(filteredAssignedItems);
     setSelectedAssignedCheckboxes([]);
     setSelectallAssaigned(false);
 
@@ -368,7 +375,7 @@ const CreateProject = (props) => {
   };
 
 /////////////// CREATE PROJECT///////////////////////////////////////////
-  const handleCreate = async () => {
+   const handleCreate = async () => {
     let projectList=props?.projectsDetails?.map(project=>project.name.trim())
     if (value !== "" && selectedApp !== "" && displayUser.length !== 0) {
       const filteredUserDetails = displayUser.map((user) => ({
@@ -394,7 +401,20 @@ const CreateProject = (props) => {
         releases: [{ name: "R1", cycles: [{ name: "C1" }] }],
       };
 
-      const project = await userCreateProject_ICE(projData);
+     try {
+     const project = await userCreateProject_ICE(projData);
+
+     if (project === "fail") {
+    // Handle the "fail" response here
+    // You can display an error message to the user
+    toast.current.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Failed to create Project",
+      life: 5000,
+    });
+    return; // Do not proceed further
+  }
 
       if (project === "invalid_name_spl") {
         setIsInvalidProject(true);
@@ -411,6 +431,16 @@ const CreateProject = (props) => {
       dispatch(loadUserInfoActions.savedNewProject(true));
       props.onHide();
       setRefreshData(!refreshData);
+    } catch (error){
+      console.error("API request failed:", error);
+
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to create Project",
+        life: 5000,
+      });
+      }
     }
   };
 

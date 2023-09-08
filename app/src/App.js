@@ -15,7 +15,7 @@ import { ErrorPage } from './pages/global';
 import Login from './pages/login/containers/LoginPage';
 import BasePage from './pages/login/containers/BasePage';
 // import ShowTrialVideo from './pages/global/components/ShowTrialVideo';
-// import SocketFactory from './SocketFactory';
+import SocketFactory from './SocketFactory';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
@@ -80,6 +80,7 @@ const App = () => {
     {/* <ErrorBoundary> */}
     <div className="main_content">
       {!['/login', '/','/undefined','/viewReports'].includes(location.pathname) && <Topbar />}
+      <SocketFactory/>
       <RouteApp/>
     </div>
     {/* </ErrorBoundary> */}

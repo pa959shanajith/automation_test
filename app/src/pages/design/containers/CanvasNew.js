@@ -97,7 +97,6 @@ const CanvasNew = (props) => {
     const [verticalLayout,setVerticalLayout] = useState(true);
     const proj = useSelector(state=>state.design.selectedProj)
     const projectList = useSelector(state=>state.design.projectList)
-    const impactAnalysis=useSelector(state=>state.design.impactAnalysis)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -132,8 +131,6 @@ const CanvasNew = (props) => {
     const [editingRowsTestCases, setEditingRowsTestCases] = useState({});
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(false);
     const [visibleDesignStep, setVisibleDesignStep] = useState(false);
-    const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 ,bottom:0});
-    const [showTooltip, setShowTooltip] = useState("");
     const [selectedSpan, setSelectedSpan] = useState(null);
     const[browserName,setBrowserName]=useState(null)
     const analyzeScenario = useSelector(state=>state.design.analyzeScenario);
@@ -158,19 +155,27 @@ const CanvasNew = (props) => {
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let Proj = reduxDefaultselectedProject;
     const typesOfAppType = props.appType;
-    const imageRef = useRef(null);
     const appType = typesOfAppType
     const [toastData, setToastData] = useState(false);
-    const handleTooltipToggle = (nodeType) => {
-      const rect = imageRef.current?.getBoundingClientRect();
-      setCardPosition({ right: rect?.right, left: rect?.left, top: rect?.top ,bottom:rect?.bottom});
-      setShowTooltip(nodeType);
-    };
-  
-    const handleMouseLeave1 = () => {
-      setShowTooltip("");
-    };
     
+  useEffect(()=>{
+    let browserName = (function (agent) {        
+
+      switch (true) {
+
+      case agent.indexOf("edge") > -1: return {name:"chromium",val:8};
+      case agent.indexOf("edg/") > -1: return {name:"chromium",val:8};
+      case agent.indexOf("chrome") > -1 && !!window.chrome: return {name:"Chrome",val:1};
+      case agent.indexOf("firefox") > -1: return {name:"mozilla",val:2};
+      default: return "other";
+   }
+
+    })(window.navigator.userAgent.toLowerCase());
+
+    setBrowserName(browserName.name)
+    setSelectedSpan(browserName.val)
+    
+  },[])
     useEffect(()=>{
       if(deletedNoded && deletedNoded.length>0){
           var scenarioIds=[]
@@ -321,17 +326,16 @@ const CanvasNew = (props) => {
         setSelectedSpan(index);
         switch (index) {
           case 1:
-            setBrowserName("explorer")
-            break;
-          case 2:
             setBrowserName("chrome")
             break;
-          case 3:
+          case 2:
             setBrowserName("mozilla")
-            break;
-          case 4:
+            break;            
+          case 8:
             setBrowserName("chromium")
             break;
+           
+
          
         }
       }
@@ -629,7 +633,7 @@ const CanvasNew = (props) => {
      // Function for impact analysis 
      const clickAnalyzeScenario = (browserName)=>{
       
-
+    let browserNameForDebug=selectedSpan.toString()
       // setShowAppPop(false);
     let err=""
     setOverlay("Impact Analysis is in progress... ")
@@ -660,7 +664,7 @@ const CanvasNew = (props) => {
     
                   data.appType = typesOfAppType;
     
-                  data.browserType = "chrome";
+                  data.browserType = browserName;
     
                   screenAnalysisData['screenName'] = dataObject['name']
     
@@ -766,7 +770,7 @@ const CanvasNew = (props) => {
     
     
     
-                  await DesignApi.debugTestCase_ICE(["1"], [dataObject.testcaseid], userInfo, typesOfAppType)
+                  await DesignApi.debugTestCase_ICE([`${browserNameForDebug}`], [dataObject.testcaseid], userInfo, typesOfAppType)
     
       
     
@@ -2245,10 +2249,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             <p className='compare__text'>List Of Browsers</p>
           </span>
           <span className='browser__col'>
-            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png'></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8  && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
           </span>
         </div>
       </Dialog>
@@ -2279,8 +2282,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                 return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} d={link[1].d}></path>)
                 })}
                 {Object.entries(nodes).map((node)=>
-                    <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} ref={imageRef} onMouseEnter={() => handleTooltipToggle(node[1].type)} onMouseLeave={() => handleMouseLeave1()}>
-                       <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src} title="reused"></image>
+                    <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform} >
+                       <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                        <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='testcases')?
@@ -2301,9 +2304,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {Object.entries(links).map((link)=>{
             return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} d={link[1].d}></path>)
             })}
-            {Object.entries(nodes).map((node, nodeIdx)=>
+            {Object.entries(nodes).map((node)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type,node[1].state)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}  ref={imageRef} onMouseEnter={() => handleTooltipToggle(nodeIdx)} onMouseLeave={() => handleMouseLeave1()}  title=  {node[1].name} ></image>
+                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type,node[1].state)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                     <text className="ct-nodeLabel" textAnchor="middle" x="20" y="50" title={node[1].title}>{node[1].name}</text>
                     {(node[1].type==="screens" && (node[1].statusCode!==undefined)) ? (
                 <g transform={node[1].transformImpact} className='node_'>
@@ -2312,28 +2315,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
                 </g>
                 ):null}
-                    <title val={node[0]} className="ct-node-title" >
-                    {showTooltip !== "" && (
-                      ((showTooltip === nodeIdx) && (node[1].type === 'modules') && (
-                        <div className="tooltip">
-                          <span className="tooltiptext">
-                            <span className="tooltip-line">{node[1].title}</span>
-                          </span>
-                        </div>
-                      )) || ((showTooltip === nodeIdx) && (node[1].type === 'scenarios') && (
-                        <div className="tooltip">
-                          <span className="tooltiptext">{node[1].title} </span>
-                        </div> 
-                     )) || ((showTooltip === nodeIdx) && (node[1].type === 'screens') && (
-                      <div className="tooltip">
-                        <span className="tooltiptext">{node[1].title}</span>
-                      </div> 
-                     )) || ((showTooltip === nodeIdx) && (node[1].type === 'testcases') && (
-                      <div className="tooltip">
-                        <span className="tooltiptext">{node[1].title}</span>
-                      </div> 
-                     ))
-                    )}</title>         
+                    <title val={node[0]} className="ct-node-title">{node[1].title}</title>         
                     {(node[1].type!=='testcases')?
                     <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                     :null}
