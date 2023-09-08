@@ -427,7 +427,6 @@ class TestSuiteExecutor {
                             redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
                             try {
                                 let result = status;
-                                console.log('On line 429');
                                 let report_result = {};
                                 report_result["status"] = status
                                 report_result["configurekey"] = execReq["configurekey"]
