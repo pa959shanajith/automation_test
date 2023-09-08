@@ -437,20 +437,13 @@ class TestSuiteExecutor {
                                 report_result["testSuiteDetails"] = execReq["suitedetails"]
                                 if (resultData.userTerminated) result = "UserTerminate";
                                 if (execType == "API") result = [d2R, status, resultData.testStatus];
-                                console.log(resSent);
-                                // console.log(notifySocMap[invokinguser]);
-                                console.log(invokinguser);
-                                console.log(notifySocMap);
                                 if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
-                                    console.log('Inside this thing')
-                                    console.log(report_result)
                                     notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
                                     rsv(constants.DO_NOT_PROCESS);
                                 } else if (resSent) {
                                     queue.Execution_Queue.add_pending_notification("", report_result, username);
                                     rsv(constants.DO_NOT_PROCESS);
                                 } else {
-                                    console.log('On line 448')
                                     rsv(result);
                                 }
                             } catch (ex) {

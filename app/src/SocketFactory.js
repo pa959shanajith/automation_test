@@ -9,6 +9,7 @@ import { url } from './App'
 import { UpdateUserInfoforLicence } from './pages/login/api';
 import { Buffer } from 'buffer';
 import { NavLink } from 'react-router-dom';
+import { Button } from 'primereact/button';
 
 /*Component SocketFactory
   use: creates/updates socket connection
@@ -64,7 +65,8 @@ const SocketFactory = () => {
                     show={showAfterExecution.show}
                     title={"Execution Status"}
                     content={<>
-                        <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br />
+                        <p className='pt-4' style={{ cursor: 'default' }}>{showAfterExecution.content} <br />
+                            Go to
                             <NavLink
                                 to="/profile"
                                 state={{
@@ -74,32 +76,16 @@ const SocketFactory = () => {
                                 className="Profile_Name"
                                 activeClassName="active"
                             >
-                                Go to <span style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}> Reports </span>
+                                <span
+                                    style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}
+                                    onClick={() => { redirectToReports(); setShowAfterExecution({ show: false }) }}
+                                > Reports </span>
                             </NavLink>
                         </p>
                     </>}
-                    // {<>
-                    //     <p style={{ cursor: 'default' }}>{showAfterExecution.content} <br />
-                    //         <p>
-                    //             <NavLink
-                    //                 to="/profile"
-                    //                 state={{
-                    //                     execution: data.configurename,
-                    //                     configureKey: data.configurekey,
-                    //                 }}
-                    //                 className="Profile_Name"
-                    //                 activeClassName="active"
-                    //             >
-                    //                 Go to <span style={{ color: '#643693', cursor: 'pointer', fontWeight: 'bold' }}> Reports </span>
-                    //             </NavLink>
-                    //         </p>
-
-                    //         {/* <p> Go to <span onClick={()=>{redirectToReports();setShowAfterExecution({show:false})}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p> */}
-                    //         </>}
-
                     close={() => setShowAfterExecution({ show: false })}
                     footer={
-                        <button onClick={() => setShowAfterExecution({ show: false })}>Ok</button>
+                        <Button label="Ok" size="small" onClick={() => setShowAfterExecution({ show: false })}></Button>
                     }
                 />
             </div>
@@ -132,10 +118,10 @@ const SocketFactory = () => {
                     }
 
                     close={() => { setShowAfterExecutionIsTrial({ show: false }); closeTrial(); }}
-                // footer={
+                    footer={
 
-                // <button onClick={()=>setShowAfterExecutioIstrial({show:false})}>Ok</button>
-                // }
+                        <Button label="Ok" size="small" onClick={() => setShowAfterExecutionIsTrial({ show: false })}></Button>
+                    }
                 />
             </div>
         )
@@ -143,12 +129,6 @@ const SocketFactory = () => {
 
     const redirectToReports = () => {
         dispatch(loadUserInfoActions.updateReport(reportData));
-        setMsg(false);
-        window.localStorage['navigateScreen'] = "reports";
-        window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-        window.localStorage['popupRedirect'] = "true";
-        window.localStorage['reportData'] = JSON.stringify(reportData);
-        window.location.href = "/reports";
     }
 
     const executionDATA = async (result) => {
