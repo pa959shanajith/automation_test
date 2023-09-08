@@ -29,7 +29,6 @@ const SocketFactory = () => {
         if (socket) {
             socket.on('notify', (value) => {
                 if (value.count === 0 && 'notifyMsg' in value) {
-                    console.log(socket, "socket");
                     dispatch(loadUserInfoActions.updateNotify(value));
                 }
             });
@@ -48,9 +47,7 @@ const SocketFactory = () => {
 
     useEffect(() => {
         var userName = Buffer.from((userInfo && userInfo.username) ? userInfo.username : uuid()).toString('base64')
-        console.log(userName, "userName");
         var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: { check: 'notify', key: userName } });
-        console.log(socket, "socket");
         dispatch(loadUserInfoActions.setSocket(socket));
         return (() => {
             socket.close();
