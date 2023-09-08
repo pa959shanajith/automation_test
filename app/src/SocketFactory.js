@@ -28,6 +28,28 @@ const SocketFactory = () => {
     const dispatch = useDispatch();
     const history = useNavigate();
     const toast = useRef();
+
+    const displayExecutionPopup = (value) => {
+        var val;
+        for (val in value) {
+            var data = value[val].status;
+            var testSuite = value[val].testSuiteIds;
+            var exec = testSuite[0].testsuitename + ": "
+            if (data == "begin") continue;
+            if (data == "unavailableLocalServer") {  toastError(MSG.CUSTOM(exec + "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR)); }
+            else if (data == "NotApproved") { toastError(MSG.CUSTOM(exec + "All the dependent tasks (design, scrape) needs to be approved before execution",VARIANT.ERROR)); }
+            else if (data == "NoTask") { toastError(MSG.CUSTOM(exec + "Task does not exist for child node", VARIANT.ERROR)); }
+            else if (data == "Modified") { toastError(MSG.CUSTOM(exec + "Task has been modified, Please approve the task",VARIANT.ERROR)); }
+            else if (data == "Completed") { toastSuccess(MSG.CUSTOM(exec + "Execution Complete", VARIANT.SUCCESS)); }
+            else if (data == "Terminate") { toastError(MSG.CUSTOM(exec + "Terminated", VARIANT.ERROR)); }
+            else if (data == "UserTerminate") { toastError(MSG.CUSTOM(exec + "Terminated by User", VARIANT.ERROR)); }
+            else if (data == "success") { toastSuccess(MSG.CUSTOM(exec + "success", VARIANT.SUCCESS)); }
+            else if (data == "API Execution Completed") { toastSuccess(MSG.CUSTOM(exec + "API Execution Completed", VARIANT.SUCCESS)); }
+            else if (data == "API Execution Fail") { toastError(MSG.CUSTOM(exec + "API Execution Failed", VARIANT.ERROR)); }
+            else { data = toastError(MSG.CUSTOM(exec + "Failed to execute", VARIANT.ERROR)); }
+        }
+    }
+    
     useEffect(() => {
         if (socket) {
             socket.on('notify', (value) => {
@@ -72,12 +94,6 @@ const SocketFactory = () => {
         else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
       }
     
-      const toastWarn = (warnMessage) => {
-        if (warnMessage.CONTENT) {
-            toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
-        }
-        else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
-    }
 
     const PostExecution = () => {
         return (
@@ -205,27 +221,6 @@ const SocketFactory = () => {
             )}
         </Fragment>
     )
-}
-
-const displayExecutionPopup = (value) => {
-    var val;
-    for (val in value) {
-        var data = value[val].status;
-        var testSuite = value[val].testSuiteIds;
-        var exec = testSuite[0].testsuitename + ": "
-        if (data == "begin") continue;
-        if (data == "unavailableLocalServer") {  toastError(MSG.CUSTOM(exec + "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR)); }
-        else if (data == "NotApproved") { toastError(MSG.CUSTOM(exec + "All the dependent tasks (design, scrape) needs to be approved before execution",VARIANT.ERROR)); }
-        else if (data == "NoTask") { toastError(MSG.CUSTOM(exec + "Task does not exist for child node", VARIANT.ERROR)); }
-        else if (data == "Modified") { toastError(MSG.CUSTOM(exec + "Task has been modified, Please approve the task",VARIANT.ERROR)); }
-        else if (data == "Completed") { toastSuccess(MSG.CUSTOM(exec + "Execution Complete", VARIANT.SUCCESS)); }
-        else if (data == "Terminate") { toastError(MSG.CUSTOM(exec + "Terminated", VARIANT.ERROR)); }
-        else if (data == "UserTerminate") { toastError(MSG.CUSTOM(exec + "Terminated by User", VARIANT.ERROR)); }
-        else if (data == "success") { toastSuccess(MSG.CUSTOM(exec + "success", VARIANT.SUCCESS)); }
-        else if (data == "API Execution Completed") { toastSuccess(MSG.CUSTOM(exec + "API Execution Completed", VARIANT.SUCCESS)); }
-        else if (data == "API Execution Fail") { toastError(MSG.CUSTOM(exec + "API Execution Failed", VARIANT.ERROR)); }
-        else { data = toastError(MSG.CUSTOM(exec + "Failed to execute", VARIANT.ERROR)); }
-    }
 }
 
 export default SocketFactory;

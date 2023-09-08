@@ -43,7 +43,7 @@ import { browsers, selections } from "../../utility/mockData";
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import ScheduleScreen from "./ScheduleScreen";
 import AvoInput from "../../../globalComponents/AvoInput";
-import ExecutionPage from "./executionPage";
+import ExecutionPage from "./ExecutionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
 import { loadUserInfoActions } from '../../landing/LandingSlice'
