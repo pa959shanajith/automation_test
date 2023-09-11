@@ -23,21 +23,8 @@ const ChangePassword = (props) => {
     const [upperCasePresent, setUpperCasePresent] = useState(false);
     const [specialCharPresent, setSpecialCharPresent] = useState(false);
     const [digitPresent, setDigitPresent] = useState(false);
-    const [errorMsg, setErrorMsg] = useState('');
-    const [successMsg, setSuccessMsg] = useState('');
     const [confirmPasswordFocus, setConfirmPasswordFocus] = useState(false);
 
-    useEffect(() => {
-        if (errorMsg) {
-            toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
-        }
-    }, [errorMsg]);
-
-    useEffect(() => {
-        if (successMsg) {
-            toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 5000 });
-        }
-    }, [successMsg]);
 
     // validating the Input password
     const newPasswordOnChangeHandler = (event) => {
@@ -71,8 +58,6 @@ const ChangePassword = (props) => {
 
     const saveButtonHandler = () => {
         try {
-            setErrorMsg('');
-            setSuccessMsg('');
             let errorMsg = "";
             let successMsg = "";
             resetPassword(newpassword, props.userInfo?props.userInfo:null, null)
@@ -93,20 +78,20 @@ const ChangePassword = (props) => {
                     else if (/^2[0-4]{10}$/.test(data))
                         errorMsg = 'Invalid Request';
 
-                    if (errorMsg) setErrorMsg(errorMsg);
+                    if (errorMsg) props.toastError(errorMsg);
                     if (successMsg) {
-                        setSuccessMsg(successMsg);
+                        props.toastSuccess(successMsg);
                         resetFields();
                     }
 
                 })
                 .catch(error => {
-                    errorMsg = 'Failed to Authenticate Current Password.';
+                    props.toastError('Failed to Authenticate Current Password.');
                 });
 
         }
         catch (error) {
-            setErrorMsg("Error while updating the password: ERROR: ", error);
+            props.toastError("Error while updating the password: ERROR: ", error);
         }
     }
 

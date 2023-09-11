@@ -43,7 +43,7 @@ import { browsers, selections } from "../../utility/mockData";
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import ScheduleScreen from "./ScheduleScreen";
 import AvoInput from "../../../globalComponents/AvoInput";
-import ExecutionPage from "./executionPage";
+import ExecutionPage from "./ExecutionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
 import { loadUserInfoActions } from '../../landing/LandingSlice'
@@ -82,6 +82,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     alm: { url: "", username: "", password: "" },
     qtest: { url: "", username: "", password: "", qteststeps: "" },
     zephyr: { url: "", username: "", password: "" },
+    azure: { url: "", username: "", password: "" },
   });
   const [proceedExecution, setProceedExecution] = useState(false);
   const [smartMode, setSmartMode] = useState("normal");
@@ -106,8 +107,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [currentKey, setCurrentKey] = useState("");
   const [currentName, setCurrentName] = useState("");
   const [currentSelectedItem, setCurrentSelectedItem] = useState("");
-  const [executionTypeInRequest, setExecutionTypeInRequest] =
-    useState("asynchronous");
+  const [executionTypeInRequest, setExecutionTypeInRequest] = useState("asynchronous");
   const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState(" Copy");
   const [copyToolTip, setCopyToolTip] = useState(" Copy");
   const [logoutClicked, setLogoutClicked] = useState(false);
@@ -130,16 +130,26 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [dropdownDay, setDropdownDay] = useState(null);
   const [project, setProject] = useState({});
   const [scheduleOption, setScheduleOption] = useState({});
+  const [typeOfExecution, setTypeOfExecution] = useState("");
+  const [executingOn, setExecutingOn] = useState("");
   const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
   const [radioButton_grid, setRadioButton_grid] = useState(
    selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
   );
+  const [defaultValues, setDefaultValues] = useState({});
+  const [emailNotificationReciever, setEmailNotificationReciever] = useState(null);
+  const [isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion] = useState(false);
+  const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
+  const [displayModal, setDisplayModal] = useState(false);
+  const [position, setPosition] = useState('center');
+
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
   
   useEffect(() => {
     setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client");
+    setExecutingOn(selectProjects?.appType==="Web"? "Agent" :"ICE")
     setShowIcePopup(selectProjects?.appType==="Web"? false:true)
   }, [selectProjects.appType]);
 
@@ -150,8 +160,29 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const dialogFuncMap = {
-    visible_execute: setVisible_execute,
+    'displayModal': setDisplayModal
   };
+
+  const onClick = (name, position) => {
+    dialogFuncMap[`${name}`](true);
+  
+    if (position) {
+        setPosition(position);
+    }
+  
+  }
+  
+  
+  
+  const onHide = (name) => {
+    dialogFuncMap[`${name}`](false);
+  
+    if (name === "displayModal") {
+        setDisplayModal(false);
+        setIsEmailNotificationEnabled(false);
+    }
+  
+  }
 
   const [setupBtn, setSetupBtn] = useState(null);
   const [tabIndex, setTabIndex] = useState(0);
@@ -453,10 +484,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     executionData["executionEnv"] = execEnv;
-    executionData["browserType"] =browserTypeExe;
+    executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
     executionData["configurename"] = currentName;
+    executionData["executingOn"] = executingOn;
     executionData["executionListId"] = uuid() ;
     executionData["batchInfo"] =
       currentSelectedItem &&
@@ -588,7 +620,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
-                setCurrentName(item.configureName)
+                setCurrentName(item.configurename);
                 setCurrentSelectedItem(item);
                 setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                 setConfigItem(idx);
@@ -677,6 +709,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         browser: browsers.filter((el) =>
           getData.executionRequest.browserType.includes(el.key)
         ),
+        
       });
       setMode(
         getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
@@ -684,11 +717,16 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setIntegration(getData?.executionRequest?.integration ? getData.executionRequest.integration : {
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}
+        zephyr: {url:"",username:"",password:""},
+        azure: { url: "", username: "", password: "" },
       });
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
+      setTypeOfExecution(getData.executionRequest.selectedModuleType)
       setDotNotExe(getData);
+      setDefaultValues({ ...defaultValues, EmailSenderAddress: getData.executionRequest.emailNotificationSender, EmailRecieverAddress: getData.executionRequest.emailNotificationReciever});
+      setIsNotifyOnExecutionCompletion(getData.executionRequest.isNotifyOnExecutionCompletion);
+      setIsEmailNotificationEnabled(getData.executionRequest.isEmailNotificationEnabled);
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -696,11 +734,16 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setIntegration({
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}
+        zephyr: {url:"",username:"",password:""},
+        azure: { url: "", username: "", password: "" },
+
       });
       setConfigTxt("");
       setModules("normalExecution");
       setSelectedNodeKeys({});
+      setDefaultValues({});
+      setIsNotifyOnExecutionCompletion(true);
+      setIsEmailNotificationEnabled(false);
     }
     setVisible_setup(true);
     setSetupBtn(getType);
@@ -803,6 +846,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         },
         scenarioFlag: false,
         isExecuteNow: false,
+        emailNotificationSender: "avoassure-alerts@avoautomation.com",
+        emailNotificationReciever: emailNotificationReciever,
+        isNotifyOnExecutionCompletion: isNotifyOnExecutionCompletion,
+        isEmailNotificationEnabled: isEmailNotificationEnabled
       };
 
       const dataObj = {
@@ -815,7 +862,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             testscenarioids: el?.suitescenarios,
             getparampaths:
               !!Object.values(paramPaths).length &&
-              Object.values(paramPaths[el?.key].map((el) => el?.value)),
+              Object.values(paramPaths[el?.key] && paramPaths[el?.key].map((el) => el?.value)),
             conditioncheck:
               !!Object.values(checkcondition).length &&
               Object.values(
@@ -921,25 +968,40 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           if (temp.error && temp.error.CONTENT) {
             setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
           } else {
-            setMsg(
-              MSG.CUSTOM(
-                "Error While Adding Configuration to the Queue",
-                VARIANT.ERROR
-              )
-            );
+            // setMsg(
+            //   MSG.CUSTOM(
+            //     "Error While Adding Configuration to the Queue",
+            //     VARIANT.ERROR
+            //   )
+            // );
+            toast.current.show({
+                severity: "error",
+                summary: "error",
+                detail:(
+                      "Error While Adding Configuration to the Queue"
+                      
+                    ),
+                life: 5000,
+              });
           }
         } else {
-          setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+          // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+          toast.current.show({
+            severity: "error",
+            summary: "error",
+            detail:("Execution Added to the Queue.", VARIANT.SUCCESS),
+            life: 5000,
+          });
         }
 
         // onHide(name);
       }
-      toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: " Execution started.",
-        life: 5000,
-      });
+      // toast.current.show({
+      //   severity: "success",
+      //   summary: "Success",
+      //   detail: " Execution started.",
+      //   life: 5000,
+      // });
       setVisible_execute(false);
     }
     if (btnType === 'Cancel') {
@@ -1172,6 +1234,32 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     );
   };
 
+  const handleSubmit = (defaultValues) => {
+    if ( "EmailRecieverAddress" in defaultValues) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (defaultValues.EmailRecieverAddress) {   
+            let allRecieverEmailAddress = defaultValues.EmailRecieverAddress.split(",");
+            const isAllValidEmail = allRecieverEmailAddress.every((recieverEmailAddress) => {
+                return emailRegex.test(recieverEmailAddress) === true
+            })
+            if (isAllValidEmail) {
+              setEmailNotificationReciever(defaultValues.EmailRecieverAddress);
+              setDisplayModal(false);
+            }
+            
+            else {
+                setMsg(MSG.GLOBAL.ERR_RECIEVER_EMAIL);
+            }
+        }
+        else {
+            setMsg(MSG.GLOBAL.ERR_SENDER_EMAIL);
+        }
+    }
+    else {
+        setMsg(MSG.GLOBAL.ERR_EMAILS_EMPTY);
+    }   
+  }
+
  
  
   const renderTable = () => {
@@ -1258,6 +1346,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
                     onChange={(e) => {
                       setShowIcePopup(false);
                       setRadioButton_grid(e.target.value);
+                      setExecutingOn("Agent");
                     }}
                     
                   />
@@ -1274,6 +1363,7 @@ Learn More '/>
                       onChange={(e) => {
                         setShowIcePopup(true);
                         setRadioButton_grid(e.target.value);
+                        setExecutingOn("ICE");
                       }}
                       checked={
                         radioButton_grid === "Execute with Avo Assure Client" || selectProjects.appType!=="Web"
@@ -1625,7 +1715,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => configModal("CancelSave")} size="small" >
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small" >
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
@@ -1672,6 +1762,17 @@ Learn More '/>
               setSelectedNodeKeys={setSelectedNodeKeys}
               dotNotExe={dotNotExe}
               setDotNotExe={setDotNotExe}
+              defaultValues={defaultValues}
+              setDefaultValues={setDefaultValues}
+              isNotifyOnExecutionCompletion={isNotifyOnExecutionCompletion}
+              setIsNotifyOnExecutionCompletion={setIsNotifyOnExecutionCompletion}
+              handleSubmit={handleSubmit}
+              isEmailNotificationEnabled={isEmailNotificationEnabled}
+              setIsEmailNotificationEnabled={setIsEmailNotificationEnabled}
+              displayModal={displayModal}
+              onHide={onHide}
+              onClick={onClick}
+              typeOfExecution={typeOfExecution}
             />
           }
           headerTxt="Execution Configuration set up"

@@ -51,6 +51,11 @@
             }
           }
         }
+        .radioButton{
+          text-align: center;
+          font-family: "Open Sans";
+          font:$f7_semibold ;
+        }
 
         .p-treetable {
           font-family: "Open Sans";
@@ -191,6 +196,7 @@
           border: 1px solid #dee2e6;
           display: flex;
           flex-direction: column;
+          width:20rem;
           .avogrid_fields {
             padding: 0.625rem;
             height: 5.4rem;
@@ -238,4 +244,8 @@
 }
 .required-asterisk {
   color: red;
+}
+.disabledEffect{
+  opacity:0.5;
+  margin-left: 0.5rem !important;
 }

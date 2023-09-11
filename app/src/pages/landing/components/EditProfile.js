@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { ScreenOverlay, VARIANT, Messages as MSG } from '../../global'
 import { Dialog } from 'primereact/dialog';
 import { FileUpload } from 'primereact/fileupload';
 import { InputText } from "primereact/inputtext";
@@ -63,19 +64,6 @@ const EditProfile = (props) => {
         }
     };
 
-    // useEffect(() => {
-    //     if (errorMsg) {
-    //         toastWrapperRef.current.show({ severity: 'error', summary: 'Error', detail: errorMsg, life: 10000 });
-    //     }
-    // }, [errorMsg]);
-
-    // useEffect(() => {
-    //     if (successMsg) {
-    //         toastWrapperRef.current.show({ severity: 'success', summary: 'Success', detail: successMsg, life: 5000 });
-    //     }
-    // }, [successMsg]);
-
-
     const click = () => {
         setIsEmail(true);
         setIsFirstName(true);
@@ -91,10 +79,6 @@ const EditProfile = (props) => {
         event.preventDefault();
         var check = true;
         setLoading("Updating User...");
-        setErrorMsg('');
-        setSuccessMsg('');
-        let errorMsg = "";
-        let successMsg = "";
         if (!validate(firstName, "name", setIsFirstName)) {
             check = false;
         }
@@ -106,14 +90,8 @@ const EditProfile = (props) => {
         }
         if (!check) {
             setLoading(false);
-            { errorMsg = 'Enter Correct Details'; }
-            // setMsg(MSG.SETTINGS.ERR_INVALID_INFO);
+            props.toastError(MSG.SETTINGS.ERR_INVALID_INFO);
             return;
-        }
-        if (errorMsg) setErrorMsg(errorMsg);
-        if (successMsg) {
-            setSuccessMsg(successMsg);
-            resetFields();
         }
 
         let userObj = {
@@ -134,21 +112,17 @@ const EditProfile = (props) => {
                 var data = await manageUserDetails("update", userObj);
                 setLoading(false);
                 if (data === 'success') {
-                    successMsg = 'Profile changed successfully';
+                    props.toastSuccess('Profile changed successfully');
                     localStorage.setItem("userInfo", JSON.stringify(userdetail))
                     dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, userimage: userObj.userimage }))
                 } else if (data === "exists") {
-                    successMsg = 'User already Exists.';
-                    // setMsg(MSG.ADMIN.WARN_USER_EXIST);
+                    props.toastWarn(MSG.ADMIN.WARN_USER_EXIST);
                 } else if (data === "fail") {
-                    successMsg = 'Failed to update user.",';
-                    // setMsg(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
-                    console.log("failed to update user");
+                    props.toastError(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
                 }
                 else if (/^2[0-4]{8}$/.test(data)) {
                     if (JSON.parse(JSON.stringify(data)[1])) {
-                        successMsg = 'Failed to update user. Invalid Request!",';
-                        // setMsg(MSG.CUSTOM("Failed to update user. Invalid Request!",VARIANT.ERROR));
+                        props.toastError(MSG.CUSTOM("Failed to update user. Invalid Request!",VARIANT.ERROR));
                         return;
                     }
                     var errfields = [];
@@ -162,17 +136,15 @@ const EditProfile = (props) => {
                     if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
                     if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
                     if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
-                    // setMsg(MSG.CUSTOM("Following values are invalid: "+errfields.join(", ")+" "+hints,VARIANT.WARNING));
-                    errorMsg = 'Following values are invalid: "+errfields.join(", ")+" "+hints';
+                    props.toastWarn(MSG.CUSTOM("Following values are invalid: "+errfields.join(", ")+" "+hints,VARIANT.WARNING));
+                   
                 } else {
-                    errorMsg = 'Something went wrong!';
-                    // setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                    props.toastError(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     click();
                 }
             }
             catch (error) {
-                errorMsg = 'Something went wrong!';
-                // setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                props.toastError(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                 console.log("Error:", error);
                 click();
             }
