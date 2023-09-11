@@ -222,24 +222,12 @@ export const connectJira_ICE_Fields = async(project, type, jiraurl, jirausername
             },
            data: {   
            "action" : 'getJiraConfigureFields',
-            "url": jiraurl,
-            "username": jirausername,
-            "password": jirapwd,
-            "projects": [{
-                "key": "10002",
-                "text": "Avobank",
-                "code": "AV"
-            }, {
-                "key": "10000",
-                "text": "N68_testing",
-                "code": "DUM"
-            }, {
-                "key": "10001",
-                "text": "Testing",
-                "code": "TES"
-            }],
-            "project": project,
-            "issuetype":"Bug",
+            url: jiraurl,
+            username: jirausername,
+            password: jirapwd,
+            projects: projects,
+            project: project,
+            issuetype:"Bug",
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -280,6 +268,32 @@ export const connectJira_ICE_create = async(data) => {
     }
 }
 
+export const connectAzzure_ICE_create = async(data) => {
+    try{
+        const res = await axios(url+'/connectAzure_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: {
+                issue_dict: data,
+                "action": "createIssueInAzure"
+            },
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.AZURE.ERR_AZURE_LOG_DEFECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.AZURE.ERR_AZURE_LOG_DEFECT}
+    }
+}
+
 export const connectAzure_ICE = async(dataObj) => {
     try{
 
@@ -305,7 +319,6 @@ export const connectAzure_ICE = async(dataObj) => {
 }
 
 export const connectAzure_ICE_Fields = async(project, type, jiraurl, jirausername, jirapwd, projects) => {
-    console.log(projects);
     try{
 
         const res = await axios(url+'/connectAzure_ICE', {
@@ -313,43 +326,14 @@ export const connectAzure_ICE_Fields = async(project, type, jiraurl, jirausernam
             headers: {
             'Content-type': 'application/json',
             },
-        //    data: {   
-        //    "action" : 'getAzureConfigureFields',
-        //     "url": jiraurl,
-        //     "username": jirausername,
-        //     "password": jirapwd,
-        //     "projects": [
-        //         {
-        //             "id": "c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd",
-        //             "name": "AvoAssure",
-        //             "description": "Avo Assure - Agile PM",
-        //             "url": "https://dev.azure.com/AvoAutomation/_apis/projects/c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd",
-        //             "state": "wellFormed",
-        //             "revision": 324,
-        //             "visibility": "private",
-        //             "lastUpdateTime": "2023-03-02T05:55:11.44Z"
-        //         }
-        //     ],
-        //     "project": project,
-        //     "issuetype":"Bug",
-        //     }
             data: {
-                "project": "5fd09fd1-b930-4a90-8740-d0ce504f1b5a",
-                "issuetype": "Bug",
-                "url": "https://dev.azure.com/AvoAutomation",
-                "username": "ajith.antony",
-                "pat": "hesmefz5oco6l3jeeujsoopifjo3tmbgu3vvezkwnrtzdo5o5ira",
-                "projects": [
-                    {
-                        "key": "5fd09fd1-b930-4a90-8740-d0ce504f1b5a",
-                        "text": "AvoTest"
-                    },
-                    {
-                        "key": "c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd",
-                        "text": "AvoAssure"
-                    }
-                ],
-                "action": "getAzureConfigureFields"
+                project: project,
+                issuetype: "Bug",
+                url: jiraurl,
+                username: jirausername,
+                pat: jirapwd,
+                projects: projects,
+                action: "getAzureConfigureFields"
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){

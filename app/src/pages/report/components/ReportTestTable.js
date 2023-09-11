@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport } from "../api";
+import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, connectAzzure_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
@@ -146,34 +146,147 @@ export default function BasicDemo() {
   };
 
   const onLogBugBtnClick = async(getClick) => {
-    const valueObj = {};
-    Object.keys(configValues).forEach((item) => {
-      valueObj[item] = {
-        field_name: responseFeilds[item]?.key,
-        userInput: responseFeilds[item]?.type === "array" ? { title: "", key: configValues[item]?.key , text: configValues[item]?.name } : configValues[item],
-        type: responseFeilds[item]?.type,
-      };
-    })
     if (getClick === "Cancel") setLogBug(false);
     else if (getClick === "Proceed") { 
-      const userDetails = await connectJira_ICE_create({
-        issue_dict: {
-          project: jiraDropDown?.id,
-          issuetype: issueDropDown?.name,
-          summary: selectedRow[0]?.Comments,
-          description: selectedRow[0]?.StepDescription,
-          url: loginUrl,
-          username: loginName,
-          password: loginKey,
-          parentissue: "",
-          reportId: reportData?.overallstatus?.reportId,
-          slno: selectedRow[0]?.slno,
-          executionId: reportData?.overallstatus?.executionId,
-          ...(!!Object.keys(configValues).length) && valueObj,
-          executionReportNo: `Execution No: ${executed}`
-        },
-        action: "createIssueInJira"
-      });
+      const valueObj = {};
+      if(bugTitle !== "Jira"){
+        valueObj["Iteration ID"] = responseFeilds["Iteration ID"];
+        valueObj["Area ID"] = responseFeilds["Area ID"];
+        valueObj["Repro Steps"] = {
+          ...responseFeilds["Repro Steps"],
+          data: "",
+          error: false,
+          isChecked: true,
+        };
+        valueObj["Iteration Path"] = {
+          ...responseFeilds["Iteration Path"],
+          allowedValues: responseFeilds["Iteration_Paths"],
+          error: false,
+          isChecked: true,
+          alwaysRequired: true,
+        };
+        valueObj["Area Path"] = {
+          ...responseFeilds["Area Path"],
+          allowedValues: responseFeilds["Area_Paths"],
+          error: false,
+          isChecked: true,
+          alwaysRequired: true,
+        };
+        valueObj["Build #"]= {
+          defaultValue: null,
+          allowedValues: [],
+          alwaysRequired: true,
+          dependentFields: [],
+          referenceName: "Custom.Build#",
+          name: "Build #",
+          url: "https://dev.azure.com/AvoAutomation/5fd09fd1-b930-4a90-8740-d0ce504f1b5a/_apis/wit/fields/Custom.Build#",
+          data: "23.1",
+          error: false,
+          isChecked: true,
+        };
+      }
+      bugTitle === "Jira"
+        ? Object.keys(configValues).forEach((item) => {
+            valueObj[item] = {
+              field_name: responseFeilds[item]?.key,
+              userInput:
+                responseFeilds[item]?.type === "array"
+                  ? {
+                      title: "",
+                      key: configValues[item]?.key,
+                      text: configValues[item]?.name,
+                    }
+                  : configValues[item],
+              type: responseFeilds[item]?.type,
+            };
+          })
+        : Object.keys(configValues).forEach((item) => {
+            valueObj[item] = {
+              ...responseFeilds[item],
+              data:
+                typeof configValues[item] === "object"
+                  ? item === "State"
+                    ? {
+                        title: "",
+                        key: responseFeilds[item]?.allowedValues.indexOf(
+                          configValues[item]?.id
+                        ) + 1,
+                        text: configValues[item]?.id?.toString(),
+                      }
+                    : configValues[item]?.id?.toString()
+                  : configValues[item],
+              error: false,
+              isChecked: true,
+            };
+          });
+      if(bugTitle !== "Jira"){
+        valueObj["Area Path"].data = configValues["Area ID"].name
+        valueObj["Iteration Path"].data = configValues["Iteration ID"].name
+      }
+      const userDetails =
+        bugTitle === "Jira"
+          ? await connectJira_ICE_create({
+              issue_dict: {
+                project: jiraDropDown?.id,
+                issuetype: issueDropDown?.name,
+                summary: selectedRow[0]?.Comments,
+                description: selectedRow[0]?.StepDescription,
+                url: loginUrl,
+                username: loginName,
+                password: loginKey,
+                parentissue: "",
+                reportId: reportData?.overallstatus?.reportId,
+                slno: selectedRow[0]?.slno,
+                executionId: reportData?.overallstatus?.executionId,
+                ...(!!Object.keys(configValues).length && valueObj),
+                executionReportNo: `Execution No: ${executed}`,
+              },
+              action: "createIssueInJira",
+            })
+          : await connectAzzure_ICE_create({
+              issue_dict: {
+                info: {
+                  project: {
+                    key: jiraDropDown?.id,
+                    text: jiraDropDown?.name,
+                    error: false,
+                  },
+                  issue: {
+                    key: "Bug",
+                    text: "Bug",
+                    error: false,
+                  },
+                  summary: {
+                    value: selectedRow[0]?.Comments,
+                    error: false,
+                  },
+                  reproSteps: {
+                    value: selectedRow[0]?.StepDescription,
+                    error: false,
+                  },
+                  parentIssueId: {
+                    value: "",
+                    error: false,
+                  },
+                  epicName: {
+                    key: "",
+                    value: "",
+                    error: false,
+                  },
+                  chosenList: {
+                    ...(!!Object.keys(configValues).length && valueObj),
+                  },
+                },
+                url: loginUrl,
+                username: loginName,
+                pat: loginKey,
+                reportId: reportData?.overallstatus?.reportId,
+                slno: selectedRow[0]?.slno,
+                executionId: reportData?.overallstatus?.executionId,
+                executionReportNo: `Execution No: ${executed}`,
+              },
+              action: "createIssueInAzure",
+            });
     }
   };
 
@@ -390,7 +503,7 @@ export default function BasicDemo() {
           key: bugTitle === "Jira" ? getFields[el].key : getFields[el].referenceName,
           name: bugTitle === "Jira" ? el : getFields[el].name,
           disabled: bugTitle === "Jira" ? getFields[el].required : getFields[el].alwaysRequired,
-          data: bugTitle === "Jira" ? getFields[el].value : getFields[el].dependentFields
+          data: bugTitle === "Jira" ? getFields[el].value : getFields[el]?.allowedValues && !!getFields[el]?.allowedValues.length ? getFields[el]?.allowedValues.map((e) => ({ key: e, name: e })) : ""
         }));
         setSelectedFiels(fieldValues);
       })();
@@ -412,6 +525,16 @@ export default function BasicDemo() {
       ...configValues,
       [e.target.name] : e.target.value
     });
+  };
+
+  const getElName = (getName) => {
+    let nameObj = { ["Iteration ID"]: "Iteration Path", ["Area ID"]: "Area Path" };
+    return nameObj[getName];
+  };
+
+  const getElDropdown = (Dropdown) => {
+    let nameObj = { ["Iteration ID"]: responseFeilds["Iteration_Paths"]?.child, ["Area ID"]: responseFeilds["Area_Paths"]?.child };
+    return nameObj[Dropdown];
   };
 
   return (
@@ -634,7 +757,9 @@ export default function BasicDemo() {
             <div className="col-12">
               <div>
                 <label>
-                  <span>Description</span>
+                  <span>
+                    {bugTitle === "Jira" ? "Description" : "Repro Steps"}
+                  </span>
                   <img
                     src="static/imgs/Required.svg"
                     className="required_icon"
@@ -648,44 +773,74 @@ export default function BasicDemo() {
                 value={selectedRow[0]?.StepDescription}
               />
             </div>
-            {!Array.isArray(mappedProjects) && <div className="col-12"><b>MappedType: {mappedProjects?.itemType}</b></div>}
-            {!Array.isArray(mappedProjects) && <div className="col-12"><b>{mappedProjects?.itemCode}: {mappedProjects?.itemSummary}</b></div>}
-            {configureFeilds.map((el) => (
+            {!Array.isArray(mappedProjects) && (
               <div className="col-12">
-                <div>
-                  <label>
-                    <span>{el.name}</span>
-                    {el.disabled && (
-                      <img
-                        src="static/imgs/Required.svg"
-                        className="required_icon"
-                      />
-                    )}
-                  </label>
-                </div>
-                {Array.isArray(el.data) ? (
-                  <AvoDropdown
-                    dropdownValue={configValues[el.name]}
-                    name={el.name}
-                    onDropdownChange={(e) => handleConfigValues(e)}
-                    dropdownOptions={el.data.map((e) => ({
-                      ...e,
-                      id: bugTitle === "Jira" ? e?.key : e?.referenceName,
-                      name: bugTitle === "Jira" ? e?.text : e?.name,
-                    }))}
-                    parentClass="flex flex-column"
-                  />
-                ) : (
-                  <InputTextarea
-                    className="text_desc"
-                    rows={1}
-                    name={el.name}
-                    value={configValues[el.name]}
-                    onChange={(e) => handleConfigValues(e)}
-                  />
-                )}
+                <b>MappedType: {mappedProjects?.itemType}</b>
               </div>
-            ))}
+            )}
+            {!Array.isArray(mappedProjects) && (
+              <div className="col-12">
+                <b>
+                  {mappedProjects?.itemCode}: {mappedProjects?.itemSummary}
+                </b>
+              </div>
+            )}
+            {configureFeilds.map((el) =>
+              el.name !== "Repro Steps" && el.name !== "Value Area" ? (
+                <div className="col-12">
+                  {Array.isArray(el.data) ||
+                  el.name === "Iteration ID" ||
+                  el.name === "Area ID" ? (
+                    <AvoDropdown
+                      dropdownValue={configValues[el.name]}
+                      name={el.name}
+                      labelTxt={
+                        el.name !== "Iteration ID" && el.name !== "Area ID"
+                          ? el.name
+                          : getElName(el.name)
+                      }
+                      onDropdownChange={(e) => handleConfigValues(e)}
+                      dropdownOptions={
+                        el.name !== "Iteration ID" && el.name !== "Area ID"
+                          ? el.data.map((e) => ({
+                              ...e,
+                              id: e?.key,
+                              name: bugTitle === "Jira" ? e?.text : e?.name,
+                            }))
+                          : getElDropdown(el.name)
+                      }
+                      parentClass="flex flex-column"
+                      required={true}
+                    />
+                  ) : (
+                    <>
+                      <div>
+                        <label>
+                          <span>
+                            {el.name !== "Iteration ID" && el.name !== "Area ID"
+                              ? el.name
+                              : getElName(el.name)}
+                          </span>
+                          {el.disabled && (
+                            <img
+                              src="static/imgs/Required.svg"
+                              className="required_icon"
+                            />
+                          )}
+                        </label>
+                      </div>
+                      <InputTextarea
+                        className="text_desc"
+                        rows={1}
+                        name={el.name}
+                        value={configValues[el.name]}
+                        onChange={(e) => handleConfigValues(e)}
+                      />
+                    </>
+                  )}
+                </div>
+              ) : null
+            )}
           </div>
         }
         customClass="jira_modal"
