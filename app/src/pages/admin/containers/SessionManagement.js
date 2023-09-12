@@ -3,7 +3,8 @@ import {ScreenOverlay, PopupMsg, ScrollBar, Messages as MSG, VARIANT, setMsg} fr
 import { useSelector } from 'react-redux';
 import {manageSessionData, fetchLockedUsers, unlockUser} from '../api';
 import '../styles/SessionManagement.scss'
-
+import { Card } from 'primereact/card';
+import {Button} from 'primereact/button';
 /*Component SessionManagement
   use: defines Admin middle Section for Session Management
   ToDo:
@@ -14,9 +15,6 @@ const SessionManagement = (props) => {
     const [loading,setLoading] = useState(false)
     const [sessions,setSessions] = useState([])
     const [clients,setClients] = useState([])
-    const [showSessions,setShowSessions] = useState(true)
-    const [showClients,setShowClients] = useState(true)
-    const [showLockedUsers,setShowLockedUsers] = useState(true)
     const [lockedusers,setLockedusers] = useState([]);
 
     useEffect(()=>{
@@ -131,107 +129,93 @@ const SessionManagement = (props) => {
     
 
     return (
-        <div className='mainContainer'>
-        <div className="sess-mgmt_container">
+        <>
+            <div className='mainSessionManagement'>
             {loading?<ScreenOverlay content={loading}/>:null}
-            
-            <div id="page-taskName"><span>Session Management</span></div>
-            <div className="adminActionBtn">
-                 <button className="a__btn pull-right " onClick={()=>{refreshSessMgmt()}} >Refresh</button>
-            </div> 
-            <div className="content_wrapper-sess-mgmt.">
-                {/* <ScrollBar thumbColor="#929397"> */}
-                <div className="col-xs-9 form-group__conv-Sess-mgmt" style={{height:"88%"}}>
-                    <div className="containerWrap sessionItemWrap">
-                        <div onClick={()=>{setShowSessions(!showSessions)}} className="sessionHeading" data-toggle="collapse" data-target="#activeUsers-x">
-                            <h4>Active Users</h4>
-                        </div>
-                        {showSessions?
-                        <div id="activeUsers" className="wrap-sess-mgmt wrap-sess-mgmt-cust " >
-                            {/* <ScrollBar scrollId='clientUsers' thumbColor="#929397" > */}
-                            <table className = "table table-hover sessionTable">
-                            <tbody >
-                                <tr>
-                                    <th> Username </th>
-                                    <th> Role </th>
-                                    <th> Logged in </th>
-                                    <th> IP </th>
-                                    <th> </th>
-                                </tr>
-                                {sessions.map((user,index)=>(
-                                    <tr >
-                                        <td> {user.username} </td>
-                                        <td> {user.role} </td>
-                                        <td data-test="login_date_time"> {formatDate(user.loggedin)} </td>
-                                        <td> {user.ip} </td>
-                                        <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{disconnectLogoff(event)}}> Logout </button></td>
-                                    </tr> 
-                                ))}
-                                </tbody>
-                            </table>
-                            {/* </ScrollBar> */}
-                        </div>
-                        :null}
-                    </div> 
-                    <div className="containerWrap sessionItemWrap clientUsers-height" style={!showSessions?{top:"110px"}:{top:"420px"}}>
-                        <div onClick={()=>{setShowClients(!showClients)}} className="sessionHeading" >
-                            <h4>ICE Engine Clients</h4>
-                        </div>
-                        {showClients?
-                        <div id="clientUsers" className="wrap-sess-mgmt wrap-sess-mgmt-custom " >
-                            {/* <ScrollBar scrollId='clientUsers' thumbColor="#929397" > */}
-                            <table className = "table table-hover sessionTable">
-                            <tbody>
-                                <tr>
-                                    <th> Username </th>
-                                    <th> Connection Mode </th>
-                                    <th> IP </th>
-                                    <th> </th>
-                                </tr>
-                                {clients.map((user,index)=>(
-                                    <tr>
-                                        <td> {user.username} </td>
-                                        <td> {user.mode} </td>
-                                        <td > {user.ip} </td>
-                                        <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{disconnectLogoff(event)}} > Disconnect </button></td>
-                                    </tr> 
-                                ))}
-                            </tbody> 
-                            </table>
-                            {/* </ScrollBar> */}
-                        </div>
-                        :null}
-                    </div>
-                    <div className="containerWrap sessionItemWrap clientUsers-height" style={!showSessions?{top:"110px"}:{top:"420px"}}>
-                        <div onClick={()=>{setShowLockedUsers(!showLockedUsers)}} className="sessionHeading" >
-                            <h4>Locked Users</h4>
-                        </div>
-                        {showLockedUsers?
-                        <div id="clientUsers" className="wrap-sess-mgmt wrap-sess-mgmt-custom " >
-                            {/* <ScrollBar scrollId='clientUsers' thumbColor="#929397" > */}
-                            <table className = "table table-hover sessionTable">
-                            <tbody>
-                                <tr>
-                                    <th> Username </th>
-                                    <th> </th>
-                                </tr>
-                                {lockedusers.map((user,index)=>(
-                                    <tr>
-                                        <td> {user.username} </td>
-                                        <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{unlock(event)}} > Unlock </button></td>
-                                    </tr> 
-                                ))}
-                            </tbody> 
-                            </table>
-                            {/* </ScrollBar> */}
-                        </div>
-                        :null}
-                    </div>       
+                <div className='headerOfSession'>
+                    <div className='headingBut'>
+                  <h2>Session Management</h2>
+                  <Button className='but' label='Refresh' onClick={()=>{refreshSessMgmt()}}/>
+                  </div>
                 </div>
-                {/* </ScrollBar> */}
+                <div className='grid'>
+                    <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12  ">
+                        <div className='Card card1'>
+                            
+                            <Card title="Active Users">
+                            {sessions.map((user,index)=>(
+                            <div className='innerCard'>
+                                <Card className='userCard'>
+                                <div className='userBut'>
+                                    <div className='user'>
+                                  <span className='userTitle'>Username</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
+                                  </div>
+                                  <Button  onClick={(event)=>{disconnectLogoff(event)}} outlined  label='Logout'/>
+                                </div>
+                                <div className='role'>
+                                  <span className=''>Role</span><span className='semicolanR'>:</span><h4 className='roleName'>{user.role}</h4>
+                                </div>
+                                <div className='lastLogged'>
+                                  <span>Last Logged In</span><span className='semicolanL'>:</span><h4>{formatDate(user.loggedin)}</h4>
+                                </div>
+                              </Card>
+                              
+                            </div>
+                             ))}
+                            
+                            </Card>
+
+                        </div>
+                    </div>
+                    <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12  ">
+                        <div className='Card card2'>
+                        {clients.map((user,index)=>(
+                            <Card title="Active Avo Assure Client">
+                            <div className='innerCard'>
+                                <Card className='userCard'>
+                                <div className='userBut'>
+                                    <div className='user'>
+                                  <span>Avo Client Name</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
+                                  </div>
+                                  <Button data-id={index} onClick={(event)=>{disconnectLogoff(event)}} outlined  label='Disconnect'/>
+                                </div>
+                                <div className='ipContainer'>
+                                  <span className='IP'>IP</span><span className='semicolan'>:</span><h4>{user.ip}</h4>
+                                </div>
+                              </Card>
+                            </div>
+                            </Card>
+                             ))}
+                             
+                        </div>
+                    </div>
+                    <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12  ">
+                        <div className='Card card3'>
+                            <Card title="Locked Users">
+                            {lockedusers.map((user,index)=>(
+                            <div className='innerCard'>
+                                <Card className='userCard'>
+                                <div className='userBut'>
+                                    <div className='user'>
+                                  <span>User Name</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
+                                  </div>
+                                  <Button data-id={index} onClick={(event)=>{unlock(event)}}  outlined  label='Unlock'/>
+                                </div>
+                                <div className='ipContainer'>
+                                  <span className='IP'>Role</span><span className='semicolan'>:</span><h4>{user.role}</h4>
+                                </div>
+                              </Card>
+                            </div>
+                             ))}
+                            </Card>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
-        </div>
-        </div>
+
+        </>
   );
 }
 

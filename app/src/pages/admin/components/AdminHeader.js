@@ -37,10 +37,11 @@ const AdminHeader = (props) => {
       };
     
     return (
+      (currentTab !== "SessionManagement"? 
         <div className="Create_Header">
             <h3 className="header_label">{currentTabImage()}{currentTab}</h3>
             {currentTab === "Users" && <Button className="Create_btn" label ="create" onClick={() => {props.setCreateUserDialog(true); dispatch(AdminActions.RESET_VALUES(""))}}> </Button>}
-        </div>
+        </div> : null )
     )
 }
 export default AdminHeader;
