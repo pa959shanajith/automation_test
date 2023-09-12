@@ -144,6 +144,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
+  
+  const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
+  const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
 
   useEffect(() => {
@@ -1798,7 +1801,7 @@ Learn More '/>
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
           isDisabled={
             !configTxt ||
-            !avodropdown?.browser?.length ||
+            (typesOfAppType !=="Web"? null:!avodropdown?.browser?.length) ||
             !Object.keys(selectedNodeKeys)?.length
           }
         />

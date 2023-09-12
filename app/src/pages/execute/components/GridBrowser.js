@@ -141,8 +141,9 @@ const GridBrowser = ({
               name="browser"
               placeholder="Select a Browser"
               labelTxt="Select Browsers"
-              required={true}
+              required={typesOfAppType !== 'Web'? false:true}
               disabled={(typesOfAppType !== 'Web')}
+              labelForNotWebApp = {typesOfAppType !== 'Web'? true:false}
             />
           </div>
           <div>

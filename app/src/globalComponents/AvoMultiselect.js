@@ -11,6 +11,7 @@ const AvoMultiselect = ({
   required,
   labelTxt,
   disabled,
+  labelForNotWebApp
 }) => {
   const [touched, setTouched] = useState(false);
   return (
@@ -21,6 +22,12 @@ const AvoMultiselect = ({
         <img src="static/imgs/Required.svg" className="required_icon" />
       </label>
       }
+      { labelForNotWebApp && 
+      <label>
+        <span>{labelTxt}</span>
+      </label>
+      }
+
       <MultiSelect
         value={multiSelectValue}
         onChange={(e) => onMultiSelectChange(e)}
