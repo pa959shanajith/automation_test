@@ -64,8 +64,14 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         //     // dispatch({type: actionTypesPlugin.SET_PN, payload:proj})
         //     // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         // }
-        const defaultProjectData = {...localStorageDefaultProject, projectId:proj,projectName:prjList[proj]?.name, appType:prjList[proj]?.apptypeName}
-        localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData))
+        const defaultProjectData = {
+            ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
+            projectId: proj,
+            projectName: prjList[proj]?.name,
+            appType: prjList[proj]?.apptypeName
+          };
+          
+          localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
         dispatch(moduleList([]))
         dispatch(selectedModuleReducer({}))
         var moduledata = await getModules({"tab":"endToend","projectid":proj,"moduleid":null})
