@@ -70,6 +70,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
   const [readTestSuite, setReadTestSuite] = useState({});
+  const [checkDisable, setCheckDisable] = useState(false);
   const [allocateICE, setAllocateICE] = useState(false);
   const [eachData, setEachData] = useState([]);
   const [currentTask, setCurrentTask] = useState({});
@@ -78,6 +79,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [execEnv, setExecEnv] = useState("default");
   const [accessibilityParameters, setAccessibilityParameters] = useState([]);
   const [browserTypeExe, setBrowserTypeExe] = useState([]);
+  const [loader, setLoader] = useState(false);
   const [integration, setIntegration] = useState({
     alm: { url: "", username: "", password: "" },
     qtest: { url: "", username: "", password: "", qteststeps: "" },
@@ -591,9 +593,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 
   const tableUpdate = async () => {
     const getState = [];
+    setLoader(true);
     const configurationList = await fetchConfigureList({
       projectid: configProjectId,
     });
+    setLoader(false);
     setFetechConfig(configurationList);
     configurationList.forEach((item, idx) => {
       getState.push({
@@ -1217,6 +1221,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   const onWeekChange = (e) => {
     let selectedWeeks = e?.value?.name === "All" ? [] : [...selectedWeek];
 
+    setCheckDisable(e?.value?.name === "All");
     if (e.checked)
       selectedWeeks.push(e.value);
     else
@@ -1275,6 +1280,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             resizableColumns
             className="  datatable_list  "
             value={configList}
+            loading={loader}
             virtualScrollerOptions={{ itemSize: 20 }}
             globalFilter={searchProfile}
             style={{
@@ -1459,6 +1465,7 @@ Learn More '/>
                 scheduleOption={scheduleOption}
                 onScheduleChange={onScheduleChange}
                 onWeekChange={onWeekChange}
+                checkDisable={checkDisable}
               />
             }
             headerTxt={`Schedule: ${fetechConfig[configItem]?.configurename}`}

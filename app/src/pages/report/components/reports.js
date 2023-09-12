@@ -307,9 +307,10 @@ const reports = () => {
                                           src={
                                             data.selectedModuleType ===
                                             "e2eExecution"
-                                              ? "static/imgs/E2E_configsetup.png"
-                                              : "static/imgs/signup_module.svg"
+                                              ? "static/imgs/E2EModuleSideIcon.png"
+                                              : "static/imgs/moduleIcon.png"
                                           }
+                                          className='exe_type_icon'
                                         />
                                         <span style={{ display: 'inline-block', marginLeft: '0.4rem' }}>{data.selectedModuleType ===
                                         "e2eExecution"
