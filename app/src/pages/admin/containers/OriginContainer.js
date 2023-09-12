@@ -10,6 +10,7 @@ import '../styles/OriginContainer.scss'
 import { validateUserState } from '../../login/api';
 // import IceProvision from './IceProvision';
 import Agents from './Agents'
+import Grid from './Grid'
 import LicenseManagement from './LicenseManagement';
 import SessionManagement from './SessionManagement';
 import Privileges from './preferences';
@@ -19,16 +20,18 @@ const OriginContainer = (props) => {
     const [createUserDialog, setCreateUserDialog] = useState(false)
     // const [provisionDialog,setProvisionDialog] = useState(false)
     return (<>
-        <div>
+        <div className={currentTab === "SessionManagement"? "rightContainer":null}>
+            {currentTab !== "SessionManagement"?
             <div className="admin_origin_header">
                 <Header setCreateUserDialog={setCreateUserDialog} />
-            </div>
+            </div> : null}
             {currentTab === "ldapConf" && <LdapConfig/>}
             {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
             {currentTab === "samlConf" && <SamlConf />}
             {currentTab === "Users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
             {currentTab === "Manage Agents" && <Agents/>}
+            {currentTab === "Grid Configuration" && <Grid/>}
             {currentTab === "License Details" && <LicenseManagement/>}
             {currentTab === "SessionManagement" && <SessionManagement/>}
             {currentTab === "Privileges" && <Privileges/>}
