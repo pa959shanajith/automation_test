@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Messages as MSG,
-  setMsg,
-  VARIANT,
-} from "../../global";
+import React, { useEffect, useState, useRef } from "react";
+import { Messages as MSG, VARIANT } from "../../global";
 import { fetchAvoAgentAndAvoGridList, saveAvoAgent } from "../api";
 import { useSelector } from "react-redux";
 import { DataTable } from 'primereact/datatable';
@@ -14,11 +10,14 @@ import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { InputSwitch } from "primereact/inputswitch";
 import { InputText } from "primereact/inputtext";
-const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
+import { Toast } from 'primereact/toast';
+
+
+const AgentsList = ({ setLoading, setShowConfirmPop, toastError, toastSuccess }) => {
 
   const [searchText, setSearchText] = useState("");
   const [isDataUpdated, setIsDataUpdated] = useState(false);
-
+  const toastWrapperRef = useRef(null);
   const [agentData, setAgentData] = useState([]);
   const [originalAgentData, setOriginalAgentData] = useState([]);
 
@@ -77,7 +76,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
     setFilteredList(filteredItems);
 
     setShowConfirmPop(false);
-    showMessageBar(
+    toastSuccess(
       `${name} Agent Deleted. Please Save to reflect the changes`,
       "SUCCESS"
     );
@@ -105,9 +104,9 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
       });
       if (agentList.error) {
         if (agentList.error.CONTENT) {
-          setMsg(MSG.CUSTOM(agentList.error.CONTENT, VARIANT.ERROR));
+          toastError(MSG.CUSTOM(agentList.error.CONTENT, VARIANT.ERROR));
         } else {
-          setMsg(MSG.CUSTOM("Error While Fetching Agent List", VARIANT.ERROR));
+          toastError(MSG.CUSTOM("Error While Fetching Agent List", VARIANT.ERROR));
         }
       } else {
         setOriginalAgentData(
@@ -130,6 +129,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
       setLoading(false);
     })();
   }, []);
+
   const handleAgentsSave = () => {
     (async () => {
       setLoading("Loading...");
@@ -182,12 +182,12 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         const storeConfig = await saveAvoAgent(requestData);
         if (storeConfig !== "success") {
           if (storeConfig.error && storeConfig.error.CONTENT) {
-            setMsg(MSG.CUSTOM(storeConfig.error.CONTENT, VARIANT.ERROR));
+            toastError(MSG.CUSTOM(storeConfig.error.CONTENT, VARIANT.ERROR));
           } else {
-            setMsg(MSG.CUSTOM("Something Went Wrong", VARIANT.ERROR));
+            toastError(MSG.CUSTOM("Something Went Wrong", VARIANT.ERROR));
           }
         } else {
-          showMessageBar("Agents List updated successfully", "SUCCESS");
+          toastSuccess("Agents List updated successfully", "SUCCESS");
           setIsDataUpdated(false);
         }
       } else {
@@ -234,10 +234,11 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
 
   return (
     <>
+      <Toast ref={toastWrapperRef} position="bottom-center" />
       <span className="page-taskName taskname">Download Agent</span>
       <pre>
         <code className="downld_cls">
-          Click <u><a onClick={onDownloadAgentClick} style={{ color: "purple", cursor: 'pointer',textDecoration: 'underline'}}>Here</a></u> to Download the Agent
+          Click <u><a onClick={onDownloadAgentClick} style={{ color: "purple", cursor: 'pointer', textDecoration: 'underline' }}>Here</a></u> to Download the Agent
         </code>
       </pre>
       <div className="page-taskName">
@@ -271,7 +272,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
         </div>
       </div>
       <div style={{ position: "absolute", width: "70%", height: "-webkit-fill-available" }}>
-        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData} scrollable>
+        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData} scrollable scrollHeight="25rem">
           <Column header="Agent Name" body={(agent) => (
             <div className="agent_state">
               <Tooltip target={`agent-name-${agent.name}`} content={agent.state} position="top" />
@@ -290,6 +291,14 @@ const AgentsList = ({ setLoading, setShowConfirmPop, showMessageBar }) => {
               onMinus={() => onClientIceCountChange("sub", agent.name)}
               onPlus={() => onClientIceCountChange("add", agent.name)}
               step={1}
+              showButtons
+              buttonLayout="horizontal"
+              incrementButtonClassName="p-button-secondary"
+              decrementButtonClassName="p-button-secondary"
+              incrementButtonIcon="pi pi-plus"
+              decrementButtonIcon="pi pi-minus"
+              className="agent_inputnumber"
+              min={0}
             />
           )} />
           <Column header="Status" body={(agent) => (
