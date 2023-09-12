@@ -36,10 +36,10 @@ const AdminSidePanel = () => {
             </Accordion>
             <div className='flex flex-column pl-2 pr-1 m-1'>
             <Button className="email_button" onClick={() => { setHeader('Email Server Configuration'); setScreen('Email Server Configuration'); }}><img src="static/imgs/email_server_configuration_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}} />Email Server Configuration</Button>
-            </div>
+                        </div>
             <div className='flex flex-column p-2 pr-1 m-1'>
             <Button className='Agent_btn' onClick={() => { setHeader('Manage Agents'); setScreen('Manage Agents'); }}><img src="static/imgs/agent_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>Manage Agents</Button>
-            <Button className='Agent_btn' onClick={() => { setHeader('Grid'); setScreen('Grid'); }}><img src="static/imgs/agent_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>Grids</Button>
+            <Button className='Agent_btn' onClick={() => { setHeader('Grid Configuration'); setScreen('Grid Configuration'); }}><img src="static/imgs/agent_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>Grid Configuration</Button>
             </div>
             <div className='flex flex-column p-2 pr-1 m-1'>
             <Button className='Session_btn' onClick={() => { setHeader('Session Management');  setScreen('SessionManagement'); }}><img src="static/imgs/users_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem',width:'2rem'}}/>Session Management</Button>
