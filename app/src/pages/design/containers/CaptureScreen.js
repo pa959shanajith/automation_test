@@ -1107,7 +1107,7 @@ const footerSave = (
     {selectedCapturedElement.length>0?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} disabled={captureData.length === 0 && captureData.some((rowData) => rowData.objectDetails.objId === undefined) && !deletedItems && !saveDisable}></Button>
+    <Button label='Save' onClick={onSave} disabled={captureData.length === 0 && captureData.some((rowData) => rowData.objectDetails.objId === undefined) && !deletedItems}></Button>
     </>
   )
   
