@@ -4,6 +4,7 @@ import { RadioButton } from "primereact/radiobutton";
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
+import { InputNumber } from 'primereact/inputnumber';
 import { Checkbox } from "primereact/checkbox";
 import { Button } from 'primereact/button';
 import { DataTable } from "primereact/datatable";
@@ -41,7 +42,8 @@ const ScheduleScreen = ({
   scheduleOption,
   onScheduleChange,
   selectedWeek,
-  onWeekChange
+  onWeekChange,
+  checkDisable
 }) => {
   const [tableFilter, setTableFilter] = useState("");
   const [exestatus, setExestatus] = useState("");
@@ -55,12 +57,13 @@ const ScheduleScreen = ({
       name: (
         <span>
           Every{" "}
-          <InputText
-          title="Enter after every how many number of day(s) you wish it to recur."
+          <InputNumber
+            title="Enter after every how many number of day(s) you wish it to recur."
             className="every_day"
             name="everyday"
             value={scheduleOption?.everyday}
-            onChange={(e) => onScheduleChange(e)}
+            onValueChange={(e) => onScheduleChange(e)}
+            disabled={selectedDaily?.key !== "day"}
           />{" "}
           day(s).
         </span>
@@ -74,22 +77,24 @@ const ScheduleScreen = ({
       name: (
         <span>
           Day{" "}
-          <InputText
+          <InputNumber
             className="every_day"
             name="monthweek"
             title=" Enter on which day of the month you wish it to recur."
             // value={scheduleOption.monthweek}
             value={scheduleOption?.monthweek}
-            onChange={(e) => onScheduleChange(e)}
+            onValueChange={(e) => onScheduleChange(e)}
+            disabled={selectedMonthly?.key !== "daymonth"}
           />{" "}
           of every{" "}
-          <InputText
+          <InputNumber
             className="every_day"
             name="monthday"
             title=" Enter after every how many month(s) you wish it to recur."
             // value={scheduleOption.monthday}
             value={scheduleOption?.monthday}
-            onChange={(e) => onScheduleChange(e)}
+            onValueChange={(e) => onScheduleChange(e)}
+            disabled={selectedMonthly?.key !== "daymonth"}
           />{" "}
           month(s).
         </span>
@@ -108,6 +113,7 @@ const ScheduleScreen = ({
             placeholder="Select Value"
             required={false}
             customeClass="dropdown_week"
+            disabled={selectedMonthly?.key !== "dayweek"}
           />{" "}
           <AvoDropdown
             dropdownValue={dropdownDay}
@@ -117,14 +123,16 @@ const ScheduleScreen = ({
             placeholder="Select day"
             required={false}
             customeClass="dropdown_day"
+            disabled={selectedMonthly?.key !== "dayweek"}
           />{" "}
           of every{" "}
-          <InputText
+          <InputNumber
             className="every_day"
             name="everymonth"
             title=" Enter after every how many month(s) you wish it to recur."
             value={scheduleOption?.everymonth}
-            onChange={(e) => onScheduleChange(e)}
+            onValueChange={(e) => onScheduleChange(e)}
+            disabled={selectedMonthly?.key !== "dayweek"}
           />{" "}
           month(s).
         </span>
@@ -166,6 +174,7 @@ const ScheduleScreen = ({
                   name="daily"
                   value={el}
                   onChange={onWeekChange}
+                  disabled={checkDisable}
                   checked={selectedWeek.some((item) => item.key === el.key)}
                 />
                 <label htmlFor={el?.key} className="ml-2">
