@@ -19,10 +19,11 @@ const OriginContainer = (props) => {
     const [createUserDialog, setCreateUserDialog] = useState(false)
     // const [provisionDialog,setProvisionDialog] = useState(false)
     return (<>
-        <div>
+        <div className={currentTab === "SessionManagement"? "rightContainer":null}>
+            {currentTab !== "SessionManagement"?
             <div className="admin_origin_header">
                 <Header setCreateUserDialog={setCreateUserDialog} />
-            </div>
+            </div> : null}
             {currentTab === "ldapConf" && <LdapConfig/>}
             {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
             {currentTab === "samlConf" && <SamlConf />}
