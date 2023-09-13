@@ -117,9 +117,11 @@ const DesignModal = (props) => {
 
     useEffect(() => {
         let shouldDisable = false;
-        dispatch(TestCases(testCaseData))
+        if(screenLavelTestSteps.length !==0){
+        const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        dispatch(TestCases(findData?.testCases))
         //eslint-disable-next-line
-        for (let value of testCaseData) {
+        for (let value of findData?.testCases) {
             if (value.custname === "" || value.custname === "OBJECT_DELETED") {
                 shouldDisable = true;
             }
@@ -130,8 +132,8 @@ const DesignModal = (props) => {
         //      }
         //     });
         setDebugEnable(shouldDisable);
-    }, [dispatch, testCaseData]);
-
+    }
+    }, [dispatch, rowExpandedName, screenLavelTestSteps, testCaseData]);
     useEffect(() => {
         setChanged(true);
     }, [saveEnable]);
