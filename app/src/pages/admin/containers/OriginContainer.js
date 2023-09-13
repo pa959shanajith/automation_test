@@ -26,15 +26,13 @@ const OriginContainer = (props) => {
                 <Header setCreateUserDialog={setCreateUserDialog} />
             </div> : null}
             {currentTab === "ldapConf" && <LdapConfig/>}
-            {/* {currentTab === "users" && <CreateUser/>}  setCreateUserDialog ={setCreateUserDialog} */}
             {currentTab === "samlConf" && <SamlConf />}
-            {currentTab === "Users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
-            {currentTab === "Email Server Configuration" && <EmailConfiguration/>}
-            {currentTab === "Manage Agents" && <Agents/>}
-            {currentTab === "Grid Configuration" && <Grid/>}
-            {currentTab === "License Details" && <LicenseManagement/>}
-            {currentTab === "SessionManagement" && <SessionManagement/>}
-            {currentTab === "Privileges" && <Privileges/>}
+            {currentTab === "users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
+            {currentTab === "email_server_configuration" && <EmailConfiguration/>}
+            {currentTab === "manage_agents" && <Agents/>}
+            {currentTab === "license_details" && <LicenseManagement/>}
+            {currentTab === "session_management" && <SessionManagement/>}
+            {currentTab === "privileges" && <Privileges/>}
             {/* {currentTab === "Avo Assure Client" && <IceProvision/>} */}
         </div>
     </>)
