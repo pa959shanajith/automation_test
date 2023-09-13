@@ -195,7 +195,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" },{label:"Execution Profile Statistics"}];
   const handleTabChange = (e) => {
-    console.log(e);
     setActiveIndex1(e.index);
   };
 
@@ -789,6 +788,17 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         selectedKeys[item] = selectedArr[index];
       });
       let getCurrent = {};
+
+      const getProjectData = () => {
+        let projectValue = [];
+        if(Array.isArray(getConfigData?.projects)){
+          projectValue = getConfigData?.projects.filter(
+            (el) => el._id === configProjectId
+          )
+        };
+        return projectValue;
+      };
+      
       xpanded?.forEach((val) => {
         if (Object.keys(selectedNodeKeys).includes(val.key)) {
           let numberArray = [];
@@ -798,6 +808,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           getCurrent[val.suiteid] = numberArray;
         }
       });
+      console.log(getProjectData());
       let batchInfoData = [];
       xpanded?.forEach((item) => {
         if (Object.keys(selectedNodeKeys).includes(item.key)) {
@@ -809,11 +820,11 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             versionNumber: 0,
             appType: selectProjects.appType,
             domainName: "Banking",
-            projectName: getConfigData?.projects[0]?.name,
+            projectName: getProjectData()[0]?.name,
             projectId: configProjectId,
-            releaseId: getConfigData?.projects[0]?.releases[0]?.name,
-            cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
-            cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
+            releaseId: "R1",
+            cycleName: getProjectData()[0]?.releases[0]?.cycles[0]?.name,
+            cycleId: "C1",
             scenarionIndex: [1],
             suiteDetails: [
               {
