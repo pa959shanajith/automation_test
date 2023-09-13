@@ -1,285 +1,60 @@
+@import "../../global/styles/ColorVariables.scss";
+.conf_email{
+    height: calc(100% - 31px);
+    margin-top: 80px;
+    .input-label{
+        width: 100%;
+        max-width: 730px;
+        font-size: small;
+        font-weight: 700;
+        margin-top: 25px;
+        label{
+            width: 120px;
+        }
+    }
+    @media screen and (min-width: 1801px) {
+        .input-label{
+            max-width: 100% !important;
+        }
+    }
+    .conf-title{
+        width: 100%;
+        background: $whisper;
+        display: block;
+        font-weight: 100;
+        font-size: 18px;
+        padding: 8px;
+    }
+    .checkbox-email{
+        label{
+            width: 200px;
+            margin-left: 10px;
+        }
+
+    }
+}
+.conf_email_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
+    button:disabled{
+        cursor: not-allowed;
+        filter: alpha(opacity=65);
+        opacity: .65;
+    }
+}
 .full_page{
     width: 100%;
     float: left;
     overflow: auto;
     height: 31rem;
 }
-.provider{
-    line-height: 3rem;
-    font-weight: bold;
-    font-family: "Open Sans";
-    margin-left: 1rem;
-    font-size: 1rem;
+.test_submit{
+    display: flex;
+    top: 4rem;
 }
-.providerdropdown{
-    margin-left: 1rem;
-    width: 20%;
-}
-.email_setting_header{
-    line-height: 3rem;
-    font-weight: bold;
-    font-family: "Open Sans";
-    margin-left: 1rem;
-    margin-top: 1.2rem;
-    font-size: 1.1rem;
-}
-.hostname{
-    line-height: 3rem;
-    font-weight: bold;
-    margin-left: 1rem;
-    font-family: "Open Sans";
-}
-.server_name{
-    margin-left: 3rem;
-    width: 20%;
-    font-family: "Open Sans";
-}
-.port_no{
-    width: 20%;
-    margin-top: -1rem;
-    margin-left: 1rem;
-}
-.provider_dropdown{
-    margin-left: 1rem;
-    width: 20%;
-}
-.host_name{
-    margin-left: 1rem;
-    width: 20%;
-    font-family: "Open Sans";
-}
-.servername{
-    margin-left: 17.3rem;
-    font-weight: bold;
-    font-family: "Open Sans";
-}
-.portname{
-    margin-left: 1rem;
-    font-weight: bold;
-    line-height: 5rem;
-    font-family: "Open Sans";
-}
-.Auth_info{
-    line-height: 4.5rem;
-    font-weight: bold;
-    margin-left: 1rem;
-    font-size: 1.1rem;
-    font-family: "Open Sans";
-    margin-top: -3rem;
-}
-.Authname{
-    font-weight: bold;
-    font-family: "Open Sans";
-    margin-left: 1rem;
-    line-height: 3rem;
-}
-.Auth_dropdown{
-    font-family: "Open Sans";
-    margin-left: 1rem;
-    width: 20%;
-}
-.AuthUsername{
-    line-height: 3rem;
-    margin-left: 1rem;
-    font-family: "Open Sans";
-    font-weight: bold;
-    font-size: 1rem;
-    
-}
-.AuthPassword{
-    line-height: 3rem;
-    margin-left: 10rem;
-    font-weight: bold;
-    font-family: "Open Sans";
-    font-size: 1rem;
-}
-.Auth_Username{
-    margin-left: 1rem;
-    width: 20%;
-}
-.Auth_Password{
-    margin-left: 3rem;
-    width: 20%;
-}
-.security_label{
-    font-size: 1.1rem;
-    font-weight: 700;
-    line-height: 3rem;
-    margin-left: 1rem;
-}
-.contime_label{
-    margin-top: 1rem;
-    line-height: 3rem;
-}
-.conSocket_label{
-    // margin-top: 1rem;
-    line-height: 3rem;
-}
-.socket_button{
-    margin-top: -1rem;
-    width: 40%;
-}
-.maxmsg_button{
-    margin-top: -1rem;
-    width: 40%;
-}
-.greet_label{
-    // margin-top: 1rem;
-    line-height: 3rem;
-}
-.greet_button{
-    margin-top: -1rem;
-    width: 40%;
-}
-.max_button{
-    width:40%;
-    margin-top: -1rem;
-
-}
-.connection_label{
-    line-height: 3rem;
-    font-weight: bold;
-    font-size: 1rem;
-    margin-left: 1rem;
-}
-.auto_radiobutton{
-    margin-left: 1rem;
-}
-.Authradio_label{
-    margin-left: 1rem;
-}
-.tLs_radiobutton{
-    margin-left: 9rem
-}
-.tLs_label{
-    font-family: "Open Sans";
-    margin-left: 14rem;
-}
-.input_button{
-    width:40%;
-    margin-top: -1rem;
-    .p-button {
-        /* background: #6366f1; */
-        background-color:white;
-        border: black;
-        border-radius: 6px;
-        color: black;
-        font-size: 1rem;
-        padding: 0.75rem 1.25rem;
-        transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s;
-    }
-}
-.accordiantab{
-    margin-top: 1.5rem;
-    overflow: auto;
-}
-.selectconn_label{
-    line-height: 2rem;
-    font-size: 1rem;
-}
-.authheader{
-    overflow: auto;
-}
-.checkbox_conn{
-    margin-left: 0rem;
-    margin-top: 16px;
-}
-.connec_but{
-    margin-left: 0rem;
-    margin-top: 1rem;
-    line-height: 3rem;
-}
-.connection_label{
-    font-weight: 700;
-    margin-left: 1rem;
-    line-height: 0.2rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-.proxy_img{
-    margin-left: 1rem;
-    margin-top: 1rem;
-}
-.msg_label{
-    margin-top: 1rem;
-    line-height: 3rem;
-}
-.Proxy_label{
-    font-family: "Open Sans";
-    margin-left: 1rem;
-    font-weight: bold;
-}
-.url_proxy{
-    margin-left: 1rem;
-    margin-top: 1rem;
-    line-height: 3rem;
-}
-.Proxy_srver{
-  
-   line-height: 3rem;
-   width: 40%;
-   height: 10%;
-}
-.timelabel{
-    margin-left: 2rem;
-    margin-top: -1.4rem;
-}
-.timeImg{
-    width: 1.5%;
-}
-.ProxyCred_label{
-    margin-left: 1rem;
-    font-weight: bold;
-    line-height: 3rem;
-}
-.proxyUser_label{
-    margin-left: 1rem;
-    line-height: 3rem;
-}
-.Proxy_username{
-   
-    margin-top: 0rem;
-    width: 40%;
-}
-.proxypass_label{
-    margin-left: 1rem;
-    line-height: 3rem;
-    width: 40%;
-}
-.Proxy_Password{
-  
-    width: 40%;
-}
-.emailActionBtn{
-font-family: "Open Sans";
-}
-.disabelbtn{
-    float: left;
-    margin-top: 1.2rem;
-    margin-left: 2rem;
-    .p-button {
-        /* background: #6366f1; */
-        border: transparent;
-        border-radius: 6px;
-        color: black;
-        font-size: 1rem;
-        padding: 0.75rem 1.25rem;
-        transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s;
-    }
-}
-.testbtn{
-    float:right;
-    margin-right: 42rem;
-    margin-top: 1.2rem;
-}
-.savebtn{
-    float: right;
-    margin-right: -10rem;
-    margin-top: 1.2rem;
-}
-.connectionradio{
-    margin-left: 0.9rem;
-}
-.auto_radiobutton{
-    margin-left: 1rem;
+.test_button{
+    height: 1rem;
+    background: transparent;
+    color: black;
 }
