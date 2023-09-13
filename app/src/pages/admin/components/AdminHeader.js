@@ -25,7 +25,7 @@ const AdminHeader = (props) => {
             return <img src="static/imgs/email_server_configuration_icon.svg"  className='current_img_icon' alt="SVG Image" />;
           case 'Manage Agents':
             return <img src="static/imgs/agent_icon.svg" alt="SVG Image" className='current_img_icon' />;
-          case 'Grid':
+          case 'Grid Configuration':
             return <img src="static/imgs/agent_icon.svg" alt="SVG Image" className='current_img_icon' />;
           case 'SessionManagement':
             return <img src="static/imgs/users_icon.svg" alt="SVG Image" className='current_img_icon'/>;
@@ -37,10 +37,11 @@ const AdminHeader = (props) => {
       };
     
     return (
+      (currentTab !== "SessionManagement"? 
         <div className="Create_Header">
             <h3 className="header_label">{currentTabImage()}{currentTab}</h3>
             {currentTab === "Users" && <Button className="Create_btn" label ="create" onClick={() => {props.setCreateUserDialog(true); dispatch(AdminActions.RESET_VALUES(""))}}> </Button>}
-        </div>
+        </div> : null )
     )
 }
 export default AdminHeader;

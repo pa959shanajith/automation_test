@@ -144,6 +144,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
+  
+  const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
+  const typesOfAppType = NameOfAppType.appType;
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
 
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
@@ -275,7 +279,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
-      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
+      // dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
@@ -918,6 +922,16 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
+    function changeProject(e){
+      const defaultProjectData = {
+        ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
+        projectId: e.target.value,
+        projectName: projectList.find((project)=>project.id === e.target.value).name,
+        appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)]
+      };
+      localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
+      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: projectList.find((project)=>project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
+    }
     return (
       <nav>
         <ul
@@ -938,7 +952,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             title=" Search for project"
             className="Search_Project"
               onChange={(e) => {
-                dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: projectList.find((project)=>project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
+                changeProject(e)
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
@@ -1798,7 +1812,7 @@ Learn More '/>
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
           isDisabled={
             !configTxt ||
-            !avodropdown?.browser?.length ||
+            (typesOfAppType !=="Web"? null:!avodropdown?.browser?.length) ||
             !Object.keys(selectedNodeKeys)?.length
           }
         />

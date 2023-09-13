@@ -626,7 +626,7 @@ const elementTypeProp =(elementProperty) =>{
     var capturedDataAfterSave = scrapeItemsL.filter(function (item) {
 
       return !selectedCapturedElement.find(function (objFromB) {
-        if (item.objectDetails.custname === objFromB.objectDetails.custname) {
+        if (item.objectDetails.val === objFromB.objectDetails.val) {
           if(item.objectDetails.objId){
             deletedArr.push(item.objectDetails.objId)}
           return true
@@ -678,7 +678,7 @@ const elementTypeProp =(elementProperty) =>{
       'deletedObj': deleted,
       'modifiedObj': modifiedObjects,
       'addedObj': { ...added, view: views },
-      'screenId': props.fetchingDetails["_id"],
+      'screenId': parentData.id,
       'userId': userInfo.user_id,
       'roleId': userInfo.role,
       'param': 'saveScrapeData',
@@ -1107,7 +1107,7 @@ const footerSave = (
     {selectedCapturedElement.length>0?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} disabled={captureData.length === 0 && !deletedItems}></Button>
+    <Button label='Save' onClick={onSave} disabled={captureData.length === 0 && captureData.some((rowData) => rowData.objectDetails.objId === undefined) && !deletedItems}></Button>
     </>
   )
   

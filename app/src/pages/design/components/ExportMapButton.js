@@ -13,7 +13,6 @@ import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
-
 /*Component ExportMapButton
   use: renders ExportMapButton and popups for selection on click 
 */
@@ -121,7 +120,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     return(
         <Fragment>
             <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
-            <Dialog className='exportDialog' header='Export MindMap' onHide={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}  visible={exportBox} style={{ width: '50vw' }} footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>} >
+            <Dialog className='exportDialog' header='Export MindMap' onHide={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}  visible={exportBox} style={{width:'50vw'}} footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>} >
                     <Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}  gitComMsgRef ={gitComMsgRef}
             setExportVer={setExportVer} />
             </Dialog>
@@ -211,22 +210,30 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
         { name: 'Git', code:'GT', value:'git',disabled:!isEndtoEnd?false:true},
         { name: 'Complete Test Suite(S) (.zip)', code: 'IST', value:'json' , disabled:!isEndtoEnd?false:true}
     ]
-    const exportProjectItem = Object.entries(projectList).map((e)=>{
-                    let appTypeName = ''
-                    for (let projects in projectList) {
-                        if(projectList[projects].id === selectedProj) {
-                            appTypeName = projectList[projects]['apptypeName']
-                            break;
-                        }
+    const exportProjectItem = Object.entries(projectList)
+        .map((e) => {
+                let appTypeName = '';
+                // Iterate over the projectList to find the appTypeName based on selectedProj
+                for (let projects in projectList) {
+                    if (projectList[projects].id === selectedProj) {
+                        appTypeName = projectList[projects]['apptypeName'];
+                        break;
                     }
-                    if(e[1].apptypeName === appTypeName)return { name:e[1].name, value:e[1].id, key:e[0]}      
-        })
-        
+                }
+                // Check if the apptypeName of the current entry matches appTypeName
+                if (e[1].apptypeName === appTypeName) {
+                    return { name: e[1].name, value: e[1].id, key: e[0] };
+                }
+                // If the condition is not met, return undefined
+                return undefined;
+            })
+            .filter((item) => item !== undefined); // Remove undefined items
+
     return(
         <div>
             <div>
                 <div className='export-rec-row'>
-             <label htmlFor='ExportProject'> <input type="radio" id ="select export to project"  checked ={exportProject} onChange={check}/> Copy To Project </label>
+             <label htmlFor='ExportProject'> <input type="radio" id="select export to project"  checked={exportProject} onChange={check}/> Copy To Project </label>
                {exportProject && <>
                <Dropdown
                     inputId="ExportProject"
