@@ -827,7 +827,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             projectId: configProjectId,
             releaseId: "R1",
             cycleName: getProjectData()[0]?.releases[0]?.cycles[0]?.name,
-            cycleId: "C1",
+            cycleId: getProjectData()[0]?.releases[0]?.cycles[0]?._id,
             scenarionIndex: [1],
             suiteDetails: [
               {
@@ -911,7 +911,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       tableUpdate();
       setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
-      errorinfo.current.show({
+      errorinfo?.current && errorinfo?.current?.show({
         severity: 'error',
         summary: 'Error',
         detail: getConfigData?.setupExists?.error?.CONTENT,
@@ -970,11 +970,11 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
   useEffect(() => {
     browsers.forEach((el) => {
-      if (el.key == currentSelectedItem?.executionRequest?.browserType[0]) {
+      if ((currentSelectedItem?.executionRequest?.browserType && el.key == currentSelectedItem?.executionRequest?.browserType[0])) {
         setBrowserTxt(el.name);
       }
     });
-  }, [currentSelectedItem?.executionRequest?.browserType[0]]);
+  }, [currentSelectedItem?.executionRequest?.browserType]);
 
   const onExecuteBtnClick = async (btnType) => {
     if (btnType === "Execute") {
