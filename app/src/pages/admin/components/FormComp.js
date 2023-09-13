@@ -282,7 +282,7 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
                         {/* {list.map((e) => (
                             <option key={e} onClick={selectOption} value={e}> {e}</option>
                         ))} */}
-                        <Dropdown value={dropdownValue} onChange={(e) => setDropdownValue(e.value)} options={list} placeholder="Select a Country"
+                        <Dropdown value={dropdownValue} onChange={(e) => setDropdownValue(e.value)} options={list} placeholder="Select"
                             filter className="w-full md:w-29rem" />
 
                     {/* </div> */}

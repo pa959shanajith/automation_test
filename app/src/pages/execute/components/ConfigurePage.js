@@ -144,6 +144,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
+  
+  const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
+  const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
 
   useEffect(() => {
@@ -196,7 +199,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 
   const items = [{ label: "Configurations" }, { label: "Execution(s)" },{label:"Execution Profile Statistics"}];
   const handleTabChange = (e) => {
-    console.log(e);
     setActiveIndex1(e.index);
   };
 
@@ -790,6 +792,17 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         selectedKeys[item] = selectedArr[index];
       });
       let getCurrent = {};
+
+      const getProjectData = () => {
+        let projectValue = [];
+        if(Array.isArray(getConfigData?.projects)){
+          projectValue = getConfigData?.projects.filter(
+            (el) => el._id === configProjectId
+          )
+        };
+        return projectValue;
+      };
+      
       xpanded?.forEach((val) => {
         if (Object.keys(selectedNodeKeys).includes(val.key)) {
           let numberArray = [];
@@ -810,11 +823,11 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             versionNumber: 0,
             appType: selectProjects.appType,
             domainName: "Banking",
-            projectName: getConfigData?.projects[0]?.name,
+            projectName: getProjectData()[0]?.name,
             projectId: configProjectId,
-            releaseId: getConfigData?.projects[0]?.releases[0]?.name,
-            cycleName: getConfigData?.projects[0]?.releases[0]?.cycles[0]?.name,
-            cycleId: getConfigData?.projects[0]?.releases[0]?.cycles[0]?._id,
+            releaseId: "R1",
+            cycleName: getProjectData()[0]?.releases[0]?.cycles[0]?.name,
+            cycleId: getProjectData()[0]?.releases[0]?.cycles[0]?._id,
             scenarionIndex: [1],
             suiteDetails: [
               {
@@ -898,7 +911,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       tableUpdate();
       setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
-      errorinfo.current.show({
+      errorinfo?.current && errorinfo?.current?.show({
         severity: 'error',
         summary: 'Error',
         detail: getConfigData?.setupExists?.error?.CONTENT,
@@ -957,11 +970,11 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
   useEffect(() => {
     browsers.forEach((el) => {
-      if (el.key == currentSelectedItem?.executionRequest?.browserType[0]) {
+      if ((currentSelectedItem?.executionRequest?.browserType && el.key == currentSelectedItem?.executionRequest?.browserType[0])) {
         setBrowserTxt(el.name);
       }
     });
-  }, [currentSelectedItem?.executionRequest?.browserType[0]]);
+  }, [currentSelectedItem?.executionRequest?.browserType]);
 
   const onExecuteBtnClick = async (btnType) => {
     if (btnType === "Execute") {
@@ -1798,7 +1811,7 @@ Learn More '/>
           modalSytle={{ width: "85vw", height: "94vh", background: "#FFFFFF" }}
           isDisabled={
             !configTxt ||
-            !avodropdown?.browser?.length ||
+            (typesOfAppType !=="Web"? null:!avodropdown?.browser?.length) ||
             !Object.keys(selectedNodeKeys)?.length
           }
         />

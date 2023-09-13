@@ -1,9 +1,9 @@
 import { browsers } from "./mockData";
 
-export const getBrowser = (browser) => {
+export const getBrowser = (browser = []) => {
   let browsersArr = [];
   browsers.forEach((el) => {
-    if (browser.includes(el?.key)) {
+    if (Array.isArray(browser) && browser.includes(el?.key)) {
       browsersArr.push(el?.name);
     }
   });
