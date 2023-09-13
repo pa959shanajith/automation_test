@@ -283,7 +283,7 @@ const DesignModal = (props) => {
                     // else props.setDisableActionBar(false); //enable left-top-section
 
                     // setHideSubmit(data.testcase.length === 0);
-                    // setReusedTC(data.reuse);
+                    setReusedTC(data.reuse);
 
                     DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectID, props.fetchingDetails['parent']['children'][j]["_id"])
                         .then(scriptData => {
