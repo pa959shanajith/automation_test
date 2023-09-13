@@ -812,7 +812,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           getCurrent[val.suiteid] = numberArray;
         }
       });
-      console.log(getProjectData());
       let batchInfoData = [];
       xpanded?.forEach((item) => {
         if (Object.keys(selectedNodeKeys).includes(item.key)) {
