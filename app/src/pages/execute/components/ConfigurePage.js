@@ -956,7 +956,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
             >
-              {projectList.map((project, index) => (
+              {[...new Set(projectList)].map((project, index) => (
                 <option value={project.id} key={index}>
                   {project.name}
                 </option>
