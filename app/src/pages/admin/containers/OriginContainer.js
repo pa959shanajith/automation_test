@@ -7,7 +7,6 @@ import CreateUser from '../components/CreateUser';
 import EmailConfiguration from './EmailConfiguration';
 import SamlConf from './SamlConf';
 import '../styles/OriginContainer.scss'
-import { validateUserState } from '../../login/api';
 // import IceProvision from './IceProvision';
 import Agents from './Agents'
 import Grid from './Grid'
@@ -20,8 +19,8 @@ const OriginContainer = (props) => {
     const [createUserDialog, setCreateUserDialog] = useState(false)
     // const [provisionDialog,setProvisionDialog] = useState(false)
     return (<>
-        <div className={currentTab === "SessionManagement"? "rightContainer":null}>
-            {currentTab !== "SessionManagement"?
+        <div className={currentTab === "session_management"? "rightContainer":null}>
+            {currentTab !== "session_management"?
             <div className="admin_origin_header">
                 <Header setCreateUserDialog={setCreateUserDialog} />
             </div> : null}
@@ -30,10 +29,10 @@ const OriginContainer = (props) => {
             {currentTab === "users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "email_server_configuration" && <EmailConfiguration/>}
             {currentTab === "manage_agents" && <Agents/>}
+            {currentTab === "grid_configuration" && <Grid/>}
             {currentTab === "license_details" && <LicenseManagement/>}
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
-            {/* {currentTab === "Avo Assure Client" && <IceProvision/>} */}
         </div>
     </>)
 }
