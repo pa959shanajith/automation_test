@@ -963,6 +963,9 @@ const DesignModal = (props) => {
         else if (props.appType === "OEBS"){
             debugTestCases('1')
         }
+        else if (props.appType === "SAP"){
+            debugTestCases('1')
+        }
     }
     const footerContent = (
         <div>
