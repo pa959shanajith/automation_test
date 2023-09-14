@@ -403,7 +403,7 @@ const ActionPanel = (props) => {
   const createElementFooter = (
     <div className='save_clear'>
       {/* <Button className='add_object_clear' >Clear</Button> */}
-      <Button className='add_object_save' onClick={() => { onSubmit(customObjList); }} disabled={!submitEnable}>Submit</Button>
+      <Button className='add_object_save' onClick={() => { onSubmit(customObjList); props.setSaveDisable(false) }} disabled={!submitEnable}>Submit</Button>
     </div>
   );
   const handleInputChange = (e) => {
@@ -714,14 +714,14 @@ const ActionPanel = (props) => {
   }
 
   const saveGroupItem = (oldObjId, keywordMap, newObjData, val) => {
-    // props.setShowPop({
-    //   'type': 'modal',
-    //   'title': 'Warning !',
-    //   'content': <div className="ss__dup_labels">
-    //     Do you want to update the object and all dependent testcases ?
-    //   </div>,
-    //   'footer': <button onClick={() => {
-    // props.setShowPop("")
+    props.setShowPop({
+      'type': 'modal',
+      'title': 'Warning !',
+      'content': <div className="ss__dup_labels">
+        Do you want to update the object and all dependent testcases ?
+      </div>,
+      'footer': <Button onClick={() => {
+    props.setShowPop("")
     // let { screenId } = props.current_task;
     const screenId = props.fetchingDetails["_id"];
 
@@ -765,8 +765,8 @@ const ActionPanel = (props) => {
         console.err(error);
       })
 
-    // }}>OK</button>
-    // })
+    }} label='OK'/>
+    })
   }
 
   const _handleModalClose = () => {
