@@ -1154,12 +1154,12 @@ const footerSave = (
     capturedDataToSave.map((object) => {
       if (objValues.val === object.val) setActiveEye(true);
       else if (activeEye) setActiveEye(false);
-      setHighlight(true);
+        setHighlight(true);
     })
     let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
     dispatch(objValue(objVal));
             setHighlight(true);
-          }
+   }
 
   useEffect(() => {
     if (mirror.scrape) {
@@ -1324,6 +1324,7 @@ const footerSave = (
     else if (!isCustom) setNewScrapedData(updNewScrapedData);
     if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
     setScrapeItems(localScrapeItems);
+    setSaveDisable(false);
   }
 
   const onCellEditComplete = (e) => {
@@ -1762,7 +1763,7 @@ const headerstyle={
 
 
         <div className="card-table" style={{ width: '100%', display: "flex" }}>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -1813,11 +1814,11 @@ const headerstyle={
         </div>
       </Dialog>
 
-         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         
 
-        {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
-        {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {/* {typesOfAppType === "OEBS"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1830,7 +1831,7 @@ const headerstyle={
            </span>}
          customClass="OEBS"
         />: null} */}
-        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "Mainframe"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1841,7 +1842,7 @@ const headerstyle={
          content = {"hello"}
          customClass="Mainframes"
         />: null}
-        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "System"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -2302,7 +2303,7 @@ const LaunchApplication = props => {
                     <input data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
                 </label>
             </span> */}
-            <input type="submit" data-test="desktopLaunch" onClick={onDesktopLaunch} style={{width: "100px"}} value="Launch" />
+            <input type="submit" data-test="desktopLaunch" onClick={()=>{onDesktopLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />
         </div>,
         'footerAction': onDesktopLaunch
     }
@@ -2326,7 +2327,7 @@ const LaunchApplication = props => {
 
     const sapApp = {
         'content': <input data-test="exePath" className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} name="sapWindowName" placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
-        'footer': <input type="submit" data-test="sapLaunch" onClick={onSapLaunch} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="sapLaunch" onClick={()=>{onSapLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
         'footerAction': onSapLaunch
     }
 
@@ -2427,7 +2428,7 @@ const LaunchApplication = props => {
             </span></div>}
         </div>,
 
-        'footer': <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="mobileAppLaunch" onClick={()=>{onMobileAppLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
         'footerAction': onMobileAppLaunch
     }
 
@@ -2449,7 +2450,7 @@ const LaunchApplication = props => {
 
     const oebsApp = {
         'content': <input data-test="oebsWinName" className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler} name="oebsWindowName" />,
-        'footer': <input type="submit" data-test="oebsLaunch" onClick={onWinLaunch} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="oebsLaunch" onClick={()=>{onWinLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
         'footerAction': onWinLaunch
     }
     
@@ -2480,7 +2481,7 @@ const LaunchApplication = props => {
             <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" />
         </div>,
 
-        'footer': <input type="submit" data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="MWLaunch" onClick={()=>{onMobileWebLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
         'footerAction': onMobileWebLaunch
     }
 
