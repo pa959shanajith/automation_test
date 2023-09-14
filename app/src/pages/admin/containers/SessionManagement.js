@@ -161,7 +161,7 @@ const action = actions
                                     <div className='user'>
                                   <span className='userTitle'>Username</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
                                   </div>
-                                  <Button  onClick={(event)=>{disconnectLogoff(event);setActions('logout'); setIndexs(index)}}  outlined  label='logout'/>
+                                  <Button  onClick={(event)=>{setActions('logout'); setIndexs(index);disconnectLogoff(event);}}  outlined  label='logout'/>
                                 </div>
                                 <div className='role'>
                                   <span className=''>Role</span><span className='semicolanR'>:</span><h4 className='roleName'>{user.role}</h4>
@@ -189,7 +189,7 @@ const action = actions
                                     <div className='user'>
                                   <span>Avo Client Name</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
                                   </div>
-                                  <Button   onClick={(event)=>{disconnectLogoff(event);setActions('disconnect');setIndexs(index)}} outlined  label='disconnect'/>
+                                  <Button   onClick={(event)=>{setActions('disconnect');setIndexs(index);disconnectLogoff(event);}} outlined  label='disconnect'/>
                                 </div>
                                 <div className='ipContainer'>
                                   <span className='IP'>IP</span><span className='semicolan'>:</span><h4>{user.ip}</h4>
