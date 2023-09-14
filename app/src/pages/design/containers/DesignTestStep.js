@@ -119,19 +119,21 @@ const DesignModal = (props) => {
         let shouldDisable = false;
         if(screenLavelTestSteps.length !==0){
         const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
-        dispatch(TestCases(findData?.testCases))
         //eslint-disable-next-line
-        for (let value of findData?.testCases) {
-            if (value.custname === "" || value.custname === "OBJECT_DELETED") {
-                shouldDisable = true;
+        if(findData !== undefined){
+            dispatch(TestCases(findData.testCases))
+            for (let value of findData.testCases) {
+                if (value.custname === "" || value.custname === "OBJECT_DELETED") {
+                    shouldDisable = true;
+                }
             }
+            // Object.values(testCaseData).forEach(value => {
+            //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+            //         shouldDisable = true;         
+            //      }
+            //     });
+            setDebugEnable(shouldDisable);
         }
-        // Object.values(testCaseData).forEach(value => {
-        //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
-        //         shouldDisable = true;         
-        //      }
-        //     });
-        setDebugEnable(shouldDisable);
     }
     }, [dispatch, rowExpandedName, screenLavelTestSteps, testCaseData]);
     useEffect(() => {

@@ -132,6 +132,7 @@ const ModuleListDrop = (props) =>{
      useEffect(()=> {
         return () => {
             dispatch(isEnELoad(false));
+            dispatch(selectedModuleReducer({}))
             // this comment is removed when auto save of mod will effect default mod
             // dispatch(dontShowFirstModule(false))
         }
