@@ -713,9 +713,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         avogrid: getAvogrid.filter(
           (el) => el.name === getData.executionRequest.avoagents[0]
         )[0],
-        browser: browsers.filter((el) =>
-          getData.executionRequest.browserType.includes(el.key)
-        ),
+        browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
+          getData?.executionRequest?.browserType.includes(el.key)
+        ) : [],
         
       });
       setMode(
@@ -956,7 +956,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
             >
-              {projectList.map((project, index) => (
+              {[...new Set(projectList)].map((project, index) => (
                 <option value={project.id} key={index}>
                   {project.name}
                 </option>
@@ -970,7 +970,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
   useEffect(() => {
     browsers.forEach((el) => {
-      if ((currentSelectedItem?.executionRequest?.browserType && el.key == currentSelectedItem?.executionRequest?.browserType[0])) {
+      if ((currentSelectedItem?.executionRequest?.browserType && Array.isArray(currentSelectedItem?.executionRequest?.browserType) && el.key == currentSelectedItem?.executionRequest?.browserType[0])) {
         setBrowserTxt(el.name);
       }
     });
@@ -1177,7 +1177,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             source: "schedule",
             exectionMode: "serial",
             executionEnv: "default",
-            browserType: selectedSchedule?.executionRequest?.browserType,
+            browserType: selectedSchedule?.executionRequest?.browserType ? selectedSchedule?.executionRequest?.browserType : ['1'],
             integration: selectedSchedule?.executionRequest?.integration,
             batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
               ...el,
