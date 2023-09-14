@@ -1355,7 +1355,7 @@ export const writeZipFileServer = async(data) => {
         const res = await axios(url+'/writeZipFileServer', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'multipart/form-data'
             },
             data: data,
             credentials: 'include'
