@@ -5,7 +5,7 @@ import * as api from '../api.js';
 import domainDetails from '../containers/Jira.js';
 import MappingPage from '../containers/MappingPage';
 import { Messages as MSG, setMsg, RedirectPage } from '../../global';
-// import CycleNode from './ZephyrTree';
+import CycleNode from './AzureTree';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss";
 import { Paginator } from 'primereact/paginator';
@@ -254,8 +254,6 @@ const AzureContent = props => {
                                 userStoryId:selectedTC[0] || '', 
                                 itemType:releaseId === 'Story' ? 'UserStory' : 'TestSuite' ,
                                 userStorySummary:selectedTC[1] || ''
-                               
-
                             }
                         ];
                         if(releaseId && releaseId === 'TestPlans'){
@@ -359,7 +357,8 @@ const AzureContent = props => {
         if(event.target.value){
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
             setTestSuites([]);
-            let apiObj = Object.assign({"action": azureapiKeys.testsuites},azureLogin,{"testplandetails":{"id":parseInt(event.target.value) || ''}},selectedProject);
+            let apiObj = Object.assign({
+                "action": azureapiKeys.testsuites},azureLogin,{"testplandetails":{"id":parseInt(event.target.value) || ''}},selectedProject);
             const getTestSuites = await api.connectAzure_ICE(apiObj);
             if(getTestSuites && getTestSuites.testsuites && getTestSuites.testsuites.length){
                 setTestSuites(getTestSuites.testsuites);
@@ -446,7 +445,7 @@ const AzureContent = props => {
                            
                         </select>
 
-                            {
+                            {/* {
                                 isShowTestplan ?
                                 <select data-test="intg_Zephyr_project_drpdwn" value={selectedTestplan} className="qcSelectDomain" onChange={(e) => { handleTestSuite(e); setSelectedTestplan(e.target.value) }} style={{ marginRight: "5px" }}>
                                     <option value="Select TestPlans" >Select TestPlans</option>
@@ -458,7 +457,7 @@ const AzureContent = props => {
                                 </select>
                                 :
                                 null
-                            }
+                            } */}
                             </>
                          }
                        
@@ -496,22 +495,47 @@ const AzureContent = props => {
                             }
                         </div>
                             ))
-                            : 
-                            testsToDisplay.map((e,i)=>(
-                                <div className={"test_tree_leaves"+ ( selected===e.id ? " test__selectedTC" : "")}>
-                                <label className="test__leaf" title={e.id} onClick={()=>handleClick(e.id,e.name)}>
-                                    <span className="leafId">{e.id}</span>    
-                                    <span className="test__tcName">{e.name} </span>
-                                </label>
-                                {selected===e.id 
-                                        && <><div className="test__syncBtns"> 
-                                        { selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled?"static/imgs/ic-qcSyncronise.png":null} />}
-                                        <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
-                                        </div></> 
-                                }
-                            </div>
-                                ))   
+                            :
+                            // Correct code
+                            // testsToDisplay.map((e,i)=>(
+                            //     <div className={"test_tree_leaves"+ ( selected===e.id ? " test__selectedTC" : "")}>
+                            //     <label className="test__leaf" title={e.id} onClick={()=>handleClick(e.id,e.name)}>
+                            //         <span className="leafId">{e.id}</span>    
+                            //         <span className="test__tcName">{e.name} </span>
+                            //     </label>
+                            //     {selected===e.id 
+                            //             && <><div className="test__syncBtns"> 
+                            //             { selected && <img className="test__syncBtn" alt="" title="Synchronize" onClick={handleSync} src={disabled?"static/imgs/ic-qcSyncronise.png":null} />}
+                            //             <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                            //             </div></> 
+                            //     }
+                            // </div>
+                            //     ))   
                             
+
+                            // Trying New Component
+                            <>
+                                {testPlansDropdown && testPlansDropdown.length ?
+                                    <div data-test="intg_zephyr_test_list" className="test__rootDiv">
+                                        <div className="test_tree_branches">
+                                            <img alt="collapse"
+                                                className="test_tree_toggle" 
+                                                src="static/imgs/ic-qcCollapse.png"
+                                                />
+                                            <label>Test Plans</label>
+                                        </div>
+                                        { testPlansDropdown.map( cycleName => <CycleNode 
+                                                    key={cycleName.name}
+                                                    phaseList={[]} 
+                                                    cycleName={cycleName.name}
+                                                    projectId={projectDropdn1}
+                                                    releaseId={releaseId}
+                                                    testPlansDetails = {cycleName}
+                                                    selectedProject = {selectedProject}
+                                                    azureLogin = {azureLogin}
+                                                    />) }
+                                    </div>:null}
+                            </>
                     }
                 </div>
                 }

@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as actionTypes from '../../plugin/state/action';
 import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
-import {readTestSuite_ICE} from '../../schedule/api';
+import {readTestSuite_ICE, getScheduledCount} from '../../schedule/api';
 import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 import CheckboxTree from 'react-checkbox-tree';
@@ -77,7 +77,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [integration,setIntegration] = useState({
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}
+        zephyr: {url:"",username:"",password:""},
+        azure:{url:"",username:"",password:""}
     });
     const [appType, setAppType] = useState('');
     const [cycleName, setCycleName] = useState('');
@@ -91,7 +92,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([]);
     const [iceStatus,setIceStatus] = useState([]);
     const [iceNameIdMap,setIceNameIdMap] = useState({});
-    const [showIcePopup,setShowIcePopup] = useState(false);
+    const [showIcePopup,setShowIcePopup] = useState(userInfo.isTrial);
     const [accessibilityParameters, setAccessibilityParameters] = useState([]);
     const [changeLable, setChangeLable] = useState(false);
     const [defaultValues, setDefaultValues] = useState({});
@@ -194,9 +195,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setMsg(MSG.CUSTOM("Error While Fetching Execute Configuration List",VARIANT.ERROR));
                     }
                 }else {
-                   const integrationData = configurationList.map((item,idx)=>{
-                        setIntegration(item.executionRequest.integration)
-                    })
+                //    const integrationData = configurationList.map((item,idx)=>{
+                //         setIntegration(item.executionRequest.integration)
+                //     })
                     setConfigList(configurationList);
                 }
             }
@@ -287,9 +288,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
             }
         }else {
-            const integrationData = configurationList.map((item,idx)=>{
-                setIntegration(item.executionRequest.integration)
-            })
+            // const integrationData = configurationList.map((item,idx)=>{
+            //     setIntegration(item.executionRequest.integration)
+            // })
             setConfigList(configurationList);
         }
         setLoading(false);
@@ -483,8 +484,23 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }
         setLoading(false);
     }
-    const onClickDeleteDevOpsConfig = (name, key) => {
-        setShowConfirmPop({'title': 'Delete Execution Profile', 'content': <p>Are you sure, you want to delete <b>{name}</b> Execution Profile?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
+    const onClickDeleteDevOpsConfig = async (name, key) => {
+        setLoading('checking scheduled execution...');
+        let message = <p>Are you sure, you want to delete <b>{name}</b> Execution Profile?</p>;
+        const result = await getScheduledCount(key);
+        if (result.error) {
+            if (result.error.CONTENT) {
+                setMsg(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
+            }
+            else {
+                setMsg(MSG.CUSTOM("Error while getting the scheduled count.",VARIANT.ERROR));
+            }
+        }
+        else if (result.count > 0) {
+            message = <p>Are you sure, you want to delete <b>{name}</b> Execution Profile? It has <b>{result.count}</b> scheduled execution.</p>;
+        }
+        setLoading(false);
+        setShowConfirmPop({'title': 'Delete Execution Profile', 'content': message, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
     }
     const handleSearchChange = (value) => {
         let filteredItems = configList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1));
@@ -501,6 +517,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         if(selectedIntegration === 'qtest') selectedIntegration = 'qTest'
         if(selectedIntegration === 'alm') selectedIntegration = 'ALM'
         if(selectedIntegration === 'zephyr') selectedIntegration = 'Zephyr'
+        if(selectedIntegration === 'azure') selectedIntegration = 'Azure'
         return selectedIntegration;
     }
     const handleEdit = (item) => {
@@ -559,7 +576,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         var str = JSON.stringify(myJsObj, null, 4);
            
         const categories = [{name: 'Avo Assure Client', key: 'A'}, {name: 'Avo Agent / Avo Grid', key: 'B'}];
-        const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+        const [selectedCategory, setSelectedCategory] = useState(userInfo.isTrial || appType!='web' ? categories[0] : categories[1]);
 
         document.addEventListener('input',(e)=>{
             
@@ -572,6 +589,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             <div>
                 <Button label="Execute" title="Execute" className="p-button-rounded" onClick={async () => {
                     if (showIcePopup) {
+                        //To make the default selection 
+                        setSelectedCategory(categories[0]);
                         dataExecution.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):"")
                         dataExecution.poolid = ""
                         if((ExeScreen===true?smartMode:"") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
@@ -581,6 +600,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         onHide(name);
                     }
                     else {
+                        // To make the default selection
+                        setSelectedCategory(categories[1]);
                         const temp = await execAutomation(currentKey);
                         if(temp.status !== "pass") {
                             if(temp.error && temp.error.CONTENT) {
@@ -871,7 +892,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     setCurrentKey(item.configurekey);
     setCurrentExecutionRequest(item.executionRequest);
     setAppType(item.executionRequest.batchInfo[0].appType);
-    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+    setShowIcePopup(selectedCategory.name == categories[0].name || item.executionRequest.batchInfo[0].appType !== "Web")
     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
     setCurrentName(item.configurename);
     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
@@ -1001,7 +1022,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     setCurrentKey(item.configurekey);
                                     setCurrentExecutionRequest(item.executionRequest);
                                     setAppType(item.executionRequest.batchInfo[0].appType);
-                                    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !== "Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+                                    setShowIcePopup(selectedCategory.name == categories[0].name || item.executionRequest.batchInfo[0].appType !== "Web")
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                                     setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
@@ -1080,6 +1101,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <td className="tkn-table__button" >
                                 <img onClick={() =>{
                                     onClick('displayBasic2');
+                                    setIntegration(item.executionRequest.integration);
                                     setCurrentKey(item.configurekey);
                                     setCurrentExecutionRequest(item.executionRequest);
                                     if ("isEmailNotificationEnabled" in item.executionRequest) {
@@ -1101,7 +1123,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         setProfileName(null)
                                     }
                                     setAppType(item.executionRequest.batchInfo[0].appType);
-                                    setShowIcePopup(!userInfo.isTrial?item.executionRequest.batchInfo[0].appType !=="Web":item.executionRequest.batchInfo[0].appType === "Web"?item.executionRequest.batchInfo[0].appType === "Web":item.executionRequest.batchInfo[0].appType !== "Web")
+                                    setShowIcePopup(selectedCategory.name == categories[0].name || item.executionRequest.batchInfo[0].appType !== "Web" )
                                     setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
                                     setCurrentName(item.configurename);
                                     let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
@@ -1177,12 +1199,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                {/* Dialog for Execute Now */}
                 <Dialog header="Execute Now" visible={displayBasic2}  className="execution" style={{ width: "43vw" }} footer={renderFooter('displayBasic2')} onHide={() => {onHide('displayBasic2'); setShowIcePopup(false) }}>
     
-                    <input type="radio" defaultChecked={!userInfo.isTrial?appType!=="Web":appType==="Web"?appType==="Web":appType!=="Web"} name='myRadios' id='first'  className='radiobutton' onChange={() => {setShowIcePopup(true)}}
+                    <input type="radio" defaultChecked={selectedCategory.name==categories[0].name || appType!=='Web'} name='myRadios' id='first'  className='radiobutton' onChange={() => {setShowIcePopup(true)}}
                       />&nbsp;&nbsp;
                     <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" >Avo Assure Client</label>
                     {!userInfo.isTrial? 
                     <>
-                     <input disabled={appType!=="Web"} title={appType!=="Web"?"Apptype not supported":""} type="radio" name='myRadios' id='second' onChange={()=>{setShowIcePopup(false)}} className='radiobutton'  defaultChecked={appType==="Web"}/>&nbsp;&nbsp; 
+                     <input disabled={appType!=="Web"} title={appType!=="Web"?"Apptype not supported":""} type="radio" name='myRadios' id='second' onChange={()=>{setShowIcePopup(false)}} className='radiobutton'  defaultChecked={appType==="Web" && selectedCategory.name==categories[1].name}/>&nbsp;&nbsp; 
                     <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice radiobutton1" title={appType!=="Web"?"Apptype not supported":""}>Avo Agent / Avo Grid</label>
                     </> : null
                     }
