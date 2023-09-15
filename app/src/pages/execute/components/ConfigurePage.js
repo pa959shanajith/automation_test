@@ -1016,9 +1016,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         } else {
           // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
           toast.current.show({
-            severity: "error",
-            summary: "error",
-            detail:("Execution Added to the Queue.", VARIANT.SUCCESS),
+            severity: "success",
+            summary: "Success",
+            detail:("Execution Added to the Queue."),
             life: 5000,
           });
         }
