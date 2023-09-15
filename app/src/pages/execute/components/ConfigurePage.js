@@ -658,6 +658,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
+              disabled={selectProjects.appType!=="Web"}
             >  
               CI/CD
             </Button>
@@ -1600,11 +1601,15 @@ Learn More '/>
                     <Button
                       icon="pi pi-copy"
                       className="copy_CICD"
+                      
                       onClick={() => {
                         copyConfigKey(url);
                       }}
+                     
+                      
                       // title={copyToolTip}
                     />
+                    
                     <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
                    </div>
                    </div>

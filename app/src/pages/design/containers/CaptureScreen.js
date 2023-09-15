@@ -1189,7 +1189,7 @@ const footerSave = (
 
 
   useEffect(() => {
-    if (objValues.val !== null) {
+    if (objValues.val !== null || highlight!==false) {
       let ScrapedObject = objValues;
 
       let top = 0; let left = 0; let height = 0; let width = 0;
@@ -1264,7 +1264,7 @@ const footerSave = (
     }
     else setHighlight(false);
     //eslint-disable-next-line
-  }, [objValues])
+  }, [objValues,highlight])
 
 
   const handleDataTableContentChange = (newData) => {
@@ -1762,7 +1762,7 @@ const headerstyle={
 
 
 
-        <div className="card-table" style={{ width: '100%', display: "flex" }}>
+        <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
           {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
@@ -1814,7 +1814,7 @@ const headerstyle={
         </div>
       </Dialog>
 
-         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         
 
         {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
@@ -2270,6 +2270,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false);
         }
     }
 
@@ -2303,7 +2304,7 @@ const LaunchApplication = props => {
                     <input data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
                 </label>
             </span> */}
-            <input type="submit" data-test="desktopLaunch" onClick={()=>{onDesktopLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />
+            <input type="submit" data-test="desktopLaunch" onClick={onDesktopLaunch} style={{width: "100px"}} value="Launch" />
         </div>,
         'footerAction': onDesktopLaunch
     }
@@ -2322,12 +2323,13 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
     const sapApp = {
         'content': <input data-test="exePath" className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} name="sapWindowName" placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
-        'footer': <input type="submit" data-test="sapLaunch" onClick={()=>{onSapLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="sapLaunch" onClick={onSapLaunch} style={{width: "100px"}} value="Launch" />,
         'footerAction': onSapLaunch
     }
 
@@ -2374,6 +2376,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2428,7 +2431,7 @@ const LaunchApplication = props => {
             </span></div>}
         </div>,
 
-        'footer': <input type="submit" data-test="mobileAppLaunch" onClick={()=>{onMobileAppLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" />,
         'footerAction': onMobileAppLaunch
     }
 
@@ -2445,12 +2448,13 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
     const oebsApp = {
         'content': <input data-test="oebsWinName" className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler} name="oebsWindowName" />,
-        'footer': <input type="submit" data-test="oebsLaunch" onClick={()=>{onWinLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="oebsLaunch" onClick={onWinLaunch} style={{width: "100px"}} value="Launch" />,
         'footerAction': onWinLaunch
     }
     
@@ -2472,6 +2476,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2481,7 +2486,7 @@ const LaunchApplication = props => {
             <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" />
         </div>,
 
-        'footer': <input type="submit" data-test="MWLaunch" onClick={()=>{onMobileWebLaunch(); props.setSaveDisable(false)}} style={{width: "100px"}} value="Launch" />,
+        'footer': <input type="submit" data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}} value="Launch" />,
         'footerAction': onMobileWebLaunch
     }
 
