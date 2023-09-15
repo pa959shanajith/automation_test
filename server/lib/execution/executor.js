@@ -74,12 +74,14 @@ class TestSuiteExecutor {
         scenario.qcdetails = [];
         for (var k = 0; k < integrationType.length; ++k) {
             inputs = {
-                "testscenarioid": scenarioid
+                "testscenarioid": scenarioid,
+                "userid":userid
             };
             const integ = integrationType[k];
             if (integ == 'qTest') inputs.query = "qtestdetails";
             else if (integ == 'ALM') inputs.query = "qcdetails";
             else if (integ == 'Zephyr') inputs.query = "zephyrdetails";
+            else if (integ == 'Azure') inputs.query = "azuredetails";
             if (inputs.query) {
                 const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
                 if (integ == 'ALM' && Array.isArray(qcdetails)) {
@@ -182,6 +184,9 @@ class TestSuiteExecutor {
                 }
                 if (batchData.integration && batchData.integration.zephyr && batchData.integration.zephyr.url) {
                     integrationType.push("Zephyr");
+                }
+                if (batchData.integration && batchData.integration.azure && batchData.integration.azure.url) {
+                   integrationType.push("Azure");
                 }
                 if (tsco.dataparam != "") {
                     var dt = tsco.dataparam[0].split(';')[0].split('/');
@@ -406,7 +411,7 @@ class TestSuiteExecutor {
                                     }
                                     const reportStatus = reportData.overallstatus.overallstatus;
                                     const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-                                    const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
+                                    const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy, timeEllapsed: reportData.overallstatus.EllapsedTime };
                                     if (reportid == "fail") {
                                         logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
                                         reportItem[reportid] = '';

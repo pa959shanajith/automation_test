@@ -616,6 +616,7 @@ if (cluster.isMaster) {
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
 		app.post('/getScheduledDetailsOnDate_ICE', auth.protect, suite.getScheduledDetailsOnDate_ICE);
 		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);
+		app.post('/getScheduledCount', auth.protect, suite.getScheduledCount);
 		//Report Screen Routes
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
