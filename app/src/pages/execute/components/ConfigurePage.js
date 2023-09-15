@@ -292,7 +292,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       // setConfigProjectId(data[0] && data[0]?.id);
       setProjectList(data);
     })();
-  }, []);
+  }, [selectProjects]);
 
 
 
@@ -948,20 +948,28 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               <b>Project: </b>
             </label>
             <select
-            placeholder="Search"
-            title=" Search for project"
-            className="Search_Project"
+              placeholder="Search"
+              title=" Search for project"
+              className="Search_Project"
               onChange={(e) => {
-                changeProject(e)
+                changeProject(e);
               }}
               style={{ width: "10rem", height: "25px" }}
               value={configProjectId}
             >
-              {[...new Set(projectList)].map((project, index) => (
-                <option value={project.id} key={index}>
-                  {project.name}
-                </option>
-              ))}
+              {projectList
+                .filter(
+                  (value, index, self) =>
+                    index ===
+                    self.findIndex(
+                      (item) => item.name === value.name
+                    )
+                )
+                .map((project, index) => (
+                  <option value={project.id} key={index}>
+                    {project.name}
+                  </option>
+                ))}
             </select>
           </li>
         </ul>
