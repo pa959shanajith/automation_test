@@ -432,6 +432,7 @@ const Messages={
         ERR_JOB_PROGRESS: {"CONTENT":"Job is in progress.. cannot be cancelled.", "VARIANT": VARIANT.ERROR},
         ERR_JOB_CANCEL_AUTH: {"CONTENT":"You are not authorized to cancel this job.", "VARIANT": VARIANT.ERROR},
         ERR_JOB_CANCEL: {"CONTENT":"Failed to cancel Job.", "VARIANT": VARIANT.ERROR},
+        ERR_FETCH_SCHEDULE_COUNT: {"CONTENT":"Error in getting the scheduled count.", "VARIANT": VARIANT.ERROR},
         
         SUCC_SHEDULE: {"CONTENT":"Successfully scheduled.", "VARIANT": VARIANT.SUCCESS},
         WARN_SCHEDULE_TIME: {"CONTENT":"Schedule time must be 5 mins more than current time.", "VARIANT": VARIANT.WARNING},
