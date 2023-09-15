@@ -119,19 +119,21 @@ const DesignModal = (props) => {
         let shouldDisable = false;
         if(screenLavelTestSteps.length !==0){
         const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
-        dispatch(TestCases(findData?.testCases))
         //eslint-disable-next-line
-        for (let value of findData?.testCases) {
-            if (value.custname === "" || value.custname === "OBJECT_DELETED") {
-                shouldDisable = true;
+        if(findData !== undefined){
+            dispatch(TestCases(findData.testCases))
+            for (let value of findData.testCases) {
+                if (value.custname === "" || value.custname === "OBJECT_DELETED") {
+                    shouldDisable = true;
+                }
             }
+            // Object.values(testCaseData).forEach(value => {
+            //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+            //         shouldDisable = true;         
+            //      }
+            //     });
+            setDebugEnable(shouldDisable);
         }
-        // Object.values(testCaseData).forEach(value => {
-        //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
-        //         shouldDisable = true;         
-        //      }
-        //     });
-        setDebugEnable(shouldDisable);
     }
     }, [dispatch, rowExpandedName, screenLavelTestSteps, testCaseData]);
     useEffect(() => {
@@ -283,7 +285,7 @@ const DesignModal = (props) => {
                     // else props.setDisableActionBar(false); //enable left-top-section
 
                     // setHideSubmit(data.testcase.length === 0);
-                    // setReusedTC(data.reuse);
+                    setReusedTC(data.reuse);
 
                     DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectID, props.fetchingDetails['parent']['children'][j]["_id"])
                         .then(scriptData => {
@@ -963,6 +965,9 @@ const DesignModal = (props) => {
             debugTestCases()
         }
         else if (props.appType === "OEBS"){
+            debugTestCases('1')
+        }
+        else if (props.appType === "SAP"){
             debugTestCases('1')
         }
     }

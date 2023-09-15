@@ -83,6 +83,7 @@ const CaptureModal = (props) => {
   const [editingCell, setEditingCell] = useState(null);
   const [deleted, setDeleted] = useState([]);
   const[browserName,setBrowserName]=useState(null)
+  const [saveDisable,setSaveDisable] = useState(true);
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -315,10 +316,10 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
         case 1:
           setBrowserName("chrome")
           break;
-        case 8:
+        case 2:
           setBrowserName("mozilla")
           break;
-        case 2:
+        case 8:
           setBrowserName("chromium")
           break;
       }
@@ -618,6 +619,7 @@ const elementTypeProp =(elementProperty) =>{
   }
   const onDelete = (e, confirmed) => {
     if (mainScrapedData.reuse && !confirmed) {
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
       return;
     }
     let deletedArr = [...deleted];
@@ -650,7 +652,7 @@ const elementTypeProp =(elementProperty) =>{
     setSelectedCapturedElement([])
     // setNewScrapedCapturedData(newCapturedDataToSave)
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
-    setDeletedItems(true);
+    setSaveDisable(false);
   }
   // {console.log(captureData[0].selectall)}
 
@@ -716,6 +718,7 @@ const elementTypeProp =(elementProperty) =>{
         }).catch(error => console.error(error));
       })
       .catch(error => console.error(error))
+      setSaveDisable(true);
   }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
@@ -947,8 +950,12 @@ else{
   };
 
 
-  const handleDelete = (rowData) => {
+  const handleDelete = (rowData,confirmed) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
+    if (mainScrapedData.reuse && !confirmed) {
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
+      return;
+    }
     if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
     let deletedArr = [...deleted];
     let scrapeItemsL = [...captureData];
@@ -1046,7 +1053,7 @@ else{
 
   const footerCapture = (
     <div className='footer__capture'>
-      {visible === 'capture' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</Button>}
+      {visible === 'capture' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); setSaveDisable(false) }}>Capture</Button>}
       {visible === 'replace' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</Button>}
     </div>
   )
@@ -1059,7 +1066,7 @@ else{
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button size='small' onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
+      <Button size='small' onMouseDownCapture={() => { setVisible(false); startScrape(browserName); setSaveDisable(false) }}>Capture</Button>
     </div>
   );
 
@@ -1073,7 +1080,7 @@ else{
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
         {captureData.length > 0 ? <div className='Header__btn'>
-          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }} >Add more</button>
+          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} >Add more</button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
@@ -1088,7 +1095,7 @@ else{
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true);}} >Capture Elements</Button>
+        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1107,7 +1114,7 @@ const footerSave = (
     {selectedCapturedElement.length>0?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} disabled={captureData.length === 0 && captureData.some((rowData) => rowData.objectDetails.objId === undefined) && !deletedItems}></Button>
+    <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
     </>
   )
   
@@ -1147,12 +1154,12 @@ const footerSave = (
     capturedDataToSave.map((object) => {
       if (objValues.val === object.val) setActiveEye(true);
       else if (activeEye) setActiveEye(false);
-      setHighlight(true);
+        setHighlight(true);
     })
     let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
     dispatch(objValue(objVal));
             setHighlight(true);
-          }
+   }
 
   useEffect(() => {
     if (mirror.scrape) {
@@ -1182,7 +1189,7 @@ const footerSave = (
 
 
   useEffect(() => {
-    if (objValues.val !== null) {
+    if (objValues.val !== null || highlight!==false) {
       let ScrapedObject = objValues;
 
       let top = 0; let left = 0; let height = 0; let width = 0;
@@ -1257,7 +1264,7 @@ const footerSave = (
     }
     else setHighlight(false);
     //eslint-disable-next-line
-  }, [objValues])
+  }, [objValues,highlight])
 
 
   const handleDataTableContentChange = (newData) => {
@@ -1317,6 +1324,7 @@ const footerSave = (
     else if (!isCustom) setNewScrapedData(updNewScrapedData);
     if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
     setScrapeItems(localScrapeItems);
+    setSaveDisable(false);
   }
 
   const onCellEditComplete = (e) => {
@@ -1346,6 +1354,7 @@ const footerSave = (
     })
     setCaptureData([...captureData, ...addElementData])
     setCapturedDataToSave([...capturedDataToSave, ...addedElements])
+    setSaveDisable(false);
   }
 
 
@@ -1753,8 +1762,8 @@ const headerstyle={
 
 
 
-        <div className="card-table" style={{ width: '100%', display: "flex" }}>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
+        <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -1805,11 +1814,11 @@ const headerstyle={
         </div>
       </Dialog>
 
-         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         
 
-        {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
-        {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {/* {typesOfAppType === "OEBS"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1822,7 +1831,7 @@ const headerstyle={
            </span>}
          customClass="OEBS"
         />: null} */}
-        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "Mainframe"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1833,7 +1842,7 @@ const headerstyle={
          content = {"hello"}
          customClass="Mainframes"
         />: null}
-        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "System"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1865,7 +1874,7 @@ const headerstyle={
         showHeader={false}
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
-        accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+        accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
         
         {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
@@ -1932,6 +1941,7 @@ const headerstyle={
         setCaptureData={setCaptureData}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        setSaveDisable={setSaveDisable}
       />}
 
       {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
@@ -2260,6 +2270,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false);
         }
     }
 
@@ -2312,6 +2323,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2364,6 +2376,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2435,6 +2448,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2462,6 +2476,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 

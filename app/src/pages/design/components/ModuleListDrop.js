@@ -108,6 +108,11 @@ const ModuleListDrop = (props) =>{
 
     const imageRefadd = useRef(null);
 
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if(!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo ;
+
     const handleTooltipToggle = () => {
       const rect = imageRefadd.current.getBoundingClientRect();
       setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
@@ -132,6 +137,7 @@ const ModuleListDrop = (props) =>{
      useEffect(()=> {
         return () => {
             dispatch(isEnELoad(false));
+            dispatch(selectedModuleReducer({}))
             // this comment is removed when auto save of mod will effect default mod
             // dispatch(dontShowFirstModule(false))
         }
@@ -1034,11 +1040,14 @@ setPreventDefaultModule(true);
                            <i className="pi pi-times"  onClick={click_X_Button}></i>
                        </div>)}
                      </div> */}
+                      {userInfo && userInfo.rolename !== "Quality Engineer" ? (
+                        <>
                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" onClick={()=>setImportPop(true)}></img>
                      <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
-                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
+                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} toast={toast} />:null}
                      <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
-                     <img  className=" testsuiteimg custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  /> 
+                     <img  className=" testsuiteimg custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  />
+                     </>) : null}
                    
                   
              </div>

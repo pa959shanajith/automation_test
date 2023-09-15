@@ -88,7 +88,7 @@ const Analysis = (props) => {
             {activeIndex === 0 ?
                 <div className='agentHealthStatus'>
                     <div className="card" width='85%'>
-                        <DataTable className='wholeTable' value={originalAgentData.map((agent, index) => ({
+                        <DataTable className='wholeTable' value={(originalAgentData && originalAgentData.length >0 ) ? originalAgentData.map((agent, index) => ({
                             id: '1000',
                             agent: agent.Hostname,
                             agentCapacity: parseInt(agent.icecount),
@@ -110,7 +110,7 @@ const Analysis = (props) => {
                                     <p>{agent.status}</p>
                                 </div>
                             ),
-                        }))}
+                        })) : []}
                         >
                             <Column field="agent" header="Agents" className='Agents' sortable ></Column>
                             <Column field="agentCapacity" header="Capacity" className='Capacity' sortable ></Column>

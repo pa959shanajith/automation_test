@@ -11,16 +11,19 @@ import {Button} from 'primereact/button';
 */
 
 const SessionManagement = (props) => {
+    const currentTab = useSelector(state => state.admin.screen);
     const dateFormat = useSelector(state=>state.landing.dateformat);
     const [loading,setLoading] = useState(false)
     const [sessions,setSessions] = useState([])
     const [clients,setClients] = useState([])
     const [lockedusers,setLockedusers] = useState([]);
+    const [actions,setActions] = useState('');
+    const [indexs,setIndexs] = useState();
 
     useEffect(()=>{
         refreshSessMgmt();
         // eslint-disable-next-line
-    },[])
+    },[currentTab])
 
     const displayError = (error) =>{
         setLoading(false)
@@ -64,17 +67,25 @@ const SessionManagement = (props) => {
 
     // Session Management: Logoff/Disconnect User
     const disconnectLogoff = async (event) =>{
-        var action = event.target.innerHTML.trim().toLowerCase();
-		var id = parseInt(event.target.dataset.id);
+//         var retrivedText = event.target.innerHTML.trim(); // Get the innerHTML
+// var tempElement = document.createElement("div"); // Create a temporary element
+// tempElement.innerHTML = retrivedText; // Set the innerHTML of the temporary element
+// var action = tempElement.textContent || tempElement.innerText; // Extract the text content
+// console.log(action); // This will give you "Logout"
+const action = actions
+		// var id = parseInt(event.target.value);
         var msg, rootObj, key, obj;
         var temp = 0;
 		if (action === "logout") {
+            var id = parseInt(indexs)
 			msg = "Logging out ";
 			rootObj = sessions;
 			obj = rootObj[id];
+            // console.log("rootObj[id]",rootObj[id])
             key = obj.id;
             temp = 1;
 		} else {
+            var id = parseInt(indexs)
 			msg = "Disconnecting ";
 			rootObj = clients;
 			obj = rootObj[id];
@@ -143,14 +154,14 @@ const SessionManagement = (props) => {
                         <div className='Card card1'>
                             
                             <Card title="Active Users">
-                            {sessions.map((user,index)=>(
+                            {sessions.map((user,index,arr)=>(
                             <div className='innerCard'>
                                 <Card className='userCard'>
                                 <div className='userBut'>
                                     <div className='user'>
                                   <span className='userTitle'>Username</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
                                   </div>
-                                  <Button  onClick={(event)=>{disconnectLogoff(event)}} outlined  label='Logout'/>
+                                  <Button  onClick={(event)=>{setActions('logout'); setIndexs(index);disconnectLogoff(event);}}  outlined  label='logout'/>
                                 </div>
                                 <div className='role'>
                                   <span className=''>Role</span><span className='semicolanR'>:</span><h4 className='roleName'>{user.role}</h4>
@@ -169,23 +180,25 @@ const SessionManagement = (props) => {
                     </div>
                     <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12  ">
                         <div className='Card card2'>
-                        {clients.map((user,index)=>(
+                       
                             <Card title="Active Avo Assure Client">
+                            {clients.map((user,index)=>(
                             <div className='innerCard'>
                                 <Card className='userCard'>
                                 <div className='userBut'>
                                     <div className='user'>
                                   <span>Avo Client Name</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
                                   </div>
-                                  <Button data-id={index} onClick={(event)=>{disconnectLogoff(event)}} outlined  label='Disconnect'/>
+                                  <Button   onClick={(event)=>{setActions('disconnect');setIndexs(index);disconnectLogoff(event);}} outlined  label='disconnect'/>
                                 </div>
                                 <div className='ipContainer'>
                                   <span className='IP'>IP</span><span className='semicolan'>:</span><h4>{user.ip}</h4>
                                 </div>
                               </Card>
                             </div>
+                            ))}
                             </Card>
-                             ))}
+                             
                              
                         </div>
                     </div>
