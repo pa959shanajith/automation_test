@@ -298,12 +298,39 @@ const TableRow = (props) => {
             );
           };
 
+          const customElementStyles = {
+            menuList: (base) => ({
+              ...base,
+              FontSize: 100,
+              fontSize: 14,
+              background: "white",
+              height:Object.keys(optionElement).length>4?200:110,
+            }),
+            menuPortal: (base) => ({ 
+                ...base, 
+                zIndex: 999999
+             }),
+            menu: (base) => ({ 
+                ...base, 
+                zIndex: 999999
+            }),
+            control: (base) => ({
+              ...base,
+              height: 25,
+              minHeight: 35,
+              width: 150
+            }),
+            option: (base) =>({
+                ...base,
+                padding: "3px",
+              fontFamily: "Open Sans",
+            })
+          };
 
         const customStyles = {
             menuList: (base) => ({
               ...base,
               FontSize: 100,
-              width: 200,
               fontSize: 14,
               background: "white",
               height:200,
@@ -340,7 +367,7 @@ const TableRow = (props) => {
                     //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
                     //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
                     // </select>
-                    <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} defaultValue={optionElement[0]} options={optionElement} getOptionLabel={getOptionElementLable} styles={customStyles} menuPortalTarget={document.body} menuPlacement="auto" isSearchable={false} menuPosition={'fixed'} placeholder='Select'/>
+                    <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} defaultValue={optionElement[0]} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" isSearchable={false} menuPosition={'fixed'} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
                         <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>

@@ -1044,7 +1044,7 @@ setPreventDefaultModule(true);
                         <>
                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" onClick={()=>setImportPop(true)}></img>
                      <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
-                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} />:null}
+                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} toast={toast} />:null}
                      <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                      <img  className=" testsuiteimg custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  />
                      </>) : null}
