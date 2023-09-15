@@ -326,13 +326,16 @@
                                             .labelOfArray {
                                                 display: flex;
                                                 align-items: center;
-                                                  width: 10rem;
+                                                  width: 20rem;
                                                 img {
                                                     width: 20px;
                                                     height: 20px;
                                                 }
                                                 .labelOfArrayText{
                                                     padding-left: 0.5rem;
+                                                    overflow: hidden;
+                                                    text-overflow: ellipsis;
+                                                    width: 20rem;
                                                 }
                                             }
                                         }

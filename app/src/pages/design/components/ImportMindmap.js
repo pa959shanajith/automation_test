@@ -3,7 +3,7 @@ import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gi
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import {setImportData} from '../designSlice';
+import {setImportData,dontShowFirstModule} from '../designSlice';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
@@ -72,7 +72,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     const upload = (e) => {
         let  project = "";
         if(importType === 'zip'){
-            project = projRef.current.value;
+            project = projectId;
             if(project==='def-val'){
                 toast.current.show({severity:'error', summary: 'Error', detail:"Please select project", life: 3000});
                 setDisableSubmit(true)
@@ -107,6 +107,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         for(var i = 0; e.target.name.length>i; i++){
             if (e.value === e.target.name[i].value){
                 id = e.target.name[i].key
+                setProjectId(e.target.name[i].key);
             }
         }
         if(id) {
@@ -781,6 +782,7 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
         var screendata = await getScreens(importProj)
         if(screendata.error){displayError(screendata.error);return;}
         setTimeout(function() {
+            dispatch(dontShowFirstModule(true))
             dispatch(setImportData({
                 selectProj : importProj,
                 selectModule : mindmapData,
@@ -971,8 +973,8 @@ function read(file) {
 const validNodeDetails = (value) =>{
     var nName, flag = !0;
     nName = value;
-    var regex = /^[a-zA-Z0-9]*$/;;
-    if (nName.length === 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName=== 'Screen0' || nName === 'Testcase0' || nName === 'TestSteps0') {
+    var regex = /^[a-zA-Z0-9_]*$/;;
+    if (nName.length === 0 || nName.length > 255 || !(regex.test(nName)) || nName=== 'Screen0' || nName === 'Testcase0' || nName === 'TestSteps0') {
         flag = !1;
     }
     return flag;

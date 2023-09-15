@@ -282,7 +282,7 @@ const ScheduleScreen = ({
                 setStartDate(e.value);
                 setStartTime(new Date());
               }}
-              disabled={selectedPattren?.key}
+              // disabled={selectedPattren?.key}
               minDate={new Date()}
               showIcon
             />
