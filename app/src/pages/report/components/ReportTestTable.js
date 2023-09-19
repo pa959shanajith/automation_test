@@ -260,8 +260,8 @@ export default function BasicDemo() {
               issue_dict: {
                 project: jiraDropDown?.id,
                 issuetype: issueDropDown?.name,
-                summary: selectedRow[0]?.Comments,
-                description: selectedRow[0]?.StepDescription,
+                summary: inputSummary,
+                description: inputDesc,
                 url: loginUrl,
                 username: loginName,
                 password: loginKey,
@@ -288,11 +288,11 @@ export default function BasicDemo() {
                     error: false,
                   },
                   summary: {
-                    value: selectedRow[0]?.Comments,
+                    value: inputSummary,
                     error: false,
                   },
                   reproSteps: {
-                    value: selectedRow[0]?.StepDescription,
+                    value: inputDesc,
                     error: false,
                   },
                   parentIssueId: {
@@ -321,7 +321,7 @@ export default function BasicDemo() {
       if(userDetails === "Fail"){
         jiraconnect?.current?.show({ severity: 'info', summary: 'Info', detail: 'Fail to log a bug.' });
       }
-      else if(Array.isArray(userDetails)){
+      else{
         getReportsTable();
         setLogBug(false);
       };
