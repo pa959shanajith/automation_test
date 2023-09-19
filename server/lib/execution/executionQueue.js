@@ -733,7 +733,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
                 //New Cache Implementation - dividing into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(vcacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);
@@ -972,7 +972,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                                                 status: statusList[index][suiteIndex]["status"],
                                                 projectName: suiteDetails.projectName,
                                                 cycleName: suiteDetails.cycleName,
-                                                releaseId: suiteDetails.releaseId
+                                                releaseId: suiteDetails.releaseId,
+                                                timeEllapsed: statusList[index][suiteIndex]["timeEllapsed"]
                                             }
                                             suiteDetailsInfo.push(reportData);
                                         })
@@ -1083,7 +1084,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
                 //New Cache Implementation - deviding into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(cacheData === null) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);
@@ -1123,7 +1124,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 
                 //New Cache Implementation - deviding into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(cacheData === null) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);
