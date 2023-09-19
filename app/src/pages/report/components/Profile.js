@@ -45,8 +45,8 @@ const Profile = () => {
       const executionProfiles = await getReportList(
         location?.state?.configureKey
         );
-        let sortExecutions= [...executionProfiles].reverse();
-        setReportsTable(sortExecutions.map((el, ind) => ({
+        // let sortExecutions= [...executionProfiles].reverse();
+        setReportsTable(executionProfiles.map((el, ind) => ({
           ...el,
           id: el._id,
           key: ind.toString(),
@@ -959,7 +959,7 @@ const Profile = () => {
   const onDownload = async (getId) => {
     let data = await downloadReports({ id: downloadId, type: getId });
     
-    if (getId === "json") data = JSON.stringify(data, undefined, 2);
+    // if (getId === "json") data = JSON.stringify(data, undefined, 2);
 
     let filedata = new Blob([data], {
       type: "application/" + getId + ";charset=utf-8",
