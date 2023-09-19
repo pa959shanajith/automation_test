@@ -857,7 +857,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         configurekey: getBtnType === "Update" ? updateKey : uuid(),
         isHeadless: mode === "Headless",
         avogridId: "",
-        avoagents: [avodropdown?.avogrid?.name],
+        avoagents: (avodropdown?.avogrid?.name && avodropdown?.avogrid?.name !="null" &&  avodropdown?.avogrid?.name !="Any Agent") ? [avodropdown?.avogrid?.name] : [],
         integration,
         batchInfo: batchInfoData,
         donotexe: {
