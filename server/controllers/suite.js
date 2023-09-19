@@ -91,21 +91,21 @@ async function getICEList (projectids,userid,host){
 		}
 		let pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
 		unallocatedICE = await utils.fetchData({}, "admin/getAvailable_ICE");
-		ice_status = await cache.gethmap(host);
+		var socket = require('../lib/socket');
+		var clientName=utils.getClientName(host);
 		unallocatedICE = unallocatedICE["available_ice"];
 		if(!unallocatedICE || unallocatedICE === "fail") unallocatedICE = {}
-		if(!ice_status )ice_status = {}
 		for(let id in unallocatedICE){
 			var ice = unallocatedICE[id];
 			var ice_name = ice["icename"]
 			ice_list.push(ice_name);
 			result.unallocatedICE[id] = {}
-			if(!ice_status )ice_status = {}
-			if(ice_name in ice_status){
+			if(socket.allSocketsMap[clientName] != undefined && ice_name in socket.allSocketsMap[clientName]){
 				result.unallocatedICE[id]["icename"] = ice_name;
-				result.unallocatedICE[id]["status"] = JSON.parse(ice_status[ice_name])["status"];
-				result.unallocatedICE[id]["mode"] = JSON.parse(ice_status[ice_name])["mode"];
-				result.unallocatedICE[id]["connected"] = JSON.parse(ice_status[ice_name])["connected"];
+				result.unallocatedICE[id]["status"] = false;
+				result.unallocatedICE[id]["mode"] = false;
+				result.unallocatedICE[id]["connected"] = socket.allSocketsMap[clientName][ice_name].connected;
+
 			}else{
 				result.unallocatedICE[id]["icename"] = ice_name
 				result.unallocatedICE[id]["status"] = false;
@@ -126,10 +126,10 @@ async function getICEList (projectids,userid,host){
 				result.ice_ids[id] = {};
 				result.ice_ids[id]["icename"] = ice_name
 				ice_list.push(ice_name)
-				if(ice_name in ice_status){
-					result.ice_ids[id]["status"] = ice_status[ice_name]["status"];
-					result.ice_ids[id]["mode"] = ice_status[ice_name]["mode"];
-					result.ice_ids[id]["connected"] = ice_status[ice_name]["connected"];
+				if(socket.allSocketsMap[clientName] != undefined && ice_name in socket.allSocketsMap[clientName]){
+					result.ice_ids[id]["status"] = false;
+					result.ice_ids[id]["mode"] = false;
+					result.ice_ids[id]["connected"] = socket.allSocketsMap[clientName][ice_name].connected;
 				}else{
 					result.ice_ids[id]["status"] = false;
 					result.ice_ids[id]["mode"] = false;
@@ -215,7 +215,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const type = batchExecutionData.type;
 	const poolid = batchExecutionData.poolid;
 	var result = {status:"fail",error:"Failed to execute",message:""}
-	var userInfo = {"invokinguser":req.session.userid,"invokingusername":req.session.username,"invokinguserrole":req.session.activeRoleId,"userid": "", "username": "", "role": ""}
+	var userInfo = {"invokinguser":req.session.userid,"invokingusername":req.session.username,"invokinguserrole":req.session.activeRoleId,"userid": "", "username": "", "role": "","host":req.headers.host}
 	//Check if execution is normal or smart
 	if(type.toLowerCase().includes('smart')){
 		//Check if users are present in target user
@@ -260,8 +260,8 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
         return res.send(result);
     }
     else if(batchExecutionData['configurekey']);{
-        return makeReq;
-    }
+		return makeReq;
+	}
 	return res.send(result);
 
 };
