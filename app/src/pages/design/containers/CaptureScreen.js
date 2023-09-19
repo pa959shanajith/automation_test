@@ -1806,7 +1806,7 @@ const headerstyle={
             <div className="ref_pop screenshot_pop">
               <div className="screenshot_pop__content" >
                 {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} style={{height: typesOfAppType==="Desktop"?"17rem":typesOfAppType==="OEBS"?"35vh":""}} alt="Screenshot Image" />
               </div>
             </div>
           </Dialog>
