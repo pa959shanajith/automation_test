@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .mainSessionManagement{
     height: 90.5%;
     width: 72vw;
@@ -35,6 +36,18 @@
         overflow-y: scroll;
         width: 100%;
         min-height: 37rem;
+    }
+    .fontResults{
+        font: $f6_semibold;
+    }
+    .fontTag{
+        font: $f6_regular;
+    }
+    .fontR{
+        font-family: "LatoWebMedium";
+    }
+    .fontT{
+        font-family: "LatoWeb";
     }
     .Card{
         height: 100%;
