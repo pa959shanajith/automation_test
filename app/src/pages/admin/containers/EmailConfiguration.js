@@ -118,7 +118,7 @@ const[servername,setServername]=useState('')
         }
         emailRef.current.style.outline = ''
         setErrMsg('Sending...')
-        const arg = { channel: confObj.channel, provider: confObj.provider, recipient: emailRef.current.value, conf: confObj }
+        const arg = { channel: emailTest.channel, provider: emailTest.provider, recipient:emailRef.current.value, conf: emailTest }
         var data = await testNotificationChannels(arg)
         if (data.error) { setErrMsg(data.error.CONTENT); return; }
         else setErrMsg(data.CONTENT);
@@ -126,8 +126,8 @@ const[servername,setServername]=useState('')
 
     const onSelectProvider = (event) => {
         selectProvider({ inputRef, ...fn, displayError, setLoading });
-        // const selectedValue = event.value;
-        // setSelectedProvider(selectedValue);
+        const selectedValue = event.value;
+        setSelectedProvider(selectedValue);
         
     }
     const onClickTest = () => {
@@ -161,14 +161,14 @@ const[servername,setServername]=useState('')
             <div className='full_page'>
                 <>
                 
-                <div>
+                {/* <div>
                         <label required className='provider'> select provider</label>
-                    </div>
+                    </div> */}
                     <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
                     {/* <Dropdown  className='providerdropdown' ref={inputRef['selectprovider']}  value={selectedProvider} options={['SMTP']} onChange={onSelectProvider} placeholder="Select Provider" id="selectprovider" /> */}
-                    <div className='email_setting_header'>
+                    {/* <div className='email_setting_header'>
                         Email Server Settings
-                    </div>
+                    </div> */}
                     <div>
                         {/* <label className='hostname' >Host name</label>
                         <label className='servername' validExp={"emailServerName"}>Server Name</label> */}
@@ -176,9 +176,13 @@ const[servername,setServername]=useState('')
                         <FormInput inpRef={inputRef['smtpHost']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
                             <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
                         </div>
-                        <div>
+                        <div className='col-xs-9 form-group input-label'>
+                    <label>Status</label>
+                    <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>
+                </div>
+                        {/* <div>
                             <lable className="portname">Port Number </lable>
-                        </div>
+                        </div> */}
                         <div>
                         <FormInput inpRef={inputRef['smtpPort']} label={'Port'} placeholder={'Server Port'}/>
                         </div>
@@ -195,6 +199,8 @@ const[servername,setServername]=useState('')
                         <FormInput inpRef={inputRef['authname']} label={'Authentication Username'} placeholder={'Authentication Username'} disabled={!inputEnabled}/>
                         <FormInput inpRef={inputRef['authpassword']} label={'Authentication Password'} placeholder={'Authentication Password'} disabled={!inputEnabled}/>
                         </div>
+                        <FormInput inpRef={inputRef['sendername']} label={'Sender Name'} placeholder={'Avo Assure Alerts'}/>
+                <FormInput inpRef={inputRef['senderaddr']} label={'Sender Address'} placeholder={'avoassure-alerts@avoautomation.com'}/>
                 <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto","Enable","Disable"]}/>
                 <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes","No"]}/>
                 <FormInput inpRef={inputRef['assureurl']} label={'Avo Assure URL'} placeholder={'Avo Assure Application URL'}/>

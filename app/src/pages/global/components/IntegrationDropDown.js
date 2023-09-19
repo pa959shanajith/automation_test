@@ -1,7 +1,7 @@
 import React , { useState, useEffect} from 'react';
 import {ModalContainer, ScreenOverlay, Messages as MSG, setMsg} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
-import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR } from '../../execute/api';
+import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR,getDetails_Azure,connectAzure_ICE } from '../../execute/api';
 import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
 
@@ -21,6 +21,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
     const [isEmpty, setIsEmpty] = useState(true);
     
     const saveAction = async (autoSaveFlag=false, updatedData={}) => {
+        var integration = {
+            alm: {url:"",username:"",password:""}, 
+            qtest: {url:"",username:"",password:"",qteststeps:""}, 
+            zephyr: {url:"",username:"",password:""},
+            azure: {url:"",username:"",password:""},}
+            setCredentialsExecution(integration)
+
         setPassErrBor(false);setUrlErrBor(false);setUserNameErrBor(false);setAuthErrBor(false);setErrorMsg("");
         const latestCredentialsData = autoSaveFlag ? updatedData : credentials;
 		if(type==="Zephyr" && !latestCredentialsData.url ) {
@@ -54,8 +61,9 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             var apiIntegration = loginQTestServer_ICE;
             if(type === "ALM") apiIntegration = loginQCServer_ICE;
             if(type === "Zephyr") data = await loginZephyrServer_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, latestCredentialsData.apitoken, latestCredentialsData.authtype, type);
-			else data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
-            if(data.error){displayError(data.error);return;}
+            if(type === "Azure") data = await connectAzure_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password);
+            if(type === "qTest") data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
+            if(data.error){displayError(data.error);return;}    
             else if (data === "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
             else if (data === "Invalid Session") setErrorMsg("Invalid Session");
             else if (data === "invalidcredentials") setErrorMsg("Invalid Credentials");
@@ -63,7 +71,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             else if (data === "notreachable") setErrorMsg("Host not reachable.");
             else if (data === "invalidurl") setErrorMsg("Invalid URL");
             else {
-                var integration = {...integrationCred};
+                
                 if(type === "ALM"){
                     integration.alm = {
 						url:latestCredentialsData.url,
@@ -86,6 +94,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
                         password: latestCredentialsData.password,
                         apitoken: latestCredentialsData.apitoken,
                         authtype: latestCredentialsData.authtype
+					}
+                }
+                else if(type === "Azure"){
+                    integration.azure = {
+						url: latestCredentialsData.url,
+						username: latestCredentialsData.userName,
+                        password: latestCredentialsData.password
 					}
                 }
                 setCredentialsExecution(integration)
@@ -154,31 +169,57 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
         setZephAuthType(authtype);
         setCredentials({url: tempCredentialsData.url, userName: tempCredentialsData.userName, password: tempCredentialsData.password, apitoken: tempCredentialsData.apitoken, authtype: authtype});
     }
-    const getZephyrDetails = async () =>{
+    const getDetails = async (type) =>{
         try {
             setLoading("Loading...")
-            const data = await getDetails_ZEPHYR()
-            if (data.error) { setMsg(data.error); return; }
-            if(data !=="empty"){
-                setIsEmpty(false);
-                let credentialsData = {
-                    // authtype: 'basic',
-                    // url: '',
-                    // apitoken: '',
-                    userName: '',
-                    password: ''
-                };
-
-                // if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
-                // if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
-                // if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
-                if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
-                if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
-
-                setDefaultValues(credentialsData);
-                // setZephAuthType(credentialsData.authtype);
-                setCredentials(credentialsData);
-                saveAction(true, credentialsData);
+            if(type == 'Zephyr') {
+                const data = await getDetails_ZEPHYR()
+                if (data.error) { setMsg(data.error); return; }
+                if(data !=="empty"){
+                    setIsEmpty(false);
+                    let credentialsData = {
+                        authtype: 'basic',
+                        url: '',
+                        apitoken: '',
+                        userName: '',
+                        password: ''
+                    };
+                    
+                    if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
+                    if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
+                    if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
+                    if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
+                    if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
+                    
+                    setDefaultValues(credentialsData);
+                    // setZephAuthType(credentialsData.authtype);
+                    setCredentials(credentialsData);
+                    saveAction(true, credentialsData);
+                }
+            } else {
+                const data = await getDetails_Azure()
+                if (data.error) { setMsg(data.error); return; }
+                if(data !=="empty"){
+                    setIsEmpty(false);
+                    let credentialsData = {
+                        // authtype: 'basic',
+                        // url: '',
+                        // apitoken: '',
+                        userName: '',
+                        password: ''
+                    };
+                    
+                    // if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
+                    // if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
+                    // if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
+                    if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
+                    if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
+                    
+                    setDefaultValues(credentialsData);
+                    // setZephAuthType(credentialsData.authtype);
+                    setCredentials(credentialsData);
+                    saveAction(true, credentialsData);
+                }
             }
             setLoading(false);
         } catch (error) {
@@ -187,7 +228,7 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
         }
     }
     useEffect(() => {
-        type==="Zephyr" && getZephyrDetails();
+        (type==="Zephyr" || type === "Azure") && getDetails(type);
     }, [])
     
 
@@ -237,6 +278,7 @@ const placeholder={
     Zephyr:{url:"Enter Zephyr URL (Ex. http(s)://SERVER[:PORT])" ,username:"Enter Zephyr Username", password:"Enter Zephyr Password", apitoken:"Enter API Token"  },
     ALM:{url:"Enter ALM Url" ,username:"Enter User Name", password:"Enter Password" },
     qTest:{url:"Enter qTest Url" ,username:"Enter User Name", password:"Enter Password" },
+    Azure:{url:"Enter Azure Url" ,username:"Enter User Name", password:"Enter Password" },
 }
 
 

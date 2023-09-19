@@ -1,5 +1,4 @@
 const utils = require('../utils');
-const redisServer = require('../redisSocketHandler');
 var myserver = require('../socket');
 var logger = require('../../../logger.js');
 const reports = require("../../controllers/report")
@@ -74,12 +73,14 @@ class TestSuiteExecutor {
         scenario.qcdetails = [];
         for (var k = 0; k < integrationType.length; ++k) {
             inputs = {
-                "testscenarioid": scenarioid
+                "testscenarioid": scenarioid,
+                "userid":userid
             };
             const integ = integrationType[k];
             if (integ == 'qTest') inputs.query = "qtestdetails";
             else if (integ == 'ALM') inputs.query = "qcdetails";
             else if (integ == 'Zephyr') inputs.query = "zephyrdetails";
+            else if (integ == 'Azure') inputs.query = "azuredetails";
             if (inputs.query) {
                 const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
                 if (integ == 'ALM' && Array.isArray(qcdetails)) {
@@ -183,6 +184,9 @@ class TestSuiteExecutor {
                 }
                 if (batchData.integration && batchData.integration.zephyr && batchData.integration.zephyr.url) {
                     integrationType.push("Zephyr");
+                }
+                if (batchData.integration && batchData.integration.azure && batchData.integration.azure.url) {
+                   integrationType.push("Azure");
                 }
                 if (tsco.dataparam != "") {
                     var dt = tsco.dataparam[0].split(';')[0].split('/');
@@ -313,10 +317,15 @@ class TestSuiteExecutor {
         const username = userInfo.username;
         const invokinguser = userInfo.invokingusername;
         const icename = userInfo.icename;
+        const host = userInfo.host;
         const _this = this;
         const scenarioFlag = execReq.scenarioFlag;
         const channel = "normal";
         var reportType = "accessiblityTestingOnly";
+        var socket = require('../socket');
+        var mySocket;
+		var clientName=utils.getClientName(host);
+        mySocket = socket.allSocketsMap[clientName][icename];	
         logger.info("Sending request to ICE for executeTestSuite");
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
         if(execReq['executingOn'] && execReq['executingOn'] =='Agent'){
@@ -325,58 +334,56 @@ class TestSuiteExecutor {
             // return 'CICD'
             return dataToIce;
         }
-        else if(execReq['executingOn'] && execReq['executingOn'] == 'ICE'){
-            redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
-
+        else{
+            mySocket.emit("executeTestSuite", execReq);
             const exePromise = async (resSent) => (new Promise((rsv, rej) => {
                 var d2R = {};
-                async function executeTestSuite_listener(channel, message) {
-                    const data = JSON.parse(message);
-                    const event = data.onAction;
-                    const resultData = data.value;
+                
+                mySocket.on("return_status_executeTestSuite",async (message)=>{
+                    const data = message;
+                    const event = "return_status_executeTestSuite";
+                    const resultData = data;
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
-                    if (!(icename == data.username && (event == constants.SOCK_NA || (event != constants.SOCK_NA && execReq.batchId == batchId)))) return false;
                     const status = resultData.status;
-                    if (event == constants.SOCK_NA) {
-                        redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
-                        logger.error("Error occurred in " + fnName + ": Socket Disconnected");
-                        if (resSent && notifySocMap[invokinguser]) {
-                            notifySocMap[invokinguser].emit("ICEnotAvailable");
+                    if (status === "success") {
+                        if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
+                    } else if (status === "skipped") {
+                        const execStatus = "Skipped";
+                        var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :
+                            "because another execution is running in ICE";
+                        // mySocket.removeListener("message", executeTestSuite_listener);
+                        logger.error("Error occurred in " + fnName + ": Execution is skipped " + errMsg);
+                        errMsg = "This scenario was skipped " + errMsg;
+                        let report_result = {};
+                        report_result["status"] = execStatus
+                        report_result["testSuiteDetails"] = execReq["suitedetails"]
+                        await _this.updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
+                        if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) {
+                            notifySocMap[invokinguser].emit(execStatus);
                             rsv(constants.DO_NOT_PROCESS);
-                        } else rsv(constants.SOCK_NA);
-                    } else if (event == "return_status_executeTestSuite") {
-                        if (status === "success") {
-                            if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
-                        } else if (status === "skipped") {
-                            const execStatus = "Skipped";
-                            var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :
-                                "because another execution is running in ICE";
-                            redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
-                            logger.error("Error occurred in " + fnName + ": Execution is skipped " + errMsg);
-                            errMsg = "This scenario was skipped " + errMsg;
-                            let report_result = {};
-                            report_result["status"] = execStatus
-                            report_result["testSuiteDetails"] = execReq["suitedetails"]
-                            await _this.updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
-                            if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) {
-                                notifySocMap[invokinguser].emit(execStatus);
-                                rsv(constants.DO_NOT_PROCESS);
-                            } else if (resSent) {
-                                queue.Execution_Queue.add_pending_notification("", report_result, username);
-                                rsv(constants.DO_NOT_PROCESS);
-                            } else rsv(execStatus);
-                        } else if (status === "started") {
-                            await _this.updateExecutionStatus([executionid], { starttime: resultData.startTime });
-                        } else if (status === "finished") {
-                            const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);
-                            const testsuite = execReq.suitedetails[testsuiteIndex];
-                            const exeStatus = resultData.executionStatus ? "pass" : "fail";
-                            await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
-                            if (reportType != "accessiblityTestingOnly")
-                                notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
-                        }
-                    } else if (event == "result_executeTestSuite") {
+                        } else if (resSent) {
+                            queue.Execution_Queue.add_pending_notification("", report_result, username);
+                            rsv(constants.DO_NOT_PROCESS);
+                        } else rsv(execStatus);
+                    } else if (status === "started") {
+                        await _this.updateExecutionStatus([executionid], { starttime: resultData.startTime });
+                    } else if (status === "finished") {
+                        const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);
+                        const testsuite = execReq.suitedetails[testsuiteIndex];
+                        const exeStatus = resultData.executionStatus ? "pass" : "fail";
+                        await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
+                        if (reportType != "accessiblityTestingOnly")
+                            notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
+                    }
+                });
+                mySocket.on("result_executeTestSuite", async (message)=>{
+                    const data = message;
+                    const event = "return_status_executeTestSuite";
+                    const resultData = data;
+                    const batchId = (resultData) ? resultData.batchId : "";
+                    const executionid = (resultData) ? resultData.executionId : "";
+                    const status = resultData.status;
                         if (!status) { // This block is for report data
                             if ("accessibility_reports" in resultData) {
                                 const accessibility_reports = resultData.accessibility_reports
@@ -407,7 +414,7 @@ class TestSuiteExecutor {
                                     }
                                     const reportStatus = reportData.overallstatus.overallstatus;
                                     const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-                                    const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
+                                    const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy, timeEllapsed: reportData.overallstatus.EllapsedTime };
                                     if (reportid == "fail") {
                                         logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
                                         reportItem[reportid] = '';
@@ -424,7 +431,6 @@ class TestSuiteExecutor {
                                 await this.updateExecutionStatus([executionid], { status: "fail" });
                             }
                         } else { // This block will trigger when resultData.status has "success or "Terminate"
-                            redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
                             try {
                                 let result = status;
                                 let report_result = {};
@@ -450,12 +456,11 @@ class TestSuiteExecutor {
                                 rej("fail");
                             }
                         }
-                    }
-                }
-                redisServer.redisSubServer.on("message", executeTestSuite_listener);
+                    
+                });
             }));
 
-            const notifySocMap = myserver.socketMapNotify;
+            const notifySocMap = socket.socketMapNotify[clientName];
             if (execType == "ACTIVE" && notifySocMap && notifySocMap[invokinguser]) {
                 exePromise(true);
                 return "begin";
@@ -469,7 +474,6 @@ class TestSuiteExecutor {
         var icename = userInfo.icename;
         var gitflag = false;
         //userInfo.icename=icename;
-        redisServer.redisSubServer.subscribe('ICE2_' + icename);
         //var iceStatus = await checkForICEstatus(icename, execType);
         //if (iceStatus != null) return iceStatus;
         var gitInfo = batchExecutionData.gitInfo;

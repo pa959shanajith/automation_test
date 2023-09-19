@@ -1,6 +1,5 @@
 const utils = require('../utils');
 var uuidV4 = require('uuid-random');
-const redisServer = require('../redisSocketHandler');
 const cache = require("../cache.js").getClient(2);
 const executionListCache = require("../cache.js").getClient(4)
 var logger = require('../../../logger.js');
@@ -61,13 +60,6 @@ module.exports.Execution_Queue = class Execution_Queue {
             this.ice_list[ice_name]["connected"] = true
         } else {
             this.connect_ice(ice_name);
-        }
-        //check if callback for ICE has already been registred
-        if (!(ice_name in this.registred_ICE)) {
-            logger.info("Registering execution call back for ICE: " + ice_name);
-            redisServer.redisSubServer.subscribe('ICE_STATUS_' + ice_name);
-            redisServer.redisSubServer.on("message", this.triggerExecution);
-            this.registred_ICE[ice_name] = true;
         }
     }
 
@@ -201,22 +193,15 @@ module.exports.Execution_Queue = class Execution_Queue {
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
                 if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
-                    const sockmode = await utils.channelStatus(targetICE);
-                    if ((!sockmode.normal && !sockmode.schedule)) {
-                        response["status"] = "pass";
-                        response["message"] = "Can't establish connection with ICE: " + targetICE + " Re-Connect to server!";
-                        response['variant'] = "error";
-                        return response;
-                    }
-                    if (this.ice_list[targetICE]['status']) {
-                        response["status"] = "pass";
-                        response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
-                        response['variant'] = "info";
-                        if (type && type == "SCHEDULE"){
-                            scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Skipped')
-                        }
-                        return response;
-                    }
+                    // if (this.ice_list[targetICE]['status']) {
+                    //     response["status"] = "pass";
+                    //     response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
+                    //     response['variant'] = "info";
+                    //     if (type && type == "SCHEDULE"){
+                    //         scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Skipped')
+                    //     }
+                    //     return response;
+                    // }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {
                         if (type == "ACTIVE") {
                             this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
@@ -314,12 +299,6 @@ module.exports.Execution_Queue = class Execution_Queue {
                     
                 } else if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
                     //ICE sent is not part of pool but is connected
-                    const sockmode = await utils.channelStatus(targetICE);
-                    if ((!sockmode.normal && !sockmode.schedule)) {
-                        // ICE is not available
-                        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['461'])
-                        return res.status("461").send({ "error": "Can't establish connection with ICE Re-Connect to server!" })
-                    }
                     if (this.ice_list[targetICE]['status']) {
                         // ICE is busy
                         res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['409'])
@@ -364,12 +343,13 @@ module.exports.Execution_Queue = class Execution_Queue {
     * @param {dictionary} ice_data
     * Function responsible to update ICE status when it changes and execute a test suite from queue when required
     */
-    static triggerExecution = async (channel, ice_data) => {
+    static triggerExecution = async (ice_data) => {
         let data = JSON.parse(ice_data);
         let result = false;
         //check if the triggered request id for ice status change and check if the request is duplicate or not 
-        if (channel != "ICE_STATUS_" + data.username || data.onAction != 'ice_status_change' || data["reqID"] in this.request_ids) return result;
+        //if (channel != "ICE_STATUS_" + data.username || data.onAction != 'ice_status_change' || data["reqID"] in this.request_ids) return result;
         let ice_name = data.username
+        this.registred_ICE[ice_name] = true;
         //register this request so that dupliacte requests can be ignored
         this.request_ids[data["reqID"]] = 1;
         //check if target ice is in this.ice_list or not, refer init method of queues for contents this.ice_list
@@ -397,12 +377,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         //iterate over execution queue 
         for (let i = 0; i < queue.length; i++) {
             let testSuite = queue[i];
-            const sockmode = await utils.channelStatus(ice_name);
-            if (data.value.status || (!sockmode.normal && !sockmode.schedule)) {
-                // TODO shift below queue check
-                logger.info("Could not execute on: " + ice_name + " ICE is either Executing a test suite or Server not connected to ice");
-                return result;
-            }
             //check if target ice for testsuite and the actual ice which has communicated it's status is same or not, accept if ice_name matches or is "any"
             if (testSuite.userInfo.icename === ice_name || testSuite.userInfo.icename === EMPTYUSER) {
                 testSuite.userInfo.icename = ice_name;
@@ -637,7 +611,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             
             //New Cache Implementation - deviding into clients
             let cacheData = await executionListCache.gethmap(req.hostname)
-            if(cacheData === null) {
+            if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                 this.key_list = {};
             } else {
                 this.key_list = JSON.parse(cacheData['execution_list']);
@@ -759,7 +733,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
                 //New Cache Implementation - dividing into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(cacheData === null) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);
@@ -817,7 +791,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 // let cacheData = await cache.get('execution_list')
                 //New Cache Implementation - dividing into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(cacheData === null) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);
@@ -849,6 +823,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     inputs['scenarioIndex'] = scenarioIndex;
                                 }
                                 executionData = await utils.fetchData(inputs, "devops/getExecScenario", fnName);
+                                executionData[0]['executionData']['executingOn'] = "Agent"
                                 // changes to support scenarioParallel
                                 if (testSuites['execType'] == 'scenarioParallel'){
                                     executionData[0]['executionData']['scenarioParallelExec'] = true;
@@ -932,7 +907,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
                 //New Cache Implementation - deviding into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(cacheData === null) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);
@@ -998,7 +973,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                                                 status: statusList[index][suiteIndex]["status"],
                                                 projectName: suiteDetails.projectName,
                                                 cycleName: suiteDetails.cycleName,
-                                                releaseId: suiteDetails.releaseId
+                                                releaseId: suiteDetails.releaseId,
+                                                timeEllapsed: statusList[index][suiteIndex]["timeEllapsed"]
                                             }
                                             suiteDetailsInfo.push(reportData);
                                         })
@@ -1109,7 +1085,7 @@ module.exports.Execution_Queue = class Execution_Queue {
 
                 //New Cache Implementation - deviding into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(cacheData === null) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);
@@ -1149,7 +1125,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 
                 //New Cache Implementation - deviding into clients
                 let cacheData = await executionListCache.gethmap(req.hostname)
-                if(cacheData === null) {
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
                     this.key_list = {};
                 } else {
                     this.key_list = JSON.parse(cacheData['execution_list']);

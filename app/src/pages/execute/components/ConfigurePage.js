@@ -857,7 +857,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         configurekey: getBtnType === "Update" ? updateKey : uuid(),
         isHeadless: mode === "Headless",
         avogridId: "",
-        avoagents: [avodropdown?.avogrid?.name],
+        avoagents: (avodropdown?.avogrid?.name && avodropdown?.avogrid?.name !="null" &&  avodropdown?.avogrid?.name !="Any Agent") ? [avodropdown?.avogrid?.name] : [],
         integration,
         batchInfo: batchInfoData,
         donotexe: {
@@ -1024,9 +1024,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         } else {
           // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
           toast.current.show({
-            severity: "error",
-            summary: "error",
-            detail:("Execution Added to the Queue.", VARIANT.SUCCESS),
+            severity: "success",
+            summary: "Success",
+            detail:("Execution Added to the Queue."),
             life: 5000,
           });
         }

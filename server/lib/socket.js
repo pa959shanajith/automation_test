@@ -5,7 +5,6 @@ const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 const pingTimer = uiConfig.pingTimer;
 const eula = uiConfig.showEULA;
 const httpsServer = require('./../../server').httpsServer;
-
 //SOCKET CONNECTION USING SOCKET.IO
 const io = require('socket.io')(httpsServer, {
 	cookie: false,
@@ -21,15 +20,16 @@ let socketMapUI = {};
 let socketMapScheduling = {};
 let socketMapNotify = {};
 let iceUserMap = {};
+let iceIPMap = {};
 module.exports = io;
 module.exports.allSocketsMap = socketMap;
 module.exports.allSocketsICEUser=userICEMap;
 module.exports.allSocketsMapUI = socketMapUI;
 module.exports.allSchedulingSocketsMap = socketMapScheduling;
 module.exports.socketMapNotify = socketMapNotify;
+module.exports.allICEIPMap = iceIPMap;
 
 var logger = require('../../logger');
-var redisServer = require('./redisSocketHandler');
 var utils = require('./utils');
 var notificationMsg = require('./../notifications').broadcast;
 const cache = require("./cache").getClient(2);
@@ -37,6 +37,8 @@ const cache = require("./cache").getClient(2);
 io.on('connection', async socket => {
 	logger.info("Inside Socket connection");
 	var address;
+	var username;
+	var clientName=utils.getClientName(socket.request.headers.host);
 	if (socket.request._query.check == "true") {
 		logger.info("Socket request from UI");
 		address = socket.request._query.username;
@@ -46,9 +48,9 @@ io.on('connection', async socket => {
 	} else if (socket.request._query.check == "notify") {
 		address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
 		logger.info("Notification Socket connecting address %s", address);
-		socketMapNotify[address] = socket;
+		if(socketMapNotify[clientName] == undefined) socketMapNotify[clientName] = {};
+		socketMapNotify[clientName][address] = socket;
 		sendPendingNotifications(socket,address);
-		redisServer.redisSubClient.subscribe('UI_notify_' + address);
 		//Broadcast Message
 		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', '/p_ALM', '/p_Integration', '/p_qTest', '/p_Zephyr'];
 		notificationMsg.to = broadcastTo;
@@ -58,6 +60,7 @@ io.on('connection', async socket => {
 	} else {
 		const ice_info = socket.handshake.query;
 		const icename = ice_info.icename;
+		username = icename;
 		logger.info("ICE Socket connecting address: %s", icename);
 		const icesession = ice_info.icesession;
 		let eulaFlag = !eula;
@@ -87,24 +90,22 @@ io.on('connection', async socket => {
 				socket.send('connected', result.ice_check);
 				if (result.node_check === "allow") {
 					host = JSON.parse(icesession).host;
-					let clientName="avoassure";
-					if(host != null && host != undefined)
-					{
-						if(!(host.includes("localhost") || require('net').isIP(host)>0)){
-							clientName=host.split('.')[0]
-						}
-					}
+					// let clientName="avoassure";
+					// if(host != null && host != undefined)
+					// {
+					// 	if(!(host.includes("localhost") || require('net').isIP(host)>0)){
+					// 		clientName=host.split('.')[0]
+					// 	}
+					// }
 					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
-					if(!userICEMap[result.username]) userICEMap[result.username] = []
+					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
+					if(!userICEMap[clientName][result.username]) userICEMap[clientName][result.username] = []
 					iceUserMap[icename] = result.username;
-					if(!userICEMap[result.username].includes(icename)) userICEMap[result.username].push(icename);
+					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username].push(icename);
+					initListeners(socket);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
-					redisServer.redisSubClient.unsubscribe('ICE1_normal_' + icename);
-					redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + icename);
-					redisServer.redisSubClient.subscribe('ICE1_normal_' + icename);
-					redisServer.initListeners(socket);
 				} else {
 					if (result.node_check === "InvalidToken" || result.node_check === "InvalidICE") {
 						logger.error("%s is not authorized to connect", icename);
@@ -124,24 +125,24 @@ io.on('connection', async socket => {
 	socket.on('disconnect', async reason => {
 		logger.info("Inside Socket disconnect");
 		var address;
+		const icesession = socket.handshake.query.icesession;
+		address = socket.handshake.query.icename;
+		var clientName=utils.getClientName(socket.request.headers.host);
 		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+		try{
 		if (socket.request._query.check == "true") {
 			address = socket.request._query.username;
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
 			address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
 			logger.info("Disconnecting from Notification socket: %s", address);
-			redisServer.redisSubClient.unsubscribe('UI_notify_' + address);
-			if (socketMapNotify[address]) delete socketMapNotify[address];
+			if (socketMapNotify[clientName][address]) delete socketMapNotify[clientName][address];
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
-			address = socket.handshake.query.icename;
-			const icesession = socket.handshake.query.icesession;
 			if (socketMap[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
-				redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
 				delete socketMap[address];
 				if(address in iceUserMap){
 					let user = iceUserMap[address];
@@ -155,7 +156,6 @@ io.on('connection', async socket => {
 			} else if (socketMapScheduling[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from Scheduling socket : %s', address);
-				redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + address);
 				delete socketMapScheduling[address];
 				module.exports.allSchedulingSocketsMap = socketMapScheduling;
 				logger.debug("No. of clients connected for Scheduling mode: %d", Object.keys(socketMapScheduling).length);
@@ -175,14 +175,16 @@ io.on('connection', async socket => {
 				}
 			}
 		}
-	});
+		}
+		catch(err){
+			logger.error("Error occurred in disconnecting to socket address");
+			const disConnResult = await utils.fetchData({"icename": address,"query": 'disconnect',"icesession": icesession}, "server/updateActiveIceSessions", "updateActiveIceSessions");
+		}});
 
 	socket.on('toggle_schedule', function (data) {
 		logger.info("Inside Socket toggle_schedule: Reconnecting for scheduling socket");
 		var address = socket.handshake.query.icename;
 		if (data && socketMap[address] != undefined) {
-			redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
-			redisServer.redisSubClient.subscribe('ICE1_scheduling_' + address);
 			logger.info('Disconnecting socket connection for Normal Mode: %s', address);
 			delete socketMap[address];
 			module.exports.allSocketsMap = socketMap;
@@ -194,8 +196,6 @@ io.on('connection', async socket => {
 			logger.debug("No. of clients connected for Scheduling mode: %d", Object.keys(socketMapScheduling).length);
 			logger.debug("Clients connected for Scheduling mode : %s", Object.keys(socketMapScheduling).join());
 		} else if (!data && socketMapScheduling != undefined) {
-			redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + address);
-			redisServer.redisSubClient.subscribe('ICE1_normal_' + address);
 			logger.info('Disconnecting socket connection for Scheduling mode: %s', address);
 			delete socketMapScheduling[address];
 			module.exports.allSchedulingSocketsMap = socketMapScheduling;
@@ -212,6 +212,21 @@ io.on('connection', async socket => {
 	socket.on('connect_failed', function () {
 		var address = socket.handshake && socket.handshake.query.icename || socket.request._query.username;
 		logger.error("Error occurred in connecting to socket address %s", address);
+	});
+	socket.on('ICE_status_change', async value => {
+		let queue = require("./execution/executionQueue")
+		var clientName= utils.getClientName(value.host);
+		if (value.connected){
+			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
+			queue.Execution_Queue.triggerExecution(dataToExecute);
+		}else{
+			logger.info("ICE: " + username + " disconnected, deleting callbacks")
+			delete queue.Execution_Queue.registred_ICE[username]
+			queue.Execution_Queue.ice_list[username]["connected"] = false
+		}
+		if(iceIPMap[clientName] == undefined) iceIPMap[clientName] = {};
+		iceIPMap[clientName][username] = value.hostip;
+		cache.sethmap(username,value)
 	});
 });
 //SOCKET CONNECTION USING SOCKET.IO
@@ -240,9 +255,10 @@ const registerICE = async (req, res) => {
 
 const getUserICE = (req,res) => {
 	let username = req.session.username;
+	var clientName=utils.getClientName(req.headers.host);
 	var result = "fail"
-	if(userICEMap[username]){
-		result = {"ice_list":userICEMap[username]}
+	if(userICEMap[clientName][username]){
+		result = {"ice_list":userICEMap[clientName][username]}
 	}
 	res.send(result)
 }
@@ -252,10 +268,11 @@ const setDefaultUserICE = (req,res) => {
 	try{
 		let user = req.session.username;
 		let defaultICE = req.body.defaultICE;
-		if(userICEMap[user] && userICEMap[user].indexOf(defaultICE) >= 0){
-			let index = userICEMap[user].indexOf(defaultICE);
-			userICEMap[user].splice(index,1);
-			userICEMap[user].splice(0,0,defaultICE);
+		var clientName=utils.getClientName(req.headers.host);
+		if(userICEMap[clientName][user] && userICEMap[clientName][user].indexOf(defaultICE) >= 0){
+			let index = userICEMap[clientName][user].indexOf(defaultICE);
+			userICEMap[clientName][user].splice(index,1);
+			userICEMap[clientName][user].splice(0,0,defaultICE);
 		}
 		result = "success"
 	}catch{
@@ -276,6 +293,73 @@ async function sendPendingNotifications(socket,address){
 			}
 		}
 }
+
+initListeners = mySocket => {
+	let queue = require("./execution/executionQueue");
+	const username = mySocket.handshake.query.icename;
+	logger.debug("Initializing ICE Engine connection for %s",username);
+	mySocket.evdata = {};
+	mySocket.pckts = [];
+	queue.Execution_Queue.register_execution_trigger_ICE(username);
+	mySocket.use((args, cb) => {
+		const ev = args[0];
+		const ack = (typeof  args[args.length-1] === 'function')? args.pop():() => {};
+		const fullPcktId = args.splice(1,1)[0];
+		const pcktId = fullPcktId.split('_')[0];
+		const index = fullPcktId.split('_')[1];
+
+		// ACK for Paginated Packets will be sent later after processing
+		if (index === undefined) ack(fullPcktId);
+		// Check if packet has already been consumed by server
+		if (mySocket.pckts.indexOf(pcktId) !== -1) {
+			if (index !== undefined) ack(fullPcktId); // If this was Paginated packet, send ACK
+			return null;  // Do nothing as packet has already been consumed
+		}
+		// Normal packet - Do not apply pagination logic
+		if (index === undefined) {
+			mySocket.pckts.push(pcktId);
+			return cb();
+		}
+		/* Paginated packets processing starts */
+		const data = args[1];
+		const ev_data = mySocket.evdata[ev];
+		const comps = data.split(';');
+		const subPackId = comps.shift();
+		const payload = comps.join(';');
+		if (index == "p@gIn8" && comps.length == 3) {
+			ack(fullPcktId);
+			const d2p = [parseInt(comps[0])].concat(Array.apply(null, Array(parseInt(comps[1]))));
+			mySocket.evdata[ev] = {id: subPackId, data: d2p, jsonify: comps[2] === "True"};
+		} else if (ev_data && ev_data.id == subPackId) {
+			if (index == 'eof') {
+				const payloadlength = mySocket.evdata[ev].data.shift();
+				const fpayload = mySocket.evdata[ev].data.join('');
+				if (fpayload.length != payloadlength) {
+					ack(fullPcktId, "paginate_fail");
+					const blocks = mySocket.evdata[ev].data.length;
+					delete mySocket.evdata[ev].data;
+					mySocket.evdata[ev].data = [payloadlength].concat(Array.apply(null, Array(blocks)));
+				} else {
+					ack(fullPcktId);
+					mySocket.pckts.push(pcktId);
+					args[1] = ev_data.jsonify? JSON.parse(fpayload):fpayload;
+					delete mySocket.evdata[ev]
+					cb();
+				}
+			} else {
+				ack(fullPcktId);
+				mySocket.evdata[ev].data[parseInt(index)] = payload;
+			}
+		} else if (validator.isUUID(subPackId)) {
+			ack(fullPcktId, "paginate_fail");
+			logger.info("Unknown packet received! Restarting pagination. Event: "+args[0]+", ID: "+fullPcktId);
+		} else {
+			ack(fullPcktId);
+			cb();
+		}
+	});
+}
+
 module.exports.registerICE = registerICE;
 module.exports.getUserICE = getUserICE;
 module.exports.setDefaultUserICE = setDefaultUserICE;
