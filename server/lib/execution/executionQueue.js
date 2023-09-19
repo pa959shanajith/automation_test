@@ -709,7 +709,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             'screenshotpath': screenshotpath.screenShotPath
         };
 
-        try {executionListCache
+        try {
             let agent = req.body.Hostname;
             
             //Add agent in the agent Collection and fetch its status
