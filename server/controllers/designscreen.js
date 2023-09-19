@@ -3,7 +3,6 @@
  */
 const myserver = require('../lib/socket');
 const logger = require('../../logger');
-const redisServer = require('../lib/redisSocketHandler');
 const utils = require('../lib/utils');
 var path = require('path');
 var fs = require('fs');
@@ -27,16 +26,16 @@ exports.initScraping_ICE = function (req, res) {
 	var dataToIce={};
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		username=req.session.username;
 		icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][icename];	
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.info("ICE Socket requesting Address: %s" , icename);
-		//cr:use utils.getChannelNum('ICE1_scheduling_' + name, function(found)
-		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
-			if (redisres[1]>0) {
+		if(mySocket != undefined && mySocket.connected) {	
 				var reqAction = "";
 				var reqBody = req.body.screenViewObject;
 				if (reqBody.appType == "Desktop") {
@@ -134,34 +133,22 @@ exports.initScraping_ICE = function (req, res) {
 				}
 				dataToIce.username = icename;
 				logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
-				redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-				function scrape_listener(channel, message) {
-					var data = JSON.parse(message);
+				mySocket.emit(dataToIce["emitAction"], dataToIce.data);
+				function scrape_listener(message) {
+					var data = message;
 					//LB: make sure to send recieved data to corresponding user
-					if (icename == data.username && ["unavailableLocalServer", "scrape"].includes(data.onAction)) {
-						redisServer.redisSubServer.removeListener('message', scrape_listener);
-						if (data.onAction == "unavailableLocalServer") {
-							logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-							if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-								var soc = myserver.socketMapNotify[username];
-								soc.emit("ICEnotAvailable");
-							}
-						} else {
-							value = data.value;
-							logger.info("Sending "+reqAction+" scraped objects from initScraping_ICE");
-							res.send(value);
-						}
-					}
+					mySocket.removeListener('scrape', scrape_listener);
+					value = data;
+					logger.info("Sending "+reqAction+" scraped objects from initScraping_ICE");
+					res.send(value);
 				}
-				redisServer.redisSubServer.on("message",scrape_listener);
+				mySocket.on("scrape", scrape_listener);
 			} else {
 				logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
-				utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
-					var flag = (found)? "scheduleModeOn" : "unavailableLocalServer";
-					res.send(flag);
-				});
+				var flag = "unavailableLocalServer";
+				res.send(flag);
 			}
-		});
+		
 	} catch (exception) {
 		logger.error("Exception in the service initScraping_ICE: %s",exception);
 		res.send("fail");
@@ -303,17 +290,18 @@ exports.fetchReplacedKeywords_ICE = async (req, res) => {
 exports.userObjectElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: userObjectElement_ICE");
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var username=req.session.username;
 		var icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][icename];	
 		var operation = req.body.object[0];
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.info("ICE Socket requesting Address: %s" , icename);
 		logger.info("Sending socket request for focus to cachedb");
-		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
-			if (redisres[1]>0) {
+		if(mySocket != undefined && mySocket.connected) {	
 				if(operation=='encrypt'){
 					props={
 						action:"userobject",
@@ -379,31 +367,21 @@ exports.userObjectElement_ICE = function (req, res) {
 					};
 					dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
 				}
-				redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-				function userObjectElement_ICE_listener(channel, message) {
-					var data = JSON.parse(message);
-					if (icename == data.username && ["unavailableLocalServer", "scrape"].includes(data.onAction)) {
-						redisServer.redisSubServer.removeListener('message', userObjectElement_ICE_listener);
-						if (data.onAction == "unavailableLocalServer") {
-							logger.error("Error occurred in initScraping_ICE: Socket Disconnected");
-							if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-								var soc = myserver.socketMapNotify[username];
-								soc.emit("ICEnotAvailable");
-							}
-						} else {
-							value = data.value;
-							logger.info("Sending objects");
-							res.send(value);
-						}
-					}
+				mySocket.emit(dataToIce["emitAction"], dataToIce.data);
+				function userObjectElement_ICE_listener(message) {
+					var data = message;
+						mySocket.removeListener('scrape', userObjectElement_ICE_listener);						
+						value = data;
+						logger.info("Sending objects");
+						res.send(value);	
 				}
-				redisServer.redisSubServer.on("message",userObjectElement_ICE_listener);
+				mySocket.on("scrape",userObjectElement_ICE_listener);
 				logger.info("Successfully updated userdefined object");
 			} else {
 				logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
 				res.send("unavailableLocalServer")
 			}
-		})
+		
 	} catch (exception) {
 		logger.error("Exception in the service userObjectElement_ICE: %s",exception);
 		res.send("fail");
@@ -413,10 +391,12 @@ exports.userObjectElement_ICE = function (req, res) {
 exports.highlightScrapElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var username=req.session.username;
 		var icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][icename];	
 		var focusParam = req.body.elementXpath;
 		var elementURL = req.body.elementUrl;
 		var appType = req.body.appType;
@@ -424,11 +404,9 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		var left = req.body.left;
 		var width = req.body.width;
 		var height = req.body.height;
-		var highlightImpact=req.body.highlightImpact;
 		logger.info("ICE Socket requesting Address: %s" , icename);
 		logger.info("Sending socket request for focus to cachedb");
-		var dataToIce = {"emitAction": "focus", "username": icename, "focusParam": focusParam, "elementURL": elementURL, "appType": appType, "top": top, "left": left, "width": width, "height": height,"impactHighlight":highlightImpact};
-		redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+		mySocket.emit("focus", focusParam, elementURL, appType, top, left, width, height);
 		logger.info("Successfully highlighted selected object");
 		res.send('success');
 	} catch (exception) {
@@ -762,42 +740,27 @@ exports.importScreenfromExcel = async (req, res) =>{
 exports.getDeviceSerialNumber_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getDeviceSerialNumber_ICE");
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var username=req.session.username;
 		var icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][icename];
 		logger.info("ICE Socket requesting Address: %s" , icename);
 		logger.info("Sending socket request to get serial number");
-		var dataToIce = {"emitAction": "getSerialNumber", "username": icename};
-		redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-		
+		mySocket.emit("getSerialNumber");
 		try {
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s", icename);
-			redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-				
-				
-				redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-
-				function get_device_serial_listener(channel, message) {
-					var data = JSON.parse(message);
-					if (icename == data.username && ["unavailableLocalServer", "get_serial_number"].includes(data.onAction)) {
-						redisServer.redisSubServer.removeListener("message", get_device_serial_listener);
-						if (data.onAction == "unavailableLocalServer") {
-							logger.error("Error occurred in getDeviceSerialNumber_ICE: Socket Disconnected");
-							if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-								var soc = myserver.socketMapNotify[username];
-								soc.emit("ICEnotAvailable");
-							}
-						} else if (data.onAction == "get_serial_number") {
-							var resultData = data.value;
-							res.send(resultData);	
-						}
-					}
+				function get_device_serial_listener(message) {
+					var data = message;
+						mySocket.removeListener("get_serial_number", get_device_serial_listener);
+						var resultData = data;
+						res.send(resultData);	
 				}
-				redisServer.redisSubServer.on("message", get_device_serial_listener);
+				mySocket.on("get_serial_number", get_device_serial_listener);
 					
-				});
+				
 		} catch (exception) {
 			logger.error("Exception in the service getDeviceSerialNumber_ICE: %s", exception);
 		}
@@ -810,42 +773,32 @@ exports.getDeviceSerialNumber_ICE = function (req, res) {
 exports.checkingMobileClient_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: checkingMobileClient_ICE");
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var username=req.session.username;
 		var icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][icename];	
 		logger.info("ICE Socket requesting Address: %s" , icename);
 		logger.info("Sending socket request to check mobile Client Folder");
-		var dataToIce = {"emitAction": "checkingMobileClient", "username": icename};
-		redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+		mySocket.emit("checkingMobileClient");
 		
 		try {
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s", icename);
-			redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-				
-				
-				redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
 
-				function Checking_mobile_client(channel, message) {
-					var data = JSON.parse(message);
-					if (icename == data.username && ["unavailableLocalServer", "checking_Mobile_Client"].includes(data.onAction)) {
-						redisServer.redisSubServer.removeListener("message", Checking_mobile_client);
-						if (data.onAction == "unavailableLocalServer") {
-							logger.error("Error occurred in checkingMobileClient_ICE: Socket Disconnected");
-							if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-								var soc = myserver.socketMapNotify[username];
-								soc.emit("ICEnotAvailable");
-							}
-						} else if (data.onAction == "checking_Mobile_Client") {
-							var resultData = data.value;
-							res.send(resultData);	
-						}
-					}
+			mySocket.emit("checkingMobileClient");
+
+				function Checking_mobile_client(message) {
+					var data = message;
+						mySocket.removeListener("checking_Mobile_Client", Checking_mobile_client);
+						var resultData = data;
+						res.send(resultData);	
+						
 				}
-				redisServer.redisSubServer.on("message", Checking_mobile_client);
+				mySocket.on("checking_Mobile_Client", Checking_mobile_client);
 					
-				});
+				
 		} catch (exception) {
 			logger.error("Exception in the checkingMobileClient_ICE: %s", exception);
 		}

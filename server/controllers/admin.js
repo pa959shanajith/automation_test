@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const generator = require('../notifications/generator');
 const email = require('../notifications/email');
-
+const mySocket = require('../lib/socket');
 const archiver = require('archiver');
 const activeDirectory = require('activedirectory');
 const Client = require("node-rest-client").Client;
@@ -358,14 +358,18 @@ exports.manageSessionData = async (req, res) => {
 		if (action == "get") {
 			logger.info("Inside UI service: manageSessionData/getSessions");
 			const data = {sessionData: [], clientData: []};
-			const connectusers = await utils.getSocketList("ICE");
-			connectusers.forEach(function(e) {
-				data.clientData.push({
-					username: e[0],
-					mode: e[1],
-					ip: e[2]
-				});
-			});
+			var clientName=utils.getClientName(req.headers.host);
+			const connectusers = mySocket.allSocketsMap[clientName]
+			const allICEIPMap = mySocket.allICEIPMap[clientName]
+			for (ice in connectusers){
+				if(ice != undefined && connectusers[ice].connected){
+					data.clientData.push({
+								username: ice,
+								mode: false,
+								ip: allICEIPMap[ice]
+							});
+				}
+			}
 			try {
 				const sessions = await utils.allSess();
 				sessions.forEach(function(e) {
@@ -401,14 +405,11 @@ exports.manageSessionData = async (req, res) => {
 					}
 				}
 			} else if (action == "disconnect" && key == '?') {
-				const icemode = await utils.channelStatus(user);
-				if (icemode.schedule) key = "schedule";
-				else if (icemode.normal) key = "normal";
-				else return res.send("success");
+				res.send("success");
 			}
 			const d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser, "reason": reason};
 			try {
-				const status = await utils.delSession(d2s);
+				const status = await utils.delSession(d2s,req.headers.host);
 				return res.send("success");
 			} catch (err) {
 				logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);

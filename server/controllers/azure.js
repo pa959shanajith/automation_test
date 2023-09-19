@@ -5,7 +5,6 @@ var async = require('async');
 var Client = require("node-rest-client").Client;
 var epurl = process.env.DAS_URL;
 var client = new Client();
-var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var fs = require('fs');
 var options = require('../config/options');
@@ -13,15 +12,17 @@ var path = require('path');
 const tokenAuth = require('../lib/tokenAuth')
 const constants = require('../lib/execution/executionConstants');
 
-// let headers
+let headers
 
 exports.connectAzure_ICE = function(req, res) {
     try {
         logger.info("Inside UI service: connectAzure_ICE");
+        var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
         var username=req.session.username;
         var icename = undefined
-        if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-        redisServer.redisSubServer.subscribe('ICE2_' + icename);
+        if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+        mySocket = myserver.allSocketsMap[clientName][icename];	
         if (req.body.action == 'loginToAzure') { //Login to Azure for creating issues
             var azureurl = req.body.url;
             var azureusername = req.body.username;
@@ -35,55 +36,33 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                    if(mySocket != undefined) {	
                             logger.info("Sending socket request for azure_login to cachedb");
-                            var dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": inputs
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, inputs);
                             var count = 0;
 
-                            function azure_login_1_listener(channel, message) {
-                                var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "auto_populate"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_1_listener);
-                                    if (data.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
+                            function azure_login_1_listener(message) {
+                                var data = message;
+                                    mySocket.removeListener("auto_populate", azure_login_1_listener);
+                                    
+                                    var resultData = data;
+                                    if (count == 0) {
+                                        if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                            logger.info('Azure: Login successfully.');
+                                        } else {
+                                            logger.error('Azure: Login Failed.');
                                         }
-                                    } else if (data.onAction == "auto_populate") {
-                                        var resultData = data.value;
-                                        if (count == 0) {
-                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
-                                                logger.info('Azure: Login successfully.');
-                                            } else {
-                                                logger.error('Azure: Login Failed.');
-                                            }
-                                            res.send(resultData);
-                                            count++;
-                                        }
+                                        res.send(resultData);
+                                        count++;
                                     }
-                                }
+                                   
                             }
-                            redisServer.redisSubServer.on("message", azure_login_1_listener);
+                            mySocket.on("auto_populate", azure_login_1_listener);
                         } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
-                                }
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
                                 res.send(flag);
-                            });
                         }
-                    });
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - loginToAzure: %s", exception);
                 }
@@ -98,56 +77,37 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                    if(mySocket != undefined) {
                             logger.info("Sending socket request for azure_login to cachedb");
-                            dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": createObj
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, createObj);
                             var count = 0;
 
-                            function azure_login_2_listener(channel, message) {
-                                var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "issue_id","auto_populate"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_2_listener);
-                                    if (data.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - createIssueInAzure: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
+                            function azure_login_2_listener(message) {
+                                var data = message;
+                                    mySocket.removeListener("auto_populate", azure_login_2_listener);
+                                    mySocket.removeListener("issue_id", azure_login_2_listener);
+                                    var resultData = data;
+                                    if (count == 0) {
+                                        if (resultData != "Fail") {
+                                            updateDbReportData(createObj.reportId, createObj.slno, resultData);
+                                            logger.info('Azure: Bug created successfully.');
+                                        } else {
+                                            logger.error('Azure: Failed to create Bug.');
                                         }
-                                    } else if (data.onAction == "issue_id" || data.onAction == "auto_populate") {
-                                        var resultData = data.value;
-                                        if (count == 0) {
-                                            if (resultData != "Fail") {
-                                                updateDbReportData(createObj.reportId, createObj.slno, resultData);
-                                                logger.info('Azure: Bug created successfully.');
-                                            } else {
-                                                logger.error('Azure: Failed to create Bug.');
-                                            }
-                                            res.send(resultData);
-                                            count++;
-                                        }
+                                        res.send(resultData);
+                                        count++;
                                     }
-                                }
+                                    
+                                
                             }
-                            redisServer.redisSubServer.on("message", azure_login_2_listener);
+                            mySocket.on("auto_populate", azure_login_2_listener);
+                            mySocket.on("issue_id", azure_login_2_listener);
                         } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - createIssueInAzure: Socket not Available");
-                                }
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - createIssueInAzure: Socket not Available");
                                 res.send(flag);
-                            });
                         }
-                    });
+                    
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - createIssueInAzure: %s", exception);
                 }
@@ -178,56 +138,36 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                    if(mySocket != undefined) {
                             logger.info("Sending socket request for azure_login to cachedb");
-                            dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": inputs
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, inputs);
 
-                            function azure_login_3_listener(channel, message) {
-                                var data1 = JSON.parse(message);
-                                if (icename == data1.username && ["unavailableLocalServer", "configure_field"].includes(data1.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_3_listener);
-                                    if (data1.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - getAzureConfigureFields: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
-                                        }
-                                    } else if (data1.onAction == "configure_field") {
-                                        var resultData = data1.value;
-                                        if(Object.keys(resultData).length && resultData.hasOwnProperty('Error')){
-                                            logger.info('Azure: '+resultData.Error.msg);
-                                            res.status(resultData.Error.status).send(resultData.Error.msg);
-                                            return;
-                                        }
-                                        if (resultData != "Fail") {
-                                            logger.info('Azure: configure field fetched successfully.');
-                                        } else {
-                                            logger.error('Azure: Failed fetch congigure fields.');
-                                        }
-                                        res.send(resultData);
+                            function azure_login_3_listener(message) {
+                                var data1 = message;
+                                    mySocket.removeListener("configure_field", azure_login_3_listener);
+                                   
+                                    var resultData = data1;
+                                    if(Object.keys(resultData).length && resultData.hasOwnProperty('Error')){
+                                        logger.info('Azure: '+resultData.Error.msg);
+                                        res.status(resultData.Error.status).send(resultData.Error.msg);
+                                        return;
                                     }
-                                }
+                                    if (resultData != "Fail") {
+                                        logger.info('Azure: configure field fetched successfully.');
+                                    } else {
+                                        logger.error('Azure: Failed fetch congigure fields.');
+                                    }
+                                    res.send(resultData);
+                                    
+                                
                             }
-                            redisServer.redisSubServer.on("message", azure_login_3_listener);
+                            mySocket.on("configure_field", azure_login_3_listener);
                         } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - getAzureConfigureFields: Socket not Available");
-                                }
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - getAzureConfigureFields: Socket not Available");
                                 res.send(flag);
-                            });
                         }
-                    });
+                    
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - getAzureConfigureFields: %s", exception);
                 }
@@ -249,55 +189,33 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                        if(mySocket != undefined) {
                             logger.info("Sending socket request for azure_login to cachedb");
-                            var dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": inputs
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, inputs);
                             var count = 0;
 
-                            function azure_login_4_listener(channel, message) {
-                                var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Azure_details"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_4_listener);
-                                    if (data.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
+                            function azure_login_4_listener(message) {
+                                var data = message;
+                                    mySocket.removeListener("Azure_details", azure_login_4_listener);
+                                    
+                                    var resultData = data;
+                                    if (count == 0) {
+                                        if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                            logger.info('Azure: Login successfully.');
+                                        } else {
+                                            logger.error('Azure: Login Failed.');
                                         }
-                                    } else if (data.onAction == "Azure_details") {
-                                        var resultData = data.value;
-                                        if (count == 0) {
-                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
-                                                logger.info('Azure: Login successfully.');
-                                            } else {
-                                                logger.error('Azure: Login Failed.');
-                                            }
-                                            res.send(resultData);
-                                            count++;
-                                        }
+                                        res.send(resultData);
+                                        count++;
                                     }
-                                }
+                                
                             }
-                            redisServer.redisSubServer.on("message", azure_login_4_listener);
+                            mySocket.on("Azure_details", azure_login_4_listener);
                         } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
-                                }
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
                                 res.send(flag);
-                            });
                         }
-                    });
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - loginToAzure: %s", exception);
                 }
@@ -321,30 +239,13 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                        if(mySocket != undefined) {
                             logger.info("Sending socket request for azure_user_stories to cachedb");
-                            var dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": inputs
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, inputs);
                             var count = 0;
-
-                            function azure_login_5_listener(channel, message) {
-                                var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Azure_details","auto_populate"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_5_listener);
-                                    if (data.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
-                                        }
-                                    } else if (data.onAction == "Azure_details") {
-                                        var resultData = data.value;
+                            mySocket.on("Azure_details", (message) =>{
+                                var data = message;
+                                var resultData = data;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                                 logger.info('Azure: Login successfully.');
@@ -354,28 +255,19 @@ exports.connectAzure_ICE = function(req, res) {
                                             res.send(resultData);
                                             count++;
                                         }
-                                    }
-                                    else if (data.onAction == "auto_populate") {
-                                        var resultData = data.value;
+                            });
+                            mySocket.on("auto_populate", (message) =>{
+                                var data = message;
+                                var resultData = data;
                                         logger.error("Error occurred while fetching data from azure devOps : "+resultData);
                                         res.status(429).send(resultData);
-                                    }
-
-                                }
-                            }
-                            redisServer.redisSubServer.on("message", azure_login_5_listener);
-                        } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
-                                }
-                                res.send(flag);
                             });
+
+                        } else {
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
+                                res.send(flag);
                         }
-                    });
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - loginToAzure: %s", exception);
                 }
@@ -399,30 +291,16 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                        if(mySocket != undefined) {
                             logger.info("Sending socket request for azure_user_stories to cachedb");
-                            var dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": inputs
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, inputs);
                             var count = 0;
 
-                            function azure_login_6_listener(channel, message) {
-                                var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Azure_details"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_6_listener);
-                                    if (data.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
-                                        }
-                                    } else if (data.onAction == "Azure_details") {
-                                        var resultData = data.value;
+                            function azure_login_6_listener(message) {
+                                var data = message;
+                                    mySocket.removeListener("Azure_details", azure_login_6_listener);
+                                    
+                                        var resultData = data;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                                 logger.info('Azure: Login successfully.');
@@ -432,22 +310,13 @@ exports.connectAzure_ICE = function(req, res) {
                                             res.send(resultData);
                                             count++;
                                         }
-                                    }
-                                }
                             }
-                            redisServer.redisSubServer.on("message", azure_login_6_listener);
+                            mySocket.on("Azure_details", azure_login_6_listener);
                         } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
-                                }
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
                                 res.send(flag);
-                            });
                         }
-                    });
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - loginToAzure: %s", exception);
                 }
@@ -474,30 +343,16 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                        if(mySocket != undefined) {
                             logger.info("Sending socket request for azure_user_stories to cachedb");
-                            var dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": inputs
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, inputs);
                             var count = 0;
 
-                            function azure_login_7_listener(channel, message) {
-                                var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Azure_details"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_7_listener);
-                                    if (data.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
-                                        }
-                                    } else if (data.onAction == "Azure_details") {
-                                        var resultData = data.value;
+                            function azure_login_7_listener(message) {
+                                var data = message;
+                                    mySocket.removeListener("Azure_details", azure_login_7_listener);
+                                    
+                                        var resultData = data;
                                         if (count == 0) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                                 logger.info('Azure: Login successfully.');
@@ -507,22 +362,15 @@ exports.connectAzure_ICE = function(req, res) {
                                             res.send(resultData);
                                             count++;
                                         }
-                                    }
-                                }
+                                    
+                                
                             }
-                            redisServer.redisSubServer.on("message", azure_login_7_listener);
+                            mySocket.on("Azure_details", azure_login_7_listener);
                         } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
-                                }
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
                                 res.send(flag);
-                            });
                         }
-                    });
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - loginToAzure: %s", exception);
                 }
@@ -551,55 +399,34 @@ exports.connectAzure_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                        if (redisres[1] > 0) {
+                        if(mySocket != undefined) {
                             logger.info("Sending socket request for azure_user_stories to cachedb");
-                            var dataToIce = {
-                                "emitAction": "azureLogin",
-                                "username": icename,
-                                "action": req.body.action,
-                                "inputs": inputs
-                            };
-                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            mySocket.emit("azurelogin", req.body.action, inputs);
                             var count = 0;
 
-                            function azure_login_8_listener(channel, message) {
-                                var data = JSON.parse(message);
-                                if (icename == data.username && ["unavailableLocalServer", "Azure_details"].includes(data.onAction)) {
-                                    redisServer.redisSubServer.removeListener("message", azure_login_8_listener);
-                                    if (data.onAction == "unavailableLocalServer") {
-                                        logger.error("Error occurred in connectAzure_ICE - loginToAzure: Socket Disconnected");
-                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                            var soc = myserver.socketMapNotify[username];
-                                            soc.emit("ICEnotAvailable");
+                            function azure_login_8_listener(message) {
+                                var data = message;
+                                    mySocket.removeListener("Azure_details", azure_login_8_listener);
+                                    var resultData = data;
+                                    if (count == 0) {
+                                        if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                            logger.info('Azure: Login successfully.');
+                                        } else {
+                                            logger.error('Azure: Login Failed.');
                                         }
-                                    } else if (data.onAction == "Azure_details") {
-                                        var resultData = data.value;
-                                        if (count == 0) {
-                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
-                                                logger.info('Azure: Login successfully.');
-                                            } else {
-                                                logger.error('Azure: Login Failed.');
-                                            }
-                                            res.send(resultData);
-                                            count++;
-                                        }
+                                        res.send(resultData);
+                                        count++;
                                     }
-                                }
+                                    
+                                
                             }
-                            redisServer.redisSubServer.on("message", azure_login_8_listener);
+                            mySocket.on("Azure_details", azure_login_8_listener);
                         } else {
-                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                var flag = "";
-                                if (found) flag = "scheduleModeOn";
-                                else {
-                                    flag = "unavailableLocalServer";
-                                    logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
-                                }
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectAzure_ICE - loginToAzure: Socket not Available");
                                 res.send(flag);
-                            });
                         }
-                    });
+                    
                 } catch (exception) {
                     logger.error("Exception in the service connectAzure_ICE - loginToAzure: %s", exception);
                 }
@@ -637,15 +464,9 @@ exports.saveAzureDetails_ICE = async (req, res) => {
             if(inputs.itemType == 'UserStory') {
                 inputs['userStoryId'] = itr.userStoryId;
                 inputs['userStorySummary'] = itr.userStorySummary
-            } else if(inputs.itemType == 'TestSuite') {
+            } else {
                 inputs['TestSuiteId'] = itr.TestSuiteId;
                 inputs['testSuiteSummary'] = itr.testSuiteSummary
-            } else {
-                inputs['TestCaseId'] = itr.testid[0];
-                inputs['testCaseSummary'] = itr.testname[0]
-                inputs['TestPlanId'] = itr.testPlanId[0]
-                inputs['TestSuiteId'] = itr.testSuiteId[0]
-                inputs['TestPoints'] = itr.testPoints
             }
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
 			if (result == "fail") flag = false;
