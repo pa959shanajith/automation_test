@@ -174,7 +174,7 @@ io.on('connection', async socket => {
 				}
 			}
 			}
-		finally{
+		catch(err){
 			const disConnResult = await utils.fetchData({"icename": address,"query": 'disconnect',"icesession": icesession}, "server/updateActiveIceSessions", "updateActiveIceSessions");
 	}});
 
