@@ -823,6 +823,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     inputs['scenarioIndex'] = scenarioIndex;
                                 }
                                 executionData = await utils.fetchData(inputs, "devops/getExecScenario", fnName);
+                                executionData[0]['executionData']['executingOn'] = "Agent"
                                 // changes to support scenarioParallel
                                 if (testSuites['execType'] == 'scenarioParallel'){
                                     executionData[0]['executionData']['scenarioParallelExec'] = true;
