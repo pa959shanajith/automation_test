@@ -151,6 +151,70 @@ export const ExecuteTestSuite_ICE = async(executionData) => {
         return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}
     }
 }
+
+export const connectAzure_ICE = async(azureURL, azureUserName, azurePassword) => {
+    try{
+        var apiObj = {   
+            "action" : 'azureLogin',
+             "url": azureURL,
+             "username": azureUserName,
+             "pat": azurePassword
+             }    
+        const res = await axios(url+'/connectAzure_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data:apiObj
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status === 429 || res.data === "Max retries exceeded"){
+            return {error:MSG.GENERIC.MAX_RETRIES_EXCEEDED};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+
+
+/*Component  ExecuteContent
+  api returns  string - success/fail
+*/
+
+export const updateAccessibilitySelection = async(suiteInfo) => { 
+    try{
+        const res = await axios(url+'/updateAccessibilitySelection', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: suiteInfo,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY}
+    }
+}
 export const execAutomation = async(props) => {
     try{
         console.log(props)

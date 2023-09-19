@@ -1761,7 +1761,7 @@ const headerstyle={
 
 
 
-        <div className="card-table" style={{ width: '100%', display: "flex" }}>
+        <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
           {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"

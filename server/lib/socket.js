@@ -124,58 +124,59 @@ io.on('connection', async socket => {
 	socket.on('disconnect', async reason => {
 		logger.info("Inside Socket disconnect");
 		var address;
+		const icesession = socket.handshake.query.icesession;
+		address = socket.handshake.query.icename;
 		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-		if (socket.request._query.check == "true") {
-			address = socket.request._query.username;
-			logger.info("Disconnecting from UI socket: %s", address);
-		} else if (socket.request._query.check == "notify") {
-			address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
-			logger.info("Disconnecting from Notification socket: %s", address);
-			redisServer.redisSubClient.unsubscribe('UI_notify_' + address);
-			if (socketMapNotify[address]) delete socketMapNotify[address];
-		} else {
-			var connect_flag = false;
-			logger.info("Inside ICE Socket disconnection");
-			address = socket.handshake.query.icename;
-			const icesession = socket.handshake.query.icesession;
-			if (socketMap[address] != undefined) {
-				connect_flag = true;
-				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
-				redisServer.redisSubClient.unsubscribe('ICE1_normal_' + address);
-				delete socketMap[address];
-				if(address in iceUserMap){
-					let user = iceUserMap[address];
-					let index = userICEMap[user].indexOf(address);
-					userICEMap[user].splice(index,1);
-					delete iceUserMap[address];
+		try{
+			if (socket.request._query.check == "true") {
+				address = socket.request._query.username;
+				logger.info("Disconnecting from UI socket: %s", address);
+			} else if (socket.request._query.check == "notify") {
+				address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
+				logger.info("Disconnecting from Notification socket: %s", address);
+				if (socketMapNotify[address]) delete socketMapNotify[address];
+			} else {
+				var connect_flag = false;
+				logger.info("Inside ICE Socket disconnection");
+				if (socketMap[address] != undefined) {
+					connect_flag = true;
+					logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
+					delete socketMap[address];
+					if(address in iceUserMap){
+						let user = iceUserMap[address];
+						let index = userICEMap[user].indexOf(address);
+						userICEMap[user].splice(index,1);
+						delete iceUserMap[address];
+					}
+					module.exports.allSocketsMap = socketMap;
+					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
+					logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
+				} else if (socketMapScheduling[address] != undefined) {
+					connect_flag = true;
+					logger.info('Disconnecting from Scheduling socket : %s', address);
+					delete socketMapScheduling[address];
+					module.exports.allSchedulingSocketsMap = socketMapScheduling;
+					logger.debug("No. of clients connected for Scheduling mode: %d", Object.keys(socketMapScheduling).length);
+					logger.debug("Clients connected for Scheduling mode : %s", Object.keys(socketMapScheduling).join());
 				}
-				module.exports.allSocketsMap = socketMap;
-				logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
-				logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
-			} else if (socketMapScheduling[address] != undefined) {
-				connect_flag = true;
-				logger.info('Disconnecting from Scheduling socket : %s', address);
-				redisServer.redisSubClient.unsubscribe('ICE1_scheduling_' + address);
-				delete socketMapScheduling[address];
-				module.exports.allSchedulingSocketsMap = socketMapScheduling;
-				logger.debug("No. of clients connected for Scheduling mode: %d", Object.keys(socketMapScheduling).length);
-				logger.debug("Clients connected for Scheduling mode : %s", Object.keys(socketMapScheduling).join());
-			}
-			if (connect_flag) {
-				inputs = {
-					"icename": address,
-					"query": 'disconnect',
-					"icesession": icesession
-				};
-				const disConnResult = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
-				if (disConnResult == "fail") {
-					socket.send("fail", "disconn");
-				} else {
-					logger.info("%s is disconnected", address);
+				if (connect_flag) {
+					inputs = {
+						"icename": address,
+						"query": 'disconnect',
+						"icesession": icesession
+					};
+					const disConnResult = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
+					if (disConnResult == "fail") {
+						socket.send("fail", "disconn");
+					} else {
+						logger.info("%s is disconnected", address);
+					}
 				}
 			}
-		}
-	});
+			}
+		catch(err){
+			const disConnResult = await utils.fetchData({"icename": address,"query": 'disconnect',"icesession": icesession}, "server/updateActiveIceSessions", "updateActiveIceSessions");
+	}});
 
 	socket.on('toggle_schedule', function (data) {
 		logger.info("Inside Socket toggle_schedule: Reconnecting for scheduling socket");

@@ -40,42 +40,7 @@ const EmailConfiguration = ({ resetMiddleScreen }) => {
     const [visible, setVisible] = useState(false);
     const emailRef = useRef()
     const [errMsg, setErrMsg] = useState("");
-    const [confObj, setConfObj] = useState({
-            channel: "email",
-            provider: "smtp",
-            name: "smtpconf",
-            host: "172.17.5194",
-            port: "25",
-            auth: {
-                "type": "none",
-                "username": "",
-                "password": ""
-            },
-            sender: {
-                name: "Avo Assure Alerts",
-                email: "avoassure-alerts@avoautomation.com"
-            },
-            appurl: "https://test1.avoautomation.com/",
-            pool: {
-                enable: false,
-                maxconnections: "",
-                maxmessages: ""
-            },
-            proxy: {
-                enable: false,
-                url: "",
-                auth: false,
-                user: "",
-                pass: ""
-            },
-            timeouts: {
-                greeting: "60000",
-                socket: "1200000",
-                connection: "240000"
-            },
-            enabletls: "auto",
-            insecuretls: "true"
-    });
+    const [confObj, setConfObj] = useState();
     const [secureConnect, setSecureConnect] = useState("Auto");
 const [ignoreTlsErrors, setIgnoreTlsErrors] = useState("Yes");
 const[hostname,setHostname]=useState('');
@@ -90,7 +55,7 @@ const[servername,setServername]=useState('')
         //on reload mount component back
         if (reload) {
             const Ref = {
-                "toggleStatus": createRef(), "toggleUppdate": createRef(), "toggleTest": createRef(''), "servername": createRef(), "serverstatus": createRef(), "host": createRef(), "port": createRef(), "authname": createRef(),
+                "toggleStatus": createRef(), "toggleUppdate": createRef(), "toggleTest": createRef(''), "servername": createRef(), "serverstatus": createRef(), "smtpHost": createRef(),"smtpPort": createRef(), "authname": createRef(),
                 "authpassword": createRef(), "sendername": createRef(), "senderaddr": createRef(), "assureurl": createRef(),
                 "conctimeout": createRef(), "grettimeout": createRef(), "socktimeout": createRef(), "maxconnection": createRef(), "maxmessages": createRef(),
                 "proxyurl": createRef(), "proxyuser": createRef(), "proxypass": createRef(), "selectauth": createRef(), "selectprovider": createRef(),
@@ -153,7 +118,7 @@ const[servername,setServername]=useState('')
         }
         emailRef.current.style.outline = ''
         setErrMsg('Sending...')
-        const arg = { channel: confObj.channel, provider: confObj.provider, recipient: emailRef.current.value, conf: confObj }
+        const arg = { channel: emailTest.channel, provider: emailTest.provider, recipient:emailRef.current.value, conf: emailTest }
         var data = await testNotificationChannels(arg)
         if (data.error) { setErrMsg(data.error.CONTENT); return; }
         else setErrMsg(data.CONTENT);
@@ -161,6 +126,8 @@ const[servername,setServername]=useState('')
 
     const onSelectProvider = (event) => {
         selectProvider({ inputRef, ...fn, displayError, setLoading });
+        const selectedValue = event.value;
+        setSelectedProvider(selectedValue);
         
     }
     const onClickTest = () => {
@@ -194,65 +161,55 @@ const[servername,setServername]=useState('')
             <div className='full_page'>
                 <>
                 
-                  
+                <div>
+                        <label required className='provider'> select provider</label>
+                    </div>
                     <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
+                    {/* <Dropdown  className='providerdropdown' ref={inputRef['selectprovider']}  value={selectedProvider} options={['SMTP']} onChange={onSelectProvider} placeholder="Select Provider" id="selectprovider" /> */}
                     <div className='email_setting_header'>
                         Email Server Settings
                     </div>
                     <div>
-                        <label className='hostname' >Host name</label>
-                        <label className='servername' validExp={"emailServerName"}>Server Name</label>
+                        {/* <label className='hostname' >Host name</label>
+                        <label className='servername' validExp={"emailServerName"}>Server Name</label> */}
                         <div>
-                        <FormInput inpRef={inputRef['host']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
+                        <FormInput inpRef={inputRef['smtpHost']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
                             <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
                         </div>
+                        <div className='col-xs-9 form-group input-label'>
+                    <label>Status</label>
+                    <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>
+                </div>
                         <div>
                             <lable className="portname">Port Number </lable>
                         </div>
                         <div>
-                        <FormInput inpRef={inputRef['port']} label={'Port'} placeholder={'Server Port'}/>
+                        <FormInput inpRef={inputRef['smtpPort']} label={'Port'} placeholder={'Server Port'}/>
                         </div>
-                        <div>
-                            <label className='Auth_info'>Authentication Information</label>
-                        </div>
-                        <div>
-                            <lable className="Authname">Authentication Type</lable>
-                        </div>
-                        <div>
                         <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} label={"Authentication"} option={['none','basic']}/>
+
+                       {/* <div class="auth-container">
+    <label class="auth-label">Authentication Type</label>
+    <div>
+                            <Dropdown ref={inputRef['selectauth']} value={selectedValue} className='Auth_dropdown' placeholder="Select Authentication Type" options={['none', 'basic']} onChange={handleDropdownChange} />
                         </div>
+</div> */}
+                    
                         <div>
-                            <label className='AuthUsername'>Authentication UserName</label>
-                            <label className='AuthPassword'>Authentication Password</label>
+                        <FormInput inpRef={inputRef['authname']} label={'Authentication Username'} placeholder={'Authentication Username'} disabled={!inputEnabled}/>
+                        <FormInput inpRef={inputRef['authpassword']} label={'Authentication Password'} placeholder={'Authentication Password'} disabled={!inputEnabled}/>
                         </div>
-                        <div>
-                        <FormInput inpRef={inputRef['authname']} label={'Authentication Username'} placeholder={'Authentication Username'}/>
-                        <FormInput inpRef={inputRef['authpassword']} label={'Authentication Password'} placeholder={'Authentication Password'}/>
-                        </div>
+                        <FormInput inpRef={inputRef['sendername']} label={'Sender Name'} placeholder={'Avo Assure Alerts'}/>
+                <FormInput inpRef={inputRef['senderaddr']} label={'Sender Address'} placeholder={'avoassure-alerts@avoautomation.com'}/>
                 <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto","Enable","Disable"]}/>
                 <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes","No"]}/>
-                        {/* <div>
-                            <label className='security_label'>Connection Security</label>
-                            <div className='connection_label'>
-                                <label className='selectconn_label'>Select connection</label>
-                                <label className='tLs_label'>Ignore TLS error</label></div>
-                            <div className="flex align-items-center connectionradio">
-                                <RadioButton inputRef={inputRef.secureconnect[0]} name="secureconnect" value="Auto" />
-                                <label className="ml-2">Auto</label>
-                                <RadioButton inputRef={inputRef.secureconnect[1]} name="secureconnect" value="Enable" />
-                                <label className="ml-2">Enable</label>
-                                <RadioButton inputRef={inputRef.secureconnect[2]} name="secureconnect" value="Disable" />
-                                <label className="ml-2">Disable</label>
-                                <RadioButton inputRef={inputRef.tlcerror[0]} name="tlcerror" value={true} />
-                                <label className="ml-2">Yes</label>
-                                <RadioButton inputRef={inputRef.tlcerror[1]} name="tlcerror" value={false} />
-                                <label className="ml-2">No</label>
-
-                            </div>
-
-
-
-                        </div> */}
+                <FormInput inpRef={inputRef['assureurl']} label={'Avo Assure URL'} placeholder={'Avo Assure Application URL'}/>
+                <div>
+                <FormInput inpRef={inputRef['conctimeout']} type={'number'} label={'Connection Timeout'} placeholder={'Connection Timeout (in milliseconds)'}/>
+                <FormInput inpRef={inputRef['grettimeout']} type={'number'} label={'Greeting Timeout'} placeholder={'Greeting Timeout (in milliseconds)'}/>
+                <FormInput inpRef={inputRef['socktimeout']} type={'number'} label={'Socket Timeout'} placeholder={'Socket Timeout (in milliseconds)'}/>
+                </div>
+                        
                       <div className='col-xs-9 form-group input-label checkbox-email'>
                     <span>
                         <input onChange={fn.showPool} id='checkboxpool' ref={inputRef['checkboxpool']} type='checkbox'></input>
@@ -284,11 +241,11 @@ const[servername,setServername]=useState('')
 
             </div>
             <div className="adminActionBtn">
-                <button ref={inputRef["toggleStatus"]} className="a__btn btn-edit" onClick={onClickToggle} title="Disable">Disable</button>
-                <button ref={inputRef["toggleUppdate"]} className="a__btn btn-edit" onClick={onClickUpdate}  title="Update">Create</button>
+                <Button ref={inputRef["toggleStatus"]} className="disabelbtn" onClick={onClickToggle} title="Disable">Disable</Button>
+                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update">Save</Button>
                 {/* <button Ref={inputRef["toggleTest"]} className="a__btn " onClick={onClickTest}  title="Test">Test</button> */}
                 
-                 <Button  className="test_button" size="small" onClick={onClickTest}>
+                 <Button  className="testbtn" size="small" onClick={onClickTest}>
                         Test
                     </Button>
                 <Dialog header="Header" visible={visible} style={{ width: '50vw', height: '40%' }} onHide={() => setVisible(false)}>
@@ -396,8 +353,8 @@ const selectProvider = async ({ inputRef, showPool, showAuth, showAll, showProxC
         inputRef.toggleUppdate.current.innerText = 'Update'
         inputRef.servername.current.value = data.name
         if (data.name) inputRef.servername.current.readOnly = true
-        inputRef.host.current.value = data.host
-        inputRef.port.current.value = data.port
+        inputRef.smtpHost.current.value = data.smtpHost ? data.smtpHost : data.host
+        inputRef.smtpPort.current.value =  data.smtpPort ? data.smtpPort : data.port
         inputRef.serverstatus.current.innerText = data.active ? 'Active' : 'InActive'
         inputRef.serverstatus.current.style.color = data.active ? 'green' : 'red'
         inputRef.toggleStatus.current.innerText = data.active ? "Disable" : "Enable"
@@ -507,16 +464,16 @@ const getConfObj = (inputRef) => {
         channel: 'email',
         provider: 'smtp',
         name: inputRef.servername.current.value,
-        host: inputRef.host.current.value,
-        port: inputRef.port.current.value,
+        smtpHost: inputRef.smtpHost.current.value,
+        smtpPort: inputRef.smtpPort.current.value,
         auth: {
-            type: inputRef.selectauth.current.value,
-            username: inputRef.authname.current.value,
-            password: inputRef.authpassword.current.value
+            type:inputRef.selectauth.current.value,
+            username:inputRef.authname.current.value,
+            password:inputRef.authpassword.current.value
         },
         sender: {
-            name: inputRef.sendername.current.value,
-            email: inputRef.senderaddr.current.value
+            name:inputRef.sendername.current.value,
+            email:inputRef.senderaddr.current.value
         },
         appurl: inputRef.assureurl.current.value,
         pool: {
@@ -536,18 +493,18 @@ const getConfObj = (inputRef) => {
             socket: inputRef.socktimeout.current.value,
             connection: inputRef.conctimeout.current.value
         },
-        enabletls: (() => {
+        enabletls: (()=>{
             var key;
-            Object.keys(inputRef.secureconnect).some(e => {
-                if (inputRef.secureconnect[e].current.checked) key = e
+            Object.keys(inputRef.secureconnect).some(e=>{
+                if(inputRef.secureconnect[e].current.checked)key = e
                 return inputRef.secureconnect[e].current.checked
             })
             return key
         })(),
-        insecuretls: (() => {
+        insecuretls: (()=>{
             var key;
-            Object.keys(inputRef.tlcerror).some(e => {
-                if (inputRef.tlcerror[e].current.checked) key = e
+            Object.keys(inputRef.tlcerror).some(e=>{
+                if(inputRef.tlcerror[e].current.checked)key = e
                 return inputRef.tlcerror[e].current.checked
             })
             return key
@@ -564,7 +521,7 @@ const validate = (inputRef, displayError) => {
     // eslint-disable-next-line
     const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-    var arr = ['selectprovider', 'selectauth', 'host', 'servername', 'port', 'sendername', 'senderaddr', 'assureurl']
+    var arr = ['selectprovider', 'selectauth', 'smtpHost', 'servername', 'smtpPort', 'sendername', 'senderaddr', 'assureurl']
     if (inputRef.checkproxyurl.current.value === 'true') {
         arr.push('proxyurl')
         if (inputRef.checkproxycred.current.value === 'true') arr.push('proxyuser', 'proxypass')
@@ -580,7 +537,7 @@ const validate = (inputRef, displayError) => {
             if (!popped) displayError(MSG.ADMIN.WARN_INVALID_SERVER_NAME);
             flag = false;
             popped = true;
-        } else if (e === 'port' && !((+inputRef[e].current.value >= 0) && (+inputRef[e].current.value < 65536))) {
+        } else if (e === 'smtpPort' && !((+inputRef[e].current.value >= 0) && (+inputRef[e].current.value < 65536))) {
             inputRef[e].current.style.outline = errBorder
             if (!popped) displayError(MSG.ADMIN.WARN_SERVER_PORT);
             flag = false;

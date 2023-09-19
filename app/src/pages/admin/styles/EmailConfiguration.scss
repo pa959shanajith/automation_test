@@ -58,3 +58,97 @@
     background: transparent;
     color: black;
 }
+.providerdropdown{
+    margin-left: 1rem;
+    width: 20%;
+}
+.provider{
+    line-height: 3rem;
+    font-weight: bold;
+    font-family: "Open Sans";
+    margin-left: 1rem;
+    font-size: 1rem;
+}
+.email_setting_header{
+    line-height: 3rem;
+    font-weight: bold;
+    font-family: "Open Sans";
+    margin-left: 1rem;
+    margin-top: 1.2rem;
+    font-size: 1.1rem;
+}
+.hostname{
+    font-weight: 700;
+    line-height: 3rem;
+    margin-left: 1.4rem;
+    margin-bottom: -1rem;
+}
+.server_name{
+    margin-left: 3rem;
+    width: 20%;
+    font-family: "Open Sans";
+}
+.servername{
+
+    margin-left: -70rem;
+    font-weight: bold;
+    font-family: "Open Sans";
+}
+.portname{
+    margin-left: 1rem;
+    font-weight: bold;
+    line-height: 5rem;
+    font-family: "Open Sans";
+}
+.Auth_dropdown{
+    font-family: Open Sans;
+    margin-left: -83rem;
+    width: 19rem;
+    display: flex;
+    margin-top: 1rem;
+}
+.Authname{
+    font-weight: bold;
+    font-family: "Open Sans";
+    margin-left: 1rem;
+    line-height: 3rem;
+}
+.savebtn{
+    float: right;
+    margin-right: 76rem;
+    margin-top: 1rem;
+}
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth-label {
+    margin-left: -156rem;
+    margin-top: 11rem;
+    font-family: "Open Sans";
+    font-weight: bold;
+}
+.testbtn{
+    float: right;
+    height: 3rem;
+    justify-content: center;
+    margin-right: -42rem;
+    width: 5rem;
+    margin-top: 1rem;
+}
+.disabelbtn{
+    float: left;
+    margin-top: 1.2rem;
+    margin-left: 2rem;
+    .p-button {
+        /* background: #6366f1; */
+        border: transparent;
+        border-radius: 6px;
+        color: black;
+        font-size: 1rem;
+        padding: 0.75rem 1.25rem;
+        transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s;
+    }
+}
