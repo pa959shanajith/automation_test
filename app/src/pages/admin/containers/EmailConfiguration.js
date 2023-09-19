@@ -118,7 +118,7 @@ const[servername,setServername]=useState('')
         }
         emailRef.current.style.outline = ''
         setErrMsg('Sending...')
-        const arg = { channel: confObj.channel, provider: confObj.provider, recipient: emailRef.current.value, conf: confObj }
+        const arg = { channel: emailTest.channel, provider: emailTest.provider, recipient:emailRef.current.value, conf: emailTest }
         var data = await testNotificationChannels(arg)
         if (data.error) { setErrMsg(data.error.CONTENT); return; }
         else setErrMsg(data.CONTENT);
@@ -126,8 +126,8 @@ const[servername,setServername]=useState('')
 
     const onSelectProvider = (event) => {
         selectProvider({ inputRef, ...fn, displayError, setLoading });
-        // const selectedValue = event.value;
-        // setSelectedProvider(selectedValue);
+        const selectedValue = event.value;
+        setSelectedProvider(selectedValue);
         
     }
     const onClickTest = () => {
@@ -176,6 +176,10 @@ const[servername,setServername]=useState('')
                         <FormInput inpRef={inputRef['smtpHost']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
                             <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
                         </div>
+                        <div className='col-xs-9 form-group input-label'>
+                    <label>Status</label>
+                    <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>
+                </div>
                         <div>
                             <lable className="portname">Port Number </lable>
                         </div>
@@ -195,6 +199,8 @@ const[servername,setServername]=useState('')
                         <FormInput inpRef={inputRef['authname']} label={'Authentication Username'} placeholder={'Authentication Username'} disabled={!inputEnabled}/>
                         <FormInput inpRef={inputRef['authpassword']} label={'Authentication Password'} placeholder={'Authentication Password'} disabled={!inputEnabled}/>
                         </div>
+                        <FormInput inpRef={inputRef['sendername']} label={'Sender Name'} placeholder={'Avo Assure Alerts'}/>
+                <FormInput inpRef={inputRef['senderaddr']} label={'Sender Address'} placeholder={'avoassure-alerts@avoautomation.com'}/>
                 <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto","Enable","Disable"]}/>
                 <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes","No"]}/>
                 <FormInput inpRef={inputRef['assureurl']} label={'Avo Assure URL'} placeholder={'Avo Assure Application URL'}/>
@@ -236,7 +242,7 @@ const[servername,setServername]=useState('')
             </div>
             <div className="adminActionBtn">
                 <Button ref={inputRef["toggleStatus"]} className="disabelbtn" onClick={onClickToggle} title="Disable">Disable</Button>
-                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update">Create</Button>
+                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update">Save</Button>
                 {/* <button Ref={inputRef["toggleTest"]} className="a__btn " onClick={onClickTest}  title="Test">Test</button> */}
                 
                  <Button  className="testbtn" size="small" onClick={onClickTest}>
