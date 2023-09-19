@@ -161,9 +161,9 @@ const[servername,setServername]=useState('')
             <div className='full_page'>
                 <>
                 
-                <div>
+                {/* <div>
                         <label required className='provider'> select provider</label>
-                    </div>
+                    </div> */}
                     <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
                     {/* <Dropdown  className='providerdropdown' ref={inputRef['selectprovider']}  value={selectedProvider} options={['SMTP']} onChange={onSelectProvider} placeholder="Select Provider" id="selectprovider" /> */}
                     <div className='email_setting_header'>
@@ -242,7 +242,7 @@ const[servername,setServername]=useState('')
             </div>
             <div className="adminActionBtn">
                 <Button ref={inputRef["toggleStatus"]} className="disabelbtn" onClick={onClickToggle} title="Disable">Disable</Button>
-                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update">Save</Button>
+                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update">Create</Button>
                 {/* <button Ref={inputRef["toggleTest"]} className="a__btn " onClick={onClickTest}  title="Test">Test</button> */}
                 
                  <Button  className="testbtn" size="small" onClick={onClickTest}>
