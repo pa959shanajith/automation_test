@@ -18,8 +18,8 @@
             // flex-direction: row;
             // justify-content: space-evenly;
             .but{
-                width: 9%;
-                height: 86%;
+                width: 6.5rem;
+                height: 2.4rem;
 
             }
             h2{
@@ -29,11 +29,12 @@
         }
     }
     .grid{
-        height: 93%;
-        width:100%; 
         flex-direction: row;
+        height: 37.5rem;
         margin-top: 0.1rem;
         overflow-y: scroll;
+        width: 100%;
+        min-height: 37rem;
     }
     .Card{
         height: 100%;
