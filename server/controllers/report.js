@@ -14,7 +14,8 @@ var path = require('path');
 const tokenAuth = require('../lib/tokenAuth');
 const constants = require('../lib/execution/executionConstants');
 const Handlebars = require('../lib/handlebar.js');
-
+var axios  =  require('axios');
+var https = require('https')
 // PDF EXPORT
 wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
@@ -78,11 +79,11 @@ const formatDate = (date) => {
 // };
 
 // To load screenshot from ICE
-const openScreenShot = async (username, path) => {
+const openScreenShot = async (username, path,host) => {
     const fnName = "openScreenShot";
     try {
         var mySocket;
-		var clientName=utils.getClientName(req.headers.host);
+		var clientName=utils.getClientName(host);
         var icename = undefined
 		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
         mySocket = myserver.allSocketsMap[clientName][icename];
@@ -117,7 +118,7 @@ const openScreenShot = async (username, path) => {
 exports.openScreenShot_API = async (req, res) => {
     try {
         const username = req.body.username; //req.session.username;
-        const result = await openScreenShot(username, req.body.absPath);
+        const result = await openScreenShot(username, req.body.absPath,req.body.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
@@ -128,7 +129,7 @@ exports.openScreenShot_API = async (req, res) => {
 exports.openScreenShot = async (req, res) => {
     try {
         const username = req.session.username;
-        const result = await openScreenShot(username, req.body.absPath);
+        const result = await openScreenShot(username, req.body.absPath,req.body.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
@@ -224,6 +225,12 @@ exports.connectJira_ICE = function(req, res) {
         var icename = undefined
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
         mySocket = myserver.allSocketsMap[clientName][icename];	
+        var dataToIce = {
+            "emitAction": "jiralogin",
+            "username": icename,
+            "action": req.body.action,
+            "inputs": inputs
+        };
         if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
             var jiraurl = req.body.url;
             var jirausername = req.body.username;
@@ -1289,7 +1296,8 @@ exports.viewReport = async (req, res, next) => {
                     },
                     data: {
                         "absPath": scrShots.paths,
-                        "username": req.session.username
+                        "username": req.session.username,
+                        "client": req.session.client
                     },
                     credentials: 'include',
                 })
