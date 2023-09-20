@@ -45,6 +45,7 @@ const EmailConfiguration = ({ resetMiddleScreen }) => {
 const [ignoreTlsErrors, setIgnoreTlsErrors] = useState("Yes");
 const[hostname,setHostname]=useState('');
 const[servername,setServername]=useState('')
+const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
 
     useEffect(() => {
         //on reset dismount component to show loading screen
@@ -122,12 +123,13 @@ const[servername,setServername]=useState('')
         var data = await testNotificationChannels(arg)
         if (data.error) { setErrMsg(data.error.CONTENT); return; }
         else setErrMsg(data.CONTENT);
+        setIsCreateButtonDisabled(false);
     }
 
     const onSelectProvider = (event) => {
         selectProvider({ inputRef, ...fn, displayError, setLoading });
-        const selectedValue = event.value;
-        setSelectedProvider(selectedValue);
+        // const selectedValue = event.value;
+        // setSelectedProvider(selectedValue);
         
     }
     const onClickTest = () => {
@@ -242,7 +244,7 @@ const[servername,setServername]=useState('')
             </div>
             <div className="adminActionBtn">
                 <Button ref={inputRef["toggleStatus"]} className="disabelbtn" onClick={onClickToggle} title="Disable">Disable</Button>
-                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update">Create</Button>
+                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update"  disabled={isCreateButtonDisabled}>Create</Button>
                 {/* <button Ref={inputRef["toggleTest"]} className="a__btn " onClick={onClickTest}  title="Test">Test</button> */}
                 
                  <Button  className="testbtn" size="small" onClick={onClickTest}>
