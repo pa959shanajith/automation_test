@@ -9,7 +9,7 @@ import { fetchProjects } from "../api"
 import { useSelector, useDispatch } from 'react-redux';
 import { getStep } from './VerticalComponentsSlice';
 import { loadUserInfoActions } from '../LandingSlice';
-
+const moment = require('moment');
 
 
 const DisplayProject = (props) => {
@@ -66,41 +66,59 @@ const DisplayProject = (props) => {
 
 
   const DateTimeFormat = (inputDate) => {
-    const convertedDate = new Date(inputDate);
-    const offsetHours = 5;
-    const offsetMinutes = 30;
-    convertedDate.setHours(convertedDate.getHours() - offsetHours);
-    convertedDate.setMinutes(convertedDate.getMinutes() - offsetMinutes);
-    var currentDate = new Date();
-    var previousDate = new Date(convertedDate);
-    var timeDifference = currentDate.getTime() - previousDate.getTime();
-    var seconds = Math.floor(timeDifference / 1000) % 60;
-    var minutes = Math.floor(timeDifference / (1000 * 60)) % 60;
-    var minute_ago = minutes > 1 ? " minutes" : " minute";
-    var hours = Math.floor(timeDifference / (1000 * 60 * 60)) % 24;
-    var hours_ago = hours > 1 ? " hours" : " hour";
-    var days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-    var months = Math.floor(days / 30);
-    var months_ago = months > 1 ? " months" : " month";
-    var years = Math.floor(months / 12);
-    var years_ago = years > 1 ? " years" : " year";
-    var output = "";
-    if (years == 0 && months == 0 && hours == 0 && minutes == 0 && seconds >= 0) {
-      output = "Created now";
-    }
-    else if (years == 0 && months == 0 && hours == 0 && minutes >= 1) {
-      output = "Last Edited " + minutes + minute_ago + " ago";
-    }
-    else if (years == 0 && months == 0 && hours >= 1) {
-      output = "Last Edited " + hours + hours_ago + " ago";
-    }
-    else if (years == 0 && months >= 1) {
-      output = "Last Edited on " + inputDate.slice(5, 11);
-    }
-    else {
-      output = "Last Edited " + years + years_ago + " ago";
-    }
+    // Provided date
+    const providedDate = new Date(inputDate);
 
+    // Current date
+    const currentDate = new Date();
+
+    // Calculate the time difference in milliseconds
+    const timeDifference = currentDate - providedDate;
+
+    // Calculate years, months, days, hours, and seconds
+    const millisecondsInASecond = 1000;
+    const millisecondsInAMinute = 60 * millisecondsInASecond;
+    const millisecondsInAnHour = 60 * millisecondsInAMinute;
+    const millisecondsInADay = 24 * millisecondsInAnHour;
+    const millisecondsInAYear = 365 * millisecondsInADay;
+
+    // const years = Math.floor(timeDifference / millisecondsInAYear);
+    // const months = Math.floor((timeDifference % millisecondsInAYear) / (30 * millisecondsInADay)); // Assuming 30 days in a month for simplicity
+    // const days = Math.floor((timeDifference % millisecondsInADay) / millisecondsInADay);
+    // const hours = Math.floor((timeDifference % millisecondsInADay) / millisecondsInAnHour);
+    // const minutes = Math.floor((timeDifference % millisecondsInAnHour) / millisecondsInAMinute);
+    // const seconds = Math.floor((timeDifference % millisecondsInAMinute) / millisecondsInASecond);
+
+    const date1 = moment(inputDate, 'ddd, DD MMM YYYY HH:mm:ss ZZ');
+    const date2 = moment(new Date(), 'ddd MMM DD YYYY HH:mm:ss ZZ');
+
+    //convert the difference to other units, such as seconds, minutes, hours, etc.
+    const seconds = date2.diff(date1, 'seconds');
+    const minutes = date2.diff(date1, 'minutes');
+    const hours = date2.diff(date1, 'hours');
+    const days = date2.diff(date1, 'days');
+    const months = date2.diff(date1, 'months');
+    const years = date2.diff(date1, 'years');
+
+    let output="";
+      if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0 && seconds >= 0) {
+        output = "Created now";
+      }
+      else if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes >= 1) {
+        output = `Last Edited ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      }
+      else if (years <= 0 && months <= 0 && days <= 0 && hours >= 1) {
+        output = `Last Edited ${hours} hr${hours > 1 ? 's' : ''} ago`;
+      }
+      else if (years <= 0 && months <= 0 && days >=1) {
+        output = `Last Edited ${days} day${days > 1 ? 's' : ''} ago`;
+      }
+      else if (years <= 0 && months >= 1) {
+        output = `Last Edited ${months} month${months > 1 ? 's' : ''} ago`;
+      }
+      else {
+        output = `Last Edited ${years} year${years > 1 ? 's' : ''} ago`;
+      }
     return output;
   }
 
@@ -180,6 +198,7 @@ const DisplayProject = (props) => {
     setSelectedsortItems(item);
     setSortVisible(false);
   };
+  
   const sortByModified = (item) => {
     const sortedProjects = [...getProjectLists].sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
     setProjectList(sortedProjects);
