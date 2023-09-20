@@ -1151,15 +1151,20 @@ const footerSave = (
     <div> <p>Note :This will completely refresh all <strong>Captured Elements</strong> on the screen. In case you want to Capture only additional elements use the <strong>"Add More"</strong> option </p></div>
   )
   const onHighlight = () => {
-    capturedDataToSave.map((object) => {
-      if (objValues.val === object.val) setActiveEye(true);
-      else if (activeEye) setActiveEye(false);
-        setHighlight(true);
-    })
-    let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
-    dispatch(objValue(objVal));
-            setHighlight(true);
-   }
+    setActiveEye((prevActiveEye) => !prevActiveEye);
+    if (activeEye !== false) {
+      let objVal = selectedCapturedElement[0].objectDetails || {};
+      let objValClone = { ...objVal };
+      let keyCount = Object.keys(objVal).length;
+      if (keyCount > 0) {
+        keyCount++;
+        objValClone['keycount'] = keyCount;
+      }
+      dispatch(objValue(objValClone));
+    } else {
+      setHighlight(true);
+    }
+  };
 
   useEffect(() => {
     if (mirror.scrape) {
@@ -1189,7 +1194,7 @@ const footerSave = (
 
 
   useEffect(() => {
-    if (objValues.val !== null || highlight!==false) {
+    if (objValues.val !== null) {
       let ScrapedObject = objValues;
 
       let top = 0; let left = 0; let height = 0; let width = 0;
@@ -1254,7 +1259,7 @@ const footerSave = (
         // highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
       } else setHighlight(false);
       if (ScrapedObject.xpath && !ScrapedObject.xpath.startsWith('iris')) {
-        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
+        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, typesOfAppType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
           .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
             if (data === "fail") return null;
@@ -1264,7 +1269,7 @@ const footerSave = (
     }
     else setHighlight(false);
     //eslint-disable-next-line
-  }, [objValues,highlight])
+  }, [objValues])
 
 
   const handleDataTableContentChange = (newData) => {
@@ -1278,9 +1283,10 @@ const footerSave = (
     <div>
           <img data-test="eyeIcon" className="ss_eye_icon_screen"
             onClick={onHighlight}
-            src={activeEye ? 
-              "static/imgs/eye-active.svg" : 
-              "static/imgs/eye_disabled.svg"} 
+            src={!activeEye ?
+              "static/imgs/eye-active.svg" :
+              "static/imgs/eye_disabled.svg"}
+              alt='eyeIcon'
           />
         </div>
       <div className='header__popup screenshot_headerName'>
@@ -1434,8 +1440,6 @@ const footerSave = (
     setElementValues(e.value)
   }
   const openElementProperties = (rowdata) => {
-    if(rowdata.objectDetails.objId!==undefined)
-    {
     console.log(rowdata)
     let element = rowdata.objectDetails.xpath.split(';')
     let dataValue = []
@@ -1458,11 +1462,6 @@ const footerSave = (
     dataValue.sort((a, b) => a.id - b.id)
     setElementValues(dataValue)
     setElementProperties(true)
-  }
-  else {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the Captured Element to view/edit the element properties', life: 5000 });
-  }
-
   }
   const Header = () => {
     return (
@@ -1807,7 +1806,7 @@ const headerstyle={
             <div className="ref_pop screenshot_pop">
               <div className="screenshot_pop__content" >
                 {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} style={{height: typesOfAppType==="Desktop"?"17rem":typesOfAppType==="OEBS"?"35vh":""}} alt="Screenshot Image" />
               </div>
             </div>
           </Dialog>

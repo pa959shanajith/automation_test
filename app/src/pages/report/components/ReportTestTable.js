@@ -28,6 +28,8 @@ export default function BasicDemo() {
   const [loginKey, setLoginKey] = useState("");
   const [loginUrl, setLoginUrl] = useState("");
   const [searchTest, setSearchTest] = useState("");
+  const [inputSummary, setInputSummary] = useState("");
+  const [inputDesc, setInputDesc] = useState("");
   const [userData, setUserData] = useState({});
   const [visibleBug, setVisibleBug] = useState(false);
   const [logBug, setLogBug] = useState(false);
@@ -54,6 +56,7 @@ export default function BasicDemo() {
   const bugRef = useRef(null);
   const userRef = useRef(null);
   const iceinfo = useRef(null);
+  const jiraconnect = useRef(null);
   useEffect(() => {
     const getQueryParam = () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -67,15 +70,23 @@ export default function BasicDemo() {
     setReportId(id);
   }, []);
 
+  const getReportsTable = async() => {
+    if(reportid){
+      const view = await viewReport(reportid);
+      setReportData(JSON.parse(view));
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      if(reportid){
-        const view = await viewReport(reportid);
-        setReportData(JSON.parse(view));
-      }
-    })();
+    getReportsTable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportid]);
+
+  useEffect(() => {
+    setInputSummary(selectedRow[0]?.Comments);
+    setInputDesc(selectedRow[0]?.StepDescription);
+  }, [selectedRow]);
+
   useEffect(() => {
     const parent = [];
     if (reportData && Array.isArray(reportData?.rows)) {
@@ -102,7 +113,12 @@ export default function BasicDemo() {
   };
 
   const onBugBtnClick = async (getBtn) => {
-    if (getBtn === "Cancel") setVisibleBug(false);
+    if (getBtn === "Cancel") {
+      setVisibleBug(false);
+      setLoginName("");
+      setLoginKey("");
+      setLoginUrl("");
+    }
     else if (getBtn === "Connect") {
       if (bugTitle === "Jira") {
         const getJiraDetails = await connectJira_ICE(
@@ -146,7 +162,22 @@ export default function BasicDemo() {
   };
 
   const onLogBugBtnClick = async(getClick) => {
-    if (getClick === "Cancel") setLogBug(false);
+    if (getClick === "Cancel") {
+      setJiraDropDown(null);
+      setLogBug(false);
+      setIssueDropDown(null);
+      setJiraDetails({projects: [], issuetype: []});
+      setMappedProjects({});
+      setConfigureFeilds([]);
+      setSelectedFiels([]);
+      setSelectedFiels([]);
+      setResponseFeilds({});
+      setConfigValues({});
+      setSelectedRow([]);
+      setLoginName("");
+      setLoginKey("");
+      setLoginUrl("");
+    }
     else if (getClick === "Proceed") { 
       const valueObj = {};
       if(bugTitle !== "Jira"){
@@ -229,8 +260,8 @@ export default function BasicDemo() {
               issue_dict: {
                 project: jiraDropDown?.id,
                 issuetype: issueDropDown?.name,
-                summary: selectedRow[0]?.Comments,
-                description: selectedRow[0]?.StepDescription,
+                summary: inputSummary,
+                description: inputDesc,
                 url: loginUrl,
                 username: loginName,
                 password: loginKey,
@@ -257,11 +288,11 @@ export default function BasicDemo() {
                     error: false,
                   },
                   summary: {
-                    value: selectedRow[0]?.Comments,
+                    value: inputSummary,
                     error: false,
                   },
                   reproSteps: {
-                    value: selectedRow[0]?.StepDescription,
+                    value: inputDesc,
                     error: false,
                   },
                   parentIssueId: {
@@ -287,6 +318,13 @@ export default function BasicDemo() {
               },
               action: "createIssueInAzure",
             });
+      if(userDetails === "Fail"){
+        jiraconnect?.current?.show({ severity: 'info', summary: 'Info', detail: 'Fail to log a bug.' });
+      }
+      else{
+        getReportsTable();
+        setLogBug(false);
+      };
     }
   };
 
@@ -488,7 +526,11 @@ export default function BasicDemo() {
                 loginUrl,
                 loginName,
                 loginKey,
-                jiraDetails?.projects
+                jiraDetails?.projects.map((el) => ({
+                  code: el?.code,
+                  key: el?.id,
+                  text: el?.name,
+                }))
               )
             : await connectAzure_ICE_Fields(
                 jiraDropDown?.id,
@@ -496,7 +538,11 @@ export default function BasicDemo() {
                 loginUrl,
                 loginName,
                 loginKey,
-                jiraDetails?.projects
+                jiraDetails?.projects.map((el) => ({
+                  code: el?.code,
+                  key: el?.id,
+                  text: el?.name,
+                }))
               );
         setResponseFeilds(getFields);
         const fieldValues = Object.keys(getFields).map((el) => ({
@@ -608,6 +654,7 @@ export default function BasicDemo() {
         <Column header="Action" style={{ padding: "0rem" }} />
       </TreeTable>
       <Toast ref={iceinfo} />
+      <Toast ref={jiraconnect} />
       <OverlayPanel ref={filterRef} className="reports_download">
         {filterValues.map((category) => {
           return (
@@ -751,7 +798,8 @@ export default function BasicDemo() {
                 name="Summary"
                 rows={2}
                 className="text_desc"
-                value={selectedRow[0]?.Comments}
+                value={inputSummary}
+                onChange={(e) => setInputSummary(e.target.value)}
               />
             </div>
             <div className="col-12">
@@ -770,7 +818,8 @@ export default function BasicDemo() {
                 name="Description"
                 rows={2}
                 className="text_desc"
-                value={selectedRow[0]?.StepDescription}
+                value={inputDesc}
+                onChange={(e) => setInputDesc(e.target.value)}
               />
             </div>
             {!Array.isArray(mappedProjects) && (

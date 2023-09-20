@@ -18,7 +18,8 @@ const SessionManagement = (props) => {
     const [clients,setClients] = useState([])
     const [lockedusers,setLockedusers] = useState([]);
     const [actions,setActions] = useState('');
-    const [indexs,setIndexs] = useState();
+    const [indexForClient,setIndexForClient] = useState();
+    const [indexForSession,setIndexForSession] = useState();
 
     useEffect(()=>{
         refreshSessMgmt();
@@ -72,21 +73,21 @@ const SessionManagement = (props) => {
 // tempElement.innerHTML = retrivedText; // Set the innerHTML of the temporary element
 // var action = tempElement.textContent || tempElement.innerText; // Extract the text content
 // console.log(action); // This will give you "Logout"
-const action = actions
+const action = event.currentTarget.innerText
 		// var id = parseInt(event.target.value);
         var msg, rootObj, key, obj;
         var temp = 0;
 		if (action === "logout") {
-            var id = parseInt(indexs)
-			msg = "Logging out ";
+            var id = parseInt(event.currentTarget.getAttribute("data-id"))
+			msg = "Logging out";
 			rootObj = sessions;
 			obj = rootObj[id];
             // console.log("rootObj[id]",rootObj[id])
             key = obj.id;
             temp = 1;
 		} else {
-            var id = parseInt(indexs)
-			msg = "Disconnecting ";
+            var id = parseInt(event.currentTarget.getAttribute("data-id"))
+			msg = "Disconnecting";
 			rootObj = clients;
 			obj = rootObj[id];
             key = obj.mode;
@@ -159,15 +160,15 @@ const action = actions
                                 <Card className='userCard'>
                                 <div className='userBut'>
                                     <div className='user'>
-                                  <span className='userTitle'>Username</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
+                                  <span className='userTitle fontTag fontT'>Username</span><span className='semicolanU'>:</span><h4 className='userName fontResults fontR'>{user.username}</h4>
                                   </div>
-                                  <Button  onClick={(event)=>{setActions('logout'); setIndexs(index);disconnectLogoff(event);}}  outlined  label='logout'/>
+                                  <Button data-id={index} onClick={(event)=>{setActions('logout'); setIndexForSession(index);disconnectLogoff(event);}}  outlined  label='logout'/>
                                 </div>
                                 <div className='role'>
-                                  <span className=''>Role</span><span className='semicolanR'>:</span><h4 className='roleName'>{user.role}</h4>
+                                  <span className='fontTag fontT'>Role</span><span className='semicolanR'>:</span><h4 className='roleName fontResults fontR'>{user.role}</h4>
                                 </div>
                                 <div className='lastLogged'>
-                                  <span>Last Logged In</span><span className='semicolanL'>:</span><h4>{formatDate(user.loggedin)}</h4>
+                                  <span className='fontTag fontT'>Last Logged In</span><span className='semicolanL'>:</span><h4 className='fontResults fontR'>{formatDate(user.loggedin)}</h4>
                                 </div>
                               </Card>
                               
@@ -187,12 +188,12 @@ const action = actions
                                 <Card className='userCard'>
                                 <div className='userBut'>
                                     <div className='user'>
-                                  <span>Avo Client Name</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
+                                  <span className='fontTag fontT'>Avo Client Name</span><span className='semicolanU'>:</span><h4 className='userName fontResults fontR'>{user.username}</h4>
                                   </div>
-                                  <Button   onClick={(event)=>{setActions('disconnect');setIndexs(index);disconnectLogoff(event);}} outlined  label='disconnect'/>
+                                  <Button data-id={index}  onClick={(event)=>{setActions('disconnect');setIndexForClient(index);disconnectLogoff(event);}} outlined  label='disconnect'/>
                                 </div>
                                 <div className='ipContainer'>
-                                  <span className='IP'>IP</span><span className='semicolan'>:</span><h4>{user.ip}</h4>
+                                  <span className='IP fontTag fontT'>IP</span><span className='semicolan'>:</span><h4 className='fontResults fontR'>{user.ip}</h4>
                                 </div>
                               </Card>
                             </div>
@@ -210,12 +211,12 @@ const action = actions
                                 <Card className='userCard'>
                                 <div className='userBut'>
                                     <div className='user'>
-                                  <span>User Name</span><span className='semicolanU'>:</span><h4 className='userName'>{user.username}</h4>
+                                  <span className='fontTag fontT'>User Name</span><span className='semicolanU'>:</span><h4 className='userName fontResults fontR'>{user.username}</h4>
                                   </div>
                                   <Button data-id={index} onClick={(event)=>{unlock(event)}}  outlined  label='Unlock'/>
                                 </div>
                                 <div className='ipContainer'>
-                                  <span className='IP'>Role</span><span className='semicolan'>:</span><h4>{user.role}</h4>
+                                  <span className='IP fontTag fontT'>Role</span><span className='semicolan'>:</span><h4 className='fontResults fontR'>{user.role}</h4>
                                 </div>
                               </Card>
                             </div>
