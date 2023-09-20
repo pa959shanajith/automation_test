@@ -75,7 +75,7 @@ module.exports.delSession = async (data,host) => {
 	var clientName=this.getClientName(host);
 	if (data.action == "disconnect") {
 		if(clientName in mySocket.allSocketsMap && data.user in mySocket.allSocketsMap[clientName]){
-			mySocket.allSocketsMap[clientName][data.user].disconnect(false);
+			mySocket.allSocketsMap[clientName][data.user].emit("killSession", data.cmdBy, data.reason);
 		}
 		return true;
 	} else {

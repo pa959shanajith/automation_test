@@ -224,6 +224,12 @@ exports.connectJira_ICE = function(req, res) {
         var icename = undefined
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
         mySocket = myserver.allSocketsMap[clientName][icename];	
+        var dataToIce = {
+            "emitAction": "jiralogin",
+            "username": icename,
+            "action": req.body.action,
+            "inputs": inputs
+        };
         if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
             var jiraurl = req.body.url;
             var jirausername = req.body.username;
