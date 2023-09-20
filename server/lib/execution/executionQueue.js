@@ -832,10 +832,16 @@ module.exports.Execution_Queue = class Execution_Queue {
                                         executionData[0]['executionData']['scenarioParallelBatchId'] = batchId;
                                     }
                                 }
-                                const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
-                                    'body': executionData[0],
-                                    'session':executionData[0].session,
-                                });
+                                // const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
+                                //     'body': executionData[0],
+                                //     'session':executionData[0].session,
+                                //     'req':req
+                                // });
+                                let updatedReq = {};
+                                updatedReq = {...req};
+                                updatedReq['body'] = executionData[0];
+                                updatedReq['session'] = executionData[0].session;
+                                const executionRequest = await suitFunctions.ExecuteTestSuite_ICE(updatedReq);
                                 if (executionData == "fail" || executionData == "forbidden") {
                                     response['status'] = "fail";
                                     return response;
