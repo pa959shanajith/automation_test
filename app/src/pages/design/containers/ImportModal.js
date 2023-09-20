@@ -157,14 +157,14 @@ const ImportModal = props => {
         title={'Import'}
         modalClass="modal-md"
         close={()=>props.setShow(false)}
-        content={<Content selectedSheet={selectedSheet} setSelectedSheet={setSelectedSheet} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay} setUploadingFile={setUploadingFile}/>}
+        content={<Content selectedSheet={selectedSheet} setSelectedSheet={setSelectedSheet} fileUpload={fileUpload} setError={setError} importType={importType} importFormat={importFormat} setImportType={setImportType} setOverlay={setOverlay} setUploadingFile={setUploadingFile} appType={appType}/>}
         footer={<Footer onImport={onImport} error={error} uploadingFile={uploadingFile}/>}
     />
     )
     
 }
 
-const Content = ({fileUpload,importType,setImportType,setError,importFormat,setOverlay,setUploadingFile,selectedSheet,setSelectedSheet}) =>{
+const Content = ({fileUpload,importType,setImportType,setError,importFormat,setOverlay,setUploadingFile,selectedSheet,setSelectedSheet,appType}) =>{
     const [isUpload,setIsUpload] = useState(false)
     const [sheetList,setSheetList] = useState([])
     // Initialize with default value
@@ -175,7 +175,8 @@ const Content = ({fileUpload,importType,setImportType,setError,importFormat,setO
   };
     const importTypes = [
         {value: "json", name: "JSON"}, 
-        {value: "excel", name: "Excel"}
+        {value: "excel", name: "Excel", disabled: appType !== 'Web'}
+        
     ]
     const acceptType = {
         excel:".xls,.xlsx",
