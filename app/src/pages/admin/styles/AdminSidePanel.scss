@@ -7,7 +7,7 @@
                 border: none !important;
                 background: none !important;
                 padding: 0.7rem !important;
-
+                font: $f6_semibold;
                 &:focus {
                     border: none !important;
                     box-shadow: none !important;
@@ -19,7 +19,7 @@
             .p-accordion-content {
                 border: none !important;
                 padding: 0.5rem !important;
-                font: $f6_bold !important;
+                font: $f6_semibold !important;
 
 
 
@@ -30,7 +30,7 @@
     .sidepanel_admin {
 
         >ul>li {
-            font: $f6_bold !important;
+            font: $f6_semibold !important;
             list-style-type: none !important;
             float: left !important;
             width: 100% !important;
@@ -42,7 +42,8 @@
             margin-bottom: 0.4rem;
 
             &:hover {
-                background: #e3cff0 !important;
+                // background: #e3cff0 !important;
+                background: #FAFAFA !important;
                 border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
             }
         }
@@ -54,6 +55,47 @@
 
         .not_active_tab {
             background-color: none !important;
+            font: $f7_regular;
+        }
+        .ldap_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .saml_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .openId_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .useers_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .license_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .email_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .agent_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .grid_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .session_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .privileges_label{
+            font: $f6_regular;
+            color: #212121;
         }
     }
 }

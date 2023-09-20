@@ -1259,7 +1259,7 @@ const footerSave = (
         // highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
       } else setHighlight(false);
       if (ScrapedObject.xpath && !ScrapedObject.xpath.startsWith('iris')) {
-        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
+        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, typesOfAppType.toLowerCase(), ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
           .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
             if (data === "fail") return null;
@@ -1806,7 +1806,7 @@ const headerstyle={
             <div className="ref_pop screenshot_pop">
               <div className="screenshot_pop__content" >
                 {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} style={{height: typesOfAppType==="Desktop"?"17rem":typesOfAppType==="OEBS"?"35vh":""}} alt="Screenshot Image" />
               </div>
             </div>
           </Dialog>
