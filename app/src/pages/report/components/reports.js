@@ -29,11 +29,7 @@ const reports = () => {
     const [selectedOption, setSelectedOption] = useState("");
     const [searchReportData, setSearchReportData] = useState("");
     const [configProjectId, setConfigProjectId] = useState("");
-    const [projectList, setProjectList] = useState([
-      { id: 1, name: 'test4' },
-      { id: 2, name: 'test5' },
-      { id: 3, name: 'test4' },
-    ]);
+    const [projectList, setProjectList] = useState([]);
     const [show, setShow] = useState(false);
     const [viewBy, setViewBy] = useState(viewByOptions[0]?.value);
     const [testType, setTestType] = useState(testTypesOptions[0]?.value);
