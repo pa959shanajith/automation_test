@@ -32,6 +32,7 @@
     "express-session": "^1.15.6",
     "express-winston": "^2.4.0",
     "helmet": "^3.9.0",
+    "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "lusca": "^1.5.2",
     "multer": "^1.4.5-lts.1",
@@ -54,10 +55,10 @@
     "validator": "^9.2.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2",
+    "wkhtmltopdf": "0.4.0",
     "xlsx": "^0.12.6",
     "xml-parser": "^1.2.1",
-    "xmldom": "^0.1.27",
-    "wkhtmltopdf": "0.4.0"
+    "xmldom": "^0.1.27"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.14"

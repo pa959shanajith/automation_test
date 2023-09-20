@@ -159,7 +159,7 @@ exports.resetPassword = async (req, res) => {
         modifiedby: userData.user._id,
         modifiedbyrole: userData.user.defaultrole,
         password: password,
-        oldPassword: userData.oldpass,
+        oldPassword: "resetpassword",
 		userimage:''
       };
       const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
