@@ -214,7 +214,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	var targetUser = batchExecutionData.targetUser;
 	const type = batchExecutionData.type;
 	const poolid = batchExecutionData.poolid;
-	var result = {status:"fail",error:"Failed to execute",message:""}
+	var result = 	{status:"fail",error:"Failed to execute",message:""}
 	var userInfo = {"invokinguser":req.session.userid,"invokingusername":req.session.username,"invokinguserrole":req.session.activeRoleId,"userid": "", "username": "", "role": "","host":req.headers.host}
 	//Check if execution is normal or smart
 	if(type.toLowerCase().includes('smart')){
