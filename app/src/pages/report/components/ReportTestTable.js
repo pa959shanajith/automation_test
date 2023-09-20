@@ -430,7 +430,7 @@ export default function BasicDemo() {
           {eval(getBug?.azure_defect_id)[0]}
         </a>
       ) : (
-        <a
+        getBug?.jira_defect_id && <a
           href={getBug?.jira_defect_id
             .split(",")[1]
             .split("]")[0]
