@@ -322,11 +322,7 @@ class TestSuiteExecutor {
         const scenarioFlag = execReq.scenarioFlag;
         const channel = "normal";
         var reportType = "accessiblityTestingOnly";
-        var socket = require('../socket');
-        var mySocket;
-		var clientName=utils.getClientName(host);
-        mySocket = socket.allSocketsMap[clientName][icename];	
-        logger.info("Sending request to ICE for executeTestSuite");
+        
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
         if(execReq['executingOn'] && execReq['executingOn'] =='Agent'){
             // const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
@@ -335,6 +331,11 @@ class TestSuiteExecutor {
             return dataToIce;
         }
         else{
+            var socket = require('../socket');
+            var mySocket;
+            var clientName=utils.getClientName(host);
+            mySocket = socket.allSocketsMap[clientName][icename];	
+            logger.info("Sending request to ICE for executeTestSuite");
             mySocket.emit("executeTestSuite", execReq);
             const exePromise = async (resSent) => (new Promise((rsv, rej) => {
                 var d2R = {};
