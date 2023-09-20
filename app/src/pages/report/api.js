@@ -276,10 +276,7 @@ export const connectAzzure_ICE_create = async(data) => {
             'Content-type': 'application/json',
             },
             credentials: 'include',
-            data: {
-                issue_dict: data,
-                "action": "createIssueInAzure"
-            },
+            data: data
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             return {error:MSG.GENERIC.INVALID_SESSION};

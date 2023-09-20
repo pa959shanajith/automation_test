@@ -419,22 +419,66 @@ export default function BasicDemo() {
   }
 
   const defectIDForJiraAndAzure = (rowData) => {
-    const hasChildren = rowData?.children && (rowData?.children?.length > 0);
+    const hasChildren = rowData?.children && rowData?.children?.length > 0;
+    const returnBug = (getBug) => {
+      console.log(getBug);
+      return getBug?.azure_defect_id ? (
+        <a
+          href={eval(getBug?.azure_defect_id)[1]}
+          target="_blank"
+        >
+          {eval(getBug?.azure_defect_id)[0]}
+        </a>
+      ) : (
+        <a
+          href={getBug?.jira_defect_id
+            .split(",")[1]
+            .split("]")[0]
+            .replace(/['‘’"“”]/g, "")}
+          target="_blank"
+        >
+          {getBug?.jira_defect_id
+            .split(",")[0]
+            .split("[")[1]
+            .replace(/['‘’"“”]/g, "")}
+        </a>
+      );
+    };
 
     const getIcon = (iconType) => {
       let icon = "static/imgs/bug.svg";
-      if(iconType === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/jira_icon.svg";
-      else if(iconType === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/azure_devops_icon.svg";
+      if (
+        iconType === "Jira" &&
+        jiraDetails?.projects &&
+        !!jiraDetails?.projects.length
+      )
+        icon = "static/imgs/jira_icon.svg";
+      else if (
+        iconType === "Azure DevOps" &&
+        jiraDetails?.projects &&
+        !!jiraDetails?.projects.length
+      )
+        icon = "static/imgs/azure_devops_icon.svg";
       return icon;
-    }
-    return hasChildren ? null : (
-      rowData?.data?.jira_defect_id ? <a href={rowData?.data?.jira_defect_id.split(',')[1].split(']')[0].replace(/['‘’"“”]/g, '')} target="_blank">{rowData?.data?.jira_defect_id.split(',')[0].split('[')[1].replace(/['‘’"“”]/g, '')}</a> : <img
-          src={getIcon(bugTitle)}
-          alt="bug defect"
-        className={((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length))) ? "img_jira" : "" }
-          onClick={(e) => onBugClick(e, rowData)}
-        />
-      );
+    };
+
+    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : (
+      <img
+        src={getIcon(bugTitle)}
+        alt="bug defect"
+        className={
+          (bugTitle === "Jira" &&
+            jiraDetails?.projects &&
+            !!jiraDetails?.projects.length) ||
+          (bugTitle === "Azure DevOps" &&
+            jiraDetails?.projects &&
+            !!jiraDetails?.projects.length)
+            ? "img_jira"
+            : ""
+        }
+        onClick={(e) => onBugClick(e, rowData)}
+      />
+    );
   };
   const convertDataToTree = (data) => {
     const treeDataArray = [];

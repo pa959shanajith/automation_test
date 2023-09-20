@@ -326,7 +326,7 @@ const ScheduleScreen = ({
                         value={el}
                         onChange={(e) => {
                           setStartTime(new Date());
-                          setStartDate(null);
+                          // setStartDate(null);
                           setSelectedPattren(e.value);
                         }}
                         checked={selectedPattren?.key === el?.key}
