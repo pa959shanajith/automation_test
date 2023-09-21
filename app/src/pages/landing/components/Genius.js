@@ -423,7 +423,12 @@ for(let i =0;i<scrnids.length;i++){
       if (res.error) { displayError(res.error); return; }
       var data = parseProjList(res)
       setAllProjects(data);
-      setSelectedProject(props.selectedProject?props.selectedProject:null)
+      let selectedProjectDetails=JSON.parse(localStorage.getItem('DefaultProject'))
+      let projId={
+        key:selectedProjectDetails.projectId,
+        text:selectedProjectDetails.projectName
+      }
+      setSelectedProject(props.selectedProject?props.selectedProject:projId?projId:null)
       res = await DesignApi.getUserDetails("user");
       if (res === "Invalid Session") return RedirectPage(history);
       if (res.error) {

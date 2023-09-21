@@ -102,7 +102,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     }
     const resetImportModule = async(e) => {
       if(uploadFileRef.current)uploadFileRef.current.value = ''
-        setProjectValue(e.value);
+        setProjectValue(e?.value);
         var id = '';
         for(var i = 0; e.target.name.length>i; i++){
             if (e.value === e.target.name[i].value){
@@ -195,10 +195,10 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         appType: projList[projRef.current.value].apptypeName
                     })
                     if(data.error){ 
-                        if (data.error == "No entries"){displayError({CONTENT:data.error,VARIANT:VARIANT.ERROR});ResetSession.end();
+                        if (data.error === "No entries"){displayError(data.error);ResetSession.end();
                         return;}
                         else{                       
-                        displayError({CONTENT:data.error.CONTENT,VARIANT:VARIANT.ERROR});}
+                        displayError(data.error.CONTENT);}
                         ResetSession.end();
                         return;
                     }
@@ -222,7 +222,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         moduleid:data._id
                     }
                     var res = await getModules(req)
-                    if(res.error){displayError(res.error);ResetSession.end();return;}
+                    if(res.error){displayError(res.error.CONTENT);ResetSession.end();return;}
                     importData = res
                     setBlockui({show:false})
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
@@ -248,7 +248,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     }
                     res = await getModules(req)
                 
-                    if(res.error){displayError({CONTENT:res.error,VARIANT:VARIANT.ERROR});setBlockui({show:false});ResetSession.end();return;}
+                    if(res.error){displayError(res.error);setBlockui({show:false});ResetSession.end();return;}
                     setFiledUpload(res)
                     Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORTED.CONTENT, life: 3000})
                     setBlockui({show:false})
@@ -259,11 +259,11 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     ResetSession.start()
                     var importproj= projectId          
                     var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: SheetValue})
-                    if(res.error){displayError(res.error);ResetSession.end();return;}                    
+                    if(res.error){displayError(res.error.CONTENT);ResetSession.end();return;}                    
                     else{
                         
                         var importexcel = await jsonToMindmap({"type":"excel","importproj":importproj})
-                        if(importexcel.error){displayError(importexcel.error);ResetSession.end();return;}
+                        if(importexcel.error){displayError(importexcel.error.CONTENT);ResetSession.end();return;}
                         if(importexcel === "InProgress"){Toast.current.show({severity:'warn', summary: 'Warning', detail:MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000});ResetSession.end();return;}
                         Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORTED.CONTENT, life: 3000})
                         setBlockui({show:false})
@@ -273,7 +273,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     // setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
                     var res = await jsonToMindmap({"type":"json","importproj":projectId})
-                    if(res.error){displayError(res.error);ResetSession.end();return;}
+                    if(res.error){displayError(res.error.CONTENT);ResetSession.end();return;}
                     if(res == "InProgress"){Toast.current.show({severity:'warn', summary: 'Warning', detail:MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000});ResetSession.end();return;}
                     Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORTED.CONTENT, life: 3000})
                     setBlockui({show:false})

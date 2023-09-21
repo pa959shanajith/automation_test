@@ -45,8 +45,8 @@ const Profile = () => {
       const executionProfiles = await getReportList(
         location?.state?.configureKey
         );
-        let sortExecutions= [...executionProfiles].reverse();
-        setReportsTable(sortExecutions.map((el, ind) => ({
+        // let sortExecutions= [...executionProfiles].reverse();
+        setReportsTable(executionProfiles.map((el, ind) => ({
           ...el,
           id: el._id,
           key: ind.toString(),
@@ -956,10 +956,10 @@ const Profile = () => {
     );
   };
 
-  const onDownload = async (getId) => {
-    let data = await downloadReports({ id: downloadId, type: getId });
+  const onDownload = async (getId,SS) => {
+    let data = await downloadReports({ id: downloadId, type: getId }, SS);
     
-    if (getId === "json") data = JSON.stringify(data, undefined, 2);
+    // if (getId === "json") data = JSON.stringify(data, undefined, 2);
 
     let filedata = new Blob([data], {
       type: "application/" + getId + ";charset=utf-8",
@@ -1005,15 +1005,15 @@ const Profile = () => {
           ))}
         </DataTable>
         <OverlayPanel ref={downloadRef} className="reports_download">
-          <div className="flex downloadItem" onClick={() => onDownload("json")}>
+          <div className="flex downloadItem" onClick={() => onDownload("json", false)}>
             <span className="pi pi-fw pi-file"></span>
             <span>JSON</span>
           </div>
-          <div className="flex downloadItem" onClick={() => onDownload("pdf")}>
+          <div className="flex downloadItem" onClick={() => onDownload("pdf", false)}>
             <span className="pi pi-fw pi-file"></span>
             <span>PDF</span>
           </div>
-          <div className="flex downloadItem" onClick={() => onDownload("pdfwithimg")}>
+          <div className="flex downloadItem" onClick={() => onDownload("pdf", true)}>
             <span className="pi pi-fw pi-file"></span>
             <span>
               PDF with screenshots
