@@ -149,36 +149,42 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                     <ProgressSpinner className="modal-spinner" style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                 </div>
                 }  */}
-                    {selectedscreen?.code === 'GIT' ? <GitConfig/> : <>
-                        {selectedscreen && authType === "basic"}
-                        <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
-                        {selectedscreen?.name === 'Zephyr' && (
-                            <div className="apptype__token">
-                                <span>Application Type:</span>
-                                <div className="p-field-radiobutton">
-                                    <RadioButton inputId="basic" name="loginType" value="basic" onChange={handleRadioChange} checked={authType === 'basic'} />
-                                    <label htmlFor="basic" className="basic_login">Basic</label>
-                                </div>
-                                <div className="p-field-radiobutton">
-                                    <RadioButton inputId="token" name="loginType" value="token" onChange={handleRadioChange} checked={authType === 'token'} />
-                                    <label htmlFor="token" className="token_login">Token</label>
-                                </div>
-                            </div>)}
-                        {authType === "basic" && selectedscreen && (
-                            <>
-                                <div className="input-cls">
-                                    <span>Username <span style={{ color: 'red' }}>*</span></span>
-                                    <span style={{ marginLeft: '1.5rem' }}>
-                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={selectedscreen.name === 'Jira' ? loginDetails.username : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.username : zephyrLoginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
-                                        {/* <label htmlFor="username">Username</label> */}
-                                    </span>
-                                </div>
-                                <div className="passwrd-cls">
+                {selectedscreen?.code === 'GIT' ? <GitConfig/> : <>
+                {selectedscreen && authType === "basic"}
+                    <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
+                    {selectedscreen?.name === 'Zephyr' && (
+                        <div className="apptype__token">
+                            <span>Application Type:</span>
+                            <div className="p-field-radiobutton">
+                                <RadioButton inputId="basic" name="loginType" value="basic" onChange={handleRadioChange} checked={authType === 'basic'} />
+                                <label htmlFor="basic" className="basic_login">Basic</label>
+                            </div>
+                            <div className="p-field-radiobutton">
+                                <RadioButton inputId="token" name="loginType" value="token" onChange={handleRadioChange} checked={authType === 'token'} />
+                                <label htmlFor="token" className="token_login">Token</label>
+                            </div>
+                        </div>)}
+                    {authType === "basic" && selectedscreen && (
+                        <>
+                            <div className="input-cls">
+                                <span>Username <span style={{ color: 'red' }}>*</span></span>
+                                <span style={{ marginLeft: '1.5rem' }}>
+                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={selectedscreen.name === 'Jira' ? loginDetails.username : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.username : zephyrLoginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
+                                    {/* <label htmlFor="username">Username</label> */}
+                                </span>
+                            </div>
+                            <div className="passwrd-cls">
+                                {selectedscreen?.name === 'Zephyr' ?(
+                                 <span> Password <span style={{ color: 'red' }}>*</span></span>)
+                                 :(
                                     <span> API Token <span style={{ color: 'red' }}>*</span></span>
-                                    <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
-                                    <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} />
-                                    {(loginDetails.password || zephyrLoginDetails.password) && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={togglePasswordVisibility}>
-                                        <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
+                                 )
+                                }
+                                
+                                <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
+                                <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} feedback={false} />
+                                {(loginDetails.password || zephyrLoginDetails.password) && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={togglePasswordVisibility}>
+                                    <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
 
                                     </div>}
 

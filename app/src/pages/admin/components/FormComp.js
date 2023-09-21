@@ -25,8 +25,7 @@ const FormInput = (props) => {
         <Fragment>
             <div className='col-xs-9 form-group input-label'>
                 <label>{name}</label>
-                {/* <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input> */}
-                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-20rem" placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
+                <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input>
             </div>
         </Fragment>
     )
@@ -42,17 +41,17 @@ const FormInputGit = (props) => {
     const name = props.label
     const type = props.type
     const placeholder = props.placeholder
-    const inpValRef = props.inpRef
+    const inpRef = props.inpRef
     const validExp = props.validExp
-    const textInpValue = props.textValue;
-    const upateInputValue = () => {
-        inpValRef.current.value = ValidationExpression(inpValRef.current.value, validExp);
+    const textValue = props.textValue;
+    const upateInput = () => {
+        inpRef.current.value = ValidationExpression(inpRef.current.value, validExp);
     }
     return (
         <Fragment>
             <div>
                 <label>{name}</label>
-                <InputText value={textInpValue} onChange={(e) => upateInputValue(e.target.value)} type={type} ref={inpValRef} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""} />
+                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-20rem" style={{position : 'relative' , right : '10.4rem' }} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
                 {/* <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input> */}
             </div>
         </Fragment>
@@ -161,7 +160,7 @@ const FormSelect = (props) => {
               onChange={onChangeFn}
               ref={inpRef}
               defaultValue={'def-opt'}
-              className={`p-dropdown form-control__conv-project left-opt ${inpId ? 'custom-class' : ''}`}
+              className={`form_drop p-dropdown form-control__conv-project left-option ${inpId ? 'custom-class' : ''}`}
               id={inpId || "selectForm"}
             >
               <option key={'def-opt'} value={'def-opt'} disabled={true}>
@@ -349,8 +348,8 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
                 {/* {list.map((e) => (
                             <option key={e} onClick={selectOption} value={e}> {e}</option>
                         ))} */}
-                <Dropdown value={dropdownValue} onChange={(e) => setDropdownValue(e.value)} options={list} placeholder="Select a Country"
-                    filter className="w-full md:w-29rem" />
+                        <Dropdown value={dropdownValue} onChange={(e) => setDropdownValue(e.value)} options={list} placeholder="Select"
+                            filter className="w-full md:w-29rem" />
 
                 {/* </div> */}
             </div>

@@ -2,12 +2,18 @@
 .input-label{
     width: 75%;
     font-size: small;
-    font-weight: 700;
+    font-weight: bold;
     margin-top: 25px;
+    font-family: "Open Sans";
     .left-opt{
-        // display: inline-block;
-        // width: 75%;
-        // margin-left: 10px;
+        display: inline-block;
+        height: 2.5rem;
+        margin-left: 24px;
+        margin-top: -1rem;
+        width: 26%;
+        border-color: gainsboro;
+    }
+    .left-option{
         width: 20rem;
         border: 1px solid #ced4da;
         border-radius: 0.3rem;
@@ -26,15 +32,13 @@
     option:disabled{
         background-color: $whisper;
     }
-    .conf-radio{
-        display: inline-block;
-        width: 75%;
-        margin-left: 10px;
-        input{
-            display: inline-block;
-            width: auto;
-            margin-right: 10px;
-        }
+    .conf-radio input[type="radio"] {
+        margin-right: 6px;
+        -webkit-transform: scale(1.5);
+        transform: scale(1.5);
+        justify-content: space-around;
+        display: initial;
+        margin-left: 1rem;
     }
 }
 .form-inp-dropdown{
@@ -62,6 +66,7 @@
     left: 130px;
     z-index: 1000;
 }
+.form_drop{
 .p-dropdown-container {
     position: relative;
   }
@@ -104,4 +109,4 @@
     background-color: #007ad9; 
     color: #ffffff; 
   }
-  
+}

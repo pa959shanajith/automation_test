@@ -83,6 +83,7 @@ const CaptureModal = (props) => {
   const [editingCell, setEditingCell] = useState(null);
   const [deleted, setDeleted] = useState([]);
   const[browserName,setBrowserName]=useState(null)
+  const [saveDisable,setSaveDisable] = useState(true);
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -118,6 +119,24 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   useEffect(() => {
     fetchScrapeData()
   }, [parentData])
+  useEffect(()=>{
+    let browserName = (function (agent) {        
+
+      switch (true) {
+
+      case agent.indexOf("edge") > -1: return {name:"chromium",val:8};
+      case agent.indexOf("edg/") > -1: return {name:"chromium",val:8};
+      case agent.indexOf("chrome") > -1 && !!window.chrome: return {name:"chrome",val:1};
+      case agent.indexOf("firefox") > -1: return {name:"mozilla",val:2};
+      default: return "other";
+   }
+
+    })(window.navigator.userAgent.toLowerCase());
+
+    setBrowserName(browserName.name)
+    setSelectedSpan(browserName.val)
+    
+  },[])
   useEffect(() => {
     if(compareSuccessful){
       toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements updated successfuly.', life: 10000 });
@@ -294,26 +313,13 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
     } else {
       setSelectedSpan(index);
       switch (index) {
-
         case 1:
-
-          setBrowserName("explorer")
-
-          break;
-
-        case 2:
-
           setBrowserName("chrome")
-
           break;
-
-        case 3:
-
+        case 2:
           setBrowserName("mozilla")
-
           break;
-
-        case 4:
+        case 8:
           setBrowserName("chromium")
           break;
       }
@@ -613,6 +619,7 @@ const elementTypeProp =(elementProperty) =>{
   }
   const onDelete = (e, confirmed) => {
     if (mainScrapedData.reuse && !confirmed) {
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
       return;
     }
     let deletedArr = [...deleted];
@@ -621,7 +628,7 @@ const elementTypeProp =(elementProperty) =>{
     var capturedDataAfterSave = scrapeItemsL.filter(function (item) {
 
       return !selectedCapturedElement.find(function (objFromB) {
-        if (item.objectDetails.custname === objFromB.objectDetails.custname) {
+        if (item.objectDetails.val === objFromB.objectDetails.val) {
           if(item.objectDetails.objId){
             deletedArr.push(item.objectDetails.objId)}
           return true
@@ -645,7 +652,7 @@ const elementTypeProp =(elementProperty) =>{
     setSelectedCapturedElement([])
     // setNewScrapedCapturedData(newCapturedDataToSave)
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
-    setDeletedItems(true);
+    setSaveDisable(false);
   }
   // {console.log(captureData[0].selectall)}
 
@@ -673,7 +680,7 @@ const elementTypeProp =(elementProperty) =>{
       'deletedObj': deleted,
       'modifiedObj': modifiedObjects,
       'addedObj': { ...added, view: views },
-      'screenId': props.fetchingDetails["_id"],
+      'screenId': parentData.id,
       'userId': userInfo.user_id,
       'roleId': userInfo.role,
       'param': 'saveScrapeData',
@@ -711,6 +718,7 @@ const elementTypeProp =(elementProperty) =>{
         }).catch(error => console.error(error));
       })
       .catch(error => console.error(error))
+      setSaveDisable(true);
   }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
@@ -942,8 +950,12 @@ else{
   };
 
 
-  const handleDelete = (rowData) => {
+  const handleDelete = (rowData,confirmed) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
+    if (mainScrapedData.reuse && !confirmed) {
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
+      return;
+    }
     if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
     let deletedArr = [...deleted];
     let scrapeItemsL = [...captureData];
@@ -1041,7 +1053,7 @@ else{
 
   const footerCapture = (
     <div className='footer__capture'>
-      {visible === 'capture' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); }}>Capture</Button>}
+      {visible === 'capture' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName); setSaveDisable(false) }}>Capture</Button>}
       {visible === 'replace' && <Button size='small' className='save__btn__cmp' onClick={()=>{ setVisible(false); startScrape(browserName, '', 'replace'); }}>Replace</Button>}
     </div>
   )
@@ -1054,7 +1066,7 @@ else{
 
   const footerAddMore = (
     <div className='footer__addmore'>
-      <Button size='small' onMouseDownCapture={() => { setVisible(false); startScrape(browserName); }}>Capture</Button>
+      <Button size='small' onMouseDownCapture={() => { setVisible(false); startScrape(browserName); setSaveDisable(false) }}>Capture</Button>
     </div>
   );
 
@@ -1068,7 +1080,7 @@ else{
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
         {captureData.length > 0 ? <div className='Header__btn'>
-          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more') }} >Add more</button>
+          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} >Add more</button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
@@ -1083,7 +1095,7 @@ else{
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true);}} >Capture Elements</Button>
+        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1102,7 +1114,7 @@ const footerSave = (
     {selectedCapturedElement.length>0?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} disabled={captureData.length === 0 && !deletedItems}></Button>
+    <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
     </>
   )
   
@@ -1139,15 +1151,20 @@ const footerSave = (
     <div> <p>Note :This will completely refresh all <strong>Captured Elements</strong> on the screen. In case you want to Capture only additional elements use the <strong>"Add More"</strong> option </p></div>
   )
   const onHighlight = () => {
-    capturedDataToSave.map((object) => {
-      if (objValues.val === object.val) setActiveEye(true);
-      else if (activeEye) setActiveEye(false);
+    setActiveEye((prevActiveEye) => !prevActiveEye);
+    if (activeEye !== false) {
+      let objVal = selectedCapturedElement[0].objectDetails || {};
+      let objValClone = { ...objVal };
+      let keyCount = Object.keys(objVal).length;
+      if (keyCount > 0) {
+        keyCount++;
+        objValClone['keycount'] = keyCount;
+      }
+      dispatch(objValue(objValClone));
+    } else {
       setHighlight(true);
-    })
-    let objVal = selectedCapturedElement && selectedCapturedElement.length>0 && selectedCapturedElement[0].objectDetails ? selectedCapturedElement[0].objectDetails: {};
-    dispatch(objValue(objVal));
-            setHighlight(true);
-          }
+    }
+  };
 
   useEffect(() => {
     if (mirror.scrape) {
@@ -1242,7 +1259,7 @@ const footerSave = (
         // highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
       } else setHighlight(false);
       if (ScrapedObject.xpath && !ScrapedObject.xpath.startsWith('iris')) {
-        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType, ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
+        scrapeApi.highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, typesOfAppType.toLowerCase(), ScrapedObject.top, ScrapedObject.left, ScrapedObject.width, ScrapedObject.height)
           .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
             if (data === "fail") return null;
@@ -1266,9 +1283,10 @@ const footerSave = (
     <div>
           <img data-test="eyeIcon" className="ss_eye_icon_screen"
             onClick={onHighlight}
-            src={activeEye ? 
-              "static/imgs/eye-active.svg" : 
-              "static/imgs/eye_disabled.svg"} 
+            src={!activeEye ?
+              "static/imgs/eye-active.svg" :
+              "static/imgs/eye_disabled.svg"}
+              alt='eyeIcon'
           />
         </div>
       <div className='header__popup screenshot_headerName'>
@@ -1312,6 +1330,7 @@ const footerSave = (
     else if (!isCustom) setNewScrapedData(updNewScrapedData);
     if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
     setScrapeItems(localScrapeItems);
+    setSaveDisable(false);
   }
 
   const onCellEditComplete = (e) => {
@@ -1341,6 +1360,7 @@ const footerSave = (
     })
     setCaptureData([...captureData, ...addElementData])
     setCapturedDataToSave([...capturedDataToSave, ...addedElements])
+    setSaveDisable(false);
   }
 
 
@@ -1420,8 +1440,6 @@ const footerSave = (
     setElementValues(e.value)
   }
   const openElementProperties = (rowdata) => {
-    if(rowdata.objectDetails.objId!==undefined)
-    {
     console.log(rowdata)
     let element = rowdata.objectDetails.xpath.split(';')
     let dataValue = []
@@ -1444,11 +1462,6 @@ const footerSave = (
     dataValue.sort((a, b) => a.id - b.id)
     setElementValues(dataValue)
     setElementProperties(true)
-  }
-  else {
-    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the Captured Element to view/edit the element properties', life: 5000 });
-  }
-
   }
   const Header = () => {
     return (
@@ -1748,8 +1761,8 @@ const headerstyle={
 
 
 
-        <div className="card-table" style={{ width: '100%', display: "flex" }}>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} fetchingDetails={props.fetchingDetails} /></> :
+        <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -1793,18 +1806,18 @@ const headerstyle={
             <div className="ref_pop screenshot_pop">
               <div className="screenshot_pop__content" >
                 {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} alt="Screenshot Image" />
+                <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} style={{height: typesOfAppType==="Desktop"?"17rem":typesOfAppType==="OEBS"?"35vh":""}} alt="Screenshot Image" />
               </div>
             </div>
           </Dialog>
         </div>
       </Dialog>
 
-         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+         {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         
 
-        {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
-        {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "Desktop"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "SAP"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {/* {typesOfAppType === "OEBS"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1817,7 +1830,7 @@ const headerstyle={
            </span>}
          customClass="OEBS"
         />: null} */}
-        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "Mainframe"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1828,7 +1841,7 @@ const headerstyle={
          content = {"hello"}
          customClass="Mainframes"
         />: null}
-        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "System"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -1846,9 +1859,9 @@ const headerstyle={
           </span>
           <span className='browser__col'>
             {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
-            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
           </span>
         </div>
         {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
@@ -1860,7 +1873,7 @@ const headerstyle={
         showHeader={false}
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
-        accept={() => { setMasterCapture(true); handleAddMore('capture') }} />
+        accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
         
         {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
@@ -1869,9 +1882,9 @@ const headerstyle={
           </span>
           <span className='browser__col'>
             {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
-            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(3)} className={selectedSpan === 3 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 3 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-            <span onClick={() => handleSpanClick(4)} className={selectedSpan === 4 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 4 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
           </span>
         </div>
       </Dialog> : null}
@@ -1927,6 +1940,7 @@ const headerstyle={
         setCaptureData={setCaptureData}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        setSaveDisable={setSaveDisable}
       />}
 
       {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
@@ -2255,6 +2269,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false);
         }
     }
 
@@ -2307,6 +2322,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2359,6 +2375,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2430,6 +2447,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 
@@ -2457,6 +2475,7 @@ const LaunchApplication = props => {
         else {
             setError(false);
             setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
+            props.setSaveDisable(false)
         }
     }
 

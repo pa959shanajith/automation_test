@@ -17,9 +17,11 @@
     }
 }
 
-.base__redirect, .base__redirect:hover{
-    color: inherit;
-    cursor: pointer;
-    text-decoration: underline;
-    font-weight: 700;
+.base__redirect {
+    &:hover {
+        color: inherit;
+        cursor: pointer;
+        text-decoration: underline;
+        font-weight: 700;
+    }
 }

@@ -1,17 +1,18 @@
 const myserver = require('../lib/socket');
 const validator = require('validator');
 const logger = require('../../logger');
-const redisServer = require('../lib/redisSocketHandler');
 const utils = require('../lib/utils');
 
 exports.getCrawlResults = function (req, res) {
 	const fnName = "getCrawlResults";
 	logger.info("Inside UI service: " + fnName);
 	try {
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var username=req.session.username;
 		var icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + icename ,1);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][icename];	
 		var url = req.body.url;
 		var level = req.body.level;
 		var agent = req.body.agent;
@@ -27,11 +28,9 @@ exports.getCrawlResults = function (req, res) {
 			return res.send("invalidParams");
 		}
 		logger.info("ICE Socket requesting Address: %s", icename);
-		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres) {
-			if (redisres[1]>0) {
+		if(mySocket != undefined) {	
 				logger.info("Sending socket request for webCrawlerGo to cachedb");
-				var dataToIce = {"emitAction": "webCrawlerGo", "username": icename, "input_url": url, "level": level, "agent":agent, "proxy": proxy,"searchData":searchData};
-				redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+				mySocket.emit("webCrawlerGo", url, level, agent, proxy,searchData);
 				var notifySocMap = myserver.socketMapNotify;
 				var mySocketUIMap = myserver.allSocketsMapUI;
 				var resSent = false;
@@ -39,56 +38,43 @@ exports.getCrawlResults = function (req, res) {
 					resSent = true;
 					res.end('begin');
 				}
-				function webCrawlerGo_listener(channel,message) {
-					var data = JSON.parse(message);
-					if (icename == data.username && ["unavailableLocalServer", "result_web_crawler", "result_web_crawler_finished"].includes(data.onAction)) {
-						var value = data.value;
-						if (data.onAction == "unavailableLocalServer") {
-							redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);
-							logger.error("Error occurred in getCrawlResults: Socket Disconnected");
-							if (notifySocMap[username]) notifySocMap[username].emit("ICEnotAvailable");
-							else if (!resSent) res.send("unavailableLocalServer");
-						} else if (data.onAction == "result_web_crawler") {
-							try {
-								mySocketUIMap[username].emit("newdata", value);
-							} catch (exception) {
-								logger.error(exception.message);
-							}
-						} else if (data.onAction == "result_web_crawler_finished") {
-							redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);
-							try {
-								var resultData = null;
-								if (value.progress == "fail") {
-									resultData = {success: false, data: "Error While Crawling"}
-								} else {
-									resultData = {success: true};
-									mySocketUIMap[username].emit("endData", value);
-									logger.info("Crawl completed successfully!");
-								}
-								if (notifySocMap[username]) notifySocMap[username].emit("result_WebcrawlerFinished", resultData);
-								else if (!resSent) res.json(resultData);
-							} catch (exception) {
-								var resultData = {success: false, data: exception};
-								logger.error("Error occurred in getCrawlResults: "+exception.message);
-								if (notifySocMap[name]) notifySocMap[name].emit("result_WebcrawlerFinished", resultData);
-								else if (!resSent) res.status(500).json(resultData);
-							}
-						}
+				
+				mySocket.on("result_web_crawler", value => {
+					var value = JSON.parse(value);
+					try {
+						mySocketUIMap[username].emit("newdata", value);
+					} catch (exception) {
+						logger.error(exception.message);
 					}
-				}
-				redisServer.redisSubServer.on("message",webCrawlerGo_listener);
-			} else {
-				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-					var flag="";
-					if (found) flag = "scheduleModeOn";
-					else {
-						flag = "unavailableLocalServer";
-						logger.info("ICE socket not available for Address : %s", name);
-					}
-					res.send(flag);
 				});
+
+				mySocket.on("result_web_crawler_finished", value => {
+					var value = JSON.parse(value);
+					try {
+						var resultData = null;
+						if (value.progress == "fail") {
+							resultData = {success: false, data: "Error While Crawling"}
+						} else {
+							resultData = {success: true};
+							mySocketUIMap[username].emit("endData", value);
+							logger.info("Crawl completed successfully!");
+						}
+						if (notifySocMap[username]) notifySocMap[username].emit("result_WebcrawlerFinished", resultData);
+						else if (!resSent) res.json(resultData);
+					} catch (exception) {
+						var resultData = {success: false, data: exception};
+						logger.error("Error occurred in getCrawlResults: "+exception.message);
+						if (notifySocMap[name]) notifySocMap[name].emit("result_WebcrawlerFinished", resultData);
+						else if (!resSent) res.status(500).json(resultData);
+					}
+				});
+
+			} else {
+					flag = "unavailableLocalServer";
+					logger.info("ICE socket not available for Address : %s", name);
+					res.send(flag);
 			}
-		});
+		
 	} catch (exception) {
 		logger.error("Error occurred in webocular/"+fnName+":", exception);
 		res.send("fail");

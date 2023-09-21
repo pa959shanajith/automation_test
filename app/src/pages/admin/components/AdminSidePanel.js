@@ -4,10 +4,10 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Button } from 'primereact/button';
 import { AdminActions } from '../adminSlice';
 import '../styles/AdminSidePanel.scss'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const AdminSidePanel = () => {
-
+    const currentScreen = useSelector(state => state.admin.screen);
     const [header, setHeader] = useState('');
     const [screen, setScreen] = useState('');
     const dispatch = useDispatch();
@@ -21,29 +21,68 @@ const AdminSidePanel = () => {
         <div className="admin_nav card flex flex-column ">
             <Accordion multiple activeIndex={0}>
                 <AccordionTab header="Authentication Configuration">
-                    <div className='flex flex-column pl-4'>
-                        <Button onClick={() => { setHeader('LDAP Configuration'); setScreen('ldapConf');}}><img src="static/imgs/ldap_configuration_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>LDAP Configuration</Button>
-                        <Button onClick={() => { setHeader('SAML Configuration'); setScreen('samlConf');}}><img src="static/imgs/saml_configuration_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>SAML Configuration</Button>
-                        <Button onClick={() => { setHeader('Open ID Connect Configuration'); setScreen('openIdConf'); }}><img src="static/imgs/openid_connect_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>Open ID Connect Configuration</Button>
+                    <div className='flex flex-column pl-4 sidepanel_admin'>
+                        <ul>
+                            <li onClick={() => { setHeader('LDAP Configuration'); setScreen('ldapConf'); }} className={currentScreen === "ldapConf" ? "active_tab" : "not_active_tab"} >
+                                <img src="static/imgs/ldap configuration.svg" alt="LDAP" style={{ marginRight: '0.5rem' }} />
+                               <span className='ldap_label'> LDAP Configuration</span>
+                            </li>
+
+                            <li onClick={() => { setHeader('SAML Configuration'); setScreen('samlConf'); }} className={currentScreen === "samlConf" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/saml_configuration.svg" alt="SAML" style={{ marginRight: '0.5rem' }} />
+                                <span className='saml_label'>SAML Configuration</span>
+                            </li>
+
+                            <li onClick={() => { setHeader('Open ID Connect Configuration'); setScreen('openIdConf'); }} className={currentScreen === "openIdConf" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/open id configuration.svg" alt="open_id_connect" style={{ marginRight: '0.5rem' }} />
+                               <span className='openId_label'> Open ID Connect Configuration</span>
+                            </li>
+                        </ul>
                     </div>
                 </AccordionTab>
                 <AccordionTab header="User management">
-                    <div className='flex flex-column pl-4'>
-                        <Button onClick={() => { setHeader('Users'); setScreen('Users');  }}><img src="static/imgs/users_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>Users</Button>
-                        <Button onClick={() => { setHeader('License'); setScreen('License Details');  }}><img src="static/imgs/license_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>License Details</Button>
+                    <div className='flex flex-column pl-4 sidepanel_admin'>
+                        <ul>
+                            <li onClick={() => { setHeader('Users'); setScreen('users'); }} className={currentScreen === "users" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/user_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                               <span className='useers_label'>Users</span> 
+                            </li>
+
+                            <li onClick={() => { setHeader('License'); setScreen('license_details'); }} className={currentScreen === "license_details" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/license.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                                <span className='license_label'> License Details</span>
+                            </li>
+                        </ul>
                     </div>
                 </AccordionTab>
             </Accordion>
-            <div className='flex flex-column pl-2 pr-1 m-1'>
-            <Button className="email_button" onClick={() => { setHeader('Email Server Configuration'); setScreen('Email Server Configuration'); }}><img src="static/imgs/email_server_configuration_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}} />Email Server Configuration</Button>
-                        </div>
-            <div className='flex flex-column p-2 pr-1 m-1'>
-            <Button className='Agent_btn' onClick={() => { setHeader('Manage Agents'); setScreen('Manage Agents'); }}><img src="static/imgs/agent_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>Manage Agents</Button>
-            <Button className='Agent_btn' onClick={() => { setHeader('Grid Configuration'); setScreen('Grid Configuration'); }}><img src="static/imgs/agent_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem'}}/>Grid Configuration</Button>
-            </div>
-            <div className='flex flex-column p-2 pr-1 m-1'>
-            <Button className='Session_btn' onClick={() => { setHeader('Session Management');  setScreen('SessionManagement'); }}><img src="static/imgs/users_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem',width:'2rem'}}/>Session Management</Button>
-            <Button className='prefer_btn' onClick={() => { setHeader('Privileges'); setScreen('Privileges');   }}><img src="static/imgs/privileges_icon.svg" alt="SVG Image" style={{marginRight:'0.5rem',width:'1.5rem'}}/>Privileges</Button>
+            <div className='flex flex-column pl-2 pr-1 m-1 sidepanel_admin'>
+                <ul>
+                    <li onClick={() => { setHeader('Email Server Configuration'); setScreen('email_server_configuration'); }} className={currentScreen === "email_server_configuration" ? "active_tab" : "not_active_tab"}>
+                        <img src="static/imgs/email server configuration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                       <span className='email_label' > Email Server Configuration</span>
+                    </li>
+
+                    <li onClick={() => { setHeader('Manage Agents'); setScreen('manage_agents'); }} className={currentScreen === "manage_agents" ? "active_tab" : "not_active_tab"}>
+                        <img src="static/imgs/agent.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                       <span className='agent_label'>  Agents</span>
+                    </li>
+
+                    <li onClick={() => { setHeader('Grid'); setScreen('grid_configuration'); }} className={currentScreen === "grid_configuration" ? "active_tab" : "not_active_tab"}>
+                        <img src="static/imgs/grid.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                        <span className='grid_label'>Grids</span>
+                    </li>
+
+                    <li onClick={() => { setHeader('Session Management'); setScreen('session_management'); }} className={currentScreen === "session_management" ? "active_tab" : "not_active_tab"}>
+                        <img src="static/imgs/grid.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                      <span className='session_label'> Session Management</span> 
+                    </li>
+
+                    <li onClick={() => { setHeader('Privileges'); setScreen('privileges'); }} className={currentScreen === "privileges" ? "active_tab" : "not_active_tab"}>
+                        <img src="static/imgs/privileges.svg" alt="SVG Image" style={{ marginRight: '0.5rem', width: '1.5rem' }} />
+                       <span className='privileges_label'>Privileges</span> 
+                    </li>
+                </ul>
             </div>
         </div>
     )

@@ -835,7 +835,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
                   const newObject = { ...dNodes[0].children[k].children[j], children: [...dNodes[0].children[k].children[j].children, dNodes[uNix]] };
                   dNodes[0].children[k].children[j] = newObject;
                   for (var m = 0; dNodes.length>m;m++){
-                    if(newObject.parent.name === dNodes[m].name){
+                    if(newObject.parent.type === dNodes[m].type){
                         dNodes[m].children = [newObject]
                     }
                   } 

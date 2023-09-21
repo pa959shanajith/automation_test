@@ -32,6 +32,7 @@
     "express-session": "^1.15.6",
     "express-winston": "^2.4.0",
     "helmet": "^3.9.0",
+    "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "lusca": "^1.5.2",
     "multer": "^1.4.5-lts.1",

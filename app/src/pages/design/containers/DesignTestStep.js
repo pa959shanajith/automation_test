@@ -117,25 +117,46 @@ const DesignModal = (props) => {
 
     useEffect(() => {
         let shouldDisable = false;
-        dispatch(TestCases(testCaseData))
+        if(screenLavelTestSteps.length !==0){
+        const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         //eslint-disable-next-line
-        for (let value of testCaseData) {
-            if (value.custname === "" || value.custname === "OBJECT_DELETED") {
-                shouldDisable = true;
+        if(findData !== undefined){
+            dispatch(TestCases(findData.testCases))
+            for (let value of findData.testCases) {
+                if (value.custname === "" || value.custname === "OBJECT_DELETED") {
+                    shouldDisable = true;
+                }
             }
+            // Object.values(testCaseData).forEach(value => {
+            //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
+            //         shouldDisable = true;         
+            //      }
+            //     });
+            setDebugEnable(shouldDisable);
         }
-        // Object.values(testCaseData).forEach(value => {
-        //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
-        //         shouldDisable = true;         
-        //      }
-        //     });
-        setDebugEnable(shouldDisable);
-    }, [dispatch, testCaseData]);
-
+    }
+    }, [dispatch, rowExpandedName, screenLavelTestSteps, testCaseData]);
     useEffect(() => {
         setChanged(true);
     }, [saveEnable]);
-
+    useEffect(()=>{
+        let browserName = (function (agent) {        
+    
+          switch (true) {
+    
+          case agent.indexOf("edge") > -1: return {name:"chromium",val:"8"};
+          case agent.indexOf("edg/") > -1: return {name:"chromium",val:"8"};
+          case agent.indexOf("chrome") > -1 && !!window.chrome: return {name:"Chrome",val:"1"};
+          case agent.indexOf("firefox") > -1: return {name:"mozilla",val:"2"};
+          default: return "other";
+       }
+    
+        })(window.navigator.userAgent.toLowerCase());
+    
+        // setBrowserName(browserName.name)
+        setSelectedSpan(browserName.val)
+        
+      },[])
     useEffect(() => {
         if (imported) {
             if(screenLavelTestSteps === 0){
@@ -264,7 +285,7 @@ const DesignModal = (props) => {
                     // else props.setDisableActionBar(false); //enable left-top-section
 
                     // setHideSubmit(data.testcase.length === 0);
-                    // setReusedTC(data.reuse);
+                    setReusedTC(data.reuse);
 
                     DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectID, props.fetchingDetails['parent']['children'][j]["_id"])
                         .then(scriptData => {
@@ -823,16 +844,16 @@ const DesignModal = (props) => {
                         setOverlay("Loading...");
                         let resultString = JSON.parse(reader.result);
                         if (!Array.isArray(resultString)) 
-                            throw MSG.DESIGN.ERR_FILE_FORMAT
+                            throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT,life:2000})
                         for (let i = 0; i < resultString.length; i++) {
                             if (!resultString[i].appType)
-                                throw MSG.DESIGN.ERR_JSON_IMPORT
+                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_JSON_IMPORT.CONTENT,life:2000})
                             if (
                                 resultString[i].appType.toLowerCase() !== "generic" && 
                                 resultString[i].appType.toLowerCase() !== "pdf" &&
                                 resultString[i].appType !== props.appType
                             ) 
-                                throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
+                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_NO_MATCH_APPTYPE.CONTENT,life:2000})
                         }
                         DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, 0, import_status)
                             .then(data => {
@@ -946,6 +967,9 @@ const DesignModal = (props) => {
         else if (props.appType === "OEBS"){
             debugTestCases('1')
         }
+        else if (props.appType === "SAP"){
+            debugTestCases('1')
+        }
     }
     const footerContent = (
         <div>
@@ -1021,6 +1045,7 @@ const DesignModal = (props) => {
             setHeaderCheck(false);
             setEdit(true);
             setDraggable(false);
+            setChanged(true)
             headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
         }
     }

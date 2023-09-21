@@ -104,6 +104,9 @@
             padding: 0.4rem;
             .every_day {
                 width: 3rem;
+                .p-inputtext {
+                    width: 100%;
+                }
             }
             .day_week {
                 display: flex;

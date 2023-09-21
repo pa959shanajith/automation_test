@@ -17,19 +17,19 @@ const AdminHeader = (props) => {
             return <img src="static/imgs/saml_configuration_icon.svg" className='current_img_icon' alt="SVG Image"/>;
           case 'openIdConf':
             return <img src="static/imgs/openid_connect_icon.svg" className='current_img_icon' alt="SVG Image" />;
-          case 'Users':
+          case 'users':
             return <img src="static/imgs/users_icon.svg" className='current_img_icon' alt="SVG Image"/>;
-          case 'License Details':
+          case 'license_details':
             return <img src="static/imgs/license_icon.svg" className='current_img_icon' alt="SVG Image" />
-          case 'Email Server Configuration':
+          case 'email_server_configuration':
             return <img src="static/imgs/email_server_configuration_icon.svg"  className='current_img_icon' alt="SVG Image" />;
-          case 'Manage Agents':
+          case 'manage_agents':
             return <img src="static/imgs/agent_icon.svg" alt="SVG Image" className='current_img_icon' />;
-          case 'Grid Configuration':
+          case 'grid_configuration':
             return <img src="static/imgs/agent_icon.svg" alt="SVG Image" className='current_img_icon' />;
-          case 'SessionManagement':
+          case 'session_management':
             return <img src="static/imgs/users_icon.svg" alt="SVG Image" className='current_img_icon'/>;
-          case 'Privileges':
+          case 'privileges':
             return <img src="static/imgs/privileges_icon.svg" alt="SVG Image" className='current_img_icon' style={{width: '1.5rem'}}/>;
           default:
             return null;
@@ -37,10 +37,11 @@ const AdminHeader = (props) => {
       };
     
     return (
+      (currentTab !== "session_management"? 
         <div className="Create_Header">
             <h3 className="header_label">{currentTabImage()}{currentTab}</h3>
-            {currentTab === "Users" && <Button className="Create_btn" label ="create" onClick={() => {props.setCreateUserDialog(true); dispatch(AdminActions.RESET_VALUES(""))}}> </Button>}
-        </div>
+            {currentTab === "users" && <Button className="Create_btn" label ="create" onClick={() => {props.setCreateUserDialog(true); dispatch(AdminActions.RESET_VALUES(""))}}> </Button>}
+        </div> : null )
     )
 }
 export default AdminHeader;

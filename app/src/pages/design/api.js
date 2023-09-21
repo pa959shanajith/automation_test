@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { Messages as MSG} from '../global/components/Messages'
+import {RedirectPage, Messages as MSG} from '../global'
+import {history} from './index'
 import {url} from '../../App';
 
 /*Component getProjectList
@@ -18,6 +19,7 @@ export const getProjectList = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -48,6 +50,7 @@ export const getModules = async(props) => {
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         console.error(res.data)
@@ -73,6 +76,7 @@ export const getScreens = async(projectId) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -112,6 +116,7 @@ export const saveMindmap = async(props) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -141,6 +146,7 @@ export const exportToExcel = async(props) => {
             responseType:'arraybuffer'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -171,6 +177,7 @@ export const exportMindmap = async(moduleId) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -199,6 +206,7 @@ export const populateScenarios = async(moduleID) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -231,6 +239,7 @@ export const readTestSuite_ICE = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -259,6 +268,7 @@ export const populateUsers = async(projectId) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail" && res.data.rows.length >0){            
@@ -289,6 +299,7 @@ export const excelToMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if (res.data == 'valueError') {
@@ -323,6 +334,7 @@ export const importMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -349,6 +361,7 @@ export const gitToMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -378,6 +391,7 @@ export const pdProcess = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -405,6 +419,7 @@ export const importGitMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.data === "empty"){
@@ -452,6 +467,7 @@ export const exportToGit = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.data==='empty'){
@@ -532,6 +548,7 @@ export const updateNotificationConfiguration = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -565,6 +582,7 @@ export const getNotificationConfiguration = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -591,6 +609,7 @@ export const getNotificationRules = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -616,6 +635,7 @@ export const deleteScenario = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -640,6 +660,7 @@ export const deleteScenarioETE = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -667,6 +688,7 @@ export const exportToProject = async(moduleId) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -721,6 +743,7 @@ export const getNotificationGroups = async(props) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -744,11 +767,11 @@ export const saveE2EDataPopup = async(HardCodedApiDataForE2E) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
-            console.log("res.data",res.data)
         }
         console.error(res.data)
         return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
@@ -779,7 +802,7 @@ export const getProjectsMMTS = async(data) => {
         });
 
         if(res.status === 401 || res.data === "Invalid Session"){
-
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
 
         }
@@ -824,7 +847,7 @@ export const updateE2E = async(data) => {
         });
 
         if(res.status === 401 || res.data === "Invalid Session"){
-
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
 
         }
@@ -868,6 +891,7 @@ export const getUserDetails = async(action, args) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
@@ -1263,6 +1287,7 @@ export const exportToMMSkel = async(data) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1288,6 +1313,7 @@ export const jsonToMindmap = async(moduleId) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1311,6 +1337,7 @@ export const writeFileServer = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1328,12 +1355,13 @@ export const writeZipFileServer = async(data) => {
         const res = await axios(url+'/writeZipFileServer', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'multipart/form-data'
             },
             data: data,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1374,7 +1402,7 @@ export const singleExcelToMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            // RedirectPage(history)
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if (res.data == 'valueError') {
@@ -1407,7 +1435,7 @@ export const checkExportVer = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            // RedirectPage(history)
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1526,7 +1554,7 @@ export const getAvailablePlugins = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            // RedirectPage(history)
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;

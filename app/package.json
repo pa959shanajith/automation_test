@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@mui/base": "^5.0.0-beta.11",
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.129",
     "@mui/material": "^5.12.0",
@@ -20,6 +21,7 @@
     "check-prop-types": "^1.1.2",
     "crypto-js": "^4.1.1",
     "d3": "^7.8.4",
+    "moment": "^2.29.4",
     "npm": "^9.3.1",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",

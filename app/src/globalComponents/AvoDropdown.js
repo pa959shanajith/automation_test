@@ -11,7 +11,8 @@ const AvoDropdown = ({
   required = false,
   labelTxt,
   customeClass = "",
-  parentClass = ""
+  parentClass = "",
+  disabled = false
 }) => {
   const [touched, setTouched] = useState(false);
   return (
@@ -30,6 +31,7 @@ const AvoDropdown = ({
         name={name}
         placeholder={placeholder}
         required={required}
+        disabled={disabled}
         {...(required && { className: touched && !dropdownValue ? "p-invalid" : "" })}
       />
       {required && (

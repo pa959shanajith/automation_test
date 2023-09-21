@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ScreenOverlay, ScrollBar, Messages as MSG, setMsg } from '../../global'
-import { FormInput, FormSelect } from '../../admin/components/FormComp'
+import { FormInputGit, FormSelect } from '../../admin/components/FormComp'
 import { getUserDetails, getDomains_ICE, getDetails_ICE, gitEditConfig } from '../../admin/api';
 import GitButtonActions from '../../settings/Components/GitButtonActions'
 import { useDispatch, useSelector } from 'react-redux';
@@ -122,33 +122,33 @@ const GitConfig = (props) => {
             <div className='git_input'>
                 <div className='flex flex-row justify-content-between align-items-center'>
                     <span htmlFor='label_git' >Git Configuration</span>
-                    <FormInput data-test="name_git" inpRef={gitconfigRef} placeholder={'Enter Git Configuration Name'} />
+                    <FormInputGit data-test="name_git" inpRef={gitconfigRef} placeholder={'Enter Git Configuration Name'} />
                 </div>
             </div>
 
             <div className='git_input'>
                 <div className='flex flex-row justify-content-between align-items-center'>
                     <span htmlFor='label_git' >Git Access Token</span>
-                    <FormInput data-test="token_git" inpRef={tokenRef} placeholder={'Enter Git Access Token'} />
+                    <FormInputGit data-test="token_git" inpRef={tokenRef} placeholder={'Enter Git Access Token'} />
                 </div>
             </div>
             <div className='git_input'>
                 <div className='flex flex-row justify-content-between align-items-center'>
                     <span htmlFor='label_git' >Git URL</span>
-                    <FormInput data-test="url_git" inpRef={urlRef} placeholder={'Enter Git URL'} />
+                    <FormInputGit data-test="url_git" inpRef={urlRef} placeholder={'Enter Git URL'} />
                 </div>
             </div>
 
             <div className='git_input'>
                 <div className='flex flex-row justify-content-between align-items-center'>
                     <span htmlFor='label_git'>Git User Name</span>
-                    <FormInput data-test="username_git" inpRef={gituserRef} placeholder={'Enter Git Username'} />
+                    <FormInputGit data-test="username_git" inpRef={gituserRef} placeholder={'Enter Git Username'} />
                 </div>
             </div>
             <div className='git_input'>
                 <div className='flex flex-row justify-content-between align-items-center'>
                     <span htmlFor='label_git' >Git User Email</span>
-                    <FormInput data-test="email_git" inpRef={gitemailRef} placeholder={'Enter Git Email Id'} />
+                    <FormInputGit data-test="email_git" inpRef={gitemailRef} placeholder={'Enter Git Email Id'} />
                 </div>
             </div>
 

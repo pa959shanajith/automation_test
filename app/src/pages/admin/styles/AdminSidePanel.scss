@@ -1,11 +1,13 @@
 @import "../../global/styles/ColorVariables.scss";
+
 .admin_nav {
     .p-accordion-tab {
         .p-accordion-header {
             .p-accordion-header-link {
                 border: none !important;
                 background: none !important;
-
+                padding: 0.7rem !important;
+                font: $f6_semibold;
                 &:focus {
                     border: none !important;
                     box-shadow: none !important;
@@ -17,130 +19,83 @@
             .p-accordion-content {
                 border: none !important;
                 padding: 0.5rem !important;
+                font: $f6_semibold !important;
 
-                .p-button {
-                    color: black !important;
-                    margin: 0.2rem 0.2rem !important;
-                    padding: 0.2rem 0.5rem !important;
-                    background: white !important;
-                    border: none !important;
-                    align-items: start !important;
-                    text-align: left !important;
-                    border-radius: 5px;
 
-                    .p-button-label {
-                        font-weight: 400;
-                    }
 
-                    &:focus {
-                        background: #e3cff0 !important;
-                        box-shadow: none !important;
-                    }
-
-                }
             }
         }
     }
 
-}
+    .sidepanel_admin {
 
-.email_button {
-    background: transparent;
-    color: black;
-    border-color: transparent;
-    margin-left: 0rem;
-    width: 21.5rem;
-    height: 2rem;
-    font: $f6_bold;
-    padding: 0.75rem 0.6rem !important;
-    &:hover {
-        background: #e3cff0 !important;
-        border-color: #e3cff0 !important;
-        box-shadow: none !important;
-        color: black !important;
-        box-shadow: none !important;
-    }
-    &:focus{
-        background: #e3cff0 !important;
-        // border-color: #e3cff0 !important;
-        // border-color: transparent !important;
-        border:none;
-        color: black;
-        box-shadow: none !important;
-    }
-}
+        >ul>li {
+            font: $f6_semibold !important;
+            list-style-type: none !important;
+            float: left !important;
+            width: 100% !important;
+            text-align: start !important;
+            display: flex;
+            align-items: center;
+            background-color: none !important;
+            padding: 0.3rem;
+            margin-bottom: 0.4rem;
 
-.Agent_btn {
-    background: transparent;
-    color: black;
-    border-color: transparent;
-    margin-left: 0rem;
-    width: 21.5rem;
-    height: 2rem;
-    font: $f6_bold;
-    padding: 0.75rem 0.6rem !important;
+            &:hover {
+                // background: #e3cff0 !important;
+                background: #FAFAFA !important;
+                border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+            }
+        }
 
-    &:hover {
-        background: #e3cff0 !important;
-        border-color: #e3cff0 !important;
-        box-shadow: none !important;
-        color: black !important;
-    }
+        .active_tab {
+            background: #e3cff0 !important;
+            border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+        }
 
-    &:focus {
-        background: #e3cff0 !important;
-        border-color: #e3cff0 !important;
-        box-shadow: none !important;
-        color: black !important;
-    }
-}
-
-.Session_btn {
-    background: transparent;
-    color: black;
-    border-color: transparent;
-    margin-left: 0rem;
-    width: 21.5rem;
-    height: 2rem;
-    font: $f6_bold;
-    padding: 0.75rem 0.1rem !important;
-
-    &:hover {
-        background: #e3cff0 !important;
-        border-color: #e3cff0 !important;
-        box-shadow: none !important;
-        color: black !important;
-    }
-
-    &:focus {
-        background: #e3cff0 !important;
-        border-color: #e3cff0 !important;
-        box-shadow: none !important;
-        color: black !important;
-    }
-}
-.prefer_btn{
-    margin-top: 2rem;
-    background: transparent;
-    color: black;
-    border-color: transparent;
-    margin-left: 0rem;
-    width: 21.5rem;
-    height: 2rem;
-    font: $f6_bold;
-    padding: 0.75rem 0.6rem !important;
-
-    &:hover {
-        background: #e3cff0 !important;
-        border-color: #e3cff0 !important;
-        box-shadow: none !important;
-        color: black !important;
-    }
-
-    &:focus {
-        background: #e3cff0 !important;
-        border-color: #e3cff0 !important;
-        box-shadow: none !important;
-        color: black !important;
+        .not_active_tab {
+            background-color: none !important;
+            font: $f7_regular;
+        }
+        .ldap_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .saml_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .openId_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .useers_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .license_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .email_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .agent_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .grid_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .session_label{
+            font: $f6_regular;
+            color: #212121;
+        }
+        .privileges_label{
+            font: $f6_regular;
+            color: #212121;
+        }
     }
 }

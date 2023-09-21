@@ -1,4 +1,4 @@
-import React, { Fragment, useState ,useEffect,createRef} from 'react';
+import React, { Fragment, useState, useEffect, createRef, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import '../styles/EmailConfiguration.scss';
@@ -7,249 +7,292 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Button } from 'primereact/button';
 import { Checkbox } from "primereact/checkbox";
-import {getNotificationChannels,manageNotificationChannels} from '../api'
-import { ScreenOverlay,setMsg, Messages as MSG, VARIANT} from '../../global' 
+import { getNotificationChannels, manageNotificationChannels } from '../api'
+import { ScreenOverlay, setMsg,ScrollBar, Messages as MSG, VARIANT } from '../../global'
+import { Dialog } from 'primereact/dialog';
+import EmailTest from '../components/EmailTest';
+import { testNotificationChannels } from '../api'
+import {FormInput,FormRadio,FormSelect} from '../components/FormComp'
 
 
 
-const EmailConfiguration = ({resetMiddleScreen}) => {
+const EmailConfiguration = ({ resetMiddleScreen }) => {
+    const [value1, setValue1] = useState('');
+    const [value2, setValue2] = useState('');
     const [value3, setValue3] = useState('');
+    const [value4, setValue4] = useState('');
+    const [value5, setValue5] = useState('');
     const [checked, setChecked] = useState(false);
-    const [loading,setLoading] = useState(false);
-    const [inputRef,setinputRef] =  useState({})
-    const [reload,setReload] = useState(false)
+    const [checked_proxy, setChecked_proxy] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [inputRef, setinputRef] = useState({})
+    const [reload, setReload] = useState(false)
     const fn = factoryFn(inputRef)
-    const displayError = (error) =>{
+    const displayError = (error) => {
         setLoading(false)
         setMsg(error)
     }
-    const [selectedProvider, setSelectedProvider] = useState(''); 
-    const [emailTest,setEmailTest] = useState(false);
-    useEffect(()=>{
+    const [selectedProvider, setSelectedProvider] = useState('');
+    const [emailTest, setEmailTest] = useState(false);
+    const [selectedValue, setSelectedValue] = useState(null);
+    const [inputEnabled, setInputEnabled] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('Auto');
+    const [visible, setVisible] = useState(false);
+    const emailRef = useRef()
+    const [errMsg, setErrMsg] = useState("");
+    const [confObj, setConfObj] = useState();
+    const [secureConnect, setSecureConnect] = useState("Auto");
+const [ignoreTlsErrors, setIgnoreTlsErrors] = useState("Yes");
+const[hostname,setHostname]=useState('');
+const[servername,setServername]=useState('')
+const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
+
+    useEffect(() => {
         //on reset dismount component to show loading screen
         setinputRef({})
         setReload(true)
-    },[resetMiddleScreen])
-    useEffect(()=>{
+    }, [resetMiddleScreen])
+    useEffect(() => {
         //on reload mount component back
-        if(reload){
-            const Ref = {"toggleStatus":createRef(),"toggleUppdate":createRef(),"toggleTest":createRef(''),"servername": createRef(),"serverstatus":createRef(),"host":createRef(),"port":createRef(),"authname":createRef(),
-            "authpassword":createRef(),"sendername":createRef(),"senderaddr":createRef(),"assureurl":createRef(),
-            "conctimeout":createRef(),"grettimeout":createRef(),"socktimeout":createRef(),"maxconnection":createRef(),"maxmessages":createRef(),
-            "proxyurl":createRef(),"proxyuser":createRef(),"proxypass":createRef(),"selectauth":createRef(),"selectprovider":createRef(),
-            "secureconnect":{"auto":createRef(),"enable":createRef(),"disable":createRef()},
-            "tlcerror":{"true":createRef(),"false":createRef()},"checkproxyurl":createRef(),"checkboxpool":createRef(),"checkproxycred":createRef()}
+        if (reload) {
+            const Ref = {
+                "toggleStatus": createRef(), "toggleUppdate": createRef(), "toggleTest": createRef(''), "servername": createRef(), "serverstatus": createRef(), "smtpHost": createRef(),"smtpPort": createRef(), "authname": createRef(),
+                "authpassword": createRef(), "sendername": createRef(), "senderaddr": createRef(), "assureurl": createRef(),
+                "conctimeout": createRef(), "grettimeout": createRef(), "socktimeout": createRef(), "maxconnection": createRef(), "maxmessages": createRef(),
+                "proxyurl": createRef(), "proxyuser": createRef(), "proxypass": createRef(), "selectauth": createRef(), "selectprovider": createRef(),
+                "secureconnect": { "auto": createRef(), "enable": createRef(), "disable": createRef() },
+                "tlcerror": { "true": createRef(), "false": createRef() }, "checkproxyurl": createRef(), "checkboxpool": createRef(), "checkproxycred": createRef()
+            }
             setinputRef(Ref)
             setReload(false)
         }
-    },[reload])
-    useEffect(()=>{
-        //disable buttons on default screen
-        if(Object.keys(inputRef).length>0){
-            inputRef.toggleUppdate.current.disabled = true
-            inputRef.toggleStatus.current.disabled = true
-            inputRef.toggleTest.current.disabled = true
+    }, [reload])
+    useEffect(() => {
+        // Disable buttons on the default screen if inputRef exists and the elements are available
+        if (Object.keys(inputRef).length > 0) {
+            if (inputRef.toggleUpdate?.current) {
+                inputRef.toggleUpdate.current.disabled = true;
+            }
+            if (inputRef.toggleStatus?.current) {
+                inputRef.toggleStatus.current.disabled = true;
+            }
+            if (inputRef.toggleTest?.current) {
+                inputRef.toggleTest.current.disabled = true;
+            }
             fn.showAll();
         }
         // eslint-disable-next-line
-    },[inputRef])
+    }, [inputRef]);
+    const options = [
+        { label: 'SMTP', value: 'SMTP' },
+    ];
+    const handleDropdownChange = (e) => {
+        const selectedType = e.value;
+        setSelectedValue(selectedType);
+        setInputEnabled(selectedType === 'basic');
+    };
+    const handleRadioClick = (value) => {
+        setSelectedOption(value);
+    };
+    const handleIgnoreTlsErrorsChange = (option) => {
+        setIgnoreTlsErrors(option);
+        inputRef["tlcerror"].current = option;
+      };
+      const handleSecureConnectChange = (option) => {
+        setSecureConnect(option);
+        inputRef["secureconnect"].current = option;
+      };
+    //   const showDialog = () => {
+    //     setVisible_test(true);
+    //   };
 
-    const onSelectProvider = () => {
-        selectProvider({inputRef,...fn,displayError,setLoading});
+    //   const onHide = () => {
+    //     setVisible_test(false);
+    //   };
+    const submit = async () => {
+        // eslint-disable-next-line
+        const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (emailRef.current.value.length === 0 || !emailRegEx.test(emailRef.current.value)) {
+            setErrMsg("Recipient address is invalid!");
+            emailRef.current.style.outline = 'red';
+            return false;
+        }
+        emailRef.current.style.outline = ''
+        setErrMsg('Sending...')
+        const arg = { channel: emailTest.channel, provider: emailTest.provider, recipient:emailRef.current.value, conf: emailTest }
+        var data = await testNotificationChannels(arg)
+        if (data.error) { setErrMsg(data.error.CONTENT); return; }
+        else setErrMsg(data.CONTENT);
+        setIsCreateButtonDisabled(false);
+    }
+
+    const onSelectProvider = (event) => {
+        selectProvider({ inputRef, ...fn, displayError, setLoading });
+        // const selectedValue = event.value;
         // setSelectedProvider(selectedValue);
+        
     }
     const onClickTest = () => {
+        setVisible(true)
         if (!validate(inputRef,displayError)) return;
         var val = getConfObj(inputRef)
-        setEmailTest(val)
+        setEmailTest(val) 
+       
+        
     }
+    
+    
     const onClickToggle = () => {
-        clickToggle(inputRef.servername.current.value,inputRef.toggleStatus.current.innerText,setLoading,displayError,onSelectProvider)   
+        clickToggle(inputRef.servername.current.value, inputRef.toggleStatus.current.innerText, setLoading, displayError, onSelectProvider)
     }
     const onClickUpdate = () => {
-        if (!validate(inputRef,displayError)) return;
+        if (!validate(inputRef, displayError)) return;
         var val = getConfObj(inputRef)
-        update(val,inputRef.toggleUppdate.current.innerText,setLoading,displayError,onSelectProvider)
+        update(val, inputRef.toggleUppdate.current.innerText, setLoading, displayError, onSelectProvider)
     }
-    if(Object.keys(inputRef).length<1){
+    if (Object.keys(inputRef).length < 1) {
         //keep screen loading till inputRef is set
         return (
-            <ScreenOverlay content={'Loading...'}/>
+            <ScreenOverlay content={'Loading...'} />
         )
     }
-   
+
 
     return (
         <div>
             <div className='full_page'>
                 <>
-                    <div>
+                
+                {/* <div>
                         <label required className='provider'> select provider</label>
-                    </div>
-                    <Dropdown inputRef={inputRef['selectprovider']} className='providerdropdown' value={selectedProvider}  option={['SMTP']} onChange={onSelectProvider}  placeholder="Select Provider"  id="selectprovider" />
-                    <div className='email_setting_header'>
+                    </div> */}
+                    <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
+                    {/* <Dropdown  className='providerdropdown' ref={inputRef['selectprovider']}  value={selectedProvider} options={['SMTP']} onChange={onSelectProvider} placeholder="Select Provider" id="selectprovider" /> */}
+                    {/* <div className='email_setting_header'>
                         Email Server Settings
-                    </div>
+                    </div> */}
                     <div>
-                        <label className='hostname' >Host name</label>
-                        <label className='servername'  validExp={"emailServerName"}>Server Name</label>
+                        {/* <label className='hostname' >Host name</label>
+                        <label className='servername' validExp={"emailServerName"}>Server Name</label> */}
                         <div>
-                            <InputText  inputRef={inputRef['host']} placeholder="Enter Server Host ID/Domain Name" className='host_name'></InputText>
-                            <InputText placeholder="Enter Server Name" className="server_name" inpRef={inputRef['servername']}></InputText>
+                        <FormInput inpRef={inputRef['smtpHost']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
+                            <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
                         </div>
-                        <div>
+                        <div className='col-xs-9 form-group input-label'>
+                    <label>Status</label>
+                    <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>
+                </div>
+                        {/* <div>
                             <lable className="portname">Port Number </lable>
-                        </div>
+                        </div> */}
                         <div>
-                            <InputText placeholder="Enter Port No" className="port_no" inpRef={inputRef['port']} label={'Port'}></InputText>
+                        <FormInput inpRef={inputRef['smtpPort']} label={'Port'} placeholder={'Server Port'}/>
                         </div>
+                        <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} label={"Authentication"} option={['none','basic']}/>
+
+                       {/* <div class="auth-container">
+    <label class="auth-label">Authentication Type</label>
+    <div>
+                            <Dropdown ref={inputRef['selectauth']} value={selectedValue} className='Auth_dropdown' placeholder="Select Authentication Type" options={['none', 'basic']} onChange={handleDropdownChange} />
+                        </div>
+</div> */}
+                    
                         <div>
-                            <label className='Auth_info'>Authentication Information</label>
+                        <FormInput inpRef={inputRef['authname']} label={'Authentication Username'} placeholder={'Authentication Username'} disabled={!inputEnabled}/>
+                        <FormInput inpRef={inputRef['authpassword']} label={'Authentication Password'} placeholder={'Authentication Password'} disabled={!inputEnabled}/>
                         </div>
-                        <div>
-                            <lable className="Authname">Authentication Type</lable>
-                        </div>
-                        <div>
-                            <Dropdown inpRef={inputRef['selectauth']} className='Auth_dropdown' placeholder="Select Authentication Type" option={['none','basic']} />
-                        </div>
-                        <div>
-                            <label className='AuthUsername'>Authentication UserName</label>
-                            <label className='AuthPassword'>Authentication Password</label>
-                        </div>
-                        <div>
-                            <InputText inpRef={inputRef['authname']} placeholder="Enter Authentication UserName" className='Auth_Username'></InputText>
-                            <InputText inpRef={inputRef['authpassword']} placeholder="Enter Authentication PassWord" className="Auth_Password"></InputText>
-                        </div>
-                        <div>
-                            <label className='security_label'>Connection Security</label>
-                            <div className='connection_label'>
-                                <label className='selectconn_label'>Select connection</label>
-                                <label className='tLs_label'>Ignore TLS error</label></div>
-                            <div className="flex align-items-center">
-                                <RadioButton />
-                                <label className="ml-2">Auto</label>
-                                <RadioButton />
-                                <label className="ml-2">Enable</label>
-                                <RadioButton />
-                                <label className="ml-2">disable</label>
-                                <RadioButton className="tLs_radiobutton" />
-                                <label className="ml-2" >yes</label>
-
-                                <RadioButton />
-                                <label className="ml-2">No</label>
-
-                            </div>
-
-
-
-                        </div>
-                        <Accordion activeIndex={0} className="accordiantab">
-                            <AccordionTab header="Authentication Configuration" >
-                                <div className='flex flex-column pl-4 authheader'>
-                                <img  src="static/imgs/timeout_icon.svg"className='timeImg' />
-                                    <label className='font-bold timelabel'> Time Out</label>
-                                    <div className="flex-auto">
-                                        <label htmlFor="minmax-buttons" className=" block mb-2 contime_label">connection time out</label>
-                                        <InputNumber inputId="minmax-buttons" value={value3} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={100} className="input_button" placeholder='Enter connection timeout(in milisec)' />
-                                    </div>
-                                    <div className="flex-auto">
-                                        <label htmlFor="minmax-buttons" className=" block mb-2 conSocket_label">Socket time out</label>
-                                        <InputNumber inputId="minmax-buttons" value={value3} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={100} className="socket_button" placeholder='Enter Socket timeout(in milisec)' />
-                                    </div>
-                                    <div className="flex-auto">
-                                        <label htmlFor="minmax-buttons" className=" block mb-2 greet_label">Greeting time out</label>
-                                        <InputNumber inputId="minmax-buttons" value={value3} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={100} className="greet_button" placeholder='Enter Greeting timeout(in milisec)' />
-                                    </div>
-                                    <div>
-                                        <Checkbox onChange={e => setChecked(e.checked)} checked={checked} className="checkbox_conn"></Checkbox>
-                                        <img  src="static/imgs/connection_icon.svg"   /> 
-                                        <lable className="connection_label">Connection</lable>
-                                        <div>
-                                            <div className="flex-auto">
-                                                <label htmlFor="minmax-buttons" className=" block mb-2 connec_but">Maximum Connection</label>
-                                                <InputNumber inputId="minmax-buttons" value={value3} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={100} className="max_button" placeholder='Enter Socket timeout(in milisec)' />
-                                            </div>
-                                            <div className="flex-auto">
-                                                <label htmlFor="minmax-buttons" className=" block mb-2 msg_label">Maximun Messages</label>
-                                                <InputNumber inputId="minmax-buttons" value={value3} onValueChange={(e) => setValue3(e.value)} mode="decimal" showButtons min={0} max={100} className="maxmsg_button" placeholder='Enter Greeting timeout(in milisec)' />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <Checkbox onChange={e => setChecked(e.checked)} checked={checked} className="checkbox_conn"></Checkbox>
-                                        <img  src="static/imgs/proxy_icon.svg" className='proxy_img'  /> 
-                                        <lable className="Proxy_label">Proxy</lable>
-                                        <div>
-                                            <div className="flex-auto">
-                                                <label className='url_proxy'>Proxy Server URL</label>
-                                                <div >
-                                                <InputText placeholder="Enter Proxy URL" className="Proxy_srver"></InputText>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        {/* <Checkbox onChange={e => setChecked(e.checked)} checked={checked} className="checkbox_conn"></Checkbox> */}
-                                        <lable className="ProxyCred_label">Proxy Credentials</lable>
-                                        <div>
-                                            <div className="flex-auto">
-                                                <label className='proxyUser_label'>Proxy username</label>
-                                                <div >
-                                                <InputText placeholder="Enter Proxy URL" className="Proxy_username"></InputText>
-                                                </div>
-                                            </div>
-                                            <div className="flex-auto">
-                                                <label className='proxypass_label'>Proxy Password</label>
-                                                <div className="Proxy_Password">
-                                                <InputText placeholder="Enter Proxy URL" ></InputText>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </AccordionTab>
-                        </Accordion>
+                        <FormInput inpRef={inputRef['sendername']} label={'Sender Name'} placeholder={'Avo Assure Alerts'}/>
+                <FormInput inpRef={inputRef['senderaddr']} label={'Sender Address'} placeholder={'avoassure-alerts@avoautomation.com'}/>
+                <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto","Enable","Disable"]}/>
+                <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes","No"]}/>
+                <FormInput inpRef={inputRef['assureurl']} label={'Avo Assure URL'} placeholder={'Avo Assure Application URL'}/>
+                <div>
+                <FormInput inpRef={inputRef['conctimeout']} type={'number'} label={'Connection Timeout'} placeholder={'Connection Timeout (in milliseconds)'}/>
+                <FormInput inpRef={inputRef['grettimeout']} type={'number'} label={'Greeting Timeout'} placeholder={'Greeting Timeout (in milliseconds)'}/>
+                <FormInput inpRef={inputRef['socktimeout']} type={'number'} label={'Socket Timeout'} placeholder={'Socket Timeout (in milliseconds)'}/>
+                </div>
+                        
+                      <div className='col-xs-9 form-group input-label checkbox-email'>
+                    <span>
+                        <input onChange={fn.showPool} id='checkboxpool' ref={inputRef['checkboxpool']} type='checkbox'></input>
+                        <label htmlFor='checkboxpool'>Use Connection Pool</label>
+                    </span>
+                </div>
+                <FormInput inpRef={inputRef['maxconnection']} type={'number'} label={'Max Connections'} placeholder={'Max Number of Connections Allowed in Pool'}/>
+                <FormInput inpRef={inputRef['maxmessages']} type={'number'} label={'Max Messages'} placeholder={'Max Number of Messages Sent via Pool'}/>
+                <div className='col-xs-9 form-group input-label checkbox-email'>
+                    <span>
+                        <input onChange={fn.showProxUrl} id='checkproxyurl' ref={inputRef['checkproxyurl']} type='checkbox'></input>
+                        <label htmlFor='checkproxyurl'>Use Proxy</label>
+                    </span>
+                </div>
+                <FormInput inpRef={inputRef['proxyurl']} label={'Proxy Server url'} placeholder={'Proxy Server URL (Eg: https://localhost:8080)'}/>
+                <div className='col-xs-9 form-group input-label checkbox-email'>
+                    <span>
+                        <input onChange={fn.showProxCred} id='checkproxycred' ref={inputRef['checkproxycred']} type='checkbox'></input>
+                        <label htmlFor='checkproxycred'>Proxy Requires Credentials</label>
+                    </span>
+                </div>
+                <FormInput inpRef={inputRef['proxyuser']} label={'Proxy User'} placeholder={'Username For Proxy Server'}/>
+                <FormInput inpRef={inputRef['proxypass']} label={'Proxy Password'} placeholder={'Password For Proxy Server'}/>
 
                     </div>
-                   
+
 
                 </>
 
             </div>
-            <div className="emailActionBtn">
-                    <Button className="disabelbtn" size="small" onClick={onClickToggle}>Disable</Button>
-                    <Button className="testbtn" size="small"onClick={onClickTest} >Test</Button>
-                    <Button className="savebtn" size="small" onClick={onClickUpdate} >Save</Button>
-                </div>
-            <div>
-               
+            <div className="adminActionBtn">
+                <Button ref={inputRef["toggleStatus"]} className="disabelbtn" onClick={onClickToggle} title="Disable">Disable</Button>
+                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update"  disabled={isCreateButtonDisabled}>Create</Button>
+                {/* <button Ref={inputRef["toggleTest"]} className="a__btn " onClick={onClickTest}  title="Test">Test</button> */}
+                
+                 <Button  className="testbtn" size="small" onClick={onClickTest}>
+                        Test
+                    </Button>
+                <Dialog header="Header" visible={visible} style={{ width: '50vw', height: '40%' }} onHide={() => setVisible(false)}>
+                        <div style={{ width: "100%", margin: "20px 0px" }}>
+                            <label>Recipient Email ID</label>
+                            <InputText
+                                ref={emailRef}
+                                style={{ width: "60%", marginLeft: "24px" }}
+                                placeholder="Enter Recipient Email ID"
+                            />
+                        </div>
+
+                        <div className="mnode__buttons">
+                            <label className="err-message">{errMsg}</label>
+                            <Button className='test_submit' label="TEST" onClick={submit} />
+
+                        </div>
+                    </Dialog>
+           
             </div>
+            {emailTest?<EmailTest setEmailTest={setEmailTest} confObj={emailTest}/>:null}
 
         </div>
 
     )
 
 }
-const update = async(conf,action,setLoading,displayError,onSelectProvider) =>{
-    var emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
-    setLoading(action.slice(0,-1) + "ing Configuration...")
-    var data = await manageNotificationChannels({'action':action.toLowerCase(), conf})
-    if(data.error){displayError(data.error);return;}
+const update = async (conf, action, setLoading, displayError, onSelectProvider) => {
+    var emsg = "Failed to " + action + " '" + conf.name + "' Configuration.";
+    setLoading(action.slice(0, -1) + "ing Configuration...")
+    var data = await manageNotificationChannels({ 'action': action.toLowerCase(), conf })
+    if (data.error) { displayError(data.error); return; }
     else if (data === "exists") {
-        displayError({CONTENT:"'"+conf.name+"' configuration already exists",VARIANT:VARIANT.WARNING});
+        displayError({ CONTENT: "'" + conf.name + "' configuration already exists", VARIANT: VARIANT.WARNING });
         return;
     }
     else if (data === "success") {
-        displayError({CONTENT:"'"+conf.name+"' Configuration "+action+"d!",VARIANT:VARIANT.SUCCESS});
+        displayError({ CONTENT: "'" + conf.name + "' Configuration " + action + "d!", VARIANT: VARIANT.SUCCESS });
         onSelectProvider()
         return;
-    } else if(/^1[0-4]{12}$/.test(data)) {
+    } else if (/^1[0-4]{12}$/.test(data)) {
         if (+data[1]) {
-            displayError({CONTENT:emsg+" Invalid Request!",VARIANT:VARIANT.WARNING});
+            displayError({ CONTENT: emsg + " Invalid Request!", VARIANT: VARIANT.WARNING });
             return;
-       }
+        }
         const errfields = [];
         if (+JSON.stringify(data)[2]) errfields.push("Server Name");
         if (+JSON.stringify(data)[3]) errfields.push("Channel");
@@ -264,63 +307,63 @@ const update = async(conf,action,setLoading,displayError,onSelectProvider) =>{
         if (+JSON.stringify(data)[12] === 1) errfields.push("Proxy Username");
         else if (+JSON.stringify(data)[12] === 2) errfields.push("Proxy Password");
         else if (+JSON.stringify(data)[12] === 3) errfields.push("Proxy Credentials");
-        displayError({CONTENT:emsg+" Following values are invalid: "+errfields.join(", "),VARIANT:VARIANT.WARNING});
-    } else{
-        displayError({CONTENT:"Failed to "+ action +" configuration",VARIANT:VARIANT.ERROR});
+        displayError({ CONTENT: emsg + " Following values are invalid: " + errfields.join(", "), VARIANT: VARIANT.WARNING });
+    } else {
+        displayError({ CONTENT: "Failed to " + action + " configuration", VARIANT: VARIANT.ERROR });
     }
 }
 
-const clickToggle = async(servername,action,setLoading,displayError,onSelectProvider) =>{
-    const emsg = "Failed to "+action+" '"+servername+"' Configuration.";
+const clickToggle = async (servername, action, setLoading, displayError, onSelectProvider) => {
+    const emsg = "Failed to " + action + " '" + servername + "' Configuration.";
     var conf = {
         channel: 'email',
         provider: 'smtp',
         name: servername
     }
-    setLoading(action.slice(0,-1) + "ing Configuration...")
-    var data = await manageNotificationChannels({action : action.toLowerCase(), conf})
-    if(data.error){displayError(data.error);return;}
+    setLoading(action.slice(0, -1) + "ing Configuration...")
+    var data = await manageNotificationChannels({ action: action.toLowerCase(), conf })
+    if (data.error) { displayError(data.error); return; }
     if (data === "success") {
-        displayError({CONTENT:"'"+conf.name+"' Configuration "+action+"d!",VARIANT:VARIANT.SUCCESS});
+        displayError({ CONTENT: "'" + conf.name + "' Configuration " + action + "d!", VARIANT: VARIANT.SUCCESS });
         onSelectProvider()
         return;
-    } else if(/^1[0-4]{9}$/.test(data)) {
+    } else if (/^1[0-4]{9}$/.test(data)) {
         if (parseInt(data[1])) {
-            displayError({CONTENT:emsg+" Invalid Request!",VARIANT:VARIANT.ERROR});
+            displayError({ CONTENT: emsg + " Invalid Request!", VARIANT: VARIANT.ERROR });
             return;
         }
         const errfields = [];
         if (parseInt(data[2])) errfields.push("Server Name");
         if (parseInt(data[3])) errfields.push("Channel");
-        displayError({CONTENT:emsg+" Following values are invalid: "+errfields.join(", "),VARIANT:VARIANT.WARNING});
-    } else{
-        displayError({CONTENT:"Failed to "+ action +" configuration",VARIANT:VARIANT.ERROR});
+        displayError({ CONTENT: emsg + " Following values are invalid: " + errfields.join(", "), VARIANT: VARIANT.WARNING });
+    } else {
+        displayError({ CONTENT: "Failed to " + action + " configuration", VARIANT: VARIANT.ERROR });
     }
 }
 
-const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,showProxUrl,displayError,setLoading}) =>{
-    var arg = {"action":"provider","channel":"email","args":"smtp"}
-    try{
+const selectProvider = async ({ inputRef, showPool, showAuth, showAll, showProxCred, showProxUrl, displayError, setLoading }) => {
+    var arg = { "action": "provider", "channel": "email", "args": "smtp" }
+    try {
         setLoading('Loading ...');
         var data = await getNotificationChannels(arg);
-        if(data.error){displayError(data.error);return;}
-        if(data === 'empty'){
-            inputRef.toggleUppdate.current.disabled=false;
+        if (data.error) { displayError(data.error); return; }
+        if (data === 'empty') {
+            inputRef.toggleUppdate.current.disabled = false;
             setLoading(false);
             return;
         }
         inputRef.toggleUppdate.current.innerText = 'Update'
         inputRef.servername.current.value = data.name
-        if(data.name)inputRef.servername.current.readOnly = true
-        inputRef.host.current.value = data.host
-        inputRef.port.current.value = data.port
-        inputRef.serverstatus.current.innerText = data.active?'Active':'InActive'
-        inputRef.serverstatus.current.style.color = data.active?'green':'red'
-        inputRef.toggleStatus.current.innerText = data.active?"Disable":"Enable"
-        inputRef.secureconnect[data.tls.security].current.checked= true 
+        if (data.name) inputRef.servername.current.readOnly = true
+        inputRef.smtpHost.current.value = data.smtpHost ? data.smtpHost : data.host
+        inputRef.smtpPort.current.value =  data.smtpPort ? data.smtpPort : data.port
+        inputRef.serverstatus.current.innerText = data.active ? 'Active' : 'InActive'
+        inputRef.serverstatus.current.style.color = data.active ? 'green' : 'red'
+        inputRef.toggleStatus.current.innerText = data.active ? "Disable" : "Enable"
+        inputRef.secureconnect[data.tls.security].current.checked = true
         inputRef.tlcerror[data.tls.insecure.toString()].current.checked = true
         const authType = (data.auth && data.auth.type) || data.auth;
-        if (authType === "basic"){
+        if (authType === "basic") {
             inputRef.selectauth.current.value = data.auth.type;
             inputRef.authname.current.value = data.auth.username
             inputRef.authpassword.current.value = data.auth.password
@@ -332,23 +375,23 @@ const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,sh
         inputRef.sendername.current.value = data.sender.name
         inputRef.senderaddr.current.value = data.sender.email
         inputRef.assureurl.current.value = data.appurl
-    
+
         if (!data.timeouts) data.timeouts = {};
         inputRef.grettimeout.current.value = data.timeouts.greeting
         inputRef.socktimeout.current.value = data.timeouts.socket
         inputRef.conctimeout.current.value = data.timeouts.connection
-    
+
         if (!data.pool) data.pool = {};
         inputRef.checkboxpool.current.checked = data.pool.enable || false;
         inputRef.maxconnection.current.value = data.pool.maxconnections || "";
         inputRef.maxmessages.current.value = data.pool.maxmessages || "";
         showPool();
-    
+
         if (!data.proxy) data.proxy = {};
         inputRef.checkproxyurl.current.value = data.proxy.enable || false;
         inputRef.proxyurl.current.value = data.proxy.url || "";
         showProxUrl();
-    
+
         inputRef.checkproxycred.current.value = data.proxy.auth || false;
         inputRef.proxyuser.current.value = data.proxy.user || "";
         inputRef.proxypass.current.value = data.proxy.pass || "";
@@ -357,51 +400,74 @@ const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,sh
         inputRef.toggleStatus.current.disabled = false
         inputRef.toggleTest.current.disabled = false
         setLoading(false);
-    }catch(err){
+    } catch (err) {
         console.error(err)
         displayError(MSG.ADMIN.ERR_PROVIDER_DETAILS)
     }
 }
-const factoryFn = (inputRef) =>{
+const factoryFn = (inputRef) => {
     const showAuth = () => {
-        inputRef.authname.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
-        inputRef.authpassword.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
-    }
-    const showProxCred = () =>{
-        inputRef.proxyuser.current.disabled = !inputRef.checkproxycred.current.checked
-        inputRef.proxypass.current.disabled = !inputRef.checkproxycred.current.checked
-    }
-    const showProxUrl = () =>{
-        if(!inputRef.checkproxyurl.current.checked){
-            inputRef.checkproxycred.current.disabled = true
-            inputRef.proxyuser.current.disabled = true
-            inputRef.proxypass.current.disabled = true
-
-        }else{
-            inputRef.checkproxycred.current.disabled = false
-            showProxCred()
+        if (inputRef.authname.current && inputRef.selectauth.current) {
+            inputRef.authname.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt");
+            inputRef.authpassword.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt");
         }
-        inputRef.proxyurl.current.disabled = !inputRef.checkproxyurl.current.checked
-    }
-    const showPool = () =>{
-        inputRef.maxconnection.current.disabled =!inputRef.checkboxpool.current.checked 
-        inputRef.maxmessages.current.disabled = !inputRef.checkboxpool.current.checked 
-    }
+    };
+
+    const showProxCred = () => {
+        if (inputRef.proxyuser.current && inputRef.checkproxycred.current) {
+            inputRef.proxyuser.current.disabled = !inputRef.checkproxycred.current.checked;
+            inputRef.proxypass.current.disabled = !inputRef.checkproxycred.current.checked;
+        }
+    };
+
+    const showProxUrl = () => {
+        if (inputRef.checkproxyurl.current) {
+            if (!inputRef.checkproxyurl.current.checked) {
+                if (inputRef.checkproxycred.current) {
+                    inputRef.checkproxycred.current.disabled = true;
+                }
+                if (inputRef.proxyuser.current) {
+                    inputRef.proxyuser.current.disabled = true;
+                }
+                if (inputRef.proxypass.current) {
+                    inputRef.proxypass.current.disabled = true;
+                }
+            } else {
+                if (inputRef.checkproxycred.current) {
+                    inputRef.checkproxycred.current.disabled = false;
+                }
+                showProxCred();
+            }
+            if (inputRef.proxyurl.current) {
+                inputRef.proxyurl.current.disabled = !inputRef.checkproxyurl.current.checked;
+            }
+        }
+    };
+
+    const showPool = () => {
+        if (inputRef.maxconnection.current && inputRef.checkboxpool.current) {
+            inputRef.maxconnection.current.disabled = !inputRef.checkboxpool.current.checked;
+        }
+        if (inputRef.maxmessages.current && inputRef.checkboxpool.current) {
+            inputRef.maxmessages.current.disabled = !inputRef.checkboxpool.current.checked;
+        }
+    };
+
     const showAll = () => {
         showAuth();
         showPool();
         showProxUrl();
         showProxCred();
     }
-    return {showPool,showAuth,showProxCred,showProxUrl,showAll}
+    return { showPool, showAuth, showProxCred, showProxUrl, showAll }
 }
 const getConfObj = (inputRef) => {
     return {
         channel: 'email',
         provider: 'smtp',
         name: inputRef.servername.current.value,
-        host: inputRef.host.current.value,
-        port: inputRef.port.current.value,
+        smtpHost: inputRef.smtpHost.current.value,
+        smtpPort: inputRef.smtpPort.current.value,
         auth: {
             type:inputRef.selectauth.current.value,
             username:inputRef.authname.current.value,
@@ -448,7 +514,7 @@ const getConfObj = (inputRef) => {
     };
 };
 
-const validate = (inputRef,displayError)=> {
+const validate = (inputRef, displayError) => {
     var flag = true;
     var popped = false;
     const errBorder = '1px solid red';
@@ -456,39 +522,40 @@ const validate = (inputRef,displayError)=> {
     const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
     // eslint-disable-next-line
     const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    
-    var arr = ['selectprovider','selectauth','host','servername','port','sendername','senderaddr','assureurl']
-    if(inputRef.checkproxyurl.current.value === 'true'){
+
+    var arr = ['selectprovider', 'selectauth', 'smtpHost', 'servername', 'smtpPort', 'sendername', 'senderaddr', 'assureurl']
+    if (inputRef.checkproxyurl.current.value === 'true') {
         arr.push('proxyurl')
-        if(inputRef.checkproxycred.current.value === 'true')arr.push('proxyuser','proxypass')
+        if (inputRef.checkproxycred.current.value === 'true') arr.push('proxyuser', 'proxypass')
     }
-    arr.forEach((e)=>{
+    arr.forEach((e) => {
+        if(inputRef[e].current !== null){
         inputRef[e].current.style.outline = ''
-        if(inputRef[e].current.value === ""){
+        if (inputRef[e].current.value === "") {
             inputRef[e].current.style.outline = errBorder
             flag = false;
-        }else if(e === 'servername' && !regExName.test(inputRef[e].current.value)){
+        } else if (e === 'servername' && !regExName.test(inputRef[e].current.value)) {
             inputRef[e].current.style.outline = errBorder
             if (!popped) displayError(MSG.ADMIN.WARN_INVALID_SERVER_NAME);
             flag = false;
             popped = true;
-        }else if(e === 'port' && !((+inputRef[e].current.value  >= 0) && (+inputRef[e].current.value  < 65536))){
+        } else if (e === 'smtpPort' && !((+inputRef[e].current.value >= 0) && (+inputRef[e].current.value < 65536))) {
             inputRef[e].current.style.outline = errBorder
             if (!popped) displayError(MSG.ADMIN.WARN_SERVER_PORT);
             flag = false;
             popped = true;
-        }else if(e === 'senderaddr' && !emailRegEx.test(inputRef[e].current.value)){
+        } else if (e === 'senderaddr' && !emailRegEx.test(inputRef[e].current.value)) {
             inputRef[e].current.style.outline = errBorder
             if (!popped) displayError(MSG.ADMIN.WARN_EMAIL_ADDRESS);
             flag = false;
             popped = true;
-        }else if((e === 'assureurl'||e === 'proxyurl') && !regExURL.test(inputRef[e].current.value)){
+        } else if ((e === 'assureurl' || e === 'proxyurl') && !regExURL.test(inputRef[e].current.value)) {
             inputRef[e].current.style.outline = errBorder
-            if (!popped) displayError({CONTENT:"Invalid "+(e === 'assureurl'?"Avo Assure Application":"Proxy Server")+" URL provided!",VARIANT:VARIANT.WARNING});
+            if (!popped) displayError({ CONTENT: "Invalid " + (e === 'assureurl' ? "Avo Assure Application" : "Proxy Server") + " URL provided!", VARIANT: VARIANT.WARNING });
             flag = false;
             popped = true;
         }
-    })
+    }})
     if (!flag && !popped) displayError(MSG.ADMIN.ERR_FORM);
     return flag;
 };

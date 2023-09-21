@@ -81,7 +81,7 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
     const errBorder = '2px solid red';
     var regExUrl = /^https:\/\//g;
     user.current.style.outline = "";
-    domain.current.style.outline = "";
+    // domain.current.style.outline = "";
     Project.current.style.outline = "";
     gitConfigName.current.style.outline = "";
     gitAccToken.current.style.outline = "";
@@ -93,10 +93,10 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
         user.current.style.outline = errBorder;
         flag = false;
     }
-    if (domain.current.value === 'def-opt') {
-        domain.current.style.outline = errBorder
-        flag = false;
-    }
+    // if (domain.current.value === 'def-opt') {
+    //     domain.current.style.outline = errBorder
+    //     flag = false;
+    // }
     if (Project.current.value === 'def-opt') {
         Project.current.style.outline = errBorder
         flag = false;

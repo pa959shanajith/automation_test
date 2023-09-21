@@ -210,8 +210,17 @@ const reports = () => {
                   handeSelectProject(e.target.value);
                 }}
               >
-                {projectList.map((project, index) => (
-                  <option key={index} value={project.id}>
+               
+                 {projectList
+                .filter(
+                  (value, index, self) =>
+                    index ===
+                    self.findIndex(
+                      (item) => item.name === value.name
+                    )
+                )
+                .map((project, index) => (
+                  <option value={project.id} key={index}>
                     {project.name}
                   </option>
                 ))}
@@ -307,9 +316,10 @@ const reports = () => {
                                           src={
                                             data.selectedModuleType ===
                                             "e2eExecution"
-                                              ? "static/imgs/E2E_configsetup.png"
-                                              : "static/imgs/signup_module.svg"
+                                              ? "static/imgs/E2EModuleSideIcon.png"
+                                              : "static/imgs/moduleIcon.png"
                                           }
+                                          className='exe_type_icon'
                                         />
                                         <span style={{ display: 'inline-block', marginLeft: '0.4rem' }}>{data.selectedModuleType ===
                                         "e2eExecution"
