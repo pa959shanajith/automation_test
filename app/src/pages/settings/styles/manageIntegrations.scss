@@ -258,17 +258,12 @@ height: 2.5rem !important;
 }
 
 
-.side-panel {
-
+.side-panel_login {
     .icon-wrapper {
-
         position: relative;
-
         top: 2rem;
-
         width: 40px;
         cursor: pointer;
-
     }
     align-items: center;
     display: flex;
@@ -279,7 +274,7 @@ height: 2.5rem !important;
     top: 12rem;
     /* bottom: -1rem; */
     width: 5rem;
-    gap: 2rem;
+    gap: 1.2rem;
     position: absolute;
 
 
@@ -315,6 +310,11 @@ height: 2.5rem !important;
         cursor: pointer;
     }
 
+    .text__git{
+        position: relative;
+        right: 2.05rem;
+    }
+
 }
 
 .map__btn{
@@ -345,7 +345,7 @@ height: 2.5rem !important;
     }
 }
 
-.side-panel .icon-wrapper.selected {
+.side-panel_login .icon-wrapper.selected {
     border: 1px solid #6837e6;
     border-radius: 7px;
     padding: 1rem 4rem 2rem 2rem;
@@ -471,4 +471,3 @@ height: 2.5rem !important;
         display: none !important;
     }
 }
-

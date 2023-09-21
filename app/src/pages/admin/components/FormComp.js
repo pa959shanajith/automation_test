@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState,useRef } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar, ValidationExpression } from '../../global';
 import { InputText } from 'primereact/inputtext';
@@ -26,6 +26,33 @@ const FormInput = (props) => {
             <div className='col-xs-9 form-group input-label'>
                 <label>{name}</label>
                 <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input>
+            </div>
+        </Fragment>
+    )
+}
+
+
+/*Component FormInput
+  use: renders input box and label in a form
+  props: name: label , placeholder : placeholder text , inpref = ref
+*/
+
+const FormInputGit = (props) => {
+    const name = props.label
+    const type = props.type
+    const placeholder = props.placeholder
+    const inpRef = props.inpRef
+    const validExp = props.validExp
+    const textValue = props.textValue;
+    const upateInput = () => {
+        inpRef.current.value = ValidationExpression(inpRef.current.value, validExp);
+    }
+    return (
+        <Fragment>
+            <div>
+                <label>{name}</label>
+                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-20rem" style={{position : 'relative' , right : '10.4rem' }} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
+                {/* <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input> */}
             </div>
         </Fragment>
     )
@@ -93,25 +120,65 @@ const FormSelectButton = (props) => {
 
 */
 
+// const FormSelect = (props) => {
+//     const name = props.label
+//     const defValue = props.defValue
+//     const option = props.option
+//     const inpRef = props.inpRef
+//     const onChangeFn = props.onChangeFn
+//     const inpId = props.inpId
+//     return(
+//         <Fragment>
+//             <div style={props.style} 
+//             className='form-group input-label'>
+//                 <label>{name}</label>
+//                 <select data-test="select_comp" onChange={onChangeFn} ref={inpRef} defaultValue={'def-opt'} className={"adminSelect-project-assign form-control__conv-project left-opt"} id={inpId || "selectForm"}>
+//                     <option key={'def-opt'} value={'def-opt'} disabled={true}>{defValue}</option>
+//                     {option.map((e,i)=><option key={i+'_def'} value={e}>{e}</option>)}
+//                 </select>            
+//             </div>
+//         </Fragment>
+//     )
+// }
+
+
 const FormSelect = (props) => {
-    const name = props.label
-    const defValue = props.defValue
-    const option = props.option
-    const inpRef = props.inpRef
-    const onChangeFn = props.onChangeFn
-    const inpId = props.inpId
+    const name = props.label;
+    const defValue = props.defValue;
+    const option = props.option;
+    const inpRef = props.inpRef;
+    const onChangeFn = props.onChangeFn;
+    const inpId = props.inpId;
+  
     return (
-        <Fragment>
-            <div style={props.style} className='col-xs-9 form-group input-label'>
-                <label>{name}</label>
-                <select data-test="select_comp" onChange={onChangeFn} ref={inpRef} defaultValue={'def-opt'} className={"adminSelect-project-assign form-control__conv-project left-opt"} id={inpId || "selectForm"}>
-                    <option key={'def-opt'} value={'def-opt'} disabled={true}>{defValue}</option>
-                    {option.map((e, i) => <option key={i + '_def'} value={e}>{e}</option>)}
-                </select>
-            </div>
-        </Fragment>
-    )
-}
+      <Fragment>
+        <div style={props.style} className='form-group input-label'>
+          <label>{name}</label>
+          <div className="p-dropdown-container"> 
+            <select
+              data-test="select_comp"
+              onChange={onChangeFn}
+              ref={inpRef}
+              defaultValue={'def-opt'}
+              className={`form_drop p-dropdown form-control__conv-project left-option ${inpId ? 'custom-class' : ''}`}
+              id={inpId || "selectForm"}
+            >
+              <option key={'def-opt'} value={'def-opt'} disabled={true}>
+                {defValue}
+              </option>
+              {option.map((e, i) => (
+                <option key={i + '_def'} value={e}>
+                  {e}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </Fragment>
+    );
+  };
+
+
 
 /*Component FormRadio
   use: renders radio button and label in a form
@@ -224,7 +291,6 @@ const FormInpDropDown = ({ data, setFilter, clickInp, inpRef, type, setNewOption
     )
 }
 
-
 /*Component FormInpDropDownLdap
   use: renders searchable dropdown
 */
@@ -244,7 +310,7 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
         }
         else {
             // var items = [...data].filter((e) => e.toUpperCase().indexOf(inputRef.current.toUpperCase()) !== -1)
-            var items=[...data];
+            var items = [...data];
             setList(items)
         }
     }, [defaultValue, data])
@@ -261,7 +327,7 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
     //     var items = [...data].filter((e) => e.toUpperCase().indexOf(val.toUpperCase()) !== -1)
     //     setList(items)
     // }
-    
+
     const resetField = () => {
         setDropDown(true)
         if (clickInp) clickInp()
@@ -276,20 +342,20 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
 
     return (
         <Fragment>
-                <div>
-                    {/* <InputText type={'text'} autoComplete={"off"} ref={inputRef} className={"btn-users edit-user-dropdown-edit" + (errBorder ? " selectErrorBorder" : "")} onChange={inputFilter} onClick={resetField} id="userIdName" placeholder="Search Data Fields.." /> */}
-                    {/* <div className="form-inp-dropdown form-inp-dropdown-ldap" role="menu" aria-labelledby="userIdName" style={{ display: (dropDown ? "block" : "none") }}> */}
-                        {/* {list.map((e) => (
+            <div>
+                {/* <InputText type={'text'} autoComplete={"off"} ref={inputRef} className={"btn-users edit-user-dropdown-edit" + (errBorder ? " selectErrorBorder" : "")} onChange={inputFilter} onClick={resetField} id="userIdName" placeholder="Search Data Fields.." /> */}
+                {/* <div className="form-inp-dropdown form-inp-dropdown-ldap" role="menu" aria-labelledby="userIdName" style={{ display: (dropDown ? "block" : "none") }}> */}
+                {/* {list.map((e) => (
                             <option key={e} onClick={selectOption} value={e}> {e}</option>
                         ))} */}
                         <Dropdown value={dropdownValue} onChange={(e) => setDropdownValue(e.value)} options={list} placeholder="Select"
                             filter className="w-full md:w-29rem" />
 
-                    {/* </div> */}
-                </div>
+                {/* </div> */}
+            </div>
         </Fragment>
     )
 }
 
-export { FormInput, FormSelect, FormRadio, FormInpDropDown, FormInpDropDownLdap, FormInputButton, FormSelectButton };
+export { FormInput, FormSelect, FormInputGit, FormRadio, FormInpDropDown, FormInpDropDownLdap, FormInputButton, FormSelectButton };
 
