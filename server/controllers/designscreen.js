@@ -23,7 +23,7 @@ var xlsToCSV = function (workbook, sheetname) {
 
 exports.initScraping_ICE = function (req, res) {
 	var icename,value,username;
-	var dataToIce={};
+	var dataToIce={"username":""};
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
 		var mySocket;
@@ -45,14 +45,20 @@ exports.initScraping_ICE = function (req, res) {
 					reqAction = "desktop";
 					dataToIce = {"emitAction": "LAUNCH_DESKTOP", "username": icename, "applicationPath": applicationPath,
 						"processID": processID, "scrapeMethod": scrapeMethod};
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath, dataToIce.processID, dataToIce.scrapeMethod);
 				} else if (reqBody.appType == "SAP") {
 					var applicationPath = reqBody.applicationPath;
 					reqAction = "SAP";
 					dataToIce = {"emitAction": "LAUNCH_SAP", "username": icename, "applicationPath": applicationPath};
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath);
 				} else if (reqBody.appType == "OEBS") {
 					var applicationPath = reqBody.applicationPath;
 					reqAction = "OEBS";
 					dataToIce = {"emitAction": "LAUNCH_OEBS", "username": icename, "applicationPath": applicationPath};
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath);
 				} else if (reqBody.appType == "MobileApp") {
 					var apkPath = reqBody.apkPath;
 					var serial = reqBody.mobileSerial;
@@ -67,10 +73,17 @@ exports.initScraping_ICE = function (req, res) {
 					if(reqBody.param == 'ios') {
 						dataToIce = {"emitAction": "LAUNCH_MOBILE", "username" : icename, "deviceName": deviceName,
 							"versionNumber": versionNumber, "bundleId":bundleId, "ipAddress": ipAddress, "param": "ios"};
+							
+							logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+							mySocket.emit("LAUNCH_MOBILE", dataToIce.deviceName, dataToIce.versionNumber, dataToIce.bundleId, dataToIce.ipAddress, dataToIce.param);
 					} else {
 						dataToIce = {"emitAction" : "LAUNCH_MOBILE", "username" : icename, "apkPath": apkPath, "serial": serial,
 							"mobileDeviceName": mobileDeviceName, "mobileIosVersion": mobileIosVersion, "mobileUDID": mobileUDID};
+						
+						logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");	
+						mySocket.emit("LAUNCH_MOBILE", dataToIce.apkPath, dataToIce.serial, dataToIce.mobileDeviceName, dataToIce.mobileIosVersion, dataToIce.mobileUDID);
 					}
+					// mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath, dataToIce.processID, dataToIce.scrapeMethod);
 				} else if (reqBody.appType == "MobileWeb") {
 					var data = {action: "scrape"};
 					// var browserType = reqBody.browserType;
@@ -91,11 +104,17 @@ exports.initScraping_ICE = function (req, res) {
 					reqAction = "mobile web";
 					dataToIce = {"emitAction": "LAUNCH_MOBILE_WEB", "username" : icename,
 						"mobileSerial": mobileSerial, "androidVersion": androidVersion, "data": data};
+
+						logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+						mySocket.emit("LAUNCH_MOBILE_WEB", dataToIce.mobileSerial, dataToIce.androidVersion, dataToIce.data);
 				} else if (req.body.screenViewObject.appType == "pdf"){
 					var data = {};
 					var browserType = req.body.screenViewObject.appType;
 					data.browsertype = browserType;
 					dataToIce = {"emitAction" : "PDF_SCRAPE","username" : icename, "data":data,"browsertype":browserType};
+					
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit("PDF_SCRAPE", data.browsertype);
 				} else {  //Web Scrape
 					var data = {action: "scrape"};
 					var browserType = reqBody.browserType;
@@ -130,10 +149,11 @@ exports.initScraping_ICE = function (req, res) {
 					else if (browserType == "safari") data.task = "OPEN BROWSER SF"
 					reqAction = "web";
 					dataToIce = {"emitAction": "webscrape", "username" : icename, "data": data};
+
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit(dataToIce["emitAction"], dataToIce.data);
 				}
 				dataToIce.username = icename;
-				logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
-				mySocket.emit(dataToIce["emitAction"], dataToIce.data);
 				function scrape_listener(message) {
 					var data = message;
 					//LB: make sure to send recieved data to corresponding user

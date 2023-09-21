@@ -1,0 +1,97 @@
+.git_container {
+    width: 38rem;
+    // padding: 20px;
+    height: 100%;
+    position: relative;
+    bottom: 9rem;
+
+    .col-xs-9 {
+        width: 83%;
+    }
+
+    .adminActionBtn {
+        padding-bottom: 5%;
+    }
+
+    .input-label {
+        margin-top: 0;
+    }
+
+    .git_token {
+        label {
+            width: 120px;
+        }
+
+        .left-option {
+            width: calc(100% - 180px);
+        }
+    }
+
+    .adminActionBtn .a__btn:disabled {
+        opacity: 0.5;
+    }
+
+    .label_ctrl {
+        float: left;
+        width: 47%;
+    }
+
+    .git_comp {
+        // margin-bottom: 3%;
+        // padding: 0px 0px;
+        // position: relative;
+        // // float: left;
+        // width: 64%;
+        margin-bottom: 2%;
+        /* padding: 0; */
+        position: relative;
+        width: 80%;
+    }
+
+    .label_git div span {
+        display: inline-block;
+        font-size: small;
+        width: 130px;
+        font-weight: 400;
+        margin-top: 5px;
+    }
+
+    .label_git div input,
+    .label_git div select {
+        width: calc(100% - 130px);
+    }
+
+    .git_input_container {
+        // width: 100%;
+        // float: left;
+        // overflow-y: auto;
+        height: 31rem;
+    }
+
+    .git_input {
+        margin-bottom: 2%;
+        // padding: 0rem 0.2rem;
+        // position: relative;
+        // float: left;
+        // width: 50%;
+        // right: 0.35rem;
+    }
+
+    .git_input div span {
+        font-size: small;
+        font-weight: 600;
+    }
+    .adminActionBtn_git{
+        position: relative;
+    top: 0rem;
+    left: 28rem;
+    }
+    .a__btn{
+        position: relative;
+        right: 1rem;
+    }
+    .btn-edit{
+        position: relative;
+        right: 1.8rem;
+    }
+}
