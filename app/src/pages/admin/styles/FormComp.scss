@@ -5,9 +5,14 @@
     font-weight: 700;
     margin-top: 25px;
     .left-opt{
-        display: inline-block;
-        width: 75%;
-        margin-left: 10px;
+        // display: inline-block;
+        // width: 75%;
+        // margin-left: 10px;
+        width: 20rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.3rem;
+        padding: 0.75rem;
+        transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s;
     }
     input:read-only ,input:disabled{
         background-color: $whisper;
@@ -57,3 +62,46 @@
     left: 130px;
     z-index: 1000;
 }
+.p-dropdown-container {
+    position: relative;
+  }
+  .p-dropdown {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #ffffff; 
+    border: 1px solid #ced4da; 
+    border-radius: 4px; 
+    outline: none; 
+  }
+  
+
+  .p-dropdown::after {
+    position: absolute;
+    top: 50%;
+    right: 10px; 
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+.p-options {
+    max-height: 150px; 
+    overflow-y: auto; 
+    border: 1px solid #ced4da;
+    border-top: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background-color: #ffffff;
+    border-radius: 0 0 4px 4px;
+    z-index: 1;
+  }
+  .p-option {
+    padding: 0.25rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; 
+  }
+  .p-option.selected {
+    background-color: #007ad9; 
+    color: #ffffff; 
+  }
+  

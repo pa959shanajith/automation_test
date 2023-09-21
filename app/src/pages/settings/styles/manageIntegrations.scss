@@ -258,17 +258,12 @@ height: 2.5rem !important;
 }
 
 
-.side-panel {
-
+.side-panel_login {
     .icon-wrapper {
-
         position: relative;
-
         top: 2rem;
-
         width: 40px;
         cursor: pointer;
-
     }
     align-items: center;
     display: flex;
@@ -279,7 +274,7 @@ height: 2.5rem !important;
     top: 12rem;
     /* bottom: -1rem; */
     width: 5rem;
-    gap: 2rem;
+    gap: 1.2rem;
     position: absolute;
 
 
@@ -313,6 +308,11 @@ height: 2.5rem !important;
         height: 2rem;
         width: 33px;
         cursor: pointer;
+    }
+
+    .text__git{
+        position: relative;
+        right: 2.05rem;
     }
 
 }
@@ -471,4 +471,3 @@ height: 2.5rem !important;
         display: none !important;
     }
 }
-
