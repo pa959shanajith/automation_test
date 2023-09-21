@@ -77,6 +77,7 @@ export default function BasicDemo() {
     }
   };
 
+  console.log(configValues);
   useEffect(() => {
     getReportsTable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,6 +85,10 @@ export default function BasicDemo() {
 
   useEffect(() => {
     setInputSummary(selectedRow[0]?.Comments);
+    setConfigValues({
+      ...configValues,
+      Summary : selectedRow[0]?.Comments
+    });
     setInputDesc(selectedRow[0]?.StepDescription);
   }, [selectedRow]);
 
@@ -169,7 +174,6 @@ export default function BasicDemo() {
       setJiraDetails({projects: [], issuetype: []});
       setMappedProjects({});
       setConfigureFeilds([]);
-      setSelectedFiels([]);
       setSelectedFiels([]);
       setResponseFeilds({});
       setConfigValues({});
@@ -561,6 +565,8 @@ export default function BasicDemo() {
 
   useEffect(() => {
     if(jiraDropDown && issueDropDown){
+      setConfigureFeilds([]);
+      setConfigValues({});
       (async() => {
         const getFields =
           bugTitle === "Jira"
@@ -828,24 +834,6 @@ export default function BasicDemo() {
               />
             </div>
             <Divider />
-            <div className="col-12">
-              <div>
-                <label>
-                  <span>Summary</span>
-                  <img
-                    src="static/imgs/Required.svg"
-                    className="required_icon"
-                  />
-                </label>
-              </div>
-              <InputTextarea
-                name="Summary"
-                rows={2}
-                className="text_desc"
-                value={inputSummary}
-                onChange={(e) => setInputSummary(e.target.value)}
-              />
-            </div>
             <div className="col-12">
               <div>
                 <label>
