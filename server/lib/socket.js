@@ -90,13 +90,7 @@ io.on('connection', async socket => {
 				socket.send('connected', result.ice_check);
 				if (result.node_check === "allow") {
 					host = JSON.parse(icesession).host;
-					// let clientName="avoassure";
-					// if(host != null && host != undefined)
-					// {
-					// 	if(!(host.includes("localhost") || require('net').isIP(host)>0)){
-					// 		clientName=host.split('.')[0]
-					// 	}
-					// }
+					clientName=utils.getClientName(host);
 					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
 					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
