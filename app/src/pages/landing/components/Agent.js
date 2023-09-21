@@ -83,7 +83,7 @@ const Agent = (props) => {
         }
     }
     const onDownloadAgentClick = () => {
-        window.location.href = "https://driver.avoautomation.com/driver/avoagent.exe";
+        window.location.href = "https://downloads.avoassure.ai/driver/avoagent.exe";
     }
 
     const resetFields = () => {
