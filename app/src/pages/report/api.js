@@ -107,9 +107,9 @@ export const getTestSuite = async(getSuiteKey) => {
     }
 }
 
-export const downloadReports = async(getDownload) => {
+export const downloadReports = async(getDownload, type) => {
     try{
-        const res = await axios(`/viewReport?reportID=${getDownload?.id}&type=${ getDownload?.type === 'json' ? 'json' : 'pdf' }&images=${ getDownload?.type === 'pdfwithimg' ? true : false }`, {
+        const res = await axios(`/viewReport?reportID=${getDownload?.id}&type=${ getDownload?.type === 'json' ? 'json' : 'pdf' }&images=${type}`, {
             method: 'GET',
             headers: {
             'Content-type': 'application/json',

@@ -94,7 +94,7 @@ const openScreenShot = async (username, path,host) => {
             let scrShotData = [];
             mySocket.on("render_screenshot_finished", (message) =>{
                 const data = message;
-                if (resultData === "fail") {
+                if (data === "fail") {
                     logger.error("Screenshots processing failed!");
                     rsv("fail");
                 } else {
@@ -104,7 +104,8 @@ const openScreenShot = async (username, path,host) => {
             });
             mySocket.on("render_screenshot", (message) =>{
                 const data = message;
-                scrShotData = scrShotData.concat(resultData);
+                scrShotData = scrShotData.concat(data);
+                rsv(scrShotData);
             });
             
         }));
