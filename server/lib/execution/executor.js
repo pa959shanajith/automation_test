@@ -377,6 +377,7 @@ class TestSuiteExecutor {
                         if (reportType != "accessiblityTestingOnly")
                             notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
                     }
+                    mySocket.removeAllListeners('return_status_executeTestSuite');
                 });
                 mySocket.on("result_executeTestSuite", async (message)=>{
                     const data = message;
@@ -457,7 +458,7 @@ class TestSuiteExecutor {
                                 rej("fail");
                             }
                         }
-                    
+                        mySocket.removeAllListeners('result_executeTestSuite');
                 });
             }));
 
