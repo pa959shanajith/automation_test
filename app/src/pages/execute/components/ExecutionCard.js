@@ -11,7 +11,7 @@ const ExecutionCard = ({ cardData, configData }) => {
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
           {
             cardData?.executionRequest?.avogridId ?
-            <div>Avo Grid: {configData.avoAgentAndGrid?.avogrids.filter((item) => item?._id === cardData?.executionRequest?.avogridId)[0]?.name}</div> :
+            <div>Avo Grid: {configData?.avoAgentAndGrid?.avogrids?.filter((item) => item?._id === cardData?.executionRequest?.avogridId)[0]?.name}</div> :
             <div>Avo Agent: {cardData?.executionRequest?.avoagents[0] ? cardData?.executionRequest?.avoagents[0] : 'Any Agent'}</div>
           }
         </div>

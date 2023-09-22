@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { InputText } from "primereact/inputtext";
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
@@ -13,10 +13,13 @@ import "../styles/manageIntegrations.scss";
 import ZephyrContent from "../Components/ZephyrContent";
 // import { useDispatch } from 'react-redux';
 import GitConfig from "../containers/GitConfig";
+import { Toast } from "primereact/toast";
+
 
 
 
 const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, setAuthType, authType }) => {
+    const toast = useRef();
     // list of selectors
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
     const selectedscreen = useSelector(state => state.setting.screenType);
@@ -30,6 +33,28 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     const [showPassword, setShowPassword] = useState(false);
     const [showUserGitConfig, setShowUserGitConfig] = useState(false);
 
+
+    
+  const toastError = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+  }
+
+  const toastSuccess = (successMessage) => {
+    if (successMessage.CONTENT) {
+      toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+  }
+
+  const toastWarn = (warnMessage) => {
+    if (warnMessage.CONTENT) {
+        toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
+}
 
 
     const handleLogin = (name, value) => {
@@ -83,6 +108,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
 
     return (
         <>
+            <Toast ref={toast} position="bottom-center" baseZIndex={1300} />
             <div className="login_container_integrations">
                 <div className="side-panel_login">
                   
@@ -149,7 +175,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                     <ProgressSpinner className="modal-spinner" style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                 </div>
                 }  */}
-                {selectedscreen?.code === 'GIT' ? <GitConfig/> : <>
+                {selectedscreen?.code === 'GIT' ? <GitConfig toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/> : <>
                 {selectedscreen && authType === "basic"}
                     <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
                     {selectedscreen?.name === 'Zephyr' && (
