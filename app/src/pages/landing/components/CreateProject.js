@@ -397,16 +397,17 @@ const CreateProject = (props) => {
       };
 
      try {
-     const project = await userCreateProject_ICE(projData);
+      const projectRes = await userCreateProject_ICE(projData);
 
-     if (project === "fail") {
-    // Handle the "fail" response here
-    // You can display an error message to the user
-    props.toastError("Failed to create Project");
-    return; // Do not proceed further
-  }
+      if (projectRes && projectRes.error) {
+        props.toastError(projectRes.error);
+        return;
+      } else if(projectRes === "fail") {
+        props.toastError("Failed to create Project");
+        return;
+      }
 
-      if (project === "invalid_name_spl") {
+      if (projectRes === "invalid_name_spl") {
         setIsInvalidProject(true);
         return;
       }
