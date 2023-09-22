@@ -146,7 +146,7 @@ const DesignModal = (props) => {
     
           case agent.indexOf("edge") > -1: return {name:"chromium",val:"8"};
           case agent.indexOf("edg/") > -1: return {name:"chromium",val:"8"};
-          case agent.indexOf("chrome") > -1 && !!window.chrome: return {name:"Chrome",val:"1"};
+          case agent.indexOf("chrome") > -1 && !!window.chrome: return {name:"chrome",val:"1"};
           case agent.indexOf("firefox") > -1: return {name:"mozilla",val:"2"};
           default: return "other";
        }
@@ -378,7 +378,7 @@ const DesignModal = (props) => {
                                         setOverlay("");
                                     }
                                     setDraggable(false);
-                                    screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id})
+                                    screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false})
                                     // console.log("screen", screenLevelTestCases)
                                     setTestCaseData([...testCaseData,testcaseArray]);
                                     // setnewtestcase([...newtestcase, testcaseArray]); 
@@ -1046,7 +1046,8 @@ const DesignModal = (props) => {
             setEdit(true);
             setDraggable(false);
             setChanged(true)
-            headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
+            const testdata = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+            headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testdata.testCases.length;
         }
     }
 
