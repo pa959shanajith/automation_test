@@ -1967,6 +1967,7 @@ const headerstyle={
         fetchingDetails={props.fetchingDetails}
         toastSuccess={toastSuccess}
         toastError={toastError}
+        setSaveDisable={setSaveDisable}
       />}
       {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
       {/* //Element properties  */}
