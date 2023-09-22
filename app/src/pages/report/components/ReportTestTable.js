@@ -84,6 +84,10 @@ export default function BasicDemo() {
 
   useEffect(() => {
     setInputSummary(selectedRow[0]?.Comments);
+    setConfigValues({
+      ...configValues,
+      Summary: selectedRow[0]?.Comments,
+    });
     setInputDesc(selectedRow[0]?.StepDescription);
   }, [selectedRow]);
 
@@ -170,6 +174,7 @@ export default function BasicDemo() {
       setMappedProjects({});
       setConfigureFeilds([]);
       setSelectedFiels([]);
+      setSelectedFiels([]);
       setResponseFeilds({});
       setConfigValues({});
       setSelectedRow([]);
@@ -202,33 +207,26 @@ export default function BasicDemo() {
           isChecked: true,
           alwaysRequired: true,
         };
-        valueObj["Build #"]= {
-          defaultValue: null,
-          allowedValues: [],
-          alwaysRequired: true,
-          dependentFields: [],
-          referenceName: "Custom.Build#",
-          name: "Build #",
-          url: "https://dev.azure.com/AvoAutomation/5fd09fd1-b930-4a90-8740-d0ce504f1b5a/_apis/wit/fields/Custom.Build#",
-          data: "23.1",
-          error: false,
-          isChecked: true,
-        };
       }
       bugTitle === "Jira"
         ? Object.keys(configValues).forEach((item) => {
-            valueObj[item] = {
-              field_name: responseFeilds[item]?.key,
-              userInput:
-                responseFeilds[item]?.type === "array"
-                  ? {
-                      title: "",
-                      key: configValues[item]?.key,
-                      text: configValues[item]?.name,
-                    }
-                  : configValues[item],
-              type: responseFeilds[item]?.type,
-            };
+          if(item !== "Summary"){
+              valueObj[item] = {
+                field_name: responseFeilds[item]?.key,
+                userInput:
+                  responseFeilds[item]?.type === "array"
+                    ? {
+                        title: "",
+                        key: configValues[item]?.key,
+                        text: configValues[item]?.name,
+                      }
+                    : configValues[item],
+                type: responseFeilds[item]?.type,
+              };
+            }
+          else if(item === "Summary") {
+            valueObj.summary = configValues[item]
+          }
           })
         : Object.keys(configValues).forEach((item) => {
             valueObj[item] = {
@@ -259,7 +257,7 @@ export default function BasicDemo() {
               issue_dict: {
                 project: jiraDropDown?.id,
                 issuetype: issueDropDown?.name,
-                summary: inputSummary,
+                // summary: inputSummary,
                 description: inputDesc,
                 url: loginUrl,
                 username: loginName,
@@ -560,7 +558,15 @@ export default function BasicDemo() {
   useEffect(() => {
     if(jiraDropDown && issueDropDown){
       setConfigureFeilds([]);
-      setConfigValues({});
+      setInputSummary(selectedRow[0]?.Comments);
+      if (bugTitle === "Jira") {
+        setConfigValues({
+          ...configValues,
+          Summary: selectedRow[0]?.Comments,
+        });
+      } else {
+        setConfigValues({});
+      }
       (async() => {
         const getFields =
           bugTitle === "Jira"
@@ -828,7 +834,7 @@ export default function BasicDemo() {
               />
             </div>
             <Divider />
-            <div className="col-12" style={{ display: 'none' }}>
+            {bugTitle !== "Jira" && <div className="col-12">
               <div>
                 <label>
                   <span>Summary</span>
@@ -845,7 +851,7 @@ export default function BasicDemo() {
                 value={inputSummary}
                 onChange={(e) => setInputSummary(e.target.value)}
               />
-            </div>
+            </div>}
             <div className="col-12">
               <div>
                 <label>
