@@ -1583,7 +1583,7 @@ Learn More '/>
             setVisible={setVisible_CICD}
             content={
               <>
-                <ExecutionCard cardData={fetechConfig[configItem]} />
+                <ExecutionCard cardData={fetechConfig[configItem]} configData={getConfigData} />
 
                 <div className="input_CICD ">
                  

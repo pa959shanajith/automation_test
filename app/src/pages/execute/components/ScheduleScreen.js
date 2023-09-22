@@ -271,7 +271,7 @@ const ScheduleScreen = ({
 
   return (
     <>
-      <ExecutionCard cardData={cardData} />
+      <ExecutionCard cardData={cardData} configData={getScheduledList} />
       <div className="schedule_container">
         <div className="grid schedule_options">
           <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
