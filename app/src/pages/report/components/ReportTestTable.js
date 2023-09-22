@@ -170,7 +170,6 @@ export default function BasicDemo() {
       setMappedProjects({});
       setConfigureFeilds([]);
       setSelectedFiels([]);
-      setSelectedFiels([]);
       setResponseFeilds({});
       setConfigValues({});
       setSelectedRow([]);
@@ -421,7 +420,6 @@ export default function BasicDemo() {
   const defectIDForJiraAndAzure = (rowData) => {
     const hasChildren = rowData?.children && rowData?.children?.length > 0;
     const returnBug = (getBug) => {
-      console.log(getBug);
       return getBug?.azure_defect_id ? (
         <a
           href={eval(getBug?.azure_defect_id)[1]}
@@ -561,6 +559,8 @@ export default function BasicDemo() {
 
   useEffect(() => {
     if(jiraDropDown && issueDropDown){
+      setConfigureFeilds([]);
+      setConfigValues({});
       (async() => {
         const getFields =
           bugTitle === "Jira"
@@ -828,7 +828,7 @@ export default function BasicDemo() {
               />
             </div>
             <Divider />
-            <div className="col-12">
+            <div className="col-12" style={{ display: 'none' }}>
               <div>
                 <label>
                   <span>Summary</span>

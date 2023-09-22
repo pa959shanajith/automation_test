@@ -3,16 +3,20 @@ import { InputText } from "primereact/inputtext";
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useDispatch, useSelector } from 'react-redux';
-import { IntergrationLogin,zephyrLogin,AzureLogin,screenType } from '../settingSlice';
+import { IntergrationLogin, zephyrLogin, AzureLogin, screenType } from '../settingSlice';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
 import { Tooltip } from 'primereact/tooltip';
+import { AdminActions } from '../../admin/adminSlice';
 import "../styles/manageIntegrations.scss";
 import ZephyrContent from "../Components/ZephyrContent";
+// import { useDispatch } from 'react-redux';
+import GitConfig from "../containers/GitConfig";
 
 
-const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,setAuthType,authType}) => {
+
+const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, setAuthType, authType }) => {
     // list of selectors
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
     const selectedscreen = useSelector(state => state.setting.screenType);
@@ -24,6 +28,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
     const [loginType, setLoginType] = useState('basic');
     const [zephyrVisible, setZephyrVisible] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [showUserGitConfig, setShowUserGitConfig] = useState(false);
 
 
 
@@ -45,8 +50,12 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
             default:
                 break;
         }
-        
+
     }
+
+    // const handleButtonClick = () => {
+    //     setShowUserGitConfig(!showUserGitConfig);
+    //   };
 
     const handleScreenType = (value) => {
         dispatchAction(screenType(value))
@@ -67,15 +76,16 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
         setShowPassword((prevState) => !prevState);
     };
 
-    const loginHandler = () =>{
+    const loginHandler = () => {
         showCard2(); setDisableFields(true);
     }
-    
+
 
     return (
         <>
             <div className="login_container_integrations">
-                <div className="side-panel">
+                <div className="side-panel_login">
+                  
                     <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Jira', code: 'JA' })}>
                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                         <span className="text__jira">Jira</span>
@@ -96,6 +106,13 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
                         <span><img src="static/imgs/ALM_icon.svg" className="img__alm"></img></span>
                         <span className="text__alm">ALM</span>
                     </div>
+                    <div>
+                        <div className={`icon-wrapper ${selectedscreen?.name === 'Git' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Git', code: 'GIT' })}>
+                            <span><img src="static/imgs/GitIcon.png" className="img__alm" alt="Git Icon" /></span>
+                            <span className="text__git">Configuration</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             {/* <div>
@@ -114,7 +131,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
             </div>
             <div className="passwrd-cls">
             <span>Password <span style={{color:'red'}}>*</span></span>
-            <Password style={{width:'20rem', height:'2.5rem' , marginLeft:'2rem'}} className="input-txt1"value={loginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} toggleMask />
+            // <Password style={{width:'20rem', height:'2.5rem' , marginLeft:'2rem'}} className="input-txt1"value={loginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} toggleMask />
             </div>
             <div className="url-cls">
             <span>URL <span style={{color:'red'}}>*</span></span>
@@ -131,7 +148,9 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
                     <div className="modal-overlay">
                     <ProgressSpinner className="modal-spinner" style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                 </div>
-                }  */}{selectedscreen && authType === "basic"}
+                }  */}
+                {selectedscreen?.code === 'GIT' ? <GitConfig/> : <>
+                {selectedscreen && authType === "basic"}
                     <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
                     {selectedscreen?.name === 'Zephyr' && (
                         <div className="apptype__token">
@@ -167,44 +186,47 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard,set
                                 {(loginDetails.password || zephyrLoginDetails.password) && <div className='p-input-icon-right mb-2 cursor-pointer' onClick={togglePasswordVisibility}>
                                     <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`} />
 
-                                </div>}
+                                    </div>}
 
-                            </div>
-                            <div className="url-cls">
-                                <span>URL <span style={{ color: 'red' }}>*</span></span>
-                                <span style={{ marginLeft: '4.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
-                                    {/* <label htmlFor="username">URL</label> */}
-                                </span>
-                            </div>
-                            <div className="login__div">
-                                <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
-                                    onClick={loginHandler} className="login__btn">
-                                </Button>
-                            </div>
-                        </>)}
-                    {authType === "token" && (
-                        <>
-                            <div className="url-cls">
-                                <span>URL <span style={{ color: 'red' }}>*</span></span>
-                                <span style={{ marginLeft: '4.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url:zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
-                                    {/* <label htmlFor="username">URL</label> */}
-                                </span>
-                            </div>
-                            <div className="url-cls">
-                                <span>Token <span style={{ color: 'red' }}>*</span></span>
-                                <span style={{ marginLeft: '4.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.token:zephyrLoginDetails.token} onChange={(e) => handleLogin('token', e.target.value)} />
-                                    {/* <label htmlFor="username">Token</label> */}
-                                </span>
-                            </div>
-                            <div className="login__div">
-                                <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
-                                    onClick={loginHandler} className="login__btn">
-                                </Button>
-                            </div>
-                        </>)}
+                                </div>
+                                <div className="url-cls">
+                                    <span>URL <span style={{ color: 'red' }}>*</span></span>
+                                    <span style={{ marginLeft: '4.5rem' }}>
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
+                                        {/* <label htmlFor="username">URL</label> */}
+                                    </span>
+                                </div>
+                                <div className="login__div">
+                                    <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
+                                        onClick={loginHandler} className="login__btn">
+                                    </Button>
+                                </div>
+                            </>)}
+                        {authType === "token" && (
+                            <>
+                                <div className="url-cls">
+                                    <span>URL <span style={{ color: 'red' }}>*</span></span>
+                                    <span style={{ marginLeft: '4.5rem' }}>
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
+                                        {/* <label htmlFor="username">URL</label> */}
+                                    </span>
+                                </div>
+                                <div className="url-cls">
+                                    <span>Token <span style={{ color: 'red' }}>*</span></span>
+                                    <span style={{ marginLeft: '4.5rem' }}>
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.token : zephyrLoginDetails.token} onChange={(e) => handleLogin('token', e.target.value)} />
+                                        {/* <label htmlFor="username">Token</label> */}
+                                    </span>
+                                </div>
+                                <div className="login__div">
+                                    <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
+                                        onClick={loginHandler} className="login__btn">
+                                    </Button>
+                                </div>
+                            </>)}
+                    </>
+
+                    }
 
                 </div>
             </Card>
