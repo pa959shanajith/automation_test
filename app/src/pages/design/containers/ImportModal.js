@@ -177,7 +177,7 @@ const Content = ({fileUpload,importType,setImportType,setError,importFormat,setO
   };
     const importTypes = [
         {value: "json", name: "JSON"}, 
-        {value: "excel", name: "Excel", disabled: appType !== 'Web'}
+        // {value: "excel", name: "Excel", disabled: appType !== 'Web'}
         
     ]
     const acceptType = {
