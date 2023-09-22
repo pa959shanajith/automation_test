@@ -136,24 +136,25 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     )
 }
 
-const validate = (arr) =>{
-    var err = false;
-    arr.forEach((e)=>{
-        if(e.current){
-            // e.current.style.borderColor = 'black'
-            if(e.current.props){
-                if(e.current.props.value === 'def-option' || e.current.props.value === ''){
-                    err = true
+
+const validate = (arr) => {
+    let err = false;
+    arr.forEach((e) => {
+        if (e && e.current) {
+            const { current } = e;
+            if (current.props) {
+                if (current.props.value === 'def-option' || current.props.value === '') {
+                    err = true;
                 }
-            }
-            else if(!e.current.value || e.current.props.value ==='def-option'){
-                e.current.style.borderColor = 'red'
-                err = true
+            } else if (!current.value || current.value === 'def-option') {
+                current.style.borderColor = 'red';
+                err = true;
             }
         }
-    })
-    return err
-}
+    });
+    return err;
+};
+
 
 
 const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,setExpType,setError,selectedProj,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile,getExportFile,showMessage,enableExport,gitComMsgRef,setExportVer}) =>{

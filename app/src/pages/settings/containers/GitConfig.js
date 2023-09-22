@@ -59,7 +59,7 @@ const GitConfig = (props) => {
 
     const displayError = (error) => {
         setLoading(false)
-        setMsg(error)
+        props.toastError(error)
     }
 
     const resetSelectList = (changeDropDown) => {
@@ -152,7 +152,7 @@ const GitConfig = (props) => {
                 </div>
             </div>
 
-            <GitButtonActions resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} gitname={gitconfigRef} token={tokenRef} url={urlRef} gituser={gituserRef} gitemail={gitemailRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} />
+            <GitButtonActions resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} gitname={gitconfigRef} token={tokenRef} url={urlRef} gituser={gituserRef} gitemail={gitemailRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} toastError={props.toastError} toastSuccess={props.toastSuccess} toastWarn={props.toastWarn}/>
         </div>
     );
 }
@@ -169,7 +169,7 @@ const onChangeProject = async (resetFields, displayError, showEdit, urlRef, gitc
     const data = await gitEditConfig(userData[userRef.current.value], projectData[ProjectRef.current.value]);
     if (data.error) { displayError(data.error); return; }
     else if (data == "empty") {
-        setMsg(MSG.ADMIN.WARN_NO_CONFIG)
+        // toastWarn(MSG.ADMIN.WARN_NO_CONFIG)
         resetFields();
     } else {
         gitconfigRef.current.value = data[0];
@@ -237,24 +237,33 @@ const fetchUsers = async (setUserList, setUserData, displayError, setLoading) =>
 }
 
 const fetchProjectList = async (resetSelectList, userData, userRef, setProjectList, setProjectData, displayError, setLoading) => {
-    setLoading("Loading Projects...")
+    setLoading("Loading Projects...");
     var idtype = ["gitdomaindetails"];
     var requestedname = {};
     requestedname.domainname = 'banking';
     requestedname.userid = userData[userRef.current.value];
-    const getDetailsResponse = await getDetails_ICE(idtype, [requestedname])
-    if (getDetailsResponse.error) { displayError(getDetailsResponse.error); return; }
-    const uniqueProjectNames = [...new Set(getDetailsResponse.projectNames)].sort();
+    const getDetailsResponse = await getDetails_ICE(idtype, [requestedname]);
+    if (getDetailsResponse.error) {
+        displayError(getDetailsResponse.error);
+        return;
+    }
+    const uniqueProjectNames = [...new Set(getDetailsResponse.projectNames)];
 
-        const projectData = {};
-        uniqueProjectNames.forEach((projectName, index) => {
+    const projectData = {};
+    uniqueProjectNames.forEach((projectName) => {
+        const index = getDetailsResponse.projectNames.indexOf(projectName);
+        if (index !== -1) {
             projectData[projectName] = getDetailsResponse.projectIds[index];
-        });
+        }
+    });
 
-        setProjectData(projectData);
-        setProjectList(uniqueProjectNames);
-        resetSelectList("domainChange");
-        setLoading(false);
+    setProjectData(projectData);
+    setProjectList(uniqueProjectNames);
+    resetSelectList("domainChange");
+    setLoading(false);
+
+    return projectData;
 }
+
 
 export default GitConfig;

@@ -37,9 +37,9 @@ const GitButtonActions = (props) => {
         setLoading("Loading...");
         const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim());
         if(data.error){displayError(data.error);return;}
-        else if (data === 'GitConfig exists') setMsg(Messages.ADMIN.WARN_GITCONFIG_EXIST);
-        else if(data  === 'GitUser exists')  setMsg(Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
-        else setMsg(Messages.CUSTOM("Git configuration "+action+ "d successfully",VARIANT.SUCCESS));
+        else if (data === 'GitConfig exists') props.toastWarn(Messages.ADMIN.WARN_GITCONFIG_EXIST);
+        else if(data  === 'GitUser exists')  props.toastWarn(Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
+        else props.toastSuccess(Messages.CUSTOM("Git configuration "+action+ "d successfully",VARIANT.SUCCESS));
         setLoading(false);
         resetFields();
     }
@@ -123,7 +123,7 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
     }
     if(!regExUrl.test(gitUrl.current.value.trim())){
         gitUrl.current.style.outline = errBorder;
-        setMsg(Messages.ADMIN.WARN_GIT_URL);
+        // toastWarn(Messages.ADMIN.WARN_GIT_URL);
         flag = false;
     }
     return flag;
