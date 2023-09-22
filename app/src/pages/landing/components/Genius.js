@@ -1045,7 +1045,7 @@ const toastSuccess = (successMessage) => {
 
           <div style={{ position: "relative",display:'flex',flexDirection:'column' }}>
           <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
-            <div> <label className="label_genius"  htmlFor="project">Module</label></div>
+            <div> <label className="label_genius"  htmlFor="project">Testsuite</label></div>
             {!props.selectedModule ?<div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Test Suite</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
             </div>
             {/* <NormalDropDown
@@ -1091,7 +1091,7 @@ const toastSuccess = (successMessage) => {
 
           <div style={{ position: "relative" ,display:'flex',flexDirection:'column' }}>
           <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
-            <div> <label className="label_genius"  htmlFor="project">Scenario</label></div>
+            <div> <label className="label_genius"  htmlFor="project">Testcase</label></div>
             {!props.selectedModule?<div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Testcase</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
             </div>
             {/* <NormalDropDown

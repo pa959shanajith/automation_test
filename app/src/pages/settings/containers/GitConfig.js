@@ -244,17 +244,17 @@ const fetchProjectList = async (resetSelectList, userData, userRef, setProjectLi
     requestedname.userid = userData[userRef.current.value];
     const getDetailsResponse = await getDetails_ICE(idtype, [requestedname])
     if (getDetailsResponse.error) { displayError(getDetailsResponse.error); return; }
-    const projectOptions = [];
-    const projectData = {};
-    for (var i = 0; i < getDetailsResponse.projectNames.length; i++) {
-        projectOptions.push(getDetailsResponse.projectNames[i]);
-        projectData[getDetailsResponse.projectNames[i]] = getDetailsResponse.projectIds[i];
-    }
-    projectOptions.sort();
-    setProjectData(projectData);
-    setProjectList(projectOptions);
-    resetSelectList("domainChange");
-    setLoading(false);
+    const uniqueProjectNames = [...new Set(getDetailsResponse.projectNames)].sort();
+
+        const projectData = {};
+        uniqueProjectNames.forEach((projectName, index) => {
+            projectData[projectName] = getDetailsResponse.projectIds[index];
+        });
+
+        setProjectData(projectData);
+        setProjectList(uniqueProjectNames);
+        resetSelectList("domainChange");
+        setLoading(false);
 }
 
 export default GitConfig;

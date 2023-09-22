@@ -711,9 +711,9 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setUpdateKey(getData.executionRequest.configurekey);
       setAvodropdown({
         ...avodropdown,
-        avogrid: getAvogrid.filter(
-          (el) => el.name === getData.executionRequest.avoagents[0]
-        )[0],
+        avogrid: getData?.executionRequest?.avoagents[0] ? getAvogrid.filter(
+          (el) => el.name === getData?.executionRequest?.avoagents[0]
+        )[0] : getConfigData?.avoAgentAndGrid?.avogrids.filter((item) => item?._id === getData?.executionRequest?.avogridId)[0],
         browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
           getData?.executionRequest?.browserType.includes(el.key)
         ) : [],
@@ -856,8 +856,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         selectedModuleType: modules,
         configurekey: getBtnType === "Update" ? updateKey : uuid(),
         isHeadless: mode === "Headless",
-        avogridId: "",
-        avoagents: (avodropdown?.avogrid?.name && avodropdown?.avogrid?.name !="null" &&  avodropdown?.avogrid?.name !="Any Agent") ? [avodropdown?.avogrid?.name] : [],
+        avogridId: avodropdown?.avogrid?.agents ? avodropdown?.avogrid?._id : "",
+        avoagents: (avodropdown?.avogrid?.name && avodropdown?.avogrid?.name !="null" &&  avodropdown?.avogrid?.name !="Any Agent" && !avodropdown?.avogrid?.agents ) ? [avodropdown?.avogrid?.name] : [],
         integration,
         batchInfo: batchInfoData,
         donotexe: {
@@ -1375,7 +1375,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             // onHide={() => setVisible_execute(false)}
             content={
               <>
-                {<ExecutionCard cardData={fetechConfig[configItem]} />}
+                {<ExecutionCard cardData={fetechConfig[configItem]} configData={getConfigData} />}
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
