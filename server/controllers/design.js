@@ -471,7 +471,7 @@ exports.getKeywordDetails_ICE = async (req, res) => {
 	const fnName = "getKeywordDetails_ICE";
 	logger.info("Inside UI service: " + fnName);
     try {
-		const inputs = req.body.projecttypename;
+		const inputs = {"projecttypename":req.body.projecttypename};
 		// Query 1 fetching the objecttype,keywords basked on projecttypename
 		const result = await utils.fetchData(inputs, "design/getKeywordDetails_ICE", fnName);
 		if (result == "fail") return res.send("Server data rendering failed: Fail");

@@ -107,9 +107,9 @@ export const getTestSuite = async(getSuiteKey) => {
     }
 }
 
-export const downloadReports = async(getDownload) => {
+export const downloadReports = async(getDownload, type) => {
     try{
-        const res = await axios(`/viewReport?reportID=${getDownload?.id}&type=${ getDownload?.type === 'json' ? 'json' : 'pdf' }&images=${ getDownload?.type === 'pdfwithimg' ? true : false }`, {
+        const res = await axios(`/viewReport?reportID=${getDownload?.id}&type=${ getDownload?.type === 'json' ? 'json' : 'pdf' }&images=${type}`, {
             method: 'GET',
             headers: {
             'Content-type': 'application/json',
@@ -276,10 +276,7 @@ export const connectAzzure_ICE_create = async(data) => {
             'Content-type': 'application/json',
             },
             credentials: 'include',
-            data: {
-                issue_dict: data,
-                "action": "createIssueInAzure"
-            },
+            data: data
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             return {error:MSG.GENERIC.INVALID_SESSION};

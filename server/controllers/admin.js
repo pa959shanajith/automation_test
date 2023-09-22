@@ -374,6 +374,7 @@ exports.manageSessionData = async (req, res) => {
 				const sessions = await utils.allSess();
 				sessions.forEach(function(e) {
 					if (e.uniqueId && currUser != e.username) {
+						if(e.client == clientName){
 						data.sessionData.push({
 							username: e.username,
 							id: Buffer.from(e.uniqueId).toString("base64"),
@@ -381,6 +382,7 @@ exports.manageSessionData = async (req, res) => {
 							loggedin: (new Date(e.loggedin)).toLocaleString(),
 							ip: e.ip
 						});
+						}
 					}
 				});
 			} catch(err) {

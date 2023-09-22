@@ -844,16 +844,16 @@ const DesignModal = (props) => {
                         setOverlay("Loading...");
                         let resultString = JSON.parse(reader.result);
                         if (!Array.isArray(resultString)) 
-                            throw MSG.DESIGN.ERR_FILE_FORMAT
+                            throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT,life:2000})
                         for (let i = 0; i < resultString.length; i++) {
                             if (!resultString[i].appType)
-                                throw MSG.DESIGN.ERR_JSON_IMPORT
+                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_JSON_IMPORT.CONTENT,life:2000})
                             if (
                                 resultString[i].appType.toLowerCase() !== "generic" && 
                                 resultString[i].appType.toLowerCase() !== "pdf" &&
                                 resultString[i].appType !== props.appType
                             ) 
-                                throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
+                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_NO_MATCH_APPTYPE.CONTENT,life:2000})
                         }
                         DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, 0, import_status)
                             .then(data => {
@@ -1045,6 +1045,7 @@ const DesignModal = (props) => {
             setHeaderCheck(false);
             setEdit(true);
             setDraggable(false);
+            setChanged(true)
             headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
         }
     }

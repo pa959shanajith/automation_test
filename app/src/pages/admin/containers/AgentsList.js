@@ -216,7 +216,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, toastError, toastSuccess })
   };
 
   const onDownloadAgentClick = () => {
-    window.location.href = "https://driver.avoautomation.com/driver/avoagent.exe";
+    window.location.href = "https://downloads.avoassure.ai/driver/avoagent.exe";
   }
   function formatDate(dateString) {
     const months = [

@@ -2,14 +2,18 @@ import { Card } from "primereact/card";
 import "../styles/ExecutionCard.scss";
 import { getBrowser } from "../../utility/utilityFunctions";
 
-const ExecutionCard = ({ cardData }) => {
+const ExecutionCard = ({ cardData, configData }) => {
   console.log(getBrowser(cardData?.executionRequest?.browserType));
 
   return (
     <Card className="card_execute">
       <div className="grid">
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
-          <div>Avo Agent: {cardData?.executionRequest?.avoagents[0] ? cardData?.executionRequest?.avoagents[0] : 'Any Agent'}</div>
+          {
+            cardData?.executionRequest?.avogridId ?
+            <div>Avo Grid: {configData.avoAgentAndGrid?.avogrids.filter((item) => item?._id === cardData?.executionRequest?.avogridId)[0]?.name}</div> :
+            <div>Avo Agent: {cardData?.executionRequest?.avoagents[0] ? cardData?.executionRequest?.avoagents[0] : 'Any Agent'}</div>
+          }
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
           <div>

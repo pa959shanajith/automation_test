@@ -165,7 +165,7 @@ const CanvasNew = (props) => {
 
       case agent.indexOf("edge") > -1: return {name:"chromium",val:8};
       case agent.indexOf("edg/") > -1: return {name:"chromium",val:8};
-      case agent.indexOf("chrome") > -1 && !!window.chrome: return {name:"Chrome",val:1};
+      case agent.indexOf("chrome") > -1 && !!window.chrome: return {name:"chrome",val:1};
       case agent.indexOf("firefox") > -1: return {name:"mozilla",val:2};
       default: return "other";
    }

@@ -84,6 +84,10 @@ export default function BasicDemo() {
 
   useEffect(() => {
     setInputSummary(selectedRow[0]?.Comments);
+    setConfigValues({
+      ...configValues,
+      Summary: selectedRow[0]?.Comments,
+    });
     setInputDesc(selectedRow[0]?.StepDescription);
   }, [selectedRow]);
 
@@ -203,33 +207,26 @@ export default function BasicDemo() {
           isChecked: true,
           alwaysRequired: true,
         };
-        valueObj["Build #"]= {
-          defaultValue: null,
-          allowedValues: [],
-          alwaysRequired: true,
-          dependentFields: [],
-          referenceName: "Custom.Build#",
-          name: "Build #",
-          url: "https://dev.azure.com/AvoAutomation/5fd09fd1-b930-4a90-8740-d0ce504f1b5a/_apis/wit/fields/Custom.Build#",
-          data: "23.1",
-          error: false,
-          isChecked: true,
-        };
       }
       bugTitle === "Jira"
         ? Object.keys(configValues).forEach((item) => {
-            valueObj[item] = {
-              field_name: responseFeilds[item]?.key,
-              userInput:
-                responseFeilds[item]?.type === "array"
-                  ? {
-                      title: "",
-                      key: configValues[item]?.key,
-                      text: configValues[item]?.name,
-                    }
-                  : configValues[item],
-              type: responseFeilds[item]?.type,
-            };
+          if(item !== "Summary"){
+              valueObj[item] = {
+                field_name: responseFeilds[item]?.key,
+                userInput:
+                  responseFeilds[item]?.type === "array"
+                    ? {
+                        title: "",
+                        key: configValues[item]?.key,
+                        text: configValues[item]?.name,
+                      }
+                    : configValues[item],
+                type: responseFeilds[item]?.type,
+              };
+            }
+          else if(item === "Summary") {
+            valueObj.summary = configValues[item]
+          }
           })
         : Object.keys(configValues).forEach((item) => {
             valueObj[item] = {
@@ -260,7 +257,7 @@ export default function BasicDemo() {
               issue_dict: {
                 project: jiraDropDown?.id,
                 issuetype: issueDropDown?.name,
-                summary: inputSummary,
+                // summary: inputSummary,
                 description: inputDesc,
                 url: loginUrl,
                 username: loginName,
@@ -419,22 +416,65 @@ export default function BasicDemo() {
   }
 
   const defectIDForJiraAndAzure = (rowData) => {
-    const hasChildren = rowData?.children && (rowData?.children?.length > 0);
+    const hasChildren = rowData?.children && rowData?.children?.length > 0;
+    const returnBug = (getBug) => {
+      return getBug?.azure_defect_id ? (
+        <a
+          href={eval(getBug?.azure_defect_id)[1]}
+          target="_blank"
+        >
+          {eval(getBug?.azure_defect_id)[0]}
+        </a>
+      ) : (
+        getBug?.jira_defect_id && <a
+          href={getBug?.jira_defect_id
+            .split(",")[1]
+            .split("]")[0]
+            .replace(/['‘’"“”]/g, "")}
+          target="_blank"
+        >
+          {getBug?.jira_defect_id
+            .split(",")[0]
+            .split("[")[1]
+            .replace(/['‘’"“”]/g, "")}
+        </a>
+      );
+    };
 
     const getIcon = (iconType) => {
       let icon = "static/imgs/bug.svg";
-      if(iconType === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/jira_icon.svg";
-      else if(iconType === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) icon = "static/imgs/azure_devops_icon.svg";
+      if (
+        iconType === "Jira" &&
+        jiraDetails?.projects &&
+        !!jiraDetails?.projects.length
+      )
+        icon = "static/imgs/jira_icon.svg";
+      else if (
+        iconType === "Azure DevOps" &&
+        jiraDetails?.projects &&
+        !!jiraDetails?.projects.length
+      )
+        icon = "static/imgs/azure_devops_icon.svg";
       return icon;
-    }
-    return hasChildren ? null : (
-      rowData?.data?.jira_defect_id ? <a href={rowData?.data?.jira_defect_id.split(',')[1].split(']')[0].replace(/['‘’"“”]/g, '')} target="_blank">{rowData?.data?.jira_defect_id.split(',')[0].split('[')[1].replace(/['‘’"“”]/g, '')}</a> : <img
-          src={getIcon(bugTitle)}
-          alt="bug defect"
-        className={((bugTitle === "Jira" && (jiraDetails?.projects && !!jiraDetails?.projects.length)) || (bugTitle === "Azure DevOps" && (jiraDetails?.projects && !!jiraDetails?.projects.length))) ? "img_jira" : "" }
-          onClick={(e) => onBugClick(e, rowData)}
-        />
-      );
+    };
+
+    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : (
+      <img
+        src={getIcon(bugTitle)}
+        alt="bug defect"
+        className={
+          (bugTitle === "Jira" &&
+            jiraDetails?.projects &&
+            !!jiraDetails?.projects.length) ||
+          (bugTitle === "Azure DevOps" &&
+            jiraDetails?.projects &&
+            !!jiraDetails?.projects.length)
+            ? "img_jira"
+            : ""
+        }
+        onClick={(e) => onBugClick(e, rowData)}
+      />
+    );
   };
   const convertDataToTree = (data) => {
     const treeDataArray = [];
@@ -517,6 +557,16 @@ export default function BasicDemo() {
 
   useEffect(() => {
     if(jiraDropDown && issueDropDown){
+      setConfigureFeilds([]);
+      setInputSummary(selectedRow[0]?.Comments);
+      if (bugTitle === "Jira") {
+        setConfigValues({
+          ...configValues,
+          Summary: selectedRow[0]?.Comments,
+        });
+      } else {
+        setConfigValues({});
+      }
       (async() => {
         const getFields =
           bugTitle === "Jira"
@@ -784,7 +834,7 @@ export default function BasicDemo() {
               />
             </div>
             <Divider />
-            <div className="col-12">
+            {bugTitle !== "Jira" && <div className="col-12">
               <div>
                 <label>
                   <span>Summary</span>
@@ -801,7 +851,7 @@ export default function BasicDemo() {
                 value={inputSummary}
                 onChange={(e) => setInputSummary(e.target.value)}
               />
-            </div>
+            </div>}
             <div className="col-12">
               <div>
                 <label>

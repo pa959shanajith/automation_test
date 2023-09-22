@@ -210,8 +210,17 @@ const reports = () => {
                   handeSelectProject(e.target.value);
                 }}
               >
-                {projectList.map((project, index) => (
-                  <option key={index} value={project.id}>
+               
+                 {projectList
+                .filter(
+                  (value, index, self) =>
+                    index ===
+                    self.findIndex(
+                      (item) => item.name === value.name
+                    )
+                )
+                .map((project, index) => (
+                  <option value={project.id} key={index}>
                     {project.name}
                   </option>
                 ))}
