@@ -384,12 +384,7 @@ const CreateProject = (props) => {
         role: user.selectedRole ? user.selectedRole.name : user.primaryRole,
       }));
       if (projectList?.length>0 && projectList.includes(value.trim())) {
-        toast.current.show({
-          severity: 'error',
-          summary: 'Project Name Exists',
-          detail: 'The project name already exists.',
-          life: 5000, // Optional: how long the toast will be visible
-        });
+        props.toastError('The project name already exists.');
         return; // Do not proceed further
       }
 
@@ -407,12 +402,7 @@ const CreateProject = (props) => {
      if (project === "fail") {
     // Handle the "fail" response here
     // You can display an error message to the user
-    toast.current.show({
-      severity: "error",
-      summary: "Error",
-      detail: "Failed to create Project",
-      life: 5000,
-    });
+    props.toastError("Failed to create Project");
     return; // Do not proceed further
   }
 
@@ -421,25 +411,14 @@ const CreateProject = (props) => {
         return;
       }
       setIsInvalidProject(false)
-      toast.current.show({
-        severity: "success",
-        summary: "Project Created Successfully",
-        detail: "Project Created Successfully",
-        life: 5000,
-      });
-  
+      props.toastSuccess("Project Created Successfully");
       dispatch(loadUserInfoActions.savedNewProject(true));
       props.onHide();
       setRefreshData(!refreshData);
     } catch (error){
       console.error("API request failed:", error);
 
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to create Project",
-        life: 5000,
-      });
+      props.toastError("Failed to create Project");
       }
     }
   };
@@ -464,12 +443,7 @@ const CreateProject = (props) => {
 
     const manageProject= await userUpdateProject_ICE(upadtedProjData)
 
-    toast.current.show({
-      severity: "success",
-      summary: "Project Modified Successfully",
-      detail: "Project Modified Successfully",
-      life: 5000,
-    });
+    props.toastSuccess("Project Modified Successfully");
      props.onHide();
 
   }
