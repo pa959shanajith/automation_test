@@ -58,7 +58,7 @@ const TableRow = (props) => {
             setObjType(caseData.obType);
             setKeyword(props.testCase.keywordVal);
             setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal !== ''?(props.testCase.custname!=="OBJECT_DELETED"?(caseData.obType !== null ? props.keywordData[caseData.obType][caseData.keywords[0]].description !== undefined?props.keywordData[caseData.obType][caseData.keywords[0]].description:props.testCase.keywordVal: props.keywordData[caseData.obType][props.testCase.keywordVal].description): props.testCase.keywordVal):props.testCase.keywordVal})
-            setObjetListOption({value: props.testCase.custname,label:props.testCase.custname === ""?caseData.obType === "defaultList"?"@Generic":objList[0]:props.testCase.custname})
+            setObjetListOption({value: props.testCase.custname,label:props.testCase.custname === ""?caseData.obType === "defaultList"?"@Generic":caseData.obType === "defaultListMobility"?"@Generic":objList[0]:props.testCase.custname})
             setInput(props.testCase.inputVal[0]);
             setOutput(props.testCase.outputVal);
             setInputPlaceholder(null);
