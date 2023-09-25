@@ -49,21 +49,22 @@ const ImportModal = props => {
                     fetchScrapeData()
                     .then(resp => {
                         if (resp === "success") {
-                            props.setShow(false);
+                                                props.setShow(false);
                            props.toastSuccess("Screen Excel imported successfully");
-                           setUploadingFile(true);
+                                            setUploadingFile(true);
                         }
                         else props.toastError("ERR_EXCEL_IMPORT");
-                    })
+                                })
                     .catch(err => {
                         props.toastError("ERR_EXCEL_IMPORT");
                         // console.error(err);
-                    });
+                                });
                 }
             }catch(err){
             props.toastError('Error fetching data from file.')
             console.error(err)
             } 
+            props.setSaveDisable(false);
         }
         else if(importType === 'json'){
             let reader = new FileReader();
@@ -128,7 +129,8 @@ const ImportModal = props => {
             }
             reader.readAsText(file);
         }
-        setOverlay('')  
+        setOverlay('') 
+        props.setSaveDisable(false); 
     }
     const validate = (arr) =>{
         var err = false;
@@ -175,7 +177,7 @@ const Content = ({fileUpload,importType,setImportType,setError,importFormat,setO
   };
     const importTypes = [
         {value: "json", name: "JSON"}, 
-        {value: "excel", name: "Excel", disabled: appType !== 'Web'}
+        // {value: "excel", name: "Excel", disabled: appType !== 'Web'}
         
     ]
     const acceptType = {

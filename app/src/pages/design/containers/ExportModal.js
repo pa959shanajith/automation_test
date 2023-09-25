@@ -14,7 +14,7 @@ const ExportModal = props => {
     const history = useNavigate();
     const exportTypes = [
         { value: "json", name: "JSON" },
-        { value: "excel", name: "Excel" }
+        // { value: "excel", name: "Excel", disabled: appType !== "Web"}
     ]
     const [objects, setObjects] = useState([{ objType: "", tempId: tempIdCounter }]);
     // const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);

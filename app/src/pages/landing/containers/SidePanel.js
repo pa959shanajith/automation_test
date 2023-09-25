@@ -4,11 +4,11 @@ import  DisplayProject from '../components/DisplayProject';
 import '../styles/SidePanel.scss';
 
 
-const SidePanel = () => {
+const SidePanel = (props) => {
 
     return(
             <div className="sidePanel_container h-full">
-                <DisplayProject/>
+                <DisplayProject toastError={props.toastError} toastSuccess={props.toastSuccess}/>
                   {/*<div className="sidebar_tiles">
                     <div>
                         <h2> Do more with AVO !</h2>

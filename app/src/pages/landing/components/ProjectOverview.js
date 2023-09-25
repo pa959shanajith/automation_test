@@ -6,7 +6,7 @@ import Settings from '../../settings/Components/Settings';
 import ProjectCreation from './ProjectCreation'
 import { useSelector } from 'react-redux';
 
-const ProjectOverview = ({ }) => {
+const ProjectOverview = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let defaultselectedProject = reduxDefaultselectedProject;
@@ -36,7 +36,7 @@ const ProjectOverview = ({ }) => {
                 <p className='DefaultProjectName'>{defaultselectedProject && defaultselectedProject.projectName}</p>
             </div>
             <TabMenu className='tab-menu' model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
-            {activeIndex === 0 && <ProjectCreation />}
+            {activeIndex === 0 && <ProjectCreation toastError={props.toastError} toastSuccess={props.toastSuccess} />}
             {activeIndex === 1 && <Analysis />}
             {activeIndex === 2 && <Settings />}
         </div>

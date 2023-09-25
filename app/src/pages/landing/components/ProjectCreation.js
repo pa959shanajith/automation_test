@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 
 
 
-const ProjectCreation = () => {
+const ProjectCreation = (props) => {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [handleManageProject, setHandleManageProject] = useState(false)
@@ -44,7 +44,13 @@ const ProjectCreation = () => {
         {userInfo && userInfo.rolename === "Quality Manager" ? (
           <Card className="CreateProj-card" id='Createproj-title' title="Do you want to create a new project?" >
             <Button className="CreateProj_btn" size="small" onClick={handleOpenDialog} >Create Project</Button>
-            <CreateProject visible={visible} onHide={handleCloseDialog} setHandleManageProject={setHandleManageProject} handleManageProject={handleManageProject} />
+            <CreateProject 
+            visible={visible} 
+            onHide={handleCloseDialog} 
+            setHandleManageProject={setHandleManageProject} 
+            handleManageProject={handleManageProject}
+            toastSuccess={props.toastSuccess}
+            toastError={props.toastError}/>
           </Card>) : null}
         {/* </div> */}
 
