@@ -61,6 +61,7 @@
 .providerdropdown{
     margin-left: 1rem;
     width: 20%;
+    margin-top: -1rem;
 }
 .provider{
     line-height: 3rem;
@@ -78,10 +79,10 @@
     font-size: 1.1rem;
 }
 .hostname{
-    font-weight: 700;
-    line-height: 3rem;
-    margin-left: 1.4rem;
-    margin-bottom: -1rem;
+    font-weight: bold;
+    font-family: 'Open Sans';
+    margin-bottom: 1rem;
+    margin-left: -15rem;
 }
 .server_name{
     margin-left: 3rem;
@@ -90,22 +91,23 @@
 }
 .servername{
 
-    margin-left: -70rem;
+    margin-left: -13rem;
     font-weight: bold;
     font-family: "Open Sans";
+    margin-bottom: 1rem;
 }
 .portname{
     margin-left: 1rem;
     font-weight: bold;
-    line-height: 5rem;
+    line-height: 3rem;
     font-family: "Open Sans";
 }
 .Auth_dropdown{
-    font-family: Open Sans;
-    margin-left: -83rem;
-    width: 19rem;
     display: flex;
-    margin-top: 1rem;
+    font-family: Open Sans;
+    margin-right: 146.5rem;
+    margin-top: -14px;
+    width: 19rem;
 }
 .Authname{
     font-weight: bold;
@@ -125,10 +127,10 @@
 }
 
 .auth-label {
+    font-family: Open Sans;
+    font-weight: 700;
     margin-left: -156rem;
-    margin-top: 11rem;
-    font-family: "Open Sans";
-    font-weight: bold;
+    margin-top: 4rem;
 }
 .testbtn{
     float: right;
@@ -152,3 +154,123 @@
         transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s;
     }
 }
+.host_name{
+    display: 'flex';
+     flex-direction: 'column';
+      align-items: 'center';
+      margin-left: "1rem";
+    margin-top: "1rem";
+    gap: 10px;
+}
+.server{
+margin-top: 1rem;
+}
+.port{
+    margin-left: 1rem;
+}
+.AuthUsername{
+    line-height: 3rem;
+    font-family: "Open Sans";
+    font-weight: bold;
+    font-size: 1rem;
+    margin-left: -7rem;
+    margin-top: -1rem;
+    
+}
+.AuthPassword{
+    line-height: 3rem;
+    // margin-left: 10rem;
+    font-weight: bold;
+    font-family: "Open Sans";
+    font-size: 1rem;
+    margin-left: -8rem;
+    margin-top: -1rem;
+}
+.Auth_Username{
+    margin-left: 1rem;
+    width: 20%;
+}
+.Auth_Password{
+    margin-left: 3rem;
+    width: 20%;
+}
+.sendername{
+    line-height: 3rem;
+    font-family: "Open Sans";
+    font-weight: bold;
+    font-size: 1rem;
+    margin-left: -13rem;
+    margin-top: -1rem;
+
+    
+}
+.senderAddress{
+    line-height: 3rem;
+    // margin-left: 10rem;
+    font-weight: bold;
+    font-family: "Open Sans";
+    font-size: 1rem;
+    margin-left: -11rem;
+    margin-top: -1rem;
+}
+.avourl{
+    margin-top: 8rem;
+    margin-left: 2rem;
+}
+.url {
+    align-items: center;
+    display: flex;
+    margin-top: 9rem;
+    margin-left: 1rem;
+  }
+  
+  .line-label {
+    margin-right: 54px;
+    font-family: "Open Sans";
+    font-weight: bold;
+  }
+  .connection {
+    align-items: center;
+    display: flex;
+    margin-left: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .connection-label {
+    margin-right: 20px;
+    font-family: "Open Sans";
+    font-weight: bold;
+  }
+  .greeting {
+    align-items: center;
+    display: flex;
+    margin-left: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .greeting-label {
+    margin-right: 42px;
+    font-family: "Open Sans";
+    font-weight: bold;
+  }
+  .Socket {
+    align-items: center;
+    display: flex;
+    margin-left: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .Socket-label {
+    font-family: "Open Sans";
+    margin-right: 59px;
+    font-weight: bold;
+  }
+
+  .custom-label{
+    margin-left: 1rem;
+  }
+  .status{
+    font-family: "Open Sans";
+    font-weight: bold;
+    font-size: initial;
+  }

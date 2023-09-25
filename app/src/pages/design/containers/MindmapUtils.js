@@ -823,7 +823,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         dNodes[uNix].cidxch = 'true'; // child index updated
         if( dNodes[uNix].type === 'screens')
         for(var i =0; dNodes[0].children.length>i; i++){
-            if(dNodes[0].children[i].name === dNodes[uNix].parent.name){
+            if(dNodes[0].children[i].id === dNodes[uNix].parent.id){
                   const newObject = { ...dNodes[0].children[i], children: [...dNodes[0].children[i].children, dNodes[uNix]] };
                   dNodes[0].children[i] = newObject;
             }
@@ -831,11 +831,11 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         else if (dNodes[uNix].type === 'testcases') {
             for (var k = 0; k < dNodes[0].children.length; k++) {
               for (var j = 0; j < dNodes[0].children[k].children.length; j++) {
-                if (dNodes[0].children[k].children[j].name === dNodes[uNix].parent.name) {
+                if (dNodes[0].children[k].children[j].id === dNodes[uNix].parent.id) {
                   const newObject = { ...dNodes[0].children[k].children[j], children: [...dNodes[0].children[k].children[j].children, dNodes[uNix]] };
                   dNodes[0].children[k].children[j] = newObject;
                   for (var m = 0; dNodes.length>m;m++){
-                    if(newObject.parent.type === dNodes[m].type){
+                    if(newObject.parent.id === dNodes[m].id){
                         dNodes[m].children = [newObject]
                     }
                   } 
@@ -900,7 +900,7 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
         for (var l = 0; l < dNodes[0].children.length; l++) {
             if (dNodes[0].children[l].name === p.name) {
                 dNodes[0].children[l].children = dNodes[0].children[l].children.filter(child => child.id !== sid);
-                break; // No need to continue looping once we find the parent
+                // break; // No need to continue looping once we find the parent
             }
         }
     } else if (dNodes[sid].type === 'testcases') {
@@ -908,7 +908,7 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
             for (var m = 0; m < dNodes[0].children[k].children.length; m++) {
                 if (dNodes[0].children[k].children[m].name === p.name) {
                     dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child => child.id !== sid);
-                    break; // No need to continue looping once we find the parent
+                     // No need to continue looping once we find the parent
                 }
             }
         }
