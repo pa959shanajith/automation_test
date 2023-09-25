@@ -988,7 +988,7 @@
   position: relative;
   top: 3rem;
 }
-.grid_download_dialog__content__code {
+.grid_download_dialog__content {
   padding: 1rem;
   border-color: #000000;
   border-top: 20px solid #d3d3d3;
@@ -1296,6 +1296,7 @@ bottom: 21%;
 }
 .url{
   display: flex;
+  
   .p-button.p-button-icon-only {
     padding: 0.75rem 0;
     width: 3rem;
