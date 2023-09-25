@@ -134,7 +134,15 @@ io.on('connection', async socket => {
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
-			if (socketMap[address] != undefined) {
+			host = JSON.parse(icesession).host;
+			let clientName="avoassure";
+			if(host != null && host != undefined)
+			{
+				if(!(host.includes("localhost") || require('net').isIP(host)>0)){
+					clientName=host.split('.')[0]
+				}
+			}
+			if (socketMap[clientName][address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
 				delete socketMap[address];
