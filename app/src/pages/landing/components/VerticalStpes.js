@@ -35,6 +35,10 @@ const VerticalSteps = (props) => {
     const buttonStyle_genius = {
       background:" #605bff",color:"white" , fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
     };
+    const buttonStyle_genius_disabled = {
+      background:"#dddddd",color:"white" , fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
+    };
+
     const buttonStyle_execute = {
       background: (Button!="Execute"&& activeStep <1)? '#a0c8ff' : '#605bff',
       color: 'white',
@@ -51,7 +55,7 @@ const VerticalSteps = (props) => {
     {
         label: activeStep  > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows',
         description: ` Visualize testcases through mindmaps, capture elements and design test steps. `,
-        title:<div><Button  type = "AVOgenius" size="small" style={buttonStyle_genius} onClick={(e)=>handleNext("AVO Genius")}><img style={{color:"white", fill:"white",marginRight:"10px"}} src="static/imgs/avo_genius_18x18_icon.svg"/>  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold",fontFamily: "Open Sans" ,padding: "0.1rem 0.2rem"}}> OR </span><Button type = "designStudio" size="small" style={buttonStyle_design} onClick={(e)=>handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg"  style={{ marginRight: '10px' }} />Design Studio</Button> </div>
+        title:<div><Button  disabled={project.appType!=="Web"} type = "AVOgenius" size="small" style={project.appType=="Web"?buttonStyle_genius:buttonStyle_genius_disabled} onClick={(e)=>handleNext("AVO Genius")}><img style={{color:"white", fill:"white",marginRight:"10px"}} src="static/imgs/avo_genius_18x18_icon.svg"/>  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold",fontFamily: "Open Sans" ,padding: "0.1rem 0.2rem"}}> OR </span><Button type = "designStudio" size="small" style={buttonStyle_design} onClick={(e)=>handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg"  style={{ marginRight: '10px' }} />Design Studio</Button> </div>
        
     },
     {
