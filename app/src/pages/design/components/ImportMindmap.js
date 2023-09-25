@@ -130,7 +130,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         setFiledUpload(undefined)
         setError('')  }      
     }        
-    
+    }
     const resetcommsg = (e) => {
         setVersionItemValue(e.value)
         let version=e.target.value
@@ -138,27 +138,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
             if (gitExportDetails[i]["version"]===version){
                 setComMsgRef(gitExportDetails[i]["commitmessage"])
             }
-        }
-                   
-    }
-    }
-    const resetVersion = async(e) => {
-        setComMsgRef("");
-        gitVerRef.current.value= 'def-val'
-        setGitExportDetails([]);
-        var res = await checkExportVer({"query":"importgit","projectId": expProjRef.current.value})
-            if(res.error){displayError(res.error);return;}
-            setGitExportDetails(res);setDisableSubmit(false)}
-                   
-    
-    const resetcommsg = (e) => {
-        let version=e.target.value
-        for(let i=0;i<gitExportDetails.length;i++){
-            if (gitExportDetails[i]["version"]==version){
-                setComMsgRef(gitExportDetails[i]["commitmessage"])
-            }
-        }
-                   
+        }              
     }
     const acceptType = {
         pd:".pd",
