@@ -182,7 +182,7 @@ export default function BasicDemo() {
       setLoginKey("");
       setLoginUrl("");
     }
-    else if (getClick === "Proceed") { 
+    else if (getClick === "Proceed") {
       const valueObj = {};
       if(bugTitle !== "Jira"){
         valueObj["Iteration ID"] = responseFeilds["Iteration ID"];
@@ -321,6 +321,20 @@ export default function BasicDemo() {
       else{
         getReportsTable();
         setLogBug(false);
+        setJiraDropDown(null);
+        setLogBug(false);
+        setIssueDropDown(null);
+        setJiraDetails({projects: [], issuetype: []});
+        setMappedProjects({});
+        setConfigureFeilds([]);
+        setSelectedFiels([]);
+        setSelectedFiels([]);
+        setResponseFeilds({});
+        setConfigValues({});
+        setSelectedRow([]);
+        setLoginName("");
+        setLoginKey("");
+        setLoginUrl("");
       };
     }
   };
@@ -402,7 +416,7 @@ export default function BasicDemo() {
   );
 
   const onBugClick = (e, rowData) => {
-    setSelectedRow(reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments));
+    setSelectedRow(reportData?.rows.filter((el) => el?.slno === rowData?.data?.slno));
     // setConfigValues({
     //   ...configValues,
     //   Summary: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.Comments,
