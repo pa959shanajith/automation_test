@@ -90,6 +90,9 @@ const DesignModal = (props) => {
     const [rowChange, setRowChange] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
     let runClickAway = true;
+    
+
+let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON.parse(s))
     const emptyRowData = {
         "objectName": "",
         "custname": "",
@@ -221,10 +224,34 @@ const DesignModal = (props) => {
                 .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
             }
             setOverlay("Loading...")
+            console.log(uniqueArray(screenLevelTestCases))
+            if (screenLevelTestCases.length !== 0) {
+                // Create an array to store unique items
+                
+                const uniqueSteps = [];
+                for (const item of screenLevelTestCases) {
+                    const reuesd = item.reused;
+                    if (reuesd === true) {
+                      // Check if the uniqueSteps array does not already contain this item
+                      const isUnique = !uniqueSteps.some(
+                        (uniqueItem) => uniqueItem.some((u) => u.reused === true)
+                      );
+                      // If it's unique, add it to the uniqueSteps array
+                      if (isUnique) {
+                        uniqueSteps.push(item);
+                      }
+                    } else {
+                      // If not reused, add it to the uniqueSteps array
+                      uniqueSteps.push(item);
+                    }
+                  }
+                  // Update the state with the uniqueSteps array
+                  setScreenLevelTastSteps(uniqueSteps);
+                }
             setScreenLevelTastSteps(screenLevelTestCases)
         // }
         //eslint-disable-next-line
-    }, [imported, setScreenLevelTastSteps]);
+    }, [imported]);
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -977,28 +1004,28 @@ const DesignModal = (props) => {
             <Button label="Debug" size='small' onClick={() => handleDebug(selectedSpan)} autoFocus />
         </div>
     );
-    const deleteProduct = () => {
-        let findData = screenLavelTestSteps.find(screen => screen.name === rowExpandedName.name);
+    // const deleteProduct = () => {
+    //     let findData = screenLavelTestSteps.find(screen => screen.name === rowExpandedName.name);
 
-        if (findData) {
-        let testcases = findData.testCases.filter(objFromA => {
-            return selectedOptions === objFromA.stepNo
-        });
-        let updatedScreenLavelTestSteps = screenLavelTestSteps.map(screen => {
-            if (screen.name === rowExpandedName.name) {
-            return { ...screen, testCases:  testcases.length === 0 ? [emptyRowData] : testcases };
-            } else {
-            return screen;
-            }
-        });
-        setScreenLevelTastSteps(updatedScreenLavelTestSteps);
-        }
-        setDeleteTestDialog(false);
-        setTestCase(emptyRowData);
-        // setSelectedTestCases(null)
-        setSelectedOptions(null)
-        toast.current.show({severity:'success', summary:'Success',detail:'success full deleted test steps', life:3000});
-    };
+    //     if (findData) {
+    //     let testcases = findData.testCases.filter(objFromA => {
+    //         return selectedOptions === objFromA.stepNo
+    //     });
+    //     let updatedScreenLavelTestSteps = screenLavelTestSteps.map(screen => {
+    //         if (screen.name === rowExpandedName.name) {
+    //         return { ...screen, testCases:  testcases.length === 0 ? [emptyRowData] : testcases };
+    //         } else {
+    //         return screen;
+    //         }
+    //     });
+    //     setScreenLevelTastSteps(updatedScreenLavelTestSteps);
+    //     }
+    //     setDeleteTestDialog(false);
+    //     setTestCase(emptyRowData);
+    //     // setSelectedTestCases(null)
+    //     setSelectedOptions(null)
+    //     toast.current.show({severity:'success', summary:'Success',detail:'success full deleted test steps', life:3000});
+    // };
     
     const DependentTestCaseDialogHideHandler = () => {
         setVisibleDependentTestCaseDialog(false);
@@ -1526,7 +1553,7 @@ const DesignModal = (props) => {
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
-                    <DataTable value={screenLavelTestSteps.length>0?screenLavelTestSteps:[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
+                    <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>

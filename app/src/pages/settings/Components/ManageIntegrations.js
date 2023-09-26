@@ -672,13 +672,24 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
 
 
+    // const testcaseCheck = (e, checkboxIndex) => {
+    //     if (checkboxIndex >= 0 && checkboxIndex < testCaseData.length) {
+    //         const setObjValue = testCaseData.map((item) => ({ ...item, checked: false }));
+    //         const updatedData = setObjValue.map((item, idx) => idx === checkboxIndex ? { ...item, checked: e.checked } : item)
+    //         setTestCaseData(updatedData);
+    //     }
+    // }
+
     const testcaseCheck = (e, checkboxIndex) => {
         if (checkboxIndex >= 0 && checkboxIndex < testCaseData.length) {
-            const setObjValue = testCaseData.map((item) => ({ ...item, checked: false }));
-            const updatedData = setObjValue.map((item, idx) => idx === checkboxIndex ? { ...item, checked: e.checked } : item)
-            setTestCaseData(updatedData);
+          const globalIndex = startIndex + checkboxIndex;  // Calculate global index for the current page
+          const updatedData = testCaseData.map((item, idx) =>
+            idx === globalIndex ? { ...item, checked: e.checked } : item
+          );
+          setTestCaseData(updatedData);
         }
-    }
+      };
+      
 
     const callAzureSaveButton = () => {
         if(azureRef.current){

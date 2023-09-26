@@ -134,7 +134,8 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                     </div>
                     <div>
                         <div className={`icon-wrapper ${selectedscreen?.name === 'Git' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Git', code: 'GIT' })}>
-                            <span><img src="static/imgs/GitIcon.png" className="img__alm" alt="Git Icon" /></span>
+                            <span><img src="static/imgs/git_configuration_icon.svg" className="img__alm" alt="Git Icon" /></span>
+                            <span className="text_git">Git</span><br/>
                             <span className="text__git">Configuration</span>
                         </div>
                     </div>

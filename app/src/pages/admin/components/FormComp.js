@@ -57,7 +57,26 @@ const FormInputGit = (props) => {
         </Fragment>
     )
 }
-
+const FormInputEmail = (props) => {
+    const name = props.label
+    const type = props.type
+    const placeholder = props.placeholder
+    const inpRef = props.inpRef
+    const validExp = props.validExp
+    const textValue = props.textValue;
+    const upateInput = () => {
+        inpRef.current.value = ValidationExpression(inpRef.current.value, validExp);
+    }
+    return (
+        <Fragment>
+            <div>
+                <label>{name}</label>
+                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-20rem"  placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
+                {/* <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input> */}
+            </div>
+        </Fragment>
+    )
+}
 /*Component FormInputButton
   use: renders input box and label with button in a form
   props: name: label , placeholder : placeholder text , inpref = ref, onClick = onclick
@@ -357,5 +376,5 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
     )
 }
 
-export { FormInput, FormSelect, FormInputGit, FormRadio, FormInpDropDown, FormInpDropDownLdap, FormInputButton, FormSelectButton };
+export { FormInput, FormSelect, FormInputGit, FormRadio, FormInpDropDown, FormInpDropDownLdap, FormInputButton, FormSelectButton,FormInputEmail };
 

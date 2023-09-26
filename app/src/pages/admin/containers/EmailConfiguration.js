@@ -8,11 +8,11 @@ import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Button } from 'primereact/button';
 import { Checkbox } from "primereact/checkbox";
 import { getNotificationChannels, manageNotificationChannels } from '../api'
-import { ScreenOverlay, setMsg,ScrollBar, Messages as MSG, VARIANT } from '../../global'
+import { ScreenOverlay, setMsg, ScrollBar, Messages as MSG, VARIANT } from '../../global'
 import { Dialog } from 'primereact/dialog';
 import EmailTest from '../components/EmailTest';
 import { testNotificationChannels } from '../api'
-import {FormInput,FormRadio,FormSelect} from '../components/FormComp'
+import { FormInput, FormRadio, FormSelect, FormInputEmail } from '../components/FormComp'
 
 
 
@@ -128,9 +128,6 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
 
     const onSelectProvider = (event) => {
         selectProvider({ inputRef, ...fn, displayError, setLoading });
-        // const selectedValue = event.value;
-        // setSelectedProvider(selectedValue);
-        
     }
     const onClickTest = () => {
         setVisible(true)
@@ -162,79 +159,117 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
         <div>
             <div className='full_page'>
                 <>
-                
-                {/* <div>
-                        <label required className='provider'> select provider</label>
-                    </div> */}
-                    <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
-                    {/* <Dropdown  className='providerdropdown' ref={inputRef['selectprovider']}  value={selectedProvider} options={['SMTP']} onChange={onSelectProvider} placeholder="Select Provider" id="selectprovider" /> */}
-                    {/* <div className='email_setting_header'>
-                        Email Server Settings
-                    </div> */}
+
                     <div>
-                        {/* <label className='hostname' >Host name</label>
-                        <label className='servername' validExp={"emailServerName"}>Server Name</label> */}
+                        <label required className='provider'> select provider</label>
+                    </div>
+                    <div className='providerdropdown'>
+                        <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} option={['SMTP']} />
+                    </div>
+                    {/* <Dropdown  className='providerdropdown' ref={inputRef['selectprovider']}  value={selectedProvider} options={['SMTP']} onChange={onSelectProvider} placeholder="Select Provider" id="selectprovider" /> */}
+                    <div className='email_setting_header'>
+                        Email Server Settings
+                    </div>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: "1rem", marginTop: "1rem" }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <label className='hostname'>Host name</label>
+                                <FormInputEmail inpRef={inputRef['smtpHost']} placeholder={'Server Host IP/Domain name'} />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                <label className='servername'>Server Name</label>
+                                <FormInputEmail style={{ marginTop: "1rem" }} inpRef={inputRef['servername']} placeholder={'Server Name'} validExp={"emailServerName"} />
+                            </div>
+                        </div>
                         <div>
-                        <FormInput inpRef={inputRef['smtpHost']} label={'Host'} placeholder={'Server Host IP/Domain name'}/>
-                            <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
+                            <lable className="portname">Port Number </lable>
+                        </div>
+                        <div className='port'>
+                        <FormInputEmail inpRef={inputRef['smtpPort']}  placeholder={'Server Port'}/>
                         </div>
                         <div className='col-xs-9 form-group input-label'>
-                    <label>Status</label>
-                    <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>
-                </div>
-                        {/* <div>
-                            <lable className="portname">Port Number </lable>
-                        </div> */}
-                        <div>
-                        <FormInput inpRef={inputRef['smtpPort']} label={'Port'} placeholder={'Server Port'}/>
+                            <label className='status'>Status</label>
+                            <span ref={inputRef['serverstatus']} style={{ marginLeft: '20px' }} className={'left-opt'}>-</span>
                         </div>
-                        <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} label={"Authentication"} option={['none','basic']}/>
 
-                       {/* <div class="auth-container">
-    <label class="auth-label">Authentication Type</label>
-    <div>
-                            <Dropdown ref={inputRef['selectauth']} value={selectedValue} className='Auth_dropdown' placeholder="Select Authentication Type" options={['none', 'basic']} onChange={handleDropdownChange} />
+                        {/* <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} label={"Authentication"} option={['none','basic']}/> */}
+
+                        <div class="auth-container">
+                            <label class="auth-label">Authentication Type</label>
+                            <div className='Auth_dropdown'>
+                                <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} option={['none', 'basic']} />
+                            </div>
                         </div>
-</div> */}
-                    
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: "1rem", marginTop: "1rem" }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',    marginTop: "1rem" }}>
+                                <label className='AuthUsername'>Authentication UserName</label>
+                                <FormInputEmail inpRef={inputRef['authname']} placeholder={'Authentication Username'}/>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: "1rem" }}>
+                                <label className='AuthPassword'>Authentication Password</label>
+                                <FormInputEmail inpRef={inputRef['authpassword']} placeholder={'Authentication Password'}/>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: "1rem", marginTop: "1rem" }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',    marginTop: "1rem" }}>
+                                <label className='sendername'>Sender Name</label>
+                                <FormInputEmail inpRef={inputRef['sendername']}  placeholder={'Avo Assure Alerts'} />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: "1rem" }}>
+                                <label className='senderAddress'>Sender Address</label>
+                                <FormInputEmail inpRef={inputRef['senderaddr']}  placeholder={'avoassure-alerts@avoautomation.com'} />
+                            </div>
+                        </div>
+                        {/* <FormInputEmail inpRef={inputRef['sendername']} label={'Sender Name'} placeholder={'Avo Assure Alerts'} />
+                        <FormInputEmail inpRef={inputRef['senderaddr']} label={'Sender Address'} placeholder={'avoassure-alerts@avoautomation.com'} /> */}
+                        <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto", "Enable", "Disable"]} />
+                        <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes", "No"]} />
+                        <div className='url_avo'>
+  <label className='line-label'>Avo Assure URL</label>
+  <FormInputEmail inpRef={inputRef['assureurl']}  placeholder={'Avo Assure Application URL'} />
+</div>
+
                         <div>
-                        <FormInput inpRef={inputRef['authname']} label={'Authentication Username'} placeholder={'Authentication Username'} disabled={!inputEnabled}/>
-                        <FormInput inpRef={inputRef['authpassword']} label={'Authentication Password'} placeholder={'Authentication Password'} disabled={!inputEnabled}/>
+                        <div className='connection'>
+  <label className='connection-label'>Connection Timeout</label>
+  <FormInputEmail inpRef={inputRef['conctimeout']} type={'number'}  placeholder={'Connection Timeout (in milliseconds)'} />
+</div>
+<div className='greeting'>
+  <label className='greeting-label'>Greeting Timeout</label>
+  <FormInputEmail inpRef={inputRef['grettimeout']} type={'number'}  placeholder={'Greeting Timeout (in milliseconds)'} />
+</div>
+<div className='Socket'>
+  <label className='Socket-label'>Socket Timeout</label>
+  <FormInputEmail inpRef={inputRef['socktimeout']} type={'number'}  placeholder={'Socket Timeout (in milliseconds)'} /> 
+</div>
+                            {/* <FormInputEmail inpRef={inputRef['conctimeout']} type={'number'} label={'Connection Timeout'} placeholder={'Connection Timeout (in milliseconds)'} /> */}
+                            {/* <FormInputEmail inpRef={inputRef['grettimeout']} type={'number'} label={'Greeting Timeout'} placeholder={'Greeting Timeout (in milliseconds)'} /> */}
+                            {/* <FormInputEmail inpRef={inputRef['socktimeout']} type={'number'} label={'Socket Timeout'} placeholder={'Socket Timeout (in milliseconds)'} /> */}
                         </div>
-                        <FormInput inpRef={inputRef['sendername']} label={'Sender Name'} placeholder={'Avo Assure Alerts'}/>
-                <FormInput inpRef={inputRef['senderaddr']} label={'Sender Address'} placeholder={'avoassure-alerts@avoautomation.com'}/>
-                <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto","Enable","Disable"]}/>
-                <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes","No"]}/>
-                <FormInput inpRef={inputRef['assureurl']} label={'Avo Assure URL'} placeholder={'Avo Assure Application URL'}/>
-                <div>
-                <FormInput inpRef={inputRef['conctimeout']} type={'number'} label={'Connection Timeout'} placeholder={'Connection Timeout (in milliseconds)'}/>
-                <FormInput inpRef={inputRef['grettimeout']} type={'number'} label={'Greeting Timeout'} placeholder={'Greeting Timeout (in milliseconds)'}/>
-                <FormInput inpRef={inputRef['socktimeout']} type={'number'} label={'Socket Timeout'} placeholder={'Socket Timeout (in milliseconds)'}/>
-                </div>
-                        
-                      <div className='col-xs-9 form-group input-label checkbox-email'>
-                    <span>
-                        <input onChange={fn.showPool} id='checkboxpool' ref={inputRef['checkboxpool']} type='checkbox'></input>
-                        <label htmlFor='checkboxpool'>Use Connection Pool</label>
-                    </span>
-                </div>
-                <FormInput inpRef={inputRef['maxconnection']} type={'number'} label={'Max Connections'} placeholder={'Max Number of Connections Allowed in Pool'}/>
-                <FormInput inpRef={inputRef['maxmessages']} type={'number'} label={'Max Messages'} placeholder={'Max Number of Messages Sent via Pool'}/>
-                <div className='col-xs-9 form-group input-label checkbox-email'>
-                    <span>
-                        <input onChange={fn.showProxUrl} id='checkproxyurl' ref={inputRef['checkproxyurl']} type='checkbox'></input>
-                        <label htmlFor='checkproxyurl'>Use Proxy</label>
-                    </span>
-                </div>
-                <FormInput inpRef={inputRef['proxyurl']} label={'Proxy Server url'} placeholder={'Proxy Server URL (Eg: https://localhost:8080)'}/>
-                <div className='col-xs-9 form-group input-label checkbox-email'>
-                    <span>
-                        <input onChange={fn.showProxCred} id='checkproxycred' ref={inputRef['checkproxycred']} type='checkbox'></input>
-                        <label htmlFor='checkproxycred'>Proxy Requires Credentials</label>
-                    </span>
-                </div>
-                <FormInput inpRef={inputRef['proxyuser']} label={'Proxy User'} placeholder={'Username For Proxy Server'}/>
-                <FormInput inpRef={inputRef['proxypass']} label={'Proxy Password'} placeholder={'Password For Proxy Server'}/>
+
+                        <div className='col-xs-9 form-group input-label checkbox-email'>
+                            <span>
+                                <input onChange={fn.showPool} id='checkboxpool' ref={inputRef['checkboxpool']} type='checkbox'></input>
+                                <label htmlFor='checkboxpool'>Use Connection Pool</label>
+                            </span>
+                        </div>
+                        <FormInput inpRef={inputRef['maxconnection']} type={'number'} label={'Max Connections'} placeholder={'Max Number of Connections Allowed in Pool'} />
+                        <FormInput inpRef={inputRef['maxmessages']} type={'number'} label={'Max Messages'} placeholder={'Max Number of Messages Sent via Pool'} />
+                        <div className='col-xs-9 form-group input-label checkbox-email'>
+                            <span>
+                                <input onChange={fn.showProxUrl} id='checkproxyurl' ref={inputRef['checkproxyurl']} type='checkbox'></input>
+                                <label htmlFor='checkproxyurl'>Use Proxy</label>
+                            </span>
+                        </div>
+                        <FormInput inpRef={inputRef['proxyurl']} label={'Proxy Server url'} placeholder={'Proxy Server URL (Eg: https://localhost:8080)'} />
+                        <div className='col-xs-9 form-group input-label checkbox-email'>
+                            <span>
+                                <input onChange={fn.showProxCred} id='checkproxycred' ref={inputRef['checkproxycred']} type='checkbox'></input>
+                                <label htmlFor='checkproxycred'>Proxy Requires Credentials</label>
+                            </span>
+                        </div>
+                        <FormInput inpRef={inputRef['proxyuser']} label={'Proxy User'} placeholder={'Username For Proxy Server'} />
+                        <FormInput inpRef={inputRef['proxypass']} label={'Proxy Password'} placeholder={'Password For Proxy Server'} />
 
                     </div>
 
@@ -244,29 +279,29 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
             </div>
             <div className="adminActionBtn">
                 <Button ref={inputRef["toggleStatus"]} className="disabelbtn" onClick={onClickToggle} title="Disable">Disable</Button>
-                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate}  title="Update"  disabled={isCreateButtonDisabled}>Create</Button>
+                <Button ref={inputRef["toggleUppdate"]} className="savebtn" onClick={onClickUpdate} title="Update" disabled={isCreateButtonDisabled}>Create</Button>
                 {/* <button Ref={inputRef["toggleTest"]} className="a__btn " onClick={onClickTest}  title="Test">Test</button> */}
-                
-                 <Button  className="testbtn" size="small" onClick={onClickTest}>
-                        Test
-                    </Button>
+
+                <Button className="testbtn" size="small" onClick={onClickTest}>
+                    Test
+                </Button>
                 <Dialog header="Header" visible={visible} style={{ width: '50vw', height: '40%' }} onHide={() => setVisible(false)}>
-                        <div style={{ width: "100%", margin: "20px 0px" }}>
-                            <label>Recipient Email ID</label>
-                            <InputText
-                                ref={emailRef}
-                                style={{ width: "60%", marginLeft: "24px" }}
-                                placeholder="Enter Recipient Email ID"
-                            />
-                        </div>
+                    <div style={{ width: "100%", margin: "20px 0px" }}>
+                        <label>Recipient Email ID</label>
+                        <InputText
+                            ref={emailRef}
+                            style={{ width: "60%", marginLeft: "24px" }}
+                            placeholder="Enter Recipient Email ID"
+                        />
+                    </div>
 
-                        <div className="mnode__buttons">
-                            <label className="err-message">{errMsg}</label>
-                            <Button className='test_submit' label="TEST" onClick={submit} />
+                    <div className="mnode__buttons">
+                        <label className="err-message">{errMsg}</label>
+                        <Button className='test_submit' label="TEST" onClick={submit} />
 
-                        </div>
-                    </Dialog>
-           
+                    </div>
+                </Dialog>
+
             </div>
             {emailTest?<EmailTest setEmailTest={setEmailTest} confObj={emailTest}/>:null}
 
