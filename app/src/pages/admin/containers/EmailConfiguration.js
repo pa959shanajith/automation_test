@@ -224,7 +224,7 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
                         <FormInputEmail inpRef={inputRef['senderaddr']} label={'Sender Address'} placeholder={'avoassure-alerts@avoautomation.com'} /> */}
                         <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto", "Enable", "Disable"]} />
                         <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes", "No"]} />
-                        <div className='url'>
+                        <div className='url_avo'>
   <label className='line-label'>Avo Assure URL</label>
   <FormInputEmail inpRef={inputRef['assureurl']}  placeholder={'Avo Assure Application URL'} />
 </div>

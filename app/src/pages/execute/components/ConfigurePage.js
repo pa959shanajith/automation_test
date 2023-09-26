@@ -1600,7 +1600,7 @@ Learn More '/>
                     DevOps Integration URL
                     </label>
                     <div className="url">
-                    <pre className="grid_download_dialog__content__code cicdpre">
+                    <pre className="grid_download_dialog__content cicdpre">
                       <code id="api-url" title={url}>
                         {url}
                       </code>
@@ -1660,7 +1660,7 @@ Learn More '/>
                     <span className="devops_label">DevOps Request Body : </span>
                     <div>
                       <div className="key">
-                      <pre className="grid_download_dialog__content__code executiontypenamepre">
+                      <pre className="grid_download_dialog__content executiontypenamepre">
                         <code
                           className="executiontypecode"
                           id="devops-key"
