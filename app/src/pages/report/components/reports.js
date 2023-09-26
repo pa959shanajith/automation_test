@@ -12,7 +12,7 @@ import { AvatarGroup } from 'primereact/avatargroup';
 import { Avatar } from 'primereact/avatar';
 import { classNames } from 'primereact/utils';
 import {FooterTwo as Footer} from '../../global';
-import { fetchConfigureList, getProjectList } from "../api";
+import { fetchConfigureList, getFunctionalReports, getProjectList } from "../api";
 import { NavLink } from 'react-router-dom';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { SelectButton } from 'primereact/selectbutton';
@@ -118,18 +118,19 @@ const reports = () => {
                     if(!initProj || !data.find((proj)=> proj.id === initProj)){
                         handeSelectProject(data[0]?.id || '');
                     }else{
-                        fetchReportData(initProj);
+                        fetchReportData(initProj, selectProjects);
                     }
                 }
             }catch(error){
                 console.error('Error fetching project list:',error);
             }
         })();
-    }, []);
+    }, [viewBy]);
 
     const fetchReportData = async (initProj) => {
         try{
-            const executionProfileName = await fetchConfigureList({ projectid: initProj ,"param":"reportData"});
+            const executionProfileName = viewBy === "Execution Profile" ? await fetchConfigureList({ projectid: initProj ,"param":"reportData"}) :
+            await getFunctionalReports(initProj, project?.releases[project?.projectId.indexOf(initProj)][0]?.name, project?.releases[project?.projectId.indexOf(initProj)][0]?.cycles[0]?._id);
             if (executionProfileName && executionProfileName.length > 0) {
                 const extractedExecutionProfileData = executionProfileName.map((obj) => ({
                     configurename: obj?.configurename || '',
@@ -139,6 +140,15 @@ const reports = () => {
                     noOfExecution: obj?.noOfExecution || 0,
                 }));
                 setReportData(extractedExecutionProfileData);
+            } else if(!!executionProfileName?.rows?.modules.length){
+              const extractedExecutionProfileData = executionProfileName?.rows?.modules.map((obj) => ({
+                configurename: obj?.name || '',
+                execDate: obj?.execDate || '',
+                selectedModuleType: obj?.type || '',
+                configurekey: obj?._id || '',
+                noOfExecution: obj?.noOfExecution || 0,
+            }));
+            setReportData(extractedExecutionProfileData);
             } else {
                 setReportData([]);
             }
@@ -299,6 +309,7 @@ const reports = () => {
                                 state={{
                                   execution: data.configurename,
                                   configureKey: data.configurekey,
+                                  viewBy: viewBy
                                 }}
                                 className="Profile_Name"
                                 activeClassName="active"

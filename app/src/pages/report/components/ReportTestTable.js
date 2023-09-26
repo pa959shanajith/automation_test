@@ -214,7 +214,7 @@ export default function BasicDemo() {
               valueObj[item] = {
                 field_name: responseFeilds[item]?.key,
                 userInput:
-                  responseFeilds[item]?.type === "array"
+                  responseFeilds[item]?.type === "array" && item !== "Attachment"
                     ? {
                         title: "",
                         key: configValues[item]?.key,
