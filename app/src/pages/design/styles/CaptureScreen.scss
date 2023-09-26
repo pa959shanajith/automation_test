@@ -912,10 +912,9 @@
 }
 
 
-.footer__btn{
-  display: flex;
-
-}
+// .footer__btn{
+//   display: flex;
+// }
 
 // .screenshot__dialog{
 //   .p-dialog-content{
@@ -924,20 +923,16 @@
 // }
 
 .ref_pop{
-  z-index: 5;
-  display: flex;
+    z-index: 5;
+    display: flex;
   position: relative;
   display: flex;
   flex-direction: row;
   // right: 110%;
-  border-radius: 5px;
-  width: 350px;
+    border-radius: 5px;
 }
 
 .screenshot_pop{
-  // width: 39rem!important;
-  // height: 25rem!important;
-  width: 396px!important;
   .p-dialog-header {
     background: #E2E2ED !important;
     height: 4rem !important;
@@ -950,9 +945,13 @@
     padding: 0.6rem;
   }
 }
-.screenshot_pop__content{
-  overflow: auto;
+.scrsht_outerContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1;
+  height: 100%;
 }
+
 .screenshot_img{
   width: 100%;
 }
