@@ -307,7 +307,7 @@ const Messages={
         ERR_MODULE_EXIST: {"CONTENT":'Module does not exist in Git repository. Please verify your inputs.', "VARIANT": VARIANT.ERROR},
         ERR_JSON_INCORRECT_IMPORT: {"CONTENT":"Incorrect JSON imported. Please check the contents.", "VARIANT": VARIANT.ERROR},
         ERR_NODE_STRUCT_IMPORT: {"CONTENT":"The file has no node structure to import, please check.", "VARIANT": VARIANT.ERROR},
-        ERR_IMPORT_MODULE_GIT: {"CONTENT":'Error in importing module from Git.', "VARIANT": VARIANT.ERROR},
+        ERR_IMPORT_MODULE_GIT: {"CONTENT":'There is no Projects in git repository to import.', "VARIANT": VARIANT.ERROR},
         ERR_PROJECT_GIT_CONGIG: {"CONTENT":'Project is not Git configured. Please verify.', "VARIANT": VARIANT.ERROR},
         ERR_PROJECT_GIT_CON: {"CONTENT":'Error connecting Git, Kindly try after some time', "VARIANT": VARIANT.ERROR},
         ERR_GIT_EXIST: {"CONTENT":'Git configuration does not exist. Please verify.', "VARIANT": VARIANT.ERROR},
