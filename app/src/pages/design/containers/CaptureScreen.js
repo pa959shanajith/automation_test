@@ -1803,7 +1803,7 @@ const headerstyle={
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
-              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?'392px':typesOfAppType==="Desktop"?'477px':typesOfAppType==="OEBS"?'423px':""}}>
+              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?'392px':typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'423px':typesOfAppType==="SAP"?'492px':""}}>
                 <div className="screenshot_pop__content" >
                  <div className="scrsht_outerContainer" id="ss_ssId">
                   <div data-test="ssScroll" className="ss_scrsht_insideScroll">
