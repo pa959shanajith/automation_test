@@ -434,13 +434,13 @@ export const importGitMindmap = async(data) => {
             console.error(res.data)
             return {error:res.data}
         }
-        if (!('testscenarios' in res.data)){
-            console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_JSON_INCORRECT_IMPORT}
-        }else if(res.data.testscenarios.length === 0){
-            console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_NODE_STRUCT_IMPORT}
-        }
+        // if (!('testscenarios' in res.data)){
+        //     console.error(res.data)
+        //     return {error:MSG.MINDMAP.ERR_JSON_INCORRECT_IMPORT}
+        // }else if(res.data.testscenarios.length === 0){
+        //     console.error(res.data)
+        //     return {error:MSG.MINDMAP.ERR_NODE_STRUCT_IMPORT}
+        // }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
