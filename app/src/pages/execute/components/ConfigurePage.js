@@ -1075,7 +1075,15 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     if (btnType === "Cancel") {
       setVisible_schedule(false);
       setStartDate(null);
+      setScheduling(false);
+      setEndDate(null);
       setStartTime(null);
+      setScheduleOption({});
+      setSelectedDaily(null);
+      setselectedWeek([]);
+      setSelectedMonthly(null);
+      setDropdownWeek(null);
+      setSelectedPattren({});
     }
     if (btnType === "Schedule") {
       if((new Date(startTime) < new Date(Date.now() + (5 * 60 * 1000))) && (new Date(startDate).getTime() < new Date(startTime).getTime())) {

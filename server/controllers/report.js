@@ -1355,3 +1355,72 @@ exports.fetchExecutionDetail = async (req, res) => {
 		return res.send({ status: 'fail'});
 	};
 }
+
+exports.getReportsData_ICE = async (req, res) => {
+    const fnName = "getReportsData_ICE";
+    try {
+        let reportInputData = req.query.reportsInputData;
+        if (reportInputData.type == 'allmodules') {
+            logger.info("Inside UI service: " + fnName + " - allmodules");
+            let inputs = {
+                "query": "getAlltestSuites",
+                "id": reportInputData.cycleId
+            };
+            if(reportInputData['configurekey'] && reportInputData['cycleId'] == ''){
+                inputs = {
+                    "query": "getAlltestSuitesDevops",
+                    "data": reportInputData
+                }
+            }
+            const result1 = await utils.fetchData(inputs, "reports/getAllSuites_ICE", fnName)
+            if (result1 == "fail") return res.send("fail");
+            return res.send({ rows: result1 });
+        }
+    } catch (exception) {
+        logger.error("Error occurred in "+fnName+". Error: " + exception.message);
+        res.status(500).send("fail");
+    }
+};
+
+exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
+    const fnName = "getSuiteDetailsInExecution_ICE";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        let inputs = {}
+        if ("configurekey" in req.query){
+            inputs = {
+                'configurekey': req.query.configurekey,
+                'suiteid': req.query.testsuiteid
+            }
+        }
+        else{
+            inputs = ("batchname" in req.query)?{"batchname": req.query.batchname}:{"suiteid": req.query.testsuiteid}
+        }
+        const executionData = await utils.fetchData(inputs, "reports/getSuiteDetailsInExecution_ICE", fnName);
+        if (executionData == "fail") return res.send("fail");
+        var startTime, endTime, starttime, endtime;
+        var executionDetailsJSON = [];
+        for (var i = 0; i < executionData.length; i++) {
+            startTime = new Date(executionData[i].starttime);
+            starttime = ("0"+startTime.getUTCDate()).slice(-2) + "-" + ("0"+(startTime.getUTCMonth() + 1)).slice(-2) + "-" + ("0"+startTime.getUTCFullYear()).slice(-2) + " " + ("0"+startTime.getUTCHours()).slice(-2) + ":" + ("0"+startTime.getUTCMinutes()).slice(-2);
+            if (executionData[i].endtime === null) endtime = '-';
+            else {
+                endTime = new Date(executionData[i].endtime);
+                endtime = ("0"+endTime.getUTCDate()).slice(-2) + "-" + ("0"+(endTime.getUTCMonth() + 1)).slice(-2) + "-" + ("0"+endTime.getUTCFullYear()).slice(-2) + " " + ("0"+endTime.getUTCHours()).slice(-2) + ":" + ("0"+endTime.getUTCMinutes()).slice(-2);
+            }
+            executionDetailsJSON.push({
+                execution_id: executionData[i]._id,
+                start_time: starttime,
+                end_time: endtime,
+                status: executionData[i].status,
+                batchid: executionData[i].batchid,
+                smart: executionData[i].smart
+            });
+        }
+        logger.info("Sending execution details from reports/"+fnName);
+        res.send(JSON.stringify(executionDetailsJSON));
+	} catch (exception) {
+		logger.error("Error occurred in report/"+fnName+":", exception);
+		res.send("fail");
+    }
+};
