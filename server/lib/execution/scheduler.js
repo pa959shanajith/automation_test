@@ -596,7 +596,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     let startDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate() - nextRun), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
                     let endDate = new Date(startDate)
                     endDate.setDate(endDate.getDate() + nextRun);
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -654,7 +659,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     const dailyJob = agenda.create(scheduleId, { scheduleData: body.executionData });
                     await agenda.start();
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -713,7 +723,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 const weeklyJob = agenda.create(scheduleId, { scheduleData: body.executionData });
                 await agenda.start();
                 let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                    endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                }
+                else {
+                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                }
                 await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
             })();
         }
@@ -816,7 +831,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     const monthlyJob = agenda.create(scheduleId, { scheduleData: body.executionData, runCount: 0 });
                     await agenda.start();
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -886,7 +906,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     const monthlyJob = agenda.create(scheduleId, { scheduleData: body.executionData, runCount: 0 });
                     await agenda.start();
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -1012,7 +1037,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         startDate = new Date(parseInt(startDate[3]), parseInt(month), parseInt(startDate[2]) - nextRun, parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
                         let endDate = new Date(startDate)
                         endDate.setDate(endDate.getDate() + nextRun);
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
@@ -1061,7 +1091,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         await agenda.start();
                         let timeValue = schd.time;
                         let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
@@ -1111,7 +1146,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                     await agenda.start();
                     let timeValue = multiBatchExecutionData.executionData.batchInfo[0].differenceInTime;;
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                    if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                    }
                     await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -1219,7 +1259,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         await agenda.start();
                         let timeValue = multiBatchExecutionData.executionData.batchInfo[0].differenceInTime;
                         let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
@@ -1274,7 +1319,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         await agenda.start();
                         let timeValue = multiBatchExecutionData.executionData.batchInfo[0].differenceInTime;
                         let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
