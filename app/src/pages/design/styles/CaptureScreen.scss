@@ -916,11 +916,11 @@
 //   display: flex;
 // }
 
-// .screenshot__dialog{
-//   .p-dialog-content{
-//     padding: 0rem 1rem 0rem 1rem !important;
-//   }
-// }
+.screenshot__dialog{
+  .p-dialog-content{
+    overflow-x: hidden;
+  }
+}
 
 .ref_pop{
     z-index: 5;
@@ -943,6 +943,7 @@
   }
   .p-dialog-content{
     padding: 0.6rem;
+    overflow-x: hidden;
   }
 }
 .scrsht_outerContainer {
