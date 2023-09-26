@@ -143,10 +143,10 @@ const reports = () => {
             } else if(!!executionProfileName?.rows?.modules.length){
               const extractedExecutionProfileData = executionProfileName?.rows?.modules.map((obj) => ({
                 configurename: obj?.name || '',
-                execDate: obj?.execDate || '',
+                execDate: obj?.lastExecutedtime || '',
                 selectedModuleType: obj?.type || '',
                 configurekey: obj?._id || '',
-                noOfExecution: obj?.noOfExecution || 0,
+                noOfExecution: obj?.executionCount || 0,
             }));
             setReportData(extractedExecutionProfileData);
             } else {
@@ -325,15 +325,15 @@ const reports = () => {
                                     <span className="exe_type">
                                         <img
                                           src={
-                                            data.selectedModuleType ===
-                                            "e2eExecution"
+                                            (data.selectedModuleType ===
+                                            "e2eExecution" || data.selectedModuleType === "endtoend")
                                               ? "static/imgs/E2EModuleSideIcon.png"
                                               : "static/imgs/moduleIcon.png"
                                           }
                                           className='exe_type_icon'
                                         />
-                                        <span style={{ display: 'inline-block', marginLeft: '0.4rem' }}>{data.selectedModuleType ===
-                                        "e2eExecution"
+                                        <span style={{ display: 'inline-block', marginLeft: '0.4rem' }}>{(data.selectedModuleType ===
+                                        "e2eExecution" || data.selectedModuleType === "endtoend")
                                           ? "End to End"
                                           : "Test Suite"}</span>
                                       </span>
