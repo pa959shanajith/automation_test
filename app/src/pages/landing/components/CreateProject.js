@@ -166,7 +166,7 @@ const CreateProject = (props) => {
     { name: 'System Application', code: 'System',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
   const appTypes = [
-    { name: 'Web', code: 'Web',value:'5db0022cf87fdec084ae49b6', image: 'static/imgs/web.png' },
+    { name: 'Web', code: 'Web',value:'5db0022cf87fdec084ae49b6', image: 'static/imgs/Web.svg' },
     { name: 'SAP', code: 'SAP', value:'5db0022cf87fdec084ae49b4', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', value:'5db0022cf87fdec084ae49b3', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', value:'5db0022cf87fdec084ae49af', image: 'static/imgs/desktop.png' },
