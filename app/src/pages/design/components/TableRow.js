@@ -304,7 +304,7 @@ const TableRow = (props) => {
               FontSize: 100,
               fontSize: 14,
               background: "white",
-              height:Object.keys(optionElement).length>4?200:110,
+              height:Object.keys(optionElement).length>6?200:110,
             }),
             menuPortal: (base) => ({ 
                 ...base, 
