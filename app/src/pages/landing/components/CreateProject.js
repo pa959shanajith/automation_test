@@ -155,7 +155,7 @@ const CreateProject = (props) => {
   }
 
   const apps = [
-    { name: 'Web', code: 'Web', image: 'static/imgs/web.png' },
+    { name: 'Web', code: 'Web', image: 'static/imgs/Web.svg' },
     { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png' },
