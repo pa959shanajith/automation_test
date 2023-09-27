@@ -184,7 +184,8 @@ exports.manageUserDetails = async (req, res) => {
 				res.send(result["status"]);			
 				let uData = result["userData"];
 				try{
-					notifications.notify("verifyUser", {field: "verifyUser", user: uData});
+					// notifications.notify("verifyUser", {field: "verifyUser", user: uData});
+					// notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
 				}catch(error) {
 					logger.error("Error occurred in admin/"+fnName,error);
 				}

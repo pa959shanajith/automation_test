@@ -233,8 +233,8 @@ class TestSuiteExecutor {
             "version": version
         };
         if(batchname)inputs['batchname']=batchname
-        if(batchExecutionData.configurekey) {
-            inputs['configurekey']=batchExecutionData.configurekey;
+        if(batchExecutionData.configurekey || batchExecutionData.configureKey) {
+            inputs['configurekey']=batchExecutionData.configurekey || batchExecutionData.configureKey;
             inputs['executionListId']=batchExecutionData.executionListId
             inputs['projectId'] = batchExecutionData.batchInfo[0].projectId;
             inputs['releaseName'] =  batchExecutionData.batchInfo[0].releaseId;
@@ -347,6 +347,10 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
+                    if(mySocket == undefined || mySocket.connected == false){
+						mySocket.removeAllListeners('result_executeTestSuite');
+						mySocket.removeAllListeners('return_status_executeTestSuite');
+					}
                     if (status === "success") {
                         if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
                     } else if (status === "skipped") {
@@ -377,7 +381,6 @@ class TestSuiteExecutor {
                         if (reportType != "accessiblityTestingOnly")
                             notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
                     }
-                    mySocket.removeAllListeners('return_status_executeTestSuite');
                 });
                 mySocket.on("result_executeTestSuite", async (message)=>{
                     const data = message;
@@ -386,6 +389,10 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
+                    if(mySocket == undefined || mySocket.connected == false){
+						mySocket.removeAllListeners('result_executeTestSuite');
+						mySocket.removeAllListeners('return_status_executeTestSuite');
+					}
                         if (!status) { // This block is for report data
                             if ("accessibility_reports" in resultData) {
                                 const accessibility_reports = resultData.accessibility_reports
@@ -436,6 +443,7 @@ class TestSuiteExecutor {
                             try {
                                 let result = status;
                                 let report_result = {};
+                                mySocket.removeAllListeners('return_status_executeTestSuite');
                                 mySocket.removeAllListeners('result_executeTestSuite');
                                 report_result["status"] = status
                                 report_result["configurekey"] = execReq["configurekey"]

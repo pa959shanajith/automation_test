@@ -177,8 +177,8 @@ const UserDemo = (props) => {
         <div className="UserProfileContainer">
             <TieredMenu className='custom-tieredmenu' model={userMenuItems} popup ref={menu} breakpoint="767px" />
             {showEditProfileDialog && <EditProfile showDialogBox={showEditProfileDialog} setShowDialogBox={setShowEditProfileDialog} userInfo={userInfo} toastError={props.toastError}  toastSuccess={props.toastSuccess} toastWarn={props.toastWarn}/>}
-            {showChangePasswordDialog && < ChangePassword showDialogBox={showChangePasswordDialog} setShowDialogBox={setShowChangePasswordDialog} toastError={props.toastError}  toastSuccess={props.toastSuccess}  />}
-            {showAgentDialog && < Agent showDialogBox={showAgentDialog} setShowDialogBox={setShowAgentDialog} />}
+            {showChangePasswordDialog && <ChangePassword showDialogBox={showChangePasswordDialog} setShowDialogBox={setShowChangePasswordDialog} toastError={props.toastError}  toastSuccess={props.toastSuccess}  />}
+            {showAgentDialog && <Agent showDialogBox={showAgentDialog} setShowDialogBox={setShowAgentDialog} />}
             <AvoConfirmDialog
                 visible={logoutClicked}
                 onHide={setLogoutClicked}

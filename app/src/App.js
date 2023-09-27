@@ -9,6 +9,7 @@ import HomePage from './pages/landing/containers/HomePage';
 import TagManager from 'react-gtm-module';
 import Report from './pages/report/components/reports';
 import More from './pages/more/more';
+import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
 import { ErrorPage } from './pages/global';
@@ -75,7 +76,7 @@ const App = () => {
   }, [])
 
   return (<>
-    {/* {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null} */}
+    {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
     {/* <ProgressBar /> */}
     {/* <ErrorBoundary> */}
     <div className="main_content">
@@ -93,9 +94,8 @@ const RouteApp = () => {
     <>
     <GeniusDialog />
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path='/verify' element={<Login/>}/>
-        <Route path='/reset' element={<Login/>}/>
+      
+        <Route path={["/login","/verify","/reset"]} element={<Login />} />
         <Route path="/" element={<BasePage />} />
         <Route path="/landing" element={<HomePage />} />
         <Route path="/integration" element={<Integration />} />
