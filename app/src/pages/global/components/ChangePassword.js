@@ -6,7 +6,7 @@ import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { resetPassword } from '../api';
 import { useDispatch } from 'react-redux';
-import '../styles//ChangePassword.scss';
+import '../styles/ChangePassword.scss';
 
 
 const ChangePassword = (props) => {
