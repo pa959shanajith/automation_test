@@ -684,6 +684,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 setSelectedSchedule(item);
                 setConfigItem(idx);
                 setVisible_schedule(true);
+                handleTestSuite(item);
               }}
               size="small"
             >
@@ -1203,12 +1204,14 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
-              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
+              testsuiteId: readTestSuite?.testSuiteDetails[el?.testsuiteId]?.testsuiteid
             })),
             scenarioFlag: false,
             type: "normal",
             configureKey: selectedSchedule?.configurekey,
             configureName: selectedSchedule?.configurename,
+            executionListId: uuid(),
           },
         })
       ).then(() => {
@@ -1252,12 +1255,14 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
-              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent"
+              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
+              testsuiteId: readTestSuite?.testSuiteDetails[el?.testsuiteId]?.testsuiteid
             })),
             scenarioFlag: false,
             type: "normal",
             configureKey: selectedSchedule?.configurekey,
             configureName: selectedSchedule?.configurename,
+            executionListId: uuid(),
           },
         })
       ).then(() => {

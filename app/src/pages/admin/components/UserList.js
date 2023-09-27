@@ -116,7 +116,7 @@ const UserList = (props) => {
 
     return (<>
 
-        <div className="UserList card p-fluid" style={{ width: '69rem', padding: '1rem' }}>
+        <div className="UserList card p-fluid" style={{ width: '67%', padding: '1rem' }}>
             <ModalContainer
                 title="Please Confirm"
                 show={showDeleteConfirmPopUp}
@@ -135,7 +135,7 @@ const UserList = (props) => {
                 header={header}
                 emptyMessage="No users found"
                 scrollable
-                scrollHeight='28rem'
+                scrollHeight='21.6rem'
                 showGridlines>
                 <Column field="userName" header="User Name" style={{ width: '20%' }}></Column>
                 <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
