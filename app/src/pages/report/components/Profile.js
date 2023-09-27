@@ -9,7 +9,7 @@ import { Badge } from "primereact/badge";
 import { Tree } from "primereact/tree";
 import { reportsBar } from "../../utility/mockData";
 import { useLocation } from "react-router-dom";
-import { downloadReports, getReportList, getTestSuite } from "../api";
+import { downloadReports, fetchModuleData, getReportList, getTestSuite } from "../api";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
@@ -41,28 +41,54 @@ const Profile = () => {
   ];
 
   useEffect(() => {
-    (async() => {
-      const executionProfiles = await getReportList(
-        location?.state?.configureKey
-        );
-        // let sortExecutions= [...executionProfiles].reverse();
-        setReportsTable(executionProfiles.map((el, ind) => ({
-          ...el,
-          id: el._id,
-          key: ind.toString(),
-          name: `Execution ${ind + 1}`,
-          dateTime: el.startDate,
-          status: checkStatus(el.modStatus),
-          testSuites: el.modStatus.reduce(
-            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-            {}
+    (async () => {
+      const executionProfiles =
+        location?.state?.viewBy === "Execution Profile"
+          ? await getReportList(location?.state?.configureKey)
+          : await fetchModuleData({
+              testsuiteid: location?.state?.configureKey,
+            });
+      // let sortExecutions= [...executionProfiles].reverse();
+      if(location?.state?.viewBy === "Execution Profile"){
+        setReportsTable(
+          executionProfiles.map((el, ind) => ({
+            ...el,
+            id: el._id,
+            key: ind.toString(),
+            name: `Execution ${ind + 1}`,
+            dateTime: el.startDate,
+            status: checkStatus(el.modStatus),
+            testSuites: el.modStatus.reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
             ),
             testCases: el.scestatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
               {}
-              ),
-            })));
-          })()
+            ),
+          }))
+        );
+      } else{
+        setReportsTable(
+          executionProfiles.map((el, ind) => ({
+            ...el,
+            id: el.batchid,
+            key: ind.toString(),
+            name: `Execution ${ind + 1}`,
+            dateTime: el?.start_time,
+            status: checkStatus(["fail"]),
+            testSuites: ["fail"].reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
+            ),
+            testCases: ["Fail", "Pass", "Pass"].reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
+            ),
+          }))
+        )
+      }
+    })();
   }, [location]);
   
   const onTestSuiteClick = async (getRow) => {

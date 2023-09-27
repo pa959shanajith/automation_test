@@ -28,6 +28,7 @@ const DisplayProject = (props) => {
   else userInfo = userInfo ;
   
   const createdProject = useSelector((state) => state.landing.savedNewProject);
+  const showGeniusDialog = useSelector((state) => state.progressbar.showGenuisWindow)
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [showTooltip, setShowTooltip] = useState(false);
   // const defaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
@@ -143,7 +144,7 @@ const DisplayProject = (props) => {
       const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
       setProjectList(sortedProject);
     })();
-  }, []);
+  }, [showGeniusDialog]);
 
   useEffect(() => {
     if (createdProject) {

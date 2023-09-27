@@ -274,30 +274,7 @@ const ScheduleScreen = ({
       <ExecutionCard cardData={cardData} configData={getScheduledList} />
       <div className="schedule_container">
         <div className="grid schedule_options">
-          <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
-            <Calendar
-              value={startDate}
-              placeholder="Enter Start date"
-              onChange={(e) => {
-                setStartDate(e.value);
-                setStartTime(new Date());
-              }}
-              // disabled={selectedPattren?.key}
-              minDate={new Date()}
-              showIcon
-            />
-          </div>
-          <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
-            <Calendar
-              value={startTime}
-              placeholder="Enter Start Time "
-              onChange={(e) => setStartTime(e.value)}
-              icon="pi pi-fw pi-clock"
-              showIcon
-              timeOnly
-            />
-          </div>
-          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+        <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
             <Button
               icon="pi pi-sync"
               label={
@@ -326,7 +303,7 @@ const ScheduleScreen = ({
                         value={el}
                         onChange={(e) => {
                           setStartTime(new Date());
-                          // setStartDate(null);
+                          setStartDate(null);
                           setSelectedPattren(e.value);
                         }}
                         checked={selectedPattren?.key === el?.key}
@@ -351,6 +328,29 @@ const ScheduleScreen = ({
                 </div>
               </div>
             </OverlayPanel>
+          </div>
+          <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+            <Calendar
+              value={startDate}
+              placeholder="Enter Start date"
+              onChange={(e) => {
+                setStartDate(e.value);
+                setStartTime(new Date());
+              }}
+              disabled={selectedPattren?.key}
+              minDate={new Date()}
+              showIcon
+            />
+          </div>
+          <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+            <Calendar
+              value={startTime}
+              placeholder="Enter Start Time "
+              onChange={(e) => setStartTime(e.value)}
+              icon="pi pi-fw pi-clock"
+              showIcon
+              timeOnly
+            />
           </div>
           <div className="col-12 lg:col-2 xl:col-2 md:col-6 sm:col-12 flex justify-content-end">
             <Button

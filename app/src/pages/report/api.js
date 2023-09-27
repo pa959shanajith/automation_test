@@ -32,6 +32,66 @@ export const fetchConfigureList = async(props) => {
     }
 }
 
+export const getFunctionalReports = async(projId, relName, cycId) => {
+    try{
+        const res = await axios(url+'/getReportsData_ICE', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            params: {
+                "param":"getReportsData_ICE",
+                "reportsInputData":{
+                    "projectId": projId,
+                    "releaseName": relName,
+                    "cycleId": cycId,
+                    "configurekey": projId,
+                    "type":"allmodules",
+                }
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
+    }
+}
+
+export const fetchModuleData = async(arg) => {
+    try{
+        const res = await axios(url+'/getSuiteDetailsInExecution_ICE', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            params: {
+                "param": "getSuiteDetailsInExecution_ICE",
+                ...arg
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
+    }
+}
+
 export const getProjectList = async() => {
     try{
         const res = await axios(url+'/populateProjects', {

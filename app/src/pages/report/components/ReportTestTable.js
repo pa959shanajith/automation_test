@@ -182,7 +182,7 @@ export default function BasicDemo() {
       setLoginKey("");
       setLoginUrl("");
     }
-    else if (getClick === "Proceed") { 
+    else if (getClick === "Proceed") {
       const valueObj = {};
       if(bugTitle !== "Jira"){
         valueObj["Iteration ID"] = responseFeilds["Iteration ID"];
@@ -214,7 +214,7 @@ export default function BasicDemo() {
               valueObj[item] = {
                 field_name: responseFeilds[item]?.key,
                 userInput:
-                  responseFeilds[item]?.type === "array"
+                  responseFeilds[item]?.type === "array" && item !== "Attachment"
                     ? {
                         title: "",
                         key: configValues[item]?.key,
@@ -321,6 +321,20 @@ export default function BasicDemo() {
       else{
         getReportsTable();
         setLogBug(false);
+        setJiraDropDown(null);
+        setLogBug(false);
+        setIssueDropDown(null);
+        setJiraDetails({projects: [], issuetype: []});
+        setMappedProjects({});
+        setConfigureFeilds([]);
+        setSelectedFiels([]);
+        setSelectedFiels([]);
+        setResponseFeilds({});
+        setConfigValues({});
+        setSelectedRow([]);
+        setLoginName("");
+        setLoginKey("");
+        setLoginUrl("");
       };
     }
   };
@@ -402,7 +416,7 @@ export default function BasicDemo() {
   );
 
   const onBugClick = (e, rowData) => {
-    setSelectedRow(reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments));
+    setSelectedRow(reportData?.rows.filter((el) => el?.slno === rowData?.data?.slno));
     // setConfigValues({
     //   ...configValues,
     //   Summary: reportData?.rows.filter((el) => el?.Comments === rowData?.data?.Comments)[0]?.Comments,
@@ -834,24 +848,26 @@ export default function BasicDemo() {
               />
             </div>
             <Divider />
-            {bugTitle !== "Jira" && <div className="col-12">
-              <div>
-                <label>
-                  <span>Summary</span>
-                  <img
-                    src="static/imgs/Required.svg"
-                    className="required_icon"
-                  />
-                </label>
+            {bugTitle !== "Jira" && (
+              <div className="col-12">
+                <div>
+                  <label>
+                    <span>Summary</span>
+                    <img
+                      src="static/imgs/Required.svg"
+                      className="required_icon"
+                    />
+                  </label>
+                </div>
+                <InputTextarea
+                  name="Summary"
+                  rows={2}
+                  className="text_desc"
+                  value={inputSummary}
+                  onChange={(e) => setInputSummary(e.target.value)}
+                />
               </div>
-              <InputTextarea
-                name="Summary"
-                rows={2}
-                className="text_desc"
-                value={inputSummary}
-                onChange={(e) => setInputSummary(e.target.value)}
-              />
-            </div>}
+            )}
             <div className="col-12">
               <div>
                 <label>
@@ -879,9 +895,15 @@ export default function BasicDemo() {
             )}
             {!Array.isArray(mappedProjects) && (
               <div className="col-12">
-                <b>
-                  {mappedProjects?.itemCode}: {mappedProjects?.itemSummary}
-                </b>
+                {bugTitle === "Jira" ? (
+                  <b>
+                    {mappedProjects?.itemCode}: {mappedProjects?.itemSummary}
+                  </b>
+                ) : (
+                  <b>
+                    {mappedProjects?.TestSuiteId}: {mappedProjects?.testSuiteSummary}
+                  </b>
+                )}
               </div>
             )}
             {configureFeilds.map((el) =>
