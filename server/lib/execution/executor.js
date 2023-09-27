@@ -233,8 +233,8 @@ class TestSuiteExecutor {
             "version": version
         };
         if(batchname)inputs['batchname']=batchname
-        if(batchExecutionData.configurekey) {
-            inputs['configurekey']=batchExecutionData.configurekey;
+        if(batchExecutionData.configurekey || batchExecutionData.configureKey) {
+            inputs['configurekey']=batchExecutionData.configurekey || batchExecutionData.configureKey;
             inputs['executionListId']=batchExecutionData.executionListId
             inputs['projectId'] = batchExecutionData.batchInfo[0].projectId;
             inputs['releaseName'] =  batchExecutionData.batchInfo[0].releaseId;
