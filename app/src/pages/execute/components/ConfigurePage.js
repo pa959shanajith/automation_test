@@ -47,6 +47,7 @@ import ExecutionPage from "./ExecutionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
 import { loadUserInfoActions } from '../../landing/LandingSlice'
+import { getNotificationChannels } from '../../admin/api'
 
 
 
@@ -144,6 +145,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
+  const [data,setData]=useState('');
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
@@ -152,6 +154,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
+
+  console.log("mod3",xpanded)
+
   
   useEffect(() => {
     setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client");
@@ -177,7 +182,42 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
   
   }
+  // let ALLData ={
   
+  //   key:uuid(),
+  //    name: configTxt,
+  //   avoAgentGrid: "cicd",
+  //   selectValues: [
+  //     { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '30%', disabled: false, selectedName: '' },
+  //     { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+  //     { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+  // ],
+  //   scenarioList: getScenarioList(),
+  //                   browsers: avodropdown?.browser?.map((el) => el.key),
+  //                   selectedModuleType: 'normalExecution',
+  //                   integration: integration,
+  //                   executionType: 'asynchronous',
+  //                   isHeadless: mode,
+  //                   isEmailNotificationEnabled: false,
+  //                   emailNotificationSender: null,
+  //                   emailNotificationReciever: null,
+  //                   isNotifyOnExecutionCompletion: true,   
+                 
+                 
+  // };
+
+//   const getScenarioList = (batchInfo, selectedModulesType,donotexe) => {
+//     let scenarioList = [];
+//     let counter = 0;
+//     for(let batch of batchInfo)
+//         for(let suiteIndex=0; suiteIndex<batch.suiteDetails.length; suiteIndex++) {
+//             if(selectedModulesType === 'normalExecution') scenarioList.push(batch.suiteDetails[suiteIndex].scenarioId)
+//             else if(selectedModulesType === 'batchExecution') scenarioList.push(batch.batchname+batch.testsuiteId+donotexe['current'][batch.testsuiteId][suiteIndex]+batch.suiteDetails[suiteIndex].scenarioId)
+//             else {
+//                 scenarioList.push(batch.batchname+batch.testsuiteId+donotexe['current'][batch.testsuiteId][suiteIndex]+batch.suiteDetails[suiteIndex].scenarioId)}
+//         }
+//     return scenarioList;
+// }
   
   
   const onHide = (name) => {
@@ -696,6 +736,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       tableUpdate();
     }
   }, [configProjectId]);
+  
 
   const configModal = (getType, getData = null) => {
     if (getType === "CancelUpdate") {
@@ -755,6 +796,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
     setVisible_setup(true);
     setSetupBtn(getType);
+    console.log(setIntegration)
   };
 
   const onModalBtnClick = (getBtnType) => {
@@ -1279,6 +1321,18 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       </>
     );
   };
+  useEffect(() => {
+        (async () => {
+            const arg = {"action":"provider","channel":"email","args":"smtp"};
+            const data = await getNotificationChannels(arg);
+            if (data) {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: data.sender.email });
+            }
+            else {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: 'avoassure-alerts@avoautomation.com' });
+            }
+        })();
+    }, []);
 
   const handleSubmit = (defaultValues) => {
     if ( "EmailRecieverAddress" in defaultValues) {
@@ -1289,7 +1343,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
                 return emailRegex.test(recieverEmailAddress) === true
             })
             if (isAllValidEmail) {
-              setEmailNotificationReciever(defaultValues.EmailRecieverAddress);
+              setEmailNotificationReciever(defaultValues.EmailRecieverAddress, defaultValues.EmailSenderAddress, isNotifyOnExecutionCompletion);
               setDisplayModal(false);
             }
             
@@ -1847,6 +1901,10 @@ Learn More '/>
         icon="pi pi-exclamation-triangle"
         accept={deleteDevOpsConfig}
       />
+      {/* <GridBrowser
+         configTxt={configTxt}
+         xpanded={xpanded}
+      /> */}
     </>
   );
 };
