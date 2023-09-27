@@ -264,9 +264,7 @@ if (cluster.isMaster) {
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
-		app.get('/viewReport', report.viewReport);	
-		app.get('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);	
-		app.get('/getSuiteDetailsInExecution_ICE', auth.protect, report.getSuiteDetailsInExecution_ICE);
+		app.get('/viewReport', report.viewReport);
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.use(csrf({
@@ -718,6 +716,10 @@ if (cluster.isMaster) {
 		app.post('/getDetails_SAUCELABS', auth.protect, admin.getDetails_SAUCELABS);
 		app.post('/manageSaucelabsDetails', auth.protect, admin.manageSaucelabsDetails);
 		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
+
+		// Added Report API's
+		app.get('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
+		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
 
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
