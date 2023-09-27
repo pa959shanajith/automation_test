@@ -34,6 +34,7 @@ import {
   testSuitesScheduler_ICE,
   testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
+  setScheduleStatus
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -1084,6 +1085,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setSelectedMonthly(null);
       setDropdownWeek(null);
       setSelectedPattren({});
+      dispatch(setScheduleStatus());
     }
     if (btnType === "Schedule") {
       if((new Date(startTime) < new Date(Date.now() + (5 * 60 * 1000))) && (new Date(startDate).getTime() < new Date(startTime).getTime())) {
@@ -1154,7 +1156,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
               date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startTime.getTime().toString(),
+              timestamp: startTime.setSeconds(0, 0).toString(),
               recurringValue: getPattren().recurringValue,
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
@@ -1203,7 +1205,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               ...(showIcePopup && { targetUser: selectedICE, iceList: [] }),
               date: startDate ? startDate.toLocaleDateString('es-CL') : "",
               time: `${startTime.getHours()}:${startTime.getMinutes()}`,
-              timestamp: startTime.getTime().toString(),
+              timestamp: startTime.setSeconds(0, 0).toString(),
               recurringValue: getPattren().recurringValue,  
               recurringString: getPattren().recurringString,
               recurringStringOnHover: getPattren().recurringStringOnHover,
