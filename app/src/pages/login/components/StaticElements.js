@@ -22,7 +22,7 @@ const StaticElements = ({ children }) => {
                 <div><span id='Test_automation'>
                         Experience the <span style={{ color: "white" }}>next-gen</span> test automation platform
                     </span></div>
-                    <img className="" src="static/imgs/animated_login.gif" alt="Login" />
+                    <img src="static/imgs/animated_login.gif" alt="Login" style={{width:"100%"}}/>
                 </div>
                 <div className="split_right">
                     <div className="right_side_login">
