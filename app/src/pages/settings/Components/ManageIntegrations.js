@@ -708,11 +708,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
             {activeIndex === 0 &&(
                 <div className="btn__2">
                     <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
-                    <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
+                    <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="logout__btn" />
                 </div>)}
 
             {activeIndex === 1 &&(
-                <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
+                <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="cancel__btn" />)}
 
         </div>)
     },[activeIndex,selectedscreen.name,mappedData])
