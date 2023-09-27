@@ -1111,7 +1111,7 @@ const elementIdentifier=()=>{
 }  
 const footerSave = (
     <>
-    {(selectedCapturedElement.length>0 && typesOfAppType=="Web") ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
+    {(selectedCapturedElement.length>0 && projectAppType.appType=="Web") ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
     <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
@@ -1802,13 +1802,17 @@ const headerstyle={
             <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
           </DataTable>
               }
-          <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{ height: `${mirrorHeight}px`, position:"right", margin:"0px", width:"29vw" }}>
-             <div className="ref_pop screenshot_pop">
-              <div className="screenshot_pop__content" >
-                      {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-                      <img className="screenshot_img" src={`data:image/PNG;base64,${screenshotData.imageUrl}`} style={{height: typesOfAppType==="Desktop"?"17rem":typesOfAppType==="OEBS"?"35vh":""}} alt="Screenshot Image" />
-                    </div>
+          <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
+              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?'392px':typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'423px':typesOfAppType==="SAP"?'492px':""}}>
+                <div className="screenshot_pop__content" >
+                 <div className="scrsht_outerContainer" id="ss_ssId">
+                  <div data-test="ssScroll" className="ss_scrsht_insideScroll">
+                  { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
+                  { (mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
+                  </div>
+                 </div>
                 </div>
+            </div>
           </Dialog>
         </div>
       </Dialog>

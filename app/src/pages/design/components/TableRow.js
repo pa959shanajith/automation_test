@@ -57,7 +57,7 @@ const TableRow = (props) => {
             const caseData = props.getKeywords(props.testCase.custname);
             setObjType(caseData.obType);
             setKeyword(props.testCase.keywordVal);
-            setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal !== ''?(props.testCase.custname!=="OBJECT_DELETED"?(caseData.obType !== null ? props.keywordData[caseData.obType][caseData.keywords[0]].description !== undefined?props.keywordData[caseData.obType][caseData.keywords[0]].description:props.testCase.keywordVal: props.keywordData[caseData.obType][props.testCase.keywordVal].description): props.testCase.keywordVal):props.testCase.keywordVal})
+            setSelectedOptions({value:props.testCase.keywordVal, label:props.testCase.keywordVal !== ''?(props.testCase.custname!=="OBJECT_DELETED"?(caseData.obType !== null ? props.keywordData[caseData.obType][caseData.keywords[0]].description !== undefined?props.keywordData[caseData.obType.toLowerCase()][props.testCase.keywordVal.toLowerCase()].description:props.keywordData[caseData.obType][caseData.keywords[0]].description: props.keywordData[caseData.obType][props.testCase.keywordVal].description): props.testCase.keywordVal):props.testCase.keywordVal})
             setObjetListOption({value: props.testCase.custname,label:props.testCase.custname === ""?caseData.obType === "defaultList"?"@Generic":caseData.obType === "defaultListMobility"?"@Generic":objList[0]:props.testCase.custname})
             setInput(props.testCase.inputVal[0]);
             setOutput(props.testCase.outputVal);
@@ -304,7 +304,7 @@ const TableRow = (props) => {
               FontSize: 100,
               fontSize: 14,
               background: "white",
-              height:Object.keys(optionElement).length>4?200:110,
+              height:Object.keys(optionElement).length>6?200:110,
             }),
             menuPortal: (base) => ({ 
                 ...base, 
