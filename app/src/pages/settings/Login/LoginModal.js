@@ -102,7 +102,8 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     };
 
     const loginHandler = () => {
-        showCard2(); setDisableFields(true);
+        showCard2();
+         setDisableFields(false);
     }
 
 
