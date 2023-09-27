@@ -31,7 +31,7 @@ import Analysis from './pages/landing/components/Analysis';
 import MindmapHome from './pages/design/containers/MindmapHome';
 import Profile from './pages/report/components/Profile';
 import ReportTestTable from './pages/report/components/ReportTestTable';
-import AdminContainer from './pages/admin/containers/AdminContainer';
+import AdminContainer from './pages/admin/containers/AdminHome';
 import GeniusDialog from './pages/global/components/GeniusDialog';
 
 

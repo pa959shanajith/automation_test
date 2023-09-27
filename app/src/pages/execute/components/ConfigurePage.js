@@ -47,11 +47,13 @@ import ExecutionPage from "./ExecutionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
 import { loadUserInfoActions } from '../../landing/LandingSlice'
-
+import { useNavigate } from 'react-router-dom';
+export var navigate
 
 
 
 const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
+  const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   // const proj = useSelector((state)=>state.design.selectedProj)
   const [visible_setup, setVisible_setup] = useState(false);

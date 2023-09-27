@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {Messages as MSG} from '../global/components/Messages'
-import {url} from '../../App'
+import {url} from '../../App';
+import {navigate} from './containers/HomePage';
 
 /* Component
   api returns [{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},,,]
@@ -22,7 +23,7 @@ export const getUserDetails = async(action, args) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            // RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
@@ -43,49 +44,27 @@ export const getUserDetails = async(action, args) => {
 }
 
 export const userCreateProject_ICE = (details) => {
-
     return new Promise((resolve, reject)=> {
-
         axios(url+"/userCreateProject_ICE", {
-
             method: 'POST',
-
             headers : {
-
                 'Content-type' : 'application/json'
-
             },
-
             data : {'action': 'createProject_ICE', 'allflag': true, ...details},
-
             credentials : 'include',
-
         })
-
         .then(res=>{
-
             if (res.status === 200){
-
                 resolve(res.data);
-
             }
-
             else{
-
                 reject(res.status)
-
             }
-
         })
-
         .catch(err => {
-
             reject(err);
-
         })
-
     })
-
 }
 
 
@@ -131,7 +110,7 @@ export const manageUserDetails = async(action, userObj) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            // RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -157,7 +136,7 @@ export const fetchProjects = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            // RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -182,7 +161,7 @@ export const getProjectsMMTS = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            // RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -218,97 +197,54 @@ export const getAgent = async () => {
 
 
 export const getUsers_ICE = (project_id) => {
-
     return new Promise((resolve, reject)=> {
-
         axios(url+"/getUsers_ICE", {
-
             method: 'POST',
-
             headers : {
-
                 'Content-type' : 'application/json'
-
             },
-
             data : {'action': 'getUsers_ICE', 'allflag': true,project_id},
-
             credentials : 'include',
-
         })
-
         .then(res=>{
-
             if (res.status === 200){
-
                 resolve(res.data);
-
             }
-
             else{
-
                 reject(res.status)
-
             }
-
         })
-
         .catch(err => {
-
             reject(err);
-
         })
-
     })
-
 }
 
 
 export const userUpdateProject_ICE = (data) => {
-
     return new Promise((resolve, reject)=> {
-
         axios(url+"/userUpdateProject_ICE", {
-
             method: 'POST',
-
             headers : {
-
                 'Content-type' : 'application/json'
-
             },
-
             data : {'action': 'userUpdateProject_ICE', 'allflag': true, ...data},
-
             credentials : 'include',
-
         })
-
         .then(res=>{
-
             if (res.status === 200){
-
                 resolve(res.data);
-
             }
-
             else{
-
                 reject(res.status)
-
             }
-
         })
-
         .catch(err => {
-
             reject(err);
-
         })
-
     })
-
 }
+
 export const fetchAvoAgentAndAvoGridList = async(props) => {
     try{
         const res = await axios(url+'/getAvoAgentAndAvoGridList', {
@@ -331,6 +267,7 @@ export const fetchAvoAgentAndAvoGridList = async(props) => {
         return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }
+
 export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused) => {
     try{
         const res = await axios(url+'/getGeniusData', {
