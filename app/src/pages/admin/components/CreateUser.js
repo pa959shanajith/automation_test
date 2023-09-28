@@ -573,12 +573,12 @@ const CreateUser = (props) => {
             }}
             disabled={nocreate}>
         </Button>}
-        {selectedTab === "avoAzzureClient" && <Button
+        {selectedTab === "avoAzzureClient" && !editUser ? <Button
             data-test="createButton"
-            label={editUser ? "Reprovision" : "Create"}
+            label="Create" 
             onClick={() => { userCreateHandler()}}
             disabled={nocreate}>
-        </Button>}
+        </Button> : ''}
     </>
 
 
