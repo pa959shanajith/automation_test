@@ -310,6 +310,7 @@ export default function BasicDemo() {
                 pat: loginKey,
                 reportId: reportData?.overallstatus?.reportId,
                 slno: selectedRow[0]?.slno,
+                ...(getItemType()?.itemId && { mappedId: getItemType()?.itemId }),
                 executionId: reportData?.overallstatus?.executionId,
                 executionReportNo: `Execution No: ${executed}`,
               },
@@ -577,6 +578,7 @@ export default function BasicDemo() {
         setConfigValues({
           ...configValues,
           Summary: selectedRow[0]?.Comments,
+          Attachment: selectedRow[0]?.screenshot_path
         });
       } else {
         setConfigValues({});
@@ -645,6 +647,21 @@ export default function BasicDemo() {
   const getElDropdown = (Dropdown) => {
     let nameObj = { ["Iteration ID"]: responseFeilds["Iteration_Paths"]?.child, ["Area ID"]: responseFeilds["Area_Paths"]?.child };
     return nameObj[Dropdown];
+  };
+
+  const getItemType = () => {
+    let itemObj = { itemId: false, itemDesc: false };
+    if(mappedProjects?.itemCode){
+      itemObj.itemId = mappedProjects?.itemCode;
+      itemObj.itemDesc = mappedProjects?.itemSummary;
+    } else if(mappedProjects?.TestSuiteId){
+      itemObj.itemId = mappedProjects?.TestSuiteId;
+      itemObj.itemDesc = mappedProjects?.testSuiteSummary;
+    } else if(mappedProjects?.userStoryId){
+      itemObj.itemId = mappedProjects?.userStoryId;
+      itemObj.itemDesc = mappedProjects?.userStorySummary;
+    }
+    return itemObj;
   };
 
   return (
@@ -895,15 +912,9 @@ export default function BasicDemo() {
             )}
             {!Array.isArray(mappedProjects) && (
               <div className="col-12">
-                {bugTitle === "Jira" ? (
-                  <b>
-                    {mappedProjects?.itemCode}: {mappedProjects?.itemSummary}
-                  </b>
-                ) : (
-                  <b>
-                    {mappedProjects?.TestSuiteId}: {mappedProjects?.testSuiteSummary}
-                  </b>
-                )}
+                <b>
+                  {getItemType()?.itemId}: {getItemType()?.itemDesc}
+                </b>
               </div>
             )}
             {configureFeilds.map((el) =>

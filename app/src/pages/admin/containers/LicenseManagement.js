@@ -12,13 +12,21 @@ function LicenseManagement() {
         (async()=>{
             const LicenseData = await getAvailablePlugins()
             setLicenseData(LicenseData)
-            console.log(LicenseData)
-            setHeaderData1(Object.entries(LicenseData).map(([key, value])=>{
-                return{
-                    License_Type:key,
-                    License_Status:value==="true"?"Enabled":value==="false"?"Disabled":value
-                }
-            }))
+            if(LicenseData.FeatureDetails !== undefined){
+                setHeaderData1(LicenseData.FeatureDetails.map(finalData=>{
+                    return{
+                        License_Type:finalData.featurename,
+                        License_Status:finalData.value==="true"?"Enabled":finalData.value==="false"?"Disabled":finalData.value
+                    }
+                }))
+            }else{
+                setHeaderData1(Object.entries(LicenseData).map(([key, value])=>{
+                    return{
+                        License_Type:key,
+                        License_Status:value==="true"?"Enabled":value==="false"?"Disabled":value
+                    }
+                }))
+            }
         })()
     },[])
 

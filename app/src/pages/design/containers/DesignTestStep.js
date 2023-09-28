@@ -389,7 +389,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                                 }
                                                 testcase[i].stepNo = (i + 1);
                                                 let temp = testcase[i].keywordVal
-                                                testcase[i].keywordVal = testcase[i].keywordVal[0].toLowerCase() + testcase[i].keywordVal.slice(1,);
+                                                // testcase[i].keywordVal = testcase[i].keywordVal[0].toLowerCase() + testcase[i].keywordVal.slice(1,);
                                                 if(testcase[i].custname !== "OBJECT_DELETED"){
                                                     let objType = getKeywordList(testcase[i].custname,keywordData,props.appType,scriptData.view)
                                                     testcase[i]["keywordTooltip"] = keywordData[objType.obType][temp]?.tooltip!==undefined?keywordData[objType.obType][temp].tooltip:testcase[i].keywordVal;

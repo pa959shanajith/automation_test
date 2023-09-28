@@ -16,6 +16,7 @@ const initialState = {
   error: "",
   scheduledList: [],
   scheduledStatusList: [],
+  scheduledStatus: false,
   setupExists: ""
 };
 
@@ -201,6 +202,9 @@ const configureSetupSlice = createSlice({
     checkRequired: (state, action) => {
       state.requiredFeilds = { ...state.requiredFeilds, ...action.payload };
     },
+    setScheduleStatus: (state) => {
+      state.scheduledStatus = false;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getProjects.pending, (state) => {
@@ -290,9 +294,11 @@ const configureSetupSlice = createSlice({
     });
     builder.addCase(testSuitesScheduler_ICE.pending, (state) => {
       state.loading = true;
+      state.scheduledStatus = false;
     });
     builder.addCase(testSuitesScheduler_ICE.fulfilled, (state, action) => {
       state.loading = false;
+      state.scheduledStatus = action?.payload;
       state.error = "";
     });
     builder.addCase(testSuitesScheduler_ICE.rejected, (state, action) => {
@@ -300,10 +306,12 @@ const configureSetupSlice = createSlice({
       state.error = action.error.message;
     });
     builder.addCase(testSuitesSchedulerRecurring_ICE.pending, (state) => {
+      state.scheduledStatus = false;
       state.loading = true;
     });
     builder.addCase(testSuitesSchedulerRecurring_ICE.fulfilled, (state, action) => {
       state.loading = false;
+      state.scheduledStatus = action?.payload;
       state.error = "";
     });
     builder.addCase(testSuitesSchedulerRecurring_ICE.rejected, (state, action) => {
@@ -352,3 +360,4 @@ const configureSetupSlice = createSlice({
 
 export default configureSetupSlice.reducer;
 export const { checkRequired } = configureSetupSlice.actions;
+export const { setScheduleStatus } = configureSetupSlice.actions;

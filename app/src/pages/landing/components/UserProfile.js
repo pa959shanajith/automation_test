@@ -31,6 +31,8 @@ const UserDemo = (props) => {
     const [config, setConfig] = useState({});
     const [showUD, setShowUD] = useState(false);
     const [showOverlay, setShowOverlay] = useState("");
+    const[OS,setOS]=useState("Windows")
+
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -53,9 +55,36 @@ const UserDemo = (props) => {
             setConfig(avoClientConfig);
 
         })();
+        getOS()
     }, []);
 
+      // getting OS version using userAgent
 
+  const getOS = () => {
+
+    let userAgent = navigator.userAgent.toLowerCase();
+
+    if (/windows nt/.test(userAgent))
+
+        setOS("Windows");
+
+ 
+
+    else if (/mac os x/.test(userAgent))
+
+        setOS("MacOS");
+
+ 
+
+    else if (/linux x86_64/.test(userAgent))
+
+        setOS("Linux")
+
+    else
+
+        setOS("Not Supported");
+
+  }
     const getIce = async (clientVer) => {
         try {
             setShowUD(false);
@@ -74,8 +103,16 @@ const UserDemo = (props) => {
         }
     }
     const handleDownloadClick = () => {
+    if(OS=="Windows"){
         getIce("avoclientpath_Windows");
-    };
+        
+    }
+    if (OS=="MacOS"){
+        getIce("avoclientpath_Mac")
+    }
+    if(OS=="Linux")
+    getIce("avoclientpath_Linux")
+    }
 
     const userMenuItems = [
         {

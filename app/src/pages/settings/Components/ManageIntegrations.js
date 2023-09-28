@@ -258,7 +258,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const setToast = (tag, summary, msg) => {
-        toast.current.show({ severity: tag, summary: summary, detail: msg, life: 10000 });
+        toast.current.show({ severity: tag, summary: summary, detail: JSON.stringify(msg), life: 10000 });
     }
 
     const integrationItems = [
