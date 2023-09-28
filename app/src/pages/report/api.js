@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {url} from '../../App';
-import { Messages as MSG,RedirectPage} from '../global/components/Messages';
+import { Messages as MSG, RedirectPage} from '../global';
 import {navigate} from './components/reports'
 
 export const fetchConfigureList = async(props) => {

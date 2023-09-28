@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Messages as MSG} from '../global/components/Messages'
+import {Messages as MSG, RedirectPage} from '../global'
 import {url} from '../../App';
 import {navigate} from './containers/HomePage';
 

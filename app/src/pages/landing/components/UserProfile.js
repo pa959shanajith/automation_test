@@ -6,8 +6,6 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
 import { useNavigate, Link } from "react-router-dom";
-import RedirectPage from '../../global/components/RedirectPage';
-import ChangePassword from '../../global/components/ChangePassword';
 import EditProfile from '../components/EditProfile'
 import Agent from '../components/Agent';
 // import 'primereact/resources/themes/saga-blue/theme.css';
@@ -15,7 +13,7 @@ import Agent from '../components/Agent';
 import '../styles/userProfile.scss';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { Button } from "primereact/button";
-import { setMsg, Messages as MSG, } from "../../global";
+import { setMsg, Messages as MSG, RedirectPage, ChangePassword} from "../../global";
 
 
 const UserDemo = (props) => {

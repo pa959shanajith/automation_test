@@ -10,8 +10,8 @@ import TagManager from 'react-gtm-module';
 import Report from './pages/report/components/reports';
 import More from './pages/more/more';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
-import Integration from './pages/integration/Integration';
-import Settings from './pages/settings/Settings';
+// import Integration from './pages/integration/Integration';
+// import Settings from './pages/settings/Settings';
 import { ErrorPage } from './pages/global';
 import Login from './pages/login/containers/LoginPage';
 import BasePage from './pages/login/containers/BasePage';
@@ -100,10 +100,10 @@ const RouteApp = () => {
         <Route path="/reset" element={<Login />} />
         <Route path="/" element={<BasePage />} />
         <Route path="/landing" element={<HomePage />} />
-        <Route path="/integration" element={<Integration />} />
+        {/* <Route path="/integration" element={<Integration />} /> */}
         <Route path="/reports" element={<Report />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
+        {/* <Route path="/settings" element={<Settings />} /> */}
         <Route path="/itdm" element={<itdm />} />
         <Route path="/design" element={<MindmapHome />} />
         <Route path="/execute" element={<ConfigurePage />} />

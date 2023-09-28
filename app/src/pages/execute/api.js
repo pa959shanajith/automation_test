@@ -355,6 +355,34 @@ export const fetchAgentModuleList = async(param) => {
     }
 }
 
+//fetching the history of execution  in Execution Profile Statistics Tab in Matrices
+
+export const fetchHistory = async(fromDate,toDate) => {
+    try{
+        const res = await axios(url+'/fetchHistory', {
+            method: 'POST',
+            headers:{
+                        'Content-type': 'application/json',
+                    },
+            data: {
+                    action: "fetchHistory",
+                    fromDate: fromDate,
+                    toDate: toDate,
+                }
+            });    
+        if(res.status === 401){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        } 
+        if(res.status === 200 && res.data !== "fail"){
+            return res.data;
+        }
+        return { error:MSG.DevOps.ERR_DevOps_Keys}  
+    }catch(err){
+        console.error(err)
+        return {error:MSG.DevOps.ERR_DevOps_Keys}
+    }
+}
 //fetching the navigate of execution  in Execution Profile Statistics Tab in Matrices
 export const fetchnavigate = async(fromDate,toDate) => {
     try{
