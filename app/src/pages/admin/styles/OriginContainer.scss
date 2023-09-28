@@ -6,6 +6,9 @@
     align-items: center;
     .Create_Header {
         padding: 1.4rem;
+        display: flex;
+        justify-content: space-between;
+        width: 66%;
     }
 }
 .rightContainer{

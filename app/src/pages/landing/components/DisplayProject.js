@@ -142,6 +142,11 @@ const DisplayProject = (props) => {
         }
       });
       const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
+      const selectedProject = sortedProject.find(project => project.projectId === defaultProjectId);
+    if (selectedProject) {
+      localStorage.setItem('DefaultProject', JSON.stringify(selectedProject));
+      dispatch(loadUserInfoActions.setDefaultProject(selectedProject));
+    }
       setProjectList(sortedProject);
     })();
   }, [showGeniusDialog]);

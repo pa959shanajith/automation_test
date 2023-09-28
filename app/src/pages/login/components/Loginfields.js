@@ -24,7 +24,6 @@ const Login = (props) => {
     const toast = useRef(null);
     const [overlayText, setOverlayText] = useState("");
     const [initialFormPos,setInitialFormPos] = useState(0)
-    const [userResetData, setResetUserData] = useState({});
     const [userInfo, setUserInfo] = useState({});
     const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
 
@@ -228,7 +227,7 @@ const Login = (props) => {
                 api.shouldResetPassword(user_id).then((res)=>{
                     if(res.flag && res.flag === "changePwd"){
                         setOverlayText("");
-                        setResetUserData(res.user)
+                        setUserInfo(res.user)
                         setShowChangePasswordDialog(true)
                     } else {
                         setOverlayText("");

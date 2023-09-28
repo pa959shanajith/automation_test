@@ -94,9 +94,10 @@ const RouteApp = () => {
     <>
     <GeniusDialog />
       <Routes>
+      
         <Route path="/login" element={<Login />} />
-        <Route path='/verify' element={<Login/>}/>
-        <Route path='/reset' element={<Login/>}/>
+        <Route path="/verify" element={<Login />} />
+        <Route path="/reset" element={<Login />} />
         <Route path="/" element={<BasePage />} />
         <Route path="/landing" element={<HomePage />} />
         <Route path="/integration" element={<Integration />} />

@@ -671,7 +671,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
 
-
+/////////////old checkbox selection code
     // const testcaseCheck = (e, checkboxIndex) => {
     //     if (checkboxIndex >= 0 && checkboxIndex < testCaseData.length) {
     //         const setObjValue = testCaseData.map((item) => ({ ...item, checked: false }));
@@ -680,15 +680,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
     //     }
     // }
 
+    ////////////////New Chcekbox selection code 
+
     const testcaseCheck = (e, checkboxIndex) => {
-        if (checkboxIndex >= 0 && checkboxIndex < testCaseData.length) {
-          const globalIndex = startIndex + checkboxIndex;  // Calculate global index for the current page
-          const updatedData = testCaseData.map((item, idx) =>
-            idx === globalIndex ? { ...item, checked: e.checked } : item
-          );
+        if (checkboxIndex >= 0 && checkboxIndex < itemsPerPageJira) {
+          const updatedData = testCaseData.map((item) => ({ ...item, checked: false })).slice();  
+          const globalIndex = startIndex + checkboxIndex;
+          updatedData[globalIndex].checked = e.checked;  
           setTestCaseData(updatedData);
         }
-      };
+     }
+
       
 
     const callAzureSaveButton = () => {
