@@ -330,7 +330,7 @@ const ScheduleScreen = ({
                     dropdownOptions={endMonths}
                     name="endmonth"
                     placeholder="End After"
-                    required={false}
+                    required={true}
                     customeClass="dropdown_enddate"
                   />
                 </div>
