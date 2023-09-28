@@ -3,7 +3,7 @@ import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gi
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import {setImportData,dontShowFirstModule} from '../designSlice';
+import {setImportData,dontShowFirstModule,selectedModuleReducer} from '../designSlice';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
@@ -193,7 +193,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
             var importData = fileUpload;
             (async()=>{
                 if(importType === 'git'){
-                    // setBlockui({content:'Importing ...',show:true})
+                    setBlockui({content:'Importing ...',show:true})
                     Toast.current.show({severity:"info", summary:"Info",detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT,life:3000})
                     ResetSession.start() 
                     var data = await importGitMindmap ({
@@ -242,7 +242,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 }
                 
                 else if(isMultiImport && importType === 'zip'){
-                    // setBlockui({content:'Importing ...',show:true})
+                    setBlockui({content:'Importing ...',show:true})
                     Toast.current.show({severity:'info', summary: 'Info', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
                     ResetSession.start()          
                     var res = await importMindmap(mindmapData)
@@ -266,7 +266,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     setBlockui({show:false})
                     ResetSession.end();
                 }else if(importType === 'excel'){
-                    // setBlockui({content:'Importing ...',show:true})
+                    setBlockui({content:'Importing ...',show:true})
                     Toast.current.show({severity:'info', summary: 'Info', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
                     ResetSession.start()
                     var importproj= projectId          
@@ -276,16 +276,44 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         
                         var importexcel = await jsonToMindmap({"type":"excel","importproj":importproj})
                         if(importexcel.error){displayError(importexcel.error.CONTENT);ResetSession.end();return;}
+                        var excelModule = await getModules({tab:"tabCreate",
+                        projectid:importproj,
+                        version:0,
+                        cycId: null,
+                        moduleid:Array.isArray(importexcel)?importexcel[0]:importexcel})
+                        if(excelModule.error){displayError(excelModule.error);ResetSession.end();return;}
+                        var excelScreen = await getScreens(importproj) 
+                        if(excelScreen.error){displayError(excelScreen.error);ResetSession.end();return;}
+                        setTimeout(function() {
+                            dispatch(selectedModuleReducer(excelModule))
+                        setImportPop(false)
+                        setOptions('importmodules')
+                        // setBlockui({show:false})
+                        }, 100);
                         if(importexcel === "InProgress"){Toast.current.show({severity:'warn', summary: 'Warning', detail:MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000});ResetSession.end();return;}
                         Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORTED.CONTENT, life: 3000})
                         setBlockui({show:false})
                         ResetSession.end();
                 }}else if(importType === 'json'){
                     Toast.current.show({severity:'info', summary: 'Info', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
-                    // setBlockui({content:'Importing ...',show:true})
+                    setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
                     var res = await jsonToMindmap({"type":"json","importproj":projectId})
                     if(res.error){displayError(res.error.CONTENT);ResetSession.end();return;}
+                    var dataModule = await getModules( {tab:"tabCreate",
+                    projectid:projectId,
+                    version:0,
+                    cycId: null,
+                    moduleid:Array.isArray(res)?res[0]:res})
+                    if(dataModule.error){displayError(dataModule.error);ResetSession.end();return;}
+                    var datascreen = await getScreens(projectId) 
+                    if(datascreen.error){displayError(datascreen.error);ResetSession.end();return;}
+                    setTimeout(function() {
+                        dispatch(selectedModuleReducer(dataModule))
+                    setImportPop(false)
+                    setOptions('importmodules')
+                    // setBlockui({show:false})
+                    }, 100);
                     if(res == "InProgress"){Toast.current.show({severity:'warn', summary: 'Warning', detail:MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000});ResetSession.end();return;}
                     Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORTED.CONTENT, life: 3000})
                     setBlockui({show:false})
@@ -362,7 +390,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         gitVerRef.current.props.value= 'def-val'
         setGitExportDetails([]);
         var res = await checkExportVer({"query":"importgit","projectId": Id})
-            if(res.error){displayError(res.error);return;}
+            if(res.error){displayError(res.error.CONTENT);return;}
             setGitExportDetails(res);setDisableSubmit(false)}  
 
     return(
@@ -767,7 +795,7 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
     if(importType === 'xls'){
         let validateNode = true;
         var res = await singleExcelToMindmap({'content':importData,'flag':'data',sheetname: sheet})
-        if(res.error){displayError(res.error);return;}
+        if(res.error){displayError(res.error.CONTENT);return;}
         res.forEach((e, i) =>{
             if (!validNodeDetails(e.name)) validateNode = false;
         });
