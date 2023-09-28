@@ -76,6 +76,15 @@ exports.loadUserInfo = async (req, res) => {
 			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
 			if (eulaData != "success") userProfile.tandc = true;
 		}
+		license_dict={'trial':'1_','training':'2_','starter':'3_','enterprise':'4_'}
+        userProfile['licenseID']='4_'
+		for(let x of userProfile.pluginsInfo )
+		{
+			if(x.pluginName == "LicenseTypes") {
+				userProfile['licenseID']=license_dict[x.pluginValue.toLowerCase()]
+			}
+		}
+		console.log(userProfile['licenseID'])
 		return res.send(userProfile);
 	} catch (exception) {
 		logger.error(exception.message);

@@ -63,7 +63,7 @@ const UserDemo = (props) => {
             const res = await fetch("/downloadICE?ver=" + clientVer);
             const { status } = await res.json();
             if (status === "available") {
-                window.location.href = window.location.origin + "/downloadICE?ver=" + clientVer + "&file=getICE" + "&fileName=" + ((userInfo.isTrial ? "1_" : "0_") + window.location.host + "." + config[clientVer].split(".").pop());
+                window.location.href = window.location.origin + "/downloadICE?ver=" + clientVer + "&file=getICE" + "&fileName=" + ((userInfo['licenseID']) + window.location.host + "." + config[clientVer].split(".").pop());
             }
             else
                 setMsg(MSG.GLOBAL.ERR_PACKAGE);
