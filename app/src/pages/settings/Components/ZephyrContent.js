@@ -22,6 +22,7 @@ import {
 } from '../settingSlice';
 import "../styles/ZephyrContent.scss";
 import { Paginator } from 'primereact/paginator';
+import { Toast } from "primereact/toast";
 
 
 const ZephyrContent = ({ domainDetails , setToast },ref) => {
@@ -103,6 +104,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const endIdx = startIdx + itemsPerPage;
     const paginatedDataZephyr = projectDetails.slice(startIdx, endIdx);
     const [saveEnable, setSaveEnable] = useState(false);
+    const toast = useRef();
 
     const [data, setData] = useState([
         {
@@ -642,26 +644,30 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
         return output;
       }
 
+      const setToastNew = (tag, summary, msg) => {
+        toast.current.show({ severity: tag, summary: summary, detail: JSON.stringify(msg), life: 10000 });
+    }
+
       const saveImportMapping = async() => {
         // if(importType === 'excel'){
             var data = await api.zephyrTestcaseDetails_ICE("testcase", selectedImportNodes[0]);
             if (data.error){
-                setToast("error", "Error", data.error);
+                setToastNew("error", "Error", data.error);
                 return;
             }
             else if (data === "unavailableLocalServer"){
-                setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);return;
+                setToastNew("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);return;
             }
             else if (data === "scheduleModeOn"){
-                setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);return;
+                setToastNew("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);return;
             }
             else if (data === "Invalid Session"){
-                setToast("error", "Error", 'Invalid Session');return;
+                setToastNew("error", "Error", 'Invalid Session');return;
             }
             
             var res = await api.excelToZephyrMappings({'content':excelContent,'flag':'data',sheetname: selectSheet})
             if(res.error){
-                setToast("error", "Error", res.error);return;
+                setToastNew("error", "Error", res.error.CONTENT);return;
             }
             
             var mappings = res.mappings;
@@ -735,30 +741,30 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     
             if(finalMappings.length === 0){
                 setImportStatus("Not_Mapped");
-                setToast("error", "Error", 'Please upload the valid testcase sheet !!!');return;
+                setToastNew("error", "Error", 'Please upload the valid testcase sheet !!!');return;
             }
             else{
                 // saving the finalMappings 
                 const response = await api.saveZephyrDetails_ICE(finalMappings);
                 if (response.error){
-                    setToast("error", "Error", response.error);return;
+                    setToastNew("error", "Error", response.error);return;
                 }
                 else if(response === "unavailableLocalServer"){
-                    setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);return;
+                    setToastNew("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);return;
                     }
                 else if(response === "scheduleModeOn"){
-                    setToast("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);return;
+                    setToastNew("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);return;
                 }
                 if(response === 'success'){
                     handleImportClose();
-                    setToast("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
+                    setToastNew("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
                 }
             }
             
             //Checking in case import is partially sucessfull
             if(!res.errorRows.length && !errorScenarioNames.length && !errorTestCasesId.length){
                 handleImportClose();
-                setToast("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
+                setToastNew("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
                 // setMsg(MSG.INTEGRATION.SUCC_IMPORT);
                 // setImportPop(false);
                 
@@ -1326,6 +1332,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                         </div>
                     </div>
                     <Dialog header="Import mappings" visible={importMap} onHide={handleImportClose} style={{ height: fileUpload && selectImportZephyrProject ?'96vh':fileUpload ? '46vh' : '28vh', width: fileUpload && selectImportZephyrProject ?'36vw':fileUpload ? '39vw' : '28vw' }} footer={importMappingFooter}>
+                    <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
                         <div>
                             <div>
                                 <label>Upload Excel File: </label>
