@@ -194,7 +194,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
             (async()=>{
                 if(importType === 'git'){
                     setBlockui({content:'Importing ...',show:true})
-                    Toast.current.show({severity:"success", summary:"Success",detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT,life:3000})
+                    Toast.current.show({severity:"info", summary:"Info",detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT,life:3000})
                     ResetSession.start() 
                     var data = await importGitMindmap ({
                         expProj: projectId,
@@ -243,7 +243,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 
                 else if(isMultiImport && importType === 'zip'){
                     setBlockui({content:'Importing ...',show:true})
-                    Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
+                    Toast.current.show({severity:'info', summary: 'Info', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
                     ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
@@ -267,7 +267,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     ResetSession.end();
                 }else if(importType === 'excel'){
                     setBlockui({content:'Importing ...',show:true})
-                    Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
+                    Toast.current.show({severity:'info', summary: 'Info', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
                     ResetSession.start()
                     var importproj= projectId          
                     var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: SheetValue})
@@ -295,7 +295,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         setBlockui({show:false})
                         ResetSession.end();
                 }}else if(importType === 'json'){
-                    Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
+                    Toast.current.show({severity:'info', summary: 'Info', detail:MSG.MINDMAP.SUCC_DATA_IMPORT_NOTIFY.CONTENT, life: 3000})
                     setBlockui({content:'Importing ...',show:true})
                     ResetSession.start()          
                     var res = await jsonToMindmap({"type":"json","importproj":projectId})
