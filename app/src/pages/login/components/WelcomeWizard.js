@@ -218,7 +218,7 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
                 if (config[clientVer].split(".").pop() === 'zip'){
 					link.setAttribute('download',  "AvoAssureClient.zip");
 				} else {
-					link.setAttribute('download',  "AvoAssureClient"+"0_"+window.location.host+"."+config[clientVer].split(".").pop());
+					link.setAttribute('download',  "AvoAssureClient"+(userInfo['licenseID'])+window.location.host+"."+config[clientVer].split(".").pop());
 				}
 				 
                 // link.setAttribute('download',  "AvoAssureClient"+(userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
