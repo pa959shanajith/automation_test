@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {RedirectPage, Messages as MSG, VARIANT} from '../global';
-import {history} from './index';
+import {navigate} from './Components/ManageIntegrations';
 import {url} from '../../App';
 
 export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
@@ -20,7 +20,7 @@ export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -56,7 +56,7 @@ export const getJiraTestcases_ICE = async(input_payload) => {
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -79,7 +79,7 @@ export const getDetails_Azure = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){
             return res.data;
@@ -102,7 +102,7 @@ export const getDetails_SAUCELABS = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){
             return res.data;
@@ -130,7 +130,7 @@ export const manageZephyrDetails = async(action, userObj) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -157,7 +157,7 @@ export const getAvoDetails = async(user_id) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){
@@ -186,7 +186,7 @@ export const saveJiraDetails_ICE = async(mappedDetails) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -214,7 +214,7 @@ export const saveUnsyncDetails = async(undoMapList) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -241,7 +241,7 @@ export const viewJiraMappedList_ICE = async(userID) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -267,7 +267,7 @@ export const excelToZephyrMappings = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if (res.data == 'valueError') {
@@ -304,7 +304,7 @@ export const loginToZephyr_ICE = async(zephyrPayload) => {
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -329,7 +329,7 @@ export const connectAzure_ICE = async(dataObj) => {
            data:dataObj
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status === 429 || res.data === "Max retries exceeded"){
@@ -360,7 +360,7 @@ export const saveAzureDetails_ICE = async(mappedDetails) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -387,7 +387,7 @@ export const viewAzureMappedList_ICE = async(userID) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -412,7 +412,7 @@ export const manageAzureDetails = async(action, userObj) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200){            
@@ -437,7 +437,7 @@ export const manageSaucelabsDetails = async(action, userObj) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -465,7 +465,7 @@ export const zephyrProjectDetails_ICE = async(projectId, user_id) => {
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200){            
@@ -494,7 +494,7 @@ export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){
@@ -522,7 +522,7 @@ export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -550,7 +550,7 @@ export const saveZephyrDetails_ICE = async(mappedDetails) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -577,7 +577,7 @@ export const viewZephyrMappedList_ICE = async(userID) => {
            }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
