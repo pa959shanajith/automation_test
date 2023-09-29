@@ -156,7 +156,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
 
-  console.log("mod3",xpanded)
+  
 
   
   useEffect(() => {
@@ -183,42 +183,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
   
   }
-  // let ALLData ={
-  
-  //   key:uuid(),
-  //    name: configTxt,
-  //   avoAgentGrid: "cicd",
-  //   selectValues: [
-  //     { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '30%', disabled: false, selectedName: '' },
-  //     { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
-  //     { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
-  // ],
-  //   scenarioList: getScenarioList(),
-  //                   browsers: avodropdown?.browser?.map((el) => el.key),
-  //                   selectedModuleType: 'normalExecution',
-  //                   integration: integration,
-  //                   executionType: 'asynchronous',
-  //                   isHeadless: mode,
-  //                   isEmailNotificationEnabled: false,
-  //                   emailNotificationSender: null,
-  //                   emailNotificationReciever: null,
-  //                   isNotifyOnExecutionCompletion: true,   
-                 
-                 
-  // };
-
-//   const getScenarioList = (batchInfo, selectedModulesType,donotexe) => {
-//     let scenarioList = [];
-//     let counter = 0;
-//     for(let batch of batchInfo)
-//         for(let suiteIndex=0; suiteIndex<batch.suiteDetails.length; suiteIndex++) {
-//             if(selectedModulesType === 'normalExecution') scenarioList.push(batch.suiteDetails[suiteIndex].scenarioId)
-//             else if(selectedModulesType === 'batchExecution') scenarioList.push(batch.batchname+batch.testsuiteId+donotexe['current'][batch.testsuiteId][suiteIndex]+batch.suiteDetails[suiteIndex].scenarioId)
-//             else {
-//                 scenarioList.push(batch.batchname+batch.testsuiteId+donotexe['current'][batch.testsuiteId][suiteIndex]+batch.suiteDetails[suiteIndex].scenarioId)}
-//         }
-//     return scenarioList;
-// }
+ 
   
   
   const onHide = (name) => {
@@ -760,8 +725,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
           getData?.executionRequest?.browserType.includes(el.key)
         ) : [],
-        
-      });
+         });
       setMode(
         getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
       );
@@ -798,7 +762,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
     setVisible_setup(true);
     setSetupBtn(getType);
-    console.log(setIntegration)
   };
 
   const onModalBtnClick = (getBtnType) => {
