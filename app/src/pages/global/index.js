@@ -14,6 +14,7 @@ import ValidationExpression from './components/ValidationExpression';
 import BrowserFp from './components/BrowserFp';
 import SelectRecipients from './components/SelectRecipients';
 import IntegrationDropDown from './components/IntegrationDropDown';
+import LandingContainer from './components/LandingContainer';
 
 
 export { 
@@ -35,5 +36,6 @@ export {
         BrowserFp,
         updateScrollBar,
         SelectRecipients,
-        IntegrationDropDown
+        IntegrationDropDown, 
+        LandingContainer,
     };

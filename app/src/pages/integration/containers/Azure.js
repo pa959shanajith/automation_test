@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, Fragment } from 'react';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MappedPage from '../containers/MappedPage';
 import LoginModal from '../components/LoginModal';
 // import ZephyrUpdateContent from '../components/ZephyrUpdateContent';
@@ -10,7 +10,7 @@ import * as actionTypes from '../state/action.js';
 import AzureContent from '../components/AzureContent';
 // 0 vvimport "../styles/TestList.scss"
 const Azure = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatch= useDispatch();
     const user_id = useSelector(state=> state.login.userinfo.user_id);
     const screenType = useSelector(state=>state.integration.screenType); 
@@ -73,7 +73,7 @@ const Azure = () => {
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (domainDetails === "Invalid Session"){
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-            return RedirectPage(history);
+            return RedirectPage(navigate);
         }
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
         else if (domainDetails === "fail") setLoginError("Fail to Login");
