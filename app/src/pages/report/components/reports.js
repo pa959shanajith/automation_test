@@ -17,10 +17,11 @@ import { NavLink } from 'react-router-dom';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { SelectButton } from 'primereact/selectbutton';
 import { testTypesOptions, viewByOptions } from '../../utility/mockData';
-
-
+import { useNavigate } from 'react-router-dom';
+export var navigate
 
 const reports = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [activeIndex, setActiveIndex] = useState("Functional Test");
     const [testSteps, setTestSteps] = useState(false);

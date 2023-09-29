@@ -9,7 +9,7 @@ import { Button } from "primereact/button";
 import { useSelector, useDispatch } from "react-redux"
 import { Toast } from "primereact/toast";
 import { updateScreen_ICE } from '../api';
-import RedirectPage from '../../global/components/RedirectPage';
+import {RedirectPage} from '../../global';
 import { useNavigate } from 'react-router-dom';
 import MapElement from './MapElement';
 import { ImpactAnalysisScreenLevel } from '../designSlice';
