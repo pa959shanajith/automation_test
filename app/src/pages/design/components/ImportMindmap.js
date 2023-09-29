@@ -114,7 +114,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         if(id) {
             var moduledata = await getModules({"tab":"tabCreate","projectid":id,"moduleid":null,"query":"modLength"})
             if (moduledata.length>0){
-                setError('Please select a Project which has no Modules.')
+                setError('Please select a Project which has no test suite.')
                 gitVerRef.current.value= null                             
                 setUploadFileField(false)
                 setFiledUpload(undefined)
@@ -145,7 +145,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
           if(id) {
               var moduledata = await getModules({"tab":"tabCreate","projectid":id,"moduleid":null,"query":"modLength"})
               if (moduledata.length>0){
-                  setError('Please select a Project which has no Modules.')
+                  setError('Please select a Project which has no test suite.')
                   gitVerRef.current.value= null                             
                   setUploadFileField(false)
                   setFiledUpload(undefined)
