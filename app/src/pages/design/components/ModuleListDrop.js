@@ -139,7 +139,7 @@ const ModuleListDrop = (props) =>{
             dispatch(isEnELoad(false));
             dispatch(selectedModuleReducer({}))
             // this comment is removed when auto save of mod will effect default mod
-            // dispatch(dontShowFirstModule(false))
+            dispatch(dontShowFirstModule(false))
         }
      // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);

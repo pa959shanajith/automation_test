@@ -1,14 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import SidePanel from './SidePanel';
 import ProjectOverview from '../components/ProjectOverview';
-import RedirectPage from '../../global/components/RedirectPage';
-import LandingContainer from '../../global/components/LandingContainer';
+import {RedirectPage, LandingContainer} from '../../global';
 import SideNavBar from '../components/SideNav';
 import { Toast } from 'primereact/toast';
+import { useNavigate } from 'react-router-dom';
 export var navigate
 
 const HomePage = () => {
     const toast = useRef();
+    navigate= useNavigate();
 
     useEffect(() => {
         if (window.localStorage['navigateScreen'] !== "landing") {
