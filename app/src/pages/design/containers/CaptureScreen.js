@@ -996,6 +996,7 @@ else{
     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
   }
     // setCaptureData(updatedData);
+    setSaveDisable(false);
   };
 
   const handleEdit = (rowData) => {
@@ -1136,7 +1137,7 @@ const elementIdentifier=()=>{
 }  
 const footerSave = (
     <>
-    {(selectedCapturedElement.length>0 && NameOfAppType.appType === "Web") ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
+    {(selectedCapturedElement.length>0 && NameOfAppType.appType == "Web") ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
     <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
@@ -1437,11 +1438,12 @@ const footerSave = (
         // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
       }
       )
+      setSelectedCapturedElement([])
   }
   const footerContent = (
     <div>
       <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div>
-      <Button label="Cancel" onClick={() => { setElementProperties(false) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
+      <Button label="Cancel" onClick={() => { setElementProperties(false);setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
       <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} />
     </div>
   )
@@ -1895,7 +1897,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
-              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?'392px':typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'423px':typesOfAppType==="SAP"?'492px':""}}>
+              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?'392px':typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'462px':typesOfAppType==="SAP"?'492px':""}}>
                 <div className="screenshot_pop__content" >
                  <div className="scrsht_outerContainer" id="ss_ssId">
                   <div data-test="ssScroll" className="ss_scrsht_insideScroll">

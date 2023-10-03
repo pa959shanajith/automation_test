@@ -106,6 +106,7 @@ const Messages={
         WARN_CONFIG_INVALID: {"CONTENT":"This configuration is deleted/invalid.", "VARIANT": VARIANT.WARNING},
         WARN_PASSWORD: {"CONTENT":"Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters.", "VARIANT": VARIANT.WARNING},
         WARN_UNMATCH_PASSWORD: {"CONTENT":"Password and Confirm Password did not match", "VARIANT": VARIANT.WARNING},
+        WARN_REQUIRED_FIELD: {"CONTENT":"Fill out all the required fields.", "VARIANT": VARIANT.WARNING},
         WARN_INVALID_EMAIL: {"CONTENT":"Email address is not valid.", "VARIANT": VARIANT.WARNING},
         WARN_LDAP_CONFIGURE: {"CONTENT":"There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.", "VARIANT": VARIANT.WARNING},
         WARN_SAML_CONFIGURE: {"CONTENT":"There are no SAML server configured. To proceed create a server configuration in SAML configuration section.", "VARIANT": VARIANT.WARNING},

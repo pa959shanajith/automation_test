@@ -11,7 +11,7 @@ import { Button } from "primereact/button";
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import { Messages as MSG, VARIANT } from '../../global/components/Messages';
-import RedirectPage from '../../global/components/RedirectPage';
+import {RedirectPage} from '../../global';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { tagList, tagListToReplace } from './ListVariables';
 import { updateScreen_ICE } from '../api';

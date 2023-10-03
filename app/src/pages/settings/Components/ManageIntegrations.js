@@ -28,11 +28,12 @@ import { Tree } from 'primereact/tree';
 import ZephyrContent from "./ZephyrContent";
 import AzureContent from "./AzureContent";
 import { Paginator } from 'primereact/paginator';
-
-
+import { useNavigate } from 'react-router-dom';
+export var navigate;
 
 const ManageIntegrations = ({ visible, onHide }) => {
     // selectors
+    const navigate = useNavigate();
     const currentProject = useSelector(state => state.setting.selectedProject);
     const currentIssue = useSelector(state => state.setting.selectedIssue);
     const selectedZTCDetails = useSelector(state => state.setting.selectedZTCDetails);
@@ -132,7 +133,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "Invalid Session") {
             setToast("error", "Error", "Session Expired please login again");
             setIsSpin(false);
-            // return RedirectPage(history);
+            return RedirectPage(navigate);
         }
         else if (domainDetails === "invalidcredentials") setToast("error", "Error", "Invalid Credentials");
         else if (domainDetails === "Fail") setToast("error", "Error", "Fail to Login");
