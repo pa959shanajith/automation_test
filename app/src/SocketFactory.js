@@ -23,7 +23,7 @@ const SocketFactory = () => {
     const [showAfterExecution, setShowAfterExecution] = useState({ show: false })
     const [showAfterExecutionIsTrial, setShowAfterExecutionIsTrial] = useState({ show: false })
     const [reportData, setReportData] = useState(undefined)
-    const userInfo = JSON.parse(localStorage.getItem('userInfo')) ?JSON.parse(localStorage.getItem('userInfo')) : {};
+    const userInfo = useSelector(state => state.landing.userinfo);
     const socket = useSelector(state => state.landing.socket);
     const dispatch = useDispatch();
     const history = useNavigate();
