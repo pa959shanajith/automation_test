@@ -176,7 +176,7 @@ const ScheduleScreen = ({
                   name="daily"
                   value={el}
                   onChange={onWeekChange}
-                  disabled={checkDisable}
+                  disabled={checkDisable && ((selectedWeek.map((item) => item?.key).includes("ALL")) && (el?.key !== "ALL"))}
                   checked={selectedWeek.some((item) => item.key === el.key)}
                 />
                 <label htmlFor={el?.key} className="ml-2">

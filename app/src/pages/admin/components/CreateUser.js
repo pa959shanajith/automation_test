@@ -131,9 +131,9 @@ const CreateUser = (props) => {
 
     const toastWarn = (warnMessage) => {
         if (warnMessage.CONTENT) {
-            toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+            toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 3000 });
         }
-        else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
+        else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 3000 });
     }
 
     const toastSuccess = (successMessage) => {
@@ -347,6 +347,10 @@ const CreateUser = (props) => {
             setUserRolesAddClass("selectErrorBorder");
             flag = false;
         }
+        if (userName === "" || firstname === "" || lastname === "" || passWord === "" || confirmPassword === "" || email === "" || role === "") {
+            toastWarn(MSG.ADMIN.WARN_REQUIRED_FIELD);
+            // flag = false;
+        }
         return flag;
     };
 
@@ -540,15 +544,22 @@ const CreateUser = (props) => {
     const createUserDialogHide = () => {
         dispatch(AdminActions.UPDATE_INPUT_PASSWORD(""));
         dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(""));
-        dispatch(AdminActions.UPDATE_USERROLE("")); 
+        dispatch(AdminActions.UPDATE_USERROLE(""));
         props.setCreateUserDialog(false);
         setRefreshUserList(!refreshUserList);
         setRoleDropdownValue("");
         setSelectedTab("userDetails");
-        if(editUser) {
+        if (editUser) {
             props.reloadData();
             dispatch(AdminActions.EDIT_USER(false));
         }
+        setUserNameAddClass(false);
+        setfirstnameAddClass(false);
+        setLastnameAddClass(false);
+        setConfirmPasswordAddClass(false); 
+        setPasswordAddClass(false);
+        setEmailAddClass(false);
+        setUserRolesAddClass(false);
     }
 
     const userCreateHandler = () => {
@@ -575,8 +586,8 @@ const CreateUser = (props) => {
         </Button>}
         {selectedTab === "avoAzzureClient" && !editUser ? <Button
             data-test="createButton"
-            label="Create" 
-            onClick={() => { userCreateHandler()}}
+            label="Create"
+            onClick={() => { userCreateHandler() }}
             disabled={nocreate}>
         </Button> : ''}
     </>
@@ -600,11 +611,11 @@ const CreateUser = (props) => {
                 {selectedTab === "userDetails" && <div data-test="create__container" className="createUser-container">
                     {/* <div data-test="heading" id="page-taskName"><span>{(showEditUser === false) ? "Create User" : "Edit User"}</span></div> */}
 
-                    <CreateLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass}
+                    <CreateLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} setEmailAddClass={setEmailAddClass} emailAddClass={emailAddClass}
                         ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown}
                         ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap} ldapDirectoryAddClass={ldapDirectoryAddClass}
                         confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
-                        ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} 
+                        ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit}
                         showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} />
 
                     <div style={{ paddingLeft: '1.5rem' }}>
@@ -616,7 +627,7 @@ const CreateUser = (props) => {
                                         <InputText
                                             data-test="password"
                                             value={passWord}
-                                            className='w-full md:w-20rem p-inputtext-sm'
+                                            className={passwordAddClass ? 'w-full md:w-20rem p-inputtext-sm inputErrorBorder' : 'w-full md:w-20rem p-inputtext-sm'}
                                             onChange={(event) => { passwordChange(event.target.value) }}
                                             type="password"
                                             autoComplete="new-password"
@@ -631,7 +642,7 @@ const CreateUser = (props) => {
                                         <InputText
                                             data-test="confirmPassword"
                                             value={confirmPassword}
-                                            className='w-full md:w-20rem p-inputtext-sm'
+                                            className={confirmPasswordAddClass ? 'w-full md:w-20rem p-inputtext-sm inputErrorBorder' : 'w-full md:w-20rem p-inputtext-sm'}
                                             onChange={(event) => { confirmPasswordChange(event.target.value) }}
                                             type="password"
                                             autoComplete="new-password"
@@ -657,7 +668,7 @@ const CreateUser = (props) => {
                                     value={roleDropdownValue}
                                     options={allRolesUpdate}
                                     optionLabel="name"
-                                    className='w-full md:w-20rem'
+                                    className= {userRolesAddClass ? 'w-full md:w-20rem inputErrorBorder' : 'w-full md:w-20rem'}
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
                                 />
