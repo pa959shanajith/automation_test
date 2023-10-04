@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, connectAzzure_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport } from "../api";
+import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, connectAzzure_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport, openScreenshot } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
@@ -664,6 +664,25 @@ export default function BasicDemo() {
     return itemObj;
   };
 
+  const screenShotLink = (getLink) =>
+    getLink?.data?.screenshot_path && (
+      <div
+        className="screenshot_view"
+        onClick={async () => {
+          let data = await openScreenshot(getLink?.data?.screenshot_path);
+          let image = "data:image/PNG;base64," + data;
+          let WindowObject = window.open();
+          let strHtml =
+            "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" +
+            image +
+            "'/>\n</body>\n</html>";
+          WindowObject.document.writeln(strHtml);
+        }}
+      >
+        View Screenshot
+      </div>
+    );
+
   return (
     <div className="reportsTable_container">
       <div className="reportSummary">
@@ -732,7 +751,11 @@ export default function BasicDemo() {
           body={defectIDForJiraAndAzure}
           style={{ padding: "0rem", textAlign: "center" }}
         />
-        <Column header="Action" style={{ padding: "0rem" }} />
+        <Column
+          body={screenShotLink}
+          header="Action"
+          style={{ padding: "0rem" }}
+        />
       </TreeTable>
       <Toast ref={iceinfo} />
       <Toast ref={jiraconnect} />

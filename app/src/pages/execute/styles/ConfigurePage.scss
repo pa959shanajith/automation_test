@@ -87,10 +87,14 @@
   .p-datatable.p-datatable-gridlines .p-datatable-thead>tr>th {
     padding: 0.5rem;
  }
- .p-panel .p-panel-content {
+ .p-panel-content {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 }
 
@@ -129,20 +133,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 16rem;
+  // margin-top: 16rem;
   width: 100%;
 
   .image-container1 {
     display: flex;
     align-items: center;
-    position: relative;
-    bottom: 10rem;
-    margin-left: -13rem;
+    // position: relative;
+    // bottom: 10rem;
+    // margin-left: -13rem;
 
     .img1 {
       height: 10rem;
       width: 14rem;
-      margin-left: 7rem;
+      // margin-left: 7rem;
     }
 
     .text1 {
@@ -175,12 +179,12 @@
 }
 
 .configure_button {
-  top: 31rem;
-  left: 42rem;
-  position: absolute;
+  // top: 31rem;
+  // left: 42rem;
+  // position: absolute;
   width: 172px;
   height: 45px;
-  left: calc(47% - 123px);
+  // left: calc(47% - 123px);
   background: #605bff;
   border-radius: 10px;
   font: $f7_semibold;

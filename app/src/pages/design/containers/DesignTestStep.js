@@ -224,7 +224,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
             }
             setOverlay("Loading...")
-            console.log(uniqueArray(screenLevelTestCases))
             if (screenLevelTestCases.length !== 0) {
                 // Create an array to store unique items
                 
@@ -1072,7 +1071,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             setHeaderCheck(false);
             setEdit(true);
             setDraggable(false);
-            setChanged(true)
             const testdata = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
             headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testdata.testCases.length;
         }
