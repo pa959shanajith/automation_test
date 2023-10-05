@@ -47,7 +47,8 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./ExecutionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
-import { loadUserInfoActions } from '../../landing/LandingSlice'
+import { loadUserInfoActions } from '../../landing/LandingSlice';
+import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
 export var navigate
 
@@ -147,7 +148,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
-  
+ 
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -155,15 +156,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
-  
+
   useEffect(() => {
     setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client");
     setExecutingOn(selectProjects?.appType==="Web"? "Agent" :"ICE")
     setShowIcePopup(selectProjects?.appType==="Web"? false:true)
   }, [selectProjects.appType]);
 
-
-  const displayError = (error) => {
+ const displayError = (error) => {
     // setLoading(false)
     setMsg(error);
   };
@@ -178,11 +178,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (position) {
         setPosition(position);
     }
-  
   }
-  
-  
-  
+ 
   const onHide = (name) => {
     dialogFuncMap[`${name}`](false);
   
@@ -190,7 +187,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         setDisplayModal(false);
         setIsEmailNotificationEnabled(false);
     }
-  
   }
 
   const [setupBtn, setSetupBtn] = useState(null);
@@ -297,9 +293,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     })();
   }, [selectProjects]);
 
-
-
-  const showSuccess_CICD = (btnType) => {
+ const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_CICD(false);
     }
@@ -392,13 +386,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setAvailableICE(ice);
   };
 
-
-
-  const confirm_delete = (event, item) => {
+ const confirm_delete = (event, item) => {
     setDeleteItem(item);
-    event.preventDefault(); // Prevent the default behavior of the button click
+    event.preventDefault(); 
     setLogoutClicked(true);
-    // let text = `Are you sure you want to delete' ${item.configurename}' execution profile?`;
     let text = (
       <p>
         Are you sure you want to delete <strong>{item.configurename}</strong> execution profile?
@@ -615,14 +606,13 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         // profileName: item.configurename,
         profileName: (
           <span
-            title={item.configurename} // Add title attribute for tooltip with full text
+            title={item.configurename} 
           >
             {item.configurename}
           </span>
         ),
         executionOptions: (
           <div className="Buttons_config_button">
-            {/* <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/> */}
             <Button
               className="execute_now"
               onClick={() => {
@@ -640,7 +630,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             >  
               Execute Now
             </Button>
-            {/* <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/> */}
             <Button
               className="schedule"
               onClick={() => {
@@ -653,7 +642,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             >
               Schedule
             </Button>
-            {/* <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/> */}
             <Button
               className="CICD"
               size="small"
@@ -687,8 +675,7 @@ src="static/imgs/ic-delete-bin.png"
 style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
 className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
 <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
-            
-          </div>
+             </div>
         ),
       });
     });
@@ -700,6 +687,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       tableUpdate();
     }
   }, [configProjectId]);
+  
 
   const configModal = (getType, getData = null) => {
     if (getType === "CancelUpdate") {
@@ -721,8 +709,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
           getData?.executionRequest?.browserType.includes(el.key)
         ) : [],
-        
-      });
+         });
       setMode(
         getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
       );
@@ -748,7 +735,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {url:"",username:"",password:""},
         azure: { url: "", username: "", password: "" },
-
       });
       setConfigTxt("");
       setModules("normalExecution");
@@ -1288,6 +1274,18 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       </>
     );
   };
+  useEffect(() => {
+        (async () => {
+            const arg = {"action":"provider","channel":"email","args":"smtp"};
+            const data = await getNotificationChannels(arg);
+            if (data) {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: data.sender.email });
+            }
+            else {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: 'avoassure-alerts@avoautomation.com' });
+            }
+        })();
+    }, []);
 
   const handleSubmit = (defaultValues) => {
     if ( "EmailRecieverAddress" in defaultValues) {
@@ -1298,7 +1296,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
                 return emailRegex.test(recieverEmailAddress) === true
             })
             if (isAllValidEmail) {
-              setEmailNotificationReciever(defaultValues.EmailRecieverAddress);
+              setEmailNotificationReciever(defaultValues.EmailRecieverAddress, defaultValues.EmailSenderAddress, isNotifyOnExecutionCompletion);
               setDisplayModal(false);
             }
             
