@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {url} from '../../App';
-import { Messages as MSG,RedirectPage} from '../global/components/Messages';
-// import {history} from './index'
+import { Messages as MSG, RedirectPage} from '../global';
+import {navigate} from './components/reports'
 
 export const fetchConfigureList = async(props) => {
     console.log(props);
@@ -18,7 +18,7 @@ export const fetchConfigureList = async(props) => {
             }
         });
         if(res.status === 401){
-            // RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
@@ -52,6 +52,7 @@ export const getFunctionalReports = async(projId, relName, cycId) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -79,6 +80,7 @@ export const fetchModuleData = async(arg) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -103,6 +105,7 @@ export const getProjectList = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -130,6 +133,7 @@ export const getReportList = async(getConfigKey) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -140,6 +144,60 @@ export const getReportList = async(getConfigKey) => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+
+
+export const getTestSuiteList = async(getTestSuiteId) => {
+    try{
+        const res = await axios(url+'/fetchExecProfileStatus', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                query:"fetchExecProfileStatus",
+                testsuiteid: getTestSuiteId,
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+
+export const openScreenshot = async(path) => {
+    try{
+        const res = await axios(url+'/openScreenShot', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: {
+                "absPath": [path]
+            },
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.JIRA.ERR_JIRA_LOG_DEFECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.JIRA.ERR_JIRA_LOG_DEFECT}
     }
 }
 
@@ -154,6 +212,7 @@ export const getTestSuite = async(getSuiteKey) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -178,6 +237,7 @@ export const downloadReports = async(getDownload, type) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -203,7 +263,7 @@ export const viewReport = async (reportid, reportType="json", screenshotFlag) =>
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            // RedirectPage(history)
+            RedirectPage(navigate)
             return { error: MSG.GENERIC.INVALID_SESSION };
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -228,7 +288,7 @@ export const getDetails_JIRA = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            // RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
@@ -258,6 +318,7 @@ export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -291,6 +352,7 @@ export const connectJira_ICE_Fields = async(project, type, jiraurl, jirausername
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -315,6 +377,7 @@ export const connectJira_ICE_create = async(data) => {
             data: data
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -339,6 +402,7 @@ export const connectAzzure_ICE_create = async(data) => {
             data: data
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
@@ -362,6 +426,7 @@ export const connectAzure_ICE = async(dataObj) => {
            data:dataObj
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -394,6 +459,7 @@ export const connectAzure_ICE_Fields = async(project, type, jiraurl, jirausernam
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -423,6 +489,7 @@ export const viewJiraMappedList_ICE = async(userID, scenarioName) => {
             },
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
@@ -451,6 +518,7 @@ export const viewAzureMappedList_ICE = async(userID, scenarioName) => {
             },
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;

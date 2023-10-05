@@ -6,8 +6,6 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
 import { useNavigate, Link } from "react-router-dom";
-import RedirectPage from '../../global/components/RedirectPage';
-import ChangePassword from '../../global/components/ChangePassword';
 import EditProfile from '../components/EditProfile'
 import Agent from '../components/Agent';
 // import 'primereact/resources/themes/saga-blue/theme.css';
@@ -15,7 +13,7 @@ import Agent from '../components/Agent';
 import '../styles/userProfile.scss';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { Button } from "primereact/button";
-import { setMsg, Messages as MSG, } from "../../global";
+import { setMsg, Messages as MSG, RedirectPage, ChangePassword} from "../../global";
 
 
 const UserDemo = (props) => {
@@ -31,6 +29,8 @@ const UserDemo = (props) => {
     const [config, setConfig] = useState({});
     const [showUD, setShowUD] = useState(false);
     const [showOverlay, setShowOverlay] = useState("");
+    const[OS,setOS]=useState("Windows")
+
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -53,9 +53,36 @@ const UserDemo = (props) => {
             setConfig(avoClientConfig);
 
         })();
+        getOS()
     }, []);
 
+      // getting OS version using userAgent
 
+  const getOS = () => {
+
+    let userAgent = navigator.userAgent.toLowerCase();
+
+    if (/windows nt/.test(userAgent))
+
+        setOS("Windows");
+
+ 
+
+    else if (/mac os x/.test(userAgent))
+
+        setOS("MacOS");
+
+ 
+
+    else if (/linux x86_64/.test(userAgent))
+
+        setOS("Linux")
+
+    else
+
+        setOS("Not Supported");
+
+  }
     const getIce = async (clientVer) => {
         try {
             setShowUD(false);
@@ -63,7 +90,7 @@ const UserDemo = (props) => {
             const res = await fetch("/downloadICE?ver=" + clientVer);
             const { status } = await res.json();
             if (status === "available") {
-                window.location.href = window.location.origin + "/downloadICE?ver=" + clientVer + "&file=getICE" + "&fileName=" + ((userInfo.isTrial ? "1_" : "0_") + window.location.host + "." + config[clientVer].split(".").pop());
+                window.location.href = window.location.origin + "/downloadICE?ver=" + clientVer + "&file=getICE" + "&fileName=" + ((userInfo['licenseID']) + window.location.host + "." + config[clientVer].split(".").pop());
             }
             else
                 setMsg(MSG.GLOBAL.ERR_PACKAGE);
@@ -74,8 +101,16 @@ const UserDemo = (props) => {
         }
     }
     const handleDownloadClick = () => {
+    if(OS=="Windows"){
         getIce("avoclientpath_Windows");
-    };
+        
+    }
+    if (OS=="MacOS"){
+        getIce("avoclientpath_Mac")
+    }
+    if(OS=="Linux")
+    getIce("avoclientpath_Linux")
+    }
 
     const userMenuItems = [
         {
@@ -177,8 +212,8 @@ const UserDemo = (props) => {
         <div className="UserProfileContainer">
             <TieredMenu className='custom-tieredmenu' model={userMenuItems} popup ref={menu} breakpoint="767px" />
             {showEditProfileDialog && <EditProfile showDialogBox={showEditProfileDialog} setShowDialogBox={setShowEditProfileDialog} userInfo={userInfo} toastError={props.toastError}  toastSuccess={props.toastSuccess} toastWarn={props.toastWarn}/>}
-            {showChangePasswordDialog && < ChangePassword showDialogBox={showChangePasswordDialog} setShowDialogBox={setShowChangePasswordDialog} toastError={props.toastError}  toastSuccess={props.toastSuccess}  />}
-            {showAgentDialog && < Agent showDialogBox={showAgentDialog} setShowDialogBox={setShowAgentDialog} />}
+            {showChangePasswordDialog && <ChangePassword showDialogBox={showChangePasswordDialog} setShowDialogBox={setShowChangePasswordDialog} toastError={props.toastError}  toastSuccess={props.toastSuccess}  />}
+            {showAgentDialog && <Agent showDialogBox={showAgentDialog} setShowDialogBox={setShowAgentDialog} />}
             <AvoConfirmDialog
                 visible={logoutClicked}
                 onHide={setLogoutClicked}

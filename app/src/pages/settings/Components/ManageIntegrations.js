@@ -28,11 +28,12 @@ import { Tree } from 'primereact/tree';
 import ZephyrContent from "./ZephyrContent";
 import AzureContent from "./AzureContent";
 import { Paginator } from 'primereact/paginator';
-
-
+import { useNavigate } from 'react-router-dom';
+export var navigate;
 
 const ManageIntegrations = ({ visible, onHide }) => {
     // selectors
+    const navigate = useNavigate();
     const currentProject = useSelector(state => state.setting.selectedProject);
     const currentIssue = useSelector(state => state.setting.selectedIssue);
     const selectedZTCDetails = useSelector(state => state.setting.selectedZTCDetails);
@@ -132,7 +133,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "Invalid Session") {
             setToast("error", "Error", "Session Expired please login again");
             setIsSpin(false);
-            // return RedirectPage(history);
+            return RedirectPage(navigate);
         }
         else if (domainDetails === "invalidcredentials") setToast("error", "Error", "Invalid Credentials");
         else if (domainDetails === "Fail") setToast("error", "Error", "Fail to Login");
@@ -258,7 +259,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const setToast = (tag, summary, msg) => {
-        toast.current.show({ severity: tag, summary: summary, detail: msg, life: 10000 });
+        toast.current.show({ severity: tag, summary: summary, detail: JSON.stringify(msg), life: 10000 });
     }
 
     const integrationItems = [
@@ -671,7 +672,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
 
-
+/////////////old checkbox selection code
     // const testcaseCheck = (e, checkboxIndex) => {
     //     if (checkboxIndex >= 0 && checkboxIndex < testCaseData.length) {
     //         const setObjValue = testCaseData.map((item) => ({ ...item, checked: false }));
@@ -680,15 +681,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
     //     }
     // }
 
+    ////////////////New Chcekbox selection code 
+
     const testcaseCheck = (e, checkboxIndex) => {
-        if (checkboxIndex >= 0 && checkboxIndex < testCaseData.length) {
-          const globalIndex = startIndex + checkboxIndex;  // Calculate global index for the current page
-          const updatedData = testCaseData.map((item, idx) =>
-            idx === globalIndex ? { ...item, checked: e.checked } : item
-          );
+        if (checkboxIndex >= 0 && checkboxIndex < itemsPerPageJira) {
+          const updatedData = testCaseData.map((item) => ({ ...item, checked: false })).slice();  
+          const globalIndex = startIndex + checkboxIndex;
+          updatedData[globalIndex].checked = e.checked;  
           setTestCaseData(updatedData);
         }
-      };
+     }
+
       
 
     const callAzureSaveButton = () => {
@@ -708,11 +711,11 @@ const ManageIntegrations = ({ visible, onHide }) => {
             {activeIndex === 0 &&(
                 <div className="btn__2">
                     <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
-                    <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
+                    <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="logout__btn" />
                 </div>)}
 
             {activeIndex === 1 &&(
-                <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
+                <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="cancel__btn" />)}
 
         </div>)
     },[activeIndex,selectedscreen.name,mappedData])

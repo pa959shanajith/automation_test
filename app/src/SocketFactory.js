@@ -109,6 +109,7 @@ const SocketFactory = () => {
                                 state={{
                                     execution: reportData.configurename,
                                     configureKey: reportData.configurekey,
+                                    viewBy:"Execution Profile"
                                 }}
                                 className="Profile_Name"
                                 activeClassName="active"
