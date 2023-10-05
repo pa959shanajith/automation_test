@@ -603,14 +603,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             {idx + 1}
           </span>
         ),
-        // profileName: item.configurename,
-        profileName: (
-          <span
-            title={item.configurename} 
-          >
-            {item.configurename}
-          </span>
-        ),
+        profileName: item.configurename,
         executionOptions: (
           <div className="Buttons_config_button">
             <Button
@@ -688,6 +681,15 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
   }, [configProjectId]);
   
+
+
+  const profieTooltip = (rowdata) => {
+    return   <span
+        title={rowdata.profileName}
+      >
+        {rowdata.profileName}
+      </span>;
+};
 
   const configModal = (getType, getData = null) => {
     if (getType === "CancelUpdate") {
@@ -1353,7 +1355,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
-            />
+              body={profieTooltip}
+    />
             <Column
               style={{
                 fontWeight: "bold",
