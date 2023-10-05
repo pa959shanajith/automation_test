@@ -7,6 +7,8 @@
 .reportsTable_container {
     .desc_text {
         padding-left: 0.4rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .img_jira {
         height: 1rem;

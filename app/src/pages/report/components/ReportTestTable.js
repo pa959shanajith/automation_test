@@ -48,9 +48,9 @@ export default function BasicDemo() {
   const [configValues, setConfigValues] = useState({});
   const [selectedRow, setSelectedRow] = useState([]);
   const filterValues = [
-        { name: 'Pass', key: 'P' },
-        { name: 'Fail', key: 'F' },
-        { name: 'Terminated', key: 'T' }
+    { name: 'Pass', key: 'P' },
+    { name: 'Fail', key: 'F' },
+    { name: 'Terminated', key: 'T' }
   ];
   const [selectedFilter, setSelectedFilter] = useState([]);
   const bugRef = useRef(null);
@@ -211,42 +211,42 @@ export default function BasicDemo() {
       bugTitle === "Jira"
         ? Object.keys(configValues).forEach((item) => {
           if(item !== "Summary"){
-              valueObj[item] = {
-                field_name: responseFeilds[item]?.key,
-                userInput:
-                  responseFeilds[item]?.type === "array" && item !== "Attachment"
-                    ? {
-                        title: "",
-                        key: configValues[item]?.key,
-                        text: configValues[item]?.name,
-                      }
-                    : configValues[item],
-                type: responseFeilds[item]?.type,
-              };
-            }
+            valueObj[item] = {
+              field_name: responseFeilds[item]?.key,
+              userInput:
+                responseFeilds[item]?.type === "array" && item !== "Attachment"
+                  ? {
+                    title: "",
+                    key: configValues[item]?.key,
+                    text: configValues[item]?.name,
+                  }
+                  : configValues[item],
+              type: responseFeilds[item]?.type,
+            };
+          }
           else if(item === "Summary") {
             valueObj.summary = configValues[item]
           }
-          })
+        })
         : Object.keys(configValues).forEach((item) => {
-            valueObj[item] = {
-              ...responseFeilds[item],
-              data:
-                typeof configValues[item] === "object"
-                  ? item === "State"
-                    ? {
-                        title: "",
-                        key: responseFeilds[item]?.allowedValues.indexOf(
-                          configValues[item]?.id
-                        ) + 1,
-                        text: configValues[item]?.id?.toString(),
-                      }
-                    : configValues[item]?.id?.toString()
-                  : configValues[item],
-              error: false,
-              isChecked: true,
-            };
-          });
+          valueObj[item] = {
+            ...responseFeilds[item],
+            data:
+              typeof configValues[item] === "object"
+                ? item === "State"
+                  ? {
+                    title: "",
+                    key: responseFeilds[item]?.allowedValues.indexOf(
+                      configValues[item]?.id
+                    ) + 1,
+                    text: configValues[item]?.id?.toString(),
+                  }
+                  : configValues[item]?.id?.toString()
+                : configValues[item],
+            error: false,
+            isChecked: true,
+          };
+        });
       if(bugTitle !== "Jira"){
         valueObj["Area Path"].data = configValues["Area ID"].name
         valueObj["Iteration Path"].data = configValues["Iteration ID"].name
@@ -254,67 +254,67 @@ export default function BasicDemo() {
       const userDetails =
         bugTitle === "Jira"
           ? await connectJira_ICE_create({
-              issue_dict: {
-                project: jiraDropDown?.id,
-                issuetype: issueDropDown?.name,
-                // summary: inputSummary,
-                description: inputDesc,
-                url: loginUrl,
-                username: loginName,
-                password: loginKey,
-                parentissue: "",
-                reportId: reportData?.overallstatus?.reportId,
-                slno: selectedRow[0]?.slno,
-                executionId: reportData?.overallstatus?.executionId,
-                ...(!!Object.keys(configValues).length && valueObj),
-                executionReportNo: `Execution No: ${executed}`,
-              },
-              action: "createIssueInJira",
-            })
+            issue_dict: {
+              project: jiraDropDown?.id,
+              issuetype: issueDropDown?.name,
+              // summary: inputSummary,
+              description: inputDesc,
+              url: loginUrl,
+              username: loginName,
+              password: loginKey,
+              parentissue: "",
+              reportId: reportData?.overallstatus?.reportId,
+              slno: selectedRow[0]?.slno,
+              executionId: reportData?.overallstatus?.executionId,
+              ...(!!Object.keys(configValues).length && valueObj),
+              executionReportNo: `Execution No: ${executed}`,
+            },
+            action: "createIssueInJira",
+          })
           : await connectAzzure_ICE_create({
-              issue_dict: {
-                info: {
-                  project: {
-                    key: jiraDropDown?.id,
-                    text: jiraDropDown?.name,
-                    error: false,
-                  },
-                  issue: {
-                    key: "Bug",
-                    text: "Bug",
-                    error: false,
-                  },
-                  summary: {
-                    value: inputSummary,
-                    error: false,
-                  },
-                  reproSteps: {
-                    value: inputDesc,
-                    error: false,
-                  },
-                  parentIssueId: {
-                    value: "",
-                    error: false,
-                  },
-                  epicName: {
-                    key: "",
-                    value: "",
-                    error: false,
-                  },
-                  chosenList: {
-                    ...(!!Object.keys(configValues).length && valueObj),
-                  },
+            issue_dict: {
+              info: {
+                project: {
+                  key: jiraDropDown?.id,
+                  text: jiraDropDown?.name,
+                  error: false,
                 },
-                url: loginUrl,
-                username: loginName,
-                pat: loginKey,
-                reportId: reportData?.overallstatus?.reportId,
-                slno: selectedRow[0]?.slno,
-                executionId: reportData?.overallstatus?.executionId,
-                executionReportNo: `Execution No: ${executed}`,
+                issue: {
+                  key: "Bug",
+                  text: "Bug",
+                  error: false,
+                },
+                summary: {
+                  value: inputSummary,
+                  error: false,
+                },
+                reproSteps: {
+                  value: inputDesc,
+                  error: false,
+                },
+                parentIssueId: {
+                  value: "",
+                  error: false,
+                },
+                epicName: {
+                  key: "",
+                  value: "",
+                  error: false,
+                },
+                chosenList: {
+                  ...(!!Object.keys(configValues).length && valueObj),
+                },
               },
-              action: "createIssueInAzure",
-            });
+              url: loginUrl,
+              username: loginName,
+              pat: loginKey,
+              reportId: reportData?.overallstatus?.reportId,
+              slno: selectedRow[0]?.slno,
+              executionId: reportData?.overallstatus?.executionId,
+              executionReportNo: `Execution No: ${executed}`,
+            },
+            action: "createIssueInAzure",
+          });
       if(userDetails === "Fail"){
         jiraconnect?.current?.show({ severity: 'info', summary: 'Info', detail: 'Fail to log a bug.' });
       }
@@ -480,9 +480,9 @@ export default function BasicDemo() {
           (bugTitle === "Jira" &&
             jiraDetails?.projects &&
             !!jiraDetails?.projects.length) ||
-          (bugTitle === "Azure DevOps" &&
-            jiraDetails?.projects &&
-            !!jiraDetails?.projects.length)
+            (bugTitle === "Azure DevOps" &&
+              jiraDetails?.projects &&
+              !!jiraDetails?.projects.length)
             ? "img_jira"
             : ""
         }
@@ -534,8 +534,8 @@ export default function BasicDemo() {
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"
             : modifiedChild.status === "Fail"
-            ? "static/imgs/fail.png"
-            : "static/imgs/treminated.png";
+              ? "static/imgs/fail.png"
+              : "static/imgs/treminated.png";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
           <div key={modifiedChild.key} style={{ display: "flex" }}>
@@ -585,29 +585,29 @@ export default function BasicDemo() {
         const getFields =
           bugTitle === "Jira"
             ? await connectJira_ICE_Fields(
-                jiraDropDown?.id,
-                issueDropDown?.name,
-                loginUrl,
-                loginName,
-                loginKey,
-                jiraDetails?.projects.map((el) => ({
-                  code: el?.code,
-                  key: el?.id,
-                  text: el?.name,
-                }))
-              )
+              jiraDropDown?.id,
+              issueDropDown?.name,
+              loginUrl,
+              loginName,
+              loginKey,
+              jiraDetails?.projects.map((el) => ({
+                code: el?.code,
+                key: el?.id,
+                text: el?.name,
+              }))
+            )
             : await connectAzure_ICE_Fields(
-                jiraDropDown?.id,
-                issueDropDown?.name,
-                loginUrl,
-                loginName,
-                loginKey,
-                jiraDetails?.projects.map((el) => ({
-                  code: el?.code,
-                  key: el?.id,
-                  text: el?.name,
-                }))
-              );
+              jiraDropDown?.id,
+              issueDropDown?.name,
+              loginUrl,
+              loginName,
+              loginKey,
+              jiraDetails?.projects.map((el) => ({
+                code: el?.code,
+                key: el?.id,
+                text: el?.name,
+              }))
+            );
         setResponseFeilds(getFields);
         const fieldValues = Object.keys(getFields).map((el) => ({
           key: bugTitle === "Jira" ? getFields[el].key : getFields[el].referenceName,
@@ -645,6 +645,14 @@ export default function BasicDemo() {
   const getElDropdown = (Dropdown) => {
     let nameObj = { ["Iteration ID"]: responseFeilds["Iteration_Paths"]?.child, ["Area ID"]: responseFeilds["Area_Paths"]?.child };
     return nameObj[Dropdown];
+  };
+
+  const reoptDescriptionTooltip = (rowdata) => {
+    return <span
+      title={rowdata.StepDescription}
+    >
+      {rowdata.StepDescription}
+    </span>;
   };
 
   return (
@@ -694,6 +702,7 @@ export default function BasicDemo() {
           field="StepDescription"
           header="Description"
           style={{ width: "18rem", padding: "0rem" }}
+          body={reoptDescriptionTooltip}
         />
         <Column
           field="EllapsedTime"
@@ -910,8 +919,8 @@ export default function BasicDemo() {
               el.name !== "Repro Steps" && el.name !== "Value Area" ? (
                 <div className="col-12">
                   {Array.isArray(el.data) ||
-                  el.name === "Iteration ID" ||
-                  el.name === "Area ID" ? (
+                    el.name === "Iteration ID" ||
+                    el.name === "Area ID" ? (
                     <AvoDropdown
                       dropdownValue={configValues[el.name]}
                       name={el.name}
@@ -924,10 +933,10 @@ export default function BasicDemo() {
                       dropdownOptions={
                         el.name !== "Iteration ID" && el.name !== "Area ID"
                           ? el.data.map((e) => ({
-                              ...e,
-                              id: e?.key,
-                              name: bugTitle === "Jira" ? e?.text : e?.name,
-                            }))
+                            ...e,
+                            id: e?.key,
+                            name: bugTitle === "Jira" ? e?.text : e?.name,
+                          }))
                           : getElDropdown(el.name)
                       }
                       parentClass="flex flex-column"
