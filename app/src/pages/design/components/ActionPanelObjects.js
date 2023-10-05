@@ -950,6 +950,7 @@ const ActionPanel = (props) => {
         toastSuccess={props.toastSuccess}
         toastError={props.toastError}
         elementTypeProp={props.elementTypeProp}
+        capturedDataToSave={props.capturedDataToSave}
       />
       }
 

@@ -1903,6 +1903,8 @@ const headerstyle={
         toastSuccess={toastSuccess}
         toastError={toastError}
         elementTypeProp ={elementTypeProp}
+        captureData={captureData}
+        capturedDataToSave={capturedDataToSave}
       />}
 
       {currentDialog === 'mapObject' && <ActionPanel
