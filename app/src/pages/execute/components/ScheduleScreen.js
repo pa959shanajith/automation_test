@@ -166,7 +166,7 @@ const ScheduleScreen = ({
       WY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
-            Recur every <InputText title="Enter after every how many week(s) you wish it to recur" /> week(s) on:
+            Recur every <InputText title="Enter after every how many week(s) you wish it to recur"   keyfilter={/^[0-9]+$/} /> week(s) on:
           </div>
           <div className="flex flex-wrap">
             {scheduleWeeks.map((el) => (
