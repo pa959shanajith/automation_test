@@ -1,0 +1,62 @@
+@import "../../global/styles/ColorVariables.scss";
+.letfnav{
+    float: left;
+    position: relative;
+    left: 10rem;
+    top: 4rem;
+}
+.util_header{
+    font: $f6_semibold;
+     color: #212121;
+}
+
+.letfnav h4{
+    text-align: center;
+    font-size: 18px;
+    // font-family: $avoPrimaryFont !important;
+    font-weight: normal;
+    // color: $whisper;
+}
+.letfnav span{
+    list-style-type: none;
+    float: left;
+    width: 80%;
+    // color: $whiteColor;
+    line-height: inherit;
+    text-align: center;
+    margin: 16% 10% 10%;
+    font-size: 12px;
+    cursor: pointer;
+
+    img{
+        padding: 8px 10px;
+    }
+}
+.encrypt_drodown{
+    height: 2.5rem !important;
+}
+
+#selected{
+    // background: $primaryColorDarkest;
+    border-radius: 5px;
+}
+
+.util__execution_ic{
+    padding: 10px;
+}
+.util__execution_ic:hover{
+    // background: $hovorIcon !important;
+}
+.util__devOps {
+    width: 4.5rem;
+}
+
+.active_tab {
+    background: #e3cff0 !important;
+    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+}
+
+.not_active_tab {
+    background-color: none !important;
+    font: $f7_regular;
+}

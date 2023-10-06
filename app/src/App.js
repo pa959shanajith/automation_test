@@ -12,6 +12,7 @@ import More from './pages/more/more';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import Integration from './pages/integration/Integration';
 import Settings from './pages/settings/Settings';
+import Utility from './pages/utilities/containers/UtilityHome'
 import { ErrorPage } from './pages/global';
 import Login from './pages/login/containers/LoginPage';
 import BasePage from './pages/login/containers/BasePage';
@@ -109,6 +110,7 @@ const RouteApp = () => {
         <Route path="/execute" element={<ConfigurePage />} />
         <Route path='/viewReports' element={<ReportTestTable/>}/>
         <Route path="/admin" element={<AdminContainer />} />
+        <Route path="/utility" element={<Utility />} />
         
       </Routes>
     </>
