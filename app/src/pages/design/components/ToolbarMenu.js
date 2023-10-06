@@ -47,9 +47,9 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     // let selectProject = reduxDefaultselectedProject;
   
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-    // if (localStorageDefaultProject) {
-    //   selectProject = JSON.parse(localStorageDefaultProject);
-    // }
+    if (localStorageDefaultProject) {
+      dispatch(selectedProj(JSON.parse(localStorageDefaultProject).projectId));
+    }
     useEffect(() => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         

@@ -37,7 +37,7 @@ const AvoDropdown = ({
       {required && (
         <div className="validation_container">
           <small className={touched && !dropdownValue ? "txt_invalid" : "txt_valid"}>
-            {labelTxt} is required.
+            {placeholder === "End After" ? `${placeholder} is required.` : `${labelTxt} is required.`}
           </small>
         </div>
       )}

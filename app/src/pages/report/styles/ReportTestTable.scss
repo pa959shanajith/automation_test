@@ -5,8 +5,13 @@
 }
 
 .reportsTable_container {
+    .screenshot_view {
+        cursor: pointer;
+    }
     .desc_text {
         padding-left: 0.4rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .img_jira {
         height: 1rem;
@@ -24,9 +29,8 @@
     }
     .viewTable{
         bottom: 1.5rem;
-        max-height: 81vh;
         overflow-y: auto;
-        height: 80vh;
+        height: 65vh;
         margin: 1.5vh;
         border-radius: 0.6rem;
         .p-treetable-thead>tr>th {

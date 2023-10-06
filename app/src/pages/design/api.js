@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {RedirectPage, Messages as MSG} from '../global'
-import {history} from './index'
+import {navigate} from './index';
 import {url} from '../../App';
 
 /*Component getProjectList
@@ -19,7 +19,7 @@ export const getProjectList = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -50,7 +50,7 @@ export const getModules = async(props) => {
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }else if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         console.error(res.data)
@@ -76,7 +76,7 @@ export const getScreens = async(projectId) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -116,7 +116,7 @@ export const saveMindmap = async(props) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -146,7 +146,7 @@ export const exportToExcel = async(props) => {
             responseType:'arraybuffer'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -177,7 +177,7 @@ export const exportMindmap = async(moduleId) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -206,7 +206,7 @@ export const populateScenarios = async(moduleID) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -239,7 +239,7 @@ export const readTestSuite_ICE = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -268,7 +268,7 @@ export const populateUsers = async(projectId) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail" && res.data.rows.length >0){            
@@ -299,7 +299,7 @@ export const excelToMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if (res.data == 'valueError') {
@@ -334,7 +334,7 @@ export const importMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -361,7 +361,7 @@ export const gitToMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -377,7 +377,7 @@ export const gitToMindmap = async(data) => {
 
 
 /*Component pdProcess
-  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"history":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
+  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"navigate":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
 */
 
 export const pdProcess = async(data) => {
@@ -391,7 +391,7 @@ export const pdProcess = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -405,7 +405,7 @@ export const pdProcess = async(data) => {
 }
 
 /*Component importGitMindmap
-  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"history":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
+  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"navigate":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
 */
 
 export const importGitMindmap = async(data) => {
@@ -419,7 +419,7 @@ export const importGitMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.data === "empty"){
@@ -453,7 +453,7 @@ export const importGitMindmap = async(data) => {
 }
 
 /*Component exportToGit
-  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"history":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
+  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"navigate":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
 */
 
 export const exportToGit = async(data) => {
@@ -467,7 +467,7 @@ export const exportToGit = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.data==='empty'){
@@ -548,7 +548,7 @@ export const updateNotificationConfiguration = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -582,7 +582,7 @@ export const getNotificationConfiguration = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -609,7 +609,7 @@ export const getNotificationRules = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -635,7 +635,7 @@ export const deleteScenario = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -660,7 +660,7 @@ export const deleteScenarioETE = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         
@@ -688,7 +688,7 @@ export const exportToProject = async(moduleId) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -714,7 +714,7 @@ export const initScraping_ICE = screenViewObject => {
         })
         .then(res=>{
             if (res.status === 401) {
-                // RedirectPage(history);
+                // RedirectPage(navigate);
                 reject("Invalid Session");
             }
             else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
@@ -743,7 +743,7 @@ export const getNotificationGroups = async(props) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -767,7 +767,7 @@ export const saveE2EDataPopup = async(HardCodedApiDataForE2E) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -802,7 +802,7 @@ export const getProjectsMMTS = async(data) => {
         });
 
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
 
         }
@@ -847,7 +847,7 @@ export const updateE2E = async(data) => {
         });
 
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
 
         }
@@ -891,7 +891,7 @@ export const getUserDetails = async(action, args) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
@@ -1287,7 +1287,7 @@ export const exportToMMSkel = async(data) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1313,7 +1313,7 @@ export const jsonToMindmap = async(moduleId) => {
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1337,7 +1337,7 @@ export const writeFileServer = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1361,7 +1361,7 @@ export const writeZipFileServer = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1402,7 +1402,7 @@ export const singleExcelToMindmap = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if (res.data == 'valueError') {
@@ -1435,7 +1435,7 @@ export const checkExportVer = async(data) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
@@ -1554,7 +1554,7 @@ export const getAvailablePlugins = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
@@ -1565,4 +1565,24 @@ export const getAvailablePlugins = async() => {
         console.error(err)
         return {error:MSG.ADMIN.ERR_FETCH_PLUGINS}
     }
+}
+
+export const updateIrisDataset = data => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/updateIrisDataset", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                data : data
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
 }

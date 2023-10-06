@@ -1045,7 +1045,7 @@ const toastSuccess = (successMessage) => {
 
           <div style={{ position: "relative",display:'flex',flexDirection:'column' }}>
           <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
-            <div> <label className="label_genius"  htmlFor="project">Testsuite</label></div>
+            <div> <label className="label_genius"  htmlFor="project">Test Suite</label></div>
             {!props.selectedModule ?<div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Test Suite</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
             </div>
             {/* <NormalDropDown

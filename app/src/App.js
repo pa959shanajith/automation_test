@@ -32,7 +32,7 @@ import Analysis from './pages/landing/components/Analysis';
 import MindmapHome from './pages/design/containers/MindmapHome';
 import Profile from './pages/report/components/Profile';
 import ReportTestTable from './pages/report/components/ReportTestTable';
-import AdminContainer from './pages/admin/containers/AdminContainer';
+import AdminContainer from './pages/admin/containers/AdminHome';
 import GeniusDialog from './pages/global/components/GeniusDialog';
 
 
@@ -101,10 +101,10 @@ const RouteApp = () => {
         <Route path="/reset" element={<Login />} />
         <Route path="/" element={<BasePage />} />
         <Route path="/landing" element={<HomePage />} />
-        <Route path="/integration" element={<Integration />} />
+        {/* <Route path="/integration" element={<Integration />} /> */}
         <Route path="/reports" element={<Report />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
+        {/* <Route path="/settings" element={<Settings />} /> */}
         <Route path="/itdm" element={<itdm />} />
         <Route path="/design" element={<MindmapHome />} />
         <Route path="/execute" element={<ConfigurePage />} />

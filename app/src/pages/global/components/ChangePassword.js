@@ -138,23 +138,23 @@ const ChangePassword = (props) => {
                         {/* checking password validation messages*/}
                         <div className="password_check_messages">
                             <div style={{ display: "flex" }}>
-                                <i className={`mr-2 ${passwordLength ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                <i className={`mr-2 font-12 ${passwordLength ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
                                 <span>Must be 8-16 characters long</span>
                             </div>
                             <div style={{ display: "flex" }}>
-                                <i className={`mr-2 ${digitPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                <i className={`mr-2 font-12 ${digitPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
                                 <span>Must contain at least 1 Number</span>
                             </div>
                             <div style={{ display: "flex" }}>
-                                <i className={`mr-2 ${lowerCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                <i className={`mr-2 font-12 ${lowerCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
                                 <span>Must contain at least 1 Lower case letter</span>
                             </div>
                             <div style={{ display: "flex" }}>
-                                <i className={`mr-2 ${upperCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                <i className={`mr-2 font-12 ${upperCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
                                 <span>Must contain at least 1 Upper case letter</span>
                             </div>
                             <div style={{ display: "flex" }}>
-                                <i className={`mr-2 ${specialCharPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                <i className={`mr-2 font-12 ${specialCharPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
                                 <span>Must contain at least 1 Special character (&,%.etc)</span>
                             </div>
                         </div>

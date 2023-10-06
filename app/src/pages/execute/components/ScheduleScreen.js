@@ -18,6 +18,7 @@ import { cancelScheduledJob_ICE, getScheduledDetailsOnDate_ICE, getScheduledDeta
 import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
 import AvoModal from "../../../globalComponents/AvoModal";
+import { Toast } from "primereact/toast";
 
 const ScheduleScreen = ({
   cardData,
@@ -49,6 +50,7 @@ const ScheduleScreen = ({
   const [exestatus, setExestatus] = useState("");
   const getScheduledList = useSelector((store) => store.configsetup);
   const dispatch = useDispatch();
+  const duplicateinfo = useRef(null);
 
   const recurrance = useRef(null);
 
@@ -164,7 +166,7 @@ const ScheduleScreen = ({
       WY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
-            Recur every <InputText title="Enter after every how many week(s) you wish it to recur" /> week(s) on:
+            Recur every <InputText title="Enter after every how many week(s) you wish it to recur"   keyfilter={/^[0-9]+$/} /> week(s) on:
           </div>
           <div className="flex flex-wrap">
             {scheduleWeeks.map((el) => (
@@ -174,7 +176,7 @@ const ScheduleScreen = ({
                   name="daily"
                   value={el}
                   onChange={onWeekChange}
-                  disabled={checkDisable}
+                  disabled={checkDisable && ((selectedWeek.map((item) => item?.key).includes("ALL")) && (el?.key !== "ALL"))}
                   checked={selectedWeek.some((item) => item.key === el.key)}
                 />
                 <label htmlFor={el?.key} className="ml-2">
@@ -216,6 +218,12 @@ const ScheduleScreen = ({
       })
     );
   }, []);
+
+  useEffect(() => {
+    if(getScheduledList?.scheduledStatus?.status === "booked"){
+      duplicateinfo?.current?.show({ severity: 'error', summary: 'Error', detail: `Schedule time is matching for test suites scheduled ${getScheduledList?.scheduledStatus?.user}` });
+    }
+  }, [getScheduledList?.scheduledStatus]);
 
   const onScheduleStatus = (getStatus) => {
     dispatch(
@@ -322,7 +330,7 @@ const ScheduleScreen = ({
                     dropdownOptions={endMonths}
                     name="endmonth"
                     placeholder="End After"
-                    required={false}
+                    required={true}
                     customeClass="dropdown_enddate"
                   />
                 </div>
@@ -373,8 +381,7 @@ const ScheduleScreen = ({
             <DataTable
               value={
                 Array.isArray(getScheduledList?.scheduledList) &&
-                getScheduledList?.scheduledList
-                  ?.filter((el) => el?.status !== "recurring")
+                [...getScheduledList?.scheduledList]?.reverse().filter((el) => el?.recurringpattern === "One Time")
                   .map((el) => ({
                     ...el,
                     scheduledon: `${new Date(
@@ -425,8 +432,7 @@ const ScheduleScreen = ({
             <DataTable
               value={
                 Array.isArray(getScheduledList?.scheduledList) &&
-                getScheduledList?.scheduledList
-                  ?.filter((el) => el?.status === "recurring")
+                [...getScheduledList?.scheduledList].reverse().filter((el) => el?.recurringpattern !== "One Time")
                   .map((el) => ({
                     ...el,
                     scheduledon: `${new Date(
@@ -475,6 +481,7 @@ const ScheduleScreen = ({
           </TabPanel>
         </TabView>
       </div>
+      <Toast ref={duplicateinfo} />
       <AvoModal
         visible={exestatus}
         setVisible={setExestatus}

@@ -155,22 +155,22 @@ const CreateProject = (props) => {
   }
 
   const apps = [
-    { name: 'Web', code: 'Web', image: 'static/imgs/web.png' },
+    { name: 'Web', code: 'Web', image: 'static/imgs/Web.svg' },
     { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png' },
-    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/webService.png' },
+    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/WebService.png' },
     { name: 'Mainframe', code: 'Mainframe',image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png' },
     { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png' },
     { name: 'System Application', code: 'System',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
   const appTypes = [
-    { name: 'Web', code: 'Web',value:'5db0022cf87fdec084ae49b6', image: 'static/imgs/web.png' },
+    { name: 'Web', code: 'Web',value:'5db0022cf87fdec084ae49b6', image: 'static/imgs/Web.svg' },
     { name: 'SAP', code: 'SAP', value:'5db0022cf87fdec084ae49b4', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', value:'5db0022cf87fdec084ae49b3', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', value:'5db0022cf87fdec084ae49af', image: 'static/imgs/desktop.png' },
-    { name: 'Web Services', code: 'Webservice',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/webService.png' },
+    { name: 'Web Services', code: 'Webservice',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/WebService.png' },
     { name: 'Mainframe', code: 'Mainframe', value:'5db0022cf87fdec084ae49b0',image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'MobileWeb',value:"5db0022cf87fdec084ae49b2", image: 'static/imgs/mobileWeb.png' },
     { name: 'Mobile Application', code: 'MobileApp',value:'5db0022cf87fdec084ae49b1', image: '/static/imgs/mobileApps.png' },

@@ -1,6 +1,6 @@
 import React,{Fragment, useState,useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as api from '../api.js';
 import domainDetails from '../containers/Jira.js';
 import MappingPage from '../containers/MappingPage';
@@ -13,7 +13,7 @@ import { Paginator } from 'primereact/paginator';
 
 const AzureContent = props => {
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const userRole = useSelector(state=>state.login.SR);
     const mappedPair = useSelector(state=>state.integration.mappedPair);
@@ -78,7 +78,7 @@ const AzureContent = props => {
     //         setMsg(MSG.INTEGRATION.WARN_UNCHECK_SCHEDULE);
     //     else if (releaseData === "Invalid Session"){
     //         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-    //         return RedirectPage(history);
+    //         return RedirectPage(navigate);
     //     }
     //     else if (releaseData === "invalidcredentials")
     //         setMsg(MSG.INTEGRATION.ERR_INVALID_CRED);
@@ -104,7 +104,7 @@ const AzureContent = props => {
             setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
         else if (projectScenario === "Invalid Session"){
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-            return RedirectPage(history);
+            return RedirectPage(navigate);
         }
         else if (projectScenario) {
             setProjectDetails(projectScenario.project_dets);
@@ -292,7 +292,7 @@ const AzureContent = props => {
             setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
         else if (testAndScenarioData === "Invalid Session"){
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-            return RedirectPage(history);
+            return RedirectPage(navigate);
         }
         else if (testAndScenarioData) {
             setProjectDetails(testAndScenarioData.project_dets);
