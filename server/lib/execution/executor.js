@@ -347,10 +347,6 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    if(mySocket == undefined || mySocket.connected == false){
-						mySocket.removeAllListeners('result_executeTestSuite');
-						mySocket.removeAllListeners('return_status_executeTestSuite');
-					}
                     if (status === "success") {
                         if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
                     } else if (status === "skipped") {
@@ -389,10 +385,6 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    if(mySocket == undefined || mySocket.connected == false){
-						mySocket.removeAllListeners('result_executeTestSuite');
-						mySocket.removeAllListeners('return_status_executeTestSuite');
-					}
                         if (!status) { // This block is for report data
                             if ("accessibility_reports" in resultData) {
                                 const accessibility_reports = resultData.accessibility_reports
