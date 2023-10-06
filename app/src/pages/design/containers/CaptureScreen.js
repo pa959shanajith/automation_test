@@ -30,7 +30,7 @@ import {getDeviceSerialNumber_ICE} from "../api";
 import { treemapSquarify } from 'd3';
 import { TabMenu } from 'primereact/tabmenu';
 import WebserviceScrape from './WebServiceCapture';
-
+import EditIrisObject from '../components/EditIrisObject';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -87,6 +87,7 @@ const CaptureModal = (props) => {
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
+  // console.log("elementPropertiesVisible",elementPropertiesVisible)
   const [elementValues, setElementValues] = useState([])
   const [isIdentifierVisible, setIsIdentifierVisible] = useState(false)
   const [regex, setRegex] = useState("")
@@ -112,7 +113,10 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [showEmptyMessage, setShowEmptyMessage] = useState(true);
-  const [deletedItems, setDeletedItems] = useState(false);
+  const [irisObject, setIrisObject] = useState(null);
+  const [scrapeDataForIris,setScrapeDataForIris] = useState();
+  const [cordData, setCordData] = useState({});
+  const [irisScrapedData, setIrisScrapedData] = useState({});
   let addMore = useRef(false);
 
 
@@ -521,6 +525,9 @@ const elementTypeProp =(elementProperty) =>{
             setOverlay("");
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
+            const irisObjectdata = []; for (let i = 0; i < data.view.length; i++) {   if (data.view[i].xpath === "iris") {     irisObjectdata.push('iris');   } else {     irisObjectdata.push('');   } } ;
+           
+
           }
           else if (typeof data === "object" && typesOfAppType === "Webservice") {
             haveItems = data.view[0].endPointURL && data.view[0].method;
@@ -616,6 +623,7 @@ const elementTypeProp =(elementProperty) =>{
           reject("fail")
         })
     });
+   
   }
   const onDelete = (e, confirmed) => {
     if (mainScrapedData.reuse && !confirmed) {
@@ -906,6 +914,7 @@ else{
           else updatedNewScrapeData = viewString;
 
           setNewScrapedData(updatedNewScrapeData);
+          setIrisScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
 
           if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
@@ -1025,14 +1034,29 @@ else{
 
 
   const renderActionsCell = (rowData) => {
+    setScrapeDataForIris(rowData)
+   let scrapeType = rowData.objectDetails.xpath.split(';')
+  //  setIrisObject(scrapeType[0]);
     return (
       <div >
-        <Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />
-        {NameOfAppType.appType=="Web" && <img src="static/imgs/ic-edit.png"
-
-          style={{ height: "20px", width: "20px" }}
-          className="edit__icon" onClick={() => openElementProperties(rowData)} />
-    }
+        
+        
+        {!saveDisable?
+        <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." />:<Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
+        {  (scrapeType[0] === "iris" || typesOfAppType==="Web")  && 
+        <button
+        disabled={!saveDisable}
+        onClick={() => {openElementProperties(rowData);}}
+      >
+        <img
+          src="static/imgs/ic-edit.png"
+          alt="Edit Icon"
+          style={{ height: "20px", width: "20px", opacity: !saveDisable? 0.6 : 1}}
+          className="edit__icon"
+        />
+      </button>
+      
+        }
         <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
         <img
 
@@ -1445,6 +1469,8 @@ const footerSave = (
   const openElementProperties = (rowdata) => {
     console.log(rowdata)
     let element = rowdata.objectDetails.xpath.split(';')
+    setIrisObject(element[0])
+    if(typesOfAppType==="Web" && element[0] !== 'iris' ){
     let dataValue = []
     let elementFinalProperties = {
       xpath: (element[0] === "null" || element[0] === "" || element[0] === "undefined") ? 'None' : element[0],
@@ -1464,8 +1490,38 @@ const footerSave = (
     )
     dataValue.sort((a, b) => a.id - b.id)
     setElementValues(dataValue)
+    // if(irisObject !== "iris"){
     setElementProperties(true)
+  // }
+
   }
+  if(element[0]=="iris"){
+    const data = {
+      appType: typesOfAppType,
+      fetchingDetails: props.fetchingDetails,
+      setIdentifierList: setIdentifierList
+    };
+    
+    let modalObject = {};
+    
+    modalObject = {
+      operation: "editIrisObject",
+      objectDetails: rowdata.objectDetails,
+      modifyScrapeItem: (data, newProperties, customFlag) =>
+        modifyScrapeItem(data, newProperties, customFlag),
+      cord: (rowdata.objectDetails.objId? mainScrapedData.view : irisScrapedData?.view)[rowdata.objectDetails.objIdx].cord
+    };
+    
+    console.log("Before calling scrapeDataForIris, modalObject:", modalObject);
+    setCordData(modalObject)
+    setScrapeDataForIris(modalObject);
+    
+  }
+
+  
+  
+  setElementProperties(true)
+}
   const Header = () => {
     return (
       <div>Element Identifier Order<span style={{ color: 'red' }}>*</span></div>
@@ -1630,6 +1686,41 @@ const headerstyle={
  textAlign: "center !important",
 }
 
+
+  
+
+const modifyScrapeItem = (value, newProperties, customFlag) => {
+  let localScrapeItems = [...capturedDataToSave];
+  let updNewScrapedData = {...newScrapedCapturedData};
+  let objId = "";
+  let isCustom = false;
+  let obj = null;
+  for (let scrapeItem of localScrapeItems){
+      if (scrapeItem.val === value) {
+          scrapeItem.title = newProperties.custname;
+          if (customFlag) {
+              scrapeItem.tag = newProperties.tag;
+              scrapeItem.url = newProperties.url;
+              scrapeItem.xpath = newProperties.xpath;
+              scrapeItem.editable = true;
+          }
+          objId = scrapeItem.objId;
+          isCustom = scrapeItem.isCustom; 
+          if (objId) obj = {...mainScrapedData.view[scrapeItem.objIdx], ...newProperties};
+          else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = {...newScrapedCapturedData.view[scrapeItem.objIdx], ...newProperties}
+          // else only if customFlag is true
+      };
+  }
+  
+  if (objId) {
+      let modifiedDict = {...modified}
+      modifiedDict[objId] = obj;
+     setModified(modifiedDict);
+  }
+  else if (!isCustom) setNewScrapedCapturedData(updNewScrapedData);
+  if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
+  setCapturedDataToSave(localScrapeItems);
+}
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -1980,18 +2071,22 @@ const headerstyle={
       />}
       {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
       {/* //Element properties  */}
-
-      <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => {setElementProperties(false);setSelectedCapturedElement([])}} footer={footerContent}>
-        <div className="card">
-        <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
-            <Column rowReorder style={{ width: '3rem' }} />
-            <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
-            {/* <column ></column> */}
-            <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-            <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
-        </DataTable>
-        </div>
-      </Dialog>
+      {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData}  toastSuccess={toastSuccess}
+        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} />
+        :
+        <>
+        {typesOfAppType ==="Web"?
+        <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
+          <div className="card">
+            <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
+              <Column rowReorder style={{ width: '3rem' }} />
+              <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
+              {/* <column ></column> */}
+              <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
+            </DataTable>
+          </div>
+        </Dialog>: null }</>}
       {/* Element reorder */}
       <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => setShowIdentifierOrder(false)} footer={footerContentIdentifier} >
         <div className="card" >
@@ -2391,6 +2486,7 @@ const LaunchApplication = props => {
 
     const handleSerialNumber = () => {
       setOS("android")
+      console.log("handleSerial")
         setError(false);
         getDeviceSerialNumber_ICE().then(data => {
             if(data) {}
@@ -2403,16 +2499,45 @@ const LaunchApplication = props => {
 
     const MobileApps = {
         'content':<div className={os==="ios"?'inputIos':'inputContent'}>
-            <div className="flex flex-wrap gap-3" >
-            <div className="flex align-items-center">
-              <RadioButton className="ss__dsktp_method_rad" data-test="chooseAndriod" type="radio" name="method" value="A" onChange={(e)=>{handleSerialNumber();} } />
-              <label htmlFor="ingredient1" className="ml-2">Android</label>
-            </div>
-            <div className="flex align-items-center">
-              <RadioButton data-test="chooseAndriod" className="ss__dsktp_method_rad" type="radio" name="method" value="B" onChange={()=>{setOS("ios"); setError(false);setCheckedForMobApp(true)}}   />
-              <label htmlFor="ingredient2" className="ml-2">iOS</label>
-            </div>
-          </div>
+           <div className="flex flex-wrap gap-3">
+  <div className="flex align-items-center">
+    <RadioButton
+      className="ss__dsktp_method_rad"
+      data-test="chooseAndriod"
+      type="radio"
+      name="method"
+      value="A"
+      onChange={
+        handleSerialNumber
+      }
+      checked={os === 'android'} 
+      // defaultChecked={true} // Set this to true for default selection
+      
+    />
+    <label htmlFor="ingredient1" className="ml-2">
+      Android
+    </label>
+  </div>
+  <div className="flex align-items-center">
+    <RadioButton
+      data-test="chooseAndriod"
+      className="ss__dsktp_method_rad"
+      type="radio"
+      name="method"
+      value="B"
+      onChange={() => {
+        setOS("ios");
+        setError(false);
+        setCheckedForMobApp(true);
+      }}
+      checked={os === 'ios'}
+    />
+    <label htmlFor="ingredient2" className="ml-2">
+      iOS
+    </label>
+  </div>
+</div>
+
           {os === "android" &&
             <div className='AndroidContent'>
                 <InputText data-test="andriodAppPath" placeholder="Enter Application Path" value={appPath} onChange={appPathHandler} name="appPath_a" />
