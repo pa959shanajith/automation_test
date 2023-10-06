@@ -147,6 +147,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
+  const [checkedExecution, setCheckedExecution] = useState(false);
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
@@ -872,7 +873,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         emailNotificationSender: "avoassure-alerts@avoautomation.com",
         emailNotificationReciever: emailNotificationReciever,
         isNotifyOnExecutionCompletion: isNotifyOnExecutionCompletion,
-        isEmailNotificationEnabled: isEmailNotificationEnabled
+        isEmailNotificationEnabled: isEmailNotificationEnabled,
+        execType: checkedExecution
       };
 
       const dataObj = {
@@ -1834,6 +1836,8 @@ Learn More '/>
               onHide={onHide}
               onClick={onClick}
               typeOfExecution={typeOfExecution}
+              checkedExecution={checkedExecution}
+              setCheckedExecution={setCheckedExecution}
             />
           }
           headerTxt="Execution Configuration set up"
