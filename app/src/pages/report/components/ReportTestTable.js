@@ -651,9 +651,9 @@ export default function BasicDemo() {
 
   const reoptDescriptionTooltip = (rowdata) => {
     return <span
-      title={rowdata.StepDescription}
+      title={rowdata?.data?.StepDescription}
     >
-      {rowdata.StepDescription}
+      {rowdata?.data?.StepDescription}
     </span>;
   };
 
@@ -892,7 +892,8 @@ export default function BasicDemo() {
                 onMultiSelectChange={(e) => setConfigureFeilds(e.value)}
                 multiSelectOptions={selectedFiels}
                 name="configureFeilds"
-                placeholder="Configure Fields"
+                labelTxt="Configure Fields"
+                placeholder="Select configure fields"
                 required={false}
               />
             </div>
