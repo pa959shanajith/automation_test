@@ -1467,7 +1467,6 @@ const footerSave = (
     setElementValues(e.value)
   }
   const openElementProperties = (rowdata) => {
-    console.log(rowdata)
     let element = rowdata?.objectDetails?.xpath?.split(';')
     if(element==undefined) return;
     setIrisObject(element[0])
