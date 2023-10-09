@@ -16,6 +16,7 @@
 
 .dt__table_ac_btn_grp{
     display: inherit;
+    padding-top: 1rem;
 }
 
 .dt__tblBtn{
@@ -85,6 +86,8 @@
     z-index: 1;
     height: 60%;
     width: 50%;
+    bottom: 1rem;
+    right: 1rem;
 
     input{
         position: absolute;
@@ -126,6 +129,8 @@
     height: 50px;
     display: flex;
     align-items: center;
+    padding-left: 1rem;
+    padding-top: 1rem;
 }
 
 .dt__tableName{

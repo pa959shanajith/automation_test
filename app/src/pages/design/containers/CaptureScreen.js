@@ -2439,7 +2439,7 @@ const LaunchApplication = props => {
 
     // Mobile App
 
-    const [os, setOS] = useState("android");
+    const [os, setOS] = useState(" ");
     const [checkedForMobApp,setCheckedForMobApp]=useState(false)
 
     const [appPath, setAppPath] = useState("");

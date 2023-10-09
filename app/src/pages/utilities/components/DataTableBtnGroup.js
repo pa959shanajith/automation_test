@@ -451,16 +451,14 @@ const SearchDataTable = props => {
          <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
         {/* <div>Enter Table Name:</div> */}
         <ClickAwayListener onClickAway={()=>setDropdown(false)}>
-        <div className="dt__selectTable">Select Data Table:
+        <div className="dt__selectTable pb-5">Select Data Table:
         <div className="dt__searchDataTable">
             <input ref={searchRef} type='text' autoComplete="off" className="btn-users edit-user-dropdown-edit" onChange={inputFilter} onClick={resetField} placeholder="Search Data Table..."/>
             <div className="dt__form_dropdown" role="menu" style={{display: (dropdown?"block":"none")}}>
-                <ScrollBar thumbColor="#929397" >
                 {(filteredList.length ? filteredList : list)
                     .map((e, i) => (  
                         <option key={e._id} value={e.name} onClick={onTableSelect}>{e.name}</option> 
                     ))}
-                </ScrollBar>
             </div>
         </div>
         </div>

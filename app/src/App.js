@@ -10,8 +10,8 @@ import TagManager from 'react-gtm-module';
 import Report from './pages/report/components/reports';
 import More from './pages/more/more';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
-import Integration from './pages/integration/Integration';
-import Settings from './pages/settings/Settings';
+// import Integration from './pages/integration/Integration';
+// import Settings from './pages/settings/Settings';
 import Utility from './pages/utilities/containers/UtilityHome'
 import { ErrorPage } from './pages/global';
 import Login from './pages/login/containers/LoginPage';

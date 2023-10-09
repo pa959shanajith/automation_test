@@ -20,7 +20,7 @@ const Encrypt = (props) => {
                     Encryption
                 </span>
             </div>
-            <div>
+            <div className='method_dropdown'>
                 {/* <select data-test="utility_screen_selection_sel" 
                 value={props.encyptMethod ? props.encyptMethod : 'SelectMethod'} 
                 onChange={(e)=>props.onDropChange(e)} 

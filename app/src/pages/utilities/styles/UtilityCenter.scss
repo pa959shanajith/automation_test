@@ -1,13 +1,13 @@
 @import "../../global/styles/ColorVariables.scss";
 .UtlmiddleContent{
-    display: flex;
-    flex-direction: column;
-    flex: 0 1 100%;
-    min-width: 0;
-    padding: 20px;
-    margin: 0 5px;
-    position: relative;
-    left: 18rem;
+    // display: flex;
+    // flex-direction: column;
+    // flex: 0 1 100%;
+    // min-width: 0;
+    // padding: 20px;
+    // margin: 0 5px;
+    // position: relative;
+    // left: 18rem;
     // background-color: $whiteColor;
 
 }
@@ -19,17 +19,17 @@
     scrollbar-width: none;  /* Firefox */
   }
 
-.page-taskName{
-    float: left;
-    width: 100%;
-    margin-bottom: 10px;
-}
+// .page-taskName{
+//     float: left;
+//     width: 100%;
+//     margin-bottom: 10px;
+// }
 
 .taskname{
     display: inline-block;
     // background: $primaryColorDarkest;
     // font-size: 18px;
-    font:$f6_regular;
+    font:$f4_semibold;
     // color: $whiteColor;
     // font-family: $avoSecondaryFont;
     padding: 2px 14px 1px;
@@ -40,16 +40,13 @@
 #dropdown{
     padding: 3px;
     padding-top: 0px;
-    margin-left: 0px;
     height: 24px;
     // border: 1px solid $borderFive !important;
-    margin-bottom: 0;
     width: 23%;
-    margin-right:10px;
     margin-top: 6px;
     border-radius: 5px;
-    margin-bottom: 10px;
     outline: none !important;
+    margin: 6px 10px 9px 10px;
     // color: $primaryText
     
 }
@@ -61,7 +58,7 @@
 #encryption_btns{
     float: right;
     position: relative;
-    right: 20rem;
+    right: 22rem;
     /* top: 8px; */
     display: flex;
     gap: 1rem;
@@ -224,11 +221,12 @@
     
 }
 .middle_holder{
-    height: 100%;
-    width : 100%;
-    position: relative;
     display: flex;
     flex-direction: column;
+    height: 38rem;
+    position: relative;
+    width: 92%;
+    bottom: 10rem;
 }
 // .pairwise_array{
 //     // overflow: scroll;

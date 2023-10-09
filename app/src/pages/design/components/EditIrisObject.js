@@ -110,7 +110,7 @@ const EditIrisObject = props => {
 
     return (
         <div className="ss__ei_container">
-            <Dialog header="IRIS Object Details" footer={footerContent} visible={props.elementPropertiesVisible} onHide={() => props.setElementProperties(false)}
+            <Dialog header="IRIS Object Details" className='irisPopUp' footer={footerContent} visible={props.elementPropertiesVisible} onHide={() => props.setElementProperties(false)}
                 
                 // footer={
                 //     <button data-test="submit" onClick={submitData}>Submit</button>

@@ -10,14 +10,9 @@ const  Utilities=()=>{
     const [screenType , setScreenType] = useState(''); //State for Utility screen type selection on icon click in leftbar
     const [pairwiseClicked , setPairwiseClicked] = useState(false); 
     return(
-        <div className="parent">
-            {/* <Header/> */}
-            <div id="holder">
+                <div>
                 <Leftbar setScreenType={setScreenType} setPairwiseClicked={setPairwiseClicked} />
                 <UtilityCenter pairwiseClicked={pairwiseClicked} setPairwiseClicked={setPairwiseClicked} screenType={screenType} setScreenType={setScreenType}/>
-                {/* <Rightbar /> */}
-            </div>    
-            {/* <div className="utlFooter"><Footer/></div> */}
         </div>
     )
 }
