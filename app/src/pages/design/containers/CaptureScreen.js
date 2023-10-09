@@ -1468,7 +1468,8 @@ const footerSave = (
   }
   const openElementProperties = (rowdata) => {
     console.log(rowdata)
-    let element = rowdata.objectDetails.xpath.split(';')
+    let element = rowdata?.objectDetails?.xpath?.split(';')
+    if(element==undefined) return;
     setIrisObject(element[0])
     if(typesOfAppType==="Web" && element[0] !== 'iris' ){
     let dataValue = []
@@ -2439,7 +2440,7 @@ const LaunchApplication = props => {
 
     // Mobile App
 
-    const [os, setOS] = useState(" ");
+    const [os, setOS] = useState("");
     const [checkedForMobApp,setCheckedForMobApp]=useState(false)
 
     const [appPath, setAppPath] = useState("");

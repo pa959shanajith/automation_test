@@ -893,7 +893,7 @@ export default function BasicDemo() {
                 multiSelectOptions={selectedFiels}
                 name="configureFeilds"
                 labelTxt="Configure Fields"
-                placeholder="Configure Fields"
+                placeholder="Select configure fields"
                 required={false}
               />
             </div>

@@ -49,7 +49,7 @@ const SideNav = () => {
         {
             path: "/utility",
             name: "Utilities",
-            icon: <img src={tabSelected==="/utility" ? "static/imgs/settings_icon_selected.svg" : "static/imgs/settings_icon.svg"} className="icon" data-pr-tooltip=" Manage/Create users, agents and other advanced configurations"  data-pr-position="right" height="25px"/>,
+            icon: <img src={tabSelected==="/utility" ? "static/imgs/Reports tab.svg" : "static/imgs/Reports tab.svg"} className="icon" data-pr-tooltip=" Manage/Create users, agents and other advanced configurations"  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         {
