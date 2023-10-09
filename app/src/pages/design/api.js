@@ -1566,3 +1566,23 @@ export const getAvailablePlugins = async() => {
         return {error:MSG.ADMIN.ERR_FETCH_PLUGINS}
     }
 }
+
+export const updateIrisDataset = data => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/updateIrisDataset", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                data : data
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}

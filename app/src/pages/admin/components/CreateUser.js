@@ -347,9 +347,10 @@ const CreateUser = (props) => {
             setUserRolesAddClass("selectErrorBorder");
             flag = false;
         }
-        if (userName === "" || firstname === "" || lastname === "" || passWord === "" || confirmPassword === "" || email === "" || role === "") {
-            toastWarn(MSG.ADMIN.WARN_REQUIRED_FIELD);
-            // flag = false;
+        if (userName === "" || firstname === "" || lastname === "" || email === "" || role === "") {
+            if(!editUser){
+                toastWarn(MSG.ADMIN.WARN_REQUIRED_FIELD);            
+            }
         }
         return flag;
     };
@@ -627,7 +628,7 @@ const CreateUser = (props) => {
                                         <InputText
                                             data-test="password"
                                             value={passWord}
-                                            className={passwordAddClass ? 'w-full md:w-20rem p-inputtext-sm inputErrorBorder' : 'w-full md:w-20rem p-inputtext-sm'}
+                                            className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
                                             onChange={(event) => { passwordChange(event.target.value) }}
                                             type="password"
                                             autoComplete="new-password"
@@ -642,7 +643,7 @@ const CreateUser = (props) => {
                                         <InputText
                                             data-test="confirmPassword"
                                             value={confirmPassword}
-                                            className={confirmPasswordAddClass ? 'w-full md:w-20rem p-inputtext-sm inputErrorBorder' : 'w-full md:w-20rem p-inputtext-sm'}
+                                            className={`w-full md:w-20rem p-inputtext-sm ${confirmPasswordAddClass ? 'inputErrorBorder' : ''}`}
                                             onChange={(event) => { confirmPasswordChange(event.target.value) }}
                                             type="password"
                                             autoComplete="new-password"
@@ -668,7 +669,7 @@ const CreateUser = (props) => {
                                     value={roleDropdownValue}
                                     options={allRolesUpdate}
                                     optionLabel="name"
-                                    className= {userRolesAddClass ? 'w-full md:w-20rem inputErrorBorder' : 'w-full md:w-20rem'}
+                                    className= {`w-full md:w-20rem ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
                                 />

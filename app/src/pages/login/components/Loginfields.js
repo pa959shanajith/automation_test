@@ -43,6 +43,7 @@ const Login = (props) => {
     const forgotPasswordLinkHandler = () => {
         setShowForgotPasswordScreen(true);
         setShowloginScreen(false);
+        setEmail('');
     }
     const singleSignOnHandler = () => {
         setSingleSignOnScreen(true);
@@ -52,6 +53,8 @@ const Login = (props) => {
         setShowloginScreen(true);
         setSingleSignOnScreen(false);
         setShowForgotPasswordScreen(false);
+        setUsername('');
+        setPassword('');
     }
     const handleUsername = event => {
         setUsername(event.target.value);
@@ -60,7 +63,6 @@ const Login = (props) => {
         setPassword(event.target.value);
     }
     const emailHandler = event => {
-        console.log(event);
         setEmail(event.target.value.trim());
     }
 

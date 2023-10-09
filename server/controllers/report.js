@@ -1107,10 +1107,13 @@ exports.fetchExecProfileStatus = async (req, res) => {
     logger.info("Inside UI service: " + fnName);
     try {            
             inputs = {
-                "query":"fetchExecProfileStatus",
-                'configurekey': req.body.configurekey,                   
-            
-        }
+              query: "fetchExecProfileStatus",
+            };
+            if (req.body.configurekey) {
+              inputs.configurekey = req.body.configurekey;
+            } else if (req.body.testsuiteid) {
+              inputs.testsuiteid = req.body.testsuiteid;
+            }
         const executionData = await utils.fetchData(inputs, "reports/fetchExecProfileStatus", fnName);
         if (executionData == "fail"){
             return res.send("fail");
@@ -1422,5 +1425,41 @@ exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
 	} catch (exception) {
 		logger.error("Error occurred in report/"+fnName+":", exception);
 		res.send("fail");
+    }
+};
+
+exports.reportStatusScenarios_ICE = async (req, res) => {
+    const fnName = "reportStatusScenarios_ICE";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        var executionid = req.query.executionId;
+        var report = [];
+        let inputs = {
+            "query": "executiondetails",
+            "executionid": executionid,
+        };
+        const result = await utils.fetchData(inputs, "reports/reportStatusScenarios_ICE", fnName);
+        if (result == "fail") return res.send("fail");
+        for (let entry of result) {
+            let executedtimeTemp = new Date(entry.executedtime);
+            if (executedtimeTemp !== null && executedtimeTemp != "Invalid Date") {
+                executedtimeTemp = ("0" + executedtimeTemp.getUTCDate()).slice(-2) + "-" + ("0" + (executedtimeTemp.getUTCMonth() + 1)).slice(-2) + "-" + (executedtimeTemp.getUTCFullYear()) + " " + ("0" + executedtimeTemp.getUTCHours()).slice(-2) + ":" + ("0" + executedtimeTemp.getUTCMinutes()).slice(-2) + ":" + ("0" + executedtimeTemp.getUTCSeconds()).slice(-2);
+                // executedtimeTemp = executedtimeTemp.getUTCDate() + "-" + executedtimeTemp.getUTCMonth() + "-" + executedtimeTemp.getUTCFullYear() + " " + executedtimeTemp.getUTCHours() + ":" + executedtimeTemp.getUTCMinutes() + ":" + executedtimeTemp.getUTCSeconds();
+            }
+            report.push({
+                executedtime: executedtimeTemp,
+                browser: entry.executedon,
+                status: entry.status,
+                reportid: entry._id,
+                testscenarioid: entry.testscenarioid,
+                testscenarioname: entry.testscenarioname
+            });
+        }
+        if (report.length > 0) report.sort((a, b) => a.executedtime - b.executedtime);
+        logger.info("Sending scenario status details from reportStatusScenarios_ICE");
+        return res.send(JSON.stringify(report));
+    } catch (exception) {
+        logger.error("Exception in the service reportStatusScenarios_ICE: %s", exception);
+        res.send("fail");
     }
 };
