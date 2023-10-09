@@ -377,7 +377,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
 				else if(saveUnsync == "success"){
                     callViewMappedFiles()
-                    setToast("success", "Success", 'Unsynced');
+                    setToast("success", "Success", 'Mapped data unsynced successfully');
                 }
 
             }
@@ -389,6 +389,51 @@ const ManageIntegrations = ({ visible, onHide }) => {
             setCompleteTreeData(unsyncMap);
             dispatchAction(mappedTree(unsyncMap));
             dispatchAction(mappedPair(unsyncMappedData));
+        }
+    }
+
+
+    const handleUnSyncmappedData = async (items) =>{
+        let unSyncObj = [];
+        if (Object.keys(items).length) {
+            // let findUnsyncedObj = mappedData.filter((item) =>  item.scenarioId[0] === node.key);
+            // const scenriodId = item.find((row) => row.scenarioId);
+            let findMappedId = viewMappedFiles.filter((item) => item.testscenarioid === items.scenarioId);
+            if (findMappedId && findMappedId.length) {
+                unSyncObj.push({
+                    'mapid': findMappedId[0]._id,
+                    'testCaseNames': [].concat(findMappedId[0].itemCode),
+                    'testid': [].concat(findMappedId[0].itemId),
+                    'testSummary': [].concat(null)
+                })
+                let args = Object.values(unSyncObj);
+                args['screenType'] = selectedscreen.name;
+                const saveUnsync = await api.saveUnsyncDetails(args);
+                if (saveUnsync.error)
+                    setToast("error", "Error", 'Failed to Unsync'); 
+				else if(saveUnsync === "unavailableLocalServer")
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+				else if(saveUnsync === "scheduleModeOn")
+                    setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+				else if(saveUnsync === "fail")
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
+				else if(saveUnsync == "success"){
+                    // callViewMappedFiles()
+                    setToast("success", "Success", 'Mapped data unsynced successfully');
+                }
+
+            }
+
+            let unsyncMap = completeTreeData.map((item) => item.key == items.scenarioId ? { ...item, checked: false, children: [] } : item);
+            let unsyncMappedData = mappedData.filter((item) => item.scenarioId[0] !== items.scenarioId);
+            let filteredRows=rows.filter(element=>element.mapId!==items.mapId)
+            setTreeData(unsyncMap.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
+            // setTreeData(unsyncMap);
+            setCompleteTreeData(unsyncMap);
+            dispatchAction(mappedTree(unsyncMap));
+            dispatchAction(mappedPair(unsyncMappedData));
+            setRows(filteredRows)
+
         }
     }
 
@@ -855,7 +900,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                     {checked ? (<div className="accordion_testcase">
                                                         <Accordion multiple activeIndex={0} >
                                                             {rows.map((item) => (
-                                                                <AccordionTab header={item.scenarioNames[0]}>
+                                                                <AccordionTab header={<span>{item.scenarioNames[0]} <i className="pi pi-times cross_icon" onClick={() => handleUnSyncmappedData(item)}/></span>}>
                                                                     <span>{item.itemSummary}</span>
                                                                 </AccordionTab>))}
                                                         </Accordion>
@@ -866,7 +911,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                         <div className="accordion_testcase">
                                                             <Accordion multiple activeIndex={0}>
                                                                 {rows.map((item) => (
-                                                                    <AccordionTab header={item.itemSummary}>
+                                                                    <AccordionTab header={<span>{item.itemSummary} <i className="pi pi-times cross_icon" onClick={() => handleUnSyncmappedData(item)}/></span>}>
                                                                         <span>{item.scenarioNames[0]}</span>
                                                                     </AccordionTab>))}
                                                             </Accordion>

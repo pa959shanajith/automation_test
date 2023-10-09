@@ -71,6 +71,12 @@ height: 2.5rem !important;
 
 }
 
+.cross_icon{
+    position: absolute;
+    right: 2rem;
+    cursor: pointer;
+}
+
 .scenario_label{
     font: $f6_regular !important;
 }

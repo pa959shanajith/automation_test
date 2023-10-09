@@ -1285,7 +1285,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                         <Accordion multiple activeIndex={0}>
                                             {rows.map((item, rowIndex) => (
                                                 item.scenarioNames.map((scenarioName, scenarioIndex) => (
-                                                    <AccordionTab key={`${item.scenarioNames.join()}_${scenarioIndex}`} header={scenarioName}>
+                                                    <AccordionTab key={`${item.scenarioNames.join()}_${scenarioIndex}`} header={<span>{scenarioName} <i className="pi pi-times cross_icon"/></span>}>
                                                         <div>
                                                             {item.testCaseNames.map((testCaseName, index) => (
                                                                 <div key={index}>{testCaseName}</div>
@@ -1303,7 +1303,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                                 <Accordion multiple activeIndex={0}>
                                                     {rows.map((item) => (
                                                         item.testCaseNames.map((testCaseName, index) => (
-                                                            <AccordionTab key={`${item.testCaseNames.join()}_${index}`} header={testCaseName}>
+                                                            <AccordionTab key={`${item.testCaseNames.join()}_${index}`} header={<span>{testCaseName} <i className="pi pi-times cross_icon"/></span>}>
                                                                 <div>
                                                                     {item.scenarioNames.map((scenarioName, scenarioIndex) => (
                                                                         <div key={scenarioIndex}>{scenarioName}</div>
