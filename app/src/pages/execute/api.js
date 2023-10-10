@@ -586,7 +586,7 @@ export const getDetails_SAUCELABS = async() => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){
             return res.data;
@@ -612,7 +612,7 @@ export const saveSauceLabData = async(props) => {
         if(res.status===200 && res.data !== "fail"){
             return res.data;
         }else if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
@@ -636,7 +636,7 @@ export const saveAppActivityData = async(props) => {
         if(res.status===200 && res.data !== "fail"){
             return res.data;
         }else if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
+            RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}

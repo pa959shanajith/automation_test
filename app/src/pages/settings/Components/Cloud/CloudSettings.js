@@ -9,7 +9,7 @@ import SaucelabsDeleteModal from "./SaucelabsDeleteModal";
 import {Messages as MSG, setMsg} from '../../global';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
 import { Toast } from "primereact/toast";
-import { saveSauceLabData } from '../../execute/api';
+import { saveSauceLabData } from '../../../execute/api';
 
 
 

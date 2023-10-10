@@ -19,10 +19,8 @@ import {readTestSuite_ICE} from '../api'
 import { Dropdown } from 'primereact/dropdown'; 
 import {saveSauceLabData} from '../api';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
-import { saveBrowserstackData } from "../api";
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
-import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack";
 import {
   fetchConfigureList,
   getPools,
@@ -81,6 +79,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [modules, setModules] = useState("normalExecution");
+  const [changeLable, setChangeLable] = useState(false);
   const [dotNotExe, setDotNotExe] = useState({});
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
@@ -637,40 +636,40 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     
 }
 
-const handleBrowserstackSubmit = async (BrowserstackPayload) => {
-  // close the existing dialog
-  setDisplayBasic6(false);
-  // open the new dialog
-  setLoading('Fetching details...') 
-  BrowserstackPayload['action'] = (showBrowserstack?"mobileWebDetails":"webDetails")
-  let resultData = await saveBrowserstackData({
-      BrowserstackPayload
+// const handleBrowserstackSubmit = async (BrowserstackPayload) => {
+//   // close the existing dialog
+//   setDisplayBasic6(false);
+//   // open the new dialog
+//   setLoading('Fetching details...') 
+//   BrowserstackPayload['action'] = (showBrowserstack?"mobileWebDetails":"webDetails")
+//   let resultData = await saveBrowserstackData({
+//       BrowserstackPayload
           
-  })
-  if(resultData && resultData.os_names && resultData.browser){
-      setLoading(false);
-      setDisplayBasic7(true);
+//   })
+//   if(resultData && resultData.os_names && resultData.browser){
+//       setLoading(false);
+//       setDisplayBasic7(true);
 
-      // const arrayOS = Object.entries(resultData.os).map(([key, value], index) => {
-      //     return {
-      //       key: key,
-      //       text: key,
-      //       title: key,
-      //       index: index
-      //     };
-      //   });
-      //   setOs(arrayOS);
-        setBrowserstackBrowserDetails(resultData);
-  }
-else{
-  setLoading(false);
-  if (resultData == "unavailableLocalServer"){
-      setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-  }else{
-      setMsg({"CONTENT":"Error while fetching the data from Browserstack", "VARIANT": VARIANT.ERROR})
-  }
-}
-};
+//       // const arrayOS = Object.entries(resultData.os).map(([key, value], index) => {
+//       //     return {
+//       //       key: key,
+//       //       text: key,
+//       //       title: key,
+//       //       index: index
+//       //     };
+//       //   });
+//       //   setOs(arrayOS);
+//         setBrowserstackBrowserDetails(resultData);
+//   }
+// else{
+//   setLoading(false);
+//   if (resultData == "unavailableLocalServer"){
+//       setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+//   }else{
+//       setMsg({"CONTENT":"Error while fetching the data from Browserstack", "VARIANT": VARIANT.ERROR})
+//   }
+// }
+// };
 
 const handleSubmit1 = async (SauceLabPayload) => {
   // close the existing dialog
@@ -1049,6 +1048,11 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >  
               CI/CD
             </Button>
+
+            <div className="cloud-test-provider" >
+  <Dropdown 
+  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}/>
+  </div> 
           
           </div>
         ),
@@ -1083,10 +1087,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
   }, [configProjectId]);
 
-  <div className="cloud-test-provider" >
-  <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}/>
-  </div> 
   
 
 
