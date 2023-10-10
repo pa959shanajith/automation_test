@@ -89,6 +89,7 @@ const DesignModal = (props) => {
     const [groupList,setGroupList] = useState([])
     const [rowChange, setRowChange] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
+    const [disableActionBar, setDisableActionBar ] = useState(false);
     let runClickAway = true;
     
 
@@ -306,9 +307,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
 
                     if (data.del_flag) {
                         deleteObjectFlag = true; // Flag for DeletedObjects Popup
-                        // props.setDisableActionBar(true); //disable left-top-section
+                        setDisableActionBar(true); //disable left-top-section
                     }
-                    // else props.setDisableActionBar(false); //enable left-top-section
+                    else setDisableActionBar(false); //enable left-top-section
 
                     // setHideSubmit(data.testcase.length === 0);
                     setReusedTC(data.reuse);
@@ -371,7 +372,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     let testcaseArray = [];
                                     if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
                                         testcaseArray.push(emptyRowData);
-                                        // props.setDisableActionBar(true);
+                                        setDisableActionBar(true);
                                         setOverlay("");
                                     } else {
                                         let testcase = data.testcase;
@@ -961,7 +962,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}}  onClick={()=>exportTestCase()} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():""} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
