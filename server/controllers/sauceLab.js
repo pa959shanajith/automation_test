@@ -46,23 +46,23 @@ exports.saveSauceLabData = function (req, res) {
 						"SauceLabUploadApk": check_SauceLabUploadApk
 					};
 					logger.info("Sending socket request for SauceLablogin to redis");
-					dataToIce = {"emitAction" : "SauceLablogin","username" : icename, "responsedata":SauceLabDetails};
-					mySocket.emit(dataToIce["emitAction"], dataToIce.data);
+					dataToIce = {"emitAction" : "saucelablogin","username" : icename, "responsedata":SauceLabDetails};
+					mySocket.emit(dataToIce["emitAction"], dataToIce.responsedata);
 					function SauceLablogin_listener(message) {
 						var data = message;
 							mySocket.removeListener('sauceconfresponse',SauceLablogin_listener);
-							if (data.onAction == "sauceconfresponse" && dataToIce.responsedata.action == "sauceMobileUploadDetails" && "name" in data.value && "activity" in data.value) {
+							if (dataToIce.responsedata.action == "sauceMobileUploadDetails" && "name" in data && "activity" in data) {
 								const fName = "saveAppActivityData"
 								const input = {
-									"name": data.value.name,
-									"activity": data.value.activity
+									"name": data.name,
+									"activity": data.activity
 								}
 								const result = utils.fetchData (input, "qualityCenter/saveAppActivityData", fName)							
-								data = data.value;
+								// data = data;
 								res.send(data);
 							}
-							else if (data.onAction == "sauceconfresponse") {
-								data = data.value;
+							else  {
+								// data = data.value;
 								res.send(data);
 							} 										
 					}

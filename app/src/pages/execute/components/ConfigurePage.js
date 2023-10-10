@@ -733,25 +733,6 @@ const handleSubmit1 = async (SauceLabPayload) => {
     }
   }
 
-   const sauceLabLogin = useMemo(() =>
-        <SauceLabLogin
-            setLoading={setLoading}
-            displayBasic4={displayBasic4}
-            onHidedia={onHidedia}
-            handleSubmit1={handleSubmit1}
-            setSauceLabUser={setSauceLabUser}
-            onModalBtnClick={onHidedia}
-        />,
-        [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
-
-        const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
-        displayBasic5={displayBasic5} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
-        changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-            onModalBtnClick={onHidedia}
-            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
-    />,
-        [mobileDetails, browserDetails, displayBasic5, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-            availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
 
            
 
@@ -844,6 +825,27 @@ const handleSubmit1 = async (SauceLabPayload) => {
     ExecuteTestSuite(executionData);
   };
 
+  const sauceLabLogin = useMemo(() =>
+  <SauceLabLogin
+      setLoading={setLoading}
+      displayBasic4={displayBasic4}
+      onHidedia={onHidedia}
+      handleSubmit1={handleSubmit1}
+      setSauceLabUser={setSauceLabUser}
+      onModalBtnClick={onHidedia}
+  />,
+  [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
+
+  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
+  displayBasic5={displayBasic5} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
+  changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+      onModalBtnClick={onHidedia}
+      availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
+/>,
+  [mobileDetails, browserDetails, displayBasic5, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+
+
   const ExecuteTestSuite = async (executionData, btnType) => {
     if (executionData === undefined) executionData = dataExecution;
     if(executionData["executionEnv"] != 'saucelabs' && executionData["executionEnv"] != 'browserstack') {
@@ -856,7 +858,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     // setLoading("Sending Execution Request");
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
-    executionData["executionEnv"] = execEnv;
+    // executionData["executionEnv"] = execEnv;
     executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
@@ -1793,6 +1795,38 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               header={<span className="actions-header">Actions</span>}
             />
           </DataTable>
+          <AvoModal
+          visible={visible_saucelab}
+          onhide={visible_saucelab}
+          content={
+          <>
+          <div className="SauceLab" >
+          <Dropdown
+          filter
+          />
+          </div>
+          <Dropdown
+          filter
+          />
+          <Dropdown
+          filter
+          />
+          <Button
+              className="execute_now"
+            
+              size="small"
+              
+            >
+                  
+              Execute Now
+            </Button>
+
+          
+          </>
+          }
+          >
+
+          </AvoModal>
           <AvoModal
             visible={visible_execute}
             setVisible={setVisible_execute}
