@@ -509,8 +509,10 @@ const Messages={
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
         ERR_SAUCELABS_FETCH: {"CONTENT": "Failed to fetch Saucelabs details.", "VARIANT": VARIANT.ERROR},
         ERR_ADD_FETCH:{"CONTENT": "Failed to fetch Azure DevOps details","VARIANT":VARIANT.ERROR},
+        ERR_UPLOAD_APK:{"CONTENT": "Failed to Upload apk","VARIANT":VARIANT.ERROR},
         
         SUCC_INFO_UPDATED: {"CONTENT": "User Information updated successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_UPLOAD_APK: {"CONTENT": "Uploaded apk successfully!", "VARIANT": VARIANT.SUCCESS},
     },
 
     LOGIN: {
