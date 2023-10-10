@@ -595,6 +595,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
+        executionData['executionData']['executionThrough'] = req.body.executionThrough || "Pipeline";
         const gettingTestSuiteIds = await suitFunctions.ExecuteTestSuite_ICE({
             'body': executionData,
             'session':executionData.session,
@@ -987,7 +988,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                         reportExecutionData.reportData.push({ suiteDetails: suiteDetailsInfo });
                                     })
                                     if (executionData[0].executionData.isEmailNotificationEnabled === true) {
-                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey });
+                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey, executionThrough: executionData[0].executionData.executionThrough });
                                     }
                                 }
                                 
