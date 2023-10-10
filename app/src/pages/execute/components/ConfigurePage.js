@@ -697,7 +697,8 @@ const handleSubmit1 = async (SauceLabPayload) => {
       setOsNames(arrayOS);
       setBrowserDetails(data);
   }
-  else if (data && data.emulator && data.real_devices && data.stored_files){
+  else if (data && data.emulator && data.real_devices){
+    // else if (data && data.emulator && data.real_devices && data.stored_files){
       // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
       //     return {
       //         key: element,
@@ -966,7 +967,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
   const cloudTestOptions = [
     { name: 'sauceLabs', code: 1 },
-    { name: 'browserstack', code: 2 },
+    // { name: 'browserstack', code: 2 },
   ];
   
   const selectedCountryTemplate = (option, props) => {
