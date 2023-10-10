@@ -220,8 +220,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }, [selectProjects.appType]);
 
   useEffect(() => { 
-    selectProjects?.appType === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false) 
-    selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false) 
+    // selectProjects?.appType === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false) 
+    // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false) 
+    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
     setExecutingOn(selectProjects?.appType==="Web"? "ICE" :"Agent")
     setExecutingOn(selectProjects?.appType==="MobileWeb"? "ICE" :"Agent")
     setExecutingOn(selectProjects?.appType==="MobileApp"? "ICE" :"Agent")
