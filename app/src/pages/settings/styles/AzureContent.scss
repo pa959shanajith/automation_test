@@ -27,6 +27,12 @@
     flex-direction: row;
 }
 
+.cross_icon{
+    position: absolute;
+    right: 2rem;
+    cursor: pointer;
+}
+
 .release_span1 {
     position: relative;
     left: 5.2rem !important;

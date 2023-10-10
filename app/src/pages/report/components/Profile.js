@@ -74,8 +74,8 @@ const Profile = () => {
             key: ind.toString(),
             name: `Execution ${ind + 1}`,
             dateTime: el?.starttime,
-            status: checkStatus(["fail"]),
-            testSuites: ["fail"].reduce(
+            status: checkStatus(el.modstatus),
+            testSuites: el.modstatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
               {}
             ),
