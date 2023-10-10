@@ -697,8 +697,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       setOsNames(arrayOS);
       setBrowserDetails(data);
   }
-  else if (data && data.emulator && data.real_devices){
-    // else if (data && data.emulator && data.real_devices && data.stored_files){
+  else if (data && data.emulator && data.real_devices && data.stored_files){
       // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
       //     return {
       //         key: element,
