@@ -277,6 +277,14 @@ height: 2.5rem !important;
     gap: 1.2rem;
     position: absolute;
 
+    .img__saucelabs{
+        height: 2rem;
+        width: 38px;
+        cursor: pointer;
+        left: 1rem;
+        position: relative;
+    }
+
 
     .img__jira {
         height: 2rem;
@@ -474,4 +482,104 @@ height: 2.5rem !important;
     .p-paginator-last {
         display: none !important;
     }
+}
+
+
+.saucelabs-action{
+    left: 23rem;
+}
+
+.saucelabs-delete{
+    left: 24rem;
+}
+
+.Browserstack_input_URL{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -2.5rem;
+    position: relative;
+    
+}
+.Borwserstack_input_Accesskey{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -4rem;
+    position: relative;
+}
+#Browserstack_dialog{
+    // max-height: 95% !important;
+    width: 39rem !important;
+    height: 20rem;
+}
+#Browserstack-form{
+    .input-label .left-opt {
+        display: inline-block;
+        width: 125%;
+        margin-left: 27px;
+    }
+}
+
+#Browserstack_submit{
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    vertical-align: bottom;
+    text-align: center;
+    left: 30rem;
+    background-color: #633693;
+    border-radius: 20px;
+    outline: auto;
+    width: 6rem;
+    top: 5rem;
+    }
+
+.Browserstack_input{
+    display: flex;
+    flex-direction: column;
+}
+.Browserstack_ilm__error_msg{
+    font-family: "LatoWeb";
+    font-size: 14px;
+    color: black;
+    position: absolute;
+    right: 19rem;
+    bottom: 3rem;
 }

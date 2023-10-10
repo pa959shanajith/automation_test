@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from 'primereact/button';
-import { ModalContainer } from '../../global'
+import { ModalContainer } from "../../../global"
 
 /*Component JiraDeleteModal 
   use: shows popup

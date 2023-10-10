@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import "../styles/manageIntegrations.scss";
+import "../../styles/manageIntegrations.scss";
 import { Card } from 'primereact/card';
 import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
-import { getDetails_SAUCELABS, manageSaucelabsDetails } from '../api'
-import classes from "../styles/CloudSettings.scss"
+import { getDetails_SAUCELABS, manageSaucelabsDetails } from '../../api'
+import classes from "../../styles/CloudSettings.scss"
 import SaucelabsDeleteModal from "./SaucelabsDeleteModal";
-import {Messages as MSG, setMsg} from '../../global';
-import ScreenOverlay from '../../global/components/ScreenOverlay';
+import {Messages as MSG, setMsg} from '../../../global';
+import ScreenOverlay from '../../../global/components/ScreenOverlay';
 import { Toast } from "primereact/toast";
 import { saveSauceLabData } from '../../../execute/api';
 
