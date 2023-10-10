@@ -31,6 +31,7 @@ exports.saveSauceLabData = function (req, res) {
 		var check_SauceLabURL =(req.body.SauceLabPayload.SaucelabsURL);
 		var check_SauceLabusername =(req.body.SauceLabPayload.SaucelabsUsername);
 		var check_SauceLabAccessKey =(req.body.SauceLabPayload.Saucelabskey);
+		var check_SauceLabUploadApk =(req.body.SauceLabPayload.uploadApkValues);
 		if(!check_SauceLabURL) {
 			logger.info("Error occurred in saveSauceLabData: Invalid SauceLab URL");
 			return res.send("invalidurl");
@@ -41,16 +42,29 @@ exports.saveSauceLabData = function (req, res) {
 						"action":req.body.SauceLabPayload.query,
 						"SauceLabURL": check_SauceLabURL,
 						"SauceLabusername" : check_SauceLabusername,
-						"SauceLabAccessKey": check_SauceLabAccessKey
+						"SauceLabAccessKey": check_SauceLabAccessKey,
+						"SauceLabUploadApk": check_SauceLabUploadApk
 					};
 					logger.info("Sending socket request for SauceLablogin to redis");
-					dataToIce = {"emitAction" : "SauceLablogin","username" : icename, "responsedata":SauceLabDetails};
-					mySocket.emit(dataToIce["emitAction"], dataToIce.data);
+					dataToIce = {"emitAction" : "saucelablogin","username" : icename, "responsedata":SauceLabDetails};
+					mySocket.emit(dataToIce["emitAction"], dataToIce.responsedata);
 					function SauceLablogin_listener(message) {
 						var data = message;
 							mySocket.removeListener('sauceconfresponse',SauceLablogin_listener);
-							data = data.value;
-							res.send(data);	
+							if (dataToIce.responsedata.action == "sauceMobileUploadDetails" && "name" in data && "activity" in data) {
+								const fName = "saveAppActivityData"
+								const input = {
+									"name": data.name,
+									"activity": data.activity
+								}
+								const result = utils.fetchData (input, "qualityCenter/saveAppActivityData", fName)							
+								// data = data;
+								res.send(data);
+							}
+							else  {
+								// data = data.value;
+								res.send(data);
+							} 										
 					}
 					mySocket.on("sauceconfresponse",SauceLablogin_listener);
 				} else {
