@@ -1035,7 +1035,7 @@ else{
 
   const renderActionsCell = (rowData) => {
     setScrapeDataForIris(rowData)
-   let scrapeType = rowData.objectDetails.xpath.split(';')
+   let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
   //  setIrisObject(scrapeType[0]);
     return (
       <div >

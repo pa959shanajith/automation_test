@@ -894,7 +894,7 @@ export default function BasicDemo() {
                 name="configureFeilds"
                 labelTxt="Configure Fields"
                 placeholder="Select configure fields"
-                required={false}
+                required={true}
               />
             </div>
             <Divider />
