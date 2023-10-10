@@ -966,7 +966,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
   const cloudTestOptions = [
     { name: 'sauceLabs', code: 1 },
-    { name: 'browserstack', code: 2 },
+    // { name: 'browserstack', code: 2 },
   ];
   
   const selectedCountryTemplate = (option, props) => {
