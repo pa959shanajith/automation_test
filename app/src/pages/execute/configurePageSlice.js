@@ -17,7 +17,7 @@ const getPoolsexe = createAsyncThunk("config/getPoolsexe", async (args) => {
     },
     data: {
       poolid: "",
-      projectids: ["6423bc74dda41c51fb256165"],
+      projectids: [""],
     },
     credentials: "include",
   })
@@ -32,7 +32,7 @@ const getICE = createAsyncThunk("config/getICE", async (args) => {
       },
       data: {
         poolid: "",
-        projectids: ["6423bc74dda41c51fb256165"],
+        projectids: [""],
       },
       credentials: "include",
     })

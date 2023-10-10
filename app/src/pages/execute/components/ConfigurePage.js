@@ -330,7 +330,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   useEffect(() => {
-    fetchData();
+    if(configProjectId !== ""){
+      fetchData();
+    }
     // eslint-disable-next-line
   }, [configProjectId]);
 
