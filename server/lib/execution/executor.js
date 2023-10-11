@@ -511,6 +511,16 @@ class TestSuiteExecutor {
         executionRequest.executionListId = batchExecutionData.executionListId;
         executionRequest.isHeadless = batchExecutionData.isHeadless;
 
+        if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
+        if(batchExecutionData['batchInfo'][0]['appType'] == 'MobileApp') {
+            // Fetch the apk details from DAS
+            const inputs = {
+                name : batchExecutionData['mobile']['uploadedApk'],
+                userid: userInfo.userid
+            }
+            let apkDetails = await utils.fetchData(inputs, "qualityCenter/fetchAppData", 'executionFunction');
+            executionRequest['mobile']['apkDetails'] = apkDetails
+        }
         if (execType == "SCHEDULE") {
             executionRequest.scheduleId = batchExecutionData.scheduleId;
             executionRequest.execType = batchExecutionData.execType;

@@ -674,8 +674,13 @@ const elementTypeProp =(elementProperty) =>{
     for (let scrapeItem of scrapeItemsL) {
       if (!Array.isArray(scrapeItem)) {
         if (!scrapeItem.objId) {
-          if (scrapeItem.isCustom) views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
-          else views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+          if (scrapeItem.isCustom){ views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+        }else {
+             const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
+          if (foundItem) {
+            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+          }}
+          // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
           orderList.push(scrapeItem.tempOrderId);
         }
         else orderList.push(scrapeItem.objId);

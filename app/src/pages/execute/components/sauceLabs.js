@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { FormInput } from '../../settings/components/AllFormComp';
-import { SearchDropdown } from '@avo/designcomponents';
+import { InputText } from "primereact/inputtext";
 import DropDownList from '../../global/components/DropDownList';
-import {getDetails_SAUCELABS} from '../../settings/api';
+import {getDetails_SAUCELABS} from '../api';
 import { Messages as MSG, setMsg} from '../../global';
-import {Toggle} from '@avo/designcomponents';
+import { InputSwitch } from 'primereact/inputswitch';
+import AvoModal from '../../../globalComponents/AvoModal';
+import { Dropdown } from 'primereact/dropdown';
+import { log } from 'async';
 
 
-const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSubmit,setSauceLabUser }) => {
+
+const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser }) => {
 
     const [defaultValues, setDefaultValues] = useState({});
     const [isEmpty, setIsEmpty] = useState(false);
 
+
+
     const getSaucelabsDetails = async () => {
         try {
-            setLoading("Loading...")
             const data = await getDetails_SAUCELABS()
             if (data.error) { setMsg(data.error); return; }
             if (data !== "empty") {
@@ -39,13 +42,13 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
 
     return (
         <>
-            <Dialog id='Saucelabs_dialog' header='Saucelabs login' visible={displayBasic4}
-                onHide={() => onHide('displayBasic4')}
-            >
+            <AvoModal className='Saucelabs_dialog' header='Saucelabs login' visible={displayBasic4}  onModalBtnClick={()=>onHidedia('displayBasic4')}
+            content={
+                <>
                 <form id='Saucelabs-form'>
                     <div className='Saucelabs_input'>
                         <div className="flex flex-row">
-                            <FormInput value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL"
+                            <InputText value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL"
                                 name="Saucelabs-URL"
                                 placeholder="Enter Saucelabs Remote URL"
                                 onChange={(event) => {
@@ -55,7 +58,7 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
                                 className="saucelabs_input" />
                         </div>
                         <div className="flex flex-row">
-                            <FormInput value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"
+                            <InputText value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"
                                 onChange={(event) => {
                                     setDefaultValues({ ...defaultValues, SaucelabsUsername: event.target.value });
                                     setSauceLabUser({ ...defaultValues, SaucelabsUsername: event.target.value });
@@ -63,7 +66,7 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
                                 className="saucelabs_input_URL" />
                         </div>
                         <div className="flex flex-row">
-                            <FormInput value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"
+                            <InputText value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"
                                 onChange={(event) => {
                                     setDefaultValues({ ...defaultValues, Saucelabskey: event.target.value });
                                     setSauceLabUser({ ...defaultValues, Saucelabskey: event.target.value });
@@ -73,19 +76,32 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
                         <div>
                             {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
                         </div>
+                        
                     </div>
                 </form>
-                <Button id='Saucelabs_submit' label="Submit"
-                    onClick={() => handleSubmit(defaultValues)}
+                    <Button id='Saucelabs_submit' label="Submit"
+                    onClick={() => handleSubmit1(defaultValues)}
+                    
                 />
-            </Dialog>
+                
+                </>
+                
+            }headerTxt='Saucelabs login' modalSytle={{
+                width: "39vw",
+                height: "44vh",
+                background: "#FFFFFF",
+                minWidth: "38rem",
+              }}/>
+            
+            
         </>
     )
 });
 
-const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBasic5, onHide, showSauceLabs,
-    changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,  selectProjects, selectedProject,
-    availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap }) => {
+const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDetails, displayBasic5, onHidedia, showSauceLabs,
+    changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder, selectedProject,
+    availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap, currentSelectedItem  }) => {
+    
     const [newOsNames, setNewOsNames] = useState([])
     const [selectedOS, setSelectedOS] = useState('');
     const [browserVersions, setBrowserVersions] = useState([]);
@@ -102,6 +118,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     const [selectApk, setSelectApk] = useState('');
     const [appPackageName,setAppPackageName] = useState('');
     const [appActivityName, setAppActivityName] = useState('');
+
 
     useEffect(() => {
         setSelectedPlatforms('')
@@ -208,10 +225,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
             let each_version = option.key + " " + element
             return (
                 {
-                    key: each_version,
-                    text: each_version,
-                    title: each_version,
-                    index: index
+                    key: each_version, 
                 }
             )
         });
@@ -221,7 +235,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     }
 
     const onMobileVersionChange = (option) => {
-        setSelectedMobileVersion(option.text);
+        setSelectedMobileVersion(option.key);
         setSelectedEmulator('')
         setEmulator([])
         let findEmulator = mobileDetails[showRealdevice][selectedPlatforms][option.key.split(" ")[1]].map((element, index) => ({
@@ -243,102 +257,122 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
         setSelectedEmulator('')
         setEmulator([])
     }
-
+    const [checked, setChecked] = useState(false);
+    
     return (
         <>
-            <Dialog id='SauceLab_Integration' header='SauceLabs Integration' visible={displayBasic5} onHide={() => onHide('displayBasic5')}>
-            {showSauceLabs && <>
-            <div className='saucelab_toggle_button'>
-                <label className='toggle_saucelabs_emulator'>Emulator </label>
-               <div className='toggle_saucelabs'> <Toggle onClick={onToggle}/></div>
-                <label className='toggle_saucelabs_realdevice'>Real Devices </label>  
-                </div>  
-            </>}
+            <AvoModal id='SauceLab_Integration' header='SauceLabs Integration' visible={displayBasic5} onModalBtnClick={() => onHidedia('displayBasic5')}
+            content={
+                <>
+                {showSauceLabs && <>
+                <div className='saucelab_toggle_button'>
+                    <label className='toggle_saucelabs_emulator'>Emulator </label>
+                <div className='toggle_saucelabs'> <InputSwitch checked={checked} onChange={(e) =>{setChecked(e.value);onToggle()}}/></div>
+                    <label className='toggle_saucelabs_realdevice'>Real Devices </label>  
+                    </div>  
+                </>}
 
 
                 {showSauceLabs &&
                     <>
                         <div><h6>Platforms</h6></div>
-                        <SearchDropdown
-                            noItemsText={[]}
-                            onChange={onMobilePlatformChange}
+                        <Dropdown
+                            // noItemsText={[]}
+                            filter
+                            onChange={(e)=>onMobilePlatformChange(e.value)}
                             options={platforms}
-                            selectedKey={selectedPlatforms}
-                            width='15rem'
+                            value={selectedPlatforms}
+                            valueTemplate={selectedPlatforms}
+                            // width='15rem'
                             placeholder='select Platform'
-                            calloutMaxHeight='12rem'
+                            optionLabel='key'
                         />
                     </>}
                 {!showSauceLabs && <>
-                    <div><h6>Operating Systems</h6></div>
-                    <SearchDropdown
-                        noItemsText={[]}
-                        onChange={onOsChange}
+                    <div><h3>Operating Systems</h3></div>
+                    <Dropdown
+                        // noItemsText={[]}
+                        filter
+                        onChange={(e) => onOsChange(e.value)}
                         options={newOsNames}
-                        selectedKey={selectedOS}
-                        width='15rem'
+                        value={selectedOS}
+                        valueTemplate={selectedOS}
+                        // width='15rem'
                         placeholder='select OS'
-                        calloutMaxHeight='12rem'
+                        optionLabel='key'
+                        // calloutMaxHeight='12rem'
                     />
                 </>}
                 {!showSauceLabs &&
                     <>
                         <div><h6>Browsers</h6></div>
-                        <SearchDropdown
-                            noItemsText={[]}
+                        <Dropdown
+                            // noItemsText={[]}
+                            filter
                             disabled={selectedOS == ''}
-                            onChange={onSaucelabBrowserChange}
+                            onChange={(e)=>onSaucelabBrowserChange(e.value)}
                             options={saucelabBrowsers}
-                            selectedKey={selectedSaucelabBrowser}
-                            width='15rem'
+                            value={selectedSaucelabBrowser}
+                            valueTemplate={selectedSaucelabBrowser}
+                            optionLabel='key'
+                            // width='15rem'
                             placeholder='select Browser'
-                            calloutMaxHeight='12rem'
+                            // calloutMaxHeight='12rem'
                         />
                     </>}
                 {showSauceLabs &&
                     <>
                         <div><h6>Versions</h6></div>
-                        <SearchDropdown
-                            noItemsText={[]}
+                        <Dropdown
+                            // noItemsText={[]}
+                            filter
                             disabled={selectedPlatforms == ''}
-                            onChange={onMobileVersionChange}
+                            onChange={(e)=>onMobileVersionChange(e.value)}
                             options={platformVersions}
-                            selectedKey={selectedMobileVersion}
-                            width='15rem'
+                            value={selectedMobileVersion}
+                            optionLabel='key'
+                            valueTemplate={selectedMobileVersion}
+                            // width='15rem'
                             placeholder={'select ' + selectedPlatforms + ' versions'}
-                            calloutMaxHeight='12rem'
+                            // calloutMaxHeight='12rem'
                         />
                     </>}
 
                 {!showSauceLabs &&
                     <>
                         <div><h6>Versions</h6></div>
-                        <SearchDropdown
-                            noItemsText={[]}
+                        <Dropdown
+                            // noItemsText={[]}
+                            filter
                             disabled={selectedSaucelabBrowser == ''}
-                            onChange={onVersionChange}
+                            onChange={(e)=>onVersionChange(e.value)}
                             options={browserVersions}
-                            selectedKey={selectedVersion}
-                            width='15rem'
+                            value={selectedVersion}
+                            valueTemplate={selectedVersion}
+                            optionLabel='key'
+                            // width='15rem'
                             placeholder='select Versions'
-                            calloutMaxHeight='12rem'
+                            // calloutMaxHeight='12rem'
                         />
                     </>}
                 {showSauceLabs &&
                     <>
                         <div><h6>{showRealdevice == 'emulator'?"Emulator":'Real Devices'}</h6></div>
-                        <SearchDropdown
-                            noItemsText={[]}
-                            onChange={onEmulatorChange}
+                        <Dropdown
+                            // noItemsText={[]}
+                            filter
+                            onChange={(e)=>onEmulatorChange(e.value)}
                             options={emulator}
-                            selectedKey={selectedEmulator}
+                            value={selectedEmulator}
+                            valueTemplate={selectedEmulator}
                             disabled={selectedMobileVersion == ''}
-                            width='15rem'
+                            // width='15rem'
+                            optionLabel='key'
                             placeholder={showRealdevice == 'emulator'?"Select Emulator":'Select Real Devices'}
-                            calloutMaxHeight='12rem'
+                            // calloutMaxHeight='12rem'
                         />
                     </>}
-                    {selectProjects === 'MobileApp' &&
+                {selectProjects === 'MobileApp' &&
                     <>
                         <div><h6>UploadedApk</h6></div>
                         <Dropdown
@@ -355,28 +389,21 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                         />
                     </>}
                 <div>
-                    <div>
-                        <div className='adminControl-ice-saucelabs'>
-                            <div className='adminControl-ice popup-content popup-content-status'>
-                                <ul className={changeLable ? "e__IceStatusExecute" : "e__IceStatusSchedule"}>
-                                    <li className="popup-li">
-                                        <label title='available' className="available_sauce">
-                                            <span id='status' className="status-available"></span>
-                                            Available
-                                        </label>
-                                        <label title='unavailable' className="unavailable_sauce">
-                                            <span id='status' className="status-unavailable" ></span>
-                                            Unavailable
-                                        </label>
-                                        <label title='do not disturb' className="dnd_sauce">
-                                            <span id='status' className="status-dnd"></span>
-                                            Do Not Disturb
-                                        </label>
-                                    </li>
-                                </ul>
-
-                            </div>
-                        </div>
+                <div>
+                <div className="legends-container">
+                      <div className="legend">
+                        <span id="status" className="status-available1"></span>
+                        <span className="legend-texta">Available</span>
+                      </div>
+                      <div className="legend">
+                        <span id="status" className="status-unavailable"></span>
+                        <span className="legend-text2">Unavailable</span>
+                      </div>
+                      <div className="legend">
+                        <span id="status" className="status-dnd"></span>
+                        <span className="legend-text1">Do Not Disturb</span>
+                      </div>
+                    </div>
                     </div>
 
                     <div className='adminControl-ice-sauce'>
@@ -427,16 +454,23 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                     setSelectedMobileVersion('');
                     setSelectedEmulator('');
                     setSelectApk([]);
-                    onHide('displayBasic5');
+
+                    onHidedia('displayBasic5');
                 }
                 }
                     autoFocus />
 
 
-                <Button id='Saucelabs_cancel' className='Saucelabs_cancel' label="Cancel" onClick={() => onHide('displayBasic5')} />
+                <Button id='Saucelabs_cancel' text  size='small' className='Saucelabs_cancel' label="Cancel"  onClick={() => onHidedia('displayBasic5')} />
 
-            </Dialog>
-        </>
+            </>
+            } headerTxt='Saucelabs Integration' modalSytle={{
+                width: "45vw",
+                height: "67vh",
+                background: "#FFFFFF",
+                }}/>
+            
+        </>      
     )
 })
 
