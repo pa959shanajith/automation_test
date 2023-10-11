@@ -769,15 +769,17 @@ const handleSubmit1 = async (SauceLabPayload) => {
         if (deletedConfig.error.CONTENT) {
           setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
         } else {
-          setMsg(
-            MSG.CUSTOM(
-              "Error While Deleting Execute Configuration",
-              VARIANT.ERROR
-            )
-          );
+          toast.current.show({severity:'error', summary: 'Error', detail:  "Error While Deleting Execute Configuration", life: 2000});
+          // setMsg(
+          //   MSG.CUSTOM(
+          //     "Error While Deleting Execute Configuration",
+          //     VARIANT.ERROR
+          //   )
+          // );
         }
       } else {
         tableUpdate();
+        toast.current.show({severity:'success', summary: 'Success', detail:"Execution Profile deleted successfully.", life: 1000});
         // const configurationList = await fetchConfigureList({
         //   projectid: selectedProject,
         // });

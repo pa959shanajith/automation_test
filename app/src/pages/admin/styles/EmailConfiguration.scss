@@ -103,11 +103,11 @@
     font-family: "Open Sans";
 }
 .Auth_dropdown{
-    display: flex;
-    font-family: Open Sans;
-    margin-right: 146.5rem;
-    margin-top: -14px;
-    width: 19rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: -5rem;
+    max-width: 20%;
+    width: calc(100% - 4rem);
 }
 .Authname{
     font-weight: bold;
@@ -116,9 +116,9 @@
     line-height: 3rem;
 }
 .savebtn{
-    float: right;
-    margin-right: 76rem;
-    margin-top: 1rem;
+    margin-right: 34%;
+    margin-top: 1.3%;
+    margin-left: 2%;
 }
 .auth-container {
     display: flex;
@@ -128,17 +128,18 @@
 
 .auth-label {
     font-family: Open Sans;
+    font-size: 1rem;
     font-weight: 700;
-    margin-left: -156rem;
-    margin-top: 4rem;
+    line-height: 10rem;
+    margin-left: -74%;
 }
 .testbtn{
     float: right;
     height: 3rem;
     justify-content: center;
-    margin-right: -42rem;
-    width: 5rem;
+    margin-right: 35%;
     margin-top: 1rem;
+    width: 5rem;
 }
 .disabelbtn{
     float: left;
