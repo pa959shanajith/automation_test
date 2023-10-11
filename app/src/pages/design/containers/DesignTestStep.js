@@ -1002,6 +1002,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         else if (props.appType === "SAP"){
             debugTestCases('1')
         }
+        else if (props.appType === "Mainframe"){
+            debugTestCases()
+        }
     }
     const footerContent = (
         <div>
