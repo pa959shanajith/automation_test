@@ -2305,11 +2305,18 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {/* <Legends/> */}
             {props.GeniusDialog?<Legends />:null}
             {testSuiteInUse? 
-            <div style={{display:'flex',gap:'1rem',alignItems:'center',marginLeft:'20rem',marginTop:'1rem',position:'absolute'}}>
-              <img src={"static/imgs/key-lock.png"} style={{height:'42px'}}></img>
-              <Tag style={{paddingLeft:'0.5rem',paddingRight:'0.5rem'}} className="mr-2" severity="warning" rounded >{`Read only acecess,currently in use by:${props.module.currentlyInUse}`}</Tag>
+            <div className='readonly__container'>
+              <Tooltip target={`.infoinuse`}  content={`${props.module.currentlyInUse}`} position="bottom"/>
+              <Tooltip target={`.viewonly`}  content={`View the files,but make no changes.`} position="bottom"/>
+              <div className='viewonly__container'>
+                <span style={{letterSpacing:'1px',fontSize:'1.3rem'}} className='readonlytext'>Read only view</span>
+                <img src={"static/imgs/view_only_access_icon.svg"} style={{height:'29px'}} className='viewonly'></img>
               </div>
-              :null}
+              <div className='avatar__container'>
+                <span style={{fontSize:'23px'}} className='inuseby'>In use by:</span>
+                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' }} className='infoinuse'>{props.module.currentlyInUse[0]}</span>
+              </div>
+            </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
             {(props.GeniusDialog|| props.module.currentlyInUse) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
             {(props.GeniusDialog|| props.module.currentlyInUse) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
