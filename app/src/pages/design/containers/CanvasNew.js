@@ -1032,7 +1032,7 @@ const CanvasNew = (props) => {
         return
       }
       if(type=="scenarios"){
-        toastWarnMsg(`TThis test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
+        toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
         return
       }
     }
