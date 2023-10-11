@@ -847,6 +847,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 <h5 className='dailog_header1'>Design Test steps</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="btn_test_screen" src="static/imgs/bi_code-square.svg" alt='screen icon' />
+                {props.testSuiteInUse?<img src="static/imgs/key-lock.png" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
+
             </div>
         </>
     );
@@ -934,7 +936,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {bodyData && <div>
+            {(bodyData && !props.testSuiteInUse)?<div>
                 {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
                     <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
@@ -970,7 +972,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
             </div>:null}
-            </div>}
+            </div>:null}
             </>
         );
     }

@@ -143,7 +143,7 @@ const CreateNew = ({importRedirect}) => {
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                 </div>
                 <div style={{display:'flex',height: '86vh',maxHeight: '100%'}}>
-                  <ModuleListDrop  setBlockui={setBlockui}/>
+                <ModuleListDrop  setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect}/>
                 </div>
               <div id='mp__canvas' className='mp__canvas'>
                      {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?

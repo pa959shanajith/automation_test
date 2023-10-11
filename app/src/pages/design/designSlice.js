@@ -52,7 +52,9 @@ const initialState = {
     SaveEnable: false,
     enableExport:false,
     exportProjname:"",
-    enableExportMindmapButton:true
+    enableExportMindmapButton:true,
+    oldModuleForReset:"",
+    currentModuleId:""
 }
 
 export const designSlice = createSlice({
@@ -204,6 +206,12 @@ export const designSlice = createSlice({
     },
     ScenarioLevelImpact:(state,action)=>{
       state.scenarioLevelImpact=action.payload
+    },
+    SetOldModuleForReset:(state,action)=>{
+      state.oldModuleForReset=action.payload
+    },
+    SetCurrentModuleId:(state,action)=>{
+      state.currentModuleId=action.payload
     }
 
 }  })
@@ -211,6 +219,7 @@ export const designSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const { projectList, moduleList,screenData,
 selectedProj,
+SetCurrentModuleId,
 searchModule,
 initEnEProj,
 isEnELoad,
@@ -241,6 +250,7 @@ ExportProjname,
 EnableExportMindmapButton,
 dontShowFirstModule,
 AnalyzeScenario,
-ScenarioLevelImpact} = designSlice.actions
+ScenarioLevelImpact,
+SetOldModuleForReset} = designSlice.actions
 
 export default designSlice.reducer
