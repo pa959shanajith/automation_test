@@ -504,7 +504,10 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                         }
                         if (["setHeader", "setHeaderTemplate"].includes(testCases[i].keywordVal)) {
                             if (typeof (testCases[i].inputVal) === "string") testCases[i].inputVal = testCases[i].inputVal.replace(/[\n\r]/g, '##');
-                            else testCases[i].inputVal[0] = testCases[i].inputVal[0].replace(/[\n\r]/g, '##');
+                            else testCases[i].inputVal = [
+                                testCases[i].inputVal[0].replace(/[\n\r]/g, '##'),
+                                ...testCases[i].inputVal.slice(1) // Copy the rest of the elements as-is
+                              ];
                         }
                     }
                     // if (!testCases[i].url) testCases[i].url = "";
