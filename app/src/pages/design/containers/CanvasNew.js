@@ -1028,11 +1028,11 @@ const CanvasNew = (props) => {
   const handleContext=(e,type,value)=>{
     if(props.module.currentlyInUse!=="" && props.module.currentlyInUse!=undefined && props.module.currentlyInUse!==userInfo.username){
       if(type=="modules"){
-        toastWarnMsg(`This test suit isin read-only mode and currently in use by ${props.module.currentlyInUse}`)
+        toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
         return
       }
       if(type=="scenarios"){
-        toastWarnMsg(`This test suit isin read-only mode and currently in use by ${props.module.currentlyInUse}`)
+        toastWarnMsg(`TThis test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
         return
       }
     }
@@ -2321,8 +2321,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
               </div>
             </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
-            {(props.GeniusDialog|| props.module.currentlyInUse) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
-            {(props.GeniusDialog|| props.module.currentlyInUse) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
+          {(props.GeniusDialog|| props.module.currentlyInUse!==userInfo.username) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
+            {(props.GeniusDialog|| props.module.currentlyInUse!==userInfo.username) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
             {props.gen?<svg id="mp__canvas_svg_genius" className='mp__canvas_svg_genius' ref={CanvasRef}>
                 <g className='ct-container-genius'>
                 {Object.entries(links).map((link)=>{
