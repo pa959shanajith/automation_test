@@ -345,7 +345,7 @@ const EditScreenActionButtons = props => {
 
         if (resp === "success") {
             props.setScreenType("datatable-Create");
-            toastError(MSG.UTILITY.SUCC_DELETE_DATATABLE);
+            toastSuccess(MSG.UTILITY.SUCC_DELETE_DATATABLE);
         } else toastError(MSG.UTILITY.ERR_DELETE_DATATABLE);
     }
 
@@ -364,7 +364,7 @@ const EditScreenActionButtons = props => {
                     const resp = await utilApi.editDataTable(arg);
                     props.setOverlay("");
                     if (resp === "success") 
-                    toastError(MSG.UTILITY.SUCC_UPDATE_DATATABLE)
+                    toastSuccess(MSG.UTILITY.SUCC_UPDATE_DATATABLE)
                     else 
                     toastError(MSG.UTILITY.ERR_UPDATE_DATATABLE)
                     break;
