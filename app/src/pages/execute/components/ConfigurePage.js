@@ -16,7 +16,9 @@ import ConfigureSetup from "./ConfigureSetup";
 import {FooterTwo as Footer} from '../../global';
 import ExecutionProfileStatistics from "./ExecutionProfileStatistics";
 import {readTestSuite_ICE} from '../api'
-import { Dropdown } from 'primereact/dropdown'; 
+import { Dropdown } from 'primereact/dropdown';
+import { saveBrowserstackData } from "../api";
+import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import {saveSauceLabData} from '../api';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
 
@@ -155,6 +157,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [loading, setLoading] = useState(false);
   const [showBrowserstackLogin,setShowBrowserstackLogin] = useState(false);
   const [displayBasic4, setDisplayBasic4] = useState(false);
+  const [showBrowserstack, setShowBrowserstack] = useState(false);
   const [displayBasic6, setDisplayBasic6] = useState(false);
   const [displayBasic7, setDisplayBasic7] = useState(false);
   const [currentExecutionRequest,setCurrentExecutionRequest] = useState(null);
@@ -222,6 +225,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // selectProjects?.appType === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false) 
     // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false) 
     setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false)
     setExecutingOn(selectProjects?.appType==="Web"? "ICE" :"Agent")
     setExecutingOn(selectProjects?.appType==="MobileWeb"? "ICE" :"Agent")
     setExecutingOn(selectProjects?.appType==="MobileApp"? "ICE" :"Agent")
@@ -537,11 +541,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           setExecutingOn("ICE")
           setConfigItem(idx);
             triggerBrowserstack(fetechConfig,type);
-            // setDropdownSelected(prevValues => {
-            //     const newValues = [...prevValues];
-            //     newValues[index] = '';
-            //     return newValues;
-            //   });
+            setDropdownSelected(prevValues => {
+                const newValues = [...prevValues];
+                newValues[index] = '';
+                return newValues;
+              });
             break;
       case 'lambdaTest':
             // add changes for lambdaTest
@@ -638,40 +642,40 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     
 }
 
-// const handleBrowserstackSubmit = async (BrowserstackPayload) => {
-//   // close the existing dialog
-//   setDisplayBasic6(false);
-//   // open the new dialog
-//   setLoading('Fetching details...') 
-//   BrowserstackPayload['action'] = (showBrowserstack?"mobileWebDetails":"webDetails")
-//   let resultData = await saveBrowserstackData({
-//       BrowserstackPayload
+const handleBrowserstackSubmit = async (BrowserstackPayload) => {
+  // close the existing dialog
+  setDisplayBasic6(false);
+  // open the new dialog
+  setLoading('Fetching details...') 
+  BrowserstackPayload['action'] = (showBrowserstack?"mobileWebDetails":"webDetails")
+  let resultData = await saveBrowserstackData({
+      BrowserstackPayload
           
-//   })
-//   if(resultData && resultData.os_names && resultData.browser){
-//       setLoading(false);
-//       setDisplayBasic7(true);
+  })
+  if(resultData && resultData.os_names && resultData.browser){
+      setLoading(false);
+      setDisplayBasic7(true);
 
-//       // const arrayOS = Object.entries(resultData.os).map(([key, value], index) => {
-//       //     return {
-//       //       key: key,
-//       //       text: key,
-//       //       title: key,
-//       //       index: index
-//       //     };
-//       //   });
-//       //   setOs(arrayOS);
-//         setBrowserstackBrowserDetails(resultData);
-//   }
-// else{
-//   setLoading(false);
-//   if (resultData == "unavailableLocalServer"){
-//       setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-//   }else{
-//       setMsg({"CONTENT":"Error while fetching the data from Browserstack", "VARIANT": VARIANT.ERROR})
-//   }
-// }
-// };
+      // const arrayOS = Object.entries(resultData.os).map(([key, value], index) => {
+      //     return {
+      //       key: key,
+      //       text: key,
+      //       title: key,
+      //       index: index
+      //     };
+      //   });
+      //   setOs(arrayOS);
+        setBrowserstackBrowserDetails(resultData);
+  }
+else{
+  setLoading(false);
+  if (resultData == "unavailableLocalServer"){
+      setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+  }else{
+      setMsg({"CONTENT":"Error while fetching the data from Browserstack", "VARIANT": VARIANT.ERROR})
+  }
+}
+};
 
 const handleSubmit1 = async (SauceLabPayload) => {
   // close the existing dialog
@@ -845,7 +849,27 @@ const handleSubmit1 = async (SauceLabPayload) => {
       availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
 />,
   [mobileDetails, browserDetails, displayBasic5, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+    availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+
+    const browserstackLogin = useMemo(() =>
+    <BrowserstackLogin
+        setLoading={setLoading}
+        displayBasic6={displayBasic6}
+        onHidedia={onHidedia}
+        handleBrowserstackSubmit={handleBrowserstackSubmit}
+        setBrowserstackUser={setBrowserstackUser}
+        onModalBtnClick={onHidedia}
+    />,
+    [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser]);
+
+    const browserstackExecute = useMemo(() => <BrowserstackExecute  browserstackBrowserDetails={browserstackBrowserDetails}
+            displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
+            changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+        />,
+            [browserstackBrowserDetails, displayBasic7, onHidedia,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist, CheckStatusAndExecute, iceNameIdMap]);
+
 
 
   const ExecuteTestSuite = async (executionData, btnType) => {
@@ -968,7 +992,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
   const cloudTestOptions = [
     { name: 'sauceLabs', code: 1 },
-    // { name: 'browserstack', code: 2 },
+    { name: 'browserstack', code: 2 },
   ];
   
   const selectedCountryTemplate = (option, props) => {
@@ -2202,6 +2226,8 @@ Learn More '/>
       <div>
       {sauceLabLogin}
       {sauceLabExecute}
+      {browserstackExecute}
+      {browserstackLogin}
         <Breadcrumbs />
         <div className="grid" style={{ borderBottom: 'solid #dee2e6' }}>
           <div className="col-12 lg:col-8 xl:col-8 md:col-6 sm:col-12" style={{ marginBottom: '-0.6rem' }}>
