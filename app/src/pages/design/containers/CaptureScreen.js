@@ -1953,7 +1953,6 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
           onModalBtnClick={onLaunchBtn}
           headerTxt="System_application"
           footerType="Launch"
-          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
          content = {"hello"}
          customClass="MobileWeb"
         />: null}
@@ -2634,7 +2633,6 @@ const LaunchApplication = props => {
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"
-            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "53vh" : "33vh", background: "#FFFFFF" }}
             content={appDict[props.appPop.appType].content}
           customClass={props.typesOfAppType}
           />

@@ -1362,6 +1362,12 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
       tableUpdate();
+      toast.current.show({
+        severity: 'success',
+        summary: 'Success',
+        detail:"Configuration created successfully.",
+        life: 5000
+      });
       setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
       errorinfo?.current && errorinfo?.current?.show({
