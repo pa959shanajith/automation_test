@@ -1946,7 +1946,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
          content = {"hello"}
          customClass="Mainframes"
         />: null}
-        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} toastError={toastError} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "System"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
@@ -2492,15 +2492,13 @@ const LaunchApplication = props => {
 
     const handleSerialNumber = () => {
       setOS("android")
-      console.log("handleSerial")
-        setError(false);
-        getDeviceSerialNumber_ICE().then(data => {
-            if(data) {}
-            setSerialNumber(data);
-            console.log(data);
-        }).catch(error => {
-            console.log(error);
-        })
+      setError(false);
+      getDeviceSerialNumber_ICE().then(data => {
+            if(data !== "fail") {setSerialNumber(data);}
+            else props.toastError(error)
+      }).catch(error => {
+          props.toastError(error)
+      })
     }
 
     const MobileApps = {
