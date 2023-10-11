@@ -68,7 +68,6 @@ const CanvasNew = (props) => {
     const dispatch = useDispatch()
     const history = useNavigate();
     const toast = useRef();
-    const userInfo = useSelector((state) => state.landing.userinfo);
     const copyNodes = useSelector(state=>state.design.copyNodes)
     const selectBox = useSelector(state=>state.design.selectBoxState)
     const deletedNoded = useSelector(state=>state.design.deletedNodes)
@@ -159,6 +158,10 @@ const CanvasNew = (props) => {
     const typesOfAppType = props.appType;
     const appType = typesOfAppType
     const [toastData, setToastData] = useState(false);
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
     
   useEffect(()=>{
     let browserName = (function (agent) {        
@@ -2314,7 +2317,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
               </div>
               <div className='avatar__container'>
                 <span style={{fontSize:'23px'}} className='inuseby'>In use by:</span>
-                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' }} className='infoinuse'>{props.module.currentlyInUse[0]}</span>
+                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' ,fontSize:'21px'}} className='infoinuse'>{props.module.currentlyInUse[0]}</span>
               </div>
             </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}

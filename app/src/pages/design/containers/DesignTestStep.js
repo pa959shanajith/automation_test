@@ -851,7 +851,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 <h5 className='dailog_header1'>Design Test steps</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="btn_test_screen" src="static/imgs/bi_code-square.svg" alt='screen icon' />
-                {props.testSuiteInUse?<img src="static/imgs/key-lock.png" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
+                {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
 
             </div>
         </>
