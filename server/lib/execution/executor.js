@@ -374,8 +374,8 @@ class TestSuiteExecutor {
                         const testsuite = execReq.suitedetails[testsuiteIndex];
                         const exeStatus = resultData.executionStatus ? "pass" : "fail";
                         await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
-                        if (reportType != "accessiblityTestingOnly")
-                            notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
+                        if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1)
+                            notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, profileName: execReq.configurename || execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
                     }
                 });
                 mySocket.on("result_executeTestSuite", async (message)=>{
@@ -428,7 +428,7 @@ class TestSuiteExecutor {
                                 }
                             } catch (ex) {
                                 logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-                                if (reportType != "accessiblityTestingOnly") notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag});
+                                if (reportType != "accessiblityTestingOnly") notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag, profileName: execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
                                 await this.updateExecutionStatus([executionid], { status: "fail" });
                             }
                         } else { // This block will trigger when resultData.status has "success or "Terminate"
@@ -510,6 +510,8 @@ class TestSuiteExecutor {
         executionRequest.invokinguser = userInfo.invokinguser;
         executionRequest.executionListId = batchExecutionData.executionListId;
         executionRequest.isHeadless = batchExecutionData.isHeadless;
+        executionRequest.profileName = batchExecutionData.profileName || batchExecutionData.configureName || null;
+        executionRequest.recieverEmailAddress = batchExecutionData.recieverEmailAddress;
 
         if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
         if(batchExecutionData['batchInfo'][0]['appType'] == 'MobileApp') {

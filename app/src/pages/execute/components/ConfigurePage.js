@@ -30,6 +30,7 @@ import {
   readTestSuite_ICEuser,
   execAutomation,
   deleteConfigureKey,
+  sendMailOnExecutionStart,
 } from "../api";
 import {
   getAvoAgentAndAvoGrid,
@@ -203,6 +204,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
   const [checkedExecution, setCheckedExecution] = useState(false);
+  const [emailNotificationEnabled, setEmailNotificationEnabled] = useState(null);
+  const [emailNotificationSender, setEmailNotificationSender] = useState(null);
+  const [batchInfo, setBatchInfo] = useState([]);
+  const [profileName, setProfileName] = useState(null);
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
@@ -866,7 +871,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
     executionData["configurekey"] = currentKey;
     executionData["configurename"] = currentName;
     executionData["executingOn"] = executingOn;
-    executionData["executionListId"] = uuid() ;
+    executionData["executionListId"] = uuid();
+    executionData["profileName"] = currentName;
+    executionData["recieverEmailAddress"] = emailNotificationReciever;
     executionData["batchInfo"] =
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
@@ -1018,6 +1025,24 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
+                if ("isEmailNotificationEnabled" in item.executionRequest) {
+                  setEmailNotificationEnabled(item.executionRequest.isEmailNotificationEnabled);
+                  if (item.executionRequest.isEmailNotificationEnabled === true) {
+                      setEmailNotificationSender(item.executionRequest.emailNotificationSender);
+                      setEmailNotificationReciever(item.executionRequest.emailNotificationReciever);
+                      setIsNotifyOnExecutionCompletion(item.executionRequest.isNotifyOnExecutionCompletion)
+                      setBatchInfo(item.executionRequest.batchInfo);
+                      setProfileName(item.executionRequest.configurename);
+                  }
+                }
+                else {
+                  setEmailNotificationEnabled(false);
+                  setEmailNotificationSender(null);
+                  setEmailNotificationReciever(null);
+                  setIsNotifyOnExecutionCompletion(null);
+                  setBatchInfo([]);
+                  setProfileName(null)
+                }
                 setCurrentName(item.configurename);
                 setCurrentSelectedItem(item);
                 setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
@@ -1034,6 +1059,26 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setSelectedSchedule(item);
                 setConfigItem(idx);
                 setVisible_schedule(true);
+                setCurrentKey(item.configurekey);
+                if ("isEmailNotificationEnabled" in item.executionRequest) {
+                  setEmailNotificationEnabled(item.executionRequest.isEmailNotificationEnabled);
+                  if (item.executionRequest.isEmailNotificationEnabled === true) {
+                      setEmailNotificationSender(item.executionRequest.emailNotificationSender);
+                      setEmailNotificationReciever(item.executionRequest.emailNotificationReciever);
+                      setIsNotifyOnExecutionCompletion(item.executionRequest.isNotifyOnExecutionCompletion)
+                      setBatchInfo(item.executionRequest.batchInfo);
+                      setProfileName(item.executionRequest.configurename);
+                  }
+                }
+                else {
+                  setEmailNotificationEnabled(false);
+                  setEmailNotificationSender(null);
+                  setEmailNotificationReciever(null);
+                  setIsNotifyOnExecutionCompletion(null);
+                  setBatchInfo([]);
+                  setProfileName(null)
+                }
+                setCurrentName(item.configurename);
                 handleTestSuite(item);
               }}
               size="small"
@@ -1404,7 +1449,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
         CheckStatusAndExecute(dataExecution, iceNameIdMap);
       } else {
-        const temp = await execAutomation(currentKey);
+        const temp = await execAutomation(currentKey, "AvoAgent/AvoGrid");
         if (temp.status !== "pass") {
           if (temp.error && temp.error.CONTENT) {
             setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
@@ -1426,13 +1471,45 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               });
           }
         } else {
-          // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail:("Execution Added to the Queue."),
-            life: 5000,
-          });
+          if (emailNotificationEnabled === true && isNotifyOnExecutionCompletion !== true) {
+            // send email on click of execution
+            let result = await sendMailOnExecutionStart(emailNotificationSender, emailNotificationReciever, batchInfo, profileName);
+
+            if(result !== "pass") {
+                if(result.error && result.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    // setMsg(MSG.CUSTOM("Error While Sending an Email.",VARIANT.ERROR));
+                    toast.current.show({
+                      severity: "error",
+                      summary: "error",
+                      detail:(
+                            "Error While Sending an Email."
+                          ),
+                      life: 5000,
+                    });
+                }
+            }
+            else {
+                // setMsg(MSG.CUSTOM("Execution Added to the Queue and Email sent successfully.",VARIANT.SUCCESS));
+                toast.current.show({
+                  severity: "success",
+                  summary: "Success",
+                  detail:("Execution Added to the Queue and Email sent successfully."),
+                  life: 5000,
+                });
+            }
+          }
+          else {
+              // setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
+              // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+              toast.current.show({
+                severity: "success",
+                summary: "Success",
+                detail:("Execution Added to the Queue."),
+                life: 5000,
+              });
+          }
         }
 
         // onHide(name);
@@ -1574,6 +1651,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             configureKey: selectedSchedule?.configurekey,
             configureName: selectedSchedule?.configurename,
             executionListId: uuid(),
+            profileName: selectedSchedule?.configurename,
+            recieverEmailAddress: selectedSchedule?.executionRequest?.emailNotificationReciever ? selectedSchedule?.executionRequest?.emailNotificationReciever : null,
           },
         })
       ).then(() => {
@@ -1625,6 +1704,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             configureKey: selectedSchedule?.configurekey,
             configureName: selectedSchedule?.configurename,
             executionListId: uuid(),
+            profileName: selectedSchedule?.configurename,
+            recieverEmailAddress: selectedSchedule?.executionRequest?.emailNotificationReciever ? selectedSchedule?.executionRequest?.emailNotificationReciever : null,
           },
         })
       ).then(() => {
