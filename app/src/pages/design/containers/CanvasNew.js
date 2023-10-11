@@ -68,7 +68,6 @@ const CanvasNew = (props) => {
     const dispatch = useDispatch()
     const history = useNavigate();
     const toast = useRef();
-    const userInfo = useSelector((state) => state.landing.userinfo);
     const copyNodes = useSelector(state=>state.design.copyNodes)
     const selectBox = useSelector(state=>state.design.selectBoxState)
     const deletedNoded = useSelector(state=>state.design.deletedNodes)
@@ -159,6 +158,10 @@ const CanvasNew = (props) => {
     const typesOfAppType = props.appType;
     const appType = typesOfAppType
     const [toastData, setToastData] = useState(false);
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
     
   useEffect(()=>{
     let browserName = (function (agent) {        
@@ -364,9 +367,9 @@ const CanvasNew = (props) => {
         { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
-        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command:()=>{confirm1()}},
+        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false,command:()=>{confirm1()}},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-        { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -376,7 +379,7 @@ const CanvasNew = (props) => {
         { label: 'Add Test steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
         { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
-        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>handleCapture() },
+        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
@@ -2314,7 +2317,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
               </div>
               <div className='avatar__container'>
                 <span style={{fontSize:'23px'}} className='inuseby'>In use by:</span>
-                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' }} className='infoinuse'>{props.module.currentlyInUse[0]}</span>
+                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' ,fontSize:'21px'}} className='infoinuse'>{props.module.currentlyInUse[0]}</span>
               </div>
             </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}

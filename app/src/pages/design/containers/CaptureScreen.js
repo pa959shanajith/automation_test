@@ -1105,7 +1105,7 @@ else{
     <>
       <div>
         <h5 className='dailog_header1'>Capture Elements</h5>
-        {props.testSuiteInUse?<img src="static/imgs/key-lock.png" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
+        {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg"alt="viewonlyaccess" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
@@ -1127,7 +1127,7 @@ else{
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>
+        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>

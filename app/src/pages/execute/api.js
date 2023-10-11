@@ -452,7 +452,7 @@ export const loginZephyrServer_ICE = async(zephyrURL, zephyrUserName, zephyrPass
             headers: {
             'Content-type': 'application/json',
             },
-            data: { action: "loginToZephyr_ICE",
+            data: { 
                 action: "loginToZephyr_ICE",
                 zephyrPayload: zephyrPayload,
                 integrationType : integrationType,
