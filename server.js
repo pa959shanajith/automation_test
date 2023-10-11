@@ -261,6 +261,7 @@ if (cluster.isMaster) {
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
+		app.post('/updateTestSuiteInUseBy',designscreen.updateTestSuiteInUseBy)
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
