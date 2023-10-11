@@ -570,28 +570,25 @@ const CreateUser = (props) => {
     }
 
     const createUserFooter = () => <>
-        <Button
-            data-test="cancelButton"
-            label="Cancel"
-            text
-            onClick={createUserDialogHide}
-        >
-        </Button>
-        {(selectedTab === "userDetails") && <Button
-            data-test="createButton"
-            label={editUser ? "Update" : "Next"}
-            onClick={() => {
-                editUser ? manage({ action: "update" }) : manage({ action: "create" });
-            }}
-            disabled={nocreate}>
-        </Button>}
-        {selectedTab === "avoAzzureClient" && !editUser ? <Button
-            data-test="createButton"
-            label="Create"
-            onClick={() => { userCreateHandler() }}
-            disabled={nocreate}>
-        </Button> : ''}
-    </>
+    <Button
+        data-test="cancelButton"
+        label="Cancel"
+        text
+        onClick={() => {
+            editUser ? createUserDialogHide() :  userCreateHandler();
+        }}
+    >
+    </Button>
+    {(selectedTab === "userDetails") && <Button
+        data-test="createButton"
+        label={editUser ? "Update" : "Create"}
+        onClick={() => {
+            editUser ? manage({ action: "update" }) : manage({ action: "create" });
+        }}
+        disabled={nocreate}>
+        {editUser ? "" : <i className="m-1 pi pi-arrow-right"/>}
+    </Button>}
+</>
 
 
 

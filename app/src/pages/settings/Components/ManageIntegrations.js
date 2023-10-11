@@ -9,6 +9,7 @@ import { Button } from 'primereact/button';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Card } from 'primereact/card';
 import LoginModal from "../Login/LoginModal";
+import CloudSettings from "../../settings/Components/Cloud/CloudSettings"
 import { useDispatch, useSelector } from 'react-redux';
 import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
@@ -28,6 +29,7 @@ import { Tree } from 'primereact/tree';
 import ZephyrContent from "./ZephyrContent";
 import AzureContent from "./AzureContent";
 import { Paginator } from 'primereact/paginator';
+import { getDetails_SAUCELABS } from "../../execute/api";
 import { useNavigate } from 'react-router-dom';
 export var navigate;
 
@@ -46,6 +48,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const enabledSaveButton = useSelector(state => state.setting.enableSaveButton);
     // state
     const [activeIndex, setActiveIndex] = useState(0);
+    const [Index, setIndex] = useState(0);
     const [activeIndexViewMap, setActiveIndexViewMap] = useState(0);
     const [showLoginCard, setShowLoginCard] = useState(true);
     const selectedscreen = useSelector(state => state.setting.screenType);
@@ -91,12 +94,45 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [currentJiraPage, setCurrentJiraPage] = useState(1);
     const toast = useRef();
     const dispatchAction = useDispatch();
-    const [saveEnable, setSaveEnabale] = useState(false);
+    const [createSaucelabs, setCreateSaucelabs] = useState(true);
+    const [SaucelabsURL, setSaucelabsURL] = useState('');
+    const [SaucelabsUsername, setSaucelabsUsername] = useState('');
+    const [SaucelabsAPI, setSaucelabsAPI] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [isCloudBasedIntegrationClicked, setIsCloudBasedIntegrationClicked] = useState(false);
 
     const handleIntegration = (value) => {
         dispatchAction(screenType(value));
         setAuthType('basic');
     }
+
+    useEffect(() => {
+        (async () => {
+          setLoading("Loading...");
+          try {
+            const data = await getDetails_SAUCELABS()
+            setLoading(false);
+            if (data.error) {return; }
+            if(data==="empty"){
+                setSaucelabsURL('');
+                setSaucelabsUsername('');
+                setSaucelabsAPI('');
+                setCreateSaucelabs(true);
+            }
+            else{
+                const url = data.SaucelabsURL;
+                const username = data.SaucelabsUsername;
+                const key = data.Saucelabskey;
+                setSaucelabsURL(url);
+                setSaucelabsUsername(username);
+                setSaucelabsAPI(key);
+                setCreateSaucelabs(false);
+            }
+        } catch (error) {
+            setLoading(false);
+        }
+        })();
+      }, [isCloudBasedIntegrationClicked]);
 
     const handleSubmit = () => {
         setIsSpin(true);
@@ -310,6 +346,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const handleTabChange = (index) => {
         setActiveIndex(index);
     };
+
+    const handleTabIndexChange = (e) => {
+        setIndex(e.index); // Update the index state when a tab is changed
+        if (e.index == 1) {
+            setIsCloudBasedIntegrationClicked(true);
+        }
+      };
 
     const showCard2 = () => {
         handleSubmit();
@@ -776,24 +819,29 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const IntergrationLogin = useMemo(() => <LoginModal isSpin={isSpin} showCard2={showCard2} handleIntegration={handleIntegration}
      setShowLoginCard={setShowLoginCard} setAuthType={setAuthType} authType={authType} />, [isSpin, showCard2,
          handleIntegration,setShowLoginCard,setAuthType,authType])
+    
+         
+
+    const CloudBasedIntegrationContent = useMemo(() => <CloudSettings  />, [])
    
 
 
     return (
         <>
             <div className="card flex justify-content-center">
-                <Dialog className="manage_integrations" header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations() : ""}>
+                <Dialog className="manage_integrations" header={Index === 1 && selectedscreen.name ? `Manage Integration` : `Manage Integration: ${selectedscreen.name} Integration`} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations() : ""}>
                     <div className="card">
-                        {showLoginCard ? <TabMenu model={integrationItems} /> : ""}
+                        {showLoginCard  ? <TabMenu model={integrationItems} activeIndex={Index}  onTabChange={handleTabIndexChange} /> : ""}
+                        {Index === 1 && <CloudSettings createSaucelabs={createSaucelabs} setCreateSaucelabs={setCreateSaucelabs} SaucelabsURL={SaucelabsURL} setSaucelabsURL={setSaucelabsURL} SaucelabsUsername={SaucelabsUsername} setSaucelabsUsername={setSaucelabsUsername} SaucelabsAPI={SaucelabsAPI} setSaucelabsAPI={setSaucelabsAPI} />}
                     </div>
                     <ConfirmDialog visible={isShowConfirm} onHide={() => setIsShowConfirm(false)} message="Are you sure you want to go Back ?"
                             header="Confirmation" icon="pi pi-exclamation-triangle" accept={acceptFunc} reject={rejectFunc} />
-
-                    {showLoginCard ? (
+                        
+                    {showLoginCard && Index === 0 ? (
                         <>
                             {IntergrationLogin}
                         </>
-                    ) : selectedscreen.name === "Jira" ?
+                    ) : selectedscreen.name === "Jira" && Index===0 ?
                             (
                                 <div>
                                     <div className="tab__cls">
@@ -927,7 +975,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
+                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

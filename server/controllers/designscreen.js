@@ -215,6 +215,48 @@ exports.updateScenarioComparisionStatus = async (req, res) => {
     }
 
 };
+exports.updateTestSuiteInUseBy = async (req, res) => {
+
+    const fnName = "updateTestSuiteInUseBy";
+
+    logger.info("Inside UI service: " + fnName);
+
+    try {
+
+        const inputs = {
+
+            "testsuiteId": req.body.testsuiteId,
+            "resetFlag":req.body.resetFlag,
+			"assignToUser":req.body.assignToUser,
+            "accessedBy": req.body.accessedBy,
+			"oldTestSuiteId":req.body.oldTestSuiteId,
+            "query": "updatetesuiteAccessedBy"
+
+        };
+
+        if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
+
+            inputs.query = "getWSscrapedata";
+
+        }
+
+        const result = await utils.fetchData(inputs, "design/updateTestSuiteInUseBy", fnName);
+
+        if (result == "fail") return res.send("fail");
+
+        logger.info("Scenario comparision status sent successfully from designscreen/"+fnName+" service");
+
+        res.send(JSON.stringify(result))
+
+    } catch (exception) {
+
+        logger.error("Error occurred in designscreen/"+fnName+":", exception);
+
+        res.status(500).send("fail");
+
+    }
+
+};
 exports.getScrapeDataScreenLevel_ICE = async (req, res) => {
 	const fnName = "getScrapeDataScreenLevel_ICE";
 	logger.info("Inside UI service: " + fnName);

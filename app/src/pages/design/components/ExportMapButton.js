@@ -341,7 +341,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
 }
 const Footer = ({clickExport,clickExportProj,error,exportProject,enableExportMindmapButton}) => {
     return ((exportProject)? <div>
-       {error && <span style={{color:"red", position: 'absolute',left: '3rem'}}>Please select a project which has no modules</span>}
+       {error && <span style={{color:"red", position: 'absolute',left: '3rem'}}>Please select a project which has no test suite</span>}
        <Button disabled={ error} onClick={clickExportProj} label='Export Project' />
        </div>:(!exportProject && enableExportMindmapButton)? <div><Button onClick={clickExport} label ='Export'/> </div>:null
       )} 

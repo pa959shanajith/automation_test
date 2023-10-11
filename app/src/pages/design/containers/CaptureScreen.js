@@ -674,8 +674,13 @@ const elementTypeProp =(elementProperty) =>{
     for (let scrapeItem of scrapeItemsL) {
       if (!Array.isArray(scrapeItem)) {
         if (!scrapeItem.objId) {
-          if (scrapeItem.isCustom) views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
-          else views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+          if (scrapeItem.isCustom){ views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+        }else {
+             const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
+          if (foundItem) {
+            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+          }}
+          // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
           orderList.push(scrapeItem.tempOrderId);
         }
         else orderList.push(scrapeItem.objId);
@@ -1035,7 +1040,7 @@ else{
 
   const renderActionsCell = (rowData) => {
     setScrapeDataForIris(rowData)
-   let scrapeType = rowData.objectDetails.xpath.split(';')
+   let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
   //  setIrisObject(scrapeType[0]);
     return (
       <div >
@@ -1100,12 +1105,13 @@ else{
     <>
       <div>
         <h5 className='dailog_header1'>Capture Elements</h5>
+        {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg"alt="viewonlyaccess" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
-        {captureData.length > 0 ? <div className='Header__btn'>
+        {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
           <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} >Add more</button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
@@ -1121,7 +1127,7 @@ else{
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>
+        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1131,7 +1137,7 @@ const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
 const elementIdentifier=()=>{
   const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'cssselector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]:
-  selectedCapturedElement[0].objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
+  selectedCapturedElement[0]?.objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
   setIdentifierList(identifierList)
   setShowIdentifierOrder(true)
 }  
@@ -1546,7 +1552,7 @@ const footerSave = (
   const footerContentIdentifier = (
     <div>
       <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Drag/drop to reorder identifiers.</div>
-      <Button label="Cancel" onClick={() => setShowIdentifierOrder(false)} className="p-button-text" />
+      <Button label="Cancel" onClick={() => {setShowIdentifierOrder(false);setSelectedCapturedElement([])}} className="p-button-text" />
       <Button label="Save" onClick={() => saveIdentifier()} autoFocus />
     </div>
   )
@@ -1579,6 +1585,7 @@ const footerSave = (
         setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
       }
       )
+      setSelectedCapturedElement([]);
 
   }
 
@@ -1728,7 +1735,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
-       <div className="card_modal">
+      {!props.testSuiteInUse?<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
               {!showPanel && <div className='insprint__block1'>
@@ -1852,7 +1859,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
 
           </Card>
         </div>
-
+        :null}
 
 
         <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
@@ -1882,10 +1889,10 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            <Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>
+            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
             <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
-              editor={(options) => cellEditor(options)}
-              onCellEditComplete={onCellEditComplete}
+              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
+              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
@@ -1893,7 +1900,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
+            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -1946,7 +1953,6 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
           onModalBtnClick={onLaunchBtn}
           headerTxt="System_application"
           footerType="Launch"
-          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
          content = {"hello"}
          customClass="MobileWeb"
         />: null}
@@ -2088,7 +2094,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
           </div>
         </Dialog>: null }</>}
       {/* Element reorder */}
-      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => setShowIdentifierOrder(false)} footer={footerContentIdentifier} >
+      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => {setShowIdentifierOrder(false);setSelectedCapturedElement([])}} footer={footerContentIdentifier} >
         <div className="card" >
           <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
             <Column rowReorder style={{ width: '3rem' }} />
@@ -2627,7 +2633,6 @@ const LaunchApplication = props => {
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"
-            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "53vh" : "33vh", background: "#FFFFFF" }}
             content={appDict[props.appPop.appType].content}
           customClass={props.typesOfAppType}
           />

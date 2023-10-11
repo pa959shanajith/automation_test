@@ -194,12 +194,15 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
 
                         {/* <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} label={"Authentication"} option={['none','basic']}/> */}
 
-                        <div class="auth-container">
-                            <label class="auth-label">Authentication Type</label>
+                        {/* <div class="auth-container"> */}
+                        <div>
+                        <label class="auth-label">Authentication Type</label>
+                        </div>
+                            
                             <div className='Auth_dropdown'>
                                 <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} option={['none', 'basic']} />
                             </div>
-                        </div>
+                         {/* </div>  */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: "1rem", marginTop: "1rem" }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',    marginTop: "1rem" }}>
                                 <label className='AuthUsername'>Authentication UserName</label>

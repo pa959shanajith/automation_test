@@ -232,3 +232,37 @@
     background: #e2e2ed;
     padding: 0.55rem;
 }
+.readonly__container{
+    display:flex;
+    gap:1rem;
+    align-items:center;
+    margin-left:20rem;
+    margin-top:1rem;
+    position:absolute;
+    border:4px solid #bdbdbd;
+    border-radius:15px;
+    padding:0.6rem;
+    flex-direction:column;
+    width:15rem;
+    
+}
+.viewonly__container{
+    display:flex;
+    gap:0.5rem;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+}
+.avatar__container{
+    display:flex;
+    gap:0.5rem;
+    align-items:center;
+    justify-content:space-between;
+    width:100%
+}
+.readonlytext{
+    font:$f6_semibold
+}
+.inuseby{
+    font:$f6_regular
+}

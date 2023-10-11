@@ -195,8 +195,8 @@ const TableActionButtons = props => {
         {'title': 'Remove Selected Row/Column', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove', onClick:  ()=>onDelete()},
         {'title': 'Copy Row/Col', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy', onClick: ()=>onCopy()},
         {'title': 'Paste Row/Col', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste', onClick: ()=>onPaste()},
-        {'title': 'Redo Last Changes', 'class': 'fa fa-repeat', 'alt': 'Redo', onClick:  ()=>onRedo()},
-        {'title': 'Undo Last Changes', 'class': 'fa fa-undo', 'alt': 'Undo', onClick:  ()=>onUndo()},
+        {'title': 'Redo Last Changes', 'img': 'static/imgs/redo_icon.svg','class': 'fa fa-repeat', 'alt': 'Redo', onClick:  ()=>onRedo()},
+        {'title': 'Undo Last Changes','img': 'static/imgs/undo_icon.svg', 'class': 'fa fa-undo', 'alt': 'Undo', onClick:  ()=>onUndo()},
     ]
 
     return (
