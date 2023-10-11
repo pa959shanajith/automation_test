@@ -125,6 +125,14 @@
                 }
             }
         }
+        .access_rules {
+            .access_rules_status {
+                margin-top: 1rem;
+            }
+            .badge_txt {
+                padding: 0 3rem 0 0.5rem;
+            }
+        }
     }
     .p-datatable-thead>tr>th {
         white-space: nowrap;

@@ -1006,28 +1006,50 @@ const Profile = () => {
       tableData = accessibilityValues[event?.key]['access-rules']
     };
     return accessibilityValues[event?.key] ? (
-      <DataTable
-        showHeaders={false}
-        className="statusTable"
-        value={tableData.map((item, i) => ({
-          scenarioname: item?.name,
-          status: item?.pass ? "Pass" : "Fail",
-          statusView: (
-            <Button
-              label="View"
-              severity="secondary"
-              size="small"
-              outlined
-              className="view_button"
-              onClick={() => handleAccessibilityReports(accessKey, item?.name)}
-            />
-          ),
-        }))}
-      >
-        <Column field="scenarioname"></Column>
-        <Column field="status"></Column>
-        <Column field="statusView"></Column>
-      </DataTable>
+      <div className="flex flex-column access_rules">
+        <div className="flex access_rules_status">
+          <div className="flex">
+            <Badge
+              className="badge_icon"
+              value={`${accessibilityValues[event?.key]["access-rules"].filter((el) => el?.pass).length} / ${accessibilityValues[event?.key]["access-rules"].length}`}
+              severity="success"
+            ></Badge>
+            <span className="badge_txt">Passed</span>
+          </div>
+          <div className="flex">
+            <Badge
+              className="badge_icon"
+              value={`${accessibilityValues[event?.key]["access-rules"].filter((el) => !el?.pass).length} / ${accessibilityValues[event?.key]["access-rules"].length}`}
+              severity="danger"
+            ></Badge>
+            <span className="badge_txt">Failed</span>
+          </div>
+        </div>
+        <DataTable
+          showHeaders={false}
+          className="statusTable"
+          value={tableData.map((item, i) => ({
+            scenarioname: item?.name,
+            status: item?.pass ? "Pass" : "Fail",
+            statusView: (
+              <Button
+                label="View"
+                severity="secondary"
+                size="small"
+                outlined
+                className="view_button"
+                onClick={() =>
+                  handleAccessibilityReports(accessKey, item?.name)
+                }
+              />
+            ),
+          }))}
+        >
+          <Column field="scenarioname"></Column>
+          <Column field="status"></Column>
+          <Column field="statusView"></Column>
+        </DataTable>
+      </div>
     ) : null;
   };
 

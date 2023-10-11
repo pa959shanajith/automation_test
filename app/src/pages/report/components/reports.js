@@ -86,7 +86,7 @@ const reports = () => {
     const fetchReportData = async (initProj) => {
         try {
           let executionProfileName = [];
-          let accessibilityData;
+          let accessibilityScreen;
           if (testType === "Functional Test" && viewBy === "Execution Profile") {
             executionProfileName = await fetchConfigureList({
               projectid: initProj,
@@ -100,7 +100,7 @@ const reports = () => {
                 ?.cycles[0]?._id
             );
           } else if (testType === "Accessibility Test") {
-            let accessibilityScreen = await getAccessibilityScreens(
+            accessibilityScreen = await getAccessibilityScreens(
               initProj,
               project?.releases[project?.projectId.indexOf(initProj)][0]?.name,
               project?.releases[project?.projectId.indexOf(initProj)][0]
@@ -138,7 +138,7 @@ const reports = () => {
             const extractedExecutionProfileData =
               executionProfileName.map((obj, index) => ({
                 configurename: obj,
-                id: Object.keys(accessibilityData)[index]
+                id: Object.keys(accessibilityScreen)[index]
               }));
             setReportData(extractedExecutionProfileData);
           } else {

@@ -47,6 +47,8 @@ export default function BasicDemo() {
   const [visibleBug, setVisibleBug] = useState(false);
   const [logBug, setLogBug] = useState(false);
   const [bugTitle, setBugTitle] = useState("");
+  const [showMoreDetails, setShowMoreDetails] = useState(false);
+  const [moreDetails, setMoreDetails] = useState({});
   const [reportSummaryCollaps, setReportSummaryCollaps] = useState(true);
   const filterRef = useRef(null);
   const [reportid, setReportId] = useState(null);
@@ -745,20 +747,44 @@ export default function BasicDemo() {
     }
   }
 
-  const rulesTested = (getAccessibility) => {
-    let rulesTestCount = 0;
+  const rulesTestedPass = (getAccessibility) => {
+    let passCount = 0;
     if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.passes){
-      rulesTestCount = accessibilityData?.rulemap[returnMap(ruleMap)]?.passes.length
+      passCount = accessibilityData?.rulemap[returnMap(ruleMap)]?.passes.length
     }
-    return rulesTestCount;
+    return passCount;
+  }
+
+  const rulesTestedFail = (getAccessibility) => {
+    let failCount = 0;
+    if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.violations){
+      failCount = accessibilityData?.rulemap[returnMap(ruleMap)]?.violations.length
+    }
+    return failCount;
   }
 
   const elementsTested = (getAccessibility) => {
     let elementsTestCount = 0;
+    if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.passes){
+      accessibilityData?.rulemap[returnMap(ruleMap)]?.passes.forEach((el) => {
+        elementsTestCount = el?.elements.length + elementsTestCount
+      })
+    }
     if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.violations){
-      elementsTestCount = accessibilityData?.rulemap[returnMap(ruleMap)]?.violations.length
+      accessibilityData?.rulemap[returnMap(ruleMap)]?.violations.forEach((el) => {
+        elementsTestCount = el?.elements.length + elementsTestCount
+      })
     }
     return elementsTestCount;
+  }
+
+  const onMoreDetails = (getMoreDetails) => {
+    setShowMoreDetails(true);
+    setMoreDetails(getMoreDetails);
+  }
+
+  const detailsTemplate = (getDetails) => {
+    return <span className="pi pi-arrow-right" onClick={() => onMoreDetails(getDetails)}></span>
   }
 
   return (
@@ -781,13 +807,27 @@ export default function BasicDemo() {
                   ? reportData?.overallstatus
                   : {
                       standardName: ruleMap,
-                      numOfRulesTested: rulesTested(accessibilityData),
+                      numOfRulesTested:
+                        rulesTestedPass(accessibilityData) +
+                        rulesTestedFail(accessibilityData),
                       screeName: accessibilityData?.screenname,
                       numOfElementsTested: elementsTested(accessibilityData),
                       url: accessibilityData?.url,
                       browserUsed: accessibilityData?.agent,
-                      pass: rulesTested(accessibilityData),
-                      fail: elementsTested(accessibilityData),
+                      pass:
+                        Math.round(
+                          (rulesTestedPass(accessibilityData) /
+                            rulesTestedPass(accessibilityData) +
+                            rulesTestedFail(accessibilityData)) *
+                            1000
+                        ) / 100,
+                      fail:
+                        Math.round(
+                          (rulesTestedFail(accessibilityData) /
+                            rulesTestedPass(accessibilityData) +
+                            rulesTestedFail(accessibilityData)) *
+                            1000
+                        ) / 100,
                     }
               }
             />
@@ -853,13 +893,23 @@ export default function BasicDemo() {
       ) : (
         <DataTable
           value={
-            (accessibilityData?.rulemap && ruleMap)
+            accessibilityData?.rulemap && ruleMap
               ? [
-                  ...(accessibilityData?.rulemap[returnMap(ruleMap)]?.passes ? accessibilityData?.rulemap[returnMap(ruleMap)]?.passes.map(
-                    (item) => ({ ...item, status: "Pass" })
-                  ) : []),
-                  ...(accessibilityData?.rulemap[returnMap(ruleMap)]?.violations ? accessibilityData?.rulemap[returnMap(ruleMap)]?.violations.map((item) => ({ ...item, status: "Fail" })) : []),
-                ].map((val, ind) => ({ ...val, slno: ind + 1 }))
+                  ...(accessibilityData?.rulemap[returnMap(ruleMap)]?.passes
+                    ? accessibilityData?.rulemap[
+                        returnMap(ruleMap)
+                      ]?.passes.map((item) => ({ ...item, status: "Pass" }))
+                    : []),
+                  ...(accessibilityData?.rulemap[returnMap(ruleMap)]?.violations
+                    ? accessibilityData?.rulemap[
+                        returnMap(ruleMap)
+                      ]?.violations.map((item) => ({ ...item, status: "Fail" }))
+                    : []),
+                ].map((val, ind) => ({
+                  ...val,
+                  slno: ind + 1,
+                  impact: val?.impact ? val?.impact : "Null",
+                }))
               : []
           }
           tableStyle={{ minWidth: "50rem" }}
@@ -871,6 +921,7 @@ export default function BasicDemo() {
           <Column field="description" header="Description"></Column>
           <Column field="status" header="Status"></Column>
           <Column field="impact" header="Impact"></Column>
+          <Column body={detailsTemplate} header=""></Column>
         </DataTable>
       )}
       <Toast ref={iceinfo} />
@@ -1122,6 +1173,40 @@ export default function BasicDemo() {
           background: "#FFFFFF",
         }}
         footerType="Proceed"
+      />
+      <AvoModal
+        visible={showMoreDetails}
+        setVisible={setShowMoreDetails}
+        onModalBtnClick={(getType) => {
+          if (getType === "Cancel") setShowMoreDetails(false);
+        }}
+        content={
+          <div className="flex flex-column">
+            <img
+              src={accessibilityData?.url}
+              height={accessibilityData?.screenshotheight}
+              width={accessibilityData?.screenshotwidth}
+            />
+            <DataTable
+              value={moreDetails?.elements ? moreDetails?.elements.map((e, i) => ({
+                ...e,
+                no: i + 1,
+                element: `Element Type: ${Object.keys(e)[0]}`,
+                status: moreDetails?.status,
+              })) : []}
+            >
+              <Column field="no" header="Sl. No."></Column>
+              <Column field="element" header="Elements"></Column>
+              <Column field="status" header="Status"></Column>
+            </DataTable>
+          </div>
+        }
+        headerTxt="More Details"
+        modalSytle={{
+          width: "80vw",
+          height: "90vh",
+          background: "#FFFFFF",
+        }}
       />
     </div>
   );
