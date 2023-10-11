@@ -948,6 +948,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const handleTestSuite = async(getItem) => {
+    if(getItem.executionRequest.integration){
+      setIntegration(getItem.executionRequest.integration);
+    }
     const readTestSuiteParams = getItem?.executionRequest?.batchInfo && getItem?.executionRequest?.batchInfo.map((el) => ({
       assignedTime: "",
       releaseid: el?.releaseId,
