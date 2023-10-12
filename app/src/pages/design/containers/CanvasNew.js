@@ -2321,8 +2321,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
               </div>
             </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
-          {(props.GeniusDialog|| props.module.currentlyInUse!==userInfo.username) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
-            {(props.GeniusDialog|| props.module.currentlyInUse!==userInfo.username) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
+          {((props.GeniusDialog|| testSuiteInUse) ) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
+            {(props.GeniusDialog|| testSuiteInUse) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
             {props.gen?<svg id="mp__canvas_svg_genius" className='mp__canvas_svg_genius' ref={CanvasRef}>
                 <g className='ct-container-genius'>
                 {Object.entries(links).map((link)=>{
