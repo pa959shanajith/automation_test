@@ -1,13 +1,11 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ScreenOverlay, ScrollBar, VARIANT, Messages as MSG, ValidationExpression } from '../../global'
+import { ScreenOverlay, VARIANT, Messages as MSG, ValidationExpression } from '../../global'
 import { getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData } from '../api';
-// impofrom '../state/actio';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
 import useOnClickOutside from '../components/UseOnClickOutside'
-import { Toast } from 'primereact/toast';
 import { AdminActions } from '../adminSlice';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
@@ -18,6 +16,7 @@ import TokenManagement from '../containers/TokenMangement';
 import { Checkbox } from 'primereact/checkbox';
 import IceProvision from '../containers/IceProvision';
 import UserList from '../components/UserList';
+import { Tooltip } from 'primereact/tooltip';
 
 
 /*Component CreateUser
@@ -27,9 +26,7 @@ import UserList from '../components/UserList';
 
 const CreateUser = (props) => {
     const dispatch = useDispatch();
-    // const userConf = useSelector(state => state.admin.userConf)
     const node = useRef();
-    const toast = useRef();
     const [toggleAddRoles, setToggleAddRoles] = useState(false)
     const [editUserIceProvision, setEditUserIceProvision] = useState();
     const [showDropdown, setShowDropdown] = useState(false)
@@ -73,15 +70,15 @@ const CreateUser = (props) => {
     const [userCreateDialog, setUserCreateDialog] = useState(props.userCreateDialog);
     const [selectedTab, setSelectedTab] = useState('userDetails');
     const [userNameForIceToken, setUserNameForIceToken] = useState('');
-    // const [userIdforIceToken, setUserIdForIceToken] = useState('');
     const [adminCheck, setAdminCheck] = useState(false);
-    const [refreshUserList, setRefreshUserList] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [confirmPasswordFocus, setConfirmPasswordFocus] = useState(false);
+    const [ldapSelectedUserList, setLdapSelectedUserList] = useState([]);
 
     useEffect(() => {
         click();
         dispatch(AdminActions.UPDATE_TYPE("inhouse"));
-        // if (currentTab === "users") setCreateUserDialog(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentTab === "users"]);
 
 
@@ -104,7 +101,6 @@ const CreateUser = (props) => {
                 if (a.name === 'Quality Lead' && b.name === 'Quality Engineer') return -1;
                 return 1;
             });
-
             setRoleDropdownValue(editUserRole);
             setAllRolesUpdate(allRolesList);
         }
@@ -119,28 +115,7 @@ const CreateUser = (props) => {
 
     const displayError = (error) => {
         setLoading(false)
-        toastError(error)
-    }
-
-    const toastError = (erroMessage) => {
-        if (erroMessage.CONTENT) {
-            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
-        }
-        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
-    }
-
-    const toastWarn = (warnMessage) => {
-        if (warnMessage.CONTENT) {
-            toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
-        }
-        else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
-    }
-
-    const toastSuccess = (successMessage) => {
-        if (successMessage.CONTENT) {
-            toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
-        }
-        else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+        props.toastError(error)
     }
 
     //Fetch UserRoles
@@ -158,10 +133,10 @@ const CreateUser = (props) => {
     }
 
     //Transaction Activity for Create/ Update/ Delete User button Action
-    const manage = (props) => {
-        toast.current.clear();
+    const manage = (input) => {
+        props.toast.current.clear();
         setUserNameForIceToken(userName);
-        const action = props.action;
+        const action = input.action;
         if (!validate({ action: action })) return;
         const bAction = action.charAt(0).toUpperCase() + action.substr(1);
         const uType = type;
@@ -196,12 +171,11 @@ const CreateUser = (props) => {
                     if (action === "create") { setSelectedTab("avoAzzureClient") }
                     else {
                         edit();
-                        toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
+                        props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                         setSelectedTab("avoAzzureClient")
                     };
-                    // toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "delete") {
-                        setRefreshUserList(!refreshUserList);
+                        props.setRefreshUserList(!props.refreshUserList);
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
                         if (data0.error) { displayError(data0.error); return; }
                         var data1 = await fetchICE(userObj.userid)
@@ -212,15 +186,15 @@ const CreateUser = (props) => {
                         if (data2.error) { displayError(data2.error); return; }
                     }
                 } else if (data === "exists") {
-                    toastWarn(MSG.ADMIN.WARN_USER_EXIST);
+                    props.toastWarn(MSG.ADMIN.WARN_USER_EXIST);
                 } else if (data === "fail") {
                     if (action === "create") click();
                     else edit();
-                    toastError(MSG.CUSTOM("Failed to " + action + " user.", VARIANT.ERROR));
+                    props.toastError(MSG.CUSTOM("Failed to " + action + " user.", VARIANT.ERROR));
                 }
                 else if (/^2[0-4]{8}$/.test(data)) {
                     if (JSON.parse(JSON.stringify(data)[1])) {
-                        toastError(MSG.CUSTOM("Failed to " + action + " user. Invalid Request!", VARIANT.ERROR));
+                        props.toastError(MSG.CUSTOM("Failed to " + action + " user. Invalid Request!", VARIANT.ERROR));
                         return;
                     }
                     var errfields = [];
@@ -234,11 +208,11 @@ const CreateUser = (props) => {
                     if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
                     if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
                     if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
-                    toastWarn(MSG.CUSTOM("Following values are invalid: " + errfields.join(", ") + " " + hints, VARIANT.WARNING));
+                    props.toastWarn(MSG.CUSTOM("Following values are invalid: " + errfields.join(", ") + " " + hints, VARIANT.WARNING));
                 }
             }
             catch (error) {
-                toastError(MSG.CUSTOM("Failed to " + action + " user.", VARIANT.ERROR));
+                props.toastError(MSG.CUSTOM("Failed to " + action + " user.", VARIANT.ERROR));
             }
         })()
     }
@@ -264,7 +238,7 @@ const CreateUser = (props) => {
             flag = false;
         } else if (!reg.test(userName)) {
             if (!popupOpen) {
-                toastWarn(MSG.ADMIN.WARN_USERNAME_SPECHAR);
+                props.toastWarn(MSG.ADMIN.WARN_USERNAME_SPECHAR);
             }
             popupOpen = true;
             setUserNameAddClass(true);
@@ -289,7 +263,7 @@ const CreateUser = (props) => {
             }
             if (confExpired && action !== "delete") {
                 if (!popupOpen) {
-                    toastWarn(MSG.ADMIN.WARN_CONFIG_INVALID);
+                    props.toastWarn(MSG.ADMIN.WARN_CONFIG_INVALID);
                 }
                 popupOpen = true;
                 setConfServerAddClass("selectErrorBorder");
@@ -306,7 +280,7 @@ const CreateUser = (props) => {
                 flag = false;
             } else if (!regexPassword.test(passWord)) {
                 if (!popupOpen) {
-                    toastWarn(MSG.ADMIN.WARN_PASSWORD);
+                    props.toastWarn(MSG.ADMIN.WARN_PASSWORD);
                 }
                 popupOpen = true;
                 setPasswordAddClass(true);
@@ -317,7 +291,7 @@ const CreateUser = (props) => {
                 flag = false;
             } else if (!regexPassword.test(confirmPassword)) {
                 if (!popupOpen) {
-                    toastWarn(MSG.ADMIN.WARN_PASSWORD);
+                    props.toastWarn(MSG.ADMIN.WARN_PASSWORD);
                 }
                 popupOpen = true;
                 setConfirmPasswordAddClass(true);
@@ -325,7 +299,7 @@ const CreateUser = (props) => {
             }
             if (passWord !== confirmPassword) {
                 if (!popupOpen) {
-                    toastWarn(MSG.ADMIN.WARN_UNMATCH_PASSWORD);
+                    props.toastWarn(MSG.ADMIN.WARN_UNMATCH_PASSWORD);
                 }
                 popupOpen = true;
                 setConfirmPasswordAddClass(true);
@@ -337,7 +311,7 @@ const CreateUser = (props) => {
             flag = false;
         } else if (!emailRegEx.test(email)) {
             if (!popupOpen) {
-                toastWarn(MSG.ADMIN.WARN_INVALID_EMAIL);
+                props.toastWarn(MSG.ADMIN.WARN_INVALID_EMAIL);
             }
             popupOpen = true;
             setEmailAddClass(true);
@@ -397,7 +371,7 @@ const CreateUser = (props) => {
         if (data.error) { displayError(data.error); return; }
         setLoading(false);
         if (data === "empty") {
-            toastWarn(MSG.ADMIN.WARN_LDAP_CONFIGURE);
+            props.toastWarn(MSG.ADMIN.WARN_LDAP_CONFIGURE);
         } else {
             dispatch(AdminActions.UPDATE_NO_CREATE(false));
             data.sort((a, b) => a.name.localeCompare(b.name));
@@ -413,7 +387,7 @@ const CreateUser = (props) => {
             if (data.error) { displayError(data.error); return; }
             setLoading(false);
             if (data === "empty") {
-                toastWarn(MSG.ADMIN.WARN_SAML_CONFIGURE);
+                props.toastWarn(MSG.ADMIN.WARN_SAML_CONFIGURE);
             } else {
                 dispatch(AdminActions.UPDATE_NO_CREATE(false));
                 data.sort();
@@ -430,7 +404,7 @@ const CreateUser = (props) => {
             if (data.error) { displayError(data.error); return; }
             setLoading(false);
             if (data === "empty") {
-                toastWarn(MSG.ADMIN.WARN_OPENID_CONFIGURE);
+                props.toastWarn(MSG.ADMIN.WARN_OPENID_CONFIGURE);
             } else {
                 dispatch(AdminActions.UPDATE_NO_CREATE(false))
                 data.sort((a, b) => a.name.localeCompare(b.name));
@@ -453,7 +427,7 @@ const CreateUser = (props) => {
         if (data.error) { displayError(data.error); return; }
         setLoading(false);
         if (data === "empty") {
-            toastWarn(MSG.ADMIN.WARN_LDAP_CONFIGURE);
+            props.toastWarn(MSG.ADMIN.WARN_LDAP_CONFIGURE);
         }
         else if (data !== undefined) {
             dispatch(AdminActions.UPDATE_NO_CREATE(false))
@@ -493,7 +467,7 @@ const CreateUser = (props) => {
         if (data.error) { displayError(data.error); return; }
         setLoading(false);
         if (data === "empty") {
-            toastWarn(MSG.ADMIN.WARN_NO_USER_FOUND);
+            props.toastWarn(MSG.ADMIN.WARN_NO_USER_FOUND);
         } else {
             dispatch(AdminActions.UPDATE_LDAP_DATA(data))
         }
@@ -542,9 +516,10 @@ const CreateUser = (props) => {
         dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(""));
         dispatch(AdminActions.UPDATE_USERROLE("")); 
         props.setCreateUserDialog(false);
-        setRefreshUserList(!refreshUserList);
+        props.setRefreshUserList(!props.refreshUserList);
         setRoleDropdownValue("");
         setSelectedTab("userDetails");
+        setAdminCheck(false);
         if(editUser) {
             props.reloadData();
             dispatch(AdminActions.EDIT_USER(false));
@@ -552,8 +527,8 @@ const CreateUser = (props) => {
     }
 
     const userCreateHandler = () => {
-        toast.current.clear();
-        editUser ? toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)) : toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
+        props.toast.current.clear();
+        editUser ? props.toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)) : props.toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
         createUserDialogHide();
     }
 
@@ -571,13 +546,15 @@ const CreateUser = (props) => {
             onClick={() => {
                 editUser ? manage({ action: "update" }) : manage({ action: "create" });
             }}
-            disabled={nocreate}>
+            disabled={nocreate}
+            >
         </Button>}
         {selectedTab === "avoAzzureClient" && !editUser ? <Button
             data-test="createButton"
             label="Create" 
             onClick={() => { userCreateHandler()}}
-            disabled={nocreate}>
+            disabled={nocreate}
+            >
         </Button> : ''}
     </>
 
@@ -585,9 +562,7 @@ const CreateUser = (props) => {
 
     return (
         <Fragment>
-            <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={2000} />
             {loading ? <ScreenOverlay content={loading} /> : null}
-            <UserList manage={manage} refreshUserList={refreshUserList} setRefreshUserList={setRefreshUserList} />
             <Dialog
                 visible={props.createUserDialog}
                 onHide={createUserDialogHide}
@@ -605,41 +580,57 @@ const CreateUser = (props) => {
                         ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap} ldapDirectoryAddClass={ldapDirectoryAddClass}
                         confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
                         ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} 
-                        showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} />
+                        showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} primaryRoles={allRolesUpdate}
+                        ldapSelectedUserList={ldapSelectedUserList} setLdapSelectedUserList={setLdapSelectedUserList}/>
 
                     <div style={{ paddingLeft: '1.5rem' }}>
                         {(type === "inhouse") ?
                             <Fragment>
                                 <div className='flex flex-row justify-content-between pl-2 pb-2' >
                                     <div className="flex flex-column">
-                                        <label htmlFor="username" className="pb-2 font-medium">Password<span style={{ color: "#d50000" }}>*</span></label>
-                                        <InputText
-                                            data-test="password"
-                                            value={passWord}
-                                            className='w-full md:w-20rem p-inputtext-sm'
-                                            onChange={(event) => { passwordChange(event.target.value) }}
-                                            type="password"
-                                            autoComplete="new-password"
-                                            name="passWord"
-                                            id="password"
-                                            maxLength="16"
-                                            placeholder='Enter Password'
-                                        />
+                                        <label htmlFor="username" className="pb-2 font-medium">Password <span style={{ color: "#d50000" }}>*</span></label>
+                                        <div className="p-input-icon-right">
+                                            <Tooltip target='.eyeIcon1' content={showNewPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
+                                            <i
+                                                className={`eyeIcon1 cursor-pointer ${showNewPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}`}
+                                                onClick={() => { setShowNewPassword(!showNewPassword) }}
+                                            />
+                                            <InputText
+                                                data-test="password"
+                                                value={passWord}
+                                                className='w-full md:w-20rem p-inputtext-sm'
+                                                onChange={(event) => { passwordChange(event.target.value) }}
+                                                type={showNewPassword ? "text" : "password"}
+                                                autoComplete="new-password"
+                                                name="passWord"
+                                                id="password"
+                                                maxLength="16"
+                                                placeholder='Enter Password'
+                                            />
+                                        </div>
                                     </div>
                                     <div className="flex flex-column">
                                         <label htmlFor="username" className="pb-2 font-medium">Confirm Password <span style={{ color: "#d50000" }}>*</span></label>
-                                        <InputText
-                                            data-test="confirmPassword"
-                                            value={confirmPassword}
-                                            className='w-full md:w-20rem p-inputtext-sm'
-                                            onChange={(event) => { confirmPasswordChange(event.target.value) }}
-                                            type="password"
-                                            autoComplete="new-password"
-                                            name='confirmPassword'
-                                            id='confirmPassword'
-                                            maxLength="16"
-                                            placeholder='Enter Confirm Password'
-                                        />
+                                        <div className="p-input-icon-right">
+                                            <Tooltip target='.eyeIcon2' content={showConfirmPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
+                                            <i
+                                                className={`eyeIcon2 cursor-pointer ${showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}`}
+                                                onClick={() => { setShowConfirmPassword(!showConfirmPassword) }}
+                                            />
+                                            <InputText
+                                                data-test="confirmPassword"
+                                                value={confirmPassword} 
+                                                onFocus={() => setConfirmPasswordFocus(true)}
+                                                className={`w-full md:w-20rem p-inputtext-sm ${confirmPasswordFocus && passWord !== confirmPassword ? 'p-invalid' : '' }`}
+                                                onChange={(event) => { confirmPasswordChange(event.target.value) }}
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                autoComplete="new-password"
+                                                name='confirmPassword'
+                                                id='confirmPassword'
+                                                maxLength="16"
+                                                placeholder='Enter Confirm Password'
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -647,7 +638,7 @@ const CreateUser = (props) => {
                             : null
                         }
 
-                        <div className="flex flex-row items-center">
+                        {type !== "ldap" && <div className="flex flex-row items-center">
                             <div className="flex flex-column">
                                 <label data-test="primaryRoleLabel" className='pb-2 font-medium' style={{ paddingLeft: '0.7rem' }}>Primary Role <span style={{ color: "#d50000" }}>*</span></label>
                                 <Dropdown
@@ -657,28 +648,31 @@ const CreateUser = (props) => {
                                     value={roleDropdownValue}
                                     options={allRolesUpdate}
                                     optionLabel="name"
-                                    className='w-full md:w-20rem'
+                                    className='w-full md:w-20rem p-inputtext-sm'
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
+                                    disabled={editUser}
                                 />
                             </div>
                             {/* Admin Check */}
                             {roleDropdownValue === "5db0022cf87fdec084ae49ab" && (
                                 <div className="flex flex-column items-center secondaryRole_admin"> {/* Test Manager role ID */}
-                                    <label htmlFor="admin_check" className="adminlable_header pb-4 font-medium">Secondary Role</label>
+                                    <label htmlFor="admin_check" className="adminlable_header pb-3 font-medium">Secondary Role</label>
                                     <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
                                     <label htmlFor="admin_check" className="ml-5 -mt-4">Admin</label>
                                 </div>
                             )}
-                        </div>
+                        </div>}
                     </div>
                 </div>}
                 {selectedTab === "avoAzzureClient" && <IceProvision editUserIceProvision={props.editUserData}
                     setEditUserIceProvision={props.setEditUserData}
                     userName={userNameForIceToken}
-                    toastError={toastError}
-                    toastSuccess={toastSuccess}
-                    toast={toast} />}
+                    toastError={props.toastError}
+                    toastSuccess={props.toastSuccess}
+                    toast={props.toast} 
+                    ldapSelectedUserList={ldapSelectedUserList} 
+                    setLdapSelectedUserList={setLdapSelectedUserList}/>}
             </Dialog>
         </Fragment>
     );

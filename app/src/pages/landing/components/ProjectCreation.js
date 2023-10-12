@@ -36,7 +36,7 @@ const ProjectCreation = (props) => {
   return (
     <>
       {/* {visible && <CreateProject setVisible={setVisible} />} */}
-      <div className='p-4 surface-100 flex flex-column'>
+      <div className='p-2 surface-100 flex flex-column' style={{overflow:"auto", height:'100vh'}}>
         <div className='VerticalStepBox'>
           <VerticalSteps />
         </div>

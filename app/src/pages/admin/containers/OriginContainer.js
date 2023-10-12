@@ -2,12 +2,10 @@ import { useSelector} from 'react-redux';
 import React,{useState} from 'react';
 import Header from '../components/AdminHeader';
 import LdapConfig from './LdapConfig';
-import CreateUser from '../components/CreateUser';
-// import UserCreation from './UserCreation';
+import UserHome from '../containers/UserHome';
 import EmailConfiguration from './EmailConfiguration';
 import SamlConf from './SamlConf';
 import '../styles/OriginContainer.scss'
-// import IceProvision from './IceProvision';
 import Agents from './Agents'
 import Grid from './Grid'
 import LicenseManagement from './LicenseManagement';
@@ -26,7 +24,7 @@ const OriginContainer = (props) => {
             </div> : null}
             {currentTab === "ldapConf" && <LdapConfig/>}
             {currentTab === "samlConf" && <SamlConf />}
-            {currentTab === "users" && <CreateUser createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
+            {currentTab === "users" && <UserHome createUserDialog={createUserDialog}  setCreateUserDialog={setCreateUserDialog}/>}
             {currentTab === "email_server_configuration" && <EmailConfiguration/>}
             {currentTab === "manage_agents" && <Agents/>}
             {currentTab === "grid_configuration" && <Grid/>}

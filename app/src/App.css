@@ -7,11 +7,14 @@
   .main_content{
     top: 0vh;
     left: 0vh;
+    height: 100vh;
   }
 
   .sidebar_sidepanel_homepage{    
     display: inline-flex;
     flex-direction: row;
+    width:100%;
+    height: 100vh;
   }
 
 ::-webkit-scrollbar {
