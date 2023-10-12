@@ -477,7 +477,7 @@ const CreateProject = (props) => {
       <Dialog className='Project-Dialog' header={dialogHeader} visible={props.visible} style={{ width: "74.875rem" }} onHide={handleClose} footer={footerContent}>
         <Card className='project-name-1'>
           <div className='pro-name1'>
-            < h5 className='proj__name' disabled={isDisabledProjectName} style={{opacity:!isDisabledAppType ? 1 : 0.5, cursor:isDisabledProjectName ? 'not-allowed ' : 'pointer'}} > Project Name <span className="imp-cls"> * </span> </h5>
+            < h5 className='proj__name' disabled={isDisabledProjectName} style={{opacity:!isDisabledAppType ? 1 : 0.5, appearance:'none'}} > Project Name <span className="imp-cls"> * </span> </h5>
             <InputText  className={`proj-input ${isInvalidProject ? 'p-invalid' : ''}`} value={value}  onChange={handleValueChange}  disabled={isDisabledProjectName} style={{opacity:!isDisabledAppType ? 1 : 0.6,background: !isDisabledAppType ? '' :'lightgray',color:'black' , cursor:isDisabledProjectName ? 'not-allowed ' : 'pointer'}} placeholder="Enter Project Name" />
             {isInvalidProject && (
           <small className="p-error error-message">Special characters are not allowed in the project name</small> )}
