@@ -768,17 +768,22 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         //add dependant checkboxes UI functionality
     const handleCheckboxChangeAddDependant = (event) => {
         const testCase = testcaseList.find(item => item.testCaseName === event.value);
-
+            
         if (testCase) {
             if (event.checked) {
                 setSelectedTestCases([...selectedTestCases, testCase.testCaseName]);
                 handleAdd(testCase);
             } else {
-                handleAdd(testCase);
+                handleRemove(testCase);
                 setSelectedTestCases(selectedTestCases.filter(item => item !== testCase.testCaseName));
-                // Add code to handle the removal of the testCase from addedTestCase
+                setAddedTestCase(addedTestCase.filter(item => item.testCaseName !== testCase.testCaseName));
             }
         }
+    };
+    const handleRemove = (testCaseToRemove) => {
+        setAddedTestCase(prevAdded => prevAdded.filter(item => item.testCaseID !== testCaseToRemove.testCaseID));
+        setTestCaseIDsList(prevIDs => prevIDs.filter(id => id !== testCaseToRemove.testCaseID));
+        setDependencyTestCaseFlag(true);
     };
     // const handleAdd = () => {
     //     const update = { ...testCases };
