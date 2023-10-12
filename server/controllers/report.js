@@ -1432,7 +1432,7 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
     const fnName = "reportStatusScenarios_ICE";
     logger.info("Inside UI service: " + fnName);
     try {
-        var executionid = req.query.executionId;
+        var executionid = req.body.executionId;
         var report = [];
         let inputs = {
             "query": "executiondetails",

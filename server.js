@@ -268,7 +268,7 @@ if (cluster.isMaster) {
 		app.get('/viewReport', report.viewReport);
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
-		app.get('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
+		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.use(csrf({
 			cookie: true
 		}));
