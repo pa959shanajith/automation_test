@@ -661,6 +661,7 @@ const CreateUser = (props) => {
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
                                     disabled={editUser}
+                                    disabled={editUser}
                                 />
                             </div>
                             {/* Admin Check */}
