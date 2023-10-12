@@ -302,7 +302,7 @@ const CreateLanding = (props) => {
                                 <InputText
                                     data-test="email"
                                     value={email}
-                                    onChange={(event) => { props.emailChange(event.target.value).toLowerCase()}}
+                                    onChange={(event) => { props.emailChange(event.target.value.toLowerCase())}}
                                     name="email"
                                     id="email"
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.emailAddClass ? 'inputErrorBorder' : ''}`}
