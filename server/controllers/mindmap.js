@@ -244,8 +244,11 @@ exports.saveData = async (req, res) => {
 				if (e.type == "modules") rIndex = uidx;
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
-				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
-				if (e.type == "testcases") nObj[nObj.length - 1]['pid_c'] = e._id||null;
+				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex,scrapedurl:e.scrapedurl || null ,scrapeinfo:e.scrapeinfo||null });
+				if (e.type == "testcases") {
+					nObj[nObj.length - 1]['pid_c'] = e._id||null;
+					nObj[nObj.length - 1]['steps'] = e.steps||null;
+				};
 				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
 				idDict[e.id] = uidx++;
 			});
@@ -254,11 +257,10 @@ exports.saveData = async (req, res) => {
 				ts.children.forEach(function (s, i) {
 					var tcList = [];
 					s.children.forEach(function (tc, i) {
-						tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex)});
-						
+						tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex),"steps":tc.steps||null});
 					});
 					tcList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-					sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex) });
+					sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex),scrapedurl:s.scrapedurl || null ,scrapeinfo:s.scrapeinfo||null });
 					
 				});
 				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
@@ -1653,4 +1655,56 @@ exports.updateE2E = async (req, res) => {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
+};
+
+
+exports.importDefinition = async (req, res) => {
+	try {
+        logger.info("Inside UI service: importDefinition");
+        var username=req.session.username;
+		var clientName=utils.getClientName(req.headers.host);
+        var icename = undefined
+        if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+        // redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		var action = req.body.param;
+		if(action == 'importDefinition_ICE'){
+			var sourceUrl = req.body.sourceUrl;
+			try {
+				// var wsdlurl = req.body.wsdlurl;
+				logger.info("Sending socket request for debugTestCase to cachedb");
+				dataToIce = {"emitAction" : "WS_ImportDefinition","username" : icename, "sourceUrl":sourceUrl};
+				// redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+				var socket = require('../lib/socket');
+				var mySocket;
+				var clientName=utils.getClientName(host);
+				mySocket = socket.allSocketsMap[clientName][icename];	
+				logger.info("Sending request to ICE for importDefinition_ICE");
+				mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl);
+					function result_WS_ImportDefinition_listener(message) {
+						let data = message;
+						//LB: make sure to send recieved data to corresponding user
+						mySocket.removeListener('result_WS_ImportDefinition', result_WS_ImportDefinition_listener);
+						try {
+							if(!Object.keys(data).length){
+								logger.info('Error Occured in fetching');
+								// res.status(resultData.Error.status).send(resultData.Error.msg);
+								// return;
+							}
+							res.send(data);
+							} catch (exception) {
+								res.send("fail");
+								logger.error("Exception in the service importDefinition - result_WS_ImportDefinition: %s", exception);
+							}
+						}
+					// redisServer.redisSubServer.on("message",result_WS_ImportDefinition_listener);
+					mySocket.on("result_WS_ImportDefinition",result_WS_ImportDefinition_listener)
+				
+			} catch (exception) {
+				logger.error("Exception in the service debugTestCase_ICE - wsdlListGenerator_ICE: %s", exception);
+			}
+		}
+	} catch (exception) {
+        logger.error("Exception in the service importDefinition: %s", exception);
+        res.send("Fail");
+    }
 };

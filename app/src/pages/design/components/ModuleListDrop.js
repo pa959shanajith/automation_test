@@ -7,6 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
 import { isEnELoad, savedList , initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer} from '../designSlice';
+import WSImportMindmap from'../components/WSImportMindmap.js';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -51,6 +52,7 @@ const ModuleListDrop = (props) =>{
     const [modE2Elist, setModE2EList] = useState(moduleLists)
     const [searchForNormal, setSearchForNormal] = useState(false)
     const [importPop,setImportPop] = useState(false)
+    const [WSimportPop,setWSImportPop] = useState(false)
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
@@ -1042,6 +1044,11 @@ setPreventDefaultModule(true);
                      </div> */}
                       {userInfo && userInfo.rolename !== "Quality Engineer" ? (
                         <>
+                      <img className="pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" onClick={()=>setImportPop(true)}></img>
+                     <img  className="custom-target-iconws" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>setWSImportPop(true)}  />
+                     <Tooltip target=".custom-target-iconws" content=" import definition" position="bottom" />
+                     {WSimportPop? <WSImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setWSImportPop} isMultiImport={true}  importPop={WSimportPop}/>:null}
+                    
                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" onClick={()=>setImportPop(true)}></img>
                      <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} toast={toast} />:null}

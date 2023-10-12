@@ -507,6 +507,7 @@ if (cluster.isMaster) {
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
 		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
 		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
+		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
