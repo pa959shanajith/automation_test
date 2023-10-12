@@ -271,12 +271,11 @@ export const getTestSuite = async(getSuiteKey) => {
 export const fetchScenarioInfo = async(executionId) => {
     try{
         const res = await axios(url+'/reportStatusScenarios_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            params: {
-                "param": "reportStatusScenarios_ICE",
+            data: {
                 "executionId": [executionId]
             },
             credentials: 'include'
