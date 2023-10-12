@@ -324,7 +324,7 @@ const CreateUser = (props) => {
         }
         if (userName === "" || firstname === "" || lastname === "" || email === "" || role === "") {
             if(!editUser){
-                toastWarn(MSG.ADMIN.WARN_REQUIRED_FIELD);            
+                props.toastWarn(MSG.ADMIN.WARN_REQUIRED_FIELD);            
             }
         }
         return flag;
@@ -660,7 +660,6 @@ const CreateUser = (props) => {
                                     className= {`w-full md:w-20rem ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
-                                    disabled={editUser}
                                     disabled={editUser}
                                 />
                             </div>
