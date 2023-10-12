@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, connectAzzure_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport } from "../api";
+import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, connectAzzure_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport, openScreenshot } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
@@ -48,9 +48,9 @@ export default function BasicDemo() {
   const [configValues, setConfigValues] = useState({});
   const [selectedRow, setSelectedRow] = useState([]);
   const filterValues = [
-        { name: 'Pass', key: 'P' },
-        { name: 'Fail', key: 'F' },
-        { name: 'Terminated', key: 'T' }
+    { name: 'Pass', key: 'P' },
+    { name: 'Fail', key: 'F' },
+    { name: 'Terminated', key: 'T' }
   ];
   const [selectedFilter, setSelectedFilter] = useState([]);
   const bugRef = useRef(null);
@@ -211,42 +211,42 @@ export default function BasicDemo() {
       bugTitle === "Jira"
         ? Object.keys(configValues).forEach((item) => {
           if(item !== "Summary"){
-              valueObj[item] = {
-                field_name: responseFeilds[item]?.key,
-                userInput:
-                  responseFeilds[item]?.type === "array" && item !== "Attachment"
-                    ? {
-                        title: "",
-                        key: configValues[item]?.key,
-                        text: configValues[item]?.name,
-                      }
-                    : configValues[item],
-                type: responseFeilds[item]?.type,
-              };
-            }
+            valueObj[item] = {
+              field_name: responseFeilds[item]?.key,
+              userInput:
+                responseFeilds[item]?.type === "array" && item !== "Attachment"
+                  ? {
+                    title: "",
+                    key: configValues[item]?.key,
+                    text: configValues[item]?.name,
+                  }
+                  : configValues[item],
+              type: responseFeilds[item]?.type,
+            };
+          }
           else if(item === "Summary") {
             valueObj.summary = configValues[item]
           }
-          })
+        })
         : Object.keys(configValues).forEach((item) => {
-            valueObj[item] = {
-              ...responseFeilds[item],
-              data:
-                typeof configValues[item] === "object"
-                  ? item === "State"
-                    ? {
-                        title: "",
-                        key: responseFeilds[item]?.allowedValues.indexOf(
-                          configValues[item]?.id
-                        ) + 1,
-                        text: configValues[item]?.id?.toString(),
-                      }
-                    : configValues[item]?.id?.toString()
-                  : configValues[item],
-              error: false,
-              isChecked: true,
-            };
-          });
+          valueObj[item] = {
+            ...responseFeilds[item],
+            data:
+              typeof configValues[item] === "object"
+                ? item === "State"
+                  ? {
+                    title: "",
+                    key: responseFeilds[item]?.allowedValues.indexOf(
+                      configValues[item]?.id
+                    ) + 1,
+                    text: configValues[item]?.id?.toString(),
+                  }
+                  : configValues[item]?.id?.toString()
+                : configValues[item],
+            error: false,
+            isChecked: true,
+          };
+        });
       if(bugTitle !== "Jira"){
         valueObj["Area Path"].data = configValues["Area ID"].name
         valueObj["Iteration Path"].data = configValues["Iteration ID"].name
@@ -254,58 +254,58 @@ export default function BasicDemo() {
       const userDetails =
         bugTitle === "Jira"
           ? await connectJira_ICE_create({
-              issue_dict: {
-                project: jiraDropDown?.id,
-                issuetype: issueDropDown?.name,
-                // summary: inputSummary,
-                description: inputDesc,
-                url: loginUrl,
-                username: loginName,
-                password: loginKey,
-                parentissue: "",
-                reportId: reportData?.overallstatus?.reportId,
-                slno: selectedRow[0]?.slno,
-                executionId: reportData?.overallstatus?.executionId,
-                ...(!!Object.keys(configValues).length && valueObj),
-                executionReportNo: `Execution No: ${executed}`,
-              },
-              action: "createIssueInJira",
-            })
+            issue_dict: {
+              project: jiraDropDown?.id,
+              issuetype: issueDropDown?.name,
+              // summary: inputSummary,
+              description: inputDesc,
+              url: loginUrl,
+              username: loginName,
+              password: loginKey,
+              parentissue: "",
+              reportId: reportData?.overallstatus?.reportId,
+              slno: selectedRow[0]?.slno,
+              executionId: reportData?.overallstatus?.executionId,
+              ...(!!Object.keys(configValues).length && valueObj),
+              executionReportNo: `Execution No: ${executed}`,
+            },
+            action: "createIssueInJira",
+          })
           : await connectAzzure_ICE_create({
-              issue_dict: {
-                info: {
-                  project: {
-                    key: jiraDropDown?.id,
-                    text: jiraDropDown?.name,
-                    error: false,
-                  },
-                  issue: {
-                    key: "Bug",
-                    text: "Bug",
-                    error: false,
-                  },
-                  summary: {
-                    value: inputSummary,
-                    error: false,
-                  },
-                  reproSteps: {
-                    value: inputDesc,
-                    error: false,
-                  },
-                  parentIssueId: {
-                    value: "",
-                    error: false,
-                  },
-                  epicName: {
-                    key: "",
-                    value: "",
-                    error: false,
-                  },
-                  chosenList: {
-                    ...(!!Object.keys(configValues).length && valueObj),
-                  },
+            issue_dict: {
+              info: {
+                project: {
+                  key: jiraDropDown?.id,
+                  text: jiraDropDown?.name,
+                  error: false,
                 },
-                url: loginUrl,
+                issue: {
+                  key: "Bug",
+                  text: "Bug",
+                  error: false,
+                },
+                summary: {
+                  value: inputSummary,
+                  error: false,
+                },
+                reproSteps: {
+                  value: inputDesc,
+                  error: false,
+                },
+                parentIssueId: {
+                  value: "",
+                  error: false,
+                },
+                epicName: {
+                  key: "",
+                  value: "",
+                  error: false,
+                },
+                chosenList: {
+                  ...(!!Object.keys(configValues).length && valueObj),
+                },
+              },
+              url: loginUrl,
                 username: loginName,
                 pat: loginKey,
                 reportId: reportData?.overallstatus?.reportId,
@@ -313,9 +313,9 @@ export default function BasicDemo() {
                 ...(getItemType()?.itemId && { mappedId: getItemType()?.itemId }),
                 executionId: reportData?.overallstatus?.executionId,
                 executionReportNo: `Execution No: ${executed}`,
-              },
-              action: "createIssueInAzure",
-            });
+            },
+            action: "createIssueInAzure",
+          });
       if(userDetails === "Fail"){
         jiraconnect?.current?.show({ severity: 'info', summary: 'Info', detail: 'Fail to log a bug.' });
       }
@@ -481,9 +481,9 @@ export default function BasicDemo() {
           (bugTitle === "Jira" &&
             jiraDetails?.projects &&
             !!jiraDetails?.projects.length) ||
-          (bugTitle === "Azure DevOps" &&
-            jiraDetails?.projects &&
-            !!jiraDetails?.projects.length)
+            (bugTitle === "Azure DevOps" &&
+              jiraDetails?.projects &&
+              !!jiraDetails?.projects.length)
             ? "img_jira"
             : ""
         }
@@ -535,8 +535,8 @@ export default function BasicDemo() {
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"
             : modifiedChild.status === "Fail"
-            ? "static/imgs/fail.png"
-            : "static/imgs/treminated.png";
+              ? "static/imgs/fail.png"
+              : "static/imgs/treminated.png";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
           <div key={modifiedChild.key} style={{ display: "flex" }}>
@@ -587,29 +587,29 @@ export default function BasicDemo() {
         const getFields =
           bugTitle === "Jira"
             ? await connectJira_ICE_Fields(
-                jiraDropDown?.id,
-                issueDropDown?.name,
-                loginUrl,
-                loginName,
-                loginKey,
-                jiraDetails?.projects.map((el) => ({
-                  code: el?.code,
-                  key: el?.id,
-                  text: el?.name,
-                }))
-              )
+              jiraDropDown?.id,
+              issueDropDown?.name,
+              loginUrl,
+              loginName,
+              loginKey,
+              jiraDetails?.projects.map((el) => ({
+                code: el?.code,
+                key: el?.id,
+                text: el?.name,
+              }))
+            )
             : await connectAzure_ICE_Fields(
-                jiraDropDown?.id,
-                issueDropDown?.name,
-                loginUrl,
-                loginName,
-                loginKey,
-                jiraDetails?.projects.map((el) => ({
-                  code: el?.code,
-                  key: el?.id,
-                  text: el?.name,
-                }))
-              );
+              jiraDropDown?.id,
+              issueDropDown?.name,
+              loginUrl,
+              loginName,
+              loginKey,
+              jiraDetails?.projects.map((el) => ({
+                code: el?.code,
+                key: el?.id,
+                text: el?.name,
+              }))
+            );
         setResponseFeilds(getFields);
         const fieldValues = Object.keys(getFields).map((el) => ({
           key: bugTitle === "Jira" ? getFields[el].key : getFields[el].referenceName,
@@ -649,6 +649,14 @@ export default function BasicDemo() {
     return nameObj[Dropdown];
   };
 
+  const reoptDescriptionTooltip = (rowdata) => {
+    return <span
+      title={rowdata?.data?.StepDescription}
+    >
+      {rowdata?.data?.StepDescription}
+    </span>;
+  };
+
   const getItemType = () => {
     let itemObj = { itemId: false, itemDesc: false };
     if(mappedProjects?.itemCode){
@@ -663,6 +671,25 @@ export default function BasicDemo() {
     }
     return itemObj;
   };
+
+  const screenShotLink = (getLink) =>
+    getLink?.data?.screenshot_path && (
+      <div
+        className="screenshot_view"
+        onClick={async () => {
+          let data = await openScreenshot(getLink?.data?.screenshot_path);
+          let image = "data:image/PNG;base64," + data;
+          let WindowObject = window.open();
+          let strHtml =
+            "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" +
+            image +
+            "'/>\n</body>\n</html>";
+          WindowObject.document.writeln(strHtml);
+        }}
+      >
+        View Screenshot
+      </div>
+    );
 
   return (
     <div className="reportsTable_container">
@@ -711,6 +738,7 @@ export default function BasicDemo() {
           field="StepDescription"
           header="Description"
           style={{ width: "18rem", padding: "0rem" }}
+          body={reoptDescriptionTooltip}
         />
         <Column
           field="EllapsedTime"
@@ -732,7 +760,11 @@ export default function BasicDemo() {
           body={defectIDForJiraAndAzure}
           style={{ padding: "0rem", textAlign: "center" }}
         />
-        <Column header="Action" style={{ padding: "0rem" }} />
+        <Column
+          body={screenShotLink}
+          header="Action"
+          style={{ padding: "0rem" }}
+        />
       </TreeTable>
       <Toast ref={iceinfo} />
       <Toast ref={jiraconnect} />
@@ -860,8 +892,9 @@ export default function BasicDemo() {
                 onMultiSelectChange={(e) => setConfigureFeilds(e.value)}
                 multiSelectOptions={selectedFiels}
                 name="configureFeilds"
-                placeholder="Configure Fields"
-                required={false}
+                labelTxt="Configure Fields"
+                placeholder="Select configure fields"
+                required={true}
               />
             </div>
             <Divider />
@@ -921,8 +954,8 @@ export default function BasicDemo() {
               el.name !== "Repro Steps" && el.name !== "Value Area" ? (
                 <div className="col-12">
                   {Array.isArray(el.data) ||
-                  el.name === "Iteration ID" ||
-                  el.name === "Area ID" ? (
+                    el.name === "Iteration ID" ||
+                    el.name === "Area ID" ? (
                     <AvoDropdown
                       dropdownValue={configValues[el.name]}
                       name={el.name}
@@ -935,10 +968,10 @@ export default function BasicDemo() {
                       dropdownOptions={
                         el.name !== "Iteration ID" && el.name !== "Area ID"
                           ? el.data.map((e) => ({
-                              ...e,
-                              id: e?.key,
-                              name: bugTitle === "Jira" ? e?.text : e?.name,
-                            }))
+                            ...e,
+                            id: e?.key,
+                            name: bugTitle === "Jira" ? e?.text : e?.name,
+                          }))
                           : getElDropdown(el.name)
                       }
                       parentClass="flex flex-column"

@@ -974,10 +974,10 @@ const toastSuccess = (successMessage) => {
               <span className="containerSpan"><span className="styledSpan">Project Details</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Record Scenario</span></span>
+              <span className="containerSpan"><span className="styledSpan">Record Testcase</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Preview scenario</span></span>
+              <span className="containerSpan"><span className="styledSpan">Preview Testcase</span></span>
             </li>
           </ol>
         </div>

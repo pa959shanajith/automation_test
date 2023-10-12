@@ -321,6 +321,11 @@ const CreateUser = (props) => {
             setUserRolesAddClass("selectErrorBorder");
             flag = false;
         }
+        if (userName === "" || firstname === "" || lastname === "" || email === "" || role === "") {
+            if(!editUser){
+                toastWarn(MSG.ADMIN.WARN_REQUIRED_FIELD);            
+            }
+        }
         return flag;
     };
 
@@ -514,7 +519,7 @@ const CreateUser = (props) => {
     const createUserDialogHide = () => {
         dispatch(AdminActions.UPDATE_INPUT_PASSWORD(""));
         dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(""));
-        dispatch(AdminActions.UPDATE_USERROLE("")); 
+        dispatch(AdminActions.UPDATE_USERROLE(""));
         props.setCreateUserDialog(false);
         props.setRefreshUserList(!props.refreshUserList);
         setRoleDropdownValue("");
@@ -524,6 +529,13 @@ const CreateUser = (props) => {
             props.reloadData();
             dispatch(AdminActions.EDIT_USER(false));
         }
+        setUserNameAddClass(false);
+        setfirstnameAddClass(false);
+        setLastnameAddClass(false);
+        setConfirmPasswordAddClass(false); 
+        setPasswordAddClass(false);
+        setEmailAddClass(false);
+        setUserRolesAddClass(false);
     }
 
     const userCreateHandler = () => {
@@ -537,25 +549,21 @@ const CreateUser = (props) => {
             data-test="cancelButton"
             label="Cancel"
             text
-            onClick={createUserDialogHide}
+            onClick={() => {
+                editUser ? createUserDialogHide() :  userCreateHandler();
+            }}
         >
         </Button>
         {(selectedTab === "userDetails") && <Button
             data-test="createButton"
-            label={editUser ? "Update" : "Next"}
+            label={editUser ? "Update" : "Create"}
             onClick={() => {
                 editUser ? manage({ action: "update" }) : manage({ action: "create" });
             }}
             disabled={nocreate}
             >
+            {editUser ? "" : <i className="m-1 pi pi-arrow-right"/>}
         </Button>}
-        {selectedTab === "avoAzzureClient" && !editUser ? <Button
-            data-test="createButton"
-            label="Create" 
-            onClick={() => { userCreateHandler()}}
-            disabled={nocreate}
-            >
-        </Button> : ''}
     </>
 
 
@@ -575,7 +583,7 @@ const CreateUser = (props) => {
                 {selectedTab === "userDetails" && <div data-test="create__container" className="createUser-container">
                     {/* <div data-test="heading" id="page-taskName"><span>{(showEditUser === false) ? "Create User" : "Edit User"}</span></div> */}
 
-                    <CreateLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass}
+                    <CreateLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} setEmailAddClass={setEmailAddClass} emailAddClass={emailAddClass}
                         ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown}
                         ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap} ldapDirectoryAddClass={ldapDirectoryAddClass}
                         confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
@@ -598,7 +606,7 @@ const CreateUser = (props) => {
                                             <InputText
                                                 data-test="password"
                                                 value={passWord}
-                                                className='w-full md:w-20rem p-inputtext-sm'
+                                                className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
                                                 onChange={(event) => { passwordChange(event.target.value) }}
                                                 type={showNewPassword ? "text" : "password"}
                                                 autoComplete="new-password"
@@ -619,9 +627,9 @@ const CreateUser = (props) => {
                                             />
                                             <InputText
                                                 data-test="confirmPassword"
-                                                value={confirmPassword} 
+                                                value={confirmPassword}
                                                 onFocus={() => setConfirmPasswordFocus(true)}
-                                                className={`w-full md:w-20rem p-inputtext-sm ${confirmPasswordFocus && passWord !== confirmPassword ? 'p-invalid' : '' }`}
+                                                className={`w-full md:w-20rem p-inputtext-sm ${confirmPasswordAddClass || ( confirmPasswordFocus && passWord !== confirmPassword ) ? 'inputErrorBorder' : '' }`}
                                                 onChange={(event) => { confirmPasswordChange(event.target.value) }}
                                                 type={showConfirmPassword ? "text" : "password"}
                                                 autoComplete="new-password"
@@ -648,7 +656,7 @@ const CreateUser = (props) => {
                                     value={roleDropdownValue}
                                     options={allRolesUpdate}
                                     optionLabel="name"
-                                    className='w-full md:w-20rem p-inputtext-sm'
+                                    className= {`w-full md:w-20rem ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
                                     disabled={editUser}

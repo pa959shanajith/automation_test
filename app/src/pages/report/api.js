@@ -66,34 +66,6 @@ export const getFunctionalReports = async(projId, relName, cycId) => {
     }
 }
 
-export const fetchModuleData = async(arg) => {
-    try{
-        const res = await axios(url+'/getSuiteDetailsInExecution_ICE', {
-            method: 'GET',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            params: {
-                "param": "getSuiteDetailsInExecution_ICE",
-                ...arg
-            },
-            credentials: 'include'
-        });
-        if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(navigate)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }
-        if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        console.error(res.data)
-        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
-    }catch(err){
-        console.error(err)
-        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
-    }
-}
-
 export const getProjectList = async() => {
     try{
         const res = await axios(url+'/populateProjects', {
@@ -147,6 +119,79 @@ export const getReportList = async(getConfigKey) => {
     }
 }
 
+export const getReportListSuites = async(getTestSuiteId) => {
+    try{
+        const res = await axios(url+'/fetchExecProfileStatus', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                query:"fetchExecProfileStatus",
+                testsuiteid: getTestSuiteId,
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+    }catch(err){
+        console.error(err)
+    }
+}
+
+export const getTestSuiteList = async(getTestSuiteId) => {
+    try{
+        const res = await axios(url+'/fetchExecProfileStatus', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                query:"fetchExecProfileStatus",
+                testsuiteid: getTestSuiteId,
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+    }catch(err){
+        console.error(err)
+    }
+}
+
+export const openScreenshot = async(path) => {
+    try{
+        const res = await axios(url+'/openScreenShot', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: {
+                "absPath": [path]
+            },
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+    }catch(err){
+        console.error(err)
+    }
+}
+
 export const getTestSuite = async(getSuiteKey) => {
     try{
         const res = await axios(url+'/fetchModSceDetails', {
@@ -159,16 +204,35 @@ export const getTestSuite = async(getSuiteKey) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(navigate)
-            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+
+export const fetchScenarioInfo = async(executionId) => {
+    try{
+        const res = await axios(url+'/reportStatusScenarios_ICE', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            params: {
+                "param": "reportStatusScenarios_ICE",
+                "executionId": [executionId]
+            },
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+    }catch(err){
+        console.error(err)
     }
 }
 

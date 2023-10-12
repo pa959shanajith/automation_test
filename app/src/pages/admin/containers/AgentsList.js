@@ -272,7 +272,7 @@ const AgentsList = ({ setLoading, setShowConfirmPop, toastError, toastSuccess })
         </div>
       </div>
       <div style={{ position: "absolute", width: "70%", height: "-webkit-fill-available" }}>
-        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData} scrollable scrollHeight="25rem">
+        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData} scrollable scrollHeight="20rem">
           <Column header="Agent Name" body={(agent) => (
             <div className="agent_state">
               <Tooltip target={`agent-name-${agent.name}`} content={agent.state} position="top" />

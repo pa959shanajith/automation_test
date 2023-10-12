@@ -106,6 +106,7 @@ const Messages={
         WARN_CONFIG_INVALID: {"CONTENT":"This configuration is deleted/invalid.", "VARIANT": VARIANT.WARNING},
         WARN_PASSWORD: {"CONTENT":"Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters.", "VARIANT": VARIANT.WARNING},
         WARN_UNMATCH_PASSWORD: {"CONTENT":"Password and Confirm Password did not match", "VARIANT": VARIANT.WARNING},
+        WARN_REQUIRED_FIELD: {"CONTENT":"Fill out all the required fields.", "VARIANT": VARIANT.WARNING},
         WARN_INVALID_EMAIL: {"CONTENT":"Email address is not valid.", "VARIANT": VARIANT.WARNING},
         WARN_LDAP_CONFIGURE: {"CONTENT":"There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section.", "VARIANT": VARIANT.WARNING},
         WARN_SAML_CONFIGURE: {"CONTENT":"There are no SAML server configured. To proceed create a server configuration in SAML configuration section.", "VARIANT": VARIANT.WARNING},
@@ -405,12 +406,12 @@ const Messages={
         SUCC_SCREEN_EXCEL_IMPORT: {"CONTENT":"Screen Excel imported successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_OBJ_ADD: {"CONTENT":"Element(s) added successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_CERT_SAVE: {"CONTENT":"Certificate Saved successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_OBJ_CREATE: {"CONTENT":"Elemnts has been created successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_OBJ_CREATE: {"CONTENT":"Elements has been created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_IRIS_SAVE: {"CONTENT":"Submitted Successfully. IRIS image saved.", "VARIANT": VARIANT.SUCCESS},
         SUCC_MAPPED_SCRAPED: {"CONTENT":"Mapped captured element(s) Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_REPLACE_SCRAPED: {"CONTENT":"Replaced captured element(s) successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_OBJ_SAVE: { "CONTENT": 'Captured elements saved successfully.', "VARIANT": VARIANT.SUCCESS },
+        SUCC_OBJ_SAVE: { "CONTENT": 'Elements saved successfully.', "VARIANT": VARIANT.SUCCESS },
         SUCC_OBJ_TESTCASES_REPLACED:{"CONTENT":'Element and all dependent Testcases Replaced successfully.',"VARIANT":VARIANT.SUCCESS},
         SUCC_OBJ_IDENTIFIER_LIST: { "CONTENT": 'Element Identifier order updated successfully.', "VARIANT": VARIANT.SUCCESS },
         SUCC_OBJ_PROPERTIES:{"CONTENT":'Element Properties updated successfully', "VARIANT": VARIANT.SUCCESS },
@@ -508,8 +509,10 @@ const Messages={
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
         ERR_SAUCELABS_FETCH: {"CONTENT": "Failed to fetch Saucelabs details.", "VARIANT": VARIANT.ERROR},
         ERR_ADD_FETCH:{"CONTENT": "Failed to fetch Azure DevOps details","VARIANT":VARIANT.ERROR},
+        ERR_UPLOAD_APK:{"CONTENT": "Failed to Upload apk","VARIANT":VARIANT.ERROR},
         
         SUCC_INFO_UPDATED: {"CONTENT": "User Information updated successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_UPLOAD_APK: {"CONTENT": "Uploaded apk successfully!", "VARIANT": VARIANT.SUCCESS},
     },
 
     LOGIN: {

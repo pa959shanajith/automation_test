@@ -1,0 +1,311 @@
+@import "../../global/styles/ColorVariables.scss";
+.UtlmiddleContent{
+    // display: flex;
+    // flex-direction: column;
+    // flex: 0 1 100%;
+    // min-width: 0;
+    // padding: 20px;
+    // margin: 0 5px;
+    // position: relative;
+    // left: 18rem;
+    // background-color: $whiteColor;
+
+}
+.middleContent::-webkit-scrollbar {
+    display: none;
+}
+.middleContent {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+// .page-taskName{
+//     float: left;
+//     width: 100%;
+//     margin-bottom: 10px;
+// }
+
+.taskname{
+    display: inline-block;
+    // background: $primaryColorDarkest;
+    // font-size: 18px;
+    font:$f4_semibold;
+    // color: $whiteColor;
+    // font-family: $avoSecondaryFont;
+    padding: 2px 14px 1px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+#dropdown{
+    padding: 3px;
+    padding-top: 0px;
+    height: 24px;
+    // border: 1px solid $borderFive !important;
+    width: 23%;
+    margin-top: 6px;
+    border-radius: 5px;
+    outline: none !important;
+    margin: 6px 10px 9px 10px;
+    // color: $primaryText
+    
+}
+.options{
+    text-align: center;
+    font-size: 14px;
+}
+
+#encryption_btns{
+    float: right;
+    position: relative;
+    right: 22rem;
+    /* top: 8px; */
+    display: flex;
+    gap: 1rem;
+}
+.btn-utl{
+    // color: $whiteColor;
+    // border: 0;
+    // border-radius: 20px;
+    // padding: 2px 25px;
+    // font-size: 17px;
+    // background: $primaryColor;
+    // font-family: $avoSecondaryFont;
+    // outline: 0;
+    height: 28px;
+    font: $f6_regular !important;
+    // margin-right: 10px;
+    // margin-bottom: 25px;
+}
+.btn-reset{
+    // color: $whiteColor;
+    // border: 0;
+    // border-radius: 20px;
+    // padding: 2px 25px;
+    // font-size: 17px;
+    // background: $primaryColor;
+    // font-family: $avoSecondaryFont;
+    // outline: 0;
+    height: 28px;
+    font: $f6_regular !important;
+    // margin-bottom: 25px;
+}
+.ult_content_conatiner{
+    height: 90%;
+}
+.encryptionData-body{
+    height: 40%;
+    float: left;
+    width: 100%;
+    resize: none;
+    padding: 10px;
+    // border: 1px solid $borderFive !important;
+    margin-bottom: 10px;
+}
+.emptycall{
+    // border: 2px solid $red !important;
+}
+.textarea{
+    border: none;
+}
+#encryptData{
+    border: none;
+    width: 77%;
+    height: 100%;
+    outline: none;
+    resize: none;
+    font-size: 16px;
+}
+#encryptedData{
+    border: none;
+    width: 77%;
+    height: 100%;
+    outline: none;
+    resize: none;
+    font-size: 16px;
+}
+#optimization-fn{
+    border-radius: 1em;
+    display: block;
+    float: left;
+    // background: $whisper;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    width: 33%;
+    height: 167px;
+
+}  
+
+#optimization-fn >div{
+    width: 100%;
+    display: flex;
+    margin: auto;
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    height: -moz-fit-content;
+    height: fit-content;
+    align-content : center;
+}
+
+.pairwise{
+    flex-grow: 1;
+    text-align: center;
+    // border-right: 1px solid $borderTwo;
+    position: relative;
+    min-width: 50%;
+    cursor: pointer;
+    
+    
+}
+.pairwise:last-child{
+    border:none;
+}
+
+.pairwise_scr{
+    padding-bottom: 15px;
+    span{
+        margin-right: 5px;
+        font-size: 14px;
+        // font-family: $avoFont;
+        margin: 2px;
+    }
+    span:last-of-type{
+        margin-left: 5px;
+    }
+    button:first-of-type{
+        padding: 0px 12px ;
+        outline: 0 ;
+        height: 25px ;
+        margin-bottom: 2px ;
+        margin-top: 2px ;
+        margin-left: 15px ;
+    }
+    button:last-of-type{
+        float: right !important;
+        margin-bottom: 0px;
+        margin-right: 0px;
+    }
+    input {
+        // border: 1px solid $borderGray !important;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        outline: none;
+        width: 113px;
+        height: 24px;
+        padding: 3px;
+        margin: 0px 6px;
+        font-size: 14px;
+        // font-family: $avoFont;
+        text-align: center;
+    }
+    
+}
+.btn-create{
+    // background: $primaryColor;
+    // color: $whiteColor;
+    outline: 0;
+    border-radius: 20px;
+    padding: 0px 12px;
+    font-size: 13px;
+    // font-family: $avoFont ;
+    margin-right: 7px;
+    // font-family: $avoSecondaryFont;
+    border: 0;
+    width: 63.25px;
+    height: 21px !important;
+   
+    
+}
+.middle_holder{
+    display: flex;
+    flex-direction: column;
+    height: 38rem;
+    position: relative;
+    width: 92%;
+    bottom: 10rem;
+}
+// .pairwise_array{
+//     // overflow: scroll;
+//     height: 90%;
+//     width : 100%;
+//     position: relative;
+// }
+.factor__row{
+    white-space: nowrap;
+    position: relative;
+    margin-bottom:10px;
+    
+}
+.factor__row > input[type="text"] {
+    margin-right: 10px;
+    // border: 1px solid $borderGray !important;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    outline: none;
+    width: 113px;
+    height: 24px;
+    padding: 3px;
+    margin: 0px 6px;
+    font-size: 14px;
+    // font-family: $avoFont;
+    text-align: center;
+}
+.factor__row > input[type="text"]:first-child{
+    margin-right: 50px !important;
+}
+.pairsie_array_container{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 100%;
+
+    .pw__con{
+        display: flex;
+        flex-direction: column;
+        flex: 1 1;
+        height: 100%;
+        width: 85%;
+    }
+    .pw__min{
+        min-height: 0;
+    }
+    .pw__ab{
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+    }
+}
+#EmptyCall{
+        // border: 1px solid $red !important;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        outline: none;
+        width: 113px;
+        height: 24px;
+        padding: 3px;
+        margin: 0px 6px;
+        font-size: 14px;
+        // font-family: $avoFont;
+        text-align: center;
+}
+#EmptyCall1{
+        // border: 1px solid $red !important;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        outline: none;
+        width: 113px;
+        height: 24px;
+        padding: 3px;
+        margin: 0px 6px;
+        font-size: 14px;
+        // font-family: $avoFont;
+        text-align: center;
+}

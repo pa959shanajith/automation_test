@@ -288,7 +288,7 @@ const CreateLanding = (props) => {
                                 <InputText
                                     data-test="userName-input__create"
                                     type="text"
-                                    className='w-full md:w-20rem p-inputtext-sm placeHolder'
+                                    className={`w-full md:w-20rem p-inputtext-sm placeHolder ${props.userNameAddClass ? 'inputErrorBorder': ''}`}
                                     id="userName"
                                     value={userName} onChange={(event) => { userNameChange(event.target.value) }}
                                     name="userName" maxLength="100"
@@ -305,32 +305,33 @@ const CreateLanding = (props) => {
                                     onChange={(event) => { props.emailChange(event.target.value) }}
                                     name="email"
                                     id="email"
-                                    className='w-full md:w-20rem p-inputtext-sm'
+                                    className={`w-full md:w-20rem p-inputtext-sm ${props.emailAddClass ? 'inputErrorBorder' : ''}`}
                                     maxLength="100"
                                     placeholder="Enter Email Id"
                                 />
                             </div>
                         </div>
 
+
                         <div className='flex flex-row justify-content-between pl-2 pb-2'>
                             <div className='flex flex-column'>
                                 <label htmlFor='firstname' className="pb-2 font-medium">First Name <span style={{ color: "#d50000" }}>*</span></label>
                                 <InputText data-test="firstName-input__create"
-                                    className='w-full md:w-20rem p-inputtext-sm' type="text"
+                                    className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
+                                    type="text"
                                     name="firstname" id="firstname" value={firstname}
                                     onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(event.target.value)) }}
                                     maxLength="100"
-                                    // className={props.firstnameAddClass ? "middle__input__border-create form-control__conv-create form-control-custom-create inputErrorBorder" : "middle__input__border-create form-control__conv-create form-control-custom-create "}
                                     placeholder="Enter First Name" />
                             </div>
                             <div className='flex flex-column'>
                                 <label htmlFor='lastname' className="pb-2 font-medium">Last Name <span style={{ color: "#d50000" }}>*</span></label>
                                 <InputText data-test="lastName-input__create"
-                                    className='w-full md:w-20rem p-inputtext-sm' type="text"
+                                className={`w-full md:w-20rem p-inputtext-sm ${props.lastnameAddClass ? 'inputErrorBorder' : ''}`}
+                                    type="text"
                                     name="lastname" id="lastname" value={lastname}
                                     onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_LASTNAME(event.target.value)) }}
                                     maxLength="100"
-                                    //  className={props.lastnameAddClass ? "middle__input__border-create form-control__conv-create form-control-custom-create inputErrorBorder" : "middle__input__border-create form-control__conv-create form-control-custom-create  "}
                                     placeholder="Enter Last Name" />
                             </div>
                         </div>

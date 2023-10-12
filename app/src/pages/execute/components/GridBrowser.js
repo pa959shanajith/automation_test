@@ -32,7 +32,9 @@ const GridBrowser = ({
   setIsEmailNotificationEnabled,
   displayModal,
   onHide,
-  onClick
+  onClick,
+  checkedExecution,
+  setCheckedExecution
 }) => {
   const dispatch = useDispatch();
   avogrids.forEach((el, index, arr) => {
@@ -44,7 +46,6 @@ const GridBrowser = ({
   const typesOfAppType = NameOfAppType.appType;
   const [showIntegrationModal, setShowIntegrationModal] = useState(false)
   const [selectedTool, setSelectedTool] = useState(false);
-  const [checkedExecution, setCheckedExecution] = useState(false);
   const [checkedNotify, setCheckedNotify] = useState(false);
   // const[isNotifyOnExecutionCompletion,setIsNotifyOnExecutionCompletion]=useState('');
   const toast = useRef(null);
@@ -52,7 +53,8 @@ const GridBrowser = ({
   const tools = [
     { name: 'ALM' },
     { name: 'qTest' },
-    { name: 'Zephyr' }
+    { name: 'Zephyr' },
+    { name: 'Azure'}
   ];
 
   const selectedToolTemplate = (option, props) => {

@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import '../styles/AddElement.scss';
+import { Messages as MSG, VARIANT } from '../../global/components/Messages';
 
 
 const AddElement = (props) => {
@@ -29,6 +30,11 @@ const AddElement = (props) => {
     ];
 
     const addElementSaveHandler = () => {
+        let errorObj = {};
+        let errorFlag = null;
+
+        let duplicateDict = {};
+        let idArr = [];
         let newObjects = [];
         let newOrderList = [];
 
@@ -37,7 +43,29 @@ const AddElement = (props) => {
             let type = addElementObjects[i].objType;
             let tempId = addElementObjects[i].tempId;
             let [tag, value] = type.split("-");
-            let custname = `${name.trim()}_${value}`;
+            let custname = `${name.trim()}`;
+
+            for(let object of props.capturedDataToSave) {
+                if (object.title === custname) {
+                    errorObj = { type: "input", tempId: [tempId], dTitle: custname };
+                    errorFlag = 'present';
+                    break;
+                }
+            }
+            if (errorFlag==='present') break;
+
+            if (!name || !type) {
+                errorObj = { type: !name ? "input" : "type", tempId: [tempId] };
+                errorFlag = 'empty';
+                break;
+            }
+
+            if (custname in duplicateDict){
+                duplicateDict[custname].push(tempId);
+                idArr.push(...duplicateDict[custname]);
+                errorFlag = 'duplicate';
+            }
+            else duplicateDict[custname] = [tempId];
             let newUUID = uuid();
             newObjects.push({
                 custname: name,
@@ -51,8 +79,17 @@ const AddElement = (props) => {
             });
             newOrderList.push(newUUID);
         }
-        if (newObjects.length > 0) {
+        if (errorFlag) {
+            if (errorFlag==='duplicate') {
+                errorObj = {type: 'input', tempId: idArr};
+                props.toastError(MSG.SCRAPE.ERR_DUPLICATE_OBJ)
+            } 
+            else if (errorFlag==='present') props.toastError(MSG.CUSTOM(`Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`,VARIANT.ERROR))
+            // setError(errorObj);
+        };
+        if (!errorFlag && newObjects.length > 0) {
             props.addCustomElement(newObjects, newOrderList);
+            props.toastSuccess(MSG.SCRAPE.SUCC_OBJ_ADD);
         }
         props.OnClose();
     }

@@ -84,7 +84,7 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHide, handleSub
 });
 
 const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBasic5, onHide, showSauceLabs,
-    changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+    changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,  selectProjects, selectedProject,
     availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap }) => {
     const [newOsNames, setNewOsNames] = useState([])
     const [selectedOS, setSelectedOS] = useState('');
@@ -99,6 +99,9 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     const [emulator, setEmulator] = useState([]);
     const [platformVersions, setPlatformVersions] = useState([]);
     const [showRealdevice, setShowRealdevice] = useState('emulator');
+    const [selectApk, setSelectApk] = useState('');
+    const [appPackageName,setAppPackageName] = useState('');
+    const [appActivityName, setAppActivityName] = useState('');
 
     useEffect(() => {
         setSelectedPlatforms('')
@@ -108,6 +111,8 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
         setPlatforms([])
         setPlatformVersions([])
         setEmulator([])
+        setSelectApk([])
+        setAppActivityName([])
         if (Object.keys(browserDetails).length) {
             setNewOsNames(browserDetails.os_names.map((element, index) => {
                 return { key: element, text: element, title: element, index: index };
@@ -188,6 +193,10 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
     }
     const onVersionChange = async (option) => {
         setSelectedVersion(option.key)
+    }
+    const onApkChange = async (option) => {
+        setSelectApk(option.value);
+        setAppPackageName(option.value.text);
     }
 
     const onMobilePlatformChange = async (option) => {
@@ -329,6 +338,22 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             calloutMaxHeight='12rem'
                         />
                     </>}
+                    {selectProjects === 'MobileApp' &&
+                    <>
+                        <div><h6>UploadedApk</h6></div>
+                        <Dropdown
+                            filter
+                            disabled={selectedPlatforms == ''}
+                            onChange={(e) => onApkChange(e)}
+                            // options={mobileDetails?.stored_files && mobileDetails?.stored_files.map((el) => ({ key: el?.name, text :el?.name, title: el?.name, index: el?.id }))}
+                            options={mobileDetails?.stored_files && mobileDetails?.stored_files.map((el) => ({ key: el?.name, text :el?.appPackageName, title: el?.name, index: el?.id }))}
+                            value={selectApk}
+                            // valueTemplate={selectApk}
+                            placeholder='select apk'
+                            optionLabel='key'
+                            className="w-full md:w-10rem"
+                        />
+                    </>}
                 <div>
                     <div>
                         <div className='adminControl-ice-saucelabs'>
@@ -381,7 +406,10 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                             "platformName": selectedPlatforms,
                             "browserName": "Chrome",
                             "deviceName": selectedEmulator,
-                            "platformVersion": selectedMobileVersion.split(" ")[1]
+                            "platformVersion": selectedMobileVersion.split(" ")[1],
+                            "uploadedApk": selectApk,
+                            "appPackageName": appPackageName,
+                            "appActivity" : appActivityName
                         }
                     }
 
@@ -398,7 +426,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, browserDetails, displayBas
                     setSelectedPlatforms('');
                     setSelectedMobileVersion('');
                     setSelectedEmulator('');
-
+                    setSelectApk([]);
                     onHide('displayBasic5');
                 }
                 }

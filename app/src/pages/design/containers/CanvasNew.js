@@ -20,6 +20,7 @@ import { RedirectPage} from '../../global';
 import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
+import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -32,7 +33,6 @@ import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from 'primereact/dropdown';
 import { highlightScrapElement_ICE } from '../../design/api'
 import MapElement from '../components/MapElement';
-import { ImpactAnalysisScreenLevel ,CompareObj, CompareData} from '../designSlice';
 import { ContextMenu } from 'primereact/contextmenu'
 import { AnalyzeScenario, deletedNodes } from '../designSlice';
 import { showGenuis } from '../../global/globalSlice';
@@ -41,6 +41,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
+import { Tag } from 'primereact/tag';
 import '../styles/ActionPanelObjects.scss'
 
 /*Component Canvas
@@ -67,7 +68,6 @@ const CanvasNew = (props) => {
     const dispatch = useDispatch()
     const history = useNavigate();
     const toast = useRef();
-    const userInfo = useSelector((state) => state.landing.userinfo);
     const copyNodes = useSelector(state=>state.design.copyNodes)
     const selectBox = useSelector(state=>state.design.selectBoxState)
     const deletedNoded = useSelector(state=>state.design.deletedNodes)
@@ -151,12 +151,17 @@ const CanvasNew = (props) => {
     const[mainScrapedData,setMainScrapedData]=useState(null)
     const[orderList,setOrderList]=useState(null)
     const[fetchingDetailsScreen,setFetchingDetailsScreen]=useState(null)
+    const[testSuiteInUse,setTestSuiteInUse]=useState(false)
     const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let Proj = reduxDefaultselectedProject;
     const typesOfAppType = props.appType;
     const appType = typesOfAppType
     const [toastData, setToastData] = useState(false);
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
     
   useEffect(()=>{
     let browserName = (function (agent) {        
@@ -174,8 +179,15 @@ const CanvasNew = (props) => {
 
     setBrowserName(browserName.name)
     setSelectedSpan(browserName.val)
+    if(props.module.currentlyInUse!=="" && props.module.currentlyInUse!==undefined && props.module.currentlyInUse!==userInfo.username){
+      setTestSuiteInUse(true)
+    }
+    else{
+      setTestSuiteInUse(false)
+    }
     
-  },[])
+  },[props.module.currentlyInUse])
+
     useEffect(()=>{
       if(deletedNoded && deletedNoded.length>0){
           var scenarioIds=[]
@@ -303,6 +315,8 @@ const CanvasNew = (props) => {
         setSection(tree.sections)
         setVerticalLayout(props.verticalLayout);
         setBlockui({show:false})
+        dispatch(SetOldModuleForReset(tree.dNodes[0]._id))
+        localStorage.setItem('OldModuleForReset',tree.dNodes[0]._id)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.module,props.reload,props.verticalLayout,analyzeScenario]);
     useEffect(()=>{
@@ -353,32 +367,39 @@ const CanvasNew = (props) => {
         { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
-        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command:()=>{confirm1()}},
+        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false,command:()=>{confirm1()}},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-        { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
         
     ];
-    const menuItemsScreen = [
+    const menuItemsScreen = !testSuiteInUse?[
         { label: 'Add Test steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
         { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
-        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>handleCapture() },
+        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
-    ];
+      ]:[
+        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>handleCapture() },
+  
+      ];
 
-    const menuItemsTestSteps = [
+
+      const menuItemsTestSteps = !testSuiteInUse?[
         { label: 'Design Test steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
 
-    ];
+      ]:[
+          { label: 'Design Test steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
+    
+        ]
     const nodeClick=(e)=>{
       d3.select('#'+box).classed('node-highlight',false)
     }
@@ -1005,6 +1026,16 @@ const CanvasNew = (props) => {
 
   const reject = () => {}
   const handleContext=(e,type,value)=>{
+    if(props.module.currentlyInUse!=="" && props.module.currentlyInUse!=undefined && props.module.currentlyInUse!==userInfo.username){
+      if(type=="modules"){
+        toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
+        return
+      }
+      if(type=="scenarios"){
+        toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
+        return
+      }
+    }
     if (value === "created"){
       setToastData(true);
     }else{
@@ -1869,6 +1900,9 @@ const toastError = (erroMessage) => {
 const toastErrorMsg=(errorMessage)=>{
   toast.current.show({ severity: 'error', summary: 'Error', detail: errorMessage, life: 5000 });
 }
+const toastWarnMsg=(errorMessage)=>{
+  toast.current.show({ severity: 'warn', summary: 'Warning', detail: errorMessage, life: 5000 });
+}
 
 const toastSuccess = (successMessage) => {
   if (successMessage.CONTENT) {
@@ -2188,8 +2222,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         scenarioId={fetchingDetails['_id']}
       ></MapElement>
       }
-{visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} />}
-{visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} />}
+{visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} testSuiteInUse={testSuiteInUse}/>}
+{visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} testSuiteInUse={testSuiteInUse}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
              <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Testcase" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
@@ -2273,9 +2307,22 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {props.GeniusDialog?null:<NavButton setCtScale={setCtScale} ctScale={ctScale} zoom={zoom}/>}
             {/* <Legends/> */}
             {props.GeniusDialog?<Legends />:null}
+            {testSuiteInUse? 
+            <div className='readonly__container'>
+              <Tooltip target={`.infoinuse`}  content={`${props.module.currentlyInUse}`} position="bottom"/>
+              <Tooltip target={`.viewonly`}  content={`View the files,but make no changes.`} position="bottom"/>
+              <div className='viewonly__container'>
+                <span style={{letterSpacing:'1px',fontSize:'1.3rem'}} className='readonlytext'>Read only view</span>
+                <img src={"static/imgs/view_only_access_icon.svg"} style={{height:'29px'}} className='viewonly'></img>
+              </div>
+              <div className='avatar__container'>
+                <span style={{fontSize:'23px'}} className='inuseby'>In use by:</span>
+                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' ,fontSize:'21px'}} className='infoinuse'>{props.module.currentlyInUse[0]}</span>
+              </div>
+            </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
-            {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
-            {props.GeniusDialog ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
+          {(props.GeniusDialog|| props.module.currentlyInUse!==userInfo.username) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
+            {(props.GeniusDialog|| props.module.currentlyInUse!==userInfo.username) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
             {props.gen?<svg id="mp__canvas_svg_genius" className='mp__canvas_svg_genius' ref={CanvasRef}>
                 <g className='ct-container-genius'>
                 {Object.entries(links).map((link)=>{

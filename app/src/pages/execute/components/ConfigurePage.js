@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useMemo} from "react";
 import { TabMenu } from "primereact/tabmenu";
 import { v4 as uuid } from "uuid";
 import { Panel } from "primereact/panel";
@@ -15,6 +15,12 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
 import {FooterTwo as Footer} from '../../global';
 import ExecutionProfileStatistics from "./ExecutionProfileStatistics";
+import {readTestSuite_ICE} from '../api'
+import { Dropdown } from 'primereact/dropdown'; 
+import {saveSauceLabData} from '../api';
+import ScreenOverlay from '../../global/components/ScreenOverlay';
+
+import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
   fetchConfigureList,
   getPools,
@@ -24,6 +30,7 @@ import {
   readTestSuite_ICEuser,
   execAutomation,
   deleteConfigureKey,
+  sendMailOnExecutionStart,
 } from "../api";
 import {
   getAvoAgentAndAvoGrid,
@@ -47,7 +54,8 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import ExecutionPage from "./ExecutionPage";
 import ExecutionCard from "./ExecutionCard";
 import { Tooltip } from 'primereact/tooltip';
-import { loadUserInfoActions } from '../../landing/LandingSlice'
+import { loadUserInfoActions } from '../../landing/LandingSlice';
+import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
 export var navigate
 
@@ -65,10 +73,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const toast = useRef(null);
   const url = window.location.href.slice(0, -7) + "execAutomation";
   const [configProjectId, setConfigProjectId] = useState("");
+  const [visible_saucelab, setVisible_saucelab] = useState(false);
+  const [saucelabsExecutionEnv, setSaucelabExecutionEnv] = useState(null);
+  const [browserstackExecutionEnv, setBrowserstackExecutionEnv] = useState(null)
   const [selectedProject, setSelectedProject] = useState("");
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [modules, setModules] = useState("normalExecution");
+  const [changeLable, setChangeLable] = useState(false);
   const [dotNotExe, setDotNotExe] = useState({});
   const buttonEl = useRef(null);
   const [dataExecution, setDataExecution] = useState({});
@@ -137,6 +149,50 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [scheduleOption, setScheduleOption] = useState({});
   const [typeOfExecution, setTypeOfExecution] = useState("");
   const [executingOn, setExecutingOn] = useState("");
+  const [sauceLab, setSauceLab] = useState(false);
+  const [dropdownSelected,setDropdownSelected] = useState([]);
+  const [appType, setAppType] = useState('');
+  const [showSauceLabLogin,setShowSauceLabLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showBrowserstackLogin,setShowBrowserstackLogin] = useState(false);
+  const [displayBasic4, setDisplayBasic4] = useState(false);
+  const [displayBasic6, setDisplayBasic6] = useState(false);
+  const [displayBasic7, setDisplayBasic7] = useState(false);
+  const [currentExecutionRequest,setCurrentExecutionRequest] = useState(null);
+  const [sauceLabUser,setSauceLabUser] = useState({});
+  const [displayBasic5, setDisplayBasic5] = useState(false);
+  const [browserDetails,setBrowserDetails] = useState([]);
+  const [mobileDetails,setMobileDetails] = useState([]);
+  const [showSauceLabs, setShowSauceLabs] = useState(false);
+  const [osNames, setOsNames] = useState([]);
+  const [browserstackUser,setBrowserstackUser] = useState({});
+  const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
+  const [browserlist, setBrowserlist] = useState([
+    {
+        key: '3',
+        text: 'Internet Explorer'
+    },
+    {
+        key: '1',
+        text: 'Google Chrome'
+    },{
+        key: '2',
+        text: 'Firefox'
+    },
+    // {
+    //     key: '7',
+    //     text: 'Microsoft Edge'
+    // },
+    {
+        key: "safari",
+        text: "Safari",
+        disabled:true,
+    },
+    {
+        key: '8',
+        text: 'Microsoft Edge'
+    }
+]);
   const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
   const [radioButton_grid, setRadioButton_grid] = useState(
    selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
@@ -147,6 +203,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
   const [displayModal, setDisplayModal] = useState(false);
   const [position, setPosition] = useState('center');
+  const [checkedExecution, setCheckedExecution] = useState(false);
+  const [emailNotificationEnabled, setEmailNotificationEnabled] = useState(null);
+  const [emailNotificationSender, setEmailNotificationSender] = useState(null);
+  const [batchInfo, setBatchInfo] = useState([]);
+  const [profileName, setProfileName] = useState(null);
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
@@ -155,22 +216,30 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
-  
+
   useEffect(() => {
     setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client");
     setExecutingOn(selectProjects?.appType==="Web"? "Agent" :"ICE")
     setShowIcePopup(selectProjects?.appType==="Web"? false:true)
   }, [selectProjects.appType]);
 
+  useEffect(() => { 
+    // selectProjects?.appType === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false) 
+    // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false) 
+    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    setExecutingOn(selectProjects?.appType==="Web"? "ICE" :"Agent")
+    setExecutingOn(selectProjects?.appType==="MobileWeb"? "ICE" :"Agent")
+    setExecutingOn(selectProjects?.appType==="MobileApp"? "ICE" :"Agent")
+  }, [selectProjects?.appType]);
 
-  const displayError = (error) => {
+ const displayError = (error) => {
     // setLoading(false)
     setMsg(error);
   };
 
-  const dialogFuncMap = {
-    'displayModal': setDisplayModal
-  };
+  // const dialogFuncMap = {
+  //   'displayModal': setDisplayModal
+  // };
 
   const onClick = (name, position) => {
     dialogFuncMap[`${name}`](true);
@@ -178,11 +247,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     if (position) {
         setPosition(position);
     }
-  
   }
-  
-  
-  
+ 
   const onHide = (name) => {
     dialogFuncMap[`${name}`](false);
   
@@ -190,7 +256,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         setDisplayModal(false);
         setIsEmailNotificationEnabled(false);
     }
-  
   }
 
   const [setupBtn, setSetupBtn] = useState(null);
@@ -229,7 +294,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     projectdata,
     moduleInfo,
     accessibilityParameters,
-    scenarioTaskType
+    scenarioTaskType,
+    currentExecutionRequest
   ) => {
     for (var i = 0; i < eachData.length; i++) {
       var testsuiteDetails = current_task.testSuiteDetails[i];
@@ -258,17 +324,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       suiteInfo.versionNumber = testsuiteDetails.versionnumber;
       suiteInfo.appType = appType;
       suiteInfo.domainName =
-        projectid in projectdata.project
+      (projectdata.project && projectid in projectdata.project)
           ? projectdata.project[projectid].domain
           : testsuiteDetails.domainName;
       suiteInfo.projectName =
-        projectid in projectdata.projectDict
+      (projectdata.projectDict && projectid in projectdata.projectDict)
           ? projectdata.projectDict[projectid]
           : testsuiteDetails.projectName;
       suiteInfo.projectId = projectid;
       suiteInfo.releaseId = relid;
       suiteInfo.cycleName =
-        cycid in projectdata.cycleDict
+      (projectdata.cycleDict &&cycid in projectdata.cycleDict)
           ? projectdata.cycleDict[cycid]
           : testsuiteDetails.cycleName;
       suiteInfo.cycleId = cycid;
@@ -297,9 +363,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     })();
   }, [selectProjects]);
 
-
-
-  const showSuccess_CICD = (btnType) => {
+ const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_CICD(false);
     }
@@ -335,7 +399,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   useEffect(() => {
-    fetchData();
+    if(configProjectId !== ""){
+      fetchData();
+    }
     // eslint-disable-next-line
   }, [configProjectId]);
 
@@ -392,13 +458,296 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setAvailableICE(ice);
   };
 
+  const readTestSuiteFunct = async (readTestSuite, fetechConfig) => {
+    setLoading("Loading in Progress. Please Wait");
+    const result = await readTestSuite_ICE(readTestSuite, "execute");
+    if(result.error){displayError(result.error);return;}
+    else if (result) {
+        var data = result;
+        var keys = Object.keys(data);
+        var tableData = [];
+        keys.map(itm => tableData.push({...data[itm]}));
+
+        //CR 2287 - If a scenario is opened and then navigated to it's scheduling then by default that particular scenario must be selected and rest of the scenarios from the module must be unselected.
+        // if (current_task.scenarioFlag === 'True') {
+        //     for (var m = 0; m < keys.length; m++) {
+        //         for (var k = 0; k < tableData[m].scenarioids.length; k++) {
+        //             if (tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds || tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds[0]) {
+        //                 tableData[m].executestatus[k] = 1;
+        //             } else tableData[m].executestatus[k] = 0;
+        //         }
+        //     }
+        // }
+
+        // Change executestatus of scenarios which should not be scheduled according to devops config
+        for (var m = 0; m < keys.length; m++) {
+            if(!tableData[m].executestatus.includes(0)){
+                tableData[m].scenarioids.map((scenarioid, index) => {
+                    tableData[m].executestatus[index] = 0;
+                    if (m < fetechConfig.executionRequest.batchInfo.length) {
+                        if(fetechConfig.executionRequest.selectedModuleType === 'normalExecution'){
+                            for (var k in fetechConfig.executionRequest.batchInfo[m].suiteDetails) {
+                                if (scenarioid === fetechConfig.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
+                                    tableData[m].executestatus[index] = 1;
+                                    break;
+                                }
+                            }
+                        } 
+                        else{
+                            for(var n = 0; n < fetechConfig.executionRequest.batchInfo[m].scenarionIndex.length; n++){
+                                tableData[m].executestatus[fetechConfig.executionRequest.batchInfo[m].scenarionIndex[n]] = 1;
+                            } 
+                        }
+                    }
+                });
+            }
+        }
+        setEachData(tableData);
+    }
+    setLoading(false);
+}
+  const onClick1 = (name) => {
+    dialogFuncMap[`${name}`](true);
+  }
+
+  const dialogFuncMap = {
+    'displayBasic4' : setDisplayBasic4,
+    'displayBasic5' : setDisplayBasic5,
+    'displayBasic6' : setDisplayBasic6,
+    'displayBasic7' : setDisplayBasic7,
+    'showSauceLabLogin':setShowSauceLabLogin,
+    'showBrowserstackLogin':setShowBrowserstackLogin 
+}
+  const handleOptionChange = (selected,type,fetechConfig,index,idx) => {
+    // setDropdownSelected(selected);
+    setDropdownSelected(prevValues => {
+        const newValues = [...prevValues];
+        newValues[index] = selected;
+        return newValues;
+      });
+    switch (selected) {
+        case 'sauceLabs':
+          setDisplayBasic4('displayBasic4');
+          setExecutingOn("ICE")
+          setConfigItem(idx);
+            triggerSauceLab(fetechConfig,type);
+            // setDropdownSelected(prevValues => {
+            //     const newValues = [...prevValues];
+            //     newValues[index] = '';
+            //     return newValues;
+            //   });
+            break;
+        case 'browserstack':
+          setDisplayBasic6('displayBasic6');
+          setExecutingOn("ICE")
+          setConfigItem(idx);
+            triggerBrowserstack(fetechConfig,type);
+            // setDropdownSelected(prevValues => {
+            //     const newValues = [...prevValues];
+            //     newValues[index] = '';
+            //     return newValues;
+            //   });
+            break;
+      case 'lambdaTest':
+            // add changes for lambdaTest
+            break;      
+        default:
+            break;
+    }
+   }
+   const triggerSauceLab = (fetechConfig,type) => {
+    if(type && type !== 'web'){
+        setSauceLab(true);
+    }
+    onClick('displayBasic4');
+    onClick('showSauceLabLogin');
+    setCurrentKey(fetechConfig.configurekey);
+    setCurrentExecutionRequest(fetechConfig.executionRequest);
+    setAppType(fetechConfig.executionRequest.batchInfo[0].appType);
+    setShowIcePopup(fetechConfig.executionRequest.batchInfo[0].appType !== "Web",fetechConfig.executionRequest.batchInfo[0].appType === "Web"?fetechConfig.executionRequest.batchInfo[0].appType === "Web":fetechConfig.executionRequest.batchInfo[0].appType !== "Web")
+    setBrowserTypeExe(fetechConfig.executionRequest.batchInfo[0].appType === "Web" ? fetechConfig.executionRequest.browserType : ['1']);
+    setCurrentName(fetechConfig.configurename);
+    let testSuiteDetails = fetechConfig.executionRequest.batchInfo.map((element) => {
+        return ({
+            assignedTime: "",
+            releaseid: element.releaseId,
+            cycleid: element.cycleId,
+            testsuiteid: element.testsuiteId,
+            testsuitename: element.testsuiteName,
+            projectidts: element.projectId,
+            assignedTestScenarioIds: "",
+            subTaskId: "",
+            versionnumber: element.versionNumber,
+            domainName: element.domainName,
+            projectName: element.projectName,
+            cycleName: element.cycleName
+        });                                   
+    });
+    setCurrentTask({
+        testSuiteDetails: testSuiteDetails
+    });
+    let accessibilityParametersValue = fetechConfig.executionRequest.batchInfo.map((element) => {
+        return (element.suiteDetails[0].accessibilityParameters)
+    });
+    setAccessibilityParameters(accessibilityParametersValue);
+    // readTestSuiteFunct(testSuiteDetails, fetechConfig);
+    fetchData(fetechConfig.executionRequest.batchInfo[0].projectId);
+    setChangeLable(true);
+    setSauceLab(true);
+    // setShowIcePopup(false);
+   } 
+
+   const triggerBrowserstack = (fetechConfig,type) => {
+    if(type && type !== 'web'){
+        setSauceLab(true);
+    }
+    onClick('displayBasic6');
+    onClick('showBrowserstackLogin');
+    setCurrentKey(fetechConfig.configurekey);
+    setCurrentExecutionRequest(fetechConfig.executionRequest);
+    setAppType(fetechConfig.executionRequest.batchInfo[0].appType);
+    setShowIcePopup(fetechConfig.isTrial?fetechConfig.executionRequest.batchInfo[0].appType !== "Web":fetechConfig.executionRequest.batchInfo[0].appType === "Web"?fetechConfig.executionRequest.batchInfo[0].appType === "Web":fetechConfig.executionRequest.batchInfo[0].appType !== "Web")
+    setBrowserTypeExe(fetechConfig.executionRequest.batchInfo[0].appType === "Web" ? fetechConfig.executionRequest.browserType : ['1']);
+    setCurrentName(fetechConfig.configurename);
+    let testSuiteDetails = fetechConfig.executionRequest.batchInfo.map((element) => {
+        return ({
+            assignedTime: "",
+            releaseid: element.releaseId,
+            cycleid: element.cycleId,
+            testsuiteid: element.testsuiteId,
+            testsuitename: element.testsuiteName,
+            projectidts: element.projectId,
+            assignedTestScenarioIds: "",
+            subTaskId: "",
+            versionnumber: element.versionNumber,
+            domainName: element.domainName,
+            projectName: element.projectName,
+            cycleName: element.cycleName
+        });                                   
+    });
+    setCurrentTask({
+        testSuiteDetails: testSuiteDetails
+    });
+    let accessibilityParametersValue = fetechConfig.executionRequest.batchInfo.map((element) => {
+        return (element.suiteDetails[0].accessibilityParameters)
+    });
+    setAccessibilityParameters(accessibilityParametersValue);
+    // readTestSuiteFunct(testSuiteDetails, fetechConfig);
+    fetchData(fetechConfig.executionRequest.batchInfo[0].projectId);
+    setChangeLable(true);
+    // setShowIcePopup(false);
+   } 
+   
+   const onHidedia = (name) => {
+    dialogFuncMap[`${name}`](false);
+    
+}
+
+// const handleBrowserstackSubmit = async (BrowserstackPayload) => {
+//   // close the existing dialog
+//   setDisplayBasic6(false);
+//   // open the new dialog
+//   setLoading('Fetching details...') 
+//   BrowserstackPayload['action'] = (showBrowserstack?"mobileWebDetails":"webDetails")
+//   let resultData = await saveBrowserstackData({
+//       BrowserstackPayload
+          
+//   })
+//   if(resultData && resultData.os_names && resultData.browser){
+//       setLoading(false);
+//       setDisplayBasic7(true);
+
+//       // const arrayOS = Object.entries(resultData.os).map(([key, value], index) => {
+//       //     return {
+//       //       key: key,
+//       //       text: key,
+//       //       title: key,
+//       //       index: index
+//       //     };
+//       //   });
+//       //   setOs(arrayOS);
+//         setBrowserstackBrowserDetails(resultData);
+//   }
+// else{
+//   setLoading(false);
+//   if (resultData == "unavailableLocalServer"){
+//       setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+//   }else{
+//       setMsg({"CONTENT":"Error while fetching the data from Browserstack", "VARIANT": VARIANT.ERROR})
+//   }
+// }
+// };
+
+const handleSubmit1 = async (SauceLabPayload) => {
+  // close the existing dialog
+  setDisplayBasic4(false);
+  // open the new dialog
+  setLoading("Fetching details..")
+  SauceLabPayload['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
+  let data = await saveSauceLabData({
+      SauceLabPayload
+  });
+  if (data && data.os_names && data.browser) {
+      // Data exists and has the expected properties
+      
+      setLoading(false)
+      setDisplayBasic5(true);
+
+      const arrayOS = data.os_names.map((element, index) => {
+        return {
+          key: element,
+          text: element,
+          title: element,
+          index: index
+        };
+      });
+      setOsNames(arrayOS);
+      setBrowserDetails(data);
+  }
+  else if (data && data.emulator && data.real_devices && data.stored_files){
+      // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
+      //     return {
+      //         key: element,
+      //         text: element,
+      //         title: element,
+      //         index: index
+      //     }
+      // })
+      // setPlatforms(arrayPlatforms);
+
+      setMobileDetails(data);
+      setLoading(false);
+      setDisplayBasic5(true);
+    }
+     else {
+      setLoading(false);
+      // Data is empty or doesn't have expected properties
+      if (data == "unavailableLocalServer"){
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
+            life: 5000
+          });
+      }else{
+        toast.current.show({
+          severity: 'error',
+          summary: 'error',
+          detail: "Error while fetching the data from Saucelabs",
+          life: 5000
+        });
+      }  
+    }
+  }
 
 
-  const confirm_delete = (event, item) => {
+           
+
+
+ const confirm_delete = (event, item) => {
     setDeleteItem(item);
-    event.preventDefault(); // Prevent the default behavior of the button click
+    event.preventDefault(); 
     setLogoutClicked(true);
-    // let text = `Are you sure you want to delete' ${item.configurename}' execution profile?`;
     let text = (
       <p>
         Are you sure you want to delete <strong>{item.configurename}</strong> execution profile?
@@ -425,15 +774,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         if (deletedConfig.error.CONTENT) {
           setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
         } else {
-          setMsg(
-            MSG.CUSTOM(
-              "Error While Deleting Execute Configuration",
-              VARIANT.ERROR
-            )
-          );
+          toast.current.show({severity:'error', summary: 'Error', detail:  "Error While Deleting Execute Configuration", life: 2000});
+          // setMsg(
+          //   MSG.CUSTOM(
+          //     "Error While Deleting Execute Configuration",
+          //     VARIANT.ERROR
+          //   )
+          // );
         }
       } else {
         tableUpdate();
+        toast.current.show({severity:'success', summary: 'Success', detail:"Execution Profile deleted successfully.", life: 1000});
         // const configurationList = await fetchConfigureList({
         //   projectid: selectedProject,
         // });
@@ -483,21 +834,48 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     ExecuteTestSuite(executionData);
   };
 
+  const sauceLabLogin = useMemo(() =>
+  <SauceLabLogin
+      setLoading={setLoading}
+      displayBasic4={displayBasic4}
+      onHidedia={onHidedia}
+      handleSubmit1={handleSubmit1}
+      setSauceLabUser={setSauceLabUser}
+      onModalBtnClick={onHidedia}
+  />,
+  [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
+
+  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
+  displayBasic5={displayBasic5} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
+  changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+      onModalBtnClick={onHidedia}
+      availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
+/>,
+  [mobileDetails, browserDetails, displayBasic5, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+
+
   const ExecuteTestSuite = async (executionData, btnType) => {
     if (executionData === undefined) executionData = dataExecution;
+    if(executionData["executionEnv"] != 'saucelabs' && executionData["executionEnv"] != 'browserstack') {
+      executionData["executionEnv"]=execEnv;
+      executionData["browserType"]=browserTypeExe;
+  }
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
     // setLoading("Sending Execution Request");
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
-    executionData["executionEnv"] = execEnv;
+    // executionData["executionEnv"] = execEnv;
     executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
     executionData["configurename"] = currentName;
     executionData["executingOn"] = executingOn;
-    executionData["executionListId"] = uuid() ;
+    executionData["executionListId"] = uuid();
+    executionData["profileName"] = currentName;
+    executionData["recieverEmailAddress"] = emailNotificationReciever;
     executionData["batchInfo"] =
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
@@ -579,6 +957,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const handleTestSuite = async(getItem) => {
+    if(getItem.executionRequest.integration){
+      setIntegration(getItem.executionRequest.integration);
+    }
     const readTestSuiteParams = getItem?.executionRequest?.batchInfo && getItem?.executionRequest?.batchInfo.map((el) => ({
       assignedTime: "",
       releaseid: el?.releaseId,
@@ -597,6 +978,33 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     setReadTestSuite(getReadTestSuite);
   };
 
+  const cloudTestOptions = [
+    { name: 'sauceLabs', code: 1 },
+    // { name: 'browserstack', code: 2 },
+  ];
+  
+  const selectedCountryTemplate = (option, props) => {
+    if (option) {
+        return (
+            <div className="flex align-items-center">
+                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '1rem' }} />
+                <div>{option.name}</div>
+            </div>
+        );
+    }
+  
+    return <span>{props.placeholder}</span>;
+      };
+  
+      const countryOptionTemplate = (option) => {
+        return (
+            <div className="flex align-items-center">
+                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '18px' }} />
+                <div>{option.name}</div>
+            </div>
+        );
+        };
+
   const tableUpdate = async () => {
     const getState = [];
     setLoader(true);
@@ -612,17 +1020,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             {idx + 1}
           </span>
         ),
-        // profileName: item.configurename,
-        profileName: (
-          <span
-            title={item.configurename} // Add title attribute for tooltip with full text
-          >
-            {item.configurename}
-          </span>
-        ),
+        profileName: item.configurename,
         executionOptions: (
           <div className="Buttons_config_button">
-            {/* <Tooltip target=".execute_now " position="left" content="  Execute configuration using Avo Assure Agent/Grid/Client."/> */}
             <Button
               className="execute_now"
               onClick={() => {
@@ -630,6 +1030,24 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
                 dispatch(getICE());
                 setVisible_execute(true);
                 setCurrentKey(item.configurekey);
+                if ("isEmailNotificationEnabled" in item.executionRequest) {
+                  setEmailNotificationEnabled(item.executionRequest.isEmailNotificationEnabled);
+                  if (item.executionRequest.isEmailNotificationEnabled === true) {
+                      setEmailNotificationSender(item.executionRequest.emailNotificationSender);
+                      setEmailNotificationReciever(item.executionRequest.emailNotificationReciever);
+                      setIsNotifyOnExecutionCompletion(item.executionRequest.isNotifyOnExecutionCompletion)
+                      setBatchInfo(item.executionRequest.batchInfo);
+                      setProfileName(item.executionRequest.configurename);
+                  }
+                }
+                else {
+                  setEmailNotificationEnabled(false);
+                  setEmailNotificationSender(null);
+                  setEmailNotificationReciever(null);
+                  setIsNotifyOnExecutionCompletion(null);
+                  setBatchInfo([]);
+                  setProfileName(null)
+                }
                 setCurrentName(item.configurename);
                 setCurrentSelectedItem(item);
                 setBrowserTypeExe(item.executionRequest.batchInfo[0].appType === "Web" ? item.executionRequest.browserType : ['1']);
@@ -640,20 +1058,38 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             >  
               Execute Now
             </Button>
-            {/* <Tooltip target=".schedule " position="left" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/> */}
             <Button
               className="schedule"
               onClick={() => {
                 setSelectedSchedule(item);
                 setConfigItem(idx);
                 setVisible_schedule(true);
+                setCurrentKey(item.configurekey);
+                if ("isEmailNotificationEnabled" in item.executionRequest) {
+                  setEmailNotificationEnabled(item.executionRequest.isEmailNotificationEnabled);
+                  if (item.executionRequest.isEmailNotificationEnabled === true) {
+                      setEmailNotificationSender(item.executionRequest.emailNotificationSender);
+                      setEmailNotificationReciever(item.executionRequest.emailNotificationReciever);
+                      setIsNotifyOnExecutionCompletion(item.executionRequest.isNotifyOnExecutionCompletion)
+                      setBatchInfo(item.executionRequest.batchInfo);
+                      setProfileName(item.executionRequest.configurename);
+                  }
+                }
+                else {
+                  setEmailNotificationEnabled(false);
+                  setEmailNotificationSender(null);
+                  setEmailNotificationReciever(null);
+                  setIsNotifyOnExecutionCompletion(null);
+                  setBatchInfo([]);
+                  setProfileName(null)
+                }
+                setCurrentName(item.configurename);
                 handleTestSuite(item);
               }}
               size="small"
             >
               Schedule
             </Button>
-            {/* <Tooltip target=".CICD " position="left" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/> */}
             <Button
               className="CICD"
               size="small"
@@ -666,6 +1102,11 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             >  
               CI/CD
             </Button>
+
+            <div className="cloud-test-provider" >
+  <Dropdown 
+  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}/>
+  </div> 
           
           </div>
         ),
@@ -687,8 +1128,7 @@ src="static/imgs/ic-delete-bin.png"
 style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
 className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
 <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
-            
-          </div>
+             </div>
         ),
       });
     });
@@ -700,6 +1140,17 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       tableUpdate();
     }
   }, [configProjectId]);
+
+  
+
+
+  const profieTooltip = (rowdata) => {
+    return   <span
+        title={rowdata.profileName}
+      >
+        {rowdata.profileName}
+      </span>;
+};
 
   const configModal = (getType, getData = null) => {
     if (getType === "CancelUpdate") {
@@ -721,8 +1172,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
           getData?.executionRequest?.browserType.includes(el.key)
         ) : [],
-        
-      });
+         });
       setMode(
         getData?.executionRequest?.isHeadless ? selections[1] : selections[0]
       );
@@ -748,7 +1198,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {url:"",username:"",password:""},
         azure: { url: "", username: "", password: "" },
-
       });
       setConfigTxt("");
       setModules("normalExecution");
@@ -872,7 +1321,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         emailNotificationSender: "avoassure-alerts@avoautomation.com",
         emailNotificationReciever: emailNotificationReciever,
         isNotifyOnExecutionCompletion: isNotifyOnExecutionCompletion,
-        isEmailNotificationEnabled: isEmailNotificationEnabled
+        isEmailNotificationEnabled: isEmailNotificationEnabled,
+        execType: checkedExecution
       };
 
       const dataObj = {
@@ -914,6 +1364,12 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
       tableUpdate();
+      toast.current.show({
+        severity: 'success',
+        summary: 'Success',
+        detail:"Configuration created successfully.",
+        life: 5000
+      });
       setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
       errorinfo?.current && errorinfo?.current?.show({
@@ -1004,7 +1460,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
         CheckStatusAndExecute(dataExecution, iceNameIdMap);
       } else {
-        const temp = await execAutomation(currentKey);
+        const temp = await execAutomation(currentKey, "AvoAgent/AvoGrid");
         if (temp.status !== "pass") {
           if (temp.error && temp.error.CONTENT) {
             setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
@@ -1026,13 +1482,45 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               });
           }
         } else {
-          // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail:("Execution Added to the Queue."),
-            life: 5000,
-          });
+          if (emailNotificationEnabled === true && isNotifyOnExecutionCompletion !== true) {
+            // send email on click of execution
+            let result = await sendMailOnExecutionStart(emailNotificationSender, emailNotificationReciever, batchInfo, profileName);
+
+            if(result !== "pass") {
+                if(result.error && result.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    // setMsg(MSG.CUSTOM("Error While Sending an Email.",VARIANT.ERROR));
+                    toast.current.show({
+                      severity: "error",
+                      summary: "error",
+                      detail:(
+                            "Error While Sending an Email."
+                          ),
+                      life: 5000,
+                    });
+                }
+            }
+            else {
+                // setMsg(MSG.CUSTOM("Execution Added to the Queue and Email sent successfully.",VARIANT.SUCCESS));
+                toast.current.show({
+                  severity: "success",
+                  summary: "Success",
+                  detail:("Execution Added to the Queue and Email sent successfully."),
+                  life: 5000,
+                });
+            }
+          }
+          else {
+              // setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
+              // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
+              toast.current.show({
+                severity: "success",
+                summary: "Success",
+                detail:("Execution Added to the Queue."),
+                life: 5000,
+              });
+          }
         }
 
         // onHide(name);
@@ -1174,6 +1662,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             configureKey: selectedSchedule?.configurekey,
             configureName: selectedSchedule?.configurename,
             executionListId: uuid(),
+            profileName: selectedSchedule?.configurename,
+            recieverEmailAddress: selectedSchedule?.executionRequest?.emailNotificationReciever ? selectedSchedule?.executionRequest?.emailNotificationReciever : null,
           },
         })
       ).then(() => {
@@ -1225,6 +1715,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             configureKey: selectedSchedule?.configurekey,
             configureName: selectedSchedule?.configurename,
             executionListId: uuid(),
+            profileName: selectedSchedule?.configurename,
+            recieverEmailAddress: selectedSchedule?.executionRequest?.emailNotificationReciever ? selectedSchedule?.executionRequest?.emailNotificationReciever : null,
           },
         })
       ).then(() => {
@@ -1288,6 +1780,18 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       </>
     );
   };
+  useEffect(() => {
+        (async () => {
+            const arg = {"action":"provider","channel":"email","args":"smtp"};
+            const data = await getNotificationChannels(arg);
+            if (data) {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: data.sender.email });
+            }
+            else {
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: 'avoassure-alerts@avoautomation.com' });
+            }
+        })();
+    }, []);
 
   const handleSubmit = (defaultValues) => {
     if ( "EmailRecieverAddress" in defaultValues) {
@@ -1298,7 +1802,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
                 return emailRegex.test(recieverEmailAddress) === true
             })
             if (isAllValidEmail) {
-              setEmailNotificationReciever(defaultValues.EmailRecieverAddress);
+              setEmailNotificationReciever(defaultValues.EmailRecieverAddress, defaultValues.EmailSenderAddress, isNotifyOnExecutionCompletion);
               setDisplayModal(false);
             }
             
@@ -1355,7 +1859,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               }}
               field="profileName"
               header={checkboxHeaderTemplate}
-            />
+              body={profieTooltip}
+    />
             <Column
               style={{
                 fontWeight: "bold",
@@ -1384,6 +1889,38 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
               header={<span className="actions-header">Actions</span>}
             />
           </DataTable>
+          <AvoModal
+          visible={visible_saucelab}
+          onhide={visible_saucelab}
+          content={
+          <>
+          <div className="SauceLab" >
+          <Dropdown
+          filter
+          />
+          </div>
+          <Dropdown
+          filter
+          />
+          <Dropdown
+          filter
+          />
+          <Button
+              className="execute_now"
+            
+              size="small"
+              
+            >
+                  
+              Execute Now
+            </Button>
+
+          
+          </>
+          }
+          >
+
+          </AvoModal>
           <AvoModal
             visible={visible_execute}
             setVisible={setVisible_execute}
@@ -1755,6 +2292,8 @@ Learn More '/>
   return (
     <>
       <div>
+      {sauceLabLogin}
+      {sauceLabExecute}
         <Breadcrumbs />
         <div className="grid" style={{ borderBottom: 'solid #dee2e6' }}>
           <div className="col-12 lg:col-8 xl:col-8 md:col-6 sm:col-12" style={{ marginBottom: '-0.6rem' }}>
@@ -1834,6 +2373,8 @@ Learn More '/>
               onHide={onHide}
               onClick={onClick}
               typeOfExecution={typeOfExecution}
+              checkedExecution={checkedExecution}
+              setCheckedExecution={setCheckedExecution}
             />
           }
           headerTxt="Execution Configuration set up"

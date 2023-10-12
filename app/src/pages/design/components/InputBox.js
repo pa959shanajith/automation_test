@@ -131,7 +131,7 @@ const InputBox = (props) => {
             if(dNodes[pi].type === 'scenarios'){
                 for (var j = 0; dNodes[0].children.length>j; j++){
                     if(dNodes[0].children[j].id === dNodes[pi].id){
-                        dNodes[0].children[j].name = tmp;
+                        dNodes[0].children[j].name = dNodes[pi].name;
                     }
                 }
             }
@@ -139,7 +139,7 @@ const InputBox = (props) => {
                 for (var k = 0; dNodes[0].children.length>k; k++){
                     for (var m =0 ; dNodes[0].children[k].children.length>m; m++){
                         if(dNodes[0].children[k].children[m].id === dNodes[pi].id){
-                            dNodes[0].children[k].children[m].name = tmp;
+                            dNodes[0].children[k].children[m].name = dNodes[pi].name;
                         }
                     }
                 }
@@ -149,7 +149,7 @@ const InputBox = (props) => {
                     for (var p =0 ; dNodes[0].children[n].children.length>p; p++){
                         for(var s =0; dNodes[0].children[n].children[p].children.length>s; s++){
                             if(dNodes[0].children[n].children[p].children[s].id === dNodes[pi].id){
-                                dNodes[0].children[n].children[p].children[s].name = tmp;
+                                dNodes[0].children[n].children[p].children[s].name = dNodes[pi].name;
                             }
                         }
                     }

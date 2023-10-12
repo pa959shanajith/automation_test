@@ -52,7 +52,9 @@ const ConfigureSetup = ({
   displayModal,
   onHide,
   onClick,
-  typeOfExecution
+  typeOfExecution,
+  checkedExecution,
+  setCheckedExecution
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
@@ -400,6 +402,8 @@ const ConfigureSetup = ({
             displayModal={displayModal}
             onHide={onHide}
             onClick={onClick}
+            checkedExecution={checkedExecution}
+            setCheckedExecution={setCheckedExecution}
           />
         </div>
       </div>

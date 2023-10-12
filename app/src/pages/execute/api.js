@@ -216,15 +216,14 @@ export const updateAccessibilitySelection = async(suiteInfo) => {
         return {error:MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY}
     }
 }
-export const execAutomation = async(props) => {
+export const execAutomation = async(executionKey, executionThrough) => {
     try{
-        console.log(props)
         const res = await axios(url+'/execAutomation', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            data: {"key":props},
+            data: { "key": executionKey, "executionThrough": executionThrough},
             credentials: 'include'
         });
         if(res.status===200 && res.data !== "fail"){
@@ -452,7 +451,7 @@ export const loginZephyrServer_ICE = async(zephyrURL, zephyrUserName, zephyrPass
             headers: {
             'Content-type': 'application/json',
             },
-            data: { action: "loginToZephyr_ICE",
+            data: { 
                 action: "loginToZephyr_ICE",
                 zephyrPayload: zephyrPayload,
                 integrationType : integrationType,
@@ -573,5 +572,105 @@ export const readTestSuite_ICEuser = async(readTestSuite) => {
     }catch(err){
         console.error(err)
         return {error:MSG.EXECUTE.ERR_TESTSUITE_FETCH}
+    }
+}
+
+export const sendMailOnExecutionStart = async (senderEmailAddress, recieverEmailAddress, executionData, profileName) => {
+    try {
+        const result = await axios(url + '/sendMailOnExecutionStart', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                senderEmailAddress: senderEmailAddress,
+                recieverEmailAddress: recieverEmailAddress,
+                executionData: executionData,
+                profileName: profileName,
+                startDate: new Date().getFullYear() + "-" + ("0" + (new Date().getMonth() + 1)).slice(-2) + "-" + ("0" + new Date().getDate()).slice(-2) + " " + ("0" + new Date().getHours()).slice(-2) + ":" + ("0" + new Date().getMinutes()).slice(-2) + ":" + ("0" + new Date().getSeconds()).slice(-2)
+           }
+        });
+
+        if(result.status===200 && result.data !== "fail"){
+            return result.data;
+        }
+        else if(result.status === 401 || result.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.GLOBAL.ERR_SEND_EMAIL}
+    }
+    catch(error) {
+        console.error(error)
+        return {error:MSG.GLOBAL.ERR_SEND_EMAIL}
+    }
+}
+
+export const getDetails_SAUCELABS = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_SAUCELABS', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
+
+export const saveSauceLabData = async(props) => {
+    try{
+            const res = await axios(url+'/saveSauceLabData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const saveAppActivityData = async(props) => {
+    try{
+            const res = await axios(url+'/saveAppActivityData', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }

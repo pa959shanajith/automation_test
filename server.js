@@ -261,12 +261,14 @@ if (cluster.isMaster) {
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
+		app.post('/updateTestSuiteInUseBy',designscreen.updateTestSuiteInUseBy)
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
 		app.get('/viewReport', report.viewReport);
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
+		app.get('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.use(csrf({
 			cookie: true
 		}));

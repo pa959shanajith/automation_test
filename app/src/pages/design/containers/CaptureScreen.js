@@ -30,7 +30,7 @@ import {getDeviceSerialNumber_ICE} from "../api";
 import { treemapSquarify } from 'd3';
 import { TabMenu } from 'primereact/tabmenu';
 import WebserviceScrape from './WebServiceCapture';
-
+import EditIrisObject from '../components/EditIrisObject';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -87,6 +87,7 @@ const CaptureModal = (props) => {
   //element properties states 
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
   const [elementPropertiesVisible, setElementProperties] = useState(false);
+  // console.log("elementPropertiesVisible",elementPropertiesVisible)
   const [elementValues, setElementValues] = useState([])
   const [isIdentifierVisible, setIsIdentifierVisible] = useState(false)
   const [regex, setRegex] = useState("")
@@ -95,7 +96,7 @@ const CaptureModal = (props) => {
   const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
   const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
   const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
-  const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
+  const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
   const [identifierModified, setIdentifierModiefied] = useState(false);
   const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] });
   const [idx, setIdx] = useState(0);
@@ -112,7 +113,10 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [showEmptyMessage, setShowEmptyMessage] = useState(true);
-  const [deletedItems, setDeletedItems] = useState(false);
+  const [irisObject, setIrisObject] = useState(null);
+  const [scrapeDataForIris,setScrapeDataForIris] = useState();
+  const [cordData, setCordData] = useState({});
+  const [irisScrapedData, setIrisScrapedData] = useState({});
   let addMore = useRef(false);
 
 
@@ -521,6 +525,9 @@ const elementTypeProp =(elementProperty) =>{
             setOverlay("");
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
+            const irisObjectdata = []; for (let i = 0; i < data.view.length; i++) {   if (data.view[i].xpath === "iris") {     irisObjectdata.push('iris');   } else {     irisObjectdata.push('');   } } ;
+           
+
           }
           else if (typeof data === "object" && typesOfAppType === "Webservice") {
             haveItems = data.view[0].endPointURL && data.view[0].method;
@@ -616,6 +623,7 @@ const elementTypeProp =(elementProperty) =>{
           reject("fail")
         })
     });
+   
   }
   const onDelete = (e, confirmed) => {
     if (mainScrapedData.reuse && !confirmed) {
@@ -666,8 +674,13 @@ const elementTypeProp =(elementProperty) =>{
     for (let scrapeItem of scrapeItemsL) {
       if (!Array.isArray(scrapeItem)) {
         if (!scrapeItem.objId) {
-          if (scrapeItem.isCustom) views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
-          else views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+          if (scrapeItem.isCustom){ views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+        }else {
+             const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
+          if (foundItem) {
+            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+          }}
+          // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
           orderList.push(scrapeItem.tempOrderId);
         }
         else orderList.push(scrapeItem.objId);
@@ -906,6 +919,7 @@ else{
           else updatedNewScrapeData = viewString;
 
           setNewScrapedData(updatedNewScrapeData);
+          setIrisScrapedData(updatedNewScrapeData);
           setNewScrapedCapturedData(updatedNewScrapeData);
 
           if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
@@ -1025,14 +1039,29 @@ else{
 
 
   const renderActionsCell = (rowData) => {
+    setScrapeDataForIris(rowData)
+   let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
+  //  setIrisObject(scrapeType[0]);
     return (
       <div >
-        <Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />
-        {NameOfAppType.appType=="Web" && <img src="static/imgs/ic-edit.png"
-
-          style={{ height: "20px", width: "20px" }}
-          className="edit__icon" onClick={() => openElementProperties(rowData)} />
-    }
+        
+        
+        {!saveDisable?
+        <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." />:<Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
+        {  (scrapeType[0] === "iris" || typesOfAppType==="Web")  && 
+        <button
+        disabled={!saveDisable}
+        onClick={() => {openElementProperties(rowData);}}
+      >
+        <img
+          src="static/imgs/ic-edit.png"
+          alt="Edit Icon"
+          style={{ height: "20px", width: "20px", opacity: !saveDisable? 0.6 : 1}}
+          className="edit__icon"
+        />
+      </button>
+      
+        }
         <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
         <img
 
@@ -1076,12 +1105,13 @@ else{
     <>
       <div>
         <h5 className='dailog_header1'>Capture Elements</h5>
+        {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg"alt="viewonlyaccess" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
-        {captureData.length > 0 ? <div className='Header__btn'>
+        {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
           <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} >Add more</button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
@@ -1097,7 +1127,7 @@ else{
       <div className='empty_msg'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>
+        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1106,8 +1136,8 @@ else{
 const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
 const elementIdentifier=()=>{
-  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'css-selector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]:
-  selectedCapturedElement[0].objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
+  const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'cssselector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]:
+  selectedCapturedElement[0]?.objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
   setIdentifierList(identifierList)
   setShowIdentifierOrder(true)
 }  
@@ -1443,8 +1473,10 @@ const footerSave = (
     setElementValues(e.value)
   }
   const openElementProperties = (rowdata) => {
-    console.log(rowdata)
-    let element = rowdata.objectDetails.xpath.split(';')
+    let element = rowdata?.objectDetails?.xpath?.split(';')
+    if(element==undefined) return;
+    setIrisObject(element[0])
+    if(typesOfAppType==="Web" && element[0] !== 'iris' ){
     let dataValue = []
     let elementFinalProperties = {
       xpath: (element[0] === "null" || element[0] === "" || element[0] === "undefined") ? 'None' : element[0],
@@ -1464,8 +1496,38 @@ const footerSave = (
     )
     dataValue.sort((a, b) => a.id - b.id)
     setElementValues(dataValue)
+    // if(irisObject !== "iris"){
     setElementProperties(true)
+  // }
+
   }
+  if(element[0]=="iris"){
+    const data = {
+      appType: typesOfAppType,
+      fetchingDetails: props.fetchingDetails,
+      setIdentifierList: setIdentifierList
+    };
+    
+    let modalObject = {};
+    
+    modalObject = {
+      operation: "editIrisObject",
+      objectDetails: rowdata.objectDetails,
+      modifyScrapeItem: (data, newProperties, customFlag) =>
+        modifyScrapeItem(data, newProperties, customFlag),
+      cord: (rowdata.objectDetails.objId? mainScrapedData.view : irisScrapedData?.view)[rowdata.objectDetails.objIdx].cord
+    };
+    
+    console.log("Before calling scrapeDataForIris, modalObject:", modalObject);
+    setCordData(modalObject)
+    setScrapeDataForIris(modalObject);
+    
+  }
+
+  
+  
+  setElementProperties(true)
+}
   const Header = () => {
     return (
       <div>Element Identifier Order<span style={{ color: 'red' }}>*</span></div>
@@ -1490,7 +1552,7 @@ const footerSave = (
   const footerContentIdentifier = (
     <div>
       <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Drag/drop to reorder identifiers.</div>
-      <Button label="Cancel" onClick={() => setShowIdentifierOrder(false)} className="p-button-text" />
+      <Button label="Cancel" onClick={() => {setShowIdentifierOrder(false);setSelectedCapturedElement([])}} className="p-button-text" />
       <Button label="Save" onClick={() => saveIdentifier()} autoFocus />
     </div>
   )
@@ -1512,7 +1574,7 @@ const footerSave = (
           setIdentifierModiefied(true)
           setShowIdentifierOrder(false)
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element Identifier order updated successfully.', life: 5000 });
-          setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
+          setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
 
         }
       })
@@ -1520,9 +1582,10 @@ const footerSave = (
         console.log(error)
         setShowIdentifierOrder(false)
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Some Error occured while saving identifier list.', life: 5000 });
-        setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'css-selector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
+        setIdentifierList([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }])
       }
       )
+      setSelectedCapturedElement([]);
 
   }
 
@@ -1630,6 +1693,41 @@ const headerstyle={
  textAlign: "center !important",
 }
 
+
+  
+
+const modifyScrapeItem = (value, newProperties, customFlag) => {
+  let localScrapeItems = [...capturedDataToSave];
+  let updNewScrapedData = {...newScrapedCapturedData};
+  let objId = "";
+  let isCustom = false;
+  let obj = null;
+  for (let scrapeItem of localScrapeItems){
+      if (scrapeItem.val === value) {
+          scrapeItem.title = newProperties.custname;
+          if (customFlag) {
+              scrapeItem.tag = newProperties.tag;
+              scrapeItem.url = newProperties.url;
+              scrapeItem.xpath = newProperties.xpath;
+              scrapeItem.editable = true;
+          }
+          objId = scrapeItem.objId;
+          isCustom = scrapeItem.isCustom; 
+          if (objId) obj = {...mainScrapedData.view[scrapeItem.objIdx], ...newProperties};
+          else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = {...newScrapedCapturedData.view[scrapeItem.objIdx], ...newProperties}
+          // else only if customFlag is true
+      };
+  }
+  
+  if (objId) {
+      let modifiedDict = {...modified}
+      modifiedDict[objId] = obj;
+     setModified(modifiedDict);
+  }
+  else if (!isCustom) setNewScrapedCapturedData(updNewScrapedData);
+  if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
+  setCapturedDataToSave(localScrapeItems);
+}
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -1637,7 +1735,7 @@ const headerstyle={
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
-       <div className="card_modal">
+      {!props.testSuiteInUse?<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
               {!showPanel && <div className='insprint__block1'>
@@ -1761,7 +1859,7 @@ const headerstyle={
 
           </Card>
         </div>
-
+        :null}
 
 
         <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
@@ -1791,10 +1889,10 @@ const headerstyle={
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            <Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>
+            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
             <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
-              editor={(options) => cellEditor(options)}
-              onCellEditComplete={onCellEditComplete}
+              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
+              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
@@ -1802,7 +1900,7 @@ const headerstyle={
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            <Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>
+            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -1848,14 +1946,13 @@ const headerstyle={
          content = {"hello"}
          customClass="Mainframes"
         />: null}
-        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} toastError={toastError} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         {typesOfAppType === "System"? <AvoModal
           visible={visibleOtherApp}
           setVisible={setVisibleOtherApp}
           onModalBtnClick={onLaunchBtn}
           headerTxt="System_application"
           footerType="Launch"
-          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
          content = {"hello"}
          customClass="MobileWeb"
         />: null}
@@ -1903,6 +2000,8 @@ const headerstyle={
         toastSuccess={toastSuccess}
         toastError={toastError}
         elementTypeProp ={elementTypeProp}
+        captureData={captureData}
+        capturedDataToSave={capturedDataToSave}
       />}
 
       {currentDialog === 'mapObject' && <ActionPanel
@@ -1978,20 +2077,24 @@ const headerstyle={
       />}
       {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
       {/* //Element properties  */}
-
-      <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => {setElementProperties(false);setSelectedCapturedElement([])}} footer={footerContent}>
-        <div className="card">
-        <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
-            <Column rowReorder style={{ width: '3rem' }} />
-            <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
-            {/* <column ></column> */}
-            <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-            <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
-        </DataTable>
-        </div>
-      </Dialog>
+      {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData}  toastSuccess={toastSuccess}
+        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} />
+        :
+        <>
+        {typesOfAppType ==="Web"?
+        <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
+          <div className="card">
+            <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
+              <Column rowReorder style={{ width: '3rem' }} />
+              <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
+              {/* <column ></column> */}
+              <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
+            </DataTable>
+          </div>
+        </Dialog>: null }</>}
       {/* Element reorder */}
-      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => setShowIdentifierOrder(false)} footer={footerContentIdentifier} >
+      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => {setShowIdentifierOrder(false);setSelectedCapturedElement([])}} footer={footerContentIdentifier} >
         <div className="card" >
           <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
             <Column rowReorder style={{ width: '3rem' }} />
@@ -2342,7 +2445,7 @@ const LaunchApplication = props => {
 
     // Mobile App
 
-    const [os, setOS] = useState("android");
+    const [os, setOS] = useState("");
     const [checkedForMobApp,setCheckedForMobApp]=useState(false)
 
     const [appPath, setAppPath] = useState("");
@@ -2389,28 +2492,56 @@ const LaunchApplication = props => {
 
     const handleSerialNumber = () => {
       setOS("android")
-        setError(false);
-        getDeviceSerialNumber_ICE().then(data => {
-            if(data) {}
-            setSerialNumber(data);
-            console.log(data);
-        }).catch(error => {
-            console.log(error);
-        })
+      setError(false);
+      getDeviceSerialNumber_ICE().then(data => {
+            if(data !== "fail") {setSerialNumber(data);}
+            else props.toastError(error)
+      }).catch(error => {
+          props.toastError(error)
+      })
     }
 
     const MobileApps = {
         'content':<div className={os==="ios"?'inputIos':'inputContent'}>
-            <div className="flex flex-wrap gap-3" >
-            <div className="flex align-items-center">
-              <RadioButton className="ss__dsktp_method_rad" data-test="chooseAndriod" type="radio" name="method" value="A" onChange={(e)=>{handleSerialNumber();} } />
-              <label htmlFor="ingredient1" className="ml-2">Android</label>
-            </div>
-            <div className="flex align-items-center">
-              <RadioButton data-test="chooseAndriod" className="ss__dsktp_method_rad" type="radio" name="method" value="B" onChange={()=>{setOS("ios"); setError(false);setCheckedForMobApp(true)}}   />
-              <label htmlFor="ingredient2" className="ml-2">iOS</label>
-            </div>
-          </div>
+           <div className="flex flex-wrap gap-3">
+  <div className="flex align-items-center">
+    <RadioButton
+      className="ss__dsktp_method_rad"
+      data-test="chooseAndriod"
+      type="radio"
+      name="method"
+      value="A"
+      onChange={
+        handleSerialNumber
+      }
+      checked={os === 'android'} 
+      // defaultChecked={true} // Set this to true for default selection
+      
+    />
+    <label htmlFor="ingredient1" className="ml-2">
+      Android
+    </label>
+  </div>
+  <div className="flex align-items-center">
+    <RadioButton
+      data-test="chooseAndriod"
+      className="ss__dsktp_method_rad"
+      type="radio"
+      name="method"
+      value="B"
+      onChange={() => {
+        setOS("ios");
+        setError(false);
+        setCheckedForMobApp(true);
+      }}
+      checked={os === 'ios'}
+    />
+    <label htmlFor="ingredient2" className="ml-2">
+      iOS
+    </label>
+  </div>
+</div>
+
           {os === "android" &&
             <div className='AndroidContent'>
                 <InputText data-test="andriodAppPath" placeholder="Enter Application Path" value={appPath} onChange={appPathHandler} name="appPath_a" />
@@ -2500,7 +2631,6 @@ const LaunchApplication = props => {
             // footer = {appDict[props.appPop.appType].footer}
             headerTxt={props.typesOfAppType}
             footerType="Launch"
-            modalSytle={{ width:checkedForMobApp? "34vw" : "32vw", height:props.typesOfAppType === "Desktop" || checkedForMobApp? "53vh" : "33vh", background: "#FFFFFF" }}
             content={appDict[props.appPop.appType].content}
           customClass={props.typesOfAppType}
           />
