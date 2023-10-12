@@ -669,13 +669,14 @@ const CreateUser = (props) => {
                                     className= {`w-full md:w-20rem ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
+                                    disabled={editUser}
                                 />
                             </div>
                             {/* Admin Check */}
                             {roleDropdownValue === "5db0022cf87fdec084ae49ab" && (
                                 <div className="flex flex-column items-center secondaryRole_admin"> {/* Test Manager role ID */}
                                     <label htmlFor="admin_check" className="adminlable_header pb-4 font-medium">Secondary Role</label>
-                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
+                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} disabled={editUser}/>
                                     <label htmlFor="admin_check" className="ml-5 -mt-4">Admin</label>
                                 </div>
                             )}
