@@ -861,8 +861,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             </div>
         </>
     );
-    const bodyHeader = ()=>{
-        let bodyData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+    const bodyHeader = (rowData)=>{
         const onInputChange = (event) => {
             let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
             let testCaseId = findTestCaseData.id;
@@ -945,8 +944,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {(bodyData && !props.testSuiteInUse)?<div>
-                {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
+            {(rowData && !props.testSuiteInUse)?<div>
+                {(rowData.name === rowExpandedName.name)?<div className='btn__grp'>
                     <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
                     <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
