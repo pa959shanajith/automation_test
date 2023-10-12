@@ -1,9 +1,10 @@
 @import "../../global/styles/ColorVariables.scss";
 .Topbar_Menu{
-    .Header_size {
-    position: relative;
-    height: 2.6rem;
-    background: #ffffff !important;
+    height: 6.5vh;
+        .Header_size {
+        position: relative;
+        height: 100%;
+        background: #ffffff !important;
 }
 
 .Headers {

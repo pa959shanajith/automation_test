@@ -1,11 +1,13 @@
 @import "../../global/styles/ColorVariables.scss";
 .sidebar_container{
     display: flex;
+    width: 3%;
+    height: 100%;
     .sidebar {
-        width: 4rem;
+        width: 100%;
         position: sticky;
         color: #fff;
-        height: 100vh;
+        height: 100%;
         transition: all 0.5s;
         border-right: solid 2px rgba(223, 220, 220, 0.925);
         .nav_item {
