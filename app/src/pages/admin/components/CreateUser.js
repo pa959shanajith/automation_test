@@ -168,10 +168,11 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
-                    if (action === "create") { setSelectedTab("avoAzzureClient") }
+                    props.toastSuccess(MSG.CUSTOM("User" + action + "d successfully!", VARIANT.SUCCESS));
+                    if (action === "create") { 
+                        setSelectedTab("avoAzzureClient") }
                     else {
                         edit();
-                        props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                         setSelectedTab("avoAzzureClient")
                     };
                     if (action === "delete") {
