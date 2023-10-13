@@ -1028,6 +1028,7 @@ export default function BasicDemo() {
                 labelTxt={`${bugTitle} Projects`}
                 required={true}
                 parentClass="flex flex-column"
+                disabled={!Array.isArray(mappedProjects)}
               />
             </div>
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
@@ -1158,6 +1159,7 @@ export default function BasicDemo() {
                         name={el.name}
                         value={configValues[el.name]}
                         onChange={(e) => handleConfigValues(e)}
+                        disabled={(el.name === "Attachment" && selectedRow[0]?.screenshot_path)}
                       />
                     </>
                   )}
