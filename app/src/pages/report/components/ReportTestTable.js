@@ -1018,6 +1018,7 @@ export default function BasicDemo() {
         onModalBtnClick={onLogBugBtnClick}
         content={
           <div className="grid">
+            <div className="flex flex-row">
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
               <AvoDropdown
                 dropdownValue={jiraDropDown}
@@ -1055,6 +1056,7 @@ export default function BasicDemo() {
                 placeholder="Select configure fields"
                 required={true}
               />
+            </div>
             </div>
             <Divider />
             {bugTitle !== "Jira" && (
