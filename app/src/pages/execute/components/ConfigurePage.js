@@ -1231,10 +1231,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         {}
       );
       const getSelected = Object.keys(selectedNodeKeys);
-      const parent = getSelected.filter((el) => el.length === 1);
+      const parent = getSelected.filter((el) => !(el.includes('-')));
       const child = getSelected
-        .filter((el) => el.length > 1)
-        .map((e) => ({ [e.charAt(0)]: e.charAt(2) }));
+        .filter((el) => el.includes('-'))
+        .map((e) => ({ [e.split("-")[0]]: e.split("-")[1] }));
       const selectedKeys = {};
       const selectedArr = parent.map((element) =>
         child
