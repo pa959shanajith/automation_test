@@ -1432,7 +1432,7 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
     const fnName = "reportStatusScenarios_ICE";
     logger.info("Inside UI service: " + fnName);
     try {
-        var executionid = req.query.executionId;
+        var executionid = req.body.executionId;
         var report = [];
         let inputs = {
             "query": "executiondetails",
@@ -1462,4 +1462,34 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
         logger.error("Exception in the service reportStatusScenarios_ICE: %s", exception);
         res.send("fail");
     }
+};
+
+exports.getAccessibilityTestingData_ICE = async function(req, res) {
+    try {
+		const fnName = "getAccessibilityTestingData_ICE"
+		var inputs = {};
+		var result = {};
+		var query = req.query;
+		switch(query.type){
+			case "screendata":
+				inputs ={query: "screendata", "cycleid": query.cycleId}; 
+				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
+				break;
+			case "reportdata":
+				inputs ={query: "reportdata", "executionid": query.executionid}; 
+				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
+				break;
+			case "reportdata_names_only":
+				inputs ={query: "reportdata_names_only", "screenname": query.screendata}; 
+				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
+				break;
+			default:
+				return res.send('fail');
+		}
+		if (result == "fail") return res.status(500).send("fail");
+		else return res.send(result)
+	} catch(e){
+		logger.error(e.message);
+		return res.status(500).send("fail");
+	}
 };

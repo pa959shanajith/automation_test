@@ -98,7 +98,7 @@ const UserList = (props) => {
 
     const actionBodyTemplate = (rowData) => {
         return (
-            <React.Fragment>
+            <div className='flex flex-row' style={{justifyContent:"center", gap:"0.5rem"}}>
                 <img src="static/imgs/ic-edit.png" alt="editUserIcon"
                     style={{ height: "20px", width: "20px" }}
                     className="edit__usericon" onClick={() => { editRowData(rowData); dispatch(AdminActions.EDIT_USER(true)); setEditUserDialog(true) }}
@@ -109,14 +109,14 @@ const UserList = (props) => {
                     className="delete__usericon"
                     onClick={() => { editRowData(rowData); setShowDeleteConfirmPopUp(true); dispatch(AdminActions.EDIT_USER(false)); }}
                 />
-            </React.Fragment>
+            </div>
         );
     }
 
 
     return (<>
 
-        <div className="UserList card p-fluid" style={{ width: '67%', padding: '1rem' }}>
+        <div className="UserList card p-fluid surface-100" style={{ width: '100%', padding: '1rem' }}>
             <ModalContainer
                 title="Please Confirm"
                 show={showDeleteConfirmPopUp}
@@ -135,7 +135,7 @@ const UserList = (props) => {
                 header={header}
                 emptyMessage="No users found"
                 scrollable
-                scrollHeight='21.6rem'
+                scrollHeight='60vh'
                 showGridlines>
                 <Column field="userName" header="User Name" style={{ width: '20%' }}></Column>
                 <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
@@ -147,9 +147,15 @@ const UserList = (props) => {
 
             {editUserDialog && <CreateUser createUserDialog={editUserDialog}
                 reloadData={reloadData}
+                refreshUserList={props.refreshUserList}
+                setRefreshUserList={props.setRefreshUserList}
                 setCreateUserDialog={setEditUserDialog}
                 setEditUserData={setEditUserData}
-                editUserData={editUserData} />}
+                editUserData={editUserData} 
+                toastSuccess={props.toastSuccess}
+                toastError={props.toastError}
+                toastWarn={props.toastWarn}
+                toast={props.toast} />}
         </div>
     </>)
 }

@@ -259,7 +259,14 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         moduleid:Array.isArray(res)?res[0]:res
                     }
                     res = await getModules(req)
-                
+                    var zipScreen = await getScreens(req.projectid) 
+                    if(zipScreen.error){displayError(zipScreen.error);ResetSession.end();return;}
+                    setTimeout(function() {
+                        dispatch(selectedModuleReducer(res))
+                    setImportPop(false)
+                    setOptions('importmodules')
+                    // setBlockui({show:false})
+                    }, 100);
                     if(res.error){displayError(res.error);setBlockui({show:false});ResetSession.end();return;}
                     setFiledUpload(res)
                     Toast.current.show({severity:'success', summary: 'Success', detail:MSG.MINDMAP.SUCC_DATA_IMPORTED.CONTENT, life: 3000})
