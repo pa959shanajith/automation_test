@@ -168,7 +168,7 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
-                    props.toastSuccess(MSG.CUSTOM("User" + action + "d successfully!", VARIANT.SUCCESS));
+                    props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "create") { 
                         setSelectedTab("avoAzzureClient") }
                     else {
