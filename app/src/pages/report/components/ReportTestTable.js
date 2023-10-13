@@ -2,7 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { Column } from "primereact/column";
 import { TreeTable } from "primereact/treetable";
 import { Button } from "primereact/button";
-import { connectAzure_ICE, connectAzure_ICE_Fields, connectJira_ICE, connectJira_ICE_Fields, connectJira_ICE_create, connectAzzure_ICE_create, getDetails_JIRA, viewJiraMappedList_ICE, viewAzureMappedList_ICE, viewReport, openScreenshot } from "../api";
+import {
+  connectAzure_ICE,
+  connectAzure_ICE_Fields,
+  connectJira_ICE,
+  connectJira_ICE_Fields,
+  connectJira_ICE_create,
+  connectAzzure_ICE_create,
+  getDetails_JIRA,
+  viewJiraMappedList_ICE,
+  viewAzureMappedList_ICE,
+  viewReport,
+  openScreenshot,
+  getAccessibilityData,
+} from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
@@ -18,7 +31,7 @@ import { getStepIcon } from "../containers/ReportUtils";
 import AvoModal from "../../../globalComponents/AvoModal";
 import "../styles/ReportTestTable.scss";
 import { Toast } from "primereact/toast";
-
+import { DataTable } from "primereact/datatable";
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -34,10 +47,15 @@ export default function BasicDemo() {
   const [visibleBug, setVisibleBug] = useState(false);
   const [logBug, setLogBug] = useState(false);
   const [bugTitle, setBugTitle] = useState("");
+  const [showMoreDetails, setShowMoreDetails] = useState(false);
+  const [moreDetails, setMoreDetails] = useState({});
   const [reportSummaryCollaps, setReportSummaryCollaps] = useState(true);
   const filterRef = useRef(null);
   const [reportid, setReportId] = useState(null);
   const [executed, setExecuted] = useState(null);
+  const [accessibilityId, setAccessibilityId] = useState(null);
+  const [ruleMap, setRuleMap] = useState(null);
+  const [accessibilityData, setAccessibilityData] = useState([]);
   const [jiraDropDown, setJiraDropDown] = useState(null);
   const [issueDropDown, setIssueDropDown] = useState(null);
   const [jiraDetails, setJiraDetails] = useState({ projects: [], issuetype: [] });
@@ -65,22 +83,41 @@ export default function BasicDemo() {
     };
     const id = getQueryParam();
     const getUrl = new URLSearchParams(window.location.search);
-    const execution = getUrl.get("execution");
-    setExecuted(execution);
-    setReportId(id);
+    const execution = getUrl.get("execution");    
+    const accessibilityID = getUrl.get("accessibilityID");
+    const rulemap = getUrl.get("rulemap");
+    if (accessibilityID) {
+      setAccessibilityId(accessibilityID);
+      setRuleMap(rulemap)
+    }
+    if (id) {
+      setExecuted(execution);
+      setReportId(id);
+    }
   }, []);
 
-  const getReportsTable = async() => {
-    if(reportid){
+  const getReportsTable = async () => {
+    if (reportid) {
       const view = await viewReport(reportid);
       setReportData(JSON.parse(view));
     }
   };
 
   useEffect(() => {
-    getReportsTable();
+    if (reportid) {
+      getReportsTable();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportid]);
+
+  useEffect(() => {
+    if (accessibilityId) {
+      (async () => {
+        let accessibilityRes = await getAccessibilityData(accessibilityId);
+        setAccessibilityData(accessibilityRes[0]);
+      })();
+    }
+  }, [accessibilityId]);
 
   useEffect(() => {
     setInputSummary(selectedRow[0]?.Comments);
@@ -211,42 +248,41 @@ export default function BasicDemo() {
       bugTitle === "Jira"
         ? Object.keys(configValues).forEach((item) => {
           if(item !== "Summary"){
-            valueObj[item] = {
-              field_name: responseFeilds[item]?.key,
-              userInput:
+              valueObj[item] = {
+                field_name: responseFeilds[item]?.key,
+                userInput:
                 responseFeilds[item]?.type === "array" && item !== "Attachment"
-                  ? {
-                    title: "",
-                    key: configValues[item]?.key,
-                    text: configValues[item]?.name,
-                  }
-                  : configValues[item],
-              type: responseFeilds[item]?.type,
-            };
-          }
-          else if(item === "Summary") {
-            valueObj.summary = configValues[item]
-          }
-        })
+                    ? {
+                        title: "",
+                        key: configValues[item]?.key,
+                        text: configValues[item]?.name,
+                      }
+                    : configValues[item],
+                type: responseFeilds[item]?.type,
+              };
+            } else if (item === "Summary") {
+              valueObj.summary = configValues[item];
+            }
+          })
         : Object.keys(configValues).forEach((item) => {
-          valueObj[item] = {
-            ...responseFeilds[item],
-            data:
-              typeof configValues[item] === "object"
-                ? item === "State"
-                  ? {
-                    title: "",
+            valueObj[item] = {
+              ...responseFeilds[item],
+              data:
+                typeof configValues[item] === "object"
+                  ? item === "State"
+                    ? {
+                        title: "",
                     key: responseFeilds[item]?.allowedValues.indexOf(
-                      configValues[item]?.id
-                    ) + 1,
-                    text: configValues[item]?.id?.toString(),
-                  }
-                  : configValues[item]?.id?.toString()
-                : configValues[item],
-            error: false,
-            isChecked: true,
-          };
-        });
+                            configValues[item]?.id
+                          ) + 1,
+                        text: configValues[item]?.id?.toString(),
+                      }
+                    : configValues[item]?.id?.toString()
+                  : configValues[item],
+              error: false,
+              isChecked: true,
+            };
+          });
       if(bugTitle !== "Jira"){
         valueObj["Area Path"].data = configValues["Area ID"].name
         valueObj["Iteration Path"].data = configValues["Iteration ID"].name
@@ -254,58 +290,58 @@ export default function BasicDemo() {
       const userDetails =
         bugTitle === "Jira"
           ? await connectJira_ICE_create({
-            issue_dict: {
-              project: jiraDropDown?.id,
-              issuetype: issueDropDown?.name,
-              // summary: inputSummary,
-              description: inputDesc,
-              url: loginUrl,
-              username: loginName,
-              password: loginKey,
-              parentissue: "",
-              reportId: reportData?.overallstatus?.reportId,
-              slno: selectedRow[0]?.slno,
-              executionId: reportData?.overallstatus?.executionId,
-              ...(!!Object.keys(configValues).length && valueObj),
-              executionReportNo: `Execution No: ${executed}`,
-            },
-            action: "createIssueInJira",
-          })
-          : await connectAzzure_ICE_create({
-            issue_dict: {
-              info: {
-                project: {
-                  key: jiraDropDown?.id,
-                  text: jiraDropDown?.name,
-                  error: false,
-                },
-                issue: {
-                  key: "Bug",
-                  text: "Bug",
-                  error: false,
-                },
-                summary: {
-                  value: inputSummary,
-                  error: false,
-                },
-                reproSteps: {
-                  value: inputDesc,
-                  error: false,
-                },
-                parentIssueId: {
-                  value: "",
-                  error: false,
-                },
-                epicName: {
-                  key: "",
-                  value: "",
-                  error: false,
-                },
-                chosenList: {
-                  ...(!!Object.keys(configValues).length && valueObj),
-                },
+              issue_dict: {
+                project: jiraDropDown?.id,
+                issuetype: issueDropDown?.name,
+                // summary: inputSummary,
+                description: inputDesc,
+                url: loginUrl,
+                username: loginName,
+                password: loginKey,
+                parentissue: "",
+                reportId: reportData?.overallstatus?.reportId,
+                slno: selectedRow[0]?.slno,
+                executionId: reportData?.overallstatus?.executionId,
+                ...(!!Object.keys(configValues).length && valueObj),
+                executionReportNo: `Execution No: ${executed}`,
               },
-              url: loginUrl,
+              action: "createIssueInJira",
+            })
+          : await connectAzzure_ICE_create({
+              issue_dict: {
+                info: {
+                  project: {
+                    key: jiraDropDown?.id,
+                    text: jiraDropDown?.name,
+                    error: false,
+                  },
+                  issue: {
+                    key: "Bug",
+                    text: "Bug",
+                    error: false,
+                  },
+                  summary: {
+                    value: inputSummary,
+                    error: false,
+                  },
+                  reproSteps: {
+                    value: inputDesc,
+                    error: false,
+                  },
+                  parentIssueId: {
+                    value: "",
+                    error: false,
+                  },
+                  epicName: {
+                    key: "",
+                    value: "",
+                    error: false,
+                  },
+                  chosenList: {
+                    ...(!!Object.keys(configValues).length && valueObj),
+                  },
+                },
+                url: loginUrl,
                 username: loginName,
                 pat: loginKey,
                 reportId: reportData?.overallstatus?.reportId,
@@ -313,9 +349,9 @@ export default function BasicDemo() {
                 ...(getItemType()?.itemId && { mappedId: getItemType()?.itemId }),
                 executionId: reportData?.overallstatus?.executionId,
                 executionReportNo: `Execution No: ${executed}`,
-            },
-            action: "createIssueInAzure",
-          });
+              },
+              action: "createIssueInAzure",
+            });
       if(userDetails === "Fail"){
         jiraconnect?.current?.show({ severity: 'info', summary: 'Info', detail: 'Fail to log a bug.' });
       }
@@ -325,7 +361,7 @@ export default function BasicDemo() {
         setJiraDropDown(null);
         setLogBug(false);
         setIssueDropDown(null);
-        setJiraDetails({projects: [], issuetype: []});
+        setJiraDetails({ projects: [], issuetype: [] });
         setMappedProjects({});
         setConfigureFeilds([]);
         setSelectedFiels([]);
@@ -441,18 +477,20 @@ export default function BasicDemo() {
           {eval(getBug?.azure_defect_id)[0]}
         </a>
       ) : (
-        getBug?.jira_defect_id && <a
-          href={getBug?.jira_defect_id
-            .split(",")[1]
-            .split("]")[0]
-            .replace(/['‘’"“”]/g, "")}
-          target="_blank"
-        >
-          {getBug?.jira_defect_id
-            .split(",")[0]
-            .split("[")[1]
-            .replace(/['‘’"“”]/g, "")}
-        </a>
+        getBug?.jira_defect_id && (
+          <a
+            href={getBug?.jira_defect_id
+              .split(",")[1]
+              .split("]")[0]
+              .replace(/['‘’"“”]/g, "")}
+            target="_blank"
+          >
+            {getBug?.jira_defect_id
+              .split(",")[0]
+              .split("[")[1]
+              .replace(/['‘’"“”]/g, "")}
+          </a>
+        )
       );
     };
 
@@ -481,9 +519,9 @@ export default function BasicDemo() {
           (bugTitle === "Jira" &&
             jiraDetails?.projects &&
             !!jiraDetails?.projects.length) ||
-            (bugTitle === "Azure DevOps" &&
-              jiraDetails?.projects &&
-              !!jiraDetails?.projects.length)
+          (bugTitle === "Azure DevOps" &&
+            jiraDetails?.projects &&
+            !!jiraDetails?.projects.length)
             ? "img_jira"
             : ""
         }
@@ -535,8 +573,8 @@ export default function BasicDemo() {
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"
             : modifiedChild.status === "Fail"
-              ? "static/imgs/fail.png"
-              : "static/imgs/treminated.png";
+            ? "static/imgs/fail.png"
+            : "static/imgs/treminated.png";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
           <div key={modifiedChild.key} style={{ display: "flex" }}>
@@ -583,36 +621,39 @@ export default function BasicDemo() {
       } else {
         setConfigValues({});
       }
-      (async() => {
+      (async () => {
         const getFields =
           bugTitle === "Jira"
             ? await connectJira_ICE_Fields(
-              jiraDropDown?.id,
-              issueDropDown?.name,
-              loginUrl,
-              loginName,
-              loginKey,
-              jiraDetails?.projects.map((el) => ({
-                code: el?.code,
-                key: el?.id,
-                text: el?.name,
-              }))
-            )
+                jiraDropDown?.id,
+                issueDropDown?.name,
+                loginUrl,
+                loginName,
+                loginKey,
+                jiraDetails?.projects.map((el) => ({
+                  code: el?.code,
+                  key: el?.id,
+                  text: el?.name,
+                }))
+              )
             : await connectAzure_ICE_Fields(
-              jiraDropDown?.id,
-              issueDropDown?.name,
-              loginUrl,
-              loginName,
-              loginKey,
-              jiraDetails?.projects.map((el) => ({
-                code: el?.code,
-                key: el?.id,
-                text: el?.name,
-              }))
-            );
+                jiraDropDown?.id,
+                issueDropDown?.name,
+                loginUrl,
+                loginName,
+                loginKey,
+                jiraDetails?.projects.map((el) => ({
+                  code: el?.code,
+                  key: el?.id,
+                  text: el?.name,
+                }))
+              );
         setResponseFeilds(getFields);
         const fieldValues = Object.keys(getFields).map((el) => ({
-          key: bugTitle === "Jira" ? getFields[el].key : getFields[el].referenceName,
+          key:
+            bugTitle === "Jira"
+              ? getFields[el].key
+              : getFields[el].referenceName,
           name: bugTitle === "Jira" ? el : getFields[el].name,
           disabled: bugTitle === "Jira" ? getFields[el].required : getFields[el].alwaysRequired,
           data: bugTitle === "Jira" ? getFields[el].value : getFields[el]?.allowedValues && !!getFields[el]?.allowedValues.length ? getFields[el]?.allowedValues.map((e) => ({ key: e, name: e })) : ""
@@ -645,7 +686,10 @@ export default function BasicDemo() {
   };
 
   const getElDropdown = (Dropdown) => {
-    let nameObj = { ["Iteration ID"]: responseFeilds["Iteration_Paths"]?.child, ["Area ID"]: responseFeilds["Area_Paths"]?.child };
+    let nameObj = {
+      ["Iteration ID"]: responseFeilds["Iteration_Paths"]?.child,
+      ["Area ID"]: responseFeilds["Area_Paths"]?.child,
+    };
     return nameObj[Dropdown];
   };
 
@@ -691,6 +735,58 @@ export default function BasicDemo() {
       </div>
     );
 
+  const returnMap = (getMap) => {
+    switch(getMap){
+      case "Best-Practice": return "best-practice";
+      case "Section 508": return "section508";
+      case "Aria": return "cat_aria";
+      case "AAA": return "wcag2aaa";
+      case "A": return "wcag2a";
+      case "AA": return "wcag2aa";
+      default: return ""
+    }
+  }
+
+  const rulesTestedPass = (getAccessibility) => {
+    let passCount = 0;
+    if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.passes){
+      passCount = accessibilityData?.rulemap[returnMap(ruleMap)]?.passes.length
+    }
+    return passCount;
+  }
+
+  const rulesTestedFail = (getAccessibility) => {
+    let failCount = 0;
+    if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.violations){
+      failCount = accessibilityData?.rulemap[returnMap(ruleMap)]?.violations.length
+    }
+    return failCount;
+  }
+
+  const elementsTested = (getAccessibility) => {
+    let elementsTestCount = 0;
+    if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.passes){
+      accessibilityData?.rulemap[returnMap(ruleMap)]?.passes.forEach((el) => {
+        elementsTestCount = el?.elements.length + elementsTestCount
+      })
+    }
+    if(getAccessibility?.rulemap && ruleMap && accessibilityData?.rulemap[returnMap(ruleMap)]?.violations){
+      accessibilityData?.rulemap[returnMap(ruleMap)]?.violations.forEach((el) => {
+        elementsTestCount = el?.elements.length + elementsTestCount
+      })
+    }
+    return elementsTestCount;
+  }
+
+  const onMoreDetails = (getMoreDetails) => {
+    setShowMoreDetails(true);
+    setMoreDetails(getMoreDetails);
+  }
+
+  const detailsTemplate = (getDetails) => {
+    return <span className="pi pi-arrow-right" onClick={() => onMoreDetails(getDetails)}></span>
+  }
+
   return (
     <div className="reportsTable_container">
       <div className="reportSummary">
@@ -705,67 +801,129 @@ export default function BasicDemo() {
               collapsible={false}
               width="100%"
               className={"card"}
-              type="Execution"
-              summaryValues={reportData?.overallstatus}
+              type={reportid ? "Execution" : "Accessibility"}
+              summaryValues={
+                reportid
+                  ? reportData?.overallstatus
+                  : {
+                      standardName: ruleMap,
+                      numOfRulesTested:
+                        rulesTestedPass(accessibilityData) +
+                        rulesTestedFail(accessibilityData),
+                      screeName: accessibilityData?.screenname,
+                      numOfElementsTested: elementsTested(accessibilityData),
+                      url: accessibilityData?.url,
+                      browserUsed: accessibilityData?.agent,
+                      pass:
+                        Math.round(
+                          (rulesTestedPass(accessibilityData) /
+                            rulesTestedPass(accessibilityData) +
+                            rulesTestedFail(accessibilityData)) *
+                            1000
+                        ) / 100,
+                      fail:
+                        Math.round(
+                          (rulesTestedFail(accessibilityData) /
+                            rulesTestedPass(accessibilityData) +
+                            rulesTestedFail(accessibilityData)) *
+                            1000
+                        ) / 100,
+                    }
+              }
             />
           </AccordionTab>
         </Accordion>
       </div>
       <br></br>
-      <TreeTable
-        globalFilter={searchTest}
-        header={getTableHeader}
-        value={treeData}
-        className={reportSummaryCollaps ? "viewTable" : "ViewTable"}
-        expandedKeys={expandedKeys}
-        dataKey="id"
-        onToggle={(e) => handdleExpend(e)}
-        tableStyle={{ minWidth: "50rem" }}
-      >
-        <Column
-          field="slno"
-          header="S No."
-          style={{ width: "8rem", padding: "0rem" }}
-          align="center"
-          expander
-        />
-        <Column
-          field="Step"
-          header="Steps"
-          style={{ width: "8rem", padding: "0rem" }}
-        />
-        <Column
-          field="StepDescription"
-          header="Description"
-          style={{ width: "18rem", padding: "0rem" }}
-          body={reoptDescriptionTooltip}
-        />
-        <Column
-          field="EllapsedTime"
-          header="Time Elapsed"
-          style={{ width: "10rem", padding: "0rem" }}
-        />
-        <Column
-          field="status"
-          header="Status"
-          style={{ width: "8rem", padding: "0rem" }}
-        />
-        <Column
-          field="Comments"
-          header="Comments"
-          style={{ width: "18rem", padding: "0rem" }}
-        />
-        <Column
-          header="No. Defect ID"
-          body={defectIDForJiraAndAzure}
-          style={{ padding: "0rem", textAlign: "center" }}
-        />
-        <Column
-          body={screenShotLink}
-          header="Action"
-          style={{ padding: "0rem" }}
-        />
-      </TreeTable>
+      {reportid ? (
+        <TreeTable
+          globalFilter={searchTest}
+          header={getTableHeader}
+          value={treeData}
+          className={reportSummaryCollaps ? "viewTable" : "ViewTable"}
+          expandedKeys={expandedKeys}
+          dataKey="id"
+          onToggle={(e) => handdleExpend(e)}
+          tableStyle={{ minWidth: "50rem" }}
+        >
+          <Column
+            field="slno"
+            header="S No."
+            style={{ width: "8rem", padding: "0rem" }}
+            align="center"
+            expander
+          />
+          <Column
+            field="Step"
+            header="Steps"
+            style={{ width: "8rem", padding: "0rem" }}
+          />
+          <Column
+            field="StepDescription"
+            header="Description"
+            style={{ width: "18rem", padding: "0rem" }}
+            body={reoptDescriptionTooltip}
+          />
+          <Column
+            field="EllapsedTime"
+            header="Time Elapsed"
+            style={{ width: "10rem", padding: "0rem" }}
+          />
+          <Column
+            field="status"
+            header="Status"
+            style={{ width: "8rem", padding: "0rem" }}
+          />
+          <Column
+            field="Comments"
+            header="Comments"
+            style={{ width: "18rem", padding: "0rem" }}
+          />
+          <Column
+            header="No. Defect ID"
+            body={defectIDForJiraAndAzure}
+            style={{ padding: "0rem", textAlign: "center" }}
+          />
+          <Column
+            body={screenShotLink}
+            header="Action"
+            style={{ padding: "0rem" }}
+          />
+        </TreeTable>
+      ) : (
+        <DataTable
+          value={
+            accessibilityData?.rulemap && ruleMap
+              ? [
+                  ...(accessibilityData?.rulemap[returnMap(ruleMap)]?.passes
+                    ? accessibilityData?.rulemap[
+                        returnMap(ruleMap)
+                      ]?.passes.map((item) => ({ ...item, status: "Pass" }))
+                    : []),
+                  ...(accessibilityData?.rulemap[returnMap(ruleMap)]?.violations
+                    ? accessibilityData?.rulemap[
+                        returnMap(ruleMap)
+                      ]?.violations.map((item) => ({ ...item, status: "Fail" }))
+                    : []),
+                ].map((val, ind) => ({
+                  ...val,
+                  slno: ind + 1,
+                  impact: val?.impact ? val?.impact : "Null",
+                }))
+              : []
+          }
+          tableStyle={{ minWidth: "50rem" }}
+          globalFilter={searchTest}
+          header={getTableHeader}
+          className="ruleMap_table"
+        >
+          <Column field="slno" header="Sl. No."></Column>
+          <Column field="description" header="Description"></Column>
+          <Column field="status" header="Status"></Column>
+          <Column field="impact" header="Impact"></Column>
+          <Column body={detailsTemplate} header=""></Column>
+        </DataTable>
+      )}
       <Toast ref={iceinfo} />
       <Toast ref={jiraconnect} />
       <OverlayPanel ref={filterRef} className="reports_download">
@@ -870,6 +1028,7 @@ export default function BasicDemo() {
                 labelTxt={`${bugTitle} Projects`}
                 required={true}
                 parentClass="flex flex-column"
+                disabled={!Array.isArray(mappedProjects)}
               />
             </div>
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
@@ -954,8 +1113,8 @@ export default function BasicDemo() {
               el.name !== "Repro Steps" && el.name !== "Value Area" ? (
                 <div className="col-12">
                   {Array.isArray(el.data) ||
-                    el.name === "Iteration ID" ||
-                    el.name === "Area ID" ? (
+                  el.name === "Iteration ID" ||
+                  el.name === "Area ID" ? (
                     <AvoDropdown
                       dropdownValue={configValues[el.name]}
                       name={el.name}
@@ -968,10 +1127,10 @@ export default function BasicDemo() {
                       dropdownOptions={
                         el.name !== "Iteration ID" && el.name !== "Area ID"
                           ? el.data.map((e) => ({
-                            ...e,
-                            id: e?.key,
-                            name: bugTitle === "Jira" ? e?.text : e?.name,
-                          }))
+                              ...e,
+                              id: e?.key,
+                              name: bugTitle === "Jira" ? e?.text : e?.name,
+                            }))
                           : getElDropdown(el.name)
                       }
                       parentClass="flex flex-column"
@@ -1000,6 +1159,7 @@ export default function BasicDemo() {
                         name={el.name}
                         value={configValues[el.name]}
                         onChange={(e) => handleConfigValues(e)}
+                        disabled={(el.name === "Attachment" && selectedRow[0]?.screenshot_path)}
                       />
                     </>
                   )}
@@ -1015,6 +1175,40 @@ export default function BasicDemo() {
           background: "#FFFFFF",
         }}
         footerType="Proceed"
+      />
+      <AvoModal
+        visible={showMoreDetails}
+        setVisible={setShowMoreDetails}
+        onModalBtnClick={(getType) => {
+          if (getType === "Cancel") setShowMoreDetails(false);
+        }}
+        content={
+          <div className="flex flex-column">
+            <img
+              src={accessibilityData?.url}
+              height={accessibilityData?.screenshotheight}
+              width={accessibilityData?.screenshotwidth}
+            />
+            <DataTable
+              value={moreDetails?.elements ? moreDetails?.elements.map((e, i) => ({
+                ...e,
+                no: i + 1,
+                element: `Element Type: ${Object.keys(e)[0]}`,
+                status: moreDetails?.status,
+              })) : []}
+            >
+              <Column field="no" header="Sl. No."></Column>
+              <Column field="element" header="Elements"></Column>
+              <Column field="status" header="Status"></Column>
+            </DataTable>
+          </div>
+        }
+        headerTxt="More Details"
+        modalSytle={{
+          width: "80vw",
+          height: "90vh",
+          background: "#FFFFFF",
+        }}
       />
     </div>
   );

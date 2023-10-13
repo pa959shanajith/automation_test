@@ -1039,6 +1039,8 @@ else{
 
 
   const renderActionsCell = (rowData) => {
+    let selectedElement=[]
+    selectedElement.push(rowData)
     setScrapeDataForIris(rowData)
    let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
   //  setIrisObject(scrapeType[0]);
@@ -1051,7 +1053,7 @@ else{
         {  (scrapeType[0] === "iris" || typesOfAppType==="Web")  && 
         <button
         disabled={!saveDisable}
-        onClick={() => {openElementProperties(rowData);}}
+        onClick={() => {setSelectedCapturedElement(selectedElement);openElementProperties(rowData);}}
       >
         <img
           src="static/imgs/ic-edit.png"
@@ -1136,6 +1138,11 @@ else{
 const setAddmoreHandler = () => addMore.current = addMore.current && false;
 
 const elementIdentifier=()=>{
+  let filterEmptyXpath=capturedDataToSave.filter(element=>element.objId==undefined)
+  if(filterEmptyXpath.length>0){
+  toastError('Please save elements to set element identifier order.')
+  return;
+  }
   const identifierList=selectedCapturedElement.length>1?[{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'},{id:6,identifier:'cssselector',name:'CSS Selector'},{id:7,identifier:'href',name:'Href Attribute'},{id:8,identifier:'label',name:'Label'}]:
   selectedCapturedElement[0]?.objectDetails.identifier.map(item=>({...item,name:defaultNames[item.identifier]}))
   setIdentifierList(identifierList)

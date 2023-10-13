@@ -324,7 +324,7 @@ const DisplayProject = (props) => {
       <Panel className="Project_Display" headerTemplate={allProjectTemplate} >
         <div className="p-input-icon-left Project-search ">
           <i className="pi pi-search" />
-          <InputText className="Search_name" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} title=" Search all projects." />
+          <InputText className="Search_name p-inputtext-sm" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} title=" Search all projects." />
         </div>
         <div className="project-list project">
           {filteredProjects.map((project) => (

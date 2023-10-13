@@ -8,8 +8,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+    // overflow-y: auto;
+    // overflow-x: hidden;
 
     .split_left {
         padding: 3% 0.5%;
@@ -33,12 +33,15 @@
         width: 50%;
 
         .right_side_login {
+            align-items: center;
             display: flex;
-            padding: 3% 14%;
             flex-direction: column;
-            position: fixed;
+            position: absolute;
             text-align: center;
-            gap: 2rem;
+            top: 7%;
+            width: 50%;
+            height: 84%;
+            overflow: auto;
 
             .icon_img {
                 height: 4rem;
@@ -51,7 +54,7 @@
             }
 
             .user_input {
-                width: 26rem;
+                width: 100%;
                 font: $f6_regular;
             }
 

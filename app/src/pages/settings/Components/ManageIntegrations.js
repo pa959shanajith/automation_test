@@ -975,7 +975,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
+                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton}  activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

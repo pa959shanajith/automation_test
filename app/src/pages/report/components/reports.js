@@ -12,7 +12,7 @@ import { AvatarGroup } from 'primereact/avatargroup';
 import { Avatar } from 'primereact/avatar';
 import { classNames } from 'primereact/utils';
 import {FooterTwo as Footer} from '../../global';
-import { fetchConfigureList, getFunctionalReports, getProjectList } from "../api";
+import { fetchConfigureList, getAccessibilityScreens, getFunctionalReports, getProjectList } from "../api";
 import { NavLink } from 'react-router-dom';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { SelectButton } from 'primereact/selectbutton';
@@ -34,7 +34,6 @@ const reports = () => {
     const [show, setShow] = useState(false);
     const [viewBy, setViewBy] = useState(viewByOptions[0]?.value);
     const [testType, setTestType] = useState(testTypesOptions[0]?.value);
-    const [dropdownData, setDropdownData] = useState([]);
     const [project, setProject] = useState({});
     const [executionButon, setExecutionButon] = useState(
       "View by Execution Profile"
@@ -42,50 +41,6 @@ const reports = () => {
     const customDropdownIcon = classNames("pi", "pi-sort-amount-down");
 
     const [reportData, setReportData] = useState([]);
-    const [reportDataModule, setReportDataModule] = useState([
-      {
-        key: "moduleName_1",
-        scenariovalue: "4 scenarios",
-        value: (
-          <img className="browser__img" src="static/imgs/chrome.png" alt="" />
-        ),
-      },
-      {
-        key: "moduleName_2",
-        scenariovalue: "2 scenarios",
-        value: (
-          <img className="browser__img" src="static/imgs/fire-fox.png" alt="" />
-        ),
-      },
-      {
-        key: "moduleName_3",
-        scenariovalue: "3 scenarios",
-        value: (
-          <img className="browser__img" src="static/imgs/chrome.png" alt="" />
-        ),
-      },
-      {
-        key: "moduleName_4",
-        scenariovalue: "1 scenarios",
-        value: (
-          <img className="browser__img" src="static/imgs/edge.png" alt="" />
-        ),
-      },
-      {
-        key: "moduleName_5",
-        scenariovalue: "4 scenarios",
-        value: (
-          <img className="browser__img" src="static/imgs/chrome.png" alt="" />
-        ),
-      },
-      {
-        key: "moduleName_6",
-        scenariovalue: "5 scenarios",
-        value: (
-          <img className="browser__img" src="static/imgs/edge.png" alt="" />
-        ),
-      },
-    ]);
     const sort = [
       { name: "Last modified", code: "0" },
       { name: "Report Generation Date", code: "1" },
@@ -126,35 +81,71 @@ const reports = () => {
                 console.error('Error fetching project list:',error);
             }
         })();
-    }, [viewBy]);
+    }, [viewBy, testType]);
 
     const fetchReportData = async (initProj) => {
-        try{
-            const executionProfileName = viewBy === "Execution Profile" ? await fetchConfigureList({ projectid: initProj ,"param":"reportData"}) :
-            await getFunctionalReports(initProj, project?.releases[project?.projectId.indexOf(initProj)][0]?.name, project?.releases[project?.projectId.indexOf(initProj)][0]?.cycles[0]?._id);
-            if (executionProfileName && executionProfileName.length > 0) {
-                const extractedExecutionProfileData = executionProfileName.map((obj) => ({
-                    configurename: obj?.configurename || '',
-                    execDate: obj?.execDate || '',
-                    selectedModuleType: obj?.executionRequest?.selectedModuleType || '',
-                    configurekey: obj?.configurekey || '',
-                    noOfExecution: obj?.noOfExecution || 0,
-                }));
-                setReportData(extractedExecutionProfileData);
-            } else if(!!executionProfileName?.rows?.modules.length){
-              const extractedExecutionProfileData = executionProfileName?.rows?.modules.map((obj) => ({
-                configurename: obj?.name || '',
-                execDate: obj?.lastExecutedtime || '',
-                selectedModuleType: obj?.type || '',
-                configurekey: obj?._id || '',
-                noOfExecution: obj?.executionCount || 0,
-            }));
+        try {
+          let executionProfileName = [];
+          let accessibilityScreen;
+          if (testType === "Functional Test" && viewBy === "Execution Profile") {
+            executionProfileName = await fetchConfigureList({
+              projectid: initProj,
+              param: "reportData",
+            });
+          } else if (testType === "Functional Test" && viewBy === "Test Suites") {
+            executionProfileName = await getFunctionalReports(
+              initProj,
+              project?.releases[project?.projectId.indexOf(initProj)][0]?.name,
+              project?.releases[project?.projectId.indexOf(initProj)][0]
+                ?.cycles[0]?._id
+            );
+          } else if (testType === "Accessibility Test") {
+            accessibilityScreen = await getAccessibilityScreens(
+              initProj,
+              project?.releases[project?.projectId.indexOf(initProj)][0]?.name,
+              project?.releases[project?.projectId.indexOf(initProj)][0]
+                ?.cycles[0]?._id
+            );
+            executionProfileName = Object.values(accessibilityScreen);
+          }
+
+          if (!!executionProfileName.length && testType === "Functional Test") {
+            const extractedExecutionProfileData = executionProfileName.map(
+              (obj) => ({
+                configurename: obj?.configurename || "",
+                execDate: obj?.execDate || "",
+                selectedModuleType:
+                  obj?.executionRequest?.selectedModuleType || "",
+                configurekey: obj?.configurekey || "",
+                noOfExecution: obj?.noOfExecution || 0,
+              })
+            );
             setReportData(extractedExecutionProfileData);
-            } else {
-                setReportData([]);
-            }
-        }catch(error){
-            console.error('Error fetching report data :',error);
+          } else if (
+            !!executionProfileName?.rows?.modules.length &&
+            testType === "Functional Test"
+          ) {
+            const extractedExecutionProfileData =
+              executionProfileName?.rows?.modules.map((obj) => ({
+                configurename: obj?.name || "",
+                execDate: obj?.lastExecutedtime || "",
+                selectedModuleType: obj?.type || "",
+                configurekey: obj?._id || "",
+                noOfExecution: obj?.executionCount || 0,
+              }));
+            setReportData(extractedExecutionProfileData);
+          } else if (!!executionProfileName.length && testType === "Accessibility Test" ) {
+            const extractedExecutionProfileData =
+              executionProfileName.map((obj, index) => ({
+                configurename: obj,
+                id: Object.keys(accessibilityScreen)[index]
+              }));
+            setReportData(extractedExecutionProfileData);
+          } else {
+            setReportData([]);
+          }
+        } catch (error) {
+          console.error("Error fetching report data :", error);
         }
         };
 
@@ -221,20 +212,17 @@ const reports = () => {
                   handeSelectProject(e.target.value);
                 }}
               >
-               
-                 {projectList
-                .filter(
-                  (value, index, self) =>
-                    index ===
-                    self.findIndex(
-                      (item) => item.name === value.name
-                    )
-                )
-                .map((project, index) => (
-                  <option value={project.id} key={index}>
-                    {project.name}
-                  </option>
-                ))}
+                {projectList
+                  .filter(
+                    (value, index, self) =>
+                      index ===
+                      self.findIndex((item) => item.name === value.name)
+                  )
+                  .map((project, index) => (
+                    <option value={project.id} key={index}>
+                      {project.name}
+                    </option>
+                  ))}
               </select>
             </div>
           </div>
@@ -253,17 +241,19 @@ const reports = () => {
             </div>
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12 selectBtnView">
-            <div className="testView">
-              <b>View By: </b>
-              <SelectButton
-                value={viewBy}
-                itemTemplate={viewByTemplate}
-                onChange={(e) => {
-                  setViewBy(e.value);
-                }}
-                options={viewByOptions}
-              />
-            </div>
+            {testType !== "Accessibility Test" ? (
+              <div className="testView">
+                <b>View By: </b>
+                <SelectButton
+                  value={viewBy}
+                  itemTemplate={viewByTemplate}
+                  onChange={(e) => {
+                    setViewBy(e.value);
+                  }}
+                  options={viewByOptions}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="flex justify-content-center ml-4 mr-4 mt-5 mb-3 search_container">
@@ -310,7 +300,7 @@ const reports = () => {
                                 state={{
                                   execution: data.configurename,
                                   configureKey: data.configurekey,
-                                  viewBy: viewBy
+                                  viewBy: viewBy,
                                 }}
                                 className="Profile_Name"
                                 activeClassName="active"
@@ -323,20 +313,30 @@ const reports = () => {
                                       </span>
                                     </div>
                                     <div className="col-6 flex justify-content-end">
-                                    <span className="exe_type">
+                                      <span className="exe_type">
                                         <img
                                           src={
-                                            (data.selectedModuleType ===
-                                            "e2eExecution" || data.selectedModuleType === "endtoend")
+                                            data.selectedModuleType ===
+                                              "e2eExecution" ||
+                                            data.selectedModuleType ===
+                                              "endtoend"
                                               ? "static/imgs/E2EModuleSideIcon.png"
                                               : "static/imgs/moduleIcon.png"
                                           }
-                                          className='exe_type_icon'
+                                          className="exe_type_icon"
                                         />
-                                        <span style={{ display: 'inline-block', marginLeft: '0.4rem' }}>{(data.selectedModuleType ===
-                                        "e2eExecution" || data.selectedModuleType === "endtoend")
-                                          ? "End to End"
-                                          : "Test Suite"}</span>
+                                        <span
+                                          style={{
+                                            display: "inline-block",
+                                            marginLeft: "0.4rem",
+                                          }}
+                                        >
+                                          {data.selectedModuleType ===
+                                            "e2eExecution" ||
+                                          data.selectedModuleType === "endtoend"
+                                            ? "End to End"
+                                            : "Test Suite"}
+                                        </span>
                                       </span>
                                     </div>
                                     <div className="col-12 exe_namebox">
@@ -354,7 +354,11 @@ const reports = () => {
                                         Executed On
                                       </span>
                                       <span className="exe_date">
-                                        {data?.execDate ? new Date(data.execDate).toLocaleDateString() : ""}
+                                        {data?.execDate
+                                          ? new Date(
+                                              data.execDate
+                                            ).toLocaleDateString()
+                                          : ""}
                                       </span>
                                     </div>
                                     <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12">
@@ -363,9 +367,22 @@ const reports = () => {
                                       </span>
                                       <span className="exe_date">Manual</span>
                                     </div>
-                                    <div className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12 flex justify-content-end" style={{ position: 'relative' }}>
-                                      <i className="pi pi-cog" style={{ fontSize: '2rem', marginRight: '1.2rem' }}></i>
-                                      <span className='count_exe'>{data?.noOfExecution ? data?.noOfExecution : 0 }</span>
+                                    <div
+                                      className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12 flex justify-content-end"
+                                      style={{ position: "relative" }}
+                                    >
+                                      <i
+                                        className="pi pi-cog"
+                                        style={{
+                                          fontSize: "2rem",
+                                          marginRight: "1.2rem",
+                                        }}
+                                      ></i>
+                                      <span className="count_exe">
+                                        {data?.noOfExecution
+                                          ? data?.noOfExecution
+                                          : 0}
+                                      </span>
                                     </div>
                                   </div>
                                 </Card>
@@ -374,80 +391,37 @@ const reports = () => {
                           ))}
                         </div>
                       )}
-                    {activeIndex === "Functional Test" &&
-                      executionButon === "View by Modules" && (
-                        <div className="grid">
-                          {reportDataModule.map((data) => (
-                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
-                              <Card key={data.key} className="testCards">
-                                <p m={handleData}>{data.key}</p>
-                                <p>{data.scenariovalue}</p>
-                                <Avatar
-                                  key={data.value}
-                                  className="browser-avatar"
-                                />
+                    {activeIndex === "Accessibility Test" && (
+                      <div className="grid">
+                        {filteredExecutionData.map((data, index) => (
+                          <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
+                            <NavLink
+                              to="/profile"
+                              state={{
+                                screen: data.configurename,
+                                id: data.id,
+                                viewBy: "Accessibility",
+                              }}
+                              className="Profile_Name"
+                              activeClassName="active"
+                            >
+                              <Card key={index} className="testCards">
+                                <div className="grid box_header">
+                                  <div className="col-6">
+                                    <span className="exe_profile">Screen</span>
+                                  </div>
+                                  <div className="col-12 exe_namebox">
+                                    <span className="exe_name">
+                                      {data.configurename}
+                                    </span>
+                                  </div>
+                                </div>
                               </Card>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    {activeIndex === "Accessibility Test" &&
-                      executionButon === "View by Execution Profile" && (
-                        <div className="grid">
-                          {reportData.map((data) => (
-                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
-                              <Card key={data.key} className="testCards">
-                                <NavLink
-                                  to="/reports/profile"
-                                  state={{
-                                    execution: data.configurename,
-                                    configureKey: data.configurekey,
-                                  }}
-                                  activeClassName="active"
-                                >
-                                  {data.key}
-                                </NavLink>
-                                <p>{data.Modulevalue + data.scenariovalue}</p>
-                                <AvatarGroup>
-                                  {data?.value?.map((image, index) => (
-                                    <Avatar
-                                      key={index}
-                                      image={image.props.src}
-                                      className="browser-avatar"
-                                    />
-                                  ))}
-                                </AvatarGroup>
-                              </Card>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    {activeIndex === "Accessibility Test" &&
-                      executionButon === "View by Modules" && (
-                        <div className="grid">
-                          {reportDataModule.map((data) => (
-                            <div className="col-12 lg:col-3 xl:col-3 md:col-6 sm:col-12">
-                              <Card key={data.key} className="testCards">
-                                <NavLink
-                                  to="/reports/profile"
-                                  state={{
-                                    execution: data.configurename,
-                                    configureKey: data.configurekey,
-                                  }}
-                                  activeClassName="active"
-                                >
-                                  {data.key}
-                                </NavLink>
-                                <p>{data.scenariovalue}</p>
-                                <Avatar
-                                  key={data.value}
-                                  className="browser-avatar"
-                                />
-                              </Card>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                            </NavLink>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="Report_Image">
