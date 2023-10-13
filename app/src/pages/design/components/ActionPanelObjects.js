@@ -1004,12 +1004,12 @@ const ActionPanel = (props) => {
                       <span className='object__text'>URL <span style={{ color: "red" }}> *</span></span>
                       <InputText required className='input__text' type='text' name="url" onChange={(e) => handleInputs(e, index)} value={object.url} />
                     </div>
-                    <div className='create-elem'>
-                      <span className='object__text'>Name Attribute <span style={{ color: "red" }}> *</span></span>
-                      <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
-                    </div>
                     <Divider className='divider-CE' />
                     <p className='msg-CE'>Fill at least any one of the details</p>
+                    <div className='create-elem'>
+                      <span className='object__text'>Name Attribute</span>
+                      <InputText className='input__text' type='text' name="name" onChange={(e) => handleInputs(e, index)} value={object.name} />
+                    </div>
                     <div className='create-elem'>
                       <span className='object__text' >Relative Xpath</span>
                       <InputText className='input__text' type='text' name="relXpath" onChange={(e) => handleInputs(e, index)} value={object.relXpath} />
