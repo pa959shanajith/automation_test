@@ -1828,6 +1828,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
          <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
          <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+         {loading ? <ScreenOverlay content={loading} /> : null}
 
           <DataTable
             showGridlines
