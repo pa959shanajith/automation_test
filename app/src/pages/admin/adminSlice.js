@@ -146,7 +146,7 @@ export const adminSlice = createSlice({
             state.nocreate = false;
             state.confExpired = false;
             state.ldapUserFilter = "";
-            state.ldapAllUserList = "";
+            state.ldapAllUserList = [];
             state.allUserFilter = "";
         },
         UPDATE_DATA: (state, action) => {
