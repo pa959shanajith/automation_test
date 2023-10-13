@@ -179,14 +179,15 @@ const CanvasNew = (props) => {
 
     setBrowserName(browserName.name)
     setSelectedSpan(browserName.val)
+  },[])
+   useEffect(()=>{
     if(props.module.currentlyInUse!=="" && props.module.currentlyInUse!==undefined && props.module.currentlyInUse!==userInfo.username){
       setTestSuiteInUse(true)
     }
     else{
       setTestSuiteInUse(false)
     }
-    
-  },[props.module.currentlyInUse])
+  })
 
     useEffect(()=>{
       if(deletedNoded && deletedNoded.length>0){
@@ -2317,7 +2318,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
               </div>
               <div className='avatar__container'>
                 <span style={{fontSize:'23px'}} className='inuseby'>In use by:</span>
-                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' ,fontSize:'21px'}} className='infoinuse'>{props.module.currentlyInUse[0]}</span>
+                <span style={{display:'flex',width:'34px',height:'34px',borderRadius:'9px',background:'#DEE2E6',alignItems:'center',justifyContent:'center' ,fontSize:'21px'}} className='infoinuse'>{props.module.currentlyInUse && props.module.currentlyInUse[0]}</span>
               </div>
             </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
