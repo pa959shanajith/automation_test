@@ -335,7 +335,7 @@ const ModuleListDrop = (props) =>{
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
-        dispatch(selectedModuleReducer({createnew:true}))
+        dispatch(selectedModuleReducer({createnew:true,currentlyInUse:""}))
         dispatch(initEnEProj({proj, isE2ECreate: false}));
         dispatch(isEnELoad(false));
         setFirstRender(false);
@@ -865,7 +865,7 @@ setPreventDefaultModule(true);
       
               // call the api to assign current testsuite and reset older one(based on above condition) 
          await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,true,resetInUse)
-         props.loadModule(props.modID)
+         loadModule(props.modID)
         }
          else if(moduledataold.currentlyInUse===props.userInfo?.username ){
       
@@ -873,10 +873,10 @@ setPreventDefaultModule(true);
           resetInUse=true
           
           await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,false,resetInUse)
-          props.loadModule(props.modID)
+          loadModule(props.modID)
         }
         else{
-          props.loadModule(props.modID)
+          loadModule(props.modID)
         }
       
       }   
