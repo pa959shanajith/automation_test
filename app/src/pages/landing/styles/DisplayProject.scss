@@ -27,7 +27,6 @@
   .Project_Display_Nav {
     display: flex;
     flex-direction: column;
-    width: 19rem;
   }
 
   #Last_modifie {
@@ -88,6 +87,7 @@
   .project {
     overflow-y: auto;
     height: 70vh;
+    overflow-x: hidden;
   }
 
   .p-menuitem-icon-left {

@@ -50,15 +50,17 @@ const CreateLanding = (props) => {
 
     useEffect(() => {
         let modifyData = []
-        ldapAllUserList.map(item => {
-            let object={}
-            object.name = item[0];
-            object.domain = item[1];
-            object.role = ""
-            object.roleId="" 
-            modifyData.push(object);
-        })
-        setFilterListSelectUser(modifyData.sort());
+        if(ldapAllUserList.length > 0){
+            ldapAllUserList.map(item => {
+                let object={}
+                object.name = item[0];
+                object.domain = item[1];
+                object.role = ""
+                object.roleId="" 
+                modifyData.push(object);
+            })
+            setFilterListSelectUser(modifyData.sort());
+        }
     }, [ldapAllUserList.length > 0]);
 
     useOnClickOutside(node, () => { props.setShowDropdown(!props.showDropdown); props.click({ query: 'retaintype' }); });
