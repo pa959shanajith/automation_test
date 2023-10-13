@@ -25,7 +25,7 @@ import { Paginator } from 'primereact/paginator';
 import { Toast } from "primereact/toast";
 
 
-const ZephyrContent = ({ domainDetails , setToast },ref) => {
+const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },ref) => {
     const uploadFileRef = useRef();
     const dispatch = useDispatch();
     const mappedData = useSelector(state => state.setting.mappedPair);
@@ -41,7 +41,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     const selectedZphyrReleaseIds = useSelector(state=> state.setting.checkedReleaseIds);
 
 
-    const [activeIndex, setActiveIndex] = useState(0);
+
     const [checked, setChecked] = useState(false);
     const [checkedAvo, setCheckedAvo] = useState(false);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
@@ -534,19 +534,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
     }
 
 
-    const footerIntegrations = (
-        <div className='btn-11'>
-            {activeIndex === 0 && (
-                <div className="btn__2">
-                    <Button label="Save" severity="primary" className='btn1' />
-                    <Button label="Back" onClick={showLogin} size="small" className="logout__btn" />
-                </div>)}
-
-            {activeIndex === 1 && (
-                <Button label="Back" onClick={showLogin} size="small" className="cancel__btn" />)}
-
-        </div>
-    );
+   
 
     const uploadFile = async ({ uploadFileRef, setSheetList, setError, setFiledUpload, dispatch }) => {
         var file = uploadFileRef.current.files[0]
@@ -944,6 +932,7 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 </div>
             );
         } else {
+            if(node.key && node.label)
             return (
                 <div>
                     <Checkbox
@@ -1118,8 +1107,10 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                 if(data.modules.length && !data.testcases.length){
                     updateModuleData(nodeobj.node.key,data.modules,projectDetails);
                 }
-                setTestCases(data.testcases);
-                setModules(data.modules);
+                if(data.testcases.length || data.modules.length) {
+                    setTestCases(data.testcases);
+                    setModules(data.modules);
+                }
                 // setCollapse(false);
             }
         }
@@ -1379,7 +1370,10 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                                     <AccordionTab key={`${item.scenarioNames.join()}_${scenarioIndex}`} header={<span>{scenarioName}</span>}>
                                                         <div>
                                                             {item.testCaseNames.map((testCaseName, index) => (
-                                                                <div key={index}>{testCaseName} <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/></div>
+                                                                <div className='accordion__tab__expand'>
+                                                                <span key={index}>{testCaseName}</span>
+                                                                <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/>
+                                                                </div>
                                                             ))}
                                                         </div>
                                                     </AccordionTab>
@@ -1397,7 +1391,10 @@ const ZephyrContent = ({ domainDetails , setToast },ref) => {
                                                             <AccordionTab key={`${item.testCaseNames.join()}_${index}`} header={<span>{testCaseName}</span>}>
                                                                 <div>
                                                                     {item.scenarioNames.map((scenarioName, scenarioIndex) => (
-                                                                        <div key={scenarioIndex}>{scenarioName}  <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/></div>
+                                                                        <div className='accordion__tab__expand'>
+                                                                        <span key={scenarioIndex}>{scenarioName} </span>
+                                                                        <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/>
+                                                                        </div>
                                                                     ))}
                                                                 </div>
                                                             </AccordionTab>

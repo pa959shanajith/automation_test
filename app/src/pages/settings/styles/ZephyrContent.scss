@@ -31,8 +31,7 @@
 }
 
 .cross_icon_zephyr{
-    position: absolute;
-    right: 6rem;
+    position: relative;
     cursor: pointer;
 }
 
@@ -344,14 +343,13 @@
 }
 
 .view_map_zephyr {
-    height: 30.5rem;
+    height: 33.5rem;
     max-height: 32.5rem;
     box-shadow: none !important;
     border: 1px solid lightgray !important;
 
      .p-card-body{
         margin-top: 1rem;
-        overflow: auto;
         height: 30rem;
     }
 
@@ -363,9 +361,15 @@
 
     .accordion_testcase {
         margin-top:-1.5rem;
-        max-height: 30rem !important;
+        max-height: 26.8rem !important;
         overflow-y: auto !important;
     }
+}
+.accordion__tab__expand{
+    display: flex;
+    flex-direction: row;
+    gap: 45rem;
+    justify-content: space-between;
 }
 
 .side-panel .icon-wrapper.selected {
