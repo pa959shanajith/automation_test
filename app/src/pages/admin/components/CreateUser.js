@@ -168,7 +168,7 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
-                    props.toastSuccess(MSG.CUSTOM("User" + action + "d successfully!", VARIANT.SUCCESS));
+                    props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "create") { 
                         setSelectedTab("avoAzzureClient") }
                     else {
@@ -657,7 +657,7 @@ const CreateUser = (props) => {
                                     value={roleDropdownValue}
                                     options={allRolesUpdate}
                                     optionLabel="name"
-                                    className= {`w-full md:w-20rem ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
+                                    className= {`w-full md:w-20rem p-inputtext-sm ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
                                     disabled={editUser}
@@ -667,7 +667,7 @@ const CreateUser = (props) => {
                             {roleDropdownValue === "5db0022cf87fdec084ae49ab" && (
                                 <div className="flex flex-column items-center secondaryRole_admin"> {/* Test Manager role ID */}
                                     <label htmlFor="admin_check" className="adminlable_header pb-3 font-medium">Secondary Role</label>
-                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
+                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} disabled={editUser} checked={adminCheck} />
                                     <label htmlFor="admin_check" className="ml-5 -mt-4">Admin</label>
                                 </div>
                             )}
