@@ -35,18 +35,17 @@ export const fetchConfigureList = async(props) => {
 export const getFunctionalReports = async(projId, relName, cycId) => {
     try{
         const res = await axios(url+'/getReportsData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            params: {
-                "param":"getReportsData_ICE",
-                "reportsInputData":{
-                    "projectId": projId,
-                    "releaseName": relName,
-                    "cycleId": cycId,
-                    "configurekey": projId,
-                    "type":"allmodules",
+            data: {
+                reportsInputData:{
+                    projectId: projId,
+                    releaseName: relName,
+                    cycleId: cycId,
+                    configurekey: projId,
+                    type:"allmodules",
                 }
             },
             credentials: 'include'

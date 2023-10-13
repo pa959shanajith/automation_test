@@ -1362,7 +1362,7 @@ exports.fetchExecutionDetail = async (req, res) => {
 exports.getReportsData_ICE = async (req, res) => {
     const fnName = "getReportsData_ICE";
     try {
-        let reportInputData = req.query.reportsInputData;
+        let reportInputData = req.body.reportsInputData;
         if (reportInputData.type == 'allmodules') {
             logger.info("Inside UI service: " + fnName + " - allmodules");
             let inputs = {
