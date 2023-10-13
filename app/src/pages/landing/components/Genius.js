@@ -953,7 +953,7 @@ const toastSuccess = (successMessage) => {
           <InputText 
             required
             id="username" 
-            placeholder={`Test Suite`}
+            placeholder={`Test Testcase`}
             style={{width:'100%'}}
             value={scenarioName} 
             onChange={(e) => { setScenarioName(e.target.value.trim())  }}
