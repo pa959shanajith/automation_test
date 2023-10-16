@@ -304,6 +304,7 @@ export default function BasicDemo() {
                 executionId: reportData?.overallstatus?.executionId,
                 ...(!!Object.keys(configValues).length && valueObj),
                 executionReportNo: `Execution No: ${executed}`,
+                ...(getItemType()?.itemId && { mappedItem: getItemType()?.itemId }),
               },
               action: "createIssueInJira",
             })
