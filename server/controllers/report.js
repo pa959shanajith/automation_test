@@ -403,6 +403,7 @@ exports.connectJira_ICE = function(req, res) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                                 logger.info('Jira: Login successfully.');
                                             } else {
+                                                resultData = {'error':data}
                                                 logger.error('Jira: Login Failed.');
                                             }
                                             res.send(resultData);
