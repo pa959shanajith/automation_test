@@ -261,7 +261,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
     
     return (
         <>
-            <AvoModal id='SauceLab_Integration' customClass="saucelab_model" header='SauceLabs Integration' visible={displayBasic4} onModalBtnClick={() => onHidedia('displayBasic5')}
+            <AvoModal id='SauceLab_Integration' customClass="saucelab_model" header='SauceLabs Integration' visible={displayBasic4} onModalBtnClick={() => onHidedia('displayBasic4')}
             content={
                 <>
                 {showSauceLabs && <>
