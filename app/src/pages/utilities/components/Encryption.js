@@ -72,6 +72,11 @@ const Encrypt = (props) => {
                         value={props.encryptedData}
                     /> */}
                 </div>
+               
+            </div>
+            <div>
+              <label className='notelabel'>Note:</label>
+                <p className='notecontent'> Avo Assure uses <strong> AES </strong>  encryption for all secure text keywords and <strong> MD5 </strong>encryption for API digital signatures</p>
             </div>
 
         </Fragment>)
