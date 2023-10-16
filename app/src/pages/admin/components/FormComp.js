@@ -71,7 +71,7 @@ const FormInputEmail = (props) => {
         <Fragment>
             <div>
                 <label>{name}</label>
-                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-20rem"  placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
+                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-23rem"  placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
                 {/* <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input> */}
             </div>
         </Fragment>

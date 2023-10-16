@@ -197,7 +197,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 ]);
   const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
   const [radioButton_grid, setRadioButton_grid] = useState(
-   selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
+   selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
   const [defaultValues, setDefaultValues] = useState({});
   const [defaultValues2, setDefaultValues2] = useState({});
@@ -221,19 +221,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }, [selectProjects]);
 
   useEffect(() => {
-    setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client");
-    setExecutingOn(selectProjects?.appType==="Web"? "Agent" :"ICE")
-    setShowIcePopup(selectProjects?.appType==="Web"? false:true)
-  }, [selectProjects.appType]);
-
-  useEffect(() => { 
+    setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid");
+    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    setExecutingOn((selectProjects?.appType==="Web" || selectProjects?.appType==="MobileApp" || selectProjects?.appType==="MobileWeb" )? "ICE" :"Agent")
+    setShowIcePopup(selectProjects?.appType==="Web"? true : false)
+    // need for sauceLab in future
     // selectProjects?.appType === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false) 
     // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false) 
-    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    setExecutingOn(selectProjects?.appType==="Web"? "ICE" :"Agent")
-    setExecutingOn(selectProjects?.appType==="MobileWeb"? "ICE" :"Agent")
-    setExecutingOn(selectProjects?.appType==="MobileApp"? "ICE" :"Agent")
-  }, [selectProjects?.appType]);
+  }, [selectProjects.appType]);
 
  const displayError = (error) => {
     // setLoading(false)
@@ -860,7 +855,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
 
   const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
-  displayBasic5={displayBasic4} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
+  displayBasic4={displayBasic4} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
   changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
       onModalBtnClick={onHidedia} handleSubmit1={handleSubmit1}
       availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
@@ -1245,10 +1240,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         {}
       );
       const getSelected = Object.keys(selectedNodeKeys);
-      const parent = getSelected.filter((el) => el.length === 1);
+      const parent = getSelected.filter((el) => !(el.includes('-')));
       const child = getSelected
-        .filter((el) => el.length > 1)
-        .map((e) => ({ [e.charAt(0)]: e.charAt(2) }));
+        .filter((el) => el.includes('-'))
+        .map((e) => ({ [e.split("-")[0]]: e.split("-")[1] }));
       const selectedKeys = {};
       const selectedArr = parent.map((element) =>
         child
