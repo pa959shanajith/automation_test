@@ -1668,7 +1668,7 @@ const footerSave = (
       return (
         <>
         {/* <Tooltip content={rowdata.selectall} target={`.tooltip__target-${rowdata.objectDetails.objId}`} tooltipOptions={{ position: 'right' }}></Tooltip> */}
-        <div style={{display:'flex',justifyContent:'space-between'}}>
+        <div className='tag__render' style={{display:'flex',justifyContent:'space-between'}}>
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
@@ -1915,8 +1915,8 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <div className="screenshot_pop__content" >
                  <div className="scrsht_outerContainer" id="ss_ssId">
                   <div data-test="ssScroll" className="ss_scrsht_insideScroll">
-                  { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
-                  { (mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
+                    { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
+                    { (mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
                   </div>
                  </div>
                 </div>
