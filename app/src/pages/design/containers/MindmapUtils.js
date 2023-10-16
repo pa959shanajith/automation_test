@@ -1,7 +1,7 @@
 /*eslint eqeqeq: "off"*/
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
-// import { readCtScale } from './Canvas';
+import { readCtScale } from './CanvasNew';
 
 function unfoldtree(d){
     // d3.select('#node_' + d.id).classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
@@ -703,7 +703,7 @@ export const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos,verticalLayout,Can
         svg.on('mousemove.nodemove', (event)=>{
                 event.stopImmediatePropagation();
                 var t = {} ;
-                // if(CanvasFlag==='createnew')pos=readCtScale();
+                if(CanvasFlag==='createnew')pos=readCtScale();
                 // else if(CanvasFlag==='assign')pos=readCtScaleAssign();
                 // else if(CanvasFlag==='endtoend')pos=readCtScaleEnE();
                 const cSpan = [pos.x, pos.y];
@@ -729,12 +729,25 @@ export const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) =>
         var l = p.attr('transform').slice(10, -1).split(',');
         dNodes[pi].x = parseFloat(l[0]);
         dNodes[pi].y = parseFloat(l[1]);
-        var link = addLink(dLinks[temp.t].source, dLinks[temp.t].target,verticalLayout);
-        var lid = 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
-        linkDisplay[lid] = link
+        let f;
+        if (dNodes[pi].type === 'testcases'){
+            for(let d = 0; d<dNodes.length; d++){
+                if(dNodes[d].name === dNodes[pi].parent.name){
+                    f = d
+                    break
+                }
+            }
+            var link = addLink(dNodes[f], dNodes[pi],verticalLayout);
+            var lid = 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
+            linkDisplay[lid] = link
+        }else {
+            var links = addLink(dLinks[temp.t].source, dNodes[pi],verticalLayout);
+            var lids= 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
+            linkDisplay[lids] = links
+        }
         temp.s.forEach(function(d) {
                 // if (deletednode_info.indexOf(dLinks[d].target) == -1) {
-                        var link = addLink(dLinks[d].source, dLinks[d].target,verticalLayout);
+                        var link = addLink(dNodes[pi], dLinks[d].target,verticalLayout);
                         var lid = 'link-' + dLinks[d].source.id + '-' + dLinks[d].target.id
                         linkDisplay[lid] = link
                         if(temp.hidden.indexOf(d) !== -1){
@@ -742,6 +755,47 @@ export const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) =>
                         }
                 //}
         });
+        if (dNodes[pi].type === "scenarios") {
+            for (let i = 0; dNodes[0].children.length > i; i++) {
+                if (dNodes[0].children[i].id === dNodes[pi].id) {
+                    const newData = {
+                        ...dNodes[0].children[i],
+                        x: parseFloat(l[0]), // Update x value
+                        y: parseFloat(l[1]), // Update y value
+                    };
+                    dNodes[0].children[i] = newData;
+                    break;
+                }
+            }
+        }
+        else if (dNodes[pi].type === "screens") {
+            for (let j = 0; j < dNodes[0].children.length; j++) {
+                for (let r = 0; r < dNodes[0].children[j].children.length; r++) {
+                    if (dNodes[0].children[j].children[r].id === dNodes[pi].id) {
+                        const newObject = {
+                            ...dNodes[0].children[j].children[r],
+                            x: parseFloat(l[0]), // Update x value for the parent object
+                            y: parseFloat(l[1]), // Update y value for the parent object
+                        };
+                        dNodes[0].children[j].children[r] = newObject;
+                    }
+                }
+            }
+        }
+        else if (dNodes[pi].type === 'testcases') {
+            for (var k = 0; k < dNodes[0].children.length; k++) {
+                for (var j = 0; j < dNodes[0].children[k].children.length; j++) {
+                    if (dNodes[0].children[k].children[j].id === dNodes[pi].parent.id) {
+                        const newObject = {
+                            ...dNodes[0].children[k].children[j],
+                            x: parseFloat(l[0]), // Update x value
+                            y: parseFloat(l[1]), // Update y value
+                        };
+                        dNodes[0].children[k].children[j] = newObject;
+                    }
+                }
+            }
+        }
         p.classed('ct-movable', !1);
         return {linkDisplay}
 };

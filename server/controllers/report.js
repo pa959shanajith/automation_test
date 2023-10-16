@@ -1471,7 +1471,7 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 		const fnName = "getAccessibilityTestingData_ICE"
 		var inputs = {};
 		var result = {};
-		var query = req.query;
+		var query = req.body;
 		switch(query.type){
 			case "screendata":
 				inputs ={query: "screendata", "cycleid": query.cycleId}; 
