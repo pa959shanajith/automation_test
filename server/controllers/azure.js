@@ -203,12 +203,13 @@ exports.connectAzure_ICE = function(req, res) {
                                         if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                             logger.info('Azure: Login successfully.');
                                         } else {
+                                            if(resultData == "Fail") data = "Fail to Login"
+                                            resultData = {'error':{'CONTENT':data}}
                                             logger.error('Azure: Login Failed.');
                                         }
                                         res.send(resultData);
                                         count++;
                                     }
-                                
                             }
                             mySocket.on("Azure_details", azure_login_4_listener);
                         } else {
