@@ -15,10 +15,11 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
 import {FooterTwo as Footer} from '../../global';
 import ExecutionProfileStatistics from "./ExecutionProfileStatistics";
-import {readTestSuite_ICE} from '../api'
+// import {readTestSuite_ICE} from '../api'
 import { Dropdown } from 'primereact/dropdown'; 
-import {saveSauceLabData} from '../api';
+// import {saveSauceLabData} from '../api';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
+import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -167,6 +168,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [osNames, setOsNames] = useState([]);
   const [browserstackUser,setBrowserstackUser] = useState({});
   const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
+  const [isEmpty, setIsEmpty] = useState(false);
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -198,6 +200,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
    selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
   );
   const [defaultValues, setDefaultValues] = useState({});
+  const [defaultValues2, setDefaultValues2] = useState({});
   const [emailNotificationReciever, setEmailNotificationReciever] = useState(null);
   const [isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion] = useState(false);
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
@@ -536,6 +539,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             //     newValues[index] = '';
             //     return newValues;
             //   });
+            handleSubmit1();
             break;
         case 'browserstack':
           setDisplayBasic6('displayBasic6');
@@ -680,64 +684,74 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 
 const handleSubmit1 = async (SauceLabPayload) => {
   // close the existing dialog
-  setDisplayBasic4(false);
+  // setDisplayBasic4(false);
   // open the new dialog
   setLoading("Fetching details..")
-  SauceLabPayload['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
-  let data = await saveSauceLabData({
-      SauceLabPayload
-  });
-  if (data && data.os_names && data.browser) {
-      // Data exists and has the expected properties
-      
-      setLoading(false)
-      setDisplayBasic5(true);
-
-      const arrayOS = data.os_names.map((element, index) => {
-        return {
-          key: element,
-          text: element,
-          title: element,
-          index: index
-        };
-      });
-      setOsNames(arrayOS);
-      setBrowserDetails(data);
-  }
-  else if (data && data.emulator && data.real_devices && data.stored_files){
-      // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
-      //     return {
-      //         key: element,
-      //         text: element,
-      //         title: element,
-      //         index: index
-      //     }
-      // })
-      // setPlatforms(arrayPlatforms);
-
-      setMobileDetails(data);
-      setLoading(false);
-      setDisplayBasic5(true);
-    }
-     else {
-      setLoading(false);
-      // Data is empty or doesn't have expected properties
-      if (data == "unavailableLocalServer"){
-          toast.current.show({
-            severity: 'error',
-            summary: 'Error',
-            detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
-            life: 5000
-          });
-      }else{
-        toast.current.show({
-          severity: 'error',
-          summary: 'error',
-          detail: "Error while fetching the data from Saucelabs",
-          life: 5000
+  setDisplayBasic4('displayBasic4');
+  const data1 = await getDetails_SAUCELABS()
+  if (data1.error) { setMsg(data1.error); return; }
+      if (data1 !== "empty") {
+        data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
+        let data = await saveSauceLabData({
+          "SauceLabPayload" : {
+            ...data1,
+            "query" : showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails'
+          }
         });
-      }  
-    }
+        if (data && data.os_names && data.browser) {
+          // Data exists and has the expected properties
+          
+          setLoading(false)
+          // setDisplayBasic5(true);
+    
+          const arrayOS = data.os_names.map((element, index) => {
+            return {
+              key: element,
+              text: element,
+              title: element,
+              index: index
+            };
+          });
+          setOsNames(arrayOS);
+          setBrowserDetails(data);
+      }
+      else if (data && data.emulator && data.real_devices && data.stored_files){
+          // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
+          //     return {
+          //         key: element,
+          //         text: element,
+          //         title: element,
+          //         index: index
+          //     }
+          // })
+          // setPlatforms(arrayPlatforms);
+    
+          setMobileDetails(data);
+          setLoading(false);
+          setDisplayBasic5(true);
+        }
+         else {
+          setLoading(false);
+          // Data is empty or doesn't have expected properties
+          if (data == "unavailableLocalServer"){
+              toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
+                life: 5000
+              });
+          }else{
+            toast.current.show({
+              severity: 'error',
+              summary: 'error',
+              detail: "Error while fetching the data from Saucelabs",
+              life: 5000
+            });
+          }  
+        }
+      } else {
+        setMsg("No data stored in settings"); return;
+      }
   }
 
 
@@ -846,13 +860,13 @@ const handleSubmit1 = async (SauceLabPayload) => {
   [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
 
   const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
-  displayBasic5={displayBasic5} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
+  displayBasic5={displayBasic4} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
   changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-      onModalBtnClick={onHidedia}
+      onModalBtnClick={onHidedia} handleSubmit1={handleSubmit1}
       availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
 />,
-  [mobileDetails, browserDetails, displayBasic5, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+  [mobileDetails, browserDetails, displayBasic4, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap, handleSubmit1]);
 
 
   const ExecuteTestSuite = async (executionData, btnType) => {

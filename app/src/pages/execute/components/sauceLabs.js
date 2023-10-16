@@ -40,65 +40,65 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHidedia, handle
         getSaucelabsDetails();
     }, [])
 
-    return (
-        <>
-            <AvoModal className='Saucelabs_dialog' header='Saucelabs login' visible={displayBasic4}  onModalBtnClick={()=>onHidedia('displayBasic4')}
-            content={
-                <>
-                <form id='Saucelabs-form'>
-                    <div className='Saucelabs_input'>
-                        <div className="flex flex-row">
-                            <InputText value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL"
-                                name="Saucelabs-URL"
-                                placeholder="Enter Saucelabs Remote URL"
-                                onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, SaucelabsURL: event.target.value });
-                                    setSauceLabUser({ ...defaultValues, SaucelabsURL: event.target.value });
-                                }}
-                                className="saucelabs_input" />
-                        </div>
-                        <div className="flex flex-row">
-                            <InputText value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"
-                                onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, SaucelabsUsername: event.target.value });
-                                    setSauceLabUser({ ...defaultValues, SaucelabsUsername: event.target.value });
-                                }}
-                                className="saucelabs_input_URL" />
-                        </div>
-                        <div className="flex flex-row">
-                            <InputText value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"
-                                onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, Saucelabskey: event.target.value });
-                                    setSauceLabUser({ ...defaultValues, Saucelabskey: event.target.value });
-                                }}
-                                className="saucelabs_input_Accesskey" />
-                        </div>
-                        <div>
-                            {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
-                        </div>
+    // return (
+    //     <>
+    //         <AvoModal className='Saucelabs_dialog' header='Saucelabs login' visible={displayBasic4}  onModalBtnClick={()=>onHidedia('displayBasic4')}
+    //         content={
+    //             <>
+    //             <form id='Saucelabs-form'>
+    //                 <div className='Saucelabs_input'>
+    //                     <div className="flex flex-row">
+    //                         <InputText value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL"
+    //                             name="Saucelabs-URL"
+    //                             placeholder="Enter Saucelabs Remote URL"
+    //                             onChange={(event) => {
+    //                                 setDefaultValues({ ...defaultValues, SaucelabsURL: event.target.value });
+    //                                 setSauceLabUser({ ...defaultValues, SaucelabsURL: event.target.value });
+    //                             }}
+    //                             className="saucelabs_input" />
+    //                     </div>
+    //                     <div className="flex flex-row">
+    //                         <InputText value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"
+    //                             onChange={(event) => {
+    //                                 setDefaultValues({ ...defaultValues, SaucelabsUsername: event.target.value });
+    //                                 setSauceLabUser({ ...defaultValues, SaucelabsUsername: event.target.value });
+    //                             }}
+    //                             className="saucelabs_input_URL" />
+    //                     </div>
+    //                     <div className="flex flex-row">
+    //                         <InputText value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"
+    //                             onChange={(event) => {
+    //                                 setDefaultValues({ ...defaultValues, Saucelabskey: event.target.value });
+    //                                 setSauceLabUser({ ...defaultValues, Saucelabskey: event.target.value });
+    //                             }}
+    //                             className="saucelabs_input_Accesskey" />
+    //                     </div>
+    //                     <div>
+    //                         {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
+    //                     </div>
                         
-                    </div>
-                </form>
-                    <Button id='Saucelabs_submit' label="Submit"
-                    onClick={() => handleSubmit1(defaultValues)}
+    //                 </div>
+    //             </form>
+    //                 <Button id='Saucelabs_submit' label="Submit"
+    //                 onClick={() => handleSubmit1(defaultValues)}
                     
-                />
+    //             />
                 
-                </>
+    //             </>
                 
-            }headerTxt='Saucelabs login' modalSytle={{
-                width: "39vw",
-                height: "44vh",
-                background: "#FFFFFF",
-                minWidth: "38rem",
-              }}/>
+    //         }headerTxt='Saucelabs login' modalSytle={{
+    //             width: "39vw",
+    //             height: "44vh",
+    //             background: "#FFFFFF",
+    //             minWidth: "38rem",
+    //           }}/>
             
             
-        </>
-    )
+    //     </>
+    // )
 });
 
-const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDetails, displayBasic5, onHidedia, showSauceLabs,
+const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDetails, displayBasic4, onHidedia, showSauceLabs,
     changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder, selectedProject,
     availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap, currentSelectedItem  }) => {
     
@@ -261,7 +261,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
     
     return (
         <>
-            <AvoModal id='SauceLab_Integration' customClass="saucelab_model" header='SauceLabs Integration' visible={displayBasic5} onModalBtnClick={() => onHidedia('displayBasic5')}
+            <AvoModal id='SauceLab_Integration' customClass="saucelab_model" header='SauceLabs Integration' visible={displayBasic4} onModalBtnClick={() => onHidedia('displayBasic5')}
             content={
                 <>
                 {showSauceLabs && <>
@@ -463,7 +463,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                     setSelectedEmulator('');
                     setSelectApk([]);
 
-                    onHidedia('displayBasic5');
+                    onHidedia('displayBasic4');
                 }
                 }
                     autoFocus />
