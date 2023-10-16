@@ -23,6 +23,7 @@ import {
 import "../styles/ZephyrContent.scss";
 import { Paginator } from 'primereact/paginator';
 import { Toast } from "primereact/toast";
+import { Tooltip } from 'primereact/tooltip';
 
 
 const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },ref) => {
@@ -835,8 +836,9 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                     setToastNew("error", "Error", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);return;
                 }
                 if(response === 'success'){
+                    setToast("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
                     handleImportClose();
-                    setToastNew("success", "Success", MSG.INTEGRATION.SUCC_IMPORT.CONTENT);
+                    
                 }
             }
             
@@ -1267,6 +1269,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                 {/* <Dialog header={selectedscreen.name ? `Manage Integration: ${selectedscreen.name} Integration` : 'Manage Integrations'} className='zephyrDialog' visible={visible} style={{ width: '70vw', height: '45vw', overflowX: 'hidden' }} onHide={onHide} footer={footerIntegrations}> */}
                     <div>
                         <div className="tab__cls1">
+                        <Tooltip target=".import_img" position="left" content="Click here to import mapping. Mapping will be accessible in view mode." />
                             {activeIndex === 0 && <img className='import_img' src="static/imgs/import_icon.svg" id="lll" onClick={() => setImportMap(true)} />}
                             <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                                 <TabPanel header="Mapping">
