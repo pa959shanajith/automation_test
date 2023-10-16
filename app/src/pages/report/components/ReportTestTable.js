@@ -617,7 +617,7 @@ export default function BasicDemo() {
         setConfigValues({
           ...configValues,
           Summary: selectedRow[0]?.Comments,
-          Attachment: selectedRow[0]?.screenshot_path
+          ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
         });
       } else {
         setConfigValues({});
