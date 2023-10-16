@@ -195,7 +195,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 ]);
   const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
   const [radioButton_grid, setRadioButton_grid] = useState(
-   selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client"
+   selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
   const [defaultValues, setDefaultValues] = useState({});
   const [emailNotificationReciever, setEmailNotificationReciever] = useState(null);
@@ -218,19 +218,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }, [selectProjects]);
 
   useEffect(() => {
-    setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Agent/ Grid":"Execute with Avo Assure Client");
-    setExecutingOn(selectProjects?.appType==="Web"? "Agent" :"ICE")
-    setShowIcePopup(selectProjects?.appType==="Web"? false:true)
-  }, [selectProjects.appType]);
-
-  useEffect(() => { 
+    setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid");
+    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    setExecutingOn((selectProjects?.appType==="Web" || selectProjects?.appType==="MobileApp" || selectProjects?.appType==="MobileWeb" )? "ICE" :"Agent")
+    setShowIcePopup(selectProjects?.appType==="Web"? true : false)
+    // need for sauceLab in future
     // selectProjects?.appType === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false) 
     // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false) 
-    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    setExecutingOn(selectProjects?.appType==="Web"? "ICE" :"Agent")
-    setExecutingOn(selectProjects?.appType==="MobileWeb"? "ICE" :"Agent")
-    setExecutingOn(selectProjects?.appType==="MobileApp"? "ICE" :"Agent")
-  }, [selectProjects?.appType]);
+  }, [selectProjects.appType]);
 
  const displayError = (error) => {
     // setLoading(false)
