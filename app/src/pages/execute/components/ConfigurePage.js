@@ -524,7 +524,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         return newValues;
       });
     switch (selected) {
-        case 'sauceLabs':
+        case 'SauceLabs':
           setDisplayBasic4('displayBasic4');
           setExecutingOn("ICE")
           setConfigItem(idx);
@@ -534,6 +534,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             //     newValues[index] = '';
             //     return newValues;
             //   });
+            setDisplayBasic4(false);
             handleSubmit1();
             break;
         case 'browserstack':
@@ -682,7 +683,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   // setDisplayBasic4(false);
   // open the new dialog
   setLoading("Fetching details..")
-  setDisplayBasic4('displayBasic4');
+  // setDisplayBasic4('displayBasic4');
   const data1 = await getDetails_SAUCELABS()
   if (data1.error) { setMsg(data1.error); return; }
       if (data1 !== "empty") {
@@ -698,7 +699,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
           
           setLoading(false)
           // setDisplayBasic5(true);
-    
+          setDisplayBasic4('displayBasic4');
           const arrayOS = data.os_names.map((element, index) => {
             return {
               key: element,
@@ -723,7 +724,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     
           setMobileDetails(data);
           setLoading(false);
-          setDisplayBasic5(true);
+          setDisplayBasic4(true);
         }
          else {
           setLoading(false);
@@ -988,7 +989,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const cloudTestOptions = [
-    { name: 'sauceLabs', code: 1 },
+    { name: 'SauceLabs', code: 1 },
     // { name: 'browserstack', code: 2 },
   ];
   
