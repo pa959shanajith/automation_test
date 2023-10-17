@@ -75,7 +75,6 @@ const Login = (props) => {
 
 
     const checkUser = async () => {
-        let errorMsg = "Failed to Login.";
         try {
             const checkUserIsPresent = await api.checkUser(username);
             if (checkUserIsPresent.redirect) {
@@ -85,7 +84,7 @@ const Login = (props) => {
                 check_credentials();
             }
             else if (checkUserIsPresent === "invalidServerConf") toastError("Authentication Server Configuration is invalid!");
-            else toastError(errorMsg);
+            else toastError(MSG.LOGIN.ERR_USER_LOGIN_CREDENTIALS);
         }
         catch (err) {
             toastError(err)

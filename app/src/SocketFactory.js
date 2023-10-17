@@ -23,11 +23,14 @@ const SocketFactory = () => {
     const [showAfterExecution, setShowAfterExecution] = useState({ show: false })
     const [showAfterExecutionIsTrial, setShowAfterExecutionIsTrial] = useState({ show: false })
     const [reportData, setReportData] = useState(undefined)
-    const userInfo = useSelector(state => state.landing.userinfo);
     const socket = useSelector(state => state.landing.socket);
     const dispatch = useDispatch();
     const history = useNavigate();
     const toast = useRef();
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo ;
 
     const displayExecutionPopup = (value) => {
         var val;
@@ -78,7 +81,7 @@ const SocketFactory = () => {
             socket.close();
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [userInfo])
+    }, [])
 
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {

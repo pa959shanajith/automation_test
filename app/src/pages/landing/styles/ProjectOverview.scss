@@ -3,7 +3,10 @@
 .OverviewSection {
   position: sticky;
   top: 2.5rem;
-  width: 81.3rem;
+  width: 100%;
+  height: 91vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .manage-btn {
@@ -44,6 +47,7 @@
   font-size: 24px;
   font-weight: 500;
   color: #030229;
+  background-color: #ffff;
 }
 
 .DefaultProjectName {

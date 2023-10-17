@@ -82,7 +82,7 @@
     font-weight: bold;
     font-family: 'Open Sans';
     margin-bottom: 1rem;
-    margin-left: -15rem;
+    margin-left: -17rem;
 }
 .server_name{
     margin-left: 3rem;
@@ -91,7 +91,7 @@
 }
 .servername{
 
-    margin-left: -13rem;
+    margin-left: -17rem;
     font-weight: bold;
     font-family: "Open Sans";
     margin-bottom: 1rem;
@@ -103,11 +103,11 @@
     font-family: "Open Sans";
 }
 .Auth_dropdown{
-    display: flex;
-    font-family: Open Sans;
-    margin-right: 146.5rem;
-    margin-top: -14px;
-    width: 19rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: -5rem;
+    max-width: 20%;
+    width: calc(100% - 4rem);
 }
 .Authname{
     font-weight: bold;
@@ -116,9 +116,9 @@
     line-height: 3rem;
 }
 .savebtn{
-    float: right;
-    margin-right: 76rem;
-    margin-top: 1rem;
+    margin-right: 34%;
+    margin-top: 1.3%;
+    margin-left: 2%;
 }
 .auth-container {
     display: flex;
@@ -128,17 +128,18 @@
 
 .auth-label {
     font-family: Open Sans;
+    font-size: 1rem;
     font-weight: 700;
-    margin-left: -156rem;
-    margin-top: 4rem;
+    line-height: 10rem;
+    margin-left: -73%;
 }
 .testbtn{
     float: right;
     height: 3rem;
     justify-content: center;
-    margin-right: -42rem;
-    width: 5rem;
+    margin-right: 35%;
     margin-top: 1rem;
+    width: 5rem;
 }
 .disabelbtn{
     float: left;
@@ -173,7 +174,7 @@ margin-top: 1rem;
     font-family: "Open Sans";
     font-weight: bold;
     font-size: 1rem;
-    margin-left: -7rem;
+    margin-left: -10rem;
     margin-top: -1rem;
     
 }
@@ -183,7 +184,7 @@ margin-top: 1rem;
     font-weight: bold;
     font-family: "Open Sans";
     font-size: 1rem;
-    margin-left: -8rem;
+    margin-left: -11rem;
     margin-top: -1rem;
 }
 .Auth_Username{
@@ -199,7 +200,7 @@ margin-top: 1rem;
     font-family: "Open Sans";
     font-weight: bold;
     font-size: 1rem;
-    margin-left: -13rem;
+    margin-left: -16rem;
     margin-top: -1rem;
 
     
@@ -210,7 +211,7 @@ margin-top: 1rem;
     font-weight: bold;
     font-family: "Open Sans";
     font-size: 1rem;
-    margin-left: -11rem;
+    margin-left: -15rem;
     margin-top: -1rem;
 }
 .avourl{
@@ -274,3 +275,65 @@ margin-top: 1rem;
     font-weight: bold;
     font-size: initial;
   }
+  .maxlabel{
+    margin-right: 54px;
+    font-family: "Open Sans";
+    font-weight: bold;
+
+  }
+  .maxmsglabel{
+    font-weight: 700;
+    line-height: 4rem;
+    margin-right: 4.5rem;
+    margin-top: -1rem;
+    
+  }
+  .maxconnection{
+    align-items: center;
+    display: flex;
+    margin-left: 1rem;
+    margin-top: 3rem;
+    line-height: 6rem;
+  }
+  .maxmsgconn{
+    align-items: center;
+    display: flex;
+    margin-left: 1rem;
+    }
+    .proxyserver{
+        align-items: center;
+        display: flex;
+        margin-left: 1rem;
+        margin-top: 3rem;
+        line-height: 6rem; 
+    }
+    .proxyserverlabel{
+        font-weight: 700;
+        line-height: 4rem;
+        margin-right: 3.8rem;
+        margin-top: -1rem;
+    }
+    .proxyuser{
+        align-items: center;
+        display: flex;
+        margin-left: 1rem;
+        margin-top: 3rem;
+        line-height: 6rem;
+    }
+    .proxyuserlabel{
+        font-weight: 700;
+        line-height: 4rem;
+        margin-right: 6.5rem;
+    }
+    .proxypasswordlabel{
+        font-weight: 700;
+        line-height: 4rem;
+        margin-right: 4.5rem;
+    }
+    .proxypassword{
+        align-items: center;
+        display: flex;
+        margin-left: 1rem;
+        // margin-top: 3rem;
+        line-height: 6rem;
+    }

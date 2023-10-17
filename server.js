@@ -261,13 +261,14 @@ if (cluster.isMaster) {
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
+		app.post('/updateTestSuiteInUseBy',designscreen.updateTestSuiteInUseBy)
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
 		app.get('/viewReport', report.viewReport);
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
-		app.get('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
+		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -720,9 +721,10 @@ if (cluster.isMaster) {
 		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
 
 		// Added Report API's
-		app.get('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
+		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
 		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
-
+		app.get('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
+		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
 

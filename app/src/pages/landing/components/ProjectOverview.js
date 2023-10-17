@@ -22,20 +22,22 @@ const ProjectOverview = (props) => {
     ];
 
     return (
-        <div className="surface-card OverviewSection">
-            <div className='DefaultProject'>
-                {defaultselectedProject && defaultselectedProject.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="35" />)}
-                {defaultselectedProject && defaultselectedProject.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="35" />)}
-                {defaultselectedProject && defaultselectedProject.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="35" />)}
-                {defaultselectedProject && defaultselectedProject.appType === "Webservice" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="35" />)}
-                {defaultselectedProject && defaultselectedProject.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="35" />)}
-                {defaultselectedProject && defaultselectedProject.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="35" width='45' />)}
-                {defaultselectedProject && defaultselectedProject.appType === "Mainframe" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="35" width='30' />)}
-                {defaultselectedProject && defaultselectedProject.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="35" width='30' />)}
-                {defaultselectedProject && defaultselectedProject.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20" />)}
-                <p className='DefaultProjectName'>{defaultselectedProject && defaultselectedProject.projectName}</p>
+        <div className="surface-100 OverviewSection">
+            <div className='flex flex-column'>
+                <div className='DefaultProject'>
+                    {defaultselectedProject && defaultselectedProject.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="35" />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="35" />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="35" />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "Webservice" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="35" />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="35" />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="35" width='45' />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "Mainframe" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="35" width='30' />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="35" width='30' />)}
+                    {defaultselectedProject && defaultselectedProject.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20" />)}
+                    <p className='DefaultProjectName'>{defaultselectedProject && defaultselectedProject.projectName}</p>
+                </div>
+                <TabMenu className='tab-menu' model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
             </div>
-            <TabMenu className='tab-menu' model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
             {activeIndex === 0 && <ProjectCreation toastError={props.toastError} toastSuccess={props.toastSuccess} />}
             {activeIndex === 1 && <Analysis />}
             {activeIndex === 2 && <Settings />}

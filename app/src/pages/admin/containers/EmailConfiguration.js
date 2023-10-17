@@ -194,12 +194,15 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
 
                         {/* <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} label={"Authentication"} option={['none','basic']}/> */}
 
-                        <div class="auth-container">
-                            <label class="auth-label">Authentication Type</label>
+                        {/* <div class="auth-container"> */}
+                        <div>
+                        <label class="auth-label">Authentication Type</label>
+                        </div>
+                            
                             <div className='Auth_dropdown'>
                                 <FormSelect inpRef={inputRef['selectauth']} onChangeFn={fn.showAuth} defValue={"Select Authentication type"} option={['none', 'basic']} />
                             </div>
-                        </div>
+                         {/* </div>  */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: "1rem", marginTop: "1rem" }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',    marginTop: "1rem" }}>
                                 <label className='AuthUsername'>Authentication UserName</label>
@@ -225,27 +228,27 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
                         <FormRadio inpRef={inputRef["secureconnect"]} label={'Secure Connection'} option={["Auto", "Enable", "Disable"]} />
                         <FormRadio inpRef={inputRef["tlcerror"]} label={'Ignore TLS Errors'} option={["Yes", "No"]} />
                         <div className='url_avo'>
-  <label className='line-label'>Avo Assure URL</label>
-  <FormInputEmail inpRef={inputRef['assureurl']}  placeholder={'Avo Assure Application URL'} />
-</div>
+                          <label className='line-label'>Avo Assure URL</label>
+                           <FormInputEmail inpRef={inputRef['assureurl']}  placeholder={'Avo Assure Application URL'} />
+                        </div>
 
-                        <div>
-                        <div className='connection'>
-  <label className='connection-label'>Connection Timeout</label>
-  <FormInputEmail inpRef={inputRef['conctimeout']} type={'number'}  placeholder={'Connection Timeout (in milliseconds)'} />
-</div>
-<div className='greeting'>
-  <label className='greeting-label'>Greeting Timeout</label>
-  <FormInputEmail inpRef={inputRef['grettimeout']} type={'number'}  placeholder={'Greeting Timeout (in milliseconds)'} />
-</div>
-<div className='Socket'>
-  <label className='Socket-label'>Socket Timeout</label>
-  <FormInputEmail inpRef={inputRef['socktimeout']} type={'number'}  placeholder={'Socket Timeout (in milliseconds)'} /> 
-</div>
+                    <div>
+                          <div className='connection'>
+                             <label className='connection-label'>Connection Timeout</label>
+                               <FormInputEmail inpRef={inputRef['conctimeout']} type={'number'}  placeholder={'Connection Timeout (in milliseconds)'} />
+                          </div>
+                        <div className='greeting'>
+                           <label className='greeting-label'>Greeting Timeout</label>
+                              <FormInputEmail inpRef={inputRef['grettimeout']} type={'number'}  placeholder={'Greeting Timeout (in milliseconds)'} />
+                        </div>
+                        <div className='Socket'>
+                          <label className='Socket-label'>Socket Timeout</label>
+                            <FormInputEmail inpRef={inputRef['socktimeout']} type={'number'}  placeholder={'Socket Timeout (in milliseconds)'} /> 
+                        </div>
                             {/* <FormInputEmail inpRef={inputRef['conctimeout']} type={'number'} label={'Connection Timeout'} placeholder={'Connection Timeout (in milliseconds)'} /> */}
                             {/* <FormInputEmail inpRef={inputRef['grettimeout']} type={'number'} label={'Greeting Timeout'} placeholder={'Greeting Timeout (in milliseconds)'} /> */}
                             {/* <FormInputEmail inpRef={inputRef['socktimeout']} type={'number'} label={'Socket Timeout'} placeholder={'Socket Timeout (in milliseconds)'} /> */}
-                        </div>
+                    </div>
 
                         <div className='col-xs-9 form-group input-label checkbox-email'>
                             <span>
@@ -253,24 +256,38 @@ const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
                                 <label htmlFor='checkboxpool'>Use Connection Pool</label>
                             </span>
                         </div>
-                        <FormInput inpRef={inputRef['maxconnection']} type={'number'} label={'Max Connections'} placeholder={'Max Number of Connections Allowed in Pool'} />
-                        <FormInput inpRef={inputRef['maxmessages']} type={'number'} label={'Max Messages'} placeholder={'Max Number of Messages Sent via Pool'} />
+                        <div className='maxconnection'>
+                            <label className='maxlabel'>Max Connections</label>
+                              <FormInputEmail inpRef={inputRef['maxconnection']} type={'number'}  placeholder={'Max Number of Connections Allowed in Pool'}  />
+                        </div>
+                        <div className='maxmsgconn'>
+                           <label className='maxmsglabel'>Max Messages</label>
+                             <FormInputEmail inpRef={inputRef['maxmessages']} type={'number'}  placeholder={'Max Number of Messages Sent via Pool'}  />
+                        </div>
                         <div className='col-xs-9 form-group input-label checkbox-email'>
                             <span>
                                 <input onChange={fn.showProxUrl} id='checkproxyurl' ref={inputRef['checkproxyurl']} type='checkbox'></input>
                                 <label htmlFor='checkproxyurl'>Use Proxy</label>
                             </span>
                         </div>
-                        <FormInput inpRef={inputRef['proxyurl']} label={'Proxy Server url'} placeholder={'Proxy Server URL (Eg: https://localhost:8080)'} />
+                        <div className='proxyserver'>
+                            <label className='proxyserverlabel'>Proxy Server url</label>
+                        <FormInputEmail inpRef={inputRef['proxyurl']}  placeholder={'Proxy Server URL (Eg: https://localhost:8080)'} />
+                        </div>
                         <div className='col-xs-9 form-group input-label checkbox-email'>
                             <span>
                                 <input onChange={fn.showProxCred} id='checkproxycred' ref={inputRef['checkproxycred']} type='checkbox'></input>
                                 <label htmlFor='checkproxycred'>Proxy Requires Credentials</label>
                             </span>
                         </div>
-                        <FormInput inpRef={inputRef['proxyuser']} label={'Proxy User'} placeholder={'Username For Proxy Server'} />
-                        <FormInput inpRef={inputRef['proxypass']} label={'Proxy Password'} placeholder={'Password For Proxy Server'} />
-
+                        <div className='proxyuser'>
+                            <label className='proxyuserlabel'>Proxy User</label>
+                         <FormInputEmail inpRef={inputRef['proxyuser']}  placeholder={'Username For Proxy Server'} />
+                        </div>
+                        <div className='proxypassword'>
+                            <label className='proxypasswordlabel'>Proxy Password</label>
+                         <FormInputEmail inpRef={inputRef['proxypass']}  placeholder={'Password For Proxy Server'} />
+                        </div>
                     </div>
 
 

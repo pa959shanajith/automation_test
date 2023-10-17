@@ -53,7 +53,8 @@ const GridBrowser = ({
   const tools = [
     { name: 'ALM' },
     { name: 'qTest' },
-    { name: 'Zephyr' }
+    { name: 'Zephyr' },
+    { name: 'Azure'}
   ];
 
   const selectedToolTemplate = (option, props) => {

@@ -6,13 +6,14 @@ import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
-import { isEnELoad, savedList , initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer} from '../designSlice';
 import WSImportMindmap from'../components/WSImportMindmap.js';
+import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
+import * as scrapeApi from "../api";
 import { Card } from 'primereact/card';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -38,6 +39,8 @@ const ModuleListDrop = (props) =>{
     const dontShowFirstModules = useSelector(state=>state.design.dontShowFirstModule)
     const moduleSelectlist = useSelector(state=>state.design.selectedModulelist)
     const initEnEProjt = useSelector(state=>state.design.initEnEProj)
+    const oldModuleForReset = useSelector(state=>state.design.oldModuleForReset)
+    const currentModuleId = useSelector(state=>state.design.currentModuleId)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
@@ -110,7 +113,7 @@ const ModuleListDrop = (props) =>{
 
     const imageRefadd = useRef(null);
 
-    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
   if(!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo ;
@@ -138,6 +141,7 @@ const ModuleListDrop = (props) =>{
      }, [moduleLists, initProj])
      useEffect(()=> {
         return () => {
+          handleReaOnlyTestSuite({oldModuleForReset:localStorage.getItem('OldModuleForReset'),modID:localStorage.getItem('CurrentModuleForReset'),userInfo,appType:props.appType,module:props.module,proj:proj})
             dispatch(isEnELoad(false));
             dispatch(selectedModuleReducer({}))
             // this comment is removed when auto save of mod will effect default mod
@@ -333,7 +337,7 @@ const ModuleListDrop = (props) =>{
     const CreateNew = () =>{
         setIsE2EOpen(false);
         setCollapse(false);
-        dispatch(selectedModuleReducer({createnew:true}))
+        dispatch(selectedModuleReducer({createnew:true,currentlyInUse:""}))
         dispatch(initEnEProj({proj, isE2ECreate: false}));
         dispatch(isEnELoad(false));
         setFirstRender(false);
@@ -406,6 +410,8 @@ const ModuleListDrop = (props) =>{
                             return;
                         }else{
                             setWarning(modID)
+                            dispatch(SetCurrentModuleId(modID))
+                            localStorage.setItem('CurrentModuleForReset',modID)
                         }
         d3.selectAll('.ct-node').classed('node-selected',false)
         //     return;
@@ -418,6 +424,9 @@ const ModuleListDrop = (props) =>{
     
         }else{
             setWarning({modID, type: name})
+            dispatch(SetCurrentModuleId(modID))
+            localStorage.setItem('CurrentModuleForReset',modID)
+            
         }
         return;
     }
@@ -824,6 +833,55 @@ setPreventDefaultModule(true);
           </div>
         )
        }
+       const handleReaOnlyTestSuite=async (props)=>{
+        let resetInUse=false
+        let assignToUser=false
+        var reqForCurrentModule={
+          tab:"createTab",
+          projectid:props.proj,
+          version:0,
+          cycId: null,
+          modName:"",
+          moduleid:props.modID
+      }
+      var reqForOldModule={
+        tab:"createTab",
+        projectid:props.proj,
+        version:0,
+        cycId: null,
+        modName:"",
+        moduleid:props.oldModuleForReset
+      }
+      
+      var moduledata = await getModules(reqForCurrentModule)
+      var moduledataold=await getModules(reqForOldModule)
+      if(moduledata.error){props.displayError(moduledata.error);return}
+        
+        if(!moduledata.currentlyInUse.length>0)
+        // if testuite isnt assigned to any user
+        {
+          // check for older testsuite assignment to get reset 
+          //here we will check whether the older module was assigned to current logged in user or not 
+          
+         (moduledataold.currentlyInUse!==props.userInfo?.username) ? resetInUse=false: resetInUse=true
+      
+              // call the api to assign current testsuite and reset older one(based on above condition) 
+         await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,true,resetInUse)
+         loadModule(props.modID)
+        }
+         else if(moduledataold.currentlyInUse===props.userInfo?.username ){
+      
+          // only reset no assignment 
+          resetInUse=true
+          
+          await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,false,resetInUse)
+          loadModule(props.modID)
+        }
+        else{
+          loadModule(props.modID)
+        }
+      
+      }   
       
       
     return(
@@ -1006,7 +1064,7 @@ setPreventDefaultModule(true);
                 style={{width:"30%"}}
                 title='Confirmation'
                 close={()=>setWarning(false)}
-                footer={<Footer modID={warning.modID} loadModule={warning.type ==='endtoend' ? loadModuleE2E : loadModule} setWarning={setWarning} />}
+                footer={<Footer modID={warning.modID} loadModule={warning.type ==='endtoend' ? loadModuleE2E : loadModule} setWarning={setWarning} userInfo={userInfo} appType={props.appType} oldModuleForReset={oldModuleForReset} module={props.module} proj={proj} displayError={displayError}/>}
                 content={<Content/>} 
                 // modalClass='warningPopUp'
             />:null}
@@ -1246,10 +1304,59 @@ const Content = () => (
 //         </div>
 //     </div>
 //   </div>
+const handleReaOnlyTestSuite=async (props)=>{
+  let resetInUse=false
+  let assignToUser=false
+  var reqForCurrentModule={
+    tab:"createTab",
+    projectid:props.proj,
+    version:0,
+    cycId: null,
+    modName:"",
+    moduleid:props.modID
+}
+var reqForOldModule={
+  tab:"createTab",
+  projectid:props.proj,
+  version:0,
+  cycId: null,
+  modName:"",
+  moduleid:props.oldModuleForReset
+}
+
+var moduledata = await getModules(reqForCurrentModule)
+var moduledataold=await getModules(reqForOldModule)
+if(moduledata.error){props.displayError(moduledata.error);return}
+  
+  if(!moduledata.currentlyInUse.length>0)
+  // if testuite isnt assigned to any user
+  {
+    // check for older testsuite assignment to get reset 
+    //here we will check whether the older module was assigned to current logged in user or not 
+    
+   (moduledataold.currentlyInUse!==props.userInfo?.username) ? resetInUse=false: resetInUse=true
+
+        // call the api to assign current testsuite and reset older one(based on above condition) 
+   await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,true,resetInUse)
+   props.loadModule(props.modID)
+  }
+   else if(moduledataold.currentlyInUse===props.userInfo?.username ){
+
+    // only reset no assignment 
+    resetInUse=true
+    
+    await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,false,resetInUse)
+    props.loadModule(props.modID)
+  }
+  else{
+    props.loadModule(props.modID)
+  }
+
+}
 const Footer = (props) => (
   <div className='toolbar__module-warning-footer'>
       <Button size="small" onClick={()=>{props.setWarning(false)}}>No</Button>
-      <Button size="small" className='btn-yes' onClick={()=>props.loadModule(props.modID)}>Yes</Button>
+      <Button size="small" className='btn-yes' onClick={()=>handleReaOnlyTestSuite(props)}>Yes</Button>
   </div>
 )
 

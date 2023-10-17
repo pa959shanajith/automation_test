@@ -923,13 +923,13 @@
 }
 
 .ref_pop{
-    z-index: 5;
-    display: flex;
+  z-index: 5;
+  display: flex;
   position: relative;
   display: flex;
   flex-direction: row;
   // right: 110%;
-    border-radius: 5px;
+  border-radius: 5px;
 }
 
 .screenshot_pop{
@@ -1132,10 +1132,13 @@
   position: relative;
   // left: 68.8rem;
 }
-.p-tag-value{
-  width: 34px;
-  height: 15px;
-  font-size: 10px;
+.tag__render{
+  .p-tag-value{
+    width: 34px;
+    height: 15px;
+    font-size: 10px;
+    text-align: center;
+  }
 }
 .panel_head{
   position: relative;

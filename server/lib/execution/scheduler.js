@@ -17,8 +17,9 @@ agenda
 exports.prepareSchedulingRequest = async (session, body) => {
     logger.info("Inside UI service testSuitesScheduler_ICE");
     const fnName = "testSuitesScheduler_ICE";
-    const userInfo = { "userid": session.userid, "username": session.username, "role": session.activeRoleId || session.role };
+    const userInfo = { "userid": session.userid, "username": session.username, "role": session.activeRoleId || session.role, "host": session.host };
     const multiExecutionData = body.executionData;
+    multiExecutionData.host = session.host;
     var batchInfo = multiExecutionData.batchInfo;
     let poolid = body.executionData.batchInfo[0].poolid;
     let recurringString = body.executionData.batchInfo[0].recurringString;
@@ -186,6 +187,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
         if (batchExecutionData.targetUser === "") batchExecutionData.targetUser = constants.EMPTYUSER
         let userInfo = userInfoMap[batchExecutionData.targetUser];
         Object.assign(userInfo, batchExecutionData.scheduledby);
+        userInfo.host = batchExecutionData.host;
         const scheduleTime = batchExecutionData.timestamp;
         const scheduleId = batchExecutionData.scheduleId;
         const smartId = batchExecutionData.smartScheduleId;

@@ -35,18 +35,17 @@ export const fetchConfigureList = async(props) => {
 export const getFunctionalReports = async(projId, relName, cycId) => {
     try{
         const res = await axios(url+'/getReportsData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            params: {
-                "param":"getReportsData_ICE",
-                "reportsInputData":{
-                    "projectId": projId,
-                    "releaseName": relName,
-                    "cycleId": cycId,
-                    "configurekey": projId,
-                    "type":"allmodules",
+            data: {
+                reportsInputData:{
+                    projectId: projId,
+                    releaseName: relName,
+                    cycleId: cycId,
+                    configurekey: projId,
+                    type:"allmodules",
                 }
             },
             credentials: 'include'
@@ -144,6 +143,60 @@ export const getReportListSuites = async(getTestSuiteId) => {
     }
 }
 
+export const getScreenData = async(screenName) =>{
+    try{
+        const res = await axios(url+'/getAccessibilityData_ICE', {
+            method: 'GET',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            params: {
+                screendata: screenName,
+                type: "reportdata_names_only"
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status === 200 && Object.keys(res.data).length < 1){
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+    }catch(err){
+        console.error(err)
+    }
+}
+
+export const getAccessibilityData = async(id, type = "reportdata") =>{
+    try{
+        const res = await axios(url+'/getAccessibilityData_ICE', {
+            method: 'GET',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            params: {
+                executionid: id,
+                type: type
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status === 200 && Object.keys(res.data).length < 1){
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+    }catch(err){
+        console.error(err)
+    }
+}
+
 export const getTestSuiteList = async(getTestSuiteId) => {
     try{
         const res = await axios(url+'/fetchExecProfileStatus', {
@@ -217,12 +270,11 @@ export const getTestSuite = async(getSuiteKey) => {
 export const fetchScenarioInfo = async(executionId) => {
     try{
         const res = await axios(url+'/reportStatusScenarios_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            params: {
-                "param": "reportStatusScenarios_ICE",
+            data: {
                 "executionId": [executionId]
             },
             credentials: 'include'
@@ -258,6 +310,34 @@ export const downloadReports = async(getDownload, type) => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+
+export const getAccessibilityScreens = async(projId, relName, cycId) =>{
+    try{
+        const res = await axios(url+'/getAccessibilityData_ICE', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            params: {
+                'cycleId': cycId,
+                'projectId': projId,
+                'releaseName': relName,
+                'type': "screendata"
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+        }
+        if(res.status === 200 && Object.keys(res.data).length < 1){
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+    }catch(err){
+        console.error(err)
     }
 }
 

@@ -89,6 +89,7 @@ const DesignModal = (props) => {
     const [groupList,setGroupList] = useState([])
     const [rowChange, setRowChange] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
+    const [disableActionBar, setDisableActionBar ] = useState(false);
     let runClickAway = true;
     
 
@@ -306,9 +307,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
 
                     if (data.del_flag) {
                         deleteObjectFlag = true; // Flag for DeletedObjects Popup
-                        // props.setDisableActionBar(true); //disable left-top-section
+                        setDisableActionBar(true); //disable left-top-section
                     }
-                    // else props.setDisableActionBar(false); //enable left-top-section
+                    else setDisableActionBar(false); //enable left-top-section
 
                     // setHideSubmit(data.testcase.length === 0);
                     setReusedTC(data.reuse);
@@ -371,7 +372,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     let testcaseArray = [];
                                     if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
                                         testcaseArray.push(emptyRowData);
-                                        // props.setDisableActionBar(true);
+                                        setDisableActionBar(true);
                                         setOverlay("");
                                     } else {
                                         let testcase = data.testcase;
@@ -767,17 +768,22 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         //add dependant checkboxes UI functionality
     const handleCheckboxChangeAddDependant = (event) => {
         const testCase = testcaseList.find(item => item.testCaseName === event.value);
-
+            
         if (testCase) {
             if (event.checked) {
                 setSelectedTestCases([...selectedTestCases, testCase.testCaseName]);
                 handleAdd(testCase);
             } else {
-                handleAdd(testCase);
+                handleRemove(testCase);
                 setSelectedTestCases(selectedTestCases.filter(item => item !== testCase.testCaseName));
-                // Add code to handle the removal of the testCase from addedTestCase
+                setAddedTestCase(addedTestCase.filter(item => item.testCaseName !== testCase.testCaseName));
             }
         }
+    };
+    const handleRemove = (testCaseToRemove) => {
+        setAddedTestCase(prevAdded => prevAdded.filter(item => item.testCaseID !== testCaseToRemove.testCaseID));
+        setTestCaseIDsList(prevIDs => prevIDs.filter(id => id !== testCaseToRemove.testCaseID));
+        setDependencyTestCaseFlag(true);
     };
     // const handleAdd = () => {
     //     const update = { ...testCases };
@@ -850,11 +856,12 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 <h5 className='dailog_header1'>Design Test steps</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="btn_test_screen" src="static/imgs/bi_code-square.svg" alt='screen icon' />
+                {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
+
             </div>
         </>
     );
-    const bodyHeader = ()=>{
-        let bodyData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
+    const bodyHeader = (rowData)=>{
         const onInputChange = (event) => {
             let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
             let testCaseId = findTestCaseData.id;
@@ -937,8 +944,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {bodyData && <div>
-                {(bodyData.name === rowExpandedName.name)?<div className='btn__grp'>
+            {(rowData && !props.testSuiteInUse)?<div>
+                {(rowData.name === rowExpandedName.name)?<div className='btn__grp'>
                     <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
                     <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
@@ -964,7 +971,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}}  onClick={()=>exportTestCase()} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():""} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
@@ -973,7 +980,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
             </div>:null}
-            </div>}
+            </div>:null}
             </>
         );
     }
@@ -998,6 +1005,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         }
         else if (props.appType === "SAP"){
             debugTestCases('1')
+        }
+        else if (props.appType === "Mainframe"){
+            debugTestCases()
         }
     }
     const footerContent = (

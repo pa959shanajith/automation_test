@@ -359,7 +359,7 @@ const toExcel = async(projId,module,fname,displayError,setBlockui,showSuccess) =
             "moduleid":Array.isArray(module)?module:module._id
         }
         var result = await exportToExcel(data)
-        if(result.error){displayError(result.error);return;}
+        if(result.error){displayError(result.error.CONTENT);return;}
         var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         var fileURL = URL.createObjectURL(file);
         var a = document.createElement('a');
@@ -394,7 +394,7 @@ const toJSON = async(module,fname,displayError,setBlockui,setShowMessage,showSuc
         ResetSession.start()
         let result = await exportMindmap(data)
         
-        if(result.error){displayError(result.error);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction(ExportProjname(""));dispatchAction(EnableExport(false));dispatchAction(EnableExportMindmapButton(true)); ResetSession.end();return;}
+        if(result.error){displayError(result.error.CONTENT);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction(ExportProjname(""));dispatchAction(EnableExport(false));dispatchAction(EnableExportMindmapButton(true)); ResetSession.end();return;}
         if(result === "InProgress"){showWarn(MSG.MINDMAP.WARN_EXPORT_INPROGRESS);setBlockui({show:false,content:''});setShowMessage(false);dispatchAction(ExportProjname(""));dispatchAction(EnableExportMindmapButton(true));dispatchAction(EnableExport(true)); ResetSession.end();return;}
         
         ResetSession.end()
@@ -426,7 +426,7 @@ const exportToProj = async(module,currProjId,displayError,setBlockui,showSuccess
         }
         ResetSession.start()
         var result =  await exportToProject(data)
-        if(result.error){displayError(result.error);ResetSession.end();return;}
+        if(result.error){displayError(result.error.CONTENT);ResetSession.end();return;}
         if(result === "InProgress"){showWarn(MSG.MINDMAP.WARN_EXPORT_INPROGRESS);setBlockui({show:false,content:''}); ResetSession.end();return;}
         setBlockui({show:false,content:''})
         showSuccess(MSG.MINDMAP.SUCC_DATA_EXPORTED)
@@ -460,7 +460,7 @@ const toGit = async ({selectedProj,projectList,displayError,setBlockui,gitconfig
         "projectName":fname,
         gitComMsgRef:gitComMsgRef.current.value
     })
-    if(res.error){displayError(res.error);setBlockui({show:false});ResetSession.end();return;}
+    if(res.error){displayError(res.error.CONTENT);setBlockui({show:false});ResetSession.end();return;}
     ResetSession.end()
     setBlockui({show:false})
     showSuccess(MSG.MINDMAP.SUCC_DATA_EXPORTED)
@@ -480,7 +480,7 @@ const toCustom = async (selectedProj,module,projectList,releaseRef,cycleRef,fnam
 		    "cycleid":null,
         }
         var result = await exportToMMSkel (data)
-        if(result.error){displayError(result.error);return;}
+        if(result.error){displayError(result.error.CONTENT);return;}
         jsonDownload(fname+'.json', JSON.stringify(result));
         setBlockui({show:false,content:''})
         showSuccess(MSG.MINDMAP.SUCC_DATA_EXPORTED)

@@ -984,6 +984,50 @@ export const updateScenarioComparisionStatus = (type, scenarioID, scenarioCompar
     })
 
 }
+export const updateTestSuiteInUseBy = (type, testSuiteId,oldModId, accessedBy,assignToUser,resetFlag) =>   {
+
+    return new Promise((resolve, reject)=>{
+
+        axios(url+"/updateTestSuiteInUseBy", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {
+
+                param: 'updateTestSuiteInUseBy',
+
+                testsuiteId: testSuiteId,
+                oldTestSuiteId:oldModId,
+                type: type,
+                accessedBy:accessedBy,
+                resetFlag:resetFlag,
+                assignToUser:assignToUser
+
+            },
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200) resolve(res.data)
+
+            else reject(res.status);
+
+        })
+
+        .catch(error=>reject(error))
+
+    })
+
+}
 // API for impact analysis
 export const getScrapeDataScenarioLevel_ICE = (type, scenarioID) => {
 
