@@ -319,6 +319,7 @@ export default function BasicDemo() {
                 executionId: reportData?.overallstatus?.executionId,
                 ...(!!Object.keys(configValues).length && valueObj),
                 executionReportNo: `Execution No: ${executed}`,
+                ...(getItemType()?.itemId && { mappedItem: getItemType()?.itemId }),
               },
               action: "createIssueInJira",
             })
@@ -631,7 +632,7 @@ export default function BasicDemo() {
         setConfigValues({
           ...configValues,
           Summary: selectedRow[0]?.Comments,
-          Attachment: selectedRow[0]?.screenshot_path
+          ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
         });
       } else {
         setConfigValues({});
