@@ -381,7 +381,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
     var projId = configProjectId;
     var dataforApi = { poolid: "", projectids: [projId] };
-    // setLoading('Fetching ICE ...')
+    setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
     if (data.error) {
       displayError(data.error);
@@ -398,7 +398,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
     setIceStatus(data1);
     populateICElist(arr, true, data1);
-    // setLoading(false);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -838,7 +838,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
-    // setLoading("Sending Execution Request");
+    setLoading("Sending Execution Request");
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     // executionData["executionEnv"] = execEnv;
