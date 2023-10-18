@@ -19,6 +19,7 @@ import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks 
 import AvoInput from "../../../globalComponents/AvoInput";
 import AvoModal from "../../../globalComponents/AvoModal";
 import { Toast } from "primereact/toast";
+import { Tooltip } from 'primereact/tooltip';
 
 const ScheduleScreen = ({
   cardData,
@@ -394,6 +395,7 @@ const ScheduleScreen = ({
                           {el.status}
                         </Link>
                         {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
+                        <Tooltip target=".pi-trash"  position="bottom" content="Click here to delete this scheduled execution." />
                       </div>
                     ),
                     target:
@@ -464,7 +466,7 @@ const ScheduleScreen = ({
               <Column
                 align="center"
                 field="target"
-                header="Envrionment"
+                header="Environment"
               ></Column>
               <Column
                 align="center"

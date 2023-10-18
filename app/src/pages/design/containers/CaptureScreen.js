@@ -583,7 +583,8 @@ const elementTypeProp =(elementProperty) =>{
                   setScreenshotData({
                     header: item.custname,
                     imageUrl: data.mirror || "",
-                    enable: true
+                    enable: true,
+                    isIris:item.xpath.split(';')[0]=="iris"?true:false
                   });
                   onHighlight();
                   // setHighlight(true);
@@ -1668,7 +1669,7 @@ const footerSave = (
       return (
         <>
         {/* <Tooltip content={rowdata.selectall} target={`.tooltip__target-${rowdata.objectDetails.objId}`} tooltipOptions={{ position: 'right' }}></Tooltip> */}
-        <div style={{display:'flex',justifyContent:'space-between'}}>
+        <div className='tag__render' style={{display:'flex',justifyContent:'space-between'}}>
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
@@ -1911,12 +1912,12 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
-              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?'392px':typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'462px':typesOfAppType==="SAP"?'492px':""}}>
+              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?(screenshotData.isIris?'491px':'392px'):typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'462px':typesOfAppType==="SAP"?'492px':""}}>
                 <div className="screenshot_pop__content" >
                  <div className="scrsht_outerContainer" id="ss_ssId">
                   <div data-test="ssScroll" className="ss_scrsht_insideScroll">
-                  { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
-                  { (mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
+                    { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
+                    { (mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
                   </div>
                  </div>
                 </div>

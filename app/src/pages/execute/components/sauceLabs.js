@@ -40,65 +40,65 @@ const SauceLabLogin = React.memo(({ setLoading, displayBasic4, onHidedia, handle
         getSaucelabsDetails();
     }, [])
 
-    return (
-        <>
-            <AvoModal className='Saucelabs_dialog' header='Saucelabs login' visible={displayBasic4}  onModalBtnClick={()=>onHidedia('displayBasic4')}
-            content={
-                <>
-                <form id='Saucelabs-form'>
-                    <div className='Saucelabs_input'>
-                        <div className="flex flex-row">
-                            <InputText value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL"
-                                name="Saucelabs-URL"
-                                placeholder="Enter Saucelabs Remote URL"
-                                onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, SaucelabsURL: event.target.value });
-                                    setSauceLabUser({ ...defaultValues, SaucelabsURL: event.target.value });
-                                }}
-                                className="saucelabs_input" />
-                        </div>
-                        <div className="flex flex-row">
-                            <InputText value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"
-                                onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, SaucelabsUsername: event.target.value });
-                                    setSauceLabUser({ ...defaultValues, SaucelabsUsername: event.target.value });
-                                }}
-                                className="saucelabs_input_URL" />
-                        </div>
-                        <div className="flex flex-row">
-                            <InputText value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"
-                                onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, Saucelabskey: event.target.value });
-                                    setSauceLabUser({ ...defaultValues, Saucelabskey: event.target.value });
-                                }}
-                                className="saucelabs_input_Accesskey" />
-                        </div>
-                        <div>
-                            {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
-                        </div>
+    // return (
+    //     <>
+    //         <AvoModal className='Saucelabs_dialog' header='Saucelabs login' visible={displayBasic4}  onModalBtnClick={()=>onHidedia('displayBasic4')}
+    //         content={
+    //             <>
+    //             <form id='Saucelabs-form'>
+    //                 <div className='Saucelabs_input'>
+    //                     <div className="flex flex-row">
+    //                         <InputText value={defaultValues.SaucelabsURL} type="text" id="Saucelabs-URL"
+    //                             name="Saucelabs-URL"
+    //                             placeholder="Enter Saucelabs Remote URL"
+    //                             onChange={(event) => {
+    //                                 setDefaultValues({ ...defaultValues, SaucelabsURL: event.target.value });
+    //                                 setSauceLabUser({ ...defaultValues, SaucelabsURL: event.target.value });
+    //                             }}
+    //                             className="saucelabs_input" />
+    //                     </div>
+    //                     <div className="flex flex-row">
+    //                         <InputText value={defaultValues.SaucelabsUsername} type="text" id="Saucelabs-username" name="aucelabs-username" placeholder="Enter Saucelabs username"
+    //                             onChange={(event) => {
+    //                                 setDefaultValues({ ...defaultValues, SaucelabsUsername: event.target.value });
+    //                                 setSauceLabUser({ ...defaultValues, SaucelabsUsername: event.target.value });
+    //                             }}
+    //                             className="saucelabs_input_URL" />
+    //                     </div>
+    //                     <div className="flex flex-row">
+    //                         <InputText value={defaultValues.Saucelabskey} type="text" id="Saucelabs-API" name="Saucelabs-API" placeholder="Enter Saucelabs Access key"
+    //                             onChange={(event) => {
+    //                                 setDefaultValues({ ...defaultValues, Saucelabskey: event.target.value });
+    //                                 setSauceLabUser({ ...defaultValues, Saucelabskey: event.target.value });
+    //                             }}
+    //                             className="saucelabs_input_Accesskey" />
+    //                     </div>
+    //                     <div>
+    //                         {isEmpty && defaultValues.SaucelabsURL && defaultValues.SaucelabsUsername && defaultValues.Saucelabskey ? "" : <div data-test="intg_log_error_span" className="saucelabs_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
+    //                     </div>
                         
-                    </div>
-                </form>
-                    <Button id='Saucelabs_submit' label="Submit"
-                    onClick={() => handleSubmit1(defaultValues)}
+    //                 </div>
+    //             </form>
+    //                 <Button id='Saucelabs_submit' label="Submit"
+    //                 onClick={() => handleSubmit1(defaultValues)}
                     
-                />
+    //             />
                 
-                </>
+    //             </>
                 
-            }headerTxt='Saucelabs login' modalSytle={{
-                width: "39vw",
-                height: "44vh",
-                background: "#FFFFFF",
-                minWidth: "38rem",
-              }}/>
+    //         }headerTxt='Saucelabs login' modalSytle={{
+    //             width: "39vw",
+    //             height: "44vh",
+    //             background: "#FFFFFF",
+    //             minWidth: "38rem",
+    //           }}/>
             
             
-        </>
-    )
+    //     </>
+    // )
 });
 
-const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDetails, displayBasic5, onHidedia, showSauceLabs,
+const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDetails, displayBasic4, onHidedia, showSauceLabs,
     changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder, selectedProject,
     availableICE, smartMode, selectedICE, setSelectedICE, sauceLab, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap, currentSelectedItem  }) => {
     
@@ -261,7 +261,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
     
     return (
         <>
-            <AvoModal id='SauceLab_Integration' customClass="saucelab_model" header='SauceLabs Integration' visible={displayBasic5} onModalBtnClick={() => onHidedia('displayBasic5')}
+            <AvoModal id='SauceLab_Integration' customClass="saucelab_model" header='SauceLabs Integration' visible={displayBasic4} onModalBtnClick={() => onHidedia('displayBasic4')}
             content={
                 <>
                 {showSauceLabs && <>
@@ -284,7 +284,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             value={selectedPlatforms}
                             valueTemplate={selectedPlatforms}
                             // width='15rem'
-                            placeholder='select Platform'
+                            placeholder='Select Platform'
                             className='saucelab_dropDown'
                             optionLabel='key'
                         />
@@ -299,7 +299,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                         value={selectedOS}
                         valueTemplate={selectedOS}
                         // width='15rem'
-                        placeholder='select OS'
+                        placeholder='Select OS'
                         optionLabel='key'
                         className='saucelab_dropDown'
                         // calloutMaxHeight='12rem'
@@ -319,7 +319,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             optionLabel='key'
                             className='saucelab_dropDown'
                             // width='15rem'
-                            placeholder='select Browser'
+                            placeholder='Select Browser'
                             // calloutMaxHeight='12rem'
                         />
                     </>}
@@ -336,7 +336,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             optionLabel='key'
                             valueTemplate={selectedMobileVersion}
                             // width='15rem'
-                            placeholder={'select ' + selectedPlatforms + ' versions'}
+                            placeholder={'Select ' + selectedPlatforms + ' Versions'}
                             className='saucelab_dropDown'
                             // calloutMaxHeight='12rem'
                         />
@@ -356,7 +356,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             className='saucelab_dropDown'
                             optionLabel='key'
                             // width='15rem'
-                            placeholder='select Versions'
+                            placeholder='Select Versions'
                             // calloutMaxHeight='12rem'
                         />
                     </>}
@@ -389,7 +389,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             options={mobileDetails?.stored_files && mobileDetails?.stored_files.map((el) => ({ key: el?.name, text :el?.appPackageName, title: el?.name, index: el?.id }))}
                             value={selectApk}
                             // valueTemplate={selectApk}
-                            placeholder='select apk'
+                            placeholder='Select apk'
                             optionLabel='key'
                             className="w-full md:w-10rem"
                         />
@@ -463,16 +463,16 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                     setSelectedEmulator('');
                     setSelectApk([]);
 
-                    onHidedia('displayBasic5');
+                    onHidedia('displayBasic4');
                 }
                 }
                     autoFocus />
 
 
-                <Button id='Saucelabs_cancel' text  size='small' className='Saucelabs_cancel' label="Cancel"  onClick={() => onHidedia('displayBasic5')} />
+                <Button id='Saucelabs_cancel' text  size='small' className='Saucelabs_cancel' label="Cancel"  onClick={() => onHidedia('displayBasic4')} />
 
             </>
-            } headerTxt='Saucelabs Integration' modalSytle={{
+            } headerTxt='SauceLabs Integration' modalSytle={{
                 width: "38vw",
                 height: "67vh",
                 background: "#FFFFFF",

@@ -403,6 +403,8 @@ exports.connectJira_ICE = function(req, res) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                                 logger.info('Jira: Login successfully.');
                                             } else {
+                                                if(resultData == "Fail") data = "Fail to Login"
+                                                resultData = {'error':data}
                                                 logger.error('Jira: Login Failed.');
                                             }
                                             res.send(resultData);
@@ -1469,7 +1471,7 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 		const fnName = "getAccessibilityTestingData_ICE"
 		var inputs = {};
 		var result = {};
-		var query = req.query;
+		var query = req.body;
 		switch(query.type){
 			case "screendata":
 				inputs ={query: "screendata", "cycleid": query.cycleId}; 
