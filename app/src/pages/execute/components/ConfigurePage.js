@@ -1095,7 +1095,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
             <div className="cloud-test-provider" >
   <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}/>
+  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}   disabled={selectProjects.appType==="Desktop"||selectProjects.appType==="Mainframe"||selectProjects.appType==="OEBS"||selectProjects.appType==="SAP"}/>
   </div> 
           
           </div>
