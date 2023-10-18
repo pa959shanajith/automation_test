@@ -205,9 +205,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "stepNo" : 2,
             "custname" : "WebService List",
             "keywordVal" : "setMethods",
-            "inputVal" : [ 
-                "POST"
-            ],
+            "inputVal" : [data['method']],
             "outputVal" : "",
             "appType" : "Webservice",
             "remarks" : "",
@@ -218,9 +216,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "stepNo" : 3,
             "custname" : "WebService List",
             "keywordVal" : "setHeader",
-            "inputVal" : [ 
-                ""
-            ],
+            "inputVal" : [data['requestHeader']],
             "outputVal" : "",
             "appType" : "Webservice",
             "remarks" : "",
@@ -231,9 +227,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "stepNo" : 4,
             "custname" : "WebService List",
             "keywordVal" : "setWholeBody",
-            "inputVal" : [ 
-                ""
-            ],
+            "inputVal" : [data['requestBody']],
             "outputVal" : "",
             "appType" : "Webservice",
             "remarks" : "",
@@ -295,16 +289,16 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             scenarioPID = indexCounter;
             tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, idx+1, scenario._id, Object.keys(scenario)[0], "scenarios", 0,''));
             let methods = [scenario[Object.keys(scenario)[0]]['HTTPmethod']];
-            let data = {
+            let apiData = {
               'requestBody':scenario[Object.keys(scenario)[0]]['requestBody'],
               'requestHeader':scenario[Object.keys(scenario)[0]]['requestHeader'],
             }
             if (methods && methods.length > 0) {
               methods.forEach((screen, idx_scr) => {
-                data['method'] = screen
+                apiData['method'] = screen
                 screenPID = indexCounter;
-                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, idx_scr+1, screen._id, Object.keys(scenario)[0]+'_'+screen, "screens", scenarioPID,data))
-                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, 1, '', Object.keys(scenario)[0]+'_'+screen+'_1', "testcases", screenPID,data))
+                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, idx_scr+1, screen._id, Object.keys(scenario)[0]+'_'+screen, "screens", scenarioPID,apiData))
+                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, 1, '', Object.keys(scenario)[0]+'_'+screen+'_1', "testcases", screenPID,apiData))
                 // if (screen.children && screen.children.length > 0) {
                 //   screen.children.forEach((tc, idx_tc) => {
                 //     tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, idx_tc+1, tc._id, tc.name, "testcases", screenPID))
