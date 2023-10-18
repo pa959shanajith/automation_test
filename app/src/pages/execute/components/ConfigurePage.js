@@ -517,6 +517,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }
 
   const dialogFuncMap = {
+    'displayModal' : setDisplayModal,
     'displayBasic4' : setDisplayBasic4,
     'displayBasic5' : setDisplayBasic5,
     'displayBasic6' : setDisplayBasic6,
