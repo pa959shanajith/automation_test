@@ -146,11 +146,11 @@ export const getReportListSuites = async(getTestSuiteId) => {
 export const getScreenData = async(screenName) =>{
     try{
         const res = await axios(url+'/getAccessibilityData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            params: {
+            data: {
                 screendata: screenName,
                 type: "reportdata_names_only"
             },
@@ -173,11 +173,11 @@ export const getScreenData = async(screenName) =>{
 export const getAccessibilityData = async(id, type = "reportdata") =>{
     try{
         const res = await axios(url+'/getAccessibilityData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            params: {
+            data: {
                 executionid: id,
                 type: type
             },
@@ -316,11 +316,11 @@ export const downloadReports = async(getDownload, type) => {
 export const getAccessibilityScreens = async(projId, relName, cycId) =>{
     try{
         const res = await axios(url+'/getAccessibilityData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            params: {
+            data: {
                 'cycleId': cycId,
                 'projectId': projId,
                 'releaseName': relName,

@@ -33,6 +33,10 @@ const CloudSettings = () => {
     const [uploadapk, setUploadapk ] = useState('');
     const [apkname, setapkname] = useState('');
     const [uploadapkValues, setUploadapkfile] = useState({});
+
+    useEffect(() => {
+        getSaucelabsDetails();
+    }, []); 
     
 
 

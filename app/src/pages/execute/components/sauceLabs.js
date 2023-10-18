@@ -469,7 +469,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                     autoFocus />
 
 
-                <Button id='Saucelabs_cancel' text  size='small' className='Saucelabs_cancel' label="Cancel"  onClick={() => onHidedia('displayBasic5')} />
+                <Button id='Saucelabs_cancel' text  size='small' className='Saucelabs_cancel' label="Cancel"  onClick={() => onHidedia('displayBasic4')} />
 
             </>
             } headerTxt='Saucelabs Integration' modalSytle={{

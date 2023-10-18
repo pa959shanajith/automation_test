@@ -466,7 +466,7 @@ const ScheduleScreen = ({
               <Column
                 align="center"
                 field="target"
-                header="Envrionment"
+                header="Environment"
               ></Column>
               <Column
                 align="center"
