@@ -722,13 +722,16 @@ export default function BasicDemo() {
     if(mappedProjects?.itemCode){
       itemObj.itemId = mappedProjects?.itemCode;
       itemObj.itemDesc = mappedProjects?.itemSummary;
-    } else if(mappedProjects?.TestSuiteId){
+    } else if(mappedProjects?.TestCaseId){
+      itemObj.itemId = mappedProjects?.TestCaseId;
+      itemObj.itemDesc = mappedProjects?.testCaseSummary;
+    }else if(mappedProjects?.TestSuiteId){
       itemObj.itemId = mappedProjects?.TestSuiteId;
       itemObj.itemDesc = mappedProjects?.testSuiteSummary;
     } else if(mappedProjects?.userStoryId){
       itemObj.itemId = mappedProjects?.userStoryId;
       itemObj.itemDesc = mappedProjects?.userStorySummary;
-    }
+    } 
     return itemObj;
   };
 
