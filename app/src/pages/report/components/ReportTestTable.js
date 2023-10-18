@@ -120,27 +120,12 @@ export default function BasicDemo() {
   }, [accessibilityId]);
 
   useEffect(() => {
-    setInputSummary(selectedRow[0]?.StepDescription);
+    setInputSummary(selectedRow[0]?.Comments);
     setConfigValues({
       ...configValues,
-      Summary: selectedRow[0]?.StepDescription,
+      Summary: selectedRow[0]?.Comments,
     });
-    // Description should include all steps till the selected step.
-    let description = "";
-    if(selectedRow.length > 0) {
-      let newDesc = [];
-      let slNo = parseInt(selectedRow[0]?.id);
-      let foundStep = reportData?.rows.find((item)=> item.id === slNo)
-      if (foundStep){
-          for (let i=0; i<reportData?.rows.length; i++) {
-              newDesc.push(reportData?.rows[i]?.StepDescription);
-              if (reportData?.rows[i]?.id === foundStep.id) break;
-          }
-      }
-      description = newDesc.join("\n\n");
-      console.log(description);
-    }
-    setInputDesc(description);
+    setInputDesc(selectedRow[0]?.StepDescription);
   }, [selectedRow]);
 
   useEffect(() => {
@@ -627,12 +612,12 @@ export default function BasicDemo() {
   useEffect(() => {
     if(jiraDropDown && issueDropDown){
       setConfigureFeilds([]);
-      setInputSummary(selectedRow[0]?.StepDescription);
+      setInputSummary(selectedRow[0]?.Comments);
       if (bugTitle === "Jira") {
         setConfigValues({
           ...configValues,
           Summary: selectedRow[0]?.Comments,
-          ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
+          // ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
         });
       } else {
         setConfigValues({});
@@ -678,6 +663,17 @@ export default function BasicDemo() {
       })();
     }
   }, [jiraDropDown, issueDropDown]);
+
+  useEffect(() => {
+    configureFeilds.forEach((el) => {
+      if(el.name === "Attachment"){
+        setConfigValues({
+          ...configValues,
+          Attachment: selectedRow[0]?.screenshot_path,
+        });
+      };
+    })
+  }, [configureFeilds]);
 
   useEffect(() => {
     const autoFill = [];
