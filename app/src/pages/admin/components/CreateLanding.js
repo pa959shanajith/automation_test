@@ -71,8 +71,10 @@ const CreateLanding = (props) => {
     }
 
     const selectServerHandler = (event) => {
-        setServerName(event.value.name);
-        dispatch(AdminActions.UPDATE_SERVER(event.value.name));
+        console.log(event.target.value.name);
+        console.log(event.value.name);
+        setServerName(event.target.value.name);
+        dispatch(AdminActions.UPDATE_SERVER(event.target.value.name));
         dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
         props.ldapSwitchFetch({ userConf_ldap_fetch: "import" });
     }
