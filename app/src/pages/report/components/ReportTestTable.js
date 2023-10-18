@@ -680,6 +680,17 @@ export default function BasicDemo() {
   }, [jiraDropDown, issueDropDown]);
 
   useEffect(() => {
+    configureFeilds.forEach((el) => {
+      if(el.name === "Attachment"){
+        setConfigValues({
+          ...configValues,
+          Attachment: selectedRow[0]?.screenshot_path,
+        });
+      };
+    })
+  }, [configureFeilds]);
+
+  useEffect(() => {
     const autoFill = [];
     selectedFiels.forEach((item) => {
       if (item.disabled) {
