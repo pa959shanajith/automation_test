@@ -272,7 +272,7 @@ export default function BasicDemo() {
                         key: configValues[item]?.key,
                         text: configValues[item]?.name,
                       }
-                    : configValues[item],
+                    : selectedRow[0]?.screenshot_path ? selectedRow[0]?.screenshot_path : configValues[item],
                 type: responseFeilds[item]?.type,
               };
             } else if (item === "Summary") {
@@ -632,7 +632,7 @@ export default function BasicDemo() {
         setConfigValues({
           ...configValues,
           Summary: selectedRow[0]?.Comments,
-          ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
+          // ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
         });
       } else {
         setConfigValues({});
@@ -678,17 +678,6 @@ export default function BasicDemo() {
       })();
     }
   }, [jiraDropDown, issueDropDown]);
-
-  useEffect(() => {
-    configureFeilds.forEach((el) => {
-      if(el.name === "Attachment"){
-        setConfigValues({
-          ...configValues,
-          Attachment: selectedRow[0]?.screenshot_path,
-        });
-      };
-    })
-  }, [configureFeilds]);
 
   useEffect(() => {
     const autoFill = [];
