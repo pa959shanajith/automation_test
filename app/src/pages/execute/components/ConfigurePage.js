@@ -221,23 +221,31 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }, [selectProjects]);
 
   useEffect(() => {
-    setRadioButton_grid( selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid");
+    setRadioButton_grid("Execute with Avo Assure Client")
     setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    setExecutingOn((selectProjects?.appType==="Web" || selectProjects?.appType==="MobileApp" || selectProjects?.appType==="MobileWeb" )? "ICE" :"Agent")
-    setShowIcePopup(selectProjects?.appType==="Web"? true : false)
-    // need for sauceLab in future
-    // selectProjects?.appType === "MobileWeb" ? setShowSauceLabs(true) : setShowSauceLabs(false) 
-    // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false) 
-  }, [selectProjects.appType]);
+    setExecutingOn("ICE");
+    setShowIcePopup(true);
+  }, [selectProjects.projectId]);
 
  const displayError = (error) => {
-    // setLoading(false)
-    setMsg(error);
+    setLoading(false)
+    toastError(error);
   };
 
-  // const dialogFuncMap = {
-  //   'displayModal': setDisplayModal
-  // };
+
+  const toastError = (erroMessage) => {
+    if (erroMessage && erroMessage.CONTENT) {
+      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: JSON.stringify(erroMessage), life: 5000 });
+  }
+
+  const toastSuccess = (successMessage) => {
+    if (successMessage && successMessage.CONTENT) {
+      toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
+  }
 
   const onClick = (name, position) => {
     dialogFuncMap[`${name}`](true);
@@ -376,7 +384,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
     var projId = configProjectId;
     var dataforApi = { poolid: "", projectids: [projId] };
-    // setLoading('Fetching ICE ...')
+    setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
     if (data.error) {
       displayError(data.error);
@@ -393,7 +401,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
     setIceStatus(data1);
     populateICElist(arr, true, data1);
-    // setLoading(false);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -509,6 +517,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }
 
   const dialogFuncMap = {
+    'displayModal' : setDisplayModal,
     'displayBasic4' : setDisplayBasic4,
     'displayBasic5' : setDisplayBasic5,
     'displayBasic6' : setDisplayBasic6,
@@ -524,7 +533,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         return newValues;
       });
     switch (selected) {
-        case 'sauceLabs':
+        case 'SauceLabs':
           setDisplayBasic4('displayBasic4');
           setExecutingOn("ICE")
           setConfigItem(idx);
@@ -534,6 +543,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             //     newValues[index] = '';
             //     return newValues;
             //   });
+            // setDisplayBasic4(false);
             handleSubmit1();
             break;
         case 'browserstack':
@@ -698,7 +708,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
           
           setLoading(false)
           // setDisplayBasic5(true);
-    
+          // setDisplayBasic4('displayBasic4');
           const arrayOS = data.os_names.map((element, index) => {
             return {
               key: element,
@@ -723,7 +733,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     
           setMobileDetails(data);
           setLoading(false);
-          setDisplayBasic5(true);
+          setDisplayBasic4(true);
         }
          else {
           setLoading(false);
@@ -775,50 +785,21 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const deleteDevOpsConfig = () => {
-    // setLoading('Please Wait...');
+    setLoading('Please Wait...');
     setTimeout(async () => {
       const deletedConfig = await deleteConfigureKey(deleteItem.configurekey);
       setLogoutClicked(false);
       if (deletedConfig.error) {
         if (deletedConfig.error.CONTENT) {
-          setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
+          toastError(MSG.CUSTOM(deletedConfig.error.CONTENT, VARIANT.ERROR));
         } else {
           toast.current.show({severity:'error', summary: 'Error', detail:  "Error While Deleting Execute Configuration", life: 2000});
-          // setMsg(
-          //   MSG.CUSTOM(
-          //     "Error While Deleting Execute Configuration",
-          //     VARIANT.ERROR
-          //   )
-          // );
         }
       } else {
         tableUpdate();
         toast.current.show({severity:'success', summary: 'Success', detail:"Execution Profile deleted successfully.", life: 1000});
-        // const configurationList = await fetchConfigureList({
-        //   projectid: selectedProject,
-        // });
-        // if (configurationList.error) {
-        //   if (configurationList.error.CONTENT) {
-        //     setMsg(MSG.CUSTOM(configurationList.error.CONTENT, VARIANT.ERROR));
-        //   } else {
-        //     setMsg(
-        //       MSG.CUSTOM(
-        //         "Error While Fetching Execute Configuration List",
-        //         VARIANT.ERROR
-        //       )
-        //     );
-        //   }
-        // } else {
-        //   const integrationData = configurationList.map((item, idx) => {
-        //     setIntegration(item.executionRequest.integration);
-        //   });
-        //   setConfigList(configurationList);
-        // }
-        // setMsg(
-        //   MSG.CUSTOM("Execution Profile deleted successfully.", VARIANT.SUCCESS)
-        // );
       }
-      // setLoading(false);
+      setLoading(false);
     }, 500);
   };
 
@@ -873,7 +854,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     setAllocateICE(false);
     const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
-    // setLoading("Sending Execution Request");
+    setLoading("Sending Execution Request");
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     // executionData["executionEnv"] = execEnv;
@@ -895,7 +876,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       currentTask.scenarioFlag == "True" ? true : false;
     ResetSession.start();
     try {
-      // setLoading(false);
+      setLoading(false);
       const data = await ExecuteTestSuite_ICE(executionData);
       if (data.errorapi) {
         displayError(data.errorapi);
@@ -949,9 +930,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
       setExecAction("serial");
       setExecEnv("default");
     } catch (error) {
-      // setLoading(false);
+      setLoading(false);
       ResetSession.end();
-      // displayError(MSG.EXECUTE.ERR_EXECUTE);
+      displayError(MSG.EXECUTE.ERR_EXECUTE);
       toast.current.show({
         severity: 'error',
         summary: 'Error',
@@ -988,7 +969,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const cloudTestOptions = [
-    { name: 'sauceLabs', code: 1 },
+    { name: 'SauceLabs', code: 1 },
     // { name: 'browserstack', code: 2 },
   ];
   
@@ -1114,7 +1095,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
             <div className="cloud-test-provider" >
   <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}/>
+  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}   disabled={selectProjects.appType==="Desktop"||selectProjects.appType==="Mainframe"||selectProjects.appType==="OEBS"||selectProjects.appType==="SAP"}/>
   </div> 
           
           </div>
@@ -1472,14 +1453,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         const temp = await execAutomation(currentKey, "AvoAgent/AvoGrid");
         if (temp.status !== "pass") {
           if (temp.error && temp.error.CONTENT) {
-            setMsg(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
+            toastError(MSG.CUSTOM(temp.error.CONTENT, VARIANT.ERROR));
           } else {
-            // setMsg(
-            //   MSG.CUSTOM(
-            //     "Error While Adding Configuration to the Queue",
-            //     VARIANT.ERROR
-            //   )
-            // );
             toast.current.show({
                 severity: "error",
                 summary: "error",
@@ -1497,9 +1472,8 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
 
             if(result !== "pass") {
                 if(result.error && result.error.CONTENT) {
-                    setMsg(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
+                    toastError(MSG.CUSTOM(result.error.CONTENT,VARIANT.ERROR));
                 } else {
-                    // setMsg(MSG.CUSTOM("Error While Sending an Email.",VARIANT.ERROR));
                     toast.current.show({
                       severity: "error",
                       summary: "error",
@@ -1511,7 +1485,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
                 }
             }
             else {
-                // setMsg(MSG.CUSTOM("Execution Added to the Queue and Email sent successfully.",VARIANT.SUCCESS));
                 toast.current.show({
                   severity: "success",
                   summary: "Success",
@@ -1521,8 +1494,6 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             }
           }
           else {
-              // setMsg(MSG.CUSTOM("Execution Added to the Queue.",VARIANT.SUCCESS));
-              // setMsg(MSG.CUSTOM("Execution Added to the Queue.", VARIANT.SUCCESS));
               toast.current.show({
                 severity: "success",
                 summary: "Success",
@@ -1532,29 +1503,14 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
           }
         }
 
-        // onHide(name);
       }
-      // toast.current.show({
-      //   severity: "success",
-      //   summary: "Success",
-      //   detail: " Execution started.",
-      //   life: 5000,
-      // });
+
       setVisible_execute(false);
     }
     if (btnType === 'Cancel') {
       setVisible_execute(false);
     }
-    // if(btnType ===  "Execute"){
-    //   toast.current.show({
-    //     severity: "success",
-    //     summary: "Success",
-    //     detail: "Execution has started",
-    //     life: 5000,
-    //   });
-
-    //   }
-
+  
   };
 
   useEffect(() => {
@@ -1816,15 +1772,15 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             }
             
             else {
-                setMsg(MSG.GLOBAL.ERR_RECIEVER_EMAIL);
+                toastError(MSG.GLOBAL.ERR_RECIEVER_EMAIL);
             }
         }
         else {
-            setMsg(MSG.GLOBAL.ERR_SENDER_EMAIL);
+            toastError(MSG.GLOBAL.ERR_SENDER_EMAIL);
         }
     }
     else {
-        setMsg(MSG.GLOBAL.ERR_EMAILS_EMPTY);
+        toastError(MSG.GLOBAL.ERR_EMAILS_EMPTY);
     }   
   }
 
