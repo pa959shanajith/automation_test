@@ -272,7 +272,7 @@ export default function BasicDemo() {
                         key: configValues[item]?.key,
                         text: configValues[item]?.name,
                       }
-                    : selectedRow[0]?.screenshot_path ? selectedRow[0]?.screenshot_path : configValues[item],
+                    : configValues[item],
                 type: responseFeilds[item]?.type,
               };
             } else if (item === "Summary") {
@@ -625,13 +625,24 @@ export default function BasicDemo() {
   }
 
   useEffect(() => {
+    const getState = { ...configValues };
+    const isAttachedArr = configureFeilds.filter((val) => val.name === "Attachment")
+    if(!!isAttachedArr.length) {
+      getState.Attachment = selectedRow[0]?.screenshot_path;
+    }else if(getState?.Attachment){
+      delete getState?.Attachment;
+    }
+    setConfigValues(getState);
+  }, [configureFeilds]);
+
+  useEffect(() => {
     if(jiraDropDown && issueDropDown){
       setConfigureFeilds([]);
       setInputSummary(selectedRow[0]?.StepDescription);
       if (bugTitle === "Jira") {
         setConfigValues({
           ...configValues,
-          Summary: selectedRow[0]?.Comments,
+          Summary: selectedRow[0]?.StepDescription,
           // ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
         });
       } else {
@@ -1178,7 +1189,7 @@ export default function BasicDemo() {
                         className="text_desc"
                         rows={1}
                         name={el.name}
-                        value={configValues[el.name]}
+                        value={(el.name === "Attachment" && selectedRow[0]?.screenshot_path) ? selectedRow[0]?.screenshot_path : configValues[el.name]}
                         onChange={(e) => handleConfigValues(e)}
                         disabled={(el.name === "Attachment" && selectedRow[0]?.screenshot_path)}
                       />

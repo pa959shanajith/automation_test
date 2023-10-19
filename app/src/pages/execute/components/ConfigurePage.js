@@ -139,6 +139,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [recurEvery, setRecurEvery] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [selectedPattren, setSelectedPattren] = useState({});
   const [selectedDaily, setSelectedDaily] = useState(null);
@@ -1534,6 +1535,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setStartDate(null);
       setScheduling(false);
       setEndDate(null);
+      setRecurEvery(null);
       setStartTime(null);
       setScheduleOption({});
       setSelectedDaily(null);
@@ -1603,7 +1605,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             source: "schedule",
             exectionMode: "serial",
             executionEnv: "default",
-            browserType: selectedSchedule?.executionRequest?.browserType,
+            browserType: selectedSchedule?.executionRequest?.browserType ? selectedSchedule?.executionRequest?.browserType : ['1'],
             integration: selectedSchedule?.executionRequest?.integration,
             batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
               ...el,
@@ -1642,6 +1644,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         setScheduling(false);
         setStartDate(null);
         setEndDate(null);
+        setRecurEvery(null);
         setStartTime(null);
         setScheduleOption({});
         setSelectedDaily(null);
@@ -1695,6 +1698,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         setScheduling(false);
         setStartDate(null);
         setEndDate(null);
+        setRecurEvery(null);
         setStartTime(null);
         setScheduleOption({});
         setSelectedDaily(null);
@@ -1708,6 +1712,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setScheduling(false);
       setStartDate(null);
       setEndDate(null);
+      setRecurEvery(null);
       setStartTime(null);
       setScheduleOption({});
       setSelectedDaily(null);
@@ -1997,6 +2002,8 @@ Learn More '/>
                 setStartDate={setStartDate}
                 endDate={endDate}
                 setEndDate={setEndDate}
+                recurEvery={recurEvery}
+                setRecurEvery={setRecurEvery}
                 startTime={startTime}
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
