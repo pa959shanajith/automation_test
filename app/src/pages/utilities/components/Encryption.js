@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Dropdown } from 'primereact/dropdown';
-import "../styles/LeftBar.scss";
+import "../styles/Leftbar.scss";
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 

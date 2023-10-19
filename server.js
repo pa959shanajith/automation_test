@@ -477,7 +477,7 @@ if (cluster.isMaster) {
 		var devOps = require('./server/controllers/devOps');
 		var azure = require('./server/controllers/azure');
 		var SauceLab = require('./server/controllers/sauceLab');
-		var browserstack = require('./server/controllers/browserstack');
+var browserstack = require('./server/controllers/browserstack');
 
 
 
@@ -721,15 +721,11 @@ if (cluster.isMaster) {
 		app.post('/manageSaucelabsDetails', auth.protect, admin.manageSaucelabsDetails);
 		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
 
-		//Browserstack API's
+		  //Browserstack API's
 
-        app.post('/getDetails_BROWSERSTACK', auth.protect, admin.getDetails_BROWSERSTACK);
-        app.post('/manageBrowserstackDetails', auth.protect, admin.manageBrowserstackDetails);
-        app.post('/saveBrowserstackData',auth.protect, browserstack.saveBrowserstackData);
-
-		// Added Report API's
-		app.get('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
-		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
+		app.post('/getDetails_BROWSERSTACK', auth.protect, admin.getDetails_BROWSERSTACK);
+		app.post('/manageBrowserstackDetails', auth.protect, admin.manageBrowserstackDetails);
+		app.post('/saveBrowserstackData',auth.protect, browserstack.saveBrowserstackData);
 
 		// Added Report API's
 		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	

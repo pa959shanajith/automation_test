@@ -21,7 +21,7 @@ wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf
 var templatepdf = '';
 
 fs.readFile(path.join(__dirname,"..","..","templates","pdfReport","content.handlebars"), 'utf8', function(err, data) {
-    templatepdf = Handlebars.compile(data);
+templatepdf = Handlebars.compile(data);
 });
 
 let headers
@@ -403,6 +403,8 @@ exports.connectJira_ICE = function(req, res) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                                 logger.info('Jira: Login successfully.');
                                             } else {
+                                                if(resultData == "Fail") data = "Fail to Login"
+                                                resultData = {'error':data}
                                                 logger.error('Jira: Login Failed.');
                                             }
                                             res.send(resultData);
@@ -1362,7 +1364,7 @@ exports.fetchExecutionDetail = async (req, res) => {
 exports.getReportsData_ICE = async (req, res) => {
     const fnName = "getReportsData_ICE";
     try {
-        let reportInputData = req.query.reportsInputData;
+        let reportInputData = req.body.reportsInputData;
         if (reportInputData.type == 'allmodules') {
             logger.info("Inside UI service: " + fnName + " - allmodules");
             let inputs = {
@@ -1432,7 +1434,7 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
     const fnName = "reportStatusScenarios_ICE";
     logger.info("Inside UI service: " + fnName);
     try {
-        var executionid = req.query.executionId;
+        var executionid = req.body.executionId;
         var report = [];
         let inputs = {
             "query": "executiondetails",
@@ -1462,4 +1464,34 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
         logger.error("Exception in the service reportStatusScenarios_ICE: %s", exception);
         res.send("fail");
     }
+};
+
+exports.getAccessibilityTestingData_ICE = async function(req, res) {
+    try {
+		const fnName = "getAccessibilityTestingData_ICE"
+		var inputs = {};
+		var result = {};
+		var query = req.body;
+		switch(query.type){
+			case "screendata":
+				inputs ={query: "screendata", "cycleid": query.cycleId}; 
+				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
+				break;
+			case "reportdata":
+				inputs ={query: "reportdata", "executionid": query.executionid}; 
+				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
+				break;
+			case "reportdata_names_only":
+				inputs ={query: "reportdata_names_only", "screenname": query.screendata}; 
+				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
+				break;
+			default:
+				return res.send('fail');
+		}
+		if (result == "fail") return res.status(500).send("fail");
+		else return res.send(result)
+	} catch(e){
+		logger.error(e.message);
+		return res.status(500).send("fail");
+	}
 };

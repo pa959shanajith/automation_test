@@ -367,6 +367,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
 	const fnName = "testSuitesScheduler_ICE";
 	try{
+		req.session.host = req.headers.host;
 		var result = await scheduler.prepareSchedulingRequest(req.session, req.body);
 		return res.send(result);
 	}catch(e){
@@ -399,6 +400,7 @@ exports.testSuitesSchedulerRecurring_ICE = async (req, res) => {
 	logger.info("Inside UI service testSuitesSchedulerRecurring_ICE");
 	const fnName = "testSuitesSchedulerRecurring_ICE";
 	try{
+			req.session.host = req.headers.host;
 			var result = await scheduler.scheduleRecurringTestSuite(req.session, req.body);
 			return res.send(result);
 		
