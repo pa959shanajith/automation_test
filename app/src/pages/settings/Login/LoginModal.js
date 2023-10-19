@@ -256,7 +256,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     }
 
     const confirmPopupMsg = (
-        <div> <p>Are you sure you want to delet the saved credentials</p></div>
+        <div> <p>Are you sure you want to delete the saved credentials</p></div>
       )
 
 
