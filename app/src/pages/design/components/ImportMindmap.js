@@ -228,10 +228,10 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     // if(res.error){setError(res.error);setBlockui({show:false});return;}
                     var req={
                         tab:"tabCreate",
-                        projectid:data.projectid,
+                        projectid:projectImportId,
                         version:0,
                         cycId: null,
-                        moduleid:data._id
+                        moduleid:Array.isArray(data)?data[0]:data
                     }
                     var res = await getModules(req)
                     if(res.error){displayError(res.error.CONTENT);ResetSession.end();return;}
