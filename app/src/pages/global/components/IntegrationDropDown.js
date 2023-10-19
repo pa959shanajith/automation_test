@@ -206,14 +206,16 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                         // url: '',
                         // apitoken: '',
                         userName: '',
-                        password: ''
+                        password: '',
+                        url:'',
                     };
                     
                     // if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
                     // if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
                     // if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
-                    if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
-                    if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
+                    if(data.AzureUsername) credentialsData['userName'] = data.AzureUsername;
+                    if(data.AzurePAT) credentialsData['password'] = data.AzurePAT;
+                    if(data.AzureURL) credentialsData['url'] = data.AzureURL;
                     
                     setDefaultValues(credentialsData);
                     // setZephAuthType(credentialsData.authtype);

@@ -2555,7 +2555,7 @@ exports.manageZephyrDetails = async (req, res) => {
 			const zephyrUrl = data.user.url;
 			const zephyrUsername = data.user.username;
 			const zephyrPassword = data.user.password;
-			const zephyrToken = data.user.token;
+			const zephyrToken = data.user.token !== ''?data.user.token:"token";
 			const zephyrAuthType = data.user.authType;
 			inputs = {
 				"userId": userId,
