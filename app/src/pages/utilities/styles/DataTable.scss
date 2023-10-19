@@ -3,7 +3,6 @@
 .dt__btn{
     border: none;
     outline: none;
-    // color: $whiteColor;
     border-radius: 20px;
 }
 
@@ -11,7 +10,6 @@
     display: flex;
     max-width: 100%;
     margin-bottom: 15px;
-    // font-family: $avoSecondaryFont;
 }
 
 .dt__table_ac_btn_grp{
@@ -45,10 +43,8 @@
     display: flex;
     flex-grow: 1;
     position: relative;
-    /* right: -6rem; */
     left: 10rem;
     gap: 1rem;
-    // justify-content: flex-end;
 }
 
 .dt__taskBtn{
@@ -56,20 +52,10 @@
     margin-right: 10px;
     width: 100px;
     height: 2.5rem;
-    // background-color: $primaryColor;
     &:disabled{
-        // background-color: $backgroundThree;
         cursor: not-allowed;
     }
 }
-
-.dt__tableNameError{
-    // border: 2px solid $redError !important;
-}
-
-// .dt__importexport{
-//     // margin-top: 15px;
-// }
 
 .dt__faBtn{
     height: 37px;
@@ -103,9 +89,10 @@
         font-size: 14px;
         box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
         display: block;
-        max-height: 100px;
+        max-height:10rem;
         width: 80%;
-        // background: $whiteColor;
+        overflow: auto;
+        background: white;
         z-index: 1;
         margin-top: 2px;
         option{
@@ -114,17 +101,16 @@
             width: calc(100% - 14px);
         }
         option:hover{
-            // background: $primaryColor;-
             border-radius: 3px;
-            color: $whiteColor;
+            color: $black;
             cursor: pointer;
+            background: #e3cff0;
         }
     }
     
 }
 
 .dt__tableName, .dt__selectTable{
-    // font-family: $avoFont ;
     font-size: 14px;
     height: 50px;
     display: flex;
@@ -144,9 +130,7 @@
         padding: 6px 12px;
         line-height: 1.42857143;
         color: $primaryText;
-        // background-color: $whiteColor;
         background-image: none;
-        // border: 1px solid $borderTwo;
         border-radius: 4px;
         box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     }

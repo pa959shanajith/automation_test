@@ -51,6 +51,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [Index, setIndex] = useState(0);
     const [activeIndexViewMap, setActiveIndexViewMap] = useState(0);
     const [showLoginCard, setShowLoginCard] = useState(true);
+    // const selectedSaucelabsScreen = useSelector(state => state.saucelabs.screenType);
+    // const selectedBrowserstackScreen = useSelector(state => state.browserstack.screenType);
     const selectedscreen = useSelector(state => state.setting.screenType);
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
     const [isSpin, setIsSpin] = useState(false);
@@ -133,6 +135,34 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
         })();
       }, [isCloudBasedIntegrationClicked]);
+
+    //   const handleSubmitSaucelabs = () => {
+    //     setIsSpin(true);
+      
+    //     switch (selectedSaucelabsScreen.name) {
+    //       // Define the cases for `saucelabs` here
+    //       case 'SauceLabs':
+    //         // callLoginSauceLabs();
+    //         break;
+    //       // Add more cases as needed
+    //       default:
+    //         break;
+    //     }
+    //   };
+
+    //   const handleSubmitBrowserstack = () => {
+    //     setIsSpin(true);
+      
+    //     switch (selectedBrowserstackScreen.name) {
+    //       // Define the cases for `browserstack` here
+    //       case 'BrowserStack':
+    //         // callLoginBrowserStack();
+    //         break;
+    //       // Add more cases as needed
+    //       default:
+    //         break;
+    //     }
+    //   };
 
     const handleSubmit = () => {
         setIsSpin(true);
@@ -975,7 +1005,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                 </div>
                             )
 
-                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} /> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
+                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton}  activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

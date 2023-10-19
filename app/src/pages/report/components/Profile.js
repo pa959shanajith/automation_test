@@ -9,7 +9,7 @@ import { Badge } from "primereact/badge";
 import { Tree } from "primereact/tree";
 import { reportsBar } from "../../utility/mockData";
 import { useLocation } from "react-router-dom";
-import { downloadReports, fetchScenarioInfo, getReportList, getReportListSuites, getTestSuite } from "../api";
+import { downloadReports, fetchScenarioInfo, getAccessibilityData, getReportList, getReportListSuites, getScreenData, getTestSuite } from "../api";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
@@ -18,8 +18,11 @@ import { FooterTwo } from "../../global";
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
   const [testSuite, setTestSuite] = useState({});
+  const [accessibilityValues, setAccessibilityValues] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
+  const [toggleBtn, setToggleBtn] = useState(true);
   const [downloadId, setDownloadId] = useState("");
+  const [accessKey, setAccessKey] = useState("");
   const [selectedExe, setSelectedExe] = useState(0);
   const location = useLocation();
   const downloadRef = useRef(null);
@@ -40,12 +43,24 @@ const Profile = () => {
     { field: "module", header: <div><span className="suite_text">Test Suite(s)</span><span className="case_text">Test Case(s)</span></div> }
   ];
 
+  const tableColumnsAccess = [
+    { field: "name", header: "Title" },
+    { field: "dateTime", header: "Date and Time" },
+    { field: "icon", header: "" },
+    { field: "statusAccess", header: ""  }
+  ];
+
   useEffect(() => {
     (async () => {
-      const executionProfiles =
-        location?.state?.viewBy === "Execution Profile"
-          ? await getReportList(location?.state?.configureKey)
-          : await getReportListSuites(location?.state?.configureKey);
+      let executionProfiles;
+      if(location?.state?.viewBy === "Execution Profile"){
+        executionProfiles = await getReportList(location?.state?.configureKey)
+      } else if(location?.state?.viewBy === "Test Suites"){
+        executionProfiles = await getReportListSuites(location?.state?.configureKey);
+      } else if(location?.state?.viewBy === "Accessibility"){
+        executionProfiles = await getScreenData(location?.state?.screen);
+      };
+
       // let sortExecutions= [...executionProfiles].reverse();
       if (location?.state?.viewBy === "Execution Profile") {
         setReportsTable(
@@ -66,7 +81,7 @@ const Profile = () => {
             ),
           }))
         );
-      } else {
+      } else if(location?.state?.viewBy === "Test Suites") {
         setReportsTable(
           executionProfiles.map((el, ind) => ({
             ...el,
@@ -83,6 +98,16 @@ const Profile = () => {
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
               {}
             ),
+          }))
+        );
+      } else if(location?.state?.viewBy === "Accessibility") {
+        setReportsTable(
+          executionProfiles.map((el, ind) => ({
+            ...el,
+            id: el?._id,
+            key: ind.toString(),
+            name: el?.title,
+            dateTime: el?.executedtime,
           }))
         );
       }
@@ -415,6 +440,10 @@ const Profile = () => {
       return prev;
     })
   }
+
+  const handleAccessibilityReports = (accessibilityId, getRuleMap) => {
+    window.open(`/viewReports?accessibilityID=${accessibilityId}&rulemap=${getRuleMap}`, "_blank"); 
+  }
  
   const onTestCaseClick = async (row, parentRow) => {
 
@@ -492,8 +521,8 @@ const Profile = () => {
                     (item) =>
                       item === "Terminate" ||
                       item === "Skipped" ||
-                          item === "Incomplete"||
-                          item === "fail"||
+                              item === "Incomplete"||
+                              item === "fail"||
                       item === "Fail"
                   )
                   .map(
@@ -517,11 +546,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter(
-                    (item) =>
-                      item === "Skipped" ||
-                      item === "Incomplete"
-                  )
+                  .filter((item) => item === "Skipped" || item === "Incomplete")
                   .map(
                     (e) =>
                       el.scenarioStatus.reduce(
@@ -681,7 +706,7 @@ const Profile = () => {
                       size="small"
                       outlined
                       className="view_button"
-                      onClick={()=>handleViweReports(item._id)}
+                      onClick={() => handleViweReports(item._id)}
                     />
                   ),
                 }))}
@@ -770,6 +795,18 @@ const Profile = () => {
       ></Badge>
     );
   };
+
+  const handleOnAccessibility = async(getRow) => {
+    setAccessKey(getRow?._id);
+    let accessibilityData = await getAccessibilityData(getRow?._id);
+    let getState = { ...accessibilityValues };
+    reportsTable.forEach((el) => {
+      if (el.key === getRow?.key) {
+        getState[getRow?.key] = accessibilityData[0];
+      }
+    });
+    setAccessibilityValues(getState);
+  }
 
   const moduleBodyTemplate = (e) => {
     let treeArr = {
@@ -956,6 +993,63 @@ const Profile = () => {
     );
   };
 
+  const iconBodyTemplate = (event) => {
+    return <span className="pi pi-angle-right" onClick={() => handleOnAccessibility(event)}></span>
+  }
+
+  const statusAccessBodyTemplate = (event) => {
+    let tableData = [];
+    if(accessibilityValues[event?.key]){
+      tableData = accessibilityValues[event?.key]['access-rules']
+    };
+    return accessibilityValues[event?.key] ? (
+      <div className="flex flex-column access_rules">
+        <div className="flex access_rules_status">
+          <div className="flex">
+            <Badge
+              className="badge_icon"
+              value={`${accessibilityValues[event?.key]["access-rules"].filter((el) => el?.pass).length} / ${accessibilityValues[event?.key]["access-rules"].length}`}
+              severity="success"
+            ></Badge>
+            <span className="badge_txt">Passed</span>
+          </div>
+          <div className="flex">
+            <Badge
+              className="badge_icon"
+              value={`${accessibilityValues[event?.key]["access-rules"].filter((el) => !el?.pass).length} / ${accessibilityValues[event?.key]["access-rules"].length}`}
+              severity="danger"
+            ></Badge>
+            <span className="badge_txt">Failed</span>
+          </div>
+        </div>
+        <DataTable
+          showHeaders={false}
+          className="statusTable"
+          value={tableData.map((item, i) => ({
+            scenarioname: item?.name,
+            status: item?.pass ? "Pass" : "Fail",
+            statusView: (
+              <Button
+                label="View"
+                severity="secondary"
+                size="small"
+                outlined
+                className="view_button"
+                onClick={() =>
+                  handleAccessibilityReports(accessKey, item?.name)
+                }
+              />
+            ),
+          }))}
+        >
+          <Column field="scenarioname"></Column>
+          <Column field="status"></Column>
+          <Column field="statusView"></Column>
+        </DataTable>
+      </div>
+    ) : null;
+  };
+
   const onDownload = async (getId,SS) => {
     let data = await downloadReports({ id: downloadId, type: getId }, SS);
     
@@ -981,43 +1075,74 @@ const Profile = () => {
   return (
     <>
       <div className="profile_container">
-        <DataTable
-          value={reportsTable}
-          tableStyle={{ minWidth: "50rem" }}
-          header={tableHeader}
-          globalFilter={searchScenario}
-          className="reports_table"
-        >
-          {tableColumns.map((col) => (
-            <Column
-              key={col.field}
-              field={col.field}
-              header={col.header}
-              {...(col.field === "testCases"
-                ? { filter: true, filterPlaceholder: "Search by name" }
-                : {})}
-              {...(col.field === "name" || col.field === "dateTime"
-                ? { sortable: true }
-                : {})}
-              {...(col.field === "status" ? { body: statusBodyTemplate } : {})}
-              {...(col.field === "module" ? { body: moduleBodyTemplate } : {})}
-            />
-          ))}
-        </DataTable>
+        {location?.state?.viewBy !== "Accessibility" ? (
+          <DataTable
+            value={reportsTable}
+            tableStyle={{ minWidth: "50rem" }}
+            header={tableHeader}
+            globalFilter={searchScenario}
+            className="reports_table"
+          >
+            {tableColumns.map((col) => (
+              <Column
+                key={col.field}
+                field={col.field}
+                header={col.header}
+                {...(col.field === "testCases"
+                  ? { filter: true, filterPlaceholder: "Search by name" }
+                  : {})}
+                {...(col.field === "name" || col.field === "dateTime"
+                  ? { sortable: true }
+                  : {})}
+                {...(col.field === "status"
+                  ? { body: statusBodyTemplate }
+                  : {})}
+                {...(col.field === "module"
+                  ? { body: moduleBodyTemplate }
+                  : {})}
+              />
+            ))}
+          </DataTable>
+        ) : (
+          <DataTable
+            value={reportsTable}
+            tableStyle={{ minWidth: "50rem" }}
+            header={tableHeader}
+            globalFilter={searchScenario}
+            className="accessibility_table"
+          >
+            {tableColumnsAccess.map((col) => (
+              <Column
+                key={col.field}
+                field={col.field}
+                header={col.header}
+                {...(col.field === "icon" ? { body: iconBodyTemplate } : {})}
+                {...(col.field === "statusAccess" ? { body: statusAccessBodyTemplate } : {})}
+              />
+            ))}
+          </DataTable>
+        )}
         <OverlayPanel ref={downloadRef} className="reports_download">
-          <div className="flex downloadItem" onClick={() => onDownload("json", false)}>
+          <div
+            className="flex downloadItem"
+            onClick={() => onDownload("json", false)}
+          >
             <span className="pi pi-fw pi-file"></span>
             <span>JSON</span>
           </div>
-          <div className="flex downloadItem" onClick={() => onDownload("pdf", false)}>
+          <div
+            className="flex downloadItem"
+            onClick={() => onDownload("pdf", false)}
+          >
             <span className="pi pi-fw pi-file"></span>
             <span>PDF</span>
           </div>
-          <div className="flex downloadItem" onClick={() => onDownload("pdf", true)}>
+          <div
+            className="flex downloadItem"
+            onClick={() => onDownload("pdf", true)}
+          >
             <span className="pi pi-fw pi-file"></span>
-            <span>
-              PDF with screenshots
-            </span>
+            <span>PDF with screenshots</span>
           </div>
         </OverlayPanel>
       </div>

@@ -23,11 +23,11 @@ const SocketFactory = () => {
     const [showAfterExecution, setShowAfterExecution] = useState({ show: false })
     const [showAfterExecutionIsTrial, setShowAfterExecutionIsTrial] = useState({ show: false })
     const [reportData, setReportData] = useState(undefined)
-    const userInfo = useSelector(state => state.landing.userinfo);
     const socket = useSelector(state => state.landing.socket);
     const dispatch = useDispatch();
     const history = useNavigate();
     const toast = useRef();
+    let userInfo = useSelector((state) => state.landing.userinfo)
 
     const displayExecutionPopup = (value) => {
         var val;
@@ -71,7 +71,7 @@ const SocketFactory = () => {
     }, [socket])
 
     useEffect(() => {
-        var userName = Buffer.from((userInfo && userInfo.username) ? userInfo.username : uuid()).toString('base64')
+        var userName = Buffer.from(((userInfo && userInfo.username) ? userInfo.username:(localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).username:uuid())) ).toString('base64')
         var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: { check: 'notify', key: userName } });
         dispatch(loadUserInfoActions.setSocket(socket));
         return (() => {

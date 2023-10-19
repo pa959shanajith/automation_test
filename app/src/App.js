@@ -121,7 +121,7 @@ const RouteApp = () => {
 //disable duplicate tabs
 const TabCheck = (setBlockui) => {
   const storage_Handler = (e) => {
-    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport') || window.location.pathname.includes('/viewReports') || window.location.pathname.includes('/profile')) return false;
+    if (window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/reports') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport') || window.location.pathname.includes('/viewReports') || window.location.pathname.includes('/profile')) return false;
     // if tabGUID does not match then more than one tab and GUID
     if (e.key === 'tabUUID' && e.oldValue !== '') {
       if (e.oldValue !== e.newValue) {

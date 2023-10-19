@@ -18,6 +18,15 @@ const initialState = {
         password:'',
         url:''
     },
+    saucelabsInitialState:{
+            username: '',
+            url: '',
+            accesskey: '',
+    },
+    browserstackInitialState:{
+        username: '',
+        accesskey: ''
+    },
     selectedProject:'',
     selectedIssue:'',
     selectedZTCDetails: {
@@ -45,6 +54,47 @@ const initialState = {
     enableSaveButton:false
 }
 
+// const saucelabsInitialState = {
+//     username: '',
+//     url: '',
+//     accesskey: '',
+//   };
+
+//   export const saucelabsSlice = createSlice({
+//     name: 'saucelabs',
+//     initialState: saucelabsInitialState,
+//     reducers: {
+//       setUsername: (state, action) => {
+//         state.username = action.payload;
+//       },
+//       setURL: (state, action) => {
+//         state.url = action.payload;
+//       },
+//       setAccesskey: (state, action) => {
+//         state.accesskey = action.payload;
+//       },
+//     },
+//   });
+
+//   const browserstackInitialState = {
+//     username: '',
+//     accesskey:''
+//   };
+
+//   export const browserstackSlice = createSlice({
+//     name: 'browserstack',
+//     initialState: browserstackInitialState,
+//     reducers: {
+//       setUsername: (state, action) => {
+//         state.username = action.payload;
+//       },
+     
+//       setAccesskey: (state, action) => {
+//         state.accesskey = action.payload;
+//       },
+//     },
+//   });
+
 export const settingSlice=createSlice({
     name:'setting',
     initialState,
@@ -55,6 +105,14 @@ export const settingSlice=createSlice({
         IntergrationLogin:(state,action) => {
             const { fieldName, value } = action.payload;
             state.intergrationLogin[fieldName] = value;
+        },
+        saucelabsInitialState:(state,action) => {
+            const { fieldName, value } = action.payload;
+            state.saucelabsInitialState[fieldName] = value;
+        },
+        browserstackInitialState:(state,action) => {
+            const { fieldName, value } = action.payload;
+            state.browserstackInitialState[fieldName] = value;
         },
         resetIntergrationLogin: (state) => {
             state.intergrationLogin = initialState.intergrationLogin;
@@ -132,6 +190,20 @@ export const settingSlice=createSlice({
         }
     }
 })
+
+// export const {
+//     setUsername: setUsernameSaucelabs,
+//     setURL: setURLSaucelabs,
+//     setAccesskey: setAccesskeySaucelabs,
+//   } = saucelabsSlice.actions;
+  
+//   export const {
+//     setUsername: setUsernameBrowserstack,
+//     setAccesskey: setAccesskeyBrowserstack,
+//   } = browserstackSlice.actions;
+
+//   export const saucelabsReducer = saucelabsSlice.reducer;
+//   export const browserstackReducer = browserstackSlice.reducer;
 // export all the action creators
 export const { 
     screenType,
@@ -151,6 +223,8 @@ export const {
     zephyrLogin,
     resetZephyrLogin,
     AzureLogin,
+    saucelabsInitialState,
+    browserstackInitialState,
     checkedTCPhaseIds,
     checkedTcIds,
     checkedTCNames,

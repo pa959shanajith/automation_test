@@ -1,5 +1,13 @@
 @import "../../global/styles/ColorVariables.scss";
 .Project_Display {
+  height: 100%;
+  width: 100%;
+  
+  .p-toggleable-content{
+    width: 100% !important;
+    height: 94% !important;
+  }
+
   .p-panel-content {
     border: none !important;
   }
@@ -11,14 +19,14 @@
 
   .Project-search {
     position: relative !important;
-    left: 0rem;
     bottom: 0.8rem;
+    height: 6vh;
+    width: 100%;
   }
 
   .Project_Display_Nav {
     display: flex;
     flex-direction: column;
-    width: 19rem;
   }
 
   #Last_modifie {
@@ -36,7 +44,7 @@
     cursor: pointer;
     display: flex;
     padding: 0.5rem;
-    width: 20rem;
+    width: 100%;
     flex-wrap: wrap;
     overflow-x: hidden;
   }
@@ -65,12 +73,12 @@
     color: rgba(0, 0, 0, 0.4);
     font: $f7_regular;
     margin-left: 1.5rem;
-    max-width: 17.8rem;
+    max-width: 90%;
     display: flex;
   }
 
   .Search_name {
-    width: 20rem !important;
+    width: 100% !important;
     background: #FAFAFB !important;
     border: none !important;
     font: $f6_regular;
@@ -78,7 +86,8 @@
 
   .project {
     overflow-y: auto;
-    max-height: 33rem;
+    height: 70vh;
+    overflow-x: hidden;
   }
 
   .p-menuitem-icon-left {
@@ -87,6 +96,8 @@
   }
 
   .Project_header {
+    height: 6%;
+    width: 100%;
     .sort-Menu {
       position: absolute;
       z-index: 1;
@@ -117,7 +128,7 @@
 
     .All_Project_font {
       color: rgba(3, 2, 41, 0.6);
-      width: 12rem;
+      width: 100%;
       font: $f6_regular;
     }
 
@@ -143,7 +154,6 @@
     .add_sort_btn {
       display: flex;
       flex-direction: row-reverse;
-      margin-left: 3.5rem;
     }
     .card__add {
       height: 11%;

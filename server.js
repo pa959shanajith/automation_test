@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-		var redisStore = require('connect-redis')(sessions);
+				var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -162,7 +162,7 @@ if (cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 			}
-			return next();
+						return next();
 		});
 
 		app.use(function(req, res, next) {
@@ -245,6 +245,7 @@ if (cluster.isMaster) {
 		var mindmap = require('./server/controllers/mindmap');
 		var admin = require('./server/controllers/admin');
         var designscreen = require('./server/controllers/designscreen');
+		var browserstack = require('./server/controllers/browserstack');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -261,6 +262,7 @@ if (cluster.isMaster) {
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
+		app.post('/updateTestSuiteInUseBy',designscreen.updateTestSuiteInUseBy)
 		app.post('/updateE2E', mindmap.updateE2E);
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
@@ -269,7 +271,7 @@ if (cluster.isMaster) {
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.get('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.use(csrf({
-			cookie: true
+		cookie: true
 		}));
 
 		app.all('*', function(req, res, next) {
@@ -718,10 +720,16 @@ if (cluster.isMaster) {
 		app.post('/manageSaucelabsDetails', auth.protect, admin.manageSaucelabsDetails);
 		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
 
-		// Added Report API's
-		app.get('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
-		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
+		  //Browserstack API's
+		app.post('/getDetails_BROWSERSTACK', auth.protect, admin.getDetails_BROWSERSTACK);
+		app.post('/manageBrowserstackDetails', auth.protect, admin.manageBrowserstackDetails);
+		app.post('/saveBrowserstackData', auth.protect, browserstack.saveBrowserstackData);
 
+		// Added Report API's
+		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
+		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
+		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
+		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
 

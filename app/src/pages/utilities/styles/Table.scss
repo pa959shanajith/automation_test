@@ -13,8 +13,9 @@
 }
 .dt__min{
     min-height: 0;
-    width: 100%;
-    height: 100%
+    min-width: 20rem;
+    height: 100%;
+    overflow-x: autos;
 }
 .dt__con{
     display: flex;
@@ -39,59 +40,42 @@
     position: relative;
     left: 1rem;
 }
-
-.full__dt {
-    height: 100%;
-    width: 90%;
-}
-
-
-
-
 // HEADERS CSS
 
 
-.dt__table_header { 
-    display: flex;
-    font: $f6_regular;
-    font-size: 17px;
+.dt__table_header {
     color: gray;
     cursor: pointer;
-    width: 100%;
-    height: 30px;
-    overflow: hidden;
+    display: flex;
+    font: 400 1rem/1.5rem Open Sans;
+    font-size: 17px;
+    height: 32px;
 }
 
 .dt__headersMainContainer {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .dt__headersScrollContainer {
-    position: relative;
-    height: 31px;
+    height: 100%;
+    overflow-x: auto;
     width: 100%;
-    overflow: hidden;
-    margin-bottom: 2px;
+    overflow-y: auto;
 }
 
 .dt__Scroller {
-    position: absolute;
-    right: 0; 
-    left: 0; 
-    overflow: hidden;
+    max-width: 100%;
 }
 
 .dt__numberColumnContainer{
     display: flex;
     flex-direction: column;
-    height: 102%;
 }
 
 .dt__numberColScrollContainer {
-    position: relative;
-    height: 100%;
-    overflow: hidden;
+        overflow-y: auto;
 }
 
 .dt__table_numbered_column_header{
@@ -99,9 +83,22 @@
     min-height: 29px;
 }
 
+.dt__table_numbered_column_header{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3vw;
+    height: 100%;
 
+    &:first-child{
+        border-right: 0.25px solid gray
+    }
+    &:last-child{
+        border-left: 0.25px solid gray;
+    }
+}
 
-.dt__table_numbered_column_header, .dt__table_new_column_header{
+ .dt__table_new_column_header{
     display: flex;
     flex-basis: 40px;
     min-width: 40px;
@@ -122,7 +119,6 @@
 
 .dt__table_header_cells { 
     display: flex;
-    flex-grow:1;
 }
 
 
@@ -131,9 +127,7 @@
 .dt__table_row{
 
     display: flex;
-    min-width: fit-content;
-    width: 123.5%;
-    min-height: 37px;
+    height: 5.15vh;
 
     textarea{
         resize: none;
@@ -147,11 +141,15 @@
 }
 
 .dt__cell{
-    width: 100%;
+    // width: 100%;
     min-width: 100px;
     border:  1px solid gray;
     display: flex;
     justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 15px;
 }
 
 .dt__subHeader {
@@ -169,11 +167,6 @@
     overflow-wrap: anywhere;
 }
 
-.dt__table_AddRow{
-    min-height: 35px;
-    margin-bottom: 10px;
-}
-
 .dt__ghost_header{
     opacity: 0.5;
 }
@@ -187,13 +180,11 @@
 
 .dt__table_numbered_column, .dt__table_add_column {
     display: flex;
-    min-width: 40px;
     align-items: center;
     justify-content: center;
 }
 
 .dt__table_numbered_column{
-    // color:#e9ecef;
     min-height: 37px;
     border-top: 1px solid gray;
     border-bottom: 1px solid gray;
@@ -251,4 +242,7 @@
   cursor: grabbing;
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
+}
+.table__utility{
+    width: 100%;
 }

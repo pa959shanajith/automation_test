@@ -19,6 +19,7 @@ import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks 
 import AvoInput from "../../../globalComponents/AvoInput";
 import AvoModal from "../../../globalComponents/AvoModal";
 import { Toast } from "primereact/toast";
+import { Tooltip } from 'primereact/tooltip';
 
 const ScheduleScreen = ({
   cardData,
@@ -26,6 +27,8 @@ const ScheduleScreen = ({
   setStartDate,
   endDate,
   setEndDate,
+  recurEvery,
+  setRecurEvery,
   startTime,
   setStartTime,
   selectedPattren,
@@ -166,7 +169,7 @@ const ScheduleScreen = ({
       WY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
-            Recur every <InputText title="Enter after every how many week(s) you wish it to recur"   keyfilter={/^[0-9]+$/} /> week(s) on:
+            Recur every <InputText title="Enter after every how many week(s) you wish it to recur" value={recurEvery} onChange={(e) => setRecurEvery(e.target.value)} keyfilter={/^[0-9]+$/} /> week(s) on:
           </div>
           <div className="flex flex-wrap">
             {scheduleWeeks.map((el) => (
@@ -394,6 +397,7 @@ const ScheduleScreen = ({
                           {el.status}
                         </Link>
                         {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
+                        <Tooltip target=".pi-trash"  position="bottom" content="Click here to delete this scheduled execution." />
                       </div>
                     ),
                     target:
@@ -464,7 +468,7 @@ const ScheduleScreen = ({
               <Column
                 align="center"
                 field="target"
-                header="Envrionment"
+                header="Environment"
               ></Column>
               <Column
                 align="center"

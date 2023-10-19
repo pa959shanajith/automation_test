@@ -45,7 +45,9 @@
             border: 1px solid #dee2e6;
         }
     }
-    
+    .ruleMap_table {
+        height: 50vh;
+    }
     .ViewTableOnClose{
         bottom: 1.5rem;
         max-height: 46vh;
@@ -111,7 +113,7 @@
     .avo_multiselect {
         width: 100%;
         .p-multiselect {
-            padding: 0.4rem;
+           padding: 0.3rem;
         }
     }
 }

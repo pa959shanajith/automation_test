@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserDetails } from '../api';
 import IceProvisionForm from '../components/IceProvisionForm';
 import IceProvisionList from '../components/IceProvisionList';
-
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 /*Component IceProvision
   use: defines Admin middle Section for Ice Provision
   props: resetMiddleScreen and setMiddleScreen (for admin), resetMiddleScreen, setMiddleScreen, userConfig, userID, username (for settings home)
@@ -27,6 +28,7 @@ const IceProvision = (props) => {
   const [defaultICE, setDefaultICE] = useState('');
   const editUser = useSelector(state => state.admin.editUser);
   const userName = useSelector(state => state.admin.userName);
+  const type = useSelector(state => state.admin.type);
 
   useEffect(() => {
     setOp('normal');
@@ -73,29 +75,25 @@ const IceProvision = (props) => {
   //   }
   // },[])
 
-  const refreshIceProvision = () =>{
-      setIcelist([]);
-      setIcename('');
-      setRefreshIceList((prevRefreshIceList)=>(!prevRefreshIceList))
-      setSelectProvisionType(!selectProvisionType);
+  const refreshIceProvision = () => {
+    setIcelist([]);
+    setIcename('');
+    setRefreshIceList((prevRefreshIceList) => (!prevRefreshIceList))
+    setSelectProvisionType(!selectProvisionType);
   }
 
   return (
     <div className="ip_container">
-      {/* <div id="page-taskName"><span>ICE Provision</span></div> */}
-      {/* <div className="adminActionBtn">
-                {!props.userConfig && <button className="a__btn pull-right" onClick={()=>{setRunProvisionsIce(!runProvisionsIce)}}  title="Provision">Provision</button>}
-                <button className="a__btn pull-right adminBtn-ice-provision " onClick={()=>{refreshIceProvision()}} title="Refresh">Refresh</button>            
-            </div> */} 
       <div className="ip-content_wrapper">
-        <IceProvisionForm  defaultICE={defaultICE} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList}
+        {(type === "inhouse") && <IceProvisionForm defaultICE={defaultICE} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList}
           op={op} setOp={setOp} runProvisionsIce={runProvisionsIce} selectProvisionType={selectProvisionType}
           setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token}
           setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid}
           tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken}
-          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess} edit={props.editUserIceProvision} toast={props.toast}/>
-        {editUser ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE}
-          userConfig={props.userConfig} 
+          setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess}
+          edit={props.editUserIceProvision} toast={props.toast} />}
+        {(type === "inhouse" && editUser) ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE}
+          userConfig={props.userConfig}
           refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp}
           setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist}
           token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid}
@@ -103,6 +101,23 @@ const IceProvision = (props) => {
           tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken} edit={props.editUserIceProvision}
           toastError={props.toastError} toastSuccess={props.toastSuccess} toast={props.toast}
         /> : null}
+        {type === 'ldap' && <div>
+          <DataTable value={props.ldapSelectedUserList} editMode="row" size='normal'
+            // loading={loading}
+            // globalFilter={globalFilter}
+            // header={header}
+            emptyMessage="No users found"
+            scrollable
+            // scrollHeight='60vh'
+            showGridlines>
+            <Column field="name" header="User Name" style={{ width: '20%' }}></Column>
+            <Column field="role" header="Role" style={{ width: '20%' }}></Column>
+            {/* <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column> */}
+            {/* <Column field="email" header="Email" className='table_email'></Column> */}
+            {/* <Column field="role" header="Role" style={{ width: '20%' }}></Column> */}
+            {/* <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column> */}
+          </DataTable>
+        </div>}
       </div>
     </div>
   );

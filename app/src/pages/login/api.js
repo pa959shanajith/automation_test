@@ -34,6 +34,7 @@ export const checkUser = async(user) => {
     try{
         const res = await axios(url+"/checkUser", {
             method: "POST",
+            referrerPolicy: 'no-referrer-when-downgrade',
             headers: {
                 "Content-type": "application/json"
             },

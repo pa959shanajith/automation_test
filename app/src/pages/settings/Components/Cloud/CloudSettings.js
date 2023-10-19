@@ -10,6 +10,8 @@ import {Messages as MSG, setMsg} from '../../../global';
 import ScreenOverlay from '../../../global/components/ScreenOverlay';
 import { Toast } from "primereact/toast";
 import { saveSauceLabData } from '../../../execute/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { screenType, saucelabsInitialState,browserstackInitialState} from '../../settingSlice';
 
 
 
@@ -33,6 +35,15 @@ const CloudSettings = () => {
     const [uploadapk, setUploadapk ] = useState('');
     const [apkname, setapkname] = useState('');
     const [uploadapkValues, setUploadapkfile] = useState({});
+
+    useEffect(() => {
+        getSaucelabsDetails();
+    }, []); 
+    
+    const dispatchAction = useDispatch();
+    const selectedscreen = useSelector(state => state.setting.screenType);
+    const saucelablogin = useSelector(state=>state.setting.saucelabsInitialState);
+    const browserstack = useSelector(state=>state.setting.browserstackInitialState);
     
 
 
@@ -60,6 +71,31 @@ const CloudSettings = () => {
         } catch (error) {
             ;
         }
+    }
+
+    const handleLogin = (name, value) => {
+        switch (selectedscreen.name) {
+            case 'saucelab':
+                dispatchAction(saucelabsInitialState({ fieldName: name, value }));
+                break;
+            case 'browserstack':
+                dispatchAction(browserstackInitialState({ fieldName: name, value }));
+                break;
+            // case 'Azure DevOps':
+            //     dispatchAction(AzureLogin({ fieldName: name, value }));
+            //     break;
+            // case 'ALM':
+            //     break;
+            // case 'qTest':
+            //     break;
+            default:
+                break;
+        }
+
+    }
+
+    const handleScreenType = (value) => {
+        dispatchAction(screenType(value))
     }
 
     const toastError = (erroMessage) => {
@@ -188,48 +224,57 @@ const CloudSettings = () => {
         {loading ? <ScreenOverlay content={loading} /> : null}
         <div className="login_container_integrations">
                 <div className="side-panel">
-                    <div className="icon-wrapper" >
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'saucelab' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'saucelab', code: 'sl' })} >
                         <span><img src="static/imgs/Saucelabs-1.png" className="img__saucelabs"></img></span>
                         <span className="text__jira">sauceLabs configuration</span>
                     </div>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'brwoserstack' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'browserstack', code: 'st' })}>
+                        <span><img src="static/imgs/Saucelabs-1.png" className="img__saucelabs"></img></span>
+                        <span className="text__jira">sauceLabs text</span>
+                    </div>
                 </div>
-            </div>
+        </div>
          
 
                 
-
+            
             <Card className="card__login__cloud">
+            {selectedscreen.name==="saucelab" ?( 
+            <div>
                 <div className="input-cls1">
                     <span>SauceLab Remote URL <span style={{ color: 'red' }}>*</span></span>
                     <span style={{ marginLeft: '1.5rem' }}>
-                        <InputText  style={{ width: '25rem', height: '2.5rem' }} data-test="url-test" type="text" id="Saucelabs-URL" placeholder="Enter SauceLabs Remote URL" className={`${classes["Saucelabs-url"]} ${classes["all-inputs"]} ${!isValidURL ? classes["invalid"] : ""}`} value={SaucelabsURL} onChange={(event) => { setSaucelabsURL(event.target.value) }}  />
+                        <InputText  style={{ width: '25rem', height: '2.5rem' }} data-test="url-test" type="text" id="Saucelabs-URL" placeholder="Enter SauceLabs Remote URL" className={`${classes["Saucelabs-url"]} ${classes["all-inputs"]} ${!isValidURL ? classes["invalid"] : ""}`} value={SaucelabsURL} onChange={(e) => handleLogin('url', e.target.value)} />
                         {/* <label htmlFor="username">Username</label> */}
                     </span>
                 </div>
                 <div className="input-cls1">
                     <span>SauceLabs Username <span style={{ color: 'red' }}>*</span></span>
                     <span style={{ marginLeft: '1.5rem' }}>
-                        <InputText  style={{ width: '25rem', height: '2.5rem', marginLeft:'0.8rem' }} data-test="username-test" type="text" id="Saucelabs-username" placeholder="Enter SauceLabs Username" className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidUsername ? classes["invalid"] : ""}`} value={SaucelabsUsername} onChange={(event) => { setSaucelabsUsername(event.target.value) }} />
+                        <InputText  style={{ width: '25rem', height: '2.5rem', marginLeft:'0.8rem' }} data-test="username-test" type="text" id="Saucelabs-username" placeholder="Enter SauceLabs Username" className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidUsername ? classes["invalid"] : ""}`} value={SaucelabsUsername} onChange={(e) => handleLogin('name', e.target.value)} />
                         {/* <label htmlFor="username">Username</label> */}
                     </span>
                 </div>
                 <div className="input-cls1">
                     <span>SauceLabs Access Key <span style={{ color: 'red' }}>*</span></span>
                     <span style={{ marginLeft: '1.5rem' }}>
-                        <InputText  style={{ width: '25rem', height: '2.5rem',marginLeft:'0.4rem' }} data-test="api-test" type="text" id="Saucelabs-API" placeholder="Enter SauceLabs Access Key" className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidAPI ? classes["invalid"] : ""}`} value={SaucelabsAPI} onChange={(event) => { setSaucelabsAPI(event.target.value) }}  />
+                        <InputText  style={{ width: '25rem', height: '2.5rem',marginLeft:'0.4rem' }} data-test="api-test" type="text" id="Saucelabs-API" placeholder="Enter SauceLabs Access Key" className={`${classes["first_name"]} ${classes["all-inputs"]} ${!isValidAPI ? classes["invalid"] : ""}`} value={SaucelabsAPI} onChange={(e) => handleLogin('api', e.target.value)}  />
                         {/* <label htmlFor="username">Username</label> */}
                     </span>
                 </div>
                 <div className="login__div" style={{ marginBottom: '15px' }}>
-                <Button  onClick={(event) => {SubmitHandler(event);event.preventDefault(event);}} className="saucelabs-action">
-                {/* <Button  onClick={(e)=>SubmitHandler(e)} className="saucelabs-action"> */}
-                {createSaucelabs?'Create':'Update'}
-                </Button>
-                <Button data-test="delete-test"  className="saucelabs-delete" onClick={(e)=>{e.preventDefault();setShowDelete(true);}}>Delete</Button>
+                    <Button  onClick={(event) => {SubmitHandler(event);event.preventDefault(event);}} className="saucelabs-action">
+                    {/* <Button  onClick={(e)=>SubmitHandler(e)} className="saucelabs-action"> */}
+                    {createSaucelabs?'Create':'Update'}
+                    </Button>
+                    <Button data-test="delete-test"  className="saucelabs-delete" onClick={(e)=>{e.preventDefault();setShowDelete(true);}}>Delete</Button>
                 </div>
+            </div>):""}
+            {selectedscreen.name==="saucelab" && (
+            <div>
                 <div>
-                <hr /> {/* Add this line to create a horizontal line */}
-                <span style={{ fontWeight: 'bold' }}> Native Mobile Test App Resources </span>
+                    <hr /> {/* Add this line to create a horizontal line */}
+                    <span style={{ fontWeight: 'bold' }}> Native Mobile Test App Resources </span>
                 </div>
                 <Toast ref={toast} position="bottom-center" />
                 <div className="apk__name">
@@ -239,8 +284,10 @@ const CloudSettings = () => {
                     <div className="apk__path">
                         <InputText style={{ width: '20rem', height: '2.5rem' }} type="text" id="Saucelabs-APK" placeholder="Enter apk Path" className={`${classes["first_name"]} ${classes["all-inputs"]}`} value={uploadapk} onChange={saucelabapkuploadhandler} disabled={!apkname} />&#160;
                         {isUploadButtonVisible && <Button data-test="upload-btn"  className="action-button" onClick={(event)=>handleUpload(event)}>Upload</Button>}
-                        </div>    
+                    </div>    
                 </div>
+            </div>
+            )} 
 
             </Card>
           

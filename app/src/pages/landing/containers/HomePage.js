@@ -12,9 +12,9 @@ const HomePage = () => {
     navigate= useNavigate();
 
     useEffect(() => {
-        if (window.localStorage['navigateScreen'] !== "landing") {
-            RedirectPage(navigate, { reason: "screenMismatch" });
-        }
+        // if (window.localStorage['navigateScreen'] !== "landing") {
+        //     RedirectPage(navigate, { reason: "screenMismatch" });
+        // }
     }, []);
 
     const toastError = (erroMessage) => {

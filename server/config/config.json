@@ -30,7 +30,7 @@
         "itdm":"https://google.com"
     },
     "avoClientConfig":{
-        "avoclientpath_Windows": "",
+        "avoclientpath_Windows": "D:/Modish UI/WebServer/server/config/options.js",
         "avoclientpath_Catalina":"",
         "avoclientpath_BigSur":"",
         "avoclientpath_Monterey":"",

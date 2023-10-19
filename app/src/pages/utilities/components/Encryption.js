@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Dropdown } from 'primereact/dropdown';
-import "../styles/Leftbar.scss";
+import "../styles/LeftBar.scss";
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 
@@ -72,6 +72,11 @@ const Encrypt = (props) => {
                         value={props.encryptedData}
                     /> */}
                 </div>
+               
+            </div>
+            <div>
+              <label className='notelabel'>Note:</label>
+                <p className='notecontent'> Avo Assure uses <strong> AES </strong>  encryption for all secure text keywords and <strong> MD5 </strong>encryption for API digital signatures</p>
             </div>
 
         </Fragment>)
