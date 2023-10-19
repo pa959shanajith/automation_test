@@ -120,12 +120,27 @@ export default function BasicDemo() {
   }, [accessibilityId]);
 
   useEffect(() => {
-    setInputSummary(selectedRow[0]?.Comments);
+    setInputSummary(selectedRow[0]?.StepDescription);
     setConfigValues({
       ...configValues,
-      Summary: selectedRow[0]?.Comments,
+      Summary: selectedRow[0]?.StepDescription,
     });
-    setInputDesc(selectedRow[0]?.StepDescription);
+    // Description should include all steps till the selected step.
+    let description = "";
+    if(selectedRow.length > 0) {
+      let newDesc = [];
+      let slNo = parseInt(selectedRow[0]?.id);
+      let foundStep = reportData?.rows.find((item)=> item.id === slNo)
+      if (foundStep){
+          for (let i=0; i<reportData?.rows.length; i++) {
+              newDesc.push(reportData?.rows[i]?.StepDescription);
+              if (reportData?.rows[i]?.id === foundStep.id) break;
+          }
+      }
+      description = newDesc.join("\n\n");
+      console.log(description);
+    }
+    setInputDesc(description);
   }, [selectedRow]);
 
   useEffect(() => {
@@ -304,6 +319,7 @@ export default function BasicDemo() {
                 executionId: reportData?.overallstatus?.executionId,
                 ...(!!Object.keys(configValues).length && valueObj),
                 executionReportNo: `Execution No: ${executed}`,
+                ...(getItemType()?.itemId && { mappedItem: getItemType()?.itemId }),
               },
               action: "createIssueInJira",
             })
@@ -609,14 +625,25 @@ export default function BasicDemo() {
   }
 
   useEffect(() => {
+    const getState = { ...configValues };
+    const isAttachedArr = configureFeilds.filter((val) => val.name === "Attachment")
+    if(!!isAttachedArr.length) {
+      getState.Attachment = selectedRow[0]?.screenshot_path;
+    }else if(getState?.Attachment){
+      delete getState?.Attachment;
+    }
+    setConfigValues(getState);
+  }, [configureFeilds]);
+
+  useEffect(() => {
     if(jiraDropDown && issueDropDown){
       setConfigureFeilds([]);
-      setInputSummary(selectedRow[0]?.Comments);
+      setInputSummary(selectedRow[0]?.StepDescription);
       if (bugTitle === "Jira") {
         setConfigValues({
           ...configValues,
-          Summary: selectedRow[0]?.Comments,
-          Attachment: selectedRow[0]?.screenshot_path
+          Summary: selectedRow[0]?.StepDescription,
+          // ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
         });
       } else {
         setConfigValues({});
@@ -706,13 +733,16 @@ export default function BasicDemo() {
     if(mappedProjects?.itemCode){
       itemObj.itemId = mappedProjects?.itemCode;
       itemObj.itemDesc = mappedProjects?.itemSummary;
-    } else if(mappedProjects?.TestSuiteId){
+    } else if(mappedProjects?.TestCaseId){
+      itemObj.itemId = mappedProjects?.TestCaseId;
+      itemObj.itemDesc = mappedProjects?.testCaseSummary;
+    }else if(mappedProjects?.TestSuiteId){
       itemObj.itemId = mappedProjects?.TestSuiteId;
       itemObj.itemDesc = mappedProjects?.testSuiteSummary;
     } else if(mappedProjects?.userStoryId){
       itemObj.itemId = mappedProjects?.userStoryId;
       itemObj.itemDesc = mappedProjects?.userStorySummary;
-    }
+    } 
     return itemObj;
   };
 
@@ -1159,7 +1189,7 @@ export default function BasicDemo() {
                         className="text_desc"
                         rows={1}
                         name={el.name}
-                        value={configValues[el.name]}
+                        value={(el.name === "Attachment" && selectedRow[0]?.screenshot_path) ? selectedRow[0]?.screenshot_path : configValues[el.name]}
                         onChange={(e) => handleConfigValues(e)}
                         disabled={(el.name === "Attachment" && selectedRow[0]?.screenshot_path)}
                       />

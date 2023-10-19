@@ -284,7 +284,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             value={selectedPlatforms}
                             valueTemplate={selectedPlatforms}
                             // width='15rem'
-                            placeholder='select Platform'
+                            placeholder='Select Platform'
                             className='saucelab_dropDown'
                             optionLabel='key'
                         />
@@ -299,7 +299,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                         value={selectedOS}
                         valueTemplate={selectedOS}
                         // width='15rem'
-                        placeholder='select OS'
+                        placeholder='Select OS'
                         optionLabel='key'
                         className='saucelab_dropDown'
                         // calloutMaxHeight='12rem'
@@ -319,7 +319,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             optionLabel='key'
                             className='saucelab_dropDown'
                             // width='15rem'
-                            placeholder='select Browser'
+                            placeholder='Select Browser'
                             // calloutMaxHeight='12rem'
                         />
                     </>}
@@ -336,7 +336,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             optionLabel='key'
                             valueTemplate={selectedMobileVersion}
                             // width='15rem'
-                            placeholder={'select ' + selectedPlatforms + ' versions'}
+                            placeholder={'Select ' + selectedPlatforms + ' Versions'}
                             className='saucelab_dropDown'
                             // calloutMaxHeight='12rem'
                         />
@@ -356,7 +356,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             className='saucelab_dropDown'
                             optionLabel='key'
                             // width='15rem'
-                            placeholder='select Versions'
+                            placeholder='Select Versions'
                             // calloutMaxHeight='12rem'
                         />
                     </>}
@@ -389,7 +389,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                             options={mobileDetails?.stored_files && mobileDetails?.stored_files.map((el) => ({ key: el?.name, text :el?.appPackageName, title: el?.name, index: el?.id }))}
                             value={selectApk}
                             // valueTemplate={selectApk}
-                            placeholder='select apk'
+                            placeholder='Select apk'
                             optionLabel='key'
                             className="w-full md:w-10rem"
                         />
@@ -469,10 +469,10 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                     autoFocus />
 
 
-                <Button id='Saucelabs_cancel' text  size='small' className='Saucelabs_cancel' label="Cancel"  onClick={() => onHidedia('displayBasic5')} />
+                <Button id='Saucelabs_cancel' text  size='small' className='Saucelabs_cancel' label="Cancel"  onClick={() => onHidedia('displayBasic4')} />
 
             </>
-            } headerTxt='Saucelabs Integration' modalSytle={{
+            } headerTxt='SauceLabs Integration' modalSytle={{
                 width: "38vw",
                 height: "67vh",
                 background: "#FFFFFF",
