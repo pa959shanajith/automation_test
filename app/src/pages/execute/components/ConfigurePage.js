@@ -216,6 +216,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
 
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
   }, [selectProjects]);
@@ -2247,6 +2249,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
+            disabled={userInfo.rolename.trim()==="Quality Engineer"}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2281,7 +2284,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small" >
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo.rolename.trim() === "Quality Engineer"}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>

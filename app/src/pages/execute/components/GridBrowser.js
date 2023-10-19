@@ -53,7 +53,10 @@ const GridBrowser = ({
       return 'qTest';
     } else if (integrationData?.zephyr?.url) {
       return 'Zephyr';
-    } else {
+    } else if (integrationData?.azure?.url) {
+      return 'Azure';
+    }
+     else {
       return 'None';
     }
   };
@@ -62,7 +65,7 @@ const GridBrowser = ({
   // const[isNotifyOnExecutionCompletion,setIsNotifyOnExecutionCompletion]=useState('');
   const toast = useRef(null);
 
-  const tools = [
+  const integrationList = [
     { name: 'ALM' },
     { name: 'qTest' },
     { name: 'Zephyr' },
@@ -171,7 +174,7 @@ const GridBrowser = ({
                 setSelectedTool(selectedIntegration.value)
                 syncScenarioChange(selectedIntegration.value.name)
               }}
-              options={tools}
+              options={integrationList}
               optionLabel="name"
               placeholder="Select Integration"
               valueTemplate={selectedToolTemplate}
