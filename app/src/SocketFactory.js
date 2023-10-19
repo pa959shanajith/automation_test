@@ -71,7 +71,7 @@ const SocketFactory = () => {
     }, [socket])
 
     useEffect(() => {
-        var userName = Buffer.from((userInfo && userInfo.username) ? userInfo.username : uuid()).toString('base64')
+        var userName = Buffer.from(((userInfo && userInfo.username) ? userInfo.username:(localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).username:uuid())) ).toString('base64')
         var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: { check: 'notify', key: userName } });
         dispatch(loadUserInfoActions.setSocket(socket));
         return (() => {
