@@ -3,7 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useDispatch, useSelector } from 'react-redux';
-import { IntergrationLogin, zephyrLogin, AzureLogin, screenType } from '../settingSlice';
+import { IntergrationLogin, zephyrLogin, AzureLogin, screenType, resetZephyrLogin, resetIntergrationLogin, resetAzureLogin } from '../settingSlice';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
@@ -18,6 +18,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { Messages as MSG } from '../../global/components/Messages';
 import { RedirectPage, ScreenOverlay,ResetSession,setMsg, VARIANT} from '../../global';
 import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR} from "../api"
+import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
 
 
@@ -39,6 +40,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     const [checked, setChecked] = useState(false);
     const [loading, setLoading] = useState(false)
     const [isEmpty, setIsEmpty] = useState(true);
+    const [showModal,setShowModal] = useState(false);
 
 
     
@@ -253,6 +255,43 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
          setDisableFields(false);
     }
 
+    const confirmPopupMsg = (
+        <div> <p>Are you sure you want to delet the saved credentials</p></div>
+      )
+
+
+      const deleteHandler = async() => {
+        if(!isEmpty){
+           switch (selectedscreen.name) {
+            case 'Jira':
+                var data = await manageJiraDetails("delete", {});
+                if(data.error){
+                    toastError(data.error);
+                    return;
+                }
+                dispatchAction(resetIntergrationLogin());
+                setIsEmpty(true);
+                toastSuccess("Successfully deleted the credentials")
+           case 'Zephyr':
+                var data = await manageZephyrDetails("delete", {});
+                if(data.error){
+                    toastError(data.error);
+                    return;
+                }
+                dispatchAction(resetZephyrLogin())
+                setIsEmpty(true);
+                toastSuccess("Successfully deleted the credentials")
+            case 'Azure DevOps':
+                    var data = await manageAzureDetails("delete", {});
+                    if(data.error){
+                        toastError(data.error);
+                        return;
+                    }
+                    dispatchAction(resetAzureLogin())
+                    setIsEmpty(true);
+                    toastSuccess("Successfully deleted the credentials")
+           }
+        }}
 
     return (
         <>
@@ -374,10 +413,11 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                     </span>
                                 </div>
                                 <div className="login__div">
-                                      <Checkbox className="checkbox_cred" onChange={e => setChecked(e.checked)} checked={checked}></Checkbox>
-                                      <span className="credentials__txt">{isEmpty?"Save":"Update"} the credentials</span>
+                                      {!isEmpty ? <Button label="Delete" onClick={()=>setShowModal(true)} severity="danger" /> :""}
+                                      <Checkbox className="checkbox_cred" style={{left:!isEmpty?"1.5rem":"7.5rem"}} onChange={e => setChecked(e.checked)} checked={checked}></Checkbox>
+                                      <span className="credentials__txt" style={{left:!isEmpty?"2rem":"8rem"}}>{isEmpty?"Save":"Update"} the credentials</span>
                                     <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
-                                        onClick={loginHandler} className="login__btn">
+                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"4rem":"11rem"}}>
                                     </Button>
                                 </div>
                             </>)}
@@ -399,11 +439,12 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                 </div>
                                 <div className="login__div">
                                    <div>
-                                     <Checkbox className="checkbox_cred" onChange={e => setChecked(e.checked)} checked={checked}></Checkbox>
-                                     <span className="credentials__txt">{isEmpty?"Save":"Update"} the credentials</span>
+                                    {!isEmpty ? <Button label="Delete" onClick={()=>setShowModal(true)} severity="danger" /> :""}
+                                     <Checkbox className="checkbox_cred" style={{left:!isEmpty?"1.5rem":"7.5rem"}} onChange={e => setChecked(e.checked)} checked={checked}></Checkbox>
+                                     <span className="credentials__txt" style={{left:!isEmpty?"2rem":"8rem"}}>{isEmpty?"Save":"Update"} the credentials</span>
                                    </div>
                                     <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
-                                        onClick={loginHandler} className="login__btn">
+                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"4rem":"11rem"}}>
                                     </Button>
                                 </div>
                             </>)}
@@ -414,6 +455,13 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                 </div>
             </Card>
             {/* <ZephyrContent visible={zephyrVisible} onHide={zephyrhideDialog} selectedscreen={selectedscreen} /> */}
+            <AvoConfirmDialog
+             visible={showModal}
+             onHide={() => setShowModal(false)}
+             showHeader={false}
+             message={confirmPopupMsg}
+             icon="pi pi-exclamation-triangle"
+             accept={()=>deleteHandler()}/>
         </>
     )
 }
