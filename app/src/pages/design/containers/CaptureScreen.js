@@ -65,7 +65,6 @@ const CaptureModal = (props) => {
   const [screenshotData, setScreenshotData] = useState([]);
   const [endScrape, setEndScrape] = useState(false)
   const [showObjModal, setShowObjModal] = useState(false);
-  const userInfo = useSelector((state) => state.landing.userinfo);
   const [showPop, setShowPop] = useState("");
   const [capturedDataToSave, setCapturedDataToSave] = useState([]);
   const [newScrapedCapturedData, setNewScrapedCapturedData] = useState([]);
@@ -118,6 +117,10 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [cordData, setCordData] = useState({});
   const [irisScrapedData, setIrisScrapedData] = useState({});
   let addMore = useRef(false);
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if(!userInfo) userInfo = userInfoFromRedux; 
+  else userInfo = userInfo ;
 
 
   useEffect(() => {

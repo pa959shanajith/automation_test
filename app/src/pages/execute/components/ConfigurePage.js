@@ -139,6 +139,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [recurEvery, setRecurEvery] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [selectedPattren, setSelectedPattren] = useState({});
   const [selectedDaily, setSelectedDaily] = useState(null);
@@ -215,6 +216,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
@@ -517,6 +520,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }
 
   const dialogFuncMap = {
+    'displayModal' : setDisplayModal,
     'displayBasic4' : setDisplayBasic4,
     'displayBasic5' : setDisplayBasic5,
     'displayBasic6' : setDisplayBasic6,
@@ -542,7 +546,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             //     newValues[index] = '';
             //     return newValues;
             //   });
-            setDisplayBasic4(false);
+            // setDisplayBasic4(false);
             handleSubmit1();
             break;
         case 'browserstack':
@@ -691,7 +695,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   // setDisplayBasic4(false);
   // open the new dialog
   setLoading("Fetching details..")
-  // setDisplayBasic4('displayBasic4');
+  setDisplayBasic4('displayBasic4');
   const data1 = await getDetails_SAUCELABS()
   if (data1.error) { setMsg(data1.error); return; }
       if (data1 !== "empty") {
@@ -707,7 +711,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
           
           setLoading(false)
           // setDisplayBasic5(true);
-          setDisplayBasic4('displayBasic4');
+          // setDisplayBasic4('displayBasic4');
           const arrayOS = data.os_names.map((element, index) => {
             return {
               key: element,
@@ -1094,7 +1098,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
             <div className="cloud-test-provider" >
   <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}/>
+  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}   disabled={selectProjects.appType==="Desktop"||selectProjects.appType==="Mainframe"||selectProjects.appType==="OEBS"||selectProjects.appType==="SAP"}/>
   </div> 
           
           </div>
@@ -1533,6 +1537,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setStartDate(null);
       setScheduling(false);
       setEndDate(null);
+      setRecurEvery(null);
       setStartTime(null);
       setScheduleOption({});
       setSelectedDaily(null);
@@ -1602,7 +1607,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             source: "schedule",
             exectionMode: "serial",
             executionEnv: "default",
-            browserType: selectedSchedule?.executionRequest?.browserType,
+            browserType: selectedSchedule?.executionRequest?.browserType ? selectedSchedule?.executionRequest?.browserType : ['1'],
             integration: selectedSchedule?.executionRequest?.integration,
             batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
               ...el,
@@ -1641,6 +1646,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         setScheduling(false);
         setStartDate(null);
         setEndDate(null);
+        setRecurEvery(null);
         setStartTime(null);
         setScheduleOption({});
         setSelectedDaily(null);
@@ -1694,6 +1700,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         setScheduling(false);
         setStartDate(null);
         setEndDate(null);
+        setRecurEvery(null);
         setStartTime(null);
         setScheduleOption({});
         setSelectedDaily(null);
@@ -1707,6 +1714,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setScheduling(false);
       setStartDate(null);
       setEndDate(null);
+      setRecurEvery(null);
       setStartTime(null);
       setScheduleOption({});
       setSelectedDaily(null);
@@ -1996,6 +2004,8 @@ Learn More '/>
                 setStartDate={setStartDate}
                 endDate={endDate}
                 setEndDate={setEndDate}
+                recurEvery={recurEvery}
+                setRecurEvery={setRecurEvery}
                 startTime={startTime}
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
@@ -2246,6 +2256,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
+            disabled={userInfo.rolename.trim()==="Quality Engineer"}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2280,7 +2291,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small" >
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo.rolename.trim() === "Quality Engineer"}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>

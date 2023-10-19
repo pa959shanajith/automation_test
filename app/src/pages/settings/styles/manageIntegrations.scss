@@ -77,6 +77,18 @@ height: 2.5rem !important;
     cursor: pointer;
 }
 
+.checkbox_cred{
+    position: relative;
+    left:7.5rem;
+    bottom: 0.5rem;
+}
+
+.credentials__txt{
+    position: relative;
+    left:8rem;
+    bottom: 0.5rem;
+}
+
 .scenario_label{
     font: $f6_regular !important;
 }
@@ -185,15 +197,10 @@ height: 2.5rem !important;
 .login__div {
 
     .login__btn {
-
         position: relative;
-
         height: 2.5rem !important;
-
         width: 6rem !important;
-
-        left: 21rem;
-
+        left: 11rem;
     }
 
 }
