@@ -663,3 +663,51 @@ export const viewZephyrMappedList_ICE = async(userID) => {
         return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }
 }
+
+export const manageBrowserstackDetails = async(action, userObj) => {
+    try{
+        const res = await axios(url+'/manageBrowserstackDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,user: userObj},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error: {content: "Failed to "+action+" Browserstack Configuration.", variant: VARIANT.ERROR}}
+    }catch(err){
+        console.error(err)
+        return {error:{content: "Failed to "+action+" Browserstack Configuration.", variant: VARIANT.ERROR}}
+    }
+}
+
+export const getDetails_BROWSERSTACK = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_BROWSERSTACK', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
