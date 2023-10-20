@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { Tooltip } from 'primereact/tooltip';
 import PrimeReact from "primereact/api";
 import { Badge } from 'primereact/badge';
@@ -16,6 +16,7 @@ const SideNav = () => {
     const [tabSelected, setTabSelected] = useState("/landing");
     const [disableIconDialogVisible, setDisableIconDialogVisible] = useState(false);
     const [filteredMenuItems, setFilteredMenuItems] = useState([]);
+    const [tabForDashboard, setTabForDashboard] = useState("");
     const recipientEmail = 'support@avoautomation.com';
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -23,9 +24,11 @@ const SideNav = () => {
     if (!userInfo) userInfo = userInfoFromRedux;
     else userInfo = userInfo;
 
-    useEffect(() =>{
+
+
+    useEffect(() => {
         updateNavListItems();
-    },[]);
+    }, []);
 
     const menuItem = [
         {
@@ -34,22 +37,10 @@ const SideNav = () => {
             icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" />,
             disabled: false
         },
-        // {
-        //     path: "/integration",
-        //     name: "Integration",
-        //     icon: <img src={tabSelected==="/integration" ? "static/imgs/integration_icon_selected.svg"  :"static/imgs/integration_icon.svg"} className="icon" data-pr-tooltip=" Configure Avo Assure to integrate with external systems"  data-pr-position="right" height="25px"/>,
-        //     disabled: false
-        // },
         {
             path: "/reports",
             name: "Reports",
             icon: <img src={tabSelected === "/reports" ? "static/imgs/report_icon_selected.svg" : "static/imgs/report_icon.svg"} className="icon" data-pr-tooltip=" View and analyze executed test automations." data-pr-position="right" height="25px" />,
-            disabled: false
-        },
-        {
-            path: "/utility",
-            name: "Utilities",
-            icon: <img src={tabSelected==="/utility" ? "static/imgs/Reports tab.svg" : "static/imgs/Reports tab.svg"} className="icon" data-pr-tooltip=" Manage utilities"  data-pr-position="right" height="25px"/>,
             disabled: false
         },
         {
@@ -61,15 +52,38 @@ const SideNav = () => {
         {
             // path: "/itdm",
             name: "ITDM",
-            icon: <img src= { tabSelected=== "/landing" ?  "static/imgs/ITDM_icon.svg" : "static/imgs/ITDM_icon_selected.svg"} className="icon" data-pr-tooltip="Test Data Management Tool to create, modify and provision data"  data-pr-position="right" height="25px"/>,
+            icon: <img src={tabSelected === "/landing" ? "static/imgs/ITDM_icon.svg" : "static/imgs/ITDM_icon_selected.svg"} className="icon" data-pr-tooltip="Test Data Management Tool to create, modify and provision data" data-pr-position="right" height="25px" />,
             disabled: true
-        }
+        },
+        {
+            // path: "/dashboard",
+            name: "dashboard",
+            icon: <img src={tabForDashboard === "dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon" data-pr-tooltip="Access to Dash board." data-pr-position="right" height="25px" />,
+            disabled: false
+        },
     ]
-    const onTabClickHandler = (event, route, disabled) => {
-        if (!disabled) setTabSelected(route);
+    const onTabClickHandler = (event, route, disabled, name) => {
+        if (!disabled) {setTabForDashboard(name);setTabSelected(route); }
         else {
             setDisableIconDialogVisible(true);
         };
+        if (name === "dashboard") {
+            window.open("/dashboard/#", '_blank');
+            const dataHandledForDashBoard = {
+                login: JSON.stringify({
+                    SR: userInfo.rolename,
+                    userinfo: userInfo,
+                })
+            };
+
+            const finalDataForDashboard = JSON.stringify(dataHandledForDashBoard);  
+            localStorage.setItem("Reduxbackup", finalDataForDashboard);
+            // window.localStorage['Reduxbackup'] = finalDataForDashboard;
+            window.localStorage['persist:login'] = window.localStorage['Reduxbackup']
+            window.localStorage['integrationScreenType'] = null
+            // window.localStorage['navigateScreen'] = 'dashboard';
+            // window.location.href = "/dashboard";
+        }
     }
 
     const itdmDialogHide = () => {
@@ -104,7 +118,7 @@ const SideNav = () => {
                 <div className="sidebar">
                     {
                         filteredMenuItems.map((item, index) => (
-                            <NavLink to={item.path} key={index} onClick={(e) => onTabClickHandler(e, item.path, item.disabled)} className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '') + (item.name === "ITDM" ? 'inactive' : '')} activeclassname={(item.name === "ITDM" ? "inactive" : "active")} end>
+                            <NavLink to={item.path} key={index} onClick={(e) => onTabClickHandler(e, item.path, item.disabled, item.name)} className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '') + (item.name === "ITDM" && item.name === "ITDM" ? 'inactive' : '')} activeclassname={(item.name === "ITDM" || "dashboard" ? "inactive" : "active")} end>
                                 <div className="flex flex-column w-full">
                                     <div className={item.name === "ITDM" ? "flex-row p-overlay-badge itdm_icon" : "icon flex-row p-overlay-badge"}>{item.icon} </div>
                                     <div className={item.name === "ITDM" ? "link_text itdm_icon" : "link_text"}>{item.name}</div>
