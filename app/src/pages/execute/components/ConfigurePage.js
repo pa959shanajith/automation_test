@@ -2105,7 +2105,7 @@ Learn More '/>
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-            // isDisabled={!selectedICE}
+            isDisabled={(radioButton_grid === "Execute with Avo Assure Client" && !selectedICE)}
           />
           <AvoModal
             visible={visible_CICD}

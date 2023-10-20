@@ -832,6 +832,8 @@ setPreventDefaultModule(true);
         )
        }
        const handleReaOnlyTestSuite=async (props)=>{
+        const data = getModules({tab:"createTab", version:0, cycId:null, projectid:props.proj})
+        if(data.length>0){
         let resetInUse=false
         let assignToUser=false
         var reqForCurrentModule={
@@ -880,7 +882,7 @@ setPreventDefaultModule(true);
         }
       
       }   
-      
+    }
       
     return(
         <Fragment>
