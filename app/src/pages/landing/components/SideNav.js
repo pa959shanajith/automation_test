@@ -44,6 +44,12 @@ const SideNav = () => {
             disabled: false
         },
         {
+            path: "/utility",
+            name: "Utilities",
+            icon: <img src={tabSelected==="/utility" ? "static/imgs/Reports tab.svg" : "static/imgs/Reports tab.svg"} className="icon" data-pr-tooltip=" Manage utilities"  data-pr-position="right" height="25px"/>,
+            disabled: false
+        },
+        {
             path: "/admin",
             name: "Admin",
             icon: <img src={tabSelected === "/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/admin_disabled_icon.svg"} className="icon" data-pr-tooltip="Manage/Create users, agents and other advanced configurations." data-pr-position="right" height="25px" />,
