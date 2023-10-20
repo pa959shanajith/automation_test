@@ -86,6 +86,7 @@ const EditIrisObject = props => {
                             props.setShow(false);
                             console.error("ERROR::::", error);
                         });
+                        props.toastSuccess(MSG.SCRAPE.SUCC_OBJ_CHANGE);
                 }
                 else {
                     props.setShow(false);
