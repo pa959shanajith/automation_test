@@ -15,6 +15,7 @@ import {
   viewReport,
   openScreenshot,
   getAccessibilityData,
+  getDetails_AZURE,
 } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -43,7 +44,6 @@ export default function BasicDemo() {
   const [searchTest, setSearchTest] = useState("");
   const [inputSummary, setInputSummary] = useState("");
   const [inputDesc, setInputDesc] = useState("");
-  const [userData, setUserData] = useState({});
   const [visibleBug, setVisibleBug] = useState(false);
   const [logBug, setLogBug] = useState(false);
   const [bugTitle, setBugTitle] = useState("");
@@ -408,9 +408,16 @@ export default function BasicDemo() {
   const handleBug = (getBugtype) => {
     setVisibleBug(true);
     setBugTitle(getBugtype);
+    let resp = ""; 
     (async () => {
-      const resp = await getDetails_JIRA();
-      setUserData(resp);
+      if(getBugtype === "Jira"){
+        resp = await getDetails_JIRA();
+      } else {
+        resp = await getDetails_AZURE();
+      }
+      setLoginName(getBugtype === "Jira" ? resp?.jiraUsername : resp?.AzureUsername );
+      setLoginKey(getBugtype === "Jira" ? resp?.jirakey : resp?.AzurePAT);
+      setLoginUrl(getBugtype === "Jira" ? resp?.jiraURL : resp?.AzureURL);
     })();
   };
 
@@ -617,12 +624,6 @@ export default function BasicDemo() {
   };
 
   const treeData = convertDataToTree(reportViewData);
-
-  const onUserName = () => {
-    setLoginName(userData?.jiraUsername);
-    setLoginKey(userData?.jirakey);
-    setLoginUrl(userData?.jiraURL);
-  }
 
   useEffect(() => {
     const getState = { ...configValues };
@@ -1027,21 +1028,6 @@ export default function BasicDemo() {
           <span>Azure DevOps</span>
         </div>
       </OverlayPanel>
-      {userData?.jiraUsername && (
-        <OverlayPanel ref={userRef} className="jira_user">
-          <Menu
-            model={[
-              {
-                label: (
-                  <span onClick={() => onUserName()}>
-                    {userData?.jiraUsername}
-                  </span>
-                ),
-              },
-            ]}
-          />
-        </OverlayPanel>
-      )}
       <AvoModal
         visible={logBug}
         setVisible={setLogBug}
