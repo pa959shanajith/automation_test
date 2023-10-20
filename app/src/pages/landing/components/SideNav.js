@@ -73,7 +73,7 @@ const SideNav = () => {
         else {
             setDisableIconDialogVisible(true);
         };
-        if (name === "dashboard") {
+        if (name === "Dashboard") {
             window.open("/dashboard/#", '_blank');
             const dataHandledForDashBoard = {
                 login: JSON.stringify({
