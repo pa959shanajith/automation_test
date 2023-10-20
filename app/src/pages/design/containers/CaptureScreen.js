@@ -2093,7 +2093,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
         :
         <>
         {typesOfAppType ==="Web"?
-        <Dialog header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
+        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
           <div className="card">
             <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
               <Column rowReorder style={{ width: '3rem' }} />

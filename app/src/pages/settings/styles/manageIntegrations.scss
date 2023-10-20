@@ -48,7 +48,7 @@ height: 2.5rem !important;
 }
 .logout__btn{
     position: absolute !important;
-    left: 55rem !important;
+    left: 53rem !important;
     background: white !important;
     color: blue !important;
     .p-button{
@@ -233,12 +233,16 @@ height: 2.5rem !important;
 
 
 
-.Manage_Integrations {
-
+.manage_integrations {
     .p-dialog-content {
-
         overflow: hidden;
-
+    }
+    .p-dialog-header {
+        background: #e2e2ed !important;
+        padding: 0.75rem !important;
+    }
+    .p-dialog-footer{
+        padding: 0.5rem !important;
     }
 
 }
