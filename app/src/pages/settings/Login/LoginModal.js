@@ -164,18 +164,18 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
             setLoading(false);
             if (data.error) { setMsg(data.error); return; }
             if(data==="empty"){
-                dispatchAction(AzureLogin({ fieldName: "username", value: ""  }));
-                dispatchAction(AzureLogin({ fieldName: "password", value: ""  }));
-                dispatchAction(AzureLogin({ fieldName: "url", value: ""  }));
-                dispatchAction(AzureLogin({ fieldName: "token", value: ""  }));
+                dispatchAction(zephyrLogin({ fieldName: "username", value: ""  }));
+                dispatchAction(zephyrLogin({ fieldName: "password", value: ""  }));
+                dispatchAction(zephyrLogin({ fieldName: "url", value: ""  }));
+                dispatchAction(zephyrLogin({ fieldName: "token", value: ""  }));
                 setIsEmpty(true);
 
             }
             else{
-                dispatchAction(AzureLogin({ fieldName: "username", value: data.zephyrUsername  }));
-                dispatchAction(AzureLogin({ fieldName: "password", value: data.zephyrPassword  }));
-                dispatchAction(AzureLogin({ fieldName: "url", value: data.zephyrURL  }));
-                dispatchAction(AzureLogin({ fieldName: "token", value: data.zephyrToken  }));
+                dispatchAction(zephyrLogin({ fieldName: "username", value: data.zephyrUsername  }));
+                dispatchAction(zephyrLogin({ fieldName: "password", value: data.zephyrPassword  }));
+                dispatchAction(zephyrLogin({ fieldName: "url", value: data.zephyrURL  }));
+                dispatchAction(zephyrLogin({ fieldName: "token", value: data.zephyrToken  }));
                 setIsEmpty(false);
             }
         } catch (error) {
@@ -432,7 +432,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                 </div>
                                 <div className="url-cls">
                                     <span>Token <span style={{ color: 'red' }}>*</span></span>
-                                    <span style={{ marginLeft: '4.5rem' }}>
+                                    <span style={{ marginLeft: '3.7rem' }}>
                                         <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.token : zephyrLoginDetails.token} onChange={(e) => handleLogin('token', e.target.value)} />
                                         {/* <label htmlFor="username">Token</label> */}
                                     </span>
@@ -444,7 +444,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                      <span className="credentials__txt" style={{left:!isEmpty?"2rem":"8rem"}}>{isEmpty?"Save":"Update"} the credentials</span>
                                    </div>
                                     <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
-                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"4rem":"11rem"}}>
+                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"22rem":"11rem", bottom:!isEmpty?"2.5rem":""}}>
                                     </Button>
                                 </div>
                             </>)}
