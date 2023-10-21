@@ -81,7 +81,7 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
         </>
     )
 });
-const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBasic7, onHidedia,changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProjects, mobileDetailsBrowserStack, displayBasic7, onHidedia,changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
     smartMode, selectedICE, setSelectedICE,availableICE, dataExecution, browserlist, CheckStatusAndExecute, iceNameIdMap,browserstackUser,showBrowserstack }) => {
     const [newOsNames, setNewOsNames] = useState([])
     const [selectedOS, setSelectedOS] = useState('');
@@ -91,35 +91,67 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
     const [browserstackBrowsers, setBrowserstackBrowsers] = useState([]);
     const [selectedBrowserVersionsDetails, setSelectedBrowserVersionsDetails] = useState('');
     const [selectedBrowserVerionDetails, setselectedBrowserVerionDetails] = useState([]);
+    const [selectedMobilePlatforms, setSelectedMobilePlatforms] = useState('');
+    const [selectedMobileVersion, setSelectedMobileVersion] = useState('');
+    const [selectedDevices, setSelectedDevices] = useState('');
+    const [selectDevices, setDevices] = useState([]);
+    const [selectPlatforms, setPlatforms] = useState([]);
+    const [mobileVersion, setMobileVersion] = useState([]);
+    const [selectApk, setSelectApk] = useState('');
+    const [selectedApk, setApk] = useState([]);
      
     useEffect(() => {
-        setNewOsNames([])
-        setselectedBrowserVerionDetails([])
-        setBrowserstackOsVersion([])
-        setBrowserstackBrowsers([])
-        setSelectedBrowserVersions('')
-        setSelectedOsVersions('')
-        setSelectedOS('')
-        setSelectedBrowserVersionsDetails('')
+        setNewOsNames([]);
+        setselectedBrowserVerionDetails([]);
+        setBrowserstackOsVersion([]);
+        setBrowserstackBrowsers([]);
+        setSelectedBrowserVersions('');
+        setSelectedOsVersions('');
+        setSelectedOS('');
+        setSelectedBrowserVersionsDetails('');
+        setSelectedMobilePlatforms('');
+        setSelectedMobileVersion('');
+        setSelectedDevices('');
+        setSelectApk('');
+        setDevices([]);
+        setPlatforms([]);
+        setApk([]);
+      
         if (Object.keys(browserstackBrowserDetails).length) {
-            const osNamesArray = Object.entries(browserstackBrowserDetails.os_names).map(([key, value], index) => ({
-                key: key,
-                text: key,
-                title: key,
-                index: index,
-                versions: value, // Add the versions array to each OS object
-              }));
-          
-              setNewOsNames(osNamesArray);
-            
-              setBrowserstackOsVersion(Object.entries(browserstackBrowserDetails.os_names).map(([key, value], index) => ({
-                    key: key,
-                    text: key,
-                    title: key,
-                    index: index,
-                  })));
-                }
-              }, [browserstackBrowserDetails]);
+          const osNamesArray = Object.entries(browserstackBrowserDetails.os_names).map(([key, value], index) => ({
+            key: key,
+            text: key,
+            title: key,
+            index: index,
+            versions: value, // Add the versions array to each OS object
+          }));
+      
+          setNewOsNames(osNamesArray);
+          setBrowserstackOsVersion(
+            Object.entries(browserstackBrowserDetails.os_names).map(([key, value], index) => ({
+              key: key,
+              text: key,
+              title: key,
+              index: index,
+            })
+          ));
+        }
+      
+        if (mobileDetailsBrowserStack && Object.keys(mobileDetailsBrowserStack).length) {
+          const platformArray = Object.entries(mobileDetailsBrowserStack.devices).map(([key, value], index) => ({
+            key: key,
+            text: key,
+            title: key,
+            index: index,
+            versions: value,
+            name:value,
+          }));
+          setPlatforms(platformArray);
+        }
+      }, [browserstackBrowserDetails, mobileDetailsBrowserStack]);
+      
+      
+              
     const onOsChange = async (option) => {
         setselectedBrowserVerionDetails([])
         setBrowserstackOsVersion([])
@@ -189,68 +221,182 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
         const onBrowserVersionChange = (option) =>{
             setSelectedBrowserVersionsDetails(option.key)
         }
+
+        const onMobilePlatformChange = async (option) => {
+            setSelectedMobilePlatforms(option.key)
+            setSelectedMobileVersion('')
+            setSelectedDevices('')
+            setDevices([])
+            let findVersions = Object.keys(mobileDetailsBrowserStack.devices[option.key]).map((element, index) => ({
+                key: element,
+                text: element,
+                title: element,
+                index: index,
+                name:element,
+            }))
+            setMobileVersion(findVersions);
+        }
+        
+        const onMobileVersionChange = (option) => {
+            setSelectedMobileVersion(option.key);
+            setSelectedDevices('')
+            setDevices([])
+            let findDevices = Object.values(mobileDetailsBrowserStack.devices[selectedMobilePlatforms][option.key]).map((element, index) => ({
+                key: element,
+                text: element,
+                title: element,
+                index: index,
+                name:element,
+            }))
+            setDevices(findDevices);
+        }
+
+        const onDeviceChange = async (option) => {
+            setSelectedDevices(option.key)
+        }
+
+        const onApkChange = async (option) => {
+            setSelectedMobileVersion(option.key);
+            setSelectedDevices('')
+            setDevices([])
+            setSelectApk([])
+            let findapk = Object.entries(mobileDetailsBrowserStack.stored_files[option.key]).map(([key, value], index) => ({
+                key: key,
+                text: key,
+                title: key,
+                index: index,
+                versions: value,
+                name:value,
+            }))
+            setApk(findapk);
+        }    
     
     return (
         <>
             <AvoModal  header='Browserstack Integration' visible={displayBasic7} onModalBtnClick={() => onHidedia('displayBasic7')}
                 
             content={
-            <>
-                <div><h6>Operating Systems</h6></div>
-                <Dropdown
-                    // noItemsText={[]}
-                    onChange={(e)=>onOsChange(e.value)}
-                    options={newOsNames}
-                    value={selectedOS}
-                    valueTemplate={selectedOS}
-                    filter
-                    // width='15rem'
-                    optionLabel='key'
-                    placeholder='select OS'
-                    // calloutMaxHeight='12rem'
-                />
-                <div><h6>Operating Systems Versions</h6></div>
-                <Dropdown
-                    // noItemsText={[]}
-                    disabled={selectedOS == ''}
-                    onChange={(e)=>onOsVersionChange(e.value)}
-                    options={browserstackOsVersion}
-                    value={selectedOsVersions}
-                    valueTemplate={selectedOsVersions}
-                    filter
-                    // width='15rem'
-                    optionLabel='key'
-                    placeholder='select OS Versions'
-                    // calloutMaxHeight='12rem'
-                />
-                <div><h6>Browsers</h6></div>
-                <Dropdown
-                    // noItemsText={[]}
-                    disabled={selectedOsVersions == ''}
-                    onChange={(e)=>onBrowserSelect(e.value)}
-                    options={browserstackBrowsers}
-                    value={selectedBrowserVersions}
-                    filter
-                    valueTemplate={selectedBrowserVersions}
-                    // width='15rem'
-                    optionLabel='key'
-                    placeholder='select Browsers'
-                    // calloutMaxHeight='12rem'
-                />
-                <div><h6>Browser Versions</h6></div>
-                <Dropdown
-                    // noItemsText={[]}
-                    disabled={selectedBrowserVersions == ''}
-                    onChange={(e)=>onBrowserVersionChange(e.value)}
-                    options={selectedBrowserVerionDetails}
-                    value={selectedBrowserVersionsDetails}
-                    valueTemplate={selectedBrowserVersionsDetails}
-                    filter
-                    // width='15rem'
-                    optionLabel='key'
-                    placeholder='select Browser Versions'
-                    // calloutMaxHeight='10rem'
-                />
+                <>
+                {!showBrowserstack && <> 
+                    <div><h6>Operating Systems</h6></div>
+                    <Dropdown
+                        // noItemsText={[]}
+                        onChange={(e)=>onOsChange(e.value)}
+                        options={newOsNames}
+                        value={selectedOS}
+                        valueTemplate={selectedOS}
+                        filter
+                        // width='15rem'
+                        optionLabel='key'
+                        placeholder='select OS'
+                        // calloutMaxHeight='12rem'
+                    />
+                    </>}
+    
+                    {!showBrowserstack && <>
+                    <div><h6>Operating Systems Versions</h6></div>
+                    <Dropdown
+                        // noItemsText={[]}
+                        disabled={selectedOS == ''}
+                        onChange={(e)=>onOsVersionChange(e.value)}
+                        options={browserstackOsVersion}
+                        value={selectedOsVersions}
+                        valueTemplate={selectedOsVersions}
+                        filter
+                        // width='15rem'
+                        optionLabel='key'
+                        placeholder='select OS Versions'
+                        // calloutMaxHeight='12rem'
+                    />
+                    </>}
+    
+                    {!showBrowserstack && <>   
+                    <div><h6>Browsers</h6></div>
+                    <Dropdown
+                        // noItemsText={[]}
+                        disabled={selectedOsVersions == ''}
+                        onChange={(e)=>onBrowserSelect(e.value)}
+                        options={browserstackBrowsers}
+                        value={selectedBrowserVersions}
+                        filter
+                        valueTemplate={selectedBrowserVersions}
+                        // width='15rem'
+                        optionLabel='key'
+                        placeholder='select Browsers'
+                        // calloutMaxHeight='12rem'
+                    />
+                    </>}
+    
+                    {!showBrowserstack && <>
+                    <div><h6>Browser Versions</h6></div>
+                    <Dropdown
+                        // noItemsText={[]}
+                        disabled={selectedBrowserVersions == ''}
+                        onChange={(e)=>onBrowserVersionChange(e.value)}
+                        options={selectedBrowserVerionDetails}
+                        value={selectedBrowserVersionsDetails}
+                        valueTemplate={selectedBrowserVersionsDetails}
+                        filter
+                        // width='15rem'
+                        optionLabel='key'
+                        placeholder='select Browser Versions'
+                        // calloutMaxHeight='10rem'
+                    />
+                    </>}
+
+                    {showBrowserstack && <>   
+                    <div><h6>Platform</h6></div>
+                    <Dropdown 
+                        onChange={(e)=>onMobilePlatformChange(e.value)}
+                        options={selectPlatforms}
+                        value={selectedMobilePlatforms}
+                        filter
+                        valueTemplate={selectedMobilePlatforms}                    
+                        optionLabel='key'
+                        placeholder='select platform'
+                    />
+                    </>}
+
+                    {showBrowserstack && <>   
+                    <div><h6>versions</h6></div>
+                    <Dropdown
+                        onChange={(e)=>onMobileVersionChange(e.value)}
+                        options={mobileVersion}
+                        value={selectedMobileVersion}
+                        filter
+                        valueTemplate={selectedMobileVersion}
+                        optionLabel='key'
+                        placeholder='select version'
+                    />
+                    </>}
+
+                    {showBrowserstack && <>   
+                    <div><h6>devices</h6></div>
+                    <Dropdown
+                        onChange={(e)=>onDeviceChange(e.value)}
+                        options={selectDevices}
+                        value={selectedDevices}
+                        filter
+                        valueTemplate={selectedDevices}
+                        optionLabel='key'
+                        placeholder='select device'
+                    />
+                    </>}
+
+                    {selectProjects === 'MobileApp' && <>   
+                    <div><h6>uploaded apk</h6></div>
+                    <Dropdown
+                        onChange={(e)=>onApkChange(e.value)}
+                        options={selectedApk}
+                        value={selectApk}
+                        filter
+                        valueTemplate={selectApk}
+                        optionLabel='key'
+                        placeholder='select apk'
+                        className="w-full md:w-10rem"
+                    />
+                    </>}
+
                 <div>
                     <div>
                 <div className="legends-container">
@@ -288,7 +434,16 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
                         dataExecution['browserVersion'] = selectedBrowserVersionsDetails
                         dataExecution['browserName'] = selectedBrowserVersions;
                         dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedBrowserVersions)[0].key]
-                    }
+                    } else {
+                        dataExecution["browserType"] = ['1']
+                        dataExecution['mobile'] = {
+                            "platformName": selectedMobilePlatforms,
+                            "deviceName": selectedDevices,
+                            "platformVersion": selectedMobileVersion,
+                            "uploadedApk": selectedApk
+                            
+                        }
+                    }        
                     CheckStatusAndExecute(dataExecution, iceNameIdMap);
                     setNewOsNames([]);
                     setSelectedOS('');
